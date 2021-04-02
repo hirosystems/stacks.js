@@ -1,0 +1,3091 @@
+{
+	"id": 0,
+	"name": "Stacks.js 1.0.0-beta.13 Library Reference",
+	"kind": 0,
+	"kindString": "Project",
+	"flags": {},
+	"children": [
+		{
+			"id": 72,
+			"name": "BNSContractCallOptions",
+			"kind": 256,
+			"kindString": "Interface",
+			"flags": {},
+			"children": [
+				{
+					"id": 77,
+					"name": "attachment",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {
+						"isOptional": true
+					},
+					"sources": [
+						{
+							"fileName": "index.ts",
+							"line": 63,
+							"character": 12
+						}
+					],
+					"type": {
+						"type": "reference",
+						"name": "Buffer"
+					}
+				},
+				{
+					"id": 74,
+					"name": "functionArgs",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {},
+					"sources": [
+						{
+							"fileName": "index.ts",
+							"line": 60,
+							"character": 14
+						}
+					],
+					"type": {
+						"type": "array",
+						"elementType": {
+							"type": "reference",
+							"name": "ClarityValue"
+						}
+					}
+				},
+				{
+					"id": 73,
+					"name": "functionName",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {},
+					"sources": [
+						{
+							"fileName": "index.ts",
+							"line": 59,
+							"character": 14
+						}
+					],
+					"type": {
+						"type": "intrinsic",
+						"name": "string"
+					}
+				},
+				{
+					"id": 76,
+					"name": "network",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {},
+					"sources": [
+						{
+							"fileName": "index.ts",
+							"line": 62,
+							"character": 9
+						}
+					],
+					"type": {
+						"type": "reference",
+						"name": "StacksNetwork"
+					}
+				},
+				{
+					"id": 75,
+					"name": "senderKey",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {},
+					"sources": [
+						{
+							"fileName": "index.ts",
+							"line": 61,
+							"character": 11
+						}
+					],
+					"type": {
+						"type": "intrinsic",
+						"name": "string"
+					}
+				}
+			],
+			"groups": [
+				{
+					"title": "Properties",
+					"kind": 1024,
+					"children": [
+						77,
+						74,
+						73,
+						76,
+						75
+					]
+				}
+			],
+			"sources": [
+				{
+					"fileName": "index.ts",
+					"line": 58,
+					"character": 39
+				}
+			]
+		},
+		{
+			"id": 78,
+			"name": "BNSReadOnlyOptions",
+			"kind": 256,
+			"kindString": "Interface",
+			"flags": {},
+			"children": [
+				{
+					"id": 80,
+					"name": "functionArgs",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {},
+					"sources": [
+						{
+							"fileName": "index.ts",
+							"line": 100,
+							"character": 14
+						}
+					],
+					"type": {
+						"type": "array",
+						"elementType": {
+							"type": "reference",
+							"name": "ClarityValue"
+						}
+					}
+				},
+				{
+					"id": 79,
+					"name": "functionName",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {},
+					"sources": [
+						{
+							"fileName": "index.ts",
+							"line": 99,
+							"character": 14
+						}
+					],
+					"type": {
+						"type": "intrinsic",
+						"name": "string"
+					}
+				},
+				{
+					"id": 82,
+					"name": "network",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {},
+					"sources": [
+						{
+							"fileName": "index.ts",
+							"line": 102,
+							"character": 9
+						}
+					],
+					"type": {
+						"type": "reference",
+						"name": "StacksNetwork"
+					}
+				},
+				{
+					"id": 81,
+					"name": "senderAddress",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {},
+					"sources": [
+						{
+							"fileName": "index.ts",
+							"line": 101,
+							"character": 15
+						}
+					],
+					"type": {
+						"type": "intrinsic",
+						"name": "string"
+					}
+				}
+			],
+			"groups": [
+				{
+					"title": "Properties",
+					"kind": 1024,
+					"children": [
+						80,
+						79,
+						82,
+						81
+					]
+				}
+			],
+			"sources": [
+				{
+					"fileName": "index.ts",
+					"line": 98,
+					"character": 35
+				}
+			]
+		},
+		{
+			"id": 97,
+			"name": "ImportNameOptions",
+			"kind": 256,
+			"kindString": "Interface",
+			"flags": {},
+			"comment": {
+				"shortText": "Namespace name import options",
+				"tags": [
+					{
+						"tag": "param",
+						"text": "the namespace to import name into",
+						"param": "namespace"
+					},
+					{
+						"tag": "param",
+						"text": "the name to import",
+						"param": "name"
+					},
+					{
+						"tag": "param",
+						"text": "the address to register the name to",
+						"param": "beneficiary"
+					},
+					{
+						"tag": "param",
+						"text": "the zonefile hash to register",
+						"param": "zonefileHash"
+					},
+					{
+						"tag": "param",
+						"text": "the private key to sign the transaction",
+						"param": "privateKey"
+					},
+					{
+						"tag": "param",
+						"text": "the Stacks blockchain network to register on\n",
+						"param": "network"
+					}
+				]
+			},
+			"children": [
+				{
+					"id": 100,
+					"name": "beneficiary",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {},
+					"sources": [
+						{
+							"fileName": "index.ts",
+							"line": 389,
+							"character": 13
+						}
+					],
+					"type": {
+						"type": "intrinsic",
+						"name": "string"
+					}
+				},
+				{
+					"id": 99,
+					"name": "name",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {},
+					"sources": [
+						{
+							"fileName": "index.ts",
+							"line": 388,
+							"character": 6
+						}
+					],
+					"type": {
+						"type": "intrinsic",
+						"name": "string"
+					}
+				},
+				{
+					"id": 98,
+					"name": "namespace",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {},
+					"sources": [
+						{
+							"fileName": "index.ts",
+							"line": 387,
+							"character": 11
+						}
+					],
+					"type": {
+						"type": "intrinsic",
+						"name": "string"
+					}
+				},
+				{
+					"id": 103,
+					"name": "network",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {
+						"isOptional": true
+					},
+					"sources": [
+						{
+							"fileName": "index.ts",
+							"line": 392,
+							"character": 9
+						}
+					],
+					"type": {
+						"type": "reference",
+						"name": "StacksNetwork"
+					}
+				},
+				{
+					"id": 102,
+					"name": "privateKey",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {},
+					"sources": [
+						{
+							"fileName": "index.ts",
+							"line": 391,
+							"character": 12
+						}
+					],
+					"type": {
+						"type": "intrinsic",
+						"name": "string"
+					}
+				},
+				{
+					"id": 101,
+					"name": "zonefile",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {},
+					"sources": [
+						{
+							"fileName": "index.ts",
+							"line": 390,
+							"character": 10
+						}
+					],
+					"type": {
+						"type": "intrinsic",
+						"name": "string"
+					}
+				}
+			],
+			"groups": [
+				{
+					"title": "Properties",
+					"kind": 1024,
+					"children": [
+						100,
+						99,
+						98,
+						103,
+						102,
+						101
+					]
+				}
+			],
+			"sources": [
+				{
+					"fileName": "index.ts",
+					"line": 386,
+					"character": 34
+				}
+			]
+		},
+		{
+			"id": 108,
+			"name": "PreorderNameOptions",
+			"kind": 256,
+			"kindString": "Interface",
+			"flags": {},
+			"comment": {
+				"shortText": "Preorder name options",
+				"tags": [
+					{
+						"tag": "param",
+						"text": "the fully qualified name to preorder including the\n                                       namespace (myName.id)",
+						"param": "fullyQualifiedName"
+					},
+					{
+						"tag": "param",
+						"text": "salt used to generate the preorder name hash",
+						"param": "salt"
+					},
+					{
+						"tag": "param",
+						"text": "amount of STX to burn for the registration",
+						"param": "stxToBurn"
+					},
+					{
+						"tag": "param",
+						"text": "the private key to sign the transaction",
+						"param": "privateKey"
+					},
+					{
+						"tag": "param",
+						"text": "the Stacks blockchain network to register on\n",
+						"param": "network"
+					}
+				]
+			},
+			"children": [
+				{
+					"id": 109,
+					"name": "fullyQualifiedName",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {},
+					"sources": [
+						{
+							"fileName": "index.ts",
+							"line": 484,
+							"character": 20
+						}
+					],
+					"type": {
+						"type": "intrinsic",
+						"name": "string"
+					}
+				},
+				{
+					"id": 113,
+					"name": "network",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {
+						"isOptional": true
+					},
+					"sources": [
+						{
+							"fileName": "index.ts",
+							"line": 488,
+							"character": 9
+						}
+					],
+					"type": {
+						"type": "reference",
+						"name": "StacksNetwork"
+					}
+				},
+				{
+					"id": 112,
+					"name": "privateKey",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {},
+					"sources": [
+						{
+							"fileName": "index.ts",
+							"line": 487,
+							"character": 12
+						}
+					],
+					"type": {
+						"type": "intrinsic",
+						"name": "string"
+					}
+				},
+				{
+					"id": 110,
+					"name": "salt",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {},
+					"sources": [
+						{
+							"fileName": "index.ts",
+							"line": 485,
+							"character": 6
+						}
+					],
+					"type": {
+						"type": "intrinsic",
+						"name": "string"
+					}
+				},
+				{
+					"id": 111,
+					"name": "stxToBurn",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {},
+					"sources": [
+						{
+							"fileName": "index.ts",
+							"line": 486,
+							"character": 11
+						}
+					],
+					"type": {
+						"type": "reference",
+						"name": "BN"
+					}
+				}
+			],
+			"groups": [
+				{
+					"title": "Properties",
+					"kind": 1024,
+					"children": [
+						109,
+						113,
+						112,
+						110,
+						111
+					]
+				}
+			],
+			"sources": [
+				{
+					"fileName": "index.ts",
+					"line": 483,
+					"character": 36
+				}
+			]
+		},
+		{
+			"id": 83,
+			"name": "PreorderNamespaceOptions",
+			"kind": 256,
+			"kindString": "Interface",
+			"flags": {},
+			"comment": {
+				"shortText": "Preorder namespace options",
+				"tags": [
+					{
+						"tag": "param",
+						"text": "the namespace to preorder",
+						"param": "namespace"
+					},
+					{
+						"tag": "param",
+						"text": "salt used to generate the preorder namespace hash",
+						"param": "salt"
+					},
+					{
+						"tag": "param",
+						"text": "amount of STX to burn for the registration",
+						"param": "stxToBurn"
+					},
+					{
+						"tag": "param",
+						"text": "the private key to sign the transaction",
+						"param": "privateKey"
+					},
+					{
+						"tag": "param",
+						"text": "the Stacks blockchain network to register on\n",
+						"param": "network"
+					}
+				]
+			},
+			"children": [
+				{
+					"id": 84,
+					"name": "namespace",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {},
+					"sources": [
+						{
+							"fileName": "index.ts",
+							"line": 259,
+							"character": 11
+						}
+					],
+					"type": {
+						"type": "intrinsic",
+						"name": "string"
+					}
+				},
+				{
+					"id": 88,
+					"name": "network",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {
+						"isOptional": true
+					},
+					"sources": [
+						{
+							"fileName": "index.ts",
+							"line": 263,
+							"character": 9
+						}
+					],
+					"type": {
+						"type": "reference",
+						"name": "StacksNetwork"
+					}
+				},
+				{
+					"id": 87,
+					"name": "privateKey",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {},
+					"sources": [
+						{
+							"fileName": "index.ts",
+							"line": 262,
+							"character": 12
+						}
+					],
+					"type": {
+						"type": "intrinsic",
+						"name": "string"
+					}
+				},
+				{
+					"id": 85,
+					"name": "salt",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {},
+					"sources": [
+						{
+							"fileName": "index.ts",
+							"line": 260,
+							"character": 6
+						}
+					],
+					"type": {
+						"type": "intrinsic",
+						"name": "string"
+					}
+				},
+				{
+					"id": 86,
+					"name": "stxToBurn",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {},
+					"sources": [
+						{
+							"fileName": "index.ts",
+							"line": 261,
+							"character": 11
+						}
+					],
+					"type": {
+						"type": "reference",
+						"name": "BN"
+					}
+				}
+			],
+			"groups": [
+				{
+					"title": "Properties",
+					"kind": 1024,
+					"children": [
+						84,
+						88,
+						87,
+						85,
+						86
+					]
+				}
+			],
+			"sources": [
+				{
+					"fileName": "index.ts",
+					"line": 258,
+					"character": 41
+				}
+			]
+		},
+		{
+			"id": 104,
+			"name": "ReadyNamespaceOptions",
+			"kind": 256,
+			"kindString": "Interface",
+			"flags": {},
+			"comment": {
+				"shortText": "Ready namespace options",
+				"tags": [
+					{
+						"tag": "param",
+						"text": "the namespace to ready",
+						"param": "namespace"
+					},
+					{
+						"tag": "param",
+						"text": "the private key to sign the transaction",
+						"param": "privateKey"
+					},
+					{
+						"tag": "param",
+						"text": "the Stacks blockchain network to register on\n",
+						"param": "network"
+					}
+				]
+			},
+			"children": [
+				{
+					"id": 105,
+					"name": "namespace",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {},
+					"sources": [
+						{
+							"fileName": "index.ts",
+							"line": 439,
+							"character": 11
+						}
+					],
+					"type": {
+						"type": "intrinsic",
+						"name": "string"
+					}
+				},
+				{
+					"id": 107,
+					"name": "network",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {
+						"isOptional": true
+					},
+					"sources": [
+						{
+							"fileName": "index.ts",
+							"line": 441,
+							"character": 9
+						}
+					],
+					"type": {
+						"type": "reference",
+						"name": "StacksNetwork"
+					}
+				},
+				{
+					"id": 106,
+					"name": "privateKey",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {},
+					"sources": [
+						{
+							"fileName": "index.ts",
+							"line": 440,
+							"character": 12
+						}
+					],
+					"type": {
+						"type": "intrinsic",
+						"name": "string"
+					}
+				}
+			],
+			"groups": [
+				{
+					"title": "Properties",
+					"kind": 1024,
+					"children": [
+						105,
+						107,
+						106
+					]
+				}
+			],
+			"sources": [
+				{
+					"fileName": "index.ts",
+					"line": 438,
+					"character": 38
+				}
+			]
+		},
+		{
+			"id": 114,
+			"name": "RegisterNameOptions",
+			"kind": 256,
+			"kindString": "Interface",
+			"flags": {},
+			"comment": {
+				"shortText": "Register name options",
+				"tags": [
+					{
+						"tag": "param",
+						"text": "the fully qualified name to preorder including the\n                                       namespace (myName.id)",
+						"param": "fullyQualifiedName"
+					},
+					{
+						"tag": "param",
+						"text": "salt used to generate the preorder name hash",
+						"param": "salt"
+					},
+					{
+						"tag": "param",
+						"text": "the zonefile to register with the name",
+						"param": "zonefile"
+					},
+					{
+						"tag": "param",
+						"text": "the private key to sign the transaction",
+						"param": "privateKey"
+					},
+					{
+						"tag": "param",
+						"text": "the Stacks blockchain network to register on\n",
+						"param": "network"
+					}
+				]
+			},
+			"children": [
+				{
+					"id": 115,
+					"name": "fullyQualifiedName",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {},
+					"sources": [
+						{
+							"fileName": "index.ts",
+							"line": 540,
+							"character": 20
+						}
+					],
+					"type": {
+						"type": "intrinsic",
+						"name": "string"
+					}
+				},
+				{
+					"id": 119,
+					"name": "network",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {
+						"isOptional": true
+					},
+					"sources": [
+						{
+							"fileName": "index.ts",
+							"line": 544,
+							"character": 9
+						}
+					],
+					"type": {
+						"type": "reference",
+						"name": "StacksNetwork"
+					}
+				},
+				{
+					"id": 118,
+					"name": "privateKey",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {},
+					"sources": [
+						{
+							"fileName": "index.ts",
+							"line": 543,
+							"character": 12
+						}
+					],
+					"type": {
+						"type": "intrinsic",
+						"name": "string"
+					}
+				},
+				{
+					"id": 116,
+					"name": "salt",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {},
+					"sources": [
+						{
+							"fileName": "index.ts",
+							"line": 541,
+							"character": 6
+						}
+					],
+					"type": {
+						"type": "intrinsic",
+						"name": "string"
+					}
+				},
+				{
+					"id": 117,
+					"name": "zonefile",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {},
+					"sources": [
+						{
+							"fileName": "index.ts",
+							"line": 542,
+							"character": 10
+						}
+					],
+					"type": {
+						"type": "intrinsic",
+						"name": "string"
+					}
+				}
+			],
+			"groups": [
+				{
+					"title": "Properties",
+					"kind": 1024,
+					"children": [
+						115,
+						119,
+						118,
+						116,
+						117
+					]
+				}
+			],
+			"sources": [
+				{
+					"fileName": "index.ts",
+					"line": 539,
+					"character": 36
+				}
+			]
+		},
+		{
+			"id": 135,
+			"name": "RenewNameOptions",
+			"kind": 256,
+			"kindString": "Interface",
+			"flags": {},
+			"comment": {
+				"shortText": "Renew name options",
+				"tags": [
+					{
+						"tag": "param",
+						"text": "the fully qualified name to renew including the\n                                       namespace (myName.id)",
+						"param": "fullyQualifiedName"
+					},
+					{
+						"tag": "param",
+						"text": "amount of STX to burn for the registration",
+						"param": "stxToBurn"
+					},
+					{
+						"tag": "param",
+						"text": "the private key to sign the transaction",
+						"param": "privateKey"
+					},
+					{
+						"tag": "param",
+						"text": "optionally choose a new owner address",
+						"param": "newOwnerAddress"
+					},
+					{
+						"tag": "param",
+						"text": "optionally update the zonefile hash",
+						"param": "zonefileHash"
+					},
+					{
+						"tag": "param",
+						"text": "the Stacks blockchain network to register on\n",
+						"param": "network"
+					}
+				]
+			},
+			"children": [
+				{
+					"id": 136,
+					"name": "fullyQualifiedName",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {},
+					"sources": [
+						{
+							"fileName": "index.ts",
+							"line": 760,
+							"character": 20
+						}
+					],
+					"type": {
+						"type": "intrinsic",
+						"name": "string"
+					}
+				},
+				{
+					"id": 141,
+					"name": "network",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {
+						"isOptional": true
+					},
+					"sources": [
+						{
+							"fileName": "index.ts",
+							"line": 765,
+							"character": 9
+						}
+					],
+					"type": {
+						"type": "reference",
+						"name": "StacksNetwork"
+					}
+				},
+				{
+					"id": 139,
+					"name": "newOwnerAddress",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {
+						"isOptional": true
+					},
+					"sources": [
+						{
+							"fileName": "index.ts",
+							"line": 763,
+							"character": 17
+						}
+					],
+					"type": {
+						"type": "intrinsic",
+						"name": "string"
+					}
+				},
+				{
+					"id": 138,
+					"name": "privateKey",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {},
+					"sources": [
+						{
+							"fileName": "index.ts",
+							"line": 762,
+							"character": 12
+						}
+					],
+					"type": {
+						"type": "intrinsic",
+						"name": "string"
+					}
+				},
+				{
+					"id": 137,
+					"name": "stxToBurn",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {},
+					"sources": [
+						{
+							"fileName": "index.ts",
+							"line": 761,
+							"character": 11
+						}
+					],
+					"type": {
+						"type": "reference",
+						"name": "BN"
+					}
+				},
+				{
+					"id": 140,
+					"name": "zonefile",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {
+						"isOptional": true
+					},
+					"sources": [
+						{
+							"fileName": "index.ts",
+							"line": 764,
+							"character": 10
+						}
+					],
+					"type": {
+						"type": "intrinsic",
+						"name": "string"
+					}
+				}
+			],
+			"groups": [
+				{
+					"title": "Properties",
+					"kind": 1024,
+					"children": [
+						136,
+						141,
+						139,
+						138,
+						137,
+						140
+					]
+				}
+			],
+			"sources": [
+				{
+					"fileName": "index.ts",
+					"line": 759,
+					"character": 33
+				}
+			]
+		},
+		{
+			"id": 89,
+			"name": "RevealNamespaceOptions",
+			"kind": 256,
+			"kindString": "Interface",
+			"flags": {},
+			"comment": {
+				"shortText": "Reveal namespace options",
+				"tags": [
+					{
+						"tag": "param",
+						"text": "the namespace to reveal",
+						"param": "namespace"
+					},
+					{
+						"tag": "param",
+						"text": "salt used to generate the preorder namespace hash",
+						"param": "salt"
+					},
+					{
+						"tag": "param",
+						"text": "an object containing the price function for the namespace",
+						"param": "priceFunction"
+					},
+					{
+						"tag": "param",
+						"text": "the number of blocks name registrations are valid for in the namespace",
+						"param": "lifeTime"
+					},
+					{
+						"tag": "param",
+						"text": "the STX address used for name imports",
+						"param": "namespaceImportAddress"
+					},
+					{
+						"tag": "param",
+						"text": "the private key to sign the transaction",
+						"param": "privateKey"
+					},
+					{
+						"tag": "param",
+						"text": "the Stacks blockchain network to register on\n",
+						"param": "network"
+					}
+				]
+			},
+			"children": [
+				{
+					"id": 93,
+					"name": "lifetime",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {},
+					"sources": [
+						{
+							"fileName": "index.ts",
+							"line": 315,
+							"character": 10
+						}
+					],
+					"type": {
+						"type": "reference",
+						"name": "BN"
+					}
+				},
+				{
+					"id": 90,
+					"name": "namespace",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {},
+					"sources": [
+						{
+							"fileName": "index.ts",
+							"line": 312,
+							"character": 11
+						}
+					],
+					"type": {
+						"type": "intrinsic",
+						"name": "string"
+					}
+				},
+				{
+					"id": 94,
+					"name": "namespaceImportAddress",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {},
+					"sources": [
+						{
+							"fileName": "index.ts",
+							"line": 316,
+							"character": 24
+						}
+					],
+					"type": {
+						"type": "intrinsic",
+						"name": "string"
+					}
+				},
+				{
+					"id": 96,
+					"name": "network",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {
+						"isOptional": true
+					},
+					"sources": [
+						{
+							"fileName": "index.ts",
+							"line": 318,
+							"character": 9
+						}
+					],
+					"type": {
+						"type": "reference",
+						"name": "StacksNetwork"
+					}
+				},
+				{
+					"id": 92,
+					"name": "priceFunction",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {},
+					"sources": [
+						{
+							"fileName": "index.ts",
+							"line": 314,
+							"character": 15
+						}
+					],
+					"type": {
+						"type": "reference",
+						"id": 50,
+						"name": "PriceFunction"
+					}
+				},
+				{
+					"id": 95,
+					"name": "privateKey",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {},
+					"sources": [
+						{
+							"fileName": "index.ts",
+							"line": 317,
+							"character": 12
+						}
+					],
+					"type": {
+						"type": "intrinsic",
+						"name": "string"
+					}
+				},
+				{
+					"id": 91,
+					"name": "salt",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {},
+					"sources": [
+						{
+							"fileName": "index.ts",
+							"line": 313,
+							"character": 6
+						}
+					],
+					"type": {
+						"type": "intrinsic",
+						"name": "string"
+					}
+				}
+			],
+			"groups": [
+				{
+					"title": "Properties",
+					"kind": 1024,
+					"children": [
+						93,
+						90,
+						94,
+						96,
+						92,
+						95,
+						91
+					]
+				}
+			],
+			"sources": [
+				{
+					"fileName": "index.ts",
+					"line": 311,
+					"character": 39
+				}
+			]
+		},
+		{
+			"id": 131,
+			"name": "RevokeNameOptions",
+			"kind": 256,
+			"kindString": "Interface",
+			"flags": {},
+			"comment": {
+				"shortText": "Revoke name options",
+				"tags": [
+					{
+						"tag": "param",
+						"text": "the fully qualified name to revoke including the\n                                       namespace (myName.id)",
+						"param": "fullyQualifiedName"
+					},
+					{
+						"tag": "param",
+						"text": "the private key to sign the transaction",
+						"param": "privateKey"
+					},
+					{
+						"tag": "param",
+						"text": "the Stacks blockchain network to register on\n",
+						"param": "network"
+					}
+				]
+			},
+			"children": [
+				{
+					"id": 132,
+					"name": "fullyQualifiedName",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {},
+					"sources": [
+						{
+							"fileName": "index.ts",
+							"line": 710,
+							"character": 20
+						}
+					],
+					"type": {
+						"type": "intrinsic",
+						"name": "string"
+					}
+				},
+				{
+					"id": 134,
+					"name": "network",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {
+						"isOptional": true
+					},
+					"sources": [
+						{
+							"fileName": "index.ts",
+							"line": 712,
+							"character": 9
+						}
+					],
+					"type": {
+						"type": "reference",
+						"name": "StacksNetwork"
+					}
+				},
+				{
+					"id": 133,
+					"name": "privateKey",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {},
+					"sources": [
+						{
+							"fileName": "index.ts",
+							"line": 711,
+							"character": 12
+						}
+					],
+					"type": {
+						"type": "intrinsic",
+						"name": "string"
+					}
+				}
+			],
+			"groups": [
+				{
+					"title": "Properties",
+					"kind": 1024,
+					"children": [
+						132,
+						134,
+						133
+					]
+				}
+			],
+			"sources": [
+				{
+					"fileName": "index.ts",
+					"line": 709,
+					"character": 34
+				}
+			]
+		},
+		{
+			"id": 125,
+			"name": "TransferNameOptions",
+			"kind": 256,
+			"kindString": "Interface",
+			"flags": {},
+			"comment": {
+				"shortText": "Transfer name options",
+				"tags": [
+					{
+						"tag": "param",
+						"text": "the fully qualified name to transfer including the\n                                       namespace (myName.id)",
+						"param": "fullyQualifiedName"
+					},
+					{
+						"tag": "param",
+						"text": "the recipient address of the name transfer",
+						"param": "newOwnerAddress"
+					},
+					{
+						"tag": "param",
+						"text": "the optional zonefile to register with the name",
+						"param": "zonefile"
+					},
+					{
+						"tag": "param",
+						"text": "the private key to sign the transaction",
+						"param": "privateKey"
+					},
+					{
+						"tag": "param",
+						"text": "the Stacks blockchain network to register on\n",
+						"param": "network"
+					}
+				]
+			},
+			"children": [
+				{
+					"id": 126,
+					"name": "fullyQualifiedName",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {},
+					"sources": [
+						{
+							"fileName": "index.ts",
+							"line": 651,
+							"character": 20
+						}
+					],
+					"type": {
+						"type": "intrinsic",
+						"name": "string"
+					}
+				},
+				{
+					"id": 130,
+					"name": "network",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {
+						"isOptional": true
+					},
+					"sources": [
+						{
+							"fileName": "index.ts",
+							"line": 655,
+							"character": 9
+						}
+					],
+					"type": {
+						"type": "reference",
+						"name": "StacksNetwork"
+					}
+				},
+				{
+					"id": 127,
+					"name": "newOwnerAddress",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {},
+					"sources": [
+						{
+							"fileName": "index.ts",
+							"line": 652,
+							"character": 17
+						}
+					],
+					"type": {
+						"type": "intrinsic",
+						"name": "string"
+					}
+				},
+				{
+					"id": 128,
+					"name": "privateKey",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {},
+					"sources": [
+						{
+							"fileName": "index.ts",
+							"line": 653,
+							"character": 12
+						}
+					],
+					"type": {
+						"type": "intrinsic",
+						"name": "string"
+					}
+				},
+				{
+					"id": 129,
+					"name": "zonefile",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {
+						"isOptional": true
+					},
+					"sources": [
+						{
+							"fileName": "index.ts",
+							"line": 654,
+							"character": 10
+						}
+					],
+					"type": {
+						"type": "intrinsic",
+						"name": "string"
+					}
+				}
+			],
+			"groups": [
+				{
+					"title": "Properties",
+					"kind": 1024,
+					"children": [
+						126,
+						130,
+						127,
+						128,
+						129
+					]
+				}
+			],
+			"sources": [
+				{
+					"fileName": "index.ts",
+					"line": 650,
+					"character": 36
+				}
+			]
+		},
+		{
+			"id": 120,
+			"name": "UpdateNameOptions",
+			"kind": 256,
+			"kindString": "Interface",
+			"flags": {},
+			"comment": {
+				"shortText": "Update name options",
+				"tags": [
+					{
+						"tag": "param",
+						"text": "the fully qualified name to update including the\n                                       namespace (myName.id)",
+						"param": "fullyQualifiedName"
+					},
+					{
+						"tag": "param",
+						"text": "the zonefile to register with the name",
+						"param": "zonefile"
+					},
+					{
+						"tag": "param",
+						"text": "the private key to sign the transaction",
+						"param": "privateKey"
+					},
+					{
+						"tag": "param",
+						"text": "the Stacks blockchain network to register on\n",
+						"param": "network"
+					}
+				]
+			},
+			"children": [
+				{
+					"id": 121,
+					"name": "fullyQualifiedName",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {},
+					"sources": [
+						{
+							"fileName": "index.ts",
+							"line": 597,
+							"character": 20
+						}
+					],
+					"type": {
+						"type": "intrinsic",
+						"name": "string"
+					}
+				},
+				{
+					"id": 124,
+					"name": "network",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {
+						"isOptional": true
+					},
+					"sources": [
+						{
+							"fileName": "index.ts",
+							"line": 600,
+							"character": 9
+						}
+					],
+					"type": {
+						"type": "reference",
+						"name": "StacksNetwork"
+					}
+				},
+				{
+					"id": 123,
+					"name": "privateKey",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {},
+					"sources": [
+						{
+							"fileName": "index.ts",
+							"line": 599,
+							"character": 12
+						}
+					],
+					"type": {
+						"type": "intrinsic",
+						"name": "string"
+					}
+				},
+				{
+					"id": 122,
+					"name": "zonefile",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {},
+					"sources": [
+						{
+							"fileName": "index.ts",
+							"line": 598,
+							"character": 10
+						}
+					],
+					"type": {
+						"type": "intrinsic",
+						"name": "string"
+					}
+				}
+			],
+			"groups": [
+				{
+					"title": "Properties",
+					"kind": 1024,
+					"children": [
+						121,
+						124,
+						123,
+						122
+					]
+				}
+			],
+			"sources": [
+				{
+					"fileName": "index.ts",
+					"line": 596,
+					"character": 34
+				}
+			]
+		},
+		{
+			"id": 50,
+			"name": "PriceFunction",
+			"kind": 4194304,
+			"kindString": "Type alias",
+			"flags": {},
+			"sources": [
+				{
+					"fileName": "index.ts",
+					"line": 35,
+					"character": 25
+				}
+			],
+			"type": {
+				"type": "reflection",
+				"declaration": {
+					"id": 51,
+					"name": "__type",
+					"kind": 65536,
+					"kindString": "Type literal",
+					"flags": {},
+					"children": [
+						{
+							"id": 54,
+							"name": "b1",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {},
+							"sources": [
+								{
+									"fileName": "index.ts",
+									"line": 38,
+									"character": 4
+								}
+							],
+							"type": {
+								"type": "reference",
+								"name": "BN"
+							}
+						},
+						{
+							"id": 63,
+							"name": "b10",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {},
+							"sources": [
+								{
+									"fileName": "index.ts",
+									"line": 47,
+									"character": 5
+								}
+							],
+							"type": {
+								"type": "reference",
+								"name": "BN"
+							}
+						},
+						{
+							"id": 64,
+							"name": "b11",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {},
+							"sources": [
+								{
+									"fileName": "index.ts",
+									"line": 48,
+									"character": 5
+								}
+							],
+							"type": {
+								"type": "reference",
+								"name": "BN"
+							}
+						},
+						{
+							"id": 65,
+							"name": "b12",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {},
+							"sources": [
+								{
+									"fileName": "index.ts",
+									"line": 49,
+									"character": 5
+								}
+							],
+							"type": {
+								"type": "reference",
+								"name": "BN"
+							}
+						},
+						{
+							"id": 66,
+							"name": "b13",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {},
+							"sources": [
+								{
+									"fileName": "index.ts",
+									"line": 50,
+									"character": 5
+								}
+							],
+							"type": {
+								"type": "reference",
+								"name": "BN"
+							}
+						},
+						{
+							"id": 67,
+							"name": "b14",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {},
+							"sources": [
+								{
+									"fileName": "index.ts",
+									"line": 51,
+									"character": 5
+								}
+							],
+							"type": {
+								"type": "reference",
+								"name": "BN"
+							}
+						},
+						{
+							"id": 68,
+							"name": "b15",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {},
+							"sources": [
+								{
+									"fileName": "index.ts",
+									"line": 52,
+									"character": 5
+								}
+							],
+							"type": {
+								"type": "reference",
+								"name": "BN"
+							}
+						},
+						{
+							"id": 69,
+							"name": "b16",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {},
+							"sources": [
+								{
+									"fileName": "index.ts",
+									"line": 53,
+									"character": 5
+								}
+							],
+							"type": {
+								"type": "reference",
+								"name": "BN"
+							}
+						},
+						{
+							"id": 55,
+							"name": "b2",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {},
+							"sources": [
+								{
+									"fileName": "index.ts",
+									"line": 39,
+									"character": 4
+								}
+							],
+							"type": {
+								"type": "reference",
+								"name": "BN"
+							}
+						},
+						{
+							"id": 56,
+							"name": "b3",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {},
+							"sources": [
+								{
+									"fileName": "index.ts",
+									"line": 40,
+									"character": 4
+								}
+							],
+							"type": {
+								"type": "reference",
+								"name": "BN"
+							}
+						},
+						{
+							"id": 57,
+							"name": "b4",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {},
+							"sources": [
+								{
+									"fileName": "index.ts",
+									"line": 41,
+									"character": 4
+								}
+							],
+							"type": {
+								"type": "reference",
+								"name": "BN"
+							}
+						},
+						{
+							"id": 58,
+							"name": "b5",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {},
+							"sources": [
+								{
+									"fileName": "index.ts",
+									"line": 42,
+									"character": 4
+								}
+							],
+							"type": {
+								"type": "reference",
+								"name": "BN"
+							}
+						},
+						{
+							"id": 59,
+							"name": "b6",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {},
+							"sources": [
+								{
+									"fileName": "index.ts",
+									"line": 43,
+									"character": 4
+								}
+							],
+							"type": {
+								"type": "reference",
+								"name": "BN"
+							}
+						},
+						{
+							"id": 60,
+							"name": "b7",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {},
+							"sources": [
+								{
+									"fileName": "index.ts",
+									"line": 44,
+									"character": 4
+								}
+							],
+							"type": {
+								"type": "reference",
+								"name": "BN"
+							}
+						},
+						{
+							"id": 61,
+							"name": "b8",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {},
+							"sources": [
+								{
+									"fileName": "index.ts",
+									"line": 45,
+									"character": 4
+								}
+							],
+							"type": {
+								"type": "reference",
+								"name": "BN"
+							}
+						},
+						{
+							"id": 62,
+							"name": "b9",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {},
+							"sources": [
+								{
+									"fileName": "index.ts",
+									"line": 46,
+									"character": 4
+								}
+							],
+							"type": {
+								"type": "reference",
+								"name": "BN"
+							}
+						},
+						{
+							"id": 52,
+							"name": "base",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {},
+							"sources": [
+								{
+									"fileName": "index.ts",
+									"line": 36,
+									"character": 6
+								}
+							],
+							"type": {
+								"type": "reference",
+								"name": "BN"
+							}
+						},
+						{
+							"id": 53,
+							"name": "coefficient",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {},
+							"sources": [
+								{
+									"fileName": "index.ts",
+									"line": 37,
+									"character": 13
+								}
+							],
+							"type": {
+								"type": "reference",
+								"name": "BN"
+							}
+						},
+						{
+							"id": 71,
+							"name": "noVowelDiscount",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {},
+							"sources": [
+								{
+									"fileName": "index.ts",
+									"line": 55,
+									"character": 17
+								}
+							],
+							"type": {
+								"type": "reference",
+								"name": "BN"
+							}
+						},
+						{
+							"id": 70,
+							"name": "nonAlphaDiscount",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {},
+							"sources": [
+								{
+									"fileName": "index.ts",
+									"line": 54,
+									"character": 18
+								}
+							],
+							"type": {
+								"type": "reference",
+								"name": "BN"
+							}
+						}
+					],
+					"groups": [
+						{
+							"title": "Properties",
+							"kind": 1024,
+							"children": [
+								54,
+								63,
+								64,
+								65,
+								66,
+								67,
+								68,
+								69,
+								55,
+								56,
+								57,
+								58,
+								59,
+								60,
+								61,
+								62,
+								52,
+								53,
+								71,
+								70
+							]
+						}
+					],
+					"sources": [
+						{
+							"fileName": "index.ts",
+							"line": 35,
+							"character": 27
+						}
+					]
+				}
+			}
+		},
+		{
+			"id": 45,
+			"name": "Result",
+			"kind": 4194304,
+			"kindString": "Type alias",
+			"flags": {},
+			"sources": [
+				{
+					"fileName": "index.ts",
+					"line": 29,
+					"character": 18
+				}
+			],
+			"type": {
+				"type": "reflection",
+				"declaration": {
+					"id": 46,
+					"name": "__type",
+					"kind": 65536,
+					"kindString": "Type literal",
+					"flags": {},
+					"children": [
+						{
+							"id": 48,
+							"name": "data",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {},
+							"sources": [
+								{
+									"fileName": "index.ts",
+									"line": 31,
+									"character": 6
+								}
+							],
+							"type": {
+								"type": "intrinsic",
+								"name": "any"
+							}
+						},
+						{
+							"id": 49,
+							"name": "error",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {
+								"isOptional": true
+							},
+							"sources": [
+								{
+									"fileName": "index.ts",
+									"line": 32,
+									"character": 7
+								}
+							],
+							"type": {
+								"type": "intrinsic",
+								"name": "string"
+							}
+						},
+						{
+							"id": 47,
+							"name": "success",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {},
+							"sources": [
+								{
+									"fileName": "index.ts",
+									"line": 30,
+									"character": 9
+								}
+							],
+							"type": {
+								"type": "intrinsic",
+								"name": "boolean"
+							}
+						}
+					],
+					"groups": [
+						{
+							"title": "Properties",
+							"kind": 1024,
+							"children": [
+								48,
+								49,
+								47
+							]
+						}
+					],
+					"sources": [
+						{
+							"fileName": "index.ts",
+							"line": 29,
+							"character": 20
+						}
+					]
+				}
+			}
+		},
+		{
+			"id": 43,
+			"name": "BNS_CONTRACT_ADDRESS",
+			"kind": 32,
+			"kindString": "Variable",
+			"flags": {
+				"isConst": true
+			},
+			"sources": [
+				{
+					"fileName": "index.ts",
+					"line": 26,
+					"character": 33
+				}
+			],
+			"type": {
+				"type": "literal",
+				"value": "ST000000000000000000002AMW42H"
+			},
+			"defaultValue": "'ST000000000000000000002AMW42H'"
+		},
+		{
+			"id": 44,
+			"name": "BNS_CONTRACT_NAME",
+			"kind": 32,
+			"kindString": "Variable",
+			"flags": {
+				"isConst": true
+			},
+			"sources": [
+				{
+					"fileName": "index.ts",
+					"line": 27,
+					"character": 30
+				}
+			],
+			"type": {
+				"type": "literal",
+				"value": "bns"
+			},
+			"defaultValue": "'bns'"
+		},
+		{
+			"id": 1,
+			"name": "canRegisterName",
+			"kind": 64,
+			"kindString": "Function",
+			"flags": {},
+			"sources": [
+				{
+					"fileName": "index.ts",
+					"line": 124,
+					"character": 37
+				}
+			],
+			"signatures": [
+				{
+					"id": 2,
+					"name": "canRegisterName",
+					"kind": 4096,
+					"kindString": "Call signature",
+					"flags": {},
+					"comment": {
+						"shortText": "Check if name can be registered",
+						"returns": "that resolves to true if the operation succeeds\n"
+					},
+					"parameters": [
+						{
+							"id": 3,
+							"name": "fullyQualifiedName",
+							"kind": 32768,
+							"kindString": "Parameter",
+							"flags": {},
+							"comment": {
+								"text": "the fully qualified name to check"
+							},
+							"type": {
+								"type": "intrinsic",
+								"name": "string"
+							}
+						},
+						{
+							"id": 4,
+							"name": "network",
+							"kind": 32768,
+							"kindString": "Parameter",
+							"flags": {
+								"isOptional": true
+							},
+							"comment": {
+								"text": "the Stacks network to broadcast transaction to\n"
+							},
+							"type": {
+								"type": "reference",
+								"name": "StacksNetwork"
+							}
+						}
+					],
+					"type": {
+						"type": "reference",
+						"typeArguments": [
+							{
+								"type": "intrinsic",
+								"name": "boolean"
+							}
+						],
+						"name": "Promise"
+					}
+				}
+			]
+		},
+		{
+			"id": 9,
+			"name": "getNamePrice",
+			"kind": 64,
+			"kindString": "Function",
+			"flags": {},
+			"sources": [
+				{
+					"fileName": "index.ts",
+					"line": 209,
+					"character": 34
+				}
+			],
+			"signatures": [
+				{
+					"id": 10,
+					"name": "getNamePrice",
+					"kind": 4096,
+					"kindString": "Call signature",
+					"flags": {},
+					"comment": {
+						"shortText": "Get price of name registration in microstacks",
+						"returns": "that resolves to a BN object number of microstacks if the operation succeeds\n"
+					},
+					"parameters": [
+						{
+							"id": 11,
+							"name": "fullyQualifiedName",
+							"kind": 32768,
+							"kindString": "Parameter",
+							"flags": {},
+							"comment": {
+								"text": "the fully qualified name"
+							},
+							"type": {
+								"type": "intrinsic",
+								"name": "string"
+							}
+						},
+						{
+							"id": 12,
+							"name": "network",
+							"kind": 32768,
+							"kindString": "Parameter",
+							"flags": {
+								"isOptional": true
+							},
+							"comment": {
+								"text": "the Stacks network to use\n"
+							},
+							"type": {
+								"type": "reference",
+								"name": "StacksNetwork"
+							}
+						}
+					],
+					"type": {
+						"type": "reference",
+						"typeArguments": [
+							{
+								"type": "reference",
+								"name": "BN"
+							}
+						],
+						"name": "Promise"
+					}
+				}
+			]
+		},
+		{
+			"id": 5,
+			"name": "getNamespacePrice",
+			"kind": 64,
+			"kindString": "Function",
+			"flags": {},
+			"sources": [
+				{
+					"fileName": "index.ts",
+					"line": 166,
+					"character": 39
+				}
+			],
+			"signatures": [
+				{
+					"id": 6,
+					"name": "getNamespacePrice",
+					"kind": 4096,
+					"kindString": "Call signature",
+					"flags": {},
+					"comment": {
+						"shortText": "Get price of namespace registration in microstacks",
+						"returns": "that resolves to a BN object number of microstacks if the operation succeeds\n"
+					},
+					"parameters": [
+						{
+							"id": 7,
+							"name": "namespace",
+							"kind": 32768,
+							"kindString": "Parameter",
+							"flags": {},
+							"comment": {
+								"text": "the namespace"
+							},
+							"type": {
+								"type": "intrinsic",
+								"name": "string"
+							}
+						},
+						{
+							"id": 8,
+							"name": "network",
+							"kind": 32768,
+							"kindString": "Parameter",
+							"flags": {
+								"isOptional": true
+							},
+							"comment": {
+								"text": "the Stacks network to use\n"
+							},
+							"type": {
+								"type": "reference",
+								"name": "StacksNetwork"
+							}
+						}
+					],
+					"type": {
+						"type": "reference",
+						"typeArguments": [
+							{
+								"type": "reference",
+								"name": "BN"
+							}
+						],
+						"name": "Promise"
+					}
+				}
+			]
+		},
+		{
+			"id": 19,
+			"name": "importName",
+			"kind": 64,
+			"kindString": "Function",
+			"flags": {},
+			"sources": [
+				{
+					"fileName": "index.ts",
+					"line": 405,
+					"character": 32
+				}
+			],
+			"signatures": [
+				{
+					"id": 20,
+					"name": "importName",
+					"kind": 4096,
+					"kindString": "Call signature",
+					"flags": {},
+					"comment": {
+						"shortText": "Generates and broadcasts a namespace name import transaction.\nAn optional step in namespace registration.",
+						"text": "Returns a Result object which will indicate if the transaction was successfully broadcasted.\n",
+						"returns": "\n"
+					},
+					"parameters": [
+						{
+							"id": 21,
+							"name": "__namedParameters",
+							"kind": 32768,
+							"kindString": "Parameter",
+							"flags": {},
+							"type": {
+								"type": "reference",
+								"id": 97,
+								"name": "ImportNameOptions"
+							}
+						}
+					],
+					"type": {
+						"type": "reference",
+						"typeArguments": [
+							{
+								"type": "reference",
+								"id": 45,
+								"name": "Result"
+							}
+						],
+						"name": "Promise"
+					}
+				}
+			]
+		},
+		{
+			"id": 25,
+			"name": "preorderName",
+			"kind": 64,
+			"kindString": "Function",
+			"flags": {},
+			"sources": [
+				{
+					"fileName": "index.ts",
+					"line": 502,
+					"character": 34
+				}
+			],
+			"signatures": [
+				{
+					"id": 26,
+					"name": "preorderName",
+					"kind": 4096,
+					"kindString": "Call signature",
+					"flags": {},
+					"comment": {
+						"shortText": "Generates and broadcasts a name preorder transaction.\nFirst step in registering a name. This transaction does not reveal the name that is\nabout to be registered. And it sets the amount of STX to be burned for the registration.",
+						"text": "Returns a Result object which will indicate if the transaction was successfully broadcasted\n",
+						"returns": "\n"
+					},
+					"parameters": [
+						{
+							"id": 27,
+							"name": "__namedParameters",
+							"kind": 32768,
+							"kindString": "Parameter",
+							"flags": {},
+							"type": {
+								"type": "reference",
+								"id": 108,
+								"name": "PreorderNameOptions"
+							}
+						}
+					],
+					"type": {
+						"type": "reference",
+						"typeArguments": [
+							{
+								"type": "reference",
+								"id": 45,
+								"name": "Result"
+							}
+						],
+						"name": "Promise"
+					}
+				}
+			]
+		},
+		{
+			"id": 13,
+			"name": "preorderNamespace",
+			"kind": 64,
+			"kindString": "Function",
+			"flags": {},
+			"sources": [
+				{
+					"fileName": "index.ts",
+					"line": 277,
+					"character": 39
+				}
+			],
+			"signatures": [
+				{
+					"id": 14,
+					"name": "preorderNamespace",
+					"kind": 4096,
+					"kindString": "Call signature",
+					"flags": {},
+					"comment": {
+						"shortText": "Generates and broadcasts a namespace preorder transaction.\nFirst step in registering a namespace. This transaction does not reveal the namespace that is\nabout to be registered. And it sets the amount of STX to be burned for the registration.",
+						"text": "Returns a Result object which will indicate if the transaction was successfully broadcasted\n",
+						"returns": "\n"
+					},
+					"parameters": [
+						{
+							"id": 15,
+							"name": "__namedParameters",
+							"kind": 32768,
+							"kindString": "Parameter",
+							"flags": {},
+							"type": {
+								"type": "reference",
+								"id": 83,
+								"name": "PreorderNamespaceOptions"
+							}
+						}
+					],
+					"type": {
+						"type": "reference",
+						"typeArguments": [
+							{
+								"type": "reference",
+								"id": 45,
+								"name": "Result"
+							}
+						],
+						"name": "Promise"
+					}
+				}
+			]
+		},
+		{
+			"id": 22,
+			"name": "readyNamespace",
+			"kind": 64,
+			"kindString": "Function",
+			"flags": {},
+			"sources": [
+				{
+					"fileName": "index.ts",
+					"line": 455,
+					"character": 36
+				}
+			],
+			"signatures": [
+				{
+					"id": 23,
+					"name": "readyNamespace",
+					"kind": 4096,
+					"kindString": "Call signature",
+					"flags": {},
+					"comment": {
+						"shortText": "Generates and broadcasts a ready namespace transaction.\nFinal step in namespace registration. This completes the namespace registration and\nmakes the namespace available for name registrations.",
+						"text": "Returns a Result object which will indicate if the transaction was successfully broadcasted.\n",
+						"returns": "\n"
+					},
+					"parameters": [
+						{
+							"id": 24,
+							"name": "__namedParameters",
+							"kind": 32768,
+							"kindString": "Parameter",
+							"flags": {},
+							"type": {
+								"type": "reference",
+								"id": 104,
+								"name": "ReadyNamespaceOptions"
+							}
+						}
+					],
+					"type": {
+						"type": "reference",
+						"typeArguments": [
+							{
+								"type": "reference",
+								"id": 45,
+								"name": "Result"
+							}
+						],
+						"name": "Promise"
+					}
+				}
+			]
+		},
+		{
+			"id": 28,
+			"name": "registerName",
+			"kind": 64,
+			"kindString": "Function",
+			"flags": {},
+			"sources": [
+				{
+					"fileName": "index.ts",
+					"line": 557,
+					"character": 34
+				}
+			],
+			"signatures": [
+				{
+					"id": 29,
+					"name": "registerName",
+					"kind": 4096,
+					"kindString": "Call signature",
+					"flags": {},
+					"comment": {
+						"shortText": "Generates and broadcasts a name registration transaction.\nSecond and final step in registering a name.",
+						"text": "Returns a Result object which will indicate if the transaction was successfully broadcast\n",
+						"returns": "\n"
+					},
+					"parameters": [
+						{
+							"id": 30,
+							"name": "__namedParameters",
+							"kind": 32768,
+							"kindString": "Parameter",
+							"flags": {},
+							"type": {
+								"type": "reference",
+								"id": 114,
+								"name": "RegisterNameOptions"
+							}
+						}
+					],
+					"type": {
+						"type": "reference",
+						"typeArguments": [
+							{
+								"type": "reference",
+								"id": 45,
+								"name": "Result"
+							}
+						],
+						"name": "Promise"
+					}
+				}
+			]
+		},
+		{
+			"id": 40,
+			"name": "renewName",
+			"kind": 64,
+			"kindString": "Function",
+			"flags": {},
+			"sources": [
+				{
+					"fileName": "index.ts",
+					"line": 778,
+					"character": 31
+				}
+			],
+			"signatures": [
+				{
+					"id": 41,
+					"name": "renewName",
+					"kind": 4096,
+					"kindString": "Call signature",
+					"flags": {},
+					"comment": {
+						"shortText": "Generates and broadcasts a name renew transaction.\nThis renews a name registration.",
+						"text": "Returns a Result object which will indicate if the transaction was successfully broadcasted\n",
+						"returns": "\n"
+					},
+					"parameters": [
+						{
+							"id": 42,
+							"name": "__namedParameters",
+							"kind": 32768,
+							"kindString": "Parameter",
+							"flags": {},
+							"type": {
+								"type": "reference",
+								"id": 135,
+								"name": "RenewNameOptions"
+							}
+						}
+					],
+					"type": {
+						"type": "reference",
+						"typeArguments": [
+							{
+								"type": "reference",
+								"id": 45,
+								"name": "Result"
+							}
+						],
+						"name": "Promise"
+					}
+				}
+			]
+		},
+		{
+			"id": 16,
+			"name": "revealNamespace",
+			"kind": 64,
+			"kindString": "Function",
+			"flags": {},
+			"sources": [
+				{
+					"fileName": "index.ts",
+					"line": 331,
+					"character": 37
+				}
+			],
+			"signatures": [
+				{
+					"id": 17,
+					"name": "revealNamespace",
+					"kind": 4096,
+					"kindString": "Call signature",
+					"flags": {},
+					"comment": {
+						"shortText": "Generates and broadcasts a namespace reveal transaction.\nSecond step in registering a namespace.",
+						"text": "Returns a Result object which will indicate if the transaction was successfully broadcasted.\n",
+						"returns": "\n"
+					},
+					"parameters": [
+						{
+							"id": 18,
+							"name": "__namedParameters",
+							"kind": 32768,
+							"kindString": "Parameter",
+							"flags": {},
+							"type": {
+								"type": "reference",
+								"id": 89,
+								"name": "RevealNamespaceOptions"
+							}
+						}
+					],
+					"type": {
+						"type": "reference",
+						"typeArguments": [
+							{
+								"type": "reference",
+								"id": 45,
+								"name": "Result"
+							}
+						],
+						"name": "Promise"
+					}
+				}
+			]
+		},
+		{
+			"id": 37,
+			"name": "revokeName",
+			"kind": 64,
+			"kindString": "Function",
+			"flags": {},
+			"sources": [
+				{
+					"fileName": "index.ts",
+					"line": 725,
+					"character": 32
+				}
+			],
+			"signatures": [
+				{
+					"id": 38,
+					"name": "revokeName",
+					"kind": 4096,
+					"kindString": "Call signature",
+					"flags": {},
+					"comment": {
+						"shortText": "Generates and broadcasts a name revoke transaction.\nThis revokes a name registration.",
+						"text": "Returns a Result object which will indicate if the transaction was successfully broadcasted\n",
+						"returns": "\n"
+					},
+					"parameters": [
+						{
+							"id": 39,
+							"name": "__namedParameters",
+							"kind": 32768,
+							"kindString": "Parameter",
+							"flags": {},
+							"type": {
+								"type": "reference",
+								"id": 131,
+								"name": "RevokeNameOptions"
+							}
+						}
+					],
+					"type": {
+						"type": "reference",
+						"typeArguments": [
+							{
+								"type": "reference",
+								"id": 45,
+								"name": "Result"
+							}
+						],
+						"name": "Promise"
+					}
+				}
+			]
+		},
+		{
+			"id": 34,
+			"name": "transferName",
+			"kind": 64,
+			"kindString": "Function",
+			"flags": {},
+			"sources": [
+				{
+					"fileName": "index.ts",
+					"line": 668,
+					"character": 34
+				}
+			],
+			"signatures": [
+				{
+					"id": 35,
+					"name": "transferName",
+					"kind": 4096,
+					"kindString": "Call signature",
+					"flags": {},
+					"comment": {
+						"shortText": "Generates and broadcasts a name transfer transaction.\nThis changes the owner of the registered name.",
+						"text": "Returns a Result object which will indicate if the transaction was successfully broadcasted\n",
+						"returns": "\n"
+					},
+					"parameters": [
+						{
+							"id": 36,
+							"name": "__namedParameters",
+							"kind": 32768,
+							"kindString": "Parameter",
+							"flags": {},
+							"type": {
+								"type": "reference",
+								"id": 125,
+								"name": "TransferNameOptions"
+							}
+						}
+					],
+					"type": {
+						"type": "reference",
+						"typeArguments": [
+							{
+								"type": "reference",
+								"id": 45,
+								"name": "Result"
+							}
+						],
+						"name": "Promise"
+					}
+				}
+			]
+		},
+		{
+			"id": 31,
+			"name": "updateName",
+			"kind": 64,
+			"kindString": "Function",
+			"flags": {},
+			"sources": [
+				{
+					"fileName": "index.ts",
+					"line": 613,
+					"character": 32
+				}
+			],
+			"signatures": [
+				{
+					"id": 32,
+					"name": "updateName",
+					"kind": 4096,
+					"kindString": "Call signature",
+					"flags": {},
+					"comment": {
+						"shortText": "Generates and broadcasts a name update transaction.\nThis changes the zonefile for the registered name.",
+						"text": "Returns a Result object which will indicate if the transaction was successfully broadcasted\n",
+						"returns": "\n"
+					},
+					"parameters": [
+						{
+							"id": 33,
+							"name": "__namedParameters",
+							"kind": 32768,
+							"kindString": "Parameter",
+							"flags": {},
+							"type": {
+								"type": "reference",
+								"id": 120,
+								"name": "UpdateNameOptions"
+							}
+						}
+					],
+					"type": {
+						"type": "reference",
+						"typeArguments": [
+							{
+								"type": "reference",
+								"id": 45,
+								"name": "Result"
+							}
+						],
+						"name": "Promise"
+					}
+				}
+			]
+		}
+	],
+	"groups": [
+		{
+			"title": "Interfaces",
+			"kind": 256,
+			"children": [
+				72,
+				78,
+				97,
+				108,
+				83,
+				104,
+				114,
+				135,
+				89,
+				131,
+				125,
+				120
+			]
+		},
+		{
+			"title": "Type aliases",
+			"kind": 4194304,
+			"children": [
+				50,
+				45
+			]
+		},
+		{
+			"title": "Variables",
+			"kind": 32,
+			"children": [
+				43,
+				44
+			]
+		},
+		{
+			"title": "Functions",
+			"kind": 64,
+			"children": [
+				1,
+				9,
+				5,
+				19,
+				25,
+				13,
+				22,
+				28,
+				40,
+				16,
+				37,
+				34,
+				31
+			]
+		}
+	],
+	"sources": [
+		{
+			"fileName": "index.ts",
+			"line": 1,
+			"character": 0
+		}
+	]
+}
