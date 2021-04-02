@@ -1,4 +1,4 @@
-# Stacks.js BNS Library Reference
+# `@stacks/bns` Library Reference
 
 ## Table of contents
 
