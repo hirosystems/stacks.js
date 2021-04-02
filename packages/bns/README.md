@@ -24,5 +24,20 @@ const network = new StacksMainnet();
 const result = await canRegisterName('name.id', network);
 ```
 
+```
+import { buildRegisterNameTX } from '@stacks/bns';
+import { StacksTestnet } from '@stacks/network';
+
+const network = new StacksMainnet();
+
+const name = 'name.id';
+const salt =  'example-salt'
+const zonefile =  'example-zonefile'
+const publicKey = 'SPF0324DSC4K505TP6A8C7GAK4R95E38TGNZP7RE'
+
+// construct an unsigned bns register-name transaction
+const unsignedTX = await buildRegisterNameTX(name, salt, zonefile, publicKey, network);
+```
+
 ## Docs
 [Library Reference](https://github.com/blockstack/stacks.js/blob/feat/bns-package/packages/bns/docs/modules.md)
