@@ -18,8 +18,8 @@ npm install --save @stacks/bns
 ### `can-register-name`
 
 ```
-import { canRegisterName } = from '@stacks/bns';
-import { StacksTestnet } = from '@stacks/network';
+import { canRegisterName } from '@stacks/bns';
+import { StacksTestnet } from '@stacks/network';
 
 const network = new StacksMainnet();
 
@@ -28,7 +28,7 @@ const result = await canRegisterName('name.id', network);
 
 ### `get-namespace-price`
 ```
-import { get } = from '@stacks/bns';
+import { canRegisterName } from '@stacks/bns';
 import { StacksTestnet } = from '@stacks/network';
 
 const network = new StacksMainnet();
@@ -38,7 +38,7 @@ const result = await canRegisterName('name.id', network);
 
 ### `get-name-price`
 ```
-import { get } = from '@stacks/bns';
+import { canRegisterName } from '@stacks/bns';
 import { StacksTestnet } = from '@stacks/network';
 
 const network = new StacksMainnet();
