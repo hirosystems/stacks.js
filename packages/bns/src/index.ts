@@ -15,9 +15,9 @@ import {
   UnsignedContractCallOptions,
 } from '@stacks/transactions';
 
-import {StacksMainnet, StacksNetwork} from '@stacks/network';
+import { StacksMainnet, StacksNetwork } from '@stacks/network';
 
-import {bufferCVFromString, decodeFQN, getZonefileHash, uintCVFromBN} from './utils'
+import { bufferCVFromString, decodeFQN, getZonefileHash, uintCVFromBN } from './utils';
 
 import BN from 'bn.js';
 
@@ -25,33 +25,33 @@ export const BNS_CONTRACT_ADDRESS = 'ST000000000000000000002AMW42H';
 export const BNS_CONTRACT_NAME = 'bns';
 
 export type Result = {
-  success: boolean,
-  data: any,
-  error?: string
+  success: boolean;
+  data: any;
+  error?: string;
 };
 
 export type PriceFunction = {
-  base: BN,
-  coefficient: BN,
-  b1: BN,
-  b2: BN,
-  b3: BN,
-  b4: BN,
-  b5: BN,
-  b6: BN,
-  b7: BN,
-  b8: BN,
-  b9: BN,
-  b10: BN,
-  b11: BN,
-  b12: BN,
-  b13: BN,
-  b14: BN,
-  b15: BN,
-  b16: BN,
-  nonAlphaDiscount: BN,
-  noVowelDiscount: BN
-}
+  base: BN;
+  coefficient: BN;
+  b1: BN;
+  b2: BN;
+  b3: BN;
+  b4: BN;
+  b5: BN;
+  b6: BN;
+  b7: BN;
+  b8: BN;
+  b9: BN;
+  b10: BN;
+  b11: BN;
+  b12: BN;
+  b13: BN;
+  b14: BN;
+  b15: BN;
+  b16: BN;
+  nonAlphaDiscount: BN;
+  noVowelDiscount: BN;
+};
 
 export interface BNSContractCallOptions {
   functionName: string;
@@ -69,7 +69,7 @@ async function makeBNSContractCall(options: BNSContractCallOptions): Promise<Sta
     functionArgs: options.functionArgs,
     publicKey: options.publicKey,
     validateWithAbi: false,
-    network: options.network
+    network: options.network,
   };
 
   return makeUnsignedContractCall(txOptions);
@@ -89,8 +89,8 @@ async function callReadOnlyBNSFunction(options: BNSReadOnlyOptions): Promise<Cla
     functionName: options.functionName,
     senderAddress: options.senderAddress,
     functionArgs: options.functionArgs,
-    network: options.network
-  })
+    network: options.network,
+  });
 }
 
 /**
@@ -102,7 +102,7 @@ async function callReadOnlyBNSFunction(options: BNSReadOnlyOptions): Promise<Cla
  * @returns {Promise} that resolves to true if the operation succeeds
  */
 export async function canRegisterName(
-  fullyQualifiedName: string, 
+  fullyQualifiedName: string,
   network?: StacksNetwork
 ): Promise<boolean> {
   const bnsFunctionName = 'can-name-be-registered';
@@ -120,19 +120,15 @@ export async function canRegisterName(
   return callReadOnlyBNSFunction({
     functionName: bnsFunctionName,
     senderAddress: randomAddress,
-    functionArgs: [
-      bufferCVFromString(namespace),
-      bufferCVFromString(name)
-    ],
-    network: network || new StacksMainnet()
-  })
-  .then((responseCV: ClarityValue) => {
+    functionArgs: [bufferCVFromString(namespace), bufferCVFromString(name)],
+    network: network || new StacksMainnet(),
+  }).then((responseCV: ClarityValue) => {
     if (responseCV.type === ClarityType.ResponseOk) {
       return responseCV.value.type === ClarityType.BoolTrue;
     } else {
       return false;
     }
-  })
+  });
 }
 
 /**
@@ -143,10 +139,7 @@ export async function canRegisterName(
  *
  * @returns {Promise} that resolves to a BN object number of microstacks if the operation succeeds
  */
-export async function getNamespacePrice(
-  namespace: string, 
-  network?: StacksNetwork
-): Promise<BN> {
+export async function getNamespacePrice(namespace: string, network?: StacksNetwork): Promise<BN> {
   const bnsFunctionName = 'get-namespace-price';
 
   // Create a random address as input to read-only function call
@@ -158,15 +151,11 @@ export async function getNamespacePrice(
   return callReadOnlyBNSFunction({
     functionName: bnsFunctionName,
     senderAddress: randomAddress,
-    functionArgs: [
-      bufferCVFromString(namespace)
-    ],
-    network: network || new StacksMainnet()
-  })
-  .then((responseCV: ClarityValue) => {
+    functionArgs: [bufferCVFromString(namespace)],
+    network: network || new StacksMainnet(),
+  }).then((responseCV: ClarityValue) => {
     if (responseCV.type === ClarityType.ResponseOk) {
-      if (responseCV.value.type === ClarityType.Int ||
-        responseCV.value.type === ClarityType.UInt) {
+      if (responseCV.value.type === ClarityType.Int || responseCV.value.type === ClarityType.UInt) {
         return responseCV.value.value;
       } else {
         throw new Error('Response did not contain a number');
@@ -175,7 +164,7 @@ export async function getNamespacePrice(
       const errorResponse = responseCV as ResponseErrorCV;
       throw new Error(cvToString(errorResponse.value));
     }
-  })
+  });
 }
 
 /**
@@ -187,7 +176,7 @@ export async function getNamespacePrice(
  * @returns {Promise} that resolves to a BN object number of microstacks if the operation succeeds
  */
 export async function getNamePrice(
-  fullyQualifiedName: string, 
+  fullyQualifiedName: string,
   network?: StacksNetwork
 ): Promise<BN> {
   const bnsFunctionName = 'get-name-price';
@@ -205,16 +194,11 @@ export async function getNamePrice(
   return callReadOnlyBNSFunction({
     functionName: bnsFunctionName,
     senderAddress: randomAddress,
-    functionArgs: [
-      bufferCVFromString(namespace),
-      bufferCVFromString(name)
-    ],
-    network: network || new StacksMainnet()
-  })
-  .then((responseCV: ClarityValue) => {
+    functionArgs: [bufferCVFromString(namespace), bufferCVFromString(name)],
+    network: network || new StacksMainnet(),
+  }).then((responseCV: ClarityValue) => {
     if (responseCV.type === ClarityType.ResponseOk) {
-      if (responseCV.value.type === ClarityType.Int ||
-          responseCV.value.type === ClarityType.UInt) {
+      if (responseCV.value.type === ClarityType.Int || responseCV.value.type === ClarityType.UInt) {
         return responseCV.value.value;
       } else {
         throw new Error('Response did not contain a number');
@@ -223,7 +207,7 @@ export async function getNamePrice(
       const errorResponse = responseCV as ResponseErrorCV;
       throw new Error(cvToString(errorResponse.value));
     }
-  })
+  });
 }
 
 /**
@@ -236,16 +220,16 @@ export async function getNamePrice(
  * @param  {StacksNetwork} network - the Stacks blockchain network to register on
  */
 export interface PreorderNamespaceOptions {
-  namespace: string, 
-  salt: string,
-  stxToBurn: BN,
-  publicKey: string,
-  network?: StacksNetwork
+  namespace: string;
+  salt: string;
+  stxToBurn: BN;
+  publicKey: string;
+  network?: StacksNetwork;
 }
 
 /**
  * Generates a namespace preorder transaction.
- * First step in registering a namespace. This transaction does not reveal the namespace that is 
+ * First step in registering a namespace. This transaction does not reveal the namespace that is
  * about to be registered. And it sets the amount of STX to be burned for the registration.
  *
  * Resolves to the generated StacksTransaction
@@ -255,11 +239,11 @@ export interface PreorderNamespaceOptions {
  * @return {Promise<StacksTransaction>}
  */
 export async function buildPreorderNamespaceTX({
-  namespace, 
+  namespace,
   salt,
   stxToBurn,
   publicKey,
-  network
+  network,
 }: PreorderNamespaceOptions): Promise<StacksTransaction> {
   const bnsFunctionName = 'namespace-preorder';
   const saltedNamespaceBuffer = Buffer.from(`0x${namespace}${salt}`);
@@ -268,12 +252,9 @@ export async function buildPreorderNamespaceTX({
 
   return makeBNSContractCall({
     functionName: bnsFunctionName,
-    functionArgs: [
-      bufferCV(hashedSaltedNamespace),
-      uintCVFromBN(stxToBurn)
-    ],
+    functionArgs: [bufferCV(hashedSaltedNamespace), uintCVFromBN(stxToBurn)],
     publicKey,
-    network: txNetwork
+    network: txNetwork,
   });
 }
 
@@ -289,13 +270,13 @@ export async function buildPreorderNamespaceTX({
  * @param  {StacksNetwork} network - the Stacks blockchain network to register on
  */
 export interface RevealNamespaceOptions {
-  namespace: string, 
-  salt: string,
-  priceFunction: PriceFunction,
-  lifetime: BN,
-  namespaceImportAddress: string,
-  publicKey: string,
-  network?: StacksNetwork
+  namespace: string;
+  salt: string;
+  priceFunction: PriceFunction;
+  lifetime: BN;
+  namespaceImportAddress: string;
+  publicKey: string;
+  network?: StacksNetwork;
 }
 
 /**
@@ -309,13 +290,13 @@ export interface RevealNamespaceOptions {
  * @return {Promise<StacksTransaction>}
  */
 export async function buildRevealNamespaceTX({
-  namespace, 
+  namespace,
   salt,
   priceFunction,
   lifetime,
   namespaceImportAddress,
   publicKey,
-  network
+  network,
 }: RevealNamespaceOptions): Promise<StacksTransaction> {
   const bnsFunctionName = 'namespace-reveal';
   const txNetwork = network || new StacksMainnet();
@@ -349,7 +330,7 @@ export async function buildRevealNamespaceTX({
       standardPrincipalCV(namespaceImportAddress),
     ],
     publicKey,
-    network: txNetwork
+    network: txNetwork,
   });
 }
 
@@ -364,12 +345,12 @@ export async function buildRevealNamespaceTX({
  * @param  {StacksNetwork} network - the Stacks blockchain network to register on
  */
 export interface ImportNameOptions {
-  namespace: string, 
-  name: string,
-  beneficiary: string,
-  zonefile: string,
-  publicKey: string,
-  network?: StacksNetwork
+  namespace: string;
+  name: string;
+  beneficiary: string;
+  zonefile: string;
+  publicKey: string;
+  network?: StacksNetwork;
 }
 
 /**
@@ -383,12 +364,12 @@ export interface ImportNameOptions {
  * @return {Promise<StacksTransaction>}
  */
 export async function buildImportNameTX({
-  namespace, 
+  namespace,
   name,
   beneficiary,
   zonefile,
   publicKey,
-  network
+  network,
 }: ImportNameOptions): Promise<StacksTransaction> {
   const bnsFunctionName = 'name-import';
   const txNetwork = network || new StacksMainnet();
@@ -400,11 +381,11 @@ export async function buildImportNameTX({
       bufferCVFromString(namespace),
       bufferCVFromString(name),
       standardPrincipalCV(beneficiary),
-      bufferCV(zonefileHash)
+      bufferCV(zonefileHash),
     ],
     publicKey,
     network: txNetwork,
-    attachment: Buffer.from(zonefile)
+    attachment: Buffer.from(zonefile),
   });
 }
 
@@ -416,9 +397,9 @@ export async function buildImportNameTX({
  * @param  {StacksNetwork} network - the Stacks blockchain network to register on
  */
 export interface ReadyNamespaceOptions {
-  namespace: string,
-  publicKey: string,
-  network?: StacksNetwork
+  namespace: string;
+  publicKey: string;
+  network?: StacksNetwork;
 }
 
 /**
@@ -435,25 +416,23 @@ export interface ReadyNamespaceOptions {
 export async function buildReadyNamespaceTX({
   namespace,
   publicKey,
-  network
+  network,
 }: ReadyNamespaceOptions): Promise<StacksTransaction> {
   const bnsFunctionName = 'namespace-ready';
   const txNetwork = network || new StacksMainnet();
 
   return makeBNSContractCall({
     functionName: bnsFunctionName,
-    functionArgs: [
-      bufferCVFromString(namespace)
-    ],
+    functionArgs: [bufferCVFromString(namespace)],
     publicKey,
-    network: txNetwork
+    network: txNetwork,
   });
 }
 
 /**
  * Preorder name options
  *
- * @param  {String} fullyQualifiedName - the fully qualified name to preorder including the 
+ * @param  {String} fullyQualifiedName - the fully qualified name to preorder including the
  *                                        namespace (myName.id)
  * @param  {String} salt - salt used to generate the preorder name hash
  * @param  {BigNum} stxToBurn - amount of STX to burn for the registration
@@ -461,16 +440,16 @@ export async function buildReadyNamespaceTX({
  * @param  {StacksNetwork} network - the Stacks blockchain network to register on
  */
 export interface PreorderNameOptions {
-  fullyQualifiedName: string,
-  salt: string,
-  stxToBurn: BN,
-  publicKey: string,
-  network?: StacksNetwork
+  fullyQualifiedName: string;
+  salt: string;
+  stxToBurn: BN;
+  publicKey: string;
+  network?: StacksNetwork;
 }
 
 /**
  * Generates a name preorder transaction.
- * First step in registering a name. This transaction does not reveal the name that is 
+ * First step in registering a name. This transaction does not reveal the name that is
  * about to be registered. And it sets the amount of STX to be burned for the registration.
  *
  * Resolves to the generated StacksTransaction
@@ -484,7 +463,7 @@ export async function buildPreorderNameTX({
   salt,
   stxToBurn,
   publicKey,
-  network
+  network,
 }: PreorderNameOptions): Promise<StacksTransaction> {
   const bnsFunctionName = 'name-preorder';
   const { subdomain } = decodeFQN(fullyQualifiedName);
@@ -497,19 +476,16 @@ export async function buildPreorderNameTX({
 
   return makeBNSContractCall({
     functionName: bnsFunctionName,
-    functionArgs: [
-      bufferCV(hashedSaltedName),
-      uintCVFromBN(stxToBurn)
-    ],
+    functionArgs: [bufferCV(hashedSaltedName), uintCVFromBN(stxToBurn)],
     publicKey,
-    network: txNetwork
+    network: txNetwork,
   });
 }
 
 /**
  * Register name options
  *
- * @param  {String} fullyQualifiedName - the fully qualified name to preorder including the 
+ * @param  {String} fullyQualifiedName - the fully qualified name to preorder including the
  *                                        namespace (myName.id)
  * @param  {String} salt - salt used to generate the preorder name hash
  * @param  {String} zonefile - the zonefile to register with the name
@@ -517,16 +493,16 @@ export async function buildPreorderNameTX({
  * @param  {StacksNetwork} network - the Stacks blockchain network to register on
  */
 export interface RegisterNameOptions {
-  fullyQualifiedName: string,
-  salt: string,
-  zonefile: string,
-  publicKey: string,
-  network?: StacksNetwork
+  fullyQualifiedName: string;
+  salt: string;
+  zonefile: string;
+  publicKey: string;
+  network?: StacksNetwork;
 }
 
 /**
  * Generates a name registration transaction.
- * Second and final step in registering a name. 
+ * Second and final step in registering a name.
  *
  * Resolves to the generated StacksTransaction
  *
@@ -539,7 +515,7 @@ export async function buildRegisterNameTX({
   salt,
   zonefile,
   publicKey,
-  network
+  network,
 }: RegisterNameOptions): Promise<StacksTransaction> {
   const bnsFunctionName = 'name-register';
   const { subdomain, namespace, name } = decodeFQN(fullyQualifiedName);
@@ -556,28 +532,28 @@ export async function buildRegisterNameTX({
       bufferCVFromString(namespace),
       bufferCVFromString(name),
       bufferCVFromString(salt),
-      bufferCV(zonefileHash)
+      bufferCV(zonefileHash),
     ],
     network: txNetwork,
     publicKey,
-    attachment: Buffer.from(zonefile)
+    attachment: Buffer.from(zonefile),
   });
 }
 
 /**
  * Update name options
  *
- * @param  {String} fullyQualifiedName - the fully qualified name to update including the 
+ * @param  {String} fullyQualifiedName - the fully qualified name to update including the
  *                                        namespace (myName.id)
  * @param  {String} zonefile - the zonefile to register with the name
  * @param  {String} publicKey - the private key to sign the transaction
  * @param  {StacksNetwork} network - the Stacks blockchain network to register on
  */
 export interface UpdateNameOptions {
-  fullyQualifiedName: string,
-  zonefile: string,
-  publicKey: string,
-  network?: StacksNetwork
+  fullyQualifiedName: string;
+  zonefile: string;
+  publicKey: string;
+  network?: StacksNetwork;
 }
 
 /**
@@ -594,7 +570,7 @@ export async function buildUpdateNameTX({
   fullyQualifiedName,
   zonefile,
   publicKey,
-  network
+  network,
 }: UpdateNameOptions): Promise<StacksTransaction> {
   const bnsFunctionName = 'name-update';
   const { subdomain, namespace, name } = decodeFQN(fullyQualifiedName);
@@ -606,21 +582,17 @@ export async function buildUpdateNameTX({
 
   return makeBNSContractCall({
     functionName: bnsFunctionName,
-    functionArgs: [
-      bufferCVFromString(namespace),
-      bufferCVFromString(name),
-      bufferCV(zonefileHash)
-    ],
+    functionArgs: [bufferCVFromString(namespace), bufferCVFromString(name), bufferCV(zonefileHash)],
     publicKey,
     network: txNetwork,
-    attachment: Buffer.from(zonefile)
+    attachment: Buffer.from(zonefile),
   });
 }
 
 /**
  * Transfer name options
  *
- * @param  {String} fullyQualifiedName - the fully qualified name to transfer including the 
+ * @param  {String} fullyQualifiedName - the fully qualified name to transfer including the
  *                                        namespace (myName.id)
  * @param  {String} newOwnerAddress - the recipient address of the name transfer
  * @param  {String} zonefile - the optional zonefile to register with the name
@@ -628,11 +600,11 @@ export async function buildUpdateNameTX({
  * @param  {StacksNetwork} network - the Stacks blockchain network to register on
  */
 export interface TransferNameOptions {
-  fullyQualifiedName: string,
-  newOwnerAddress: string,
-  publicKey: string,
-  zonefile?: string,
-  network?: StacksNetwork
+  fullyQualifiedName: string;
+  newOwnerAddress: string;
+  publicKey: string;
+  zonefile?: string;
+  network?: StacksNetwork;
 }
 
 /**
@@ -650,7 +622,7 @@ export async function buildTransferNameTX({
   newOwnerAddress,
   zonefile,
   publicKey,
-  network
+  network,
 }: TransferNameOptions): Promise<StacksTransaction> {
   const bnsFunctionName = 'name-transfer';
   const { subdomain, namespace, name } = decodeFQN(fullyQualifiedName);
@@ -659,10 +631,10 @@ export async function buildTransferNameTX({
   }
   const txNetwork = network || new StacksMainnet();
 
-  const functionArgs = [      
+  const functionArgs = [
     bufferCVFromString(namespace),
     bufferCVFromString(name),
-    bufferCVFromString(newOwnerAddress)
+    bufferCVFromString(newOwnerAddress),
   ];
 
   if (zonefile) {
@@ -674,22 +646,22 @@ export async function buildTransferNameTX({
     functionArgs,
     publicKey,
     network: txNetwork,
-    attachment: zonefile ? Buffer.from(zonefile) : undefined
+    attachment: zonefile ? Buffer.from(zonefile) : undefined,
   });
 }
 
 /**
  * Revoke name options
  *
- * @param  {String} fullyQualifiedName - the fully qualified name to revoke including the 
+ * @param  {String} fullyQualifiedName - the fully qualified name to revoke including the
  *                                        namespace (myName.id)
  * @param  {String} publicKey - the private key to sign the transaction
  * @param  {StacksNetwork} network - the Stacks blockchain network to register on
  */
 export interface RevokeNameOptions {
-  fullyQualifiedName: string,
-  publicKey: string,
-  network?: StacksNetwork
+  fullyQualifiedName: string;
+  publicKey: string;
+  network?: StacksNetwork;
 }
 
 /**
@@ -705,7 +677,7 @@ export interface RevokeNameOptions {
 export async function buildRevokeNameTX({
   fullyQualifiedName,
   publicKey,
-  network
+  network,
 }: RevokeNameOptions): Promise<StacksTransaction> {
   const bnsFunctionName = 'name-revoke';
   const { subdomain, namespace, name } = decodeFQN(fullyQualifiedName);
@@ -716,19 +688,16 @@ export async function buildRevokeNameTX({
 
   return makeBNSContractCall({
     functionName: bnsFunctionName,
-    functionArgs: [
-      bufferCVFromString(namespace),
-      bufferCVFromString(name)
-    ],
+    functionArgs: [bufferCVFromString(namespace), bufferCVFromString(name)],
     publicKey,
-    network: txNetwork
+    network: txNetwork,
   });
 }
 
 /**
  * Renew name options
  *
- * @param  {String} fullyQualifiedName - the fully qualified name to renew including the 
+ * @param  {String} fullyQualifiedName - the fully qualified name to renew including the
  *                                        namespace (myName.id)
  * @param  {BigNum} stxToBurn - amount of STX to burn for the registration
  * @param  {String} publicKey - the private key to sign the transaction
@@ -737,12 +706,12 @@ export async function buildRevokeNameTX({
  * @param  {StacksNetwork} network - the Stacks blockchain network to register on
  */
 export interface RenewNameOptions {
-  fullyQualifiedName: string,
-  stxToBurn: BN,
-  publicKey: string,
-  newOwnerAddress?: string,
-  zonefile?: string,
-  network?: StacksNetwork
+  fullyQualifiedName: string;
+  stxToBurn: BN;
+  publicKey: string;
+  newOwnerAddress?: string;
+  zonefile?: string;
+  network?: StacksNetwork;
 }
 
 /**
@@ -761,7 +730,7 @@ export async function buildRenewNameTX({
   newOwnerAddress,
   zonefile,
   publicKey,
-  network
+  network,
 }: RenewNameOptions): Promise<StacksTransaction> {
   const bnsFunctionName = 'name-renewal';
   const { subdomain, namespace, name } = decodeFQN(fullyQualifiedName);
@@ -770,13 +739,13 @@ export async function buildRenewNameTX({
   }
   const txNetwork = network || new StacksMainnet();
 
-  const functionArgs = [      
+  const functionArgs = [
     bufferCVFromString(namespace),
     bufferCVFromString(name),
     uintCVFromBN(stxToBurn),
   ];
 
-  if (newOwnerAddress) { 
+  if (newOwnerAddress) {
     functionArgs.push(bufferCVFromString(newOwnerAddress));
   }
 
@@ -790,6 +759,6 @@ export async function buildRenewNameTX({
     functionArgs,
     publicKey,
     network: txNetwork,
-    attachment: zonefile ? Buffer.from(zonefile) : undefined
+    attachment: zonefile ? Buffer.from(zonefile) : undefined,
   });
 }

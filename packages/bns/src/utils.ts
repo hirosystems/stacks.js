@@ -1,15 +1,13 @@
-import {
-  bufferCV,
-  uintCV,
-  hash160
-} from '@stacks/transactions';
+import { bufferCV, uintCV, hash160 } from '@stacks/transactions';
 
 import BN from 'bn.js';
 
-export function decodeFQN(fqdn: string): { 
-  name: string, 
-  namespace: string, 
-  subdomain?: string 
+export function decodeFQN(
+  fqdn: string
+): {
+  name: string;
+  namespace: string;
+  subdomain?: string;
 } {
   const nameParts = fqdn.split('.');
   if (nameParts.length > 2) {
@@ -19,15 +17,15 @@ export function decodeFQN(fqdn: string): {
     return {
       subdomain,
       name,
-      namespace
-    }
+      namespace,
+    };
   } else {
     const name = nameParts[0];
     const namespace = nameParts[1];
     return {
       name,
-      namespace
-    }
+      namespace,
+    };
   }
 }
 
