@@ -68,7 +68,7 @@ async function makeBNSContractCall(options: BNSContractCallOptions): Promise<Sta
     functionName: options.functionName,
     functionArgs: options.functionArgs,
     publicKey: options.publicKey,
-    validateWithAbi: true,
+    validateWithAbi: false,
     network: options.network
   };
 
