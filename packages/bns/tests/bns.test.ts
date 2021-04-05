@@ -7,13 +7,12 @@ import {
   falseCV,
   uintCV,
   bufferCV,
-  makeRandomPrivKey,
   hash160,
-  privateKeyToString, standardPrincipalCV,
+  standardPrincipalCV,
 } from '@stacks/transactions';
 
 import {
-  StacksMainnet
+  StacksMainnet, StacksTestnet
 } from '@stacks/network';
 
 import {
@@ -193,7 +192,7 @@ test('getNamespacePrice', async () => {
       functionArgs: [
       bufferCVFromString(namespace)
     ],
-      network: network
+      network
   };
 
   expect(result).toEqual(new BN(10));
@@ -235,7 +234,7 @@ test('getNamespacePrice error', async () => {
     functionArgs: [
       bufferCVFromString(namespace)
     ],
-    network: network
+    network
   };
 
   await expect(getNamespacePrice(namespace, network)).rejects.toEqual(new Error('u1001'));
@@ -280,7 +279,7 @@ test('getNamePrice', async () => {
       bufferCVFromString(namespace),
       bufferCVFromString(name)
     ],
-    network: network
+    network
   };
 
   expect(result).toEqual(new BN(10));
@@ -325,7 +324,7 @@ test('getNamePrice error', async () => {
       bufferCVFromString(namespace),
       bufferCVFromString(name)
     ],
-    network: network
+    network
   };
 
   await expect(getNamePrice(fullyQualifiedName, network)).rejects.toEqual(new Error('u2001'));
@@ -338,27 +337,24 @@ test('preorderNamespace', async () => {
   const salt = 'salt';
   const stxToBurn = new BN(10);
 
-  const privateKey = privateKeyToString(makeRandomPrivKey());
+  const publicKey = '03ef788b3830c00abe8f64f62dc32fc863bc0b2cafeb073b6c8e1c7657d9c2c3ab';
+  const network = new StacksTestnet();
 
-  const makeContractCall = jest.fn().mockResolvedValue('tx');
-  const broadcastTransaction = jest.fn().mockResolvedValue('0');
-
-  const network = new StacksMainnet();
+  const makeUnsignedContractCall = jest.fn().mockResolvedValue({});
 
   jest.mock('@stacks/transactions', () => ({
-    makeContractCall,
-    broadcastTransaction,
+    makeUnsignedContractCall,
     bufferCV: jest.requireActual('@stacks/transactions').bufferCV,
     uintCV: jest.requireActual('@stacks/transactions').uintCV,
     hash160: jest.requireActual('@stacks/transactions').hash160
   }));
 
-  const { preorderNamespace } = require('../src');
-  const result = await preorderNamespace({
+  const { buildPreorderNamespaceTX } = require('../src');
+  await buildPreorderNamespaceTX({
     namespace,
     salt,
     stxToBurn,
-    privateKey,
+    publicKey,
     network
   });
 
@@ -372,24 +368,19 @@ test('preorderNamespace', async () => {
       bufferCV(hash160(Buffer.from(`0x${namespace}${salt}`))),
       uintCVFromBN(stxToBurn)
     ],
-    validateWithAbi: true,
-    senderKey: privateKey,
-    network: network
+    validateWithAbi: false,
+    publicKey,
+    network
   };
 
-  expect(result).toEqual({
-    success: true,
-    data: {
-      txid: '0'
-    }
-  });
-  expect(makeContractCall).toHaveBeenCalledTimes(1);
-  expect(makeContractCall).toHaveBeenCalledWith(expectedBNSContractCallOptions);
+  expect(makeUnsignedContractCall).toHaveBeenCalledTimes(1);
+  expect(makeUnsignedContractCall).toHaveBeenCalledWith(expectedBNSContractCallOptions);
 });
 
 test('revealNamespace', async () => {
   const namespace = 'id';
   const salt = 'salt';
+  const publicKey = '03ef788b3830c00abe8f64f62dc32fc863bc0b2cafeb073b6c8e1c7657d9c2c3ab';
 
   const priceFunction: PriceFunction = {
     base: new BN(10),
@@ -416,30 +407,27 @@ test('revealNamespace', async () => {
 
   const lifetime = new BN(10000);
   const namespaceImportAddress = 'SPF0324DSC4K505TP6A8C7GAK4R95E38TGNZP7RE';
-  const privateKey = privateKeyToString(makeRandomPrivKey());
 
-  const makeContractCall = jest.fn().mockResolvedValue('tx');
-  const broadcastTransaction = jest.fn().mockResolvedValue('0');
+  const makeUnsignedContractCall = jest.fn().mockResolvedValue({});
 
-  const network = new StacksMainnet();
+  const network = new StacksTestnet();
 
   jest.mock('@stacks/transactions', () => ({
-    makeContractCall,
-    broadcastTransaction,
+    makeUnsignedContractCall,
     bufferCV: jest.requireActual('@stacks/transactions').bufferCV,
     uintCV: jest.requireActual('@stacks/transactions').uintCV,
     standardPrincipalCV: jest.requireActual('@stacks/transactions').standardPrincipalCV,
     hash160: jest.requireActual('@stacks/transactions').hash160
   }));
 
-  const { revealNamespace } = require('../src');
-  const result = await revealNamespace({
+  const { buildRevealNamespaceTX } = require('../src');
+  await buildRevealNamespaceTX({
     namespace,
     salt,
     priceFunction,
     lifetime,
     namespaceImportAddress,
-    privateKey,
+    publicKey,
     network
   });
 
@@ -475,19 +463,13 @@ test('revealNamespace', async () => {
       uintCVFromBN(lifetime),
       standardPrincipalCV(namespaceImportAddress),
     ],
-    validateWithAbi: true,
-    senderKey: privateKey,
-    network: network
+    validateWithAbi: false,
+    publicKey,
+    network
   };
 
-  expect(result).toEqual({
-    success: true,
-    data: {
-      txid: '0'
-    }
-  });
-  expect(makeContractCall).toHaveBeenCalledTimes(1);
-  expect(makeContractCall).toHaveBeenCalledWith(expectedBNSContractCallOptions);
+  expect(makeUnsignedContractCall).toHaveBeenCalledTimes(1);
+  expect(makeUnsignedContractCall).toHaveBeenCalledWith(expectedBNSContractCallOptions);
 });
 
 test('importName', async () => {
@@ -495,30 +477,27 @@ test('importName', async () => {
   const name = 'test';
   const beneficiary = 'SPF0324DSC4K505TP6A8C7GAK4R95E38TGNZP7RE';
   const zonefile = 'zonefile';
+  const publicKey = '03ef788b3830c00abe8f64f62dc32fc863bc0b2cafeb073b6c8e1c7657d9c2c3ab';
 
-  const privateKey = privateKeyToString(makeRandomPrivKey());
-
-  const makeContractCall = jest.fn().mockResolvedValue('tx');
-  const broadcastTransaction = jest.fn().mockResolvedValue('0');
+  const makeUnsignedContractCall = jest.fn().mockResolvedValue({});
 
   const network = new StacksMainnet();
 
   jest.mock('@stacks/transactions', () => ({
-    makeContractCall,
-    broadcastTransaction,
+    makeUnsignedContractCall,
     bufferCV: jest.requireActual('@stacks/transactions').bufferCV,
     uintCV: jest.requireActual('@stacks/transactions').uintCV,
     standardPrincipalCV: jest.requireActual('@stacks/transactions').standardPrincipalCV,
     hash160: jest.requireActual('@stacks/transactions').hash160
   }));
 
-  const { importName } = require('../src');
-  const result = await importName({
+  const { buildImportNameTX } = require('../src');
+  await buildImportNameTX({
     namespace,
     name,
     beneficiary,
     zonefile,
-    privateKey,
+    publicKey,
     network
   });
 
@@ -534,41 +513,32 @@ test('importName', async () => {
       standardPrincipalCV(beneficiary),
       bufferCV(getZonefileHash(zonefile))
     ],
-    senderKey: privateKey,
-    network: network,
-    validateWithAbi: true,
+    publicKey,
+    network,
+    validateWithAbi: false,
   };
 
-  expect(result).toEqual({
-    success: true,
-    data: {
-      txid: '0'
-    }
-  });
-  expect(makeContractCall).toHaveBeenCalledTimes(1);
-  expect(makeContractCall).toHaveBeenCalledWith(expectedBNSContractCallOptions);
-  expect(broadcastTransaction).toHaveBeenCalledWith(expect.anything(), network, Buffer.from(zonefile));
+  expect(makeUnsignedContractCall).toHaveBeenCalledTimes(1);
+  expect(makeUnsignedContractCall).toHaveBeenCalledWith(expectedBNSContractCallOptions);
 });
 
 test('readyNamespace', async () => {
   const namespace = 'id';
-  const privateKey = privateKeyToString(makeRandomPrivKey());
+  const publicKey = '03ef788b3830c00abe8f64f62dc32fc863bc0b2cafeb073b6c8e1c7657d9c2c3ab';
 
-  const makeContractCall = jest.fn().mockResolvedValue('tx');
-  const broadcastTransaction = jest.fn().mockResolvedValue('0');
+  const makeUnsignedContractCall = jest.fn().mockResolvedValue({});
 
   const network = new StacksMainnet();
 
   jest.mock('@stacks/transactions', () => ({
-    makeContractCall,
-    broadcastTransaction,
+    makeUnsignedContractCall,
     bufferCV: jest.requireActual('@stacks/transactions').bufferCV,
   }));
 
-  const { readyNamespace } = require('../src');
-  const result = await readyNamespace({
+  const { buildReadyNamespaceTX } = require('../src');
+  await buildReadyNamespaceTX({
     namespace,
-    privateKey,
+    publicKey,
     network
   });
 
@@ -581,46 +551,38 @@ test('readyNamespace', async () => {
     functionArgs: [
       bufferCVFromString(namespace),
     ],
-    senderKey: privateKey,
-    network: network,
-    validateWithAbi: true,
+    publicKey,
+    network,
+    validateWithAbi: false,
   };
 
-  expect(result).toEqual({
-    success: true,
-    data: {
-      txid: '0'
-    }
-  });
-  expect(makeContractCall).toHaveBeenCalledTimes(1);
-  expect(makeContractCall).toHaveBeenCalledWith(expectedBNSContractCallOptions);
+  expect(makeUnsignedContractCall).toHaveBeenCalledTimes(1);
+  expect(makeUnsignedContractCall).toHaveBeenCalledWith(expectedBNSContractCallOptions);
 });
 
 test('preorderName', async () => {
   const fullyQualifiedName = 'test.id';
   const salt = 'salt';
   const stxToBurn = new BN(10);
-  const privateKey = privateKeyToString(makeRandomPrivKey());
+  const publicKey = '03ef788b3830c00abe8f64f62dc32fc863bc0b2cafeb073b6c8e1c7657d9c2c3ab';
 
-  const makeContractCall = jest.fn().mockResolvedValue('tx');
-  const broadcastTransaction = jest.fn().mockResolvedValue('0');
+  const makeUnsignedContractCall = jest.fn().mockResolvedValue({});
 
   const network = new StacksMainnet();
 
   jest.mock('@stacks/transactions', () => ({
-    makeContractCall,
-    broadcastTransaction,
+    makeUnsignedContractCall,
     bufferCV: jest.requireActual('@stacks/transactions').bufferCV,
     uintCV: jest.requireActual('@stacks/transactions').uintCV,
     hash160: jest.requireActual('@stacks/transactions').hash160,
   }));
 
-  const { preorderName } = require('../src');
-  const result = await preorderName({
+  const { buildPreorderNameTX } = require('../src');
+  await buildPreorderNameTX({
     fullyQualifiedName,
     salt,
     stxToBurn,
-    privateKey,
+    publicKey,
     network
   });
 
@@ -634,45 +596,37 @@ test('preorderName', async () => {
       bufferCV(hash160(Buffer.from(`0x${fullyQualifiedName}${salt}`))),
       uintCVFromBN(stxToBurn),
     ],
-    senderKey: privateKey,
-    network: network,
-    validateWithAbi: true,
+    publicKey,
+    network,
+    validateWithAbi: false,
   };
 
-  expect(result).toEqual({
-    success: true,
-    data: {
-      txid: '0'
-    }
-  });
-  expect(makeContractCall).toHaveBeenCalledTimes(1);
-  expect(makeContractCall).toHaveBeenCalledWith(expectedBNSContractCallOptions);
+  expect(makeUnsignedContractCall).toHaveBeenCalledTimes(1);
+  expect(makeUnsignedContractCall).toHaveBeenCalledWith(expectedBNSContractCallOptions);
 });
 
 test('registerName', async () => {
   const fullyQualifiedName = 'test.id';
   const salt = 'salt';
   const zonefile = 'zonefile';
-  const privateKey = privateKeyToString(makeRandomPrivKey());
+  const publicKey = '03ef788b3830c00abe8f64f62dc32fc863bc0b2cafeb073b6c8e1c7657d9c2c3ab';
 
-  const makeContractCall = jest.fn().mockResolvedValue('tx');
-  const broadcastTransaction = jest.fn().mockResolvedValue('0');
+  const makeUnsignedContractCall = jest.fn().mockResolvedValue({});
 
   const network = new StacksMainnet();
 
   jest.mock('@stacks/transactions', () => ({
-    makeContractCall,
-    broadcastTransaction,
+    makeUnsignedContractCall,
     bufferCV: jest.requireActual('@stacks/transactions').bufferCV,
     hash160: jest.requireActual('@stacks/transactions').hash160,
   }));
 
-  const { registerName } = require('../src');
-  const result = await registerName({
+  const { buildRegisterNameTX } = require('../src');
+  await buildRegisterNameTX({
     fullyQualifiedName,
     salt,
     zonefile,
-    privateKey,
+    publicKey,
     network
   });
 
@@ -690,44 +644,35 @@ test('registerName', async () => {
       bufferCVFromString(salt),
       bufferCV(getZonefileHash(zonefile))
     ],
-    senderKey: privateKey,
-    network: network,
-    validateWithAbi: true,
+    publicKey,
+    network,
+    validateWithAbi: false,
   };
 
-  expect(result).toEqual({
-    success: true,
-    data: {
-      txid: '0'
-    }
-  });
-  expect(makeContractCall).toHaveBeenCalledTimes(1);
-  expect(makeContractCall).toHaveBeenCalledWith(expectedBNSContractCallOptions);
-  expect(broadcastTransaction).toHaveBeenCalledWith(expect.anything(), network, Buffer.from(zonefile));
+  expect(makeUnsignedContractCall).toHaveBeenCalledTimes(1);
+  expect(makeUnsignedContractCall).toHaveBeenCalledWith(expectedBNSContractCallOptions);
 });
 
 test('updateName', async () => {
   const fullyQualifiedName = 'test.id';
   const zonefile = 'zonefile';
-  const privateKey = privateKeyToString(makeRandomPrivKey());
+  const publicKey = '03ef788b3830c00abe8f64f62dc32fc863bc0b2cafeb073b6c8e1c7657d9c2c3ab';
 
-  const makeContractCall = jest.fn().mockResolvedValue('tx');
-  const broadcastTransaction = jest.fn().mockResolvedValue('0');
+  const makeUnsignedContractCall = jest.fn().mockResolvedValue({});
 
   const network = new StacksMainnet();
 
   jest.mock('@stacks/transactions', () => ({
-    makeContractCall,
-    broadcastTransaction,
+    makeUnsignedContractCall,
     bufferCV: jest.requireActual('@stacks/transactions').bufferCV,
     hash160: jest.requireActual('@stacks/transactions').hash160,
   }));
 
-  const { updateName } = require('../src');
-  const result = await updateName({
+  const { buildUpdateNameTX } = require('../src');
+  await buildUpdateNameTX({
     fullyQualifiedName,
     zonefile,
-    privateKey,
+    publicKey,
     network
   });
 
@@ -744,45 +689,36 @@ test('updateName', async () => {
       bufferCVFromString(name),
       bufferCV(getZonefileHash(zonefile))
     ],
-    senderKey: privateKey,
-    network: network,
-    validateWithAbi: true,
+    publicKey,
+    network,
+    validateWithAbi: false,
   };
 
-  expect(result).toEqual({
-    success: true,
-    data: {
-      txid: '0'
-    }
-  });
-  expect(makeContractCall).toHaveBeenCalledTimes(1);
-  expect(makeContractCall).toHaveBeenCalledWith(expectedBNSContractCallOptions);
-  expect(broadcastTransaction).toHaveBeenCalledWith(expect.anything(), network, Buffer.from(zonefile));
+  expect(makeUnsignedContractCall).toHaveBeenCalledTimes(1);
+  expect(makeUnsignedContractCall).toHaveBeenCalledWith(expectedBNSContractCallOptions);
 });
 
 test('transferName', async () => {
   const fullyQualifiedName = 'test.id';
   const newOwnerAddress = 'SPF0324DSC4K505TP6A8C7GAK4R95E38TGNZP7RE';
   const zonefile = 'zonefile';
-  const privateKey = privateKeyToString(makeRandomPrivKey());
+  const publicKey = '03ef788b3830c00abe8f64f62dc32fc863bc0b2cafeb073b6c8e1c7657d9c2c3ab';
 
-  const makeContractCall = jest.fn().mockResolvedValue('tx');
-  const broadcastTransaction = jest.fn().mockResolvedValue('0');
+  const makeUnsignedContractCall = jest.fn().mockResolvedValue({});
 
   const network = new StacksMainnet();
 
   jest.mock('@stacks/transactions', () => ({
-    makeContractCall,
-    broadcastTransaction,
+    makeUnsignedContractCall,
     bufferCV: jest.requireActual('@stacks/transactions').bufferCV,
     hash160: jest.requireActual('@stacks/transactions').hash160,
   }));
 
-  const { transferName } = require('../src');
-  const result = await transferName({
+  const { buildTransferNameTX } = require('../src');
+  await buildTransferNameTX({
     fullyQualifiedName,
     newOwnerAddress,
-    privateKey,
+    publicKey,
     zonefile,
     network
   });
@@ -801,42 +737,33 @@ test('transferName', async () => {
       bufferCVFromString(newOwnerAddress),
       bufferCV(getZonefileHash(zonefile)),
     ],
-    senderKey: privateKey,
-    network: network,
-    validateWithAbi: true,
+    publicKey,
+    network,
+    validateWithAbi: false,
   };
 
-  expect(result).toEqual({
-    success: true,
-    data: {
-      txid: '0'
-    }
-  });
-  expect(makeContractCall).toHaveBeenCalledTimes(1);
-  expect(makeContractCall).toHaveBeenCalledWith(expectedBNSContractCallOptions);
-  expect(broadcastTransaction).toHaveBeenCalledWith(expect.anything(), network, Buffer.from(zonefile));
+  expect(makeUnsignedContractCall).toHaveBeenCalledTimes(1);
+  expect(makeUnsignedContractCall).toHaveBeenCalledWith(expectedBNSContractCallOptions);
 });
 
 test('revokeName', async () => {
   const fullyQualifiedName = 'test.id';
-  const privateKey = privateKeyToString(makeRandomPrivKey());
+  const publicKey = '03ef788b3830c00abe8f64f62dc32fc863bc0b2cafeb073b6c8e1c7657d9c2c3ab';
 
-  const makeContractCall = jest.fn().mockResolvedValue('tx');
-  const broadcastTransaction = jest.fn().mockResolvedValue('0');
+  const makeUnsignedContractCall = jest.fn().mockResolvedValue({});
 
   const network = new StacksMainnet();
 
   jest.mock('@stacks/transactions', () => ({
-    makeContractCall,
-    broadcastTransaction,
+    makeUnsignedContractCall,
     bufferCV: jest.requireActual('@stacks/transactions').bufferCV,
     hash160: jest.requireActual('@stacks/transactions').hash160,
   }));
 
-  const { revokeName } = require('../src');
-  const result = await revokeName({
+  const { buildRevokeNameTX } = require('../src');
+  await buildRevokeNameTX({
     fullyQualifiedName,
-    privateKey,
+    publicKey,
     network
   });
 
@@ -852,19 +779,13 @@ test('revokeName', async () => {
       bufferCVFromString(namespace),
       bufferCVFromString(name),
     ],
-    senderKey: privateKey,
-    network: network,
-    validateWithAbi: true,
+    publicKey,
+    network,
+    validateWithAbi: false,
   };
 
-  expect(result).toEqual({
-    success: true,
-    data: {
-      txid: '0'
-    }
-  });
-  expect(makeContractCall).toHaveBeenCalledTimes(1);
-  expect(makeContractCall).toHaveBeenCalledWith(expectedBNSContractCallOptions);
+  expect(makeUnsignedContractCall).toHaveBeenCalledTimes(1);
+  expect(makeUnsignedContractCall).toHaveBeenCalledWith(expectedBNSContractCallOptions);
 });
 
 test('renewName', async () => {
@@ -872,28 +793,26 @@ test('renewName', async () => {
   const stxToBurn = new BN(10);
   const newOwnerAddress = 'SPF0324DSC4K505TP6A8C7GAK4R95E38TGNZP7RE';
   const zonefile = 'zonefile';
-  const privateKey = privateKeyToString(makeRandomPrivKey());
+  const publicKey = '03ef788b3830c00abe8f64f62dc32fc863bc0b2cafeb073b6c8e1c7657d9c2c3ab';
 
-  const makeContractCall = jest.fn().mockResolvedValue('tx');
-  const broadcastTransaction = jest.fn().mockResolvedValue('0');
+  const makeUnsignedContractCall = jest.fn().mockResolvedValue({});
 
   const network = new StacksMainnet();
 
   jest.mock('@stacks/transactions', () => ({
-    makeContractCall,
-    broadcastTransaction,
+    makeUnsignedContractCall,
     bufferCV: jest.requireActual('@stacks/transactions').bufferCV,
     uintCV: jest.requireActual('@stacks/transactions').uintCV,
     hash160: jest.requireActual('@stacks/transactions').hash160,
   }));
 
-  const { renewName } = require('../src');
-  const result = await renewName({
+  const { buildRenewNameTX } = require('../src');
+  await buildRenewNameTX({
     fullyQualifiedName,
     stxToBurn,
     newOwnerAddress,
     zonefile,
-    privateKey,
+    publicKey,
     network
   });
 
@@ -912,18 +831,11 @@ test('renewName', async () => {
       bufferCVFromString(newOwnerAddress),
       bufferCV(getZonefileHash(zonefile))
     ],
-    senderKey: privateKey,
-    network: network,
-    validateWithAbi: true,
+    publicKey,
+    network,
+    validateWithAbi: false,
   };
 
-  expect(result).toEqual({
-    success: true,
-    data: {
-      txid: '0'
-    }
-  });
-  expect(makeContractCall).toHaveBeenCalledTimes(1);
-  expect(makeContractCall).toHaveBeenCalledWith(expectedBNSContractCallOptions);
-  expect(broadcastTransaction).toHaveBeenCalledWith(expect.anything(), network, Buffer.from(zonefile));
+  expect(makeUnsignedContractCall).toHaveBeenCalledTimes(1);
+  expect(makeUnsignedContractCall).toHaveBeenCalledWith(expectedBNSContractCallOptions);
 });
