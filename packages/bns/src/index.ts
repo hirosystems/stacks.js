@@ -15,7 +15,7 @@ import {
   UnsignedContractCallOptions,
 } from '@stacks/transactions';
 
-import { StacksMainnet, StacksNetwork } from '@stacks/network';
+import { StacksNetwork } from '@stacks/network';
 
 import { bufferCVFromString, decodeFQN, getZonefileHash, uintCVFromBN } from './utils';
 
@@ -24,13 +24,7 @@ import BN from 'bn.js';
 export const BNS_CONTRACT_ADDRESS = 'ST000000000000000000002AMW42H';
 export const BNS_CONTRACT_NAME = 'bns';
 
-export type Result = {
-  success: boolean;
-  data: any;
-  error?: string;
-};
-
-export type PriceFunction = {
+export interface PriceFunction {
   base: BN;
   coefficient: BN;
   b1: BN;
@@ -51,7 +45,7 @@ export type PriceFunction = {
   b16: BN;
   nonAlphaDiscount: BN;
   noVowelDiscount: BN;
-};
+}
 
 export interface BNSContractCallOptions {
   functionName: string;
@@ -103,7 +97,7 @@ async function callReadOnlyBNSFunction(options: BNSReadOnlyOptions): Promise<Cla
  */
 export async function canRegisterName(
   fullyQualifiedName: string,
-  network?: StacksNetwork
+  network: StacksNetwork
 ): Promise<boolean> {
   const bnsFunctionName = 'can-name-be-registered';
   const { subdomain, namespace, name } = decodeFQN(fullyQualifiedName);
@@ -121,7 +115,7 @@ export async function canRegisterName(
     functionName: bnsFunctionName,
     senderAddress: randomAddress,
     functionArgs: [bufferCVFromString(namespace), bufferCVFromString(name)],
-    network: network || new StacksMainnet(),
+    network,
   }).then((responseCV: ClarityValue) => {
     if (responseCV.type === ClarityType.ResponseOk) {
       return responseCV.value.type === ClarityType.BoolTrue;
@@ -139,7 +133,7 @@ export async function canRegisterName(
  *
  * @returns {Promise} that resolves to a BN object number of microstacks if the operation succeeds
  */
-export async function getNamespacePrice(namespace: string, network?: StacksNetwork): Promise<BN> {
+export async function getNamespacePrice(namespace: string, network: StacksNetwork): Promise<BN> {
   const bnsFunctionName = 'get-namespace-price';
 
   // Create a random address as input to read-only function call
@@ -152,7 +146,7 @@ export async function getNamespacePrice(namespace: string, network?: StacksNetwo
     functionName: bnsFunctionName,
     senderAddress: randomAddress,
     functionArgs: [bufferCVFromString(namespace)],
-    network: network || new StacksMainnet(),
+    network,
   }).then((responseCV: ClarityValue) => {
     if (responseCV.type === ClarityType.ResponseOk) {
       if (responseCV.value.type === ClarityType.Int || responseCV.value.type === ClarityType.UInt) {
@@ -177,7 +171,7 @@ export async function getNamespacePrice(namespace: string, network?: StacksNetwo
  */
 export async function getNamePrice(
   fullyQualifiedName: string,
-  network?: StacksNetwork
+  network: StacksNetwork
 ): Promise<BN> {
   const bnsFunctionName = 'get-name-price';
   const { subdomain, namespace, name } = decodeFQN(fullyQualifiedName);
@@ -195,7 +189,7 @@ export async function getNamePrice(
     functionName: bnsFunctionName,
     senderAddress: randomAddress,
     functionArgs: [bufferCVFromString(namespace), bufferCVFromString(name)],
-    network: network || new StacksMainnet(),
+    network,
   }).then((responseCV: ClarityValue) => {
     if (responseCV.type === ClarityType.ResponseOk) {
       if (responseCV.value.type === ClarityType.Int || responseCV.value.type === ClarityType.UInt) {
@@ -224,7 +218,7 @@ export interface PreorderNamespaceOptions {
   salt: string;
   stxToBurn: BN;
   publicKey: string;
-  network?: StacksNetwork;
+  network: StacksNetwork;
 }
 
 /**
@@ -238,7 +232,7 @@ export interface PreorderNamespaceOptions {
  *
  * @return {Promise<StacksTransaction>}
  */
-export async function buildPreorderNamespaceTX({
+export async function buildPreorderNamespaceTx({
   namespace,
   salt,
   stxToBurn,
@@ -248,13 +242,12 @@ export async function buildPreorderNamespaceTX({
   const bnsFunctionName = 'namespace-preorder';
   const saltedNamespaceBuffer = Buffer.from(`0x${namespace}${salt}`);
   const hashedSaltedNamespace = hash160(saltedNamespaceBuffer);
-  const txNetwork = network || new StacksMainnet();
 
   return makeBNSContractCall({
     functionName: bnsFunctionName,
     functionArgs: [bufferCV(hashedSaltedNamespace), uintCVFromBN(stxToBurn)],
     publicKey,
-    network: txNetwork,
+    network,
   });
 }
 
@@ -276,7 +269,7 @@ export interface RevealNamespaceOptions {
   lifetime: BN;
   namespaceImportAddress: string;
   publicKey: string;
-  network?: StacksNetwork;
+  network: StacksNetwork;
 }
 
 /**
@@ -289,7 +282,7 @@ export interface RevealNamespaceOptions {
  *
  * @return {Promise<StacksTransaction>}
  */
-export async function buildRevealNamespaceTX({
+export async function buildRevealNamespaceTx({
   namespace,
   salt,
   priceFunction,
@@ -299,7 +292,6 @@ export async function buildRevealNamespaceTX({
   network,
 }: RevealNamespaceOptions): Promise<StacksTransaction> {
   const bnsFunctionName = 'namespace-reveal';
-  const txNetwork = network || new StacksMainnet();
 
   return makeBNSContractCall({
     functionName: bnsFunctionName,
@@ -330,7 +322,7 @@ export async function buildRevealNamespaceTX({
       standardPrincipalCV(namespaceImportAddress),
     ],
     publicKey,
-    network: txNetwork,
+    network,
   });
 }
 
@@ -350,7 +342,7 @@ export interface ImportNameOptions {
   beneficiary: string;
   zonefile: string;
   publicKey: string;
-  network?: StacksNetwork;
+  network: StacksNetwork;
 }
 
 /**
@@ -363,7 +355,7 @@ export interface ImportNameOptions {
  *
  * @return {Promise<StacksTransaction>}
  */
-export async function buildImportNameTX({
+export async function buildImportNameTx({
   namespace,
   name,
   beneficiary,
@@ -372,7 +364,6 @@ export async function buildImportNameTX({
   network,
 }: ImportNameOptions): Promise<StacksTransaction> {
   const bnsFunctionName = 'name-import';
-  const txNetwork = network || new StacksMainnet();
   const zonefileHash = getZonefileHash(zonefile);
 
   return makeBNSContractCall({
@@ -384,7 +375,7 @@ export async function buildImportNameTX({
       bufferCV(zonefileHash),
     ],
     publicKey,
-    network: txNetwork,
+    network,
     attachment: Buffer.from(zonefile),
   });
 }
@@ -399,7 +390,7 @@ export async function buildImportNameTX({
 export interface ReadyNamespaceOptions {
   namespace: string;
   publicKey: string;
-  network?: StacksNetwork;
+  network: StacksNetwork;
 }
 
 /**
@@ -413,19 +404,18 @@ export interface ReadyNamespaceOptions {
  *
  * @return {Promise<StacksTransaction>}
  */
-export async function buildReadyNamespaceTX({
+export async function buildReadyNamespaceTx({
   namespace,
   publicKey,
   network,
 }: ReadyNamespaceOptions): Promise<StacksTransaction> {
   const bnsFunctionName = 'namespace-ready';
-  const txNetwork = network || new StacksMainnet();
 
   return makeBNSContractCall({
     functionName: bnsFunctionName,
     functionArgs: [bufferCVFromString(namespace)],
     publicKey,
-    network: txNetwork,
+    network,
   });
 }
 
@@ -444,7 +434,7 @@ export interface PreorderNameOptions {
   salt: string;
   stxToBurn: BN;
   publicKey: string;
-  network?: StacksNetwork;
+  network: StacksNetwork;
 }
 
 /**
@@ -458,7 +448,7 @@ export interface PreorderNameOptions {
  *
  * @return {Promise<StacksTransaction>}
  */
-export async function buildPreorderNameTX({
+export async function buildPreorderNameTx({
   fullyQualifiedName,
   salt,
   stxToBurn,
@@ -472,13 +462,12 @@ export async function buildPreorderNameTX({
   }
   const saltedNamesBuffer = Buffer.from(`0x${fullyQualifiedName}${salt}`);
   const hashedSaltedName = hash160(saltedNamesBuffer);
-  const txNetwork = network || new StacksMainnet();
 
   return makeBNSContractCall({
     functionName: bnsFunctionName,
     functionArgs: [bufferCV(hashedSaltedName), uintCVFromBN(stxToBurn)],
     publicKey,
-    network: txNetwork,
+    network,
   });
 }
 
@@ -497,7 +486,7 @@ export interface RegisterNameOptions {
   salt: string;
   zonefile: string;
   publicKey: string;
-  network?: StacksNetwork;
+  network: StacksNetwork;
 }
 
 /**
@@ -510,7 +499,7 @@ export interface RegisterNameOptions {
  *
  * @return {Promise<StacksTransaction>}
  */
-export async function buildRegisterNameTX({
+export async function buildRegisterNameTx({
   fullyQualifiedName,
   salt,
   zonefile,
@@ -522,7 +511,6 @@ export async function buildRegisterNameTX({
   if (subdomain) {
     throw new Error('Cannot register a subdomain using registerName()');
   }
-  const txNetwork = network || new StacksMainnet();
 
   const zonefileHash = getZonefileHash(zonefile);
 
@@ -534,7 +522,7 @@ export async function buildRegisterNameTX({
       bufferCVFromString(salt),
       bufferCV(zonefileHash),
     ],
-    network: txNetwork,
+    network,
     publicKey,
     attachment: Buffer.from(zonefile),
   });
@@ -553,7 +541,7 @@ export interface UpdateNameOptions {
   fullyQualifiedName: string;
   zonefile: string;
   publicKey: string;
-  network?: StacksNetwork;
+  network: StacksNetwork;
 }
 
 /**
@@ -566,7 +554,7 @@ export interface UpdateNameOptions {
  *
  * @return {Promise<StacksTransaction>}
  */
-export async function buildUpdateNameTX({
+export async function buildUpdateNameTx({
   fullyQualifiedName,
   zonefile,
   publicKey,
@@ -577,14 +565,13 @@ export async function buildUpdateNameTX({
   if (subdomain) {
     throw new Error('Cannot update a subdomain using updateName()');
   }
-  const txNetwork = network || new StacksMainnet();
   const zonefileHash = getZonefileHash(zonefile);
 
   return makeBNSContractCall({
     functionName: bnsFunctionName,
     functionArgs: [bufferCVFromString(namespace), bufferCVFromString(name), bufferCV(zonefileHash)],
     publicKey,
-    network: txNetwork,
+    network,
     attachment: Buffer.from(zonefile),
   });
 }
@@ -603,8 +590,8 @@ export interface TransferNameOptions {
   fullyQualifiedName: string;
   newOwnerAddress: string;
   publicKey: string;
+  network: StacksNetwork;
   zonefile?: string;
-  network?: StacksNetwork;
 }
 
 /**
@@ -617,7 +604,7 @@ export interface TransferNameOptions {
  *
  * @return {Promise<StacksTransaction>}
  */
-export async function buildTransferNameTX({
+export async function buildTransferNameTx({
   fullyQualifiedName,
   newOwnerAddress,
   zonefile,
@@ -629,7 +616,6 @@ export async function buildTransferNameTX({
   if (subdomain) {
     throw new Error('Cannot transfer a subdomain using transferName()');
   }
-  const txNetwork = network || new StacksMainnet();
 
   const functionArgs = [
     bufferCVFromString(namespace),
@@ -645,7 +631,7 @@ export async function buildTransferNameTX({
     functionName: bnsFunctionName,
     functionArgs,
     publicKey,
-    network: txNetwork,
+    network,
     attachment: zonefile ? Buffer.from(zonefile) : undefined,
   });
 }
@@ -661,7 +647,7 @@ export async function buildTransferNameTX({
 export interface RevokeNameOptions {
   fullyQualifiedName: string;
   publicKey: string;
-  network?: StacksNetwork;
+  network: StacksNetwork;
 }
 
 /**
@@ -674,7 +660,7 @@ export interface RevokeNameOptions {
  *
  * @return {Promise<StacksTransaction>}
  */
-export async function buildRevokeNameTX({
+export async function buildRevokeNameTx({
   fullyQualifiedName,
   publicKey,
   network,
@@ -684,13 +670,12 @@ export async function buildRevokeNameTX({
   if (subdomain) {
     throw new Error('Cannot revoke a subdomain using revokeName()');
   }
-  const txNetwork = network || new StacksMainnet();
 
   return makeBNSContractCall({
     functionName: bnsFunctionName,
     functionArgs: [bufferCVFromString(namespace), bufferCVFromString(name)],
     publicKey,
-    network: txNetwork,
+    network,
   });
 }
 
@@ -709,9 +694,9 @@ export interface RenewNameOptions {
   fullyQualifiedName: string;
   stxToBurn: BN;
   publicKey: string;
+  network: StacksNetwork;
   newOwnerAddress?: string;
   zonefile?: string;
-  network?: StacksNetwork;
 }
 
 /**
@@ -724,7 +709,7 @@ export interface RenewNameOptions {
  *
  * @return {Promise<StacksTransaction>}
  */
-export async function buildRenewNameTX({
+export async function buildRenewNameTx({
   fullyQualifiedName,
   stxToBurn,
   newOwnerAddress,
@@ -737,7 +722,6 @@ export async function buildRenewNameTX({
   if (subdomain) {
     throw new Error('Cannot renew a subdomain using renewName()');
   }
-  const txNetwork = network || new StacksMainnet();
 
   const functionArgs = [
     bufferCVFromString(namespace),
@@ -758,7 +742,7 @@ export async function buildRenewNameTX({
     functionName: bnsFunctionName,
     functionArgs,
     publicKey,
-    network: txNetwork,
+    network,
     attachment: zonefile ? Buffer.from(zonefile) : undefined,
   });
 }
