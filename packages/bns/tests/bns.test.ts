@@ -349,8 +349,8 @@ test('preorderNamespace', async () => {
     hash160: jest.requireActual('@stacks/transactions').hash160
   }));
 
-  const { buildPreorderNamespaceTX } = require('../src');
-  await buildPreorderNamespaceTX({
+  const { buildPreorderNamespaceTx } = require('../src');
+  await buildPreorderNamespaceTx({
     namespace,
     salt,
     stxToBurn,
@@ -420,8 +420,8 @@ test('revealNamespace', async () => {
     hash160: jest.requireActual('@stacks/transactions').hash160
   }));
 
-  const { buildRevealNamespaceTX } = require('../src');
-  await buildRevealNamespaceTX({
+  const { buildRevealNamespaceTx } = require('../src');
+  await buildRevealNamespaceTx({
     namespace,
     salt,
     priceFunction,
@@ -491,8 +491,8 @@ test('importName', async () => {
     hash160: jest.requireActual('@stacks/transactions').hash160
   }));
 
-  const { buildImportNameTX } = require('../src');
-  await buildImportNameTX({
+  const { buildImportNameTx } = require('../src');
+  await buildImportNameTx({
     namespace,
     name,
     beneficiary,
@@ -535,8 +535,8 @@ test('readyNamespace', async () => {
     bufferCV: jest.requireActual('@stacks/transactions').bufferCV,
   }));
 
-  const { buildReadyNamespaceTX } = require('../src');
-  await buildReadyNamespaceTX({
+  const { buildReadyNamespaceTx } = require('../src');
+  await buildReadyNamespaceTx({
     namespace,
     publicKey,
     network
@@ -577,8 +577,8 @@ test('preorderName', async () => {
     hash160: jest.requireActual('@stacks/transactions').hash160,
   }));
 
-  const { buildPreorderNameTX } = require('../src');
-  await buildPreorderNameTX({
+  const { buildPreorderNameTx } = require('../src');
+  await buildPreorderNameTx({
     fullyQualifiedName,
     salt,
     stxToBurn,
@@ -621,8 +621,8 @@ test('registerName', async () => {
     hash160: jest.requireActual('@stacks/transactions').hash160,
   }));
 
-  const { buildRegisterNameTX } = require('../src');
-  await buildRegisterNameTX({
+  const { buildRegisterNameTx } = require('../src');
+  await buildRegisterNameTx({
     fullyQualifiedName,
     salt,
     zonefile,
@@ -668,8 +668,8 @@ test('updateName', async () => {
     hash160: jest.requireActual('@stacks/transactions').hash160,
   }));
 
-  const { buildUpdateNameTX } = require('../src');
-  await buildUpdateNameTX({
+  const { buildUpdateNameTx } = require('../src');
+  await buildUpdateNameTx({
     fullyQualifiedName,
     zonefile,
     publicKey,
@@ -714,8 +714,8 @@ test('transferName', async () => {
     hash160: jest.requireActual('@stacks/transactions').hash160,
   }));
 
-  const { buildTransferNameTX } = require('../src');
-  await buildTransferNameTX({
+  const { buildTransferNameTx } = require('../src');
+  await buildTransferNameTx({
     fullyQualifiedName,
     newOwnerAddress,
     publicKey,
@@ -760,8 +760,8 @@ test('revokeName', async () => {
     hash160: jest.requireActual('@stacks/transactions').hash160,
   }));
 
-  const { buildRevokeNameTX } = require('../src');
-  await buildRevokeNameTX({
+  const { buildRevokeNameTx } = require('../src');
+  await buildRevokeNameTx({
     fullyQualifiedName,
     publicKey,
     network
@@ -806,8 +806,8 @@ test('renewName', async () => {
     hash160: jest.requireActual('@stacks/transactions').hash160,
   }));
 
-  const { buildRenewNameTX } = require('../src');
-  await buildRenewNameTX({
+  const { buildRenewNameTx } = require('../src');
+  await buildRenewNameTx({
     fullyQualifiedName,
     stxToBurn,
     newOwnerAddress,
