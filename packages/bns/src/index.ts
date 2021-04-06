@@ -100,6 +100,17 @@ async function callReadOnlyBnsFunction(options: BnsReadOnlyOptions): Promise<Cla
 }
 
 /**
+ * Can register name options
+ *
+ * @param  {String} fullyQualifiedName - the fully qualified name ("name.namespace") to check
+ * @param  {StacksNetwork} network - the Stacks blockchain network to use
+ */
+export interface CanRegisterNameOptions {
+  fullyQualifiedName: string,
+  network: StacksNetwork,
+}
+
+/**
  * Check if name can be registered
  *
  * @param {string} fullyQualifiedName - the fully qualified name to check
@@ -107,10 +118,10 @@ async function callReadOnlyBnsFunction(options: BnsReadOnlyOptions): Promise<Cla
  *
  * @returns {Promise} that resolves to true if the operation succeeds
  */
-export async function canRegisterName(
-  fullyQualifiedName: string,
-  network: StacksNetwork
-): Promise<boolean> {
+export async function canRegisterName({
+  fullyQualifiedName,
+  network
+}: CanRegisterNameOptions): Promise<boolean> {
   const bnsFunctionName = 'can-name-be-registered';
   const { subdomain, namespace, name } = decodeFQN(fullyQualifiedName);
   if (subdomain) {
@@ -138,6 +149,17 @@ export async function canRegisterName(
 }
 
 /**
+ * Get namespace price options
+ *
+ * @param  {String} namespace - the namespace to get the price of
+ * @param  {StacksNetwork} network - the Stacks blockchain network to use
+ */
+export interface GetNamespacePriceOptions {
+  namespace: string,
+  network: StacksNetwork,
+}
+
+/**
  * Get price of namespace registration in microstacks
  *
  * @param {string} namespace - the namespace
@@ -145,7 +167,7 @@ export async function canRegisterName(
  *
  * @returns {Promise} that resolves to a BN object number of microstacks if the operation succeeds
  */
-export async function getNamespacePrice(namespace: string, network: StacksNetwork): Promise<BN> {
+export async function getNamespacePrice({ namespace, network }: GetNamespacePriceOptions): Promise<BN> {
   const bnsFunctionName = 'get-namespace-price';
 
   // Create a random address as input to read-only function call
@@ -175,6 +197,17 @@ export async function getNamespacePrice(namespace: string, network: StacksNetwor
 }
 
 /**
+ * Get name price options
+ *
+ * @param  {String} fullyQualifiedName - the fully qualified name ("name.namespace") to get the price of
+ * @param  {StacksNetwork} network - the Stacks blockchain network to use
+ */
+export interface GetNamePriceOptions {
+  fullyQualifiedName: string,
+  network: StacksNetwork,
+}
+
+/**
  * Get price of name registration in microstacks
  *
  * @param {string} fullyQualifiedName - the fully qualified name
@@ -182,10 +215,7 @@ export async function getNamespacePrice(namespace: string, network: StacksNetwor
  *
  * @returns {Promise} that resolves to a BN object number of microstacks if the operation succeeds
  */
-export async function getNamePrice(
-  fullyQualifiedName: string,
-  network: StacksNetwork
-): Promise<BN> {
+export async function getNamePrice({ fullyQualifiedName, network }: GetNamePriceOptions): Promise<BN> {
   const bnsFunctionName = 'get-name-price';
   const { subdomain, namespace, name } = decodeFQN(fullyQualifiedName);
   if (subdomain) {
@@ -222,9 +252,9 @@ export async function getNamePrice(
  *
  * @param  {String} namespace - the namespace to preorder
  * @param  {String} salt - salt used to generate the preorder namespace hash
- * @param  {BigNum} stxToBurn - amount of STX to burn for the registration
+ * @param  {BN} stxToBurn - amount of STX to burn for the registration
  * @param  {String} publicKey - the private key to sign the transaction
- * @param  {StacksNetwork} network - the Stacks blockchain network to register on
+ * @param  {StacksNetwork} network - the Stacks blockchain network to use
  */
 export interface PreorderNamespaceOptions {
   namespace: string;
@@ -270,10 +300,10 @@ export async function buildPreorderNamespaceTx({
  * @param  {String} namespace - the namespace to reveal
  * @param  {String} salt - salt used to generate the preorder namespace hash
  * @param  {PriceFunction} priceFunction - an object containing the price function for the namespace
- * @param  {BigNum} lifeTime - the number of blocks name registrations are valid for in the namespace
+ * @param  {BN} lifeTime - the number of blocks name registrations are valid for in the namespace
  * @param  {String} namespaceImportAddress - the STX address used for name imports
  * @param  {String} publicKey - the private key to sign the transaction
- * @param  {StacksNetwork} network - the Stacks blockchain network to register on
+ * @param  {StacksNetwork} network - the Stacks blockchain network to use
  */
 export interface RevealNamespaceOptions {
   namespace: string;
@@ -347,7 +377,7 @@ export async function buildRevealNamespaceTx({
  * @param  {String} beneficiary - the address to register the name to
  * @param  {String} zonefileHash - the zonefile hash to register
  * @param  {String} publicKey - the private key to sign the transaction
- * @param  {StacksNetwork} network - the Stacks blockchain network to register on
+ * @param  {StacksNetwork} network - the Stacks blockchain network to use
  */
 export interface ImportNameOptions {
   namespace: string;
@@ -398,7 +428,7 @@ export async function buildImportNameTx({
  *
  * @param  {String} namespace - the namespace to ready
  * @param  {String} publicKey - the private key to sign the transaction
- * @param  {StacksNetwork} network - the Stacks blockchain network to register on
+ * @param  {StacksNetwork} network - the Stacks blockchain network to use
  */
 export interface ReadyNamespaceOptions {
   namespace: string;
@@ -438,9 +468,9 @@ export async function buildReadyNamespaceTx({
  * @param  {String} fullyQualifiedName - the fully qualified name to preorder including the
  *                                        namespace (myName.id)
  * @param  {String} salt - salt used to generate the preorder name hash
- * @param  {BigNum} stxToBurn - amount of STX to burn for the registration
+ * @param  {BN} stxToBurn - amount of STX to burn for the registration
  * @param  {String} publicKey - the private key to sign the transaction
- * @param  {StacksNetwork} network - the Stacks blockchain network to register on
+ * @param  {StacksNetwork} network - the Stacks blockchain network to use
  */
 export interface PreorderNameOptions {
   fullyQualifiedName: string;
@@ -492,7 +522,7 @@ export async function buildPreorderNameTx({
  * @param  {String} salt - salt used to generate the preorder name hash
  * @param  {String} zonefile - the zonefile to register with the name
  * @param  {String} publicKey - the private key to sign the transaction
- * @param  {StacksNetwork} network - the Stacks blockchain network to register on
+ * @param  {StacksNetwork} network - the Stacks blockchain network to use
  */
 export interface RegisterNameOptions {
   fullyQualifiedName: string;
@@ -548,7 +578,7 @@ export async function buildRegisterNameTx({
  *                                        namespace (myName.id)
  * @param  {String} zonefile - the zonefile to register with the name
  * @param  {String} publicKey - the private key to sign the transaction
- * @param  {StacksNetwork} network - the Stacks blockchain network to register on
+ * @param  {StacksNetwork} network - the Stacks blockchain network to use
  */
 export interface UpdateNameOptions {
   fullyQualifiedName: string;
@@ -597,7 +627,7 @@ export async function buildUpdateNameTx({
  * @param  {String} newOwnerAddress - the recipient address of the name transfer
  * @param  {String} zonefile - the optional zonefile to register with the name
  * @param  {String} publicKey - the private key to sign the transaction
- * @param  {StacksNetwork} network - the Stacks blockchain network to register on
+ * @param  {StacksNetwork} network - the Stacks blockchain network to use
  */
 export interface TransferNameOptions {
   fullyQualifiedName: string;
@@ -655,7 +685,7 @@ export async function buildTransferNameTx({
  * @param  {String} fullyQualifiedName - the fully qualified name to revoke including the
  *                                        namespace (myName.id)
  * @param  {String} publicKey - the private key to sign the transaction
- * @param  {StacksNetwork} network - the Stacks blockchain network to register on
+ * @param  {StacksNetwork} network - the Stacks blockchain network to use
  */
 export interface RevokeNameOptions {
   fullyQualifiedName: string;
@@ -697,11 +727,11 @@ export async function buildRevokeNameTx({
  *
  * @param  {String} fullyQualifiedName - the fully qualified name to renew including the
  *                                        namespace (myName.id)
- * @param  {BigNum} stxToBurn - amount of STX to burn for the registration
+ * @param  {BN} stxToBurn - amount of STX to burn for the registration
  * @param  {String} publicKey - the private key to sign the transaction
  * @param  {String} newOwnerAddress - optionally choose a new owner address
  * @param  {String} zonefileHash - optionally update the zonefile hash
- * @param  {StacksNetwork} network - the Stacks blockchain network to register on
+ * @param  {StacksNetwork} network - the Stacks blockchain network to use
  */
 export interface RenewNameOptions {
   fullyQualifiedName: string;
