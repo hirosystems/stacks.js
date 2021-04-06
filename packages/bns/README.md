@@ -15,16 +15,17 @@ npm install --save @stacks/bns
 
 ## Example Usage
 
-```
+```typescript
 import { canRegisterName } from '@stacks/bns';
 import { StacksTestnet } from '@stacks/network';
 
 const network = new StacksMainnet();
 
-const result = await canRegisterName('name.id', network);
+const fullyQualifiedName = 'name.id';
+const result = await canRegisterName({ fullyQualifiedName, network });
 ```
 
-```
+```typescript
 import { buildRegisterNameTX } from '@stacks/bns';
 import { StacksTestnet } from '@stacks/network';
 
@@ -36,7 +37,7 @@ const zonefile =  'example-zonefile'
 const publicKey = 'SPF0324DSC4K505TP6A8C7GAK4R95E38TGNZP7RE'
 
 // construct an unsigned bns register-name transaction
-const unsignedTX = await buildRegisterNameTX({name, salt, zonefile, publicKey, network});
+const unsignedTX = await buildRegisterNameTX({ name, salt, zonefile, publicKey, network });
 ```
 
 ## Docs
