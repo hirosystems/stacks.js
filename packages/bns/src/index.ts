@@ -5,6 +5,7 @@ import {
   ClarityValue,
   cvToString,
   getAddressFromPrivateKey,
+  getCVTypeString,
   hash160,
   makeRandomPrivKey,
   makeUnsignedContractCall,
@@ -21,8 +22,19 @@ import { bufferCVFromString, decodeFQN, getZonefileHash, uintCVFromBN } from './
 
 import BN from 'bn.js';
 
-export const BNS_CONTRACT_ADDRESS = 'ST000000000000000000002AMW42H';
+import { ChainID } from '@stacks/common';
+
 export const BNS_CONTRACT_NAME = 'bns';
+
+export const enum BnsContractAddress {
+  mainnet = 'SP000000000000000000002Q6VF78',
+  testnet = 'ST000000000000000000002AMW42H',
+}
+
+function getBnsContractAddress(network: StacksNetwork) {
+  if (network.chainId === ChainID.Mainnet) return BnsContractAddress.mainnet;
+  else return BnsContractAddress.testnet;
+}
 
 export interface PriceFunction {
   base: BN;
@@ -57,7 +69,7 @@ export interface BnsContractCallOptions {
 
 async function makeBnsContractCall(options: BnsContractCallOptions): Promise<StacksTransaction> {
   const txOptions: UnsignedContractCallOptions = {
-    contractAddress: BNS_CONTRACT_ADDRESS,
+    contractAddress: getBnsContractAddress(options.network),
     contractName: BNS_CONTRACT_NAME,
     functionName: options.functionName,
     functionArgs: options.functionArgs,
@@ -78,7 +90,7 @@ export interface BnsReadOnlyOptions {
 
 async function callReadOnlyBnsFunction(options: BnsReadOnlyOptions): Promise<ClarityValue> {
   return callReadOnlyFunction({
-    contractAddress: BNS_CONTRACT_ADDRESS,
+    contractAddress: getBnsContractAddress(options.network),
     contractName: BNS_CONTRACT_NAME,
     functionName: options.functionName,
     senderAddress: options.senderAddress,
@@ -154,9 +166,10 @@ export async function getNamespacePrice(namespace: string, network: StacksNetwor
       } else {
         throw new Error('Response did not contain a number');
       }
+    } else if (responseCV.type === ClarityType.ResponseErr) {
+      throw new Error(cvToString(responseCV.value));
     } else {
-      const errorResponse = responseCV as ResponseErrorCV;
-      throw new Error(cvToString(errorResponse.value));
+      throw new Error(`Unexpected Clarity Value type: ${getCVTypeString(responseCV)}`);
     }
   });
 }
