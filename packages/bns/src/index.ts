@@ -107,8 +107,8 @@ async function callReadOnlyBnsFunction(options: BnsReadOnlyOptions): Promise<Cla
  * @param  {StacksNetwork} network - the Stacks blockchain network to use
  */
 export interface CanRegisterNameOptions {
-  fullyQualifiedName: string,
-  network: StacksNetwork,
+  fullyQualifiedName: string;
+  network: StacksNetwork;
 }
 
 /**
@@ -121,7 +121,7 @@ export interface CanRegisterNameOptions {
  */
 export async function canRegisterName({
   fullyQualifiedName,
-  network
+  network,
 }: CanRegisterNameOptions): Promise<boolean> {
   const bnsFunctionName = 'can-name-be-registered';
   const { subdomain, namespace, name } = decodeFQN(fullyQualifiedName);
@@ -156,8 +156,8 @@ export async function canRegisterName({
  * @param  {StacksNetwork} network - the Stacks blockchain network to use
  */
 export interface GetNamespacePriceOptions {
-  namespace: string,
-  network: StacksNetwork,
+  namespace: string;
+  network: StacksNetwork;
 }
 
 /**
@@ -168,7 +168,10 @@ export interface GetNamespacePriceOptions {
  *
  * @returns {Promise} that resolves to a BN object number of microstacks if the operation succeeds
  */
-export async function getNamespacePrice({ namespace, network }: GetNamespacePriceOptions): Promise<BN> {
+export async function getNamespacePrice({
+  namespace,
+  network,
+}: GetNamespacePriceOptions): Promise<BN> {
   const bnsFunctionName = 'get-namespace-price';
 
   // Create a random address as input to read-only function call
@@ -204,8 +207,8 @@ export async function getNamespacePrice({ namespace, network }: GetNamespacePric
  * @param  {StacksNetwork} network - the Stacks blockchain network to use
  */
 export interface GetNamePriceOptions {
-  fullyQualifiedName: string,
-  network: StacksNetwork,
+  fullyQualifiedName: string;
+  network: StacksNetwork;
 }
 
 /**
@@ -216,7 +219,10 @@ export interface GetNamePriceOptions {
  *
  * @returns {Promise} that resolves to a BN object number of microstacks if the operation succeeds
  */
-export async function getNamePrice({ fullyQualifiedName, network }: GetNamePriceOptions): Promise<BN> {
+export async function getNamePrice({
+  fullyQualifiedName,
+  network,
+}: GetNamePriceOptions): Promise<BN> {
   const bnsFunctionName = 'get-name-price';
   const { subdomain, namespace, name } = decodeFQN(fullyQualifiedName);
   if (subdomain) {
