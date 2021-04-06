@@ -107,7 +107,12 @@ export async function doPublicKeysMatchUsername(
     const responseJSON = JSON.parse(responseText);
     if (responseJSON.hasOwnProperty('address')) {
       const nameOwningAddress = responseJSON.address;
-      const nameOwningAddressBtc = c32ToB58(nameOwningAddress, 0);
+      let nameOwningAddressBtc = nameOwningAddress;
+      try {
+        // try converting STX to BTC
+        // if this throws, it's already a BTC address
+        nameOwningAddressBtc = c32ToB58(nameOwningAddress, 0);
+      } catch {}
       const addressFromIssuer = getAddressFromDID(payload.iss);
       if (nameOwningAddressBtc === addressFromIssuer) {
         return true;
@@ -261,21 +266,31 @@ export async function verifyAuthRequestAndLoadManifest(token: string): Promise<a
 }
 
 /**
- * Verify the authentication response is valid
+ * Verify the authentication response is valid.
  * @param {String} token the authentication response token
  * @param {String} nameLookupURL the url use to verify owner of a username
+ * @param fallbackLookupURLs an optional array of name lookup URLs to check usernames for
  * @return {Promise} that resolves to true if auth response
  * is valid and false if it does not
  * @private
  * @ignore
  */
-export async function verifyAuthResponse(token: string, nameLookupURL: string): Promise<boolean> {
+export async function verifyAuthResponse(
+  token: string,
+  nameLookupURL: string,
+  fallbackLookupURLs?: string[]
+): Promise<boolean> {
   const values = await Promise.all([
     isExpirationDateValid(token),
     isIssuanceDateValid(token),
     doSignaturesMatchPublicKeys(token),
     doPublicKeysMatchIssuer(token),
-    doPublicKeysMatchUsername(token, nameLookupURL),
   ]);
-  return values.every(val => val);
+  const usernameMatchings = await Promise.all(
+    [nameLookupURL]
+      .concat(fallbackLookupURLs || [])
+      .map(url => doPublicKeysMatchUsername(token, url))
+  );
+  const someUsernameMatches = usernameMatchings.find(doesMatch => doesMatch);
+  return !!someUsernameMatches && values.every(val => val);
 }
