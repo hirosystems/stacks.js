@@ -286,7 +286,7 @@ test('handlePendingSignIn with authResponseToken', async () => {
 
   expect(fail).toBeCalledTimes(0);
   expect(pass).toBeCalledTimes(1);
-  expect(fetchMock.mock.calls.length).toEqual(1);
+  expect(fetchMock.mock.calls.length).toEqual(3);
   expect(fetchMock.mock.calls[0][0]).toEqual(url);
 });
 
@@ -319,7 +319,7 @@ test('handlePendingSignIn 2', async () => {
   await blockstack.handlePendingSignIn(authResponse).then(pass).catch(fail);
   expect(fail).toBeCalledTimes(0);
   expect(pass).toBeCalledTimes(1);
-  expect(fetchMock.mock.calls.length).toEqual(1);
+  expect(fetchMock.mock.calls.length).toEqual(3);
   expect(fetchMock.mock.calls[0][0]).toEqual(url);
 });
 
