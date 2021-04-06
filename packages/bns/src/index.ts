@@ -33,8 +33,8 @@ export const enum BnsContractAddress {
 
 function getBnsContractAddress(network: StacksNetwork) {
   if (network.chainId === ChainID.Mainnet) return BnsContractAddress.mainnet;
-  else if (network.chainId == ChainID.Testnest) return BnsContractAddress.testnet;
-  else throw new Error(`Unexpected ChainID: ${network.chainID}`);
+  else if (network.chainId == ChainID.Testnet) return BnsContractAddress.testnet;
+  else throw new Error(`Unexpected ChainID: ${network.chainId}`);
 }
 
 export interface PriceFunction {
