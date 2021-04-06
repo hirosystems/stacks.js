@@ -47,7 +47,7 @@ export interface PriceFunction {
   noVowelDiscount: BN;
 }
 
-export interface BNSContractCallOptions {
+export interface BnsContractCallOptions {
   functionName: string;
   functionArgs: ClarityValue[];
   publicKey: string;
@@ -55,7 +55,7 @@ export interface BNSContractCallOptions {
   attachment?: Buffer;
 }
 
-async function makeBNSContractCall(options: BNSContractCallOptions): Promise<StacksTransaction> {
+async function makeBnsContractCall(options: BnsContractCallOptions): Promise<StacksTransaction> {
   const txOptions: UnsignedContractCallOptions = {
     contractAddress: BNS_CONTRACT_ADDRESS,
     contractName: BNS_CONTRACT_NAME,
@@ -69,14 +69,14 @@ async function makeBNSContractCall(options: BNSContractCallOptions): Promise<Sta
   return makeUnsignedContractCall(txOptions);
 }
 
-export interface BNSReadOnlyOptions {
+export interface BnsReadOnlyOptions {
   functionName: string;
   functionArgs: ClarityValue[];
   senderAddress: string;
   network: StacksNetwork;
 }
 
-async function callReadOnlyBNSFunction(options: BNSReadOnlyOptions): Promise<ClarityValue> {
+async function callReadOnlyBnsFunction(options: BnsReadOnlyOptions): Promise<ClarityValue> {
   return callReadOnlyFunction({
     contractAddress: BNS_CONTRACT_ADDRESS,
     contractName: BNS_CONTRACT_NAME,
@@ -111,7 +111,7 @@ export async function canRegisterName(
   const randomPrivateKey = privateKeyToString(makeRandomPrivKey());
   const randomAddress = getAddressFromPrivateKey(randomPrivateKey);
 
-  return callReadOnlyBNSFunction({
+  return callReadOnlyBnsFunction({
     functionName: bnsFunctionName,
     senderAddress: randomAddress,
     functionArgs: [bufferCVFromString(namespace), bufferCVFromString(name)],
@@ -142,7 +142,7 @@ export async function getNamespacePrice(namespace: string, network: StacksNetwor
   const randomPrivateKey = privateKeyToString(makeRandomPrivKey());
   const randomAddress = getAddressFromPrivateKey(randomPrivateKey);
 
-  return callReadOnlyBNSFunction({
+  return callReadOnlyBnsFunction({
     functionName: bnsFunctionName,
     senderAddress: randomAddress,
     functionArgs: [bufferCVFromString(namespace)],
@@ -185,7 +185,7 @@ export async function getNamePrice(
   const randomPrivateKey = privateKeyToString(makeRandomPrivKey());
   const randomAddress = getAddressFromPrivateKey(randomPrivateKey);
 
-  return callReadOnlyBNSFunction({
+  return callReadOnlyBnsFunction({
     functionName: bnsFunctionName,
     senderAddress: randomAddress,
     functionArgs: [bufferCVFromString(namespace), bufferCVFromString(name)],
@@ -243,7 +243,7 @@ export async function buildPreorderNamespaceTx({
   const saltedNamespaceBuffer = Buffer.from(`0x${namespace}${salt}`);
   const hashedSaltedNamespace = hash160(saltedNamespaceBuffer);
 
-  return makeBNSContractCall({
+  return makeBnsContractCall({
     functionName: bnsFunctionName,
     functionArgs: [bufferCV(hashedSaltedNamespace), uintCVFromBN(stxToBurn)],
     publicKey,
@@ -293,7 +293,7 @@ export async function buildRevealNamespaceTx({
 }: RevealNamespaceOptions): Promise<StacksTransaction> {
   const bnsFunctionName = 'namespace-reveal';
 
-  return makeBNSContractCall({
+  return makeBnsContractCall({
     functionName: bnsFunctionName,
     functionArgs: [
       bufferCVFromString(namespace),
@@ -366,7 +366,7 @@ export async function buildImportNameTx({
   const bnsFunctionName = 'name-import';
   const zonefileHash = getZonefileHash(zonefile);
 
-  return makeBNSContractCall({
+  return makeBnsContractCall({
     functionName: bnsFunctionName,
     functionArgs: [
       bufferCVFromString(namespace),
@@ -411,7 +411,7 @@ export async function buildReadyNamespaceTx({
 }: ReadyNamespaceOptions): Promise<StacksTransaction> {
   const bnsFunctionName = 'namespace-ready';
 
-  return makeBNSContractCall({
+  return makeBnsContractCall({
     functionName: bnsFunctionName,
     functionArgs: [bufferCVFromString(namespace)],
     publicKey,
@@ -463,7 +463,7 @@ export async function buildPreorderNameTx({
   const saltedNamesBuffer = Buffer.from(`0x${fullyQualifiedName}${salt}`);
   const hashedSaltedName = hash160(saltedNamesBuffer);
 
-  return makeBNSContractCall({
+  return makeBnsContractCall({
     functionName: bnsFunctionName,
     functionArgs: [bufferCV(hashedSaltedName), uintCVFromBN(stxToBurn)],
     publicKey,
@@ -514,7 +514,7 @@ export async function buildRegisterNameTx({
 
   const zonefileHash = getZonefileHash(zonefile);
 
-  return makeBNSContractCall({
+  return makeBnsContractCall({
     functionName: bnsFunctionName,
     functionArgs: [
       bufferCVFromString(namespace),
@@ -567,7 +567,7 @@ export async function buildUpdateNameTx({
   }
   const zonefileHash = getZonefileHash(zonefile);
 
-  return makeBNSContractCall({
+  return makeBnsContractCall({
     functionName: bnsFunctionName,
     functionArgs: [bufferCVFromString(namespace), bufferCVFromString(name), bufferCV(zonefileHash)],
     publicKey,
@@ -627,7 +627,7 @@ export async function buildTransferNameTx({
     functionArgs.push(bufferCV(getZonefileHash(zonefile)));
   }
 
-  return makeBNSContractCall({
+  return makeBnsContractCall({
     functionName: bnsFunctionName,
     functionArgs,
     publicKey,
@@ -671,7 +671,7 @@ export async function buildRevokeNameTx({
     throw new Error('Cannot revoke a subdomain using revokeName()');
   }
 
-  return makeBNSContractCall({
+  return makeBnsContractCall({
     functionName: bnsFunctionName,
     functionArgs: [bufferCVFromString(namespace), bufferCVFromString(name)],
     publicKey,
@@ -738,7 +738,7 @@ export async function buildRenewNameTx({
     functionArgs.push(bufferCV(zonefileHash));
   }
 
-  return makeBNSContractCall({
+  return makeBnsContractCall({
     functionName: bnsFunctionName,
     functionArgs,
     publicKey,
