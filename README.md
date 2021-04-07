@@ -12,6 +12,7 @@ This repo is home to the Stacks.js libraries which provide everything you need t
 - [`@stacks/encryption`](https://github.com/blockstack/stacks.js/tree/master/packages/encryption) Encryption functions used by Stacks.js packages.
 - [`@stacks/profile`](https://github.com/blockstack/stacks.js/tree/master/packages/profile) Functions for manipulating user profiles.
 - [`@stacks/common`](https://github.com/blockstack/stacks.js/tree/master/packages/common) Common utilities used by Stacks.js packages.
+- [`@stacks/bns`](https://github.com/blockstack/stacks.js/tree/master/packages/bns) Library for interacting with the BNS contract.
 
 See `README` in each package directory for installation instructions and usage.
 
@@ -24,7 +25,6 @@ To migrate your app from blockstack.js to stacks.js follow the steps in the [mig
 To setup the development environment for this repository, follow these steps:
 
 1. Clone this package.
-2. Make sure you have both `lerna` and `yarn` installed globally
 3. Run `lerna bootstrap` to install dependencies
 4. Run `lerna run build` to build packages
 5. Run `lerna run test` to run tests
