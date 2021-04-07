@@ -648,6 +648,10 @@ export interface TransferNameOptions {
  * Generates a name transfer transaction.
  * This changes the owner of the registered name.
  *
+ * Since the underlying NFT will be transferred,
+ * you will be required to add a post-condition to this
+ * transaction before broadcasting it.
+ *
  * Resolves to the generated StacksTransaction
  *
  * @param  {TransferNameOptions} options - an options object for the transfer
