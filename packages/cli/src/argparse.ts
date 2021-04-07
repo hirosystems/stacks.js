@@ -416,13 +416,39 @@ export const CLI_ARGS = {
         '\n' +
         '    $ stx convert_address 12qdRgXxgNBNPnDeEChy3fYTbSHQ8nfZfD\n' +
         '    {\n' +
-        '      "STACKS": "SPA2MZWV9N67TBYVWTE0PSSKMJ2F6YXW7CBE6YPW",\n' +
-        '      "BTC": "12qdRgXxgNBNPnDeEChy3fYTbSHQ8nfZfD"\n' +
+        '      "mainnet": {\n' +
+        '        "STACKS": "SPA2MZWV9N67TBYVWTE0PSSKMJ2F6YXW7CBE6YPW",\n' +
+        '        "BTC": "12qdRgXxgNBNPnDeEChy3fYTbSHQ8nfZfD"\n' +
+        '      }\n' +
         '    }\n' +
         '    $ stx convert_address SPA2MZWV9N67TBYVWTE0PSSKMJ2F6YXW7CBE6YPW\n' +
         '    {\n' +
-        '      "STACKS": "SPA2MZWV9N67TBYVWTE0PSSKMJ2F6YXW7CBE6YPW",\n' +
-        '      "BTC": "12qdRgXxgNBNPnDeEChy3fYTbSHQ8nfZfD"\n' +
+        '      "mainnet": {\n' +
+        '        "STACKS": "SPA2MZWV9N67TBYVWTE0PSSKMJ2F6YXW7CBE6YPW",\n' +
+        '        "BTC": "12qdRgXxgNBNPnDeEChy3fYTbSHQ8nfZfD"\n' +
+        '      }\n' +
+        '    }\n' +
+        '    $ stx convert_address SPA2MZWV9N67TBYVWTE0PSSKMJ2F6YXW7CBE6YPW -t\n' +
+        '    {\n' +
+        '      "mainnet": {\n' +
+        '        "STACKS": "SPA2MZWV9N67TBYVWTE0PSSKMJ2F6YXW7CBE6YPW",\n' +
+        '        "BTC": "12qdRgXxgNBNPnDeEChy3fYTbSHQ8nfZfD"\n' +
+        '      },\n' +
+        '      "testnet": {\n' +
+        '        "STACKS": "STA2MZWV9N67TBYVWTE0PSSKMJ2F6YXW7DX96QAM",\n' +
+        '        "BTC": "mhMaijcwVPcdAthFwmgLsaknTRt72GqQYo"\n' +
+        '      }\n' +
+        '    }\n' +
+        '    $ stx convert_address STA2MZWV9N67TBYVWTE0PSSKMJ2F6YXW7DX96QAM\n' +
+        '    {\n' +
+        '      "mainnet": {\n' +
+        '        "STACKS": "SPA2MZWV9N67TBYVWTE0PSSKMJ2F6YXW7CBE6YPW",\n' +
+        '        "BTC": "12qdRgXxgNBNPnDeEChy3fYTbSHQ8nfZfD"\n' +
+        '      },\n' +
+        '      "testnet": {\n' +
+        '        "STACKS": "STA2MZWV9N67TBYVWTE0PSSKMJ2F6YXW7DX96QAM",\n' +
+        '        "BTC": "mhMaijcwVPcdAthFwmgLsaknTRt72GqQYo"\n' +
+        '      }\n' +
         '    }\n',
       group: 'Account Management',
     },

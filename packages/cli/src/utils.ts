@@ -897,3 +897,8 @@ export function generateExplorerTxPageUrl(txid: string, network: StacksNetwork):
     return `https://explorer.stacks.co/txid/0x${txid}?chain=mainnet`;
   }
 }
+
+export function isTestnetAddress(address: string) {
+  const addressInfo = bitcoinjs.address.fromBase58Check(address);
+  return addressInfo.version === bitcoinjs.networks.testnet.pubKeyHash;
+}
