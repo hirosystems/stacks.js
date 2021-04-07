@@ -14,7 +14,7 @@ Namespace name import options
 
 **`param`** the private key to sign the transaction
 
-**`param`** the Stacks blockchain network to register on
+**`param`** the Stacks blockchain network to use
 
 ## Table of contents
 
@@ -24,7 +24,7 @@ Namespace name import options
 - [name](importnameoptions.md#name)
 - [namespace](importnameoptions.md#namespace)
 - [network](importnameoptions.md#network)
-- [privateKey](importnameoptions.md#privatekey)
+- [publicKey](importnameoptions.md#publickey)
 - [zonefile](importnameoptions.md#zonefile)
 
 ## Properties
@@ -33,7 +33,7 @@ Namespace name import options
 
 • **beneficiary**: *string*
 
-Defined in: [index.ts:389](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L389)
+Defined in: [index.ts:392](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L392)
 
 ___
 
@@ -41,7 +41,7 @@ ___
 
 • **name**: *string*
 
-Defined in: [index.ts:388](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L388)
+Defined in: [index.ts:391](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L391)
 
 ___
 
@@ -49,23 +49,23 @@ ___
 
 • **namespace**: *string*
 
-Defined in: [index.ts:387](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L387)
+Defined in: [index.ts:390](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L390)
 
 ___
 
 ### network
 
-• `Optional` **network**: StacksNetwork
+• **network**: StacksNetwork
 
-Defined in: [index.ts:392](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L392)
+Defined in: [index.ts:395](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L395)
 
 ___
 
-### privateKey
+### publicKey
 
-• **privateKey**: *string*
+• **publicKey**: *string*
 
-Defined in: [index.ts:391](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L391)
+Defined in: [index.ts:394](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L394)
 
 ___
 
@@ -73,4 +73,4 @@ ___
 
 • **zonefile**: *string*
 
-Defined in: [index.ts:390](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L390)
+Defined in: [index.ts:393](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L393)

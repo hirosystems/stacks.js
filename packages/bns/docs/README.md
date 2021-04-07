@@ -1,3 +1,5 @@
+Stacks.js Library Reference / [Exports](modules.md)
+
 # `@stacks/bns`
 
 A package for interacting with the [BNS contract](https://explorer.stacks.co/txid/SP000000000000000000002Q6VF78.bns?chain=mainnet)
@@ -13,35 +15,32 @@ state without relying on any central points of control.
 npm install --save @stacks/bns
 ```
 
-## Usage
+## Example Usage
 
-### `can-register-name`
-
-```
+```typescript
 import { canRegisterName } from '@stacks/bns';
 import { StacksTestnet } from '@stacks/network';
 
 const network = new StacksMainnet();
 
-const result = await canRegisterName('name.id', network);
+const fullyQualifiedName = 'name.id';
+const result = await canRegisterName({ fullyQualifiedName, network });
 ```
 
-### `get-namespace-price`
-```
-import { canRegisterName } from '@stacks/bns';
-import { StacksTestnet } = from '@stacks/network';
+```typescript
+import { buildRegisterNameTX } from '@stacks/bns';
+import { StacksTestnet } from '@stacks/network';
 
 const network = new StacksMainnet();
 
-const result = await canRegisterName('name.id', network);
+const name = 'name.id';
+const salt =  'example-salt'
+const zonefile =  'example-zonefile'
+const publicKey = 'SPF0324DSC4K505TP6A8C7GAK4R95E38TGNZP7RE'
+
+// construct an unsigned bns register-name transaction
+const unsignedTX = await buildRegisterNameTX({ name, salt, zonefile, publicKey, network });
 ```
 
-### `get-name-price`
-```
-import { canRegisterName } from '@stacks/bns';
-import { StacksTestnet } = from '@stacks/network';
-
-const network = new StacksMainnet();
-
-const result = await canRegisterName('name.id', network);
-```
+## Docs
+[Library Reference](https://github.com/blockstack/stacks.js/blob/feat/bns-package/packages/bns/docs/modules.md)

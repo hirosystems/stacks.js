@@ -16,7 +16,7 @@ Reveal namespace options
 
 **`param`** the private key to sign the transaction
 
-**`param`** the Stacks blockchain network to register on
+**`param`** the Stacks blockchain network to use
 
 ## Table of contents
 
@@ -27,7 +27,7 @@ Reveal namespace options
 - [namespaceImportAddress](revealnamespaceoptions.md#namespaceimportaddress)
 - [network](revealnamespaceoptions.md#network)
 - [priceFunction](revealnamespaceoptions.md#pricefunction)
-- [privateKey](revealnamespaceoptions.md#privatekey)
+- [publicKey](revealnamespaceoptions.md#publickey)
 - [salt](revealnamespaceoptions.md#salt)
 
 ## Properties
@@ -36,7 +36,7 @@ Reveal namespace options
 
 • **lifetime**: *BN*
 
-Defined in: [index.ts:315](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L315)
+Defined in: [index.ts:319](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L319)
 
 ___
 
@@ -44,7 +44,7 @@ ___
 
 • **namespace**: *string*
 
-Defined in: [index.ts:312](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L312)
+Defined in: [index.ts:316](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L316)
 
 ___
 
@@ -52,31 +52,31 @@ ___
 
 • **namespaceImportAddress**: *string*
 
-Defined in: [index.ts:316](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L316)
+Defined in: [index.ts:320](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L320)
 
 ___
 
 ### network
 
-• `Optional` **network**: StacksNetwork
+• **network**: StacksNetwork
 
-Defined in: [index.ts:318](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L318)
+Defined in: [index.ts:322](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L322)
 
 ___
 
 ### priceFunction
 
-• **priceFunction**: [*PriceFunction*](../modules.md#pricefunction)
+• **priceFunction**: [*PriceFunction*](pricefunction.md)
 
-Defined in: [index.ts:314](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L314)
+Defined in: [index.ts:318](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L318)
 
 ___
 
-### privateKey
+### publicKey
 
-• **privateKey**: *string*
+• **publicKey**: *string*
 
-Defined in: [index.ts:317](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L317)
+Defined in: [index.ts:321](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L321)
 
 ___
 
@@ -84,4 +84,4 @@ ___
 
 • **salt**: *string*
 
-Defined in: [index.ts:313](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L313)
+Defined in: [index.ts:317](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L317)

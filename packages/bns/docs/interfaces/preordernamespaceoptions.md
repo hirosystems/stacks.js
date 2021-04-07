@@ -12,7 +12,7 @@ Preorder namespace options
 
 **`param`** the private key to sign the transaction
 
-**`param`** the Stacks blockchain network to register on
+**`param`** the Stacks blockchain network to use
 
 ## Table of contents
 
@@ -20,7 +20,7 @@ Preorder namespace options
 
 - [namespace](preordernamespaceoptions.md#namespace)
 - [network](preordernamespaceoptions.md#network)
-- [privateKey](preordernamespaceoptions.md#privatekey)
+- [publicKey](preordernamespaceoptions.md#publickey)
 - [salt](preordernamespaceoptions.md#salt)
 - [stxToBurn](preordernamespaceoptions.md#stxtoburn)
 
@@ -30,23 +30,23 @@ Preorder namespace options
 
 • **namespace**: *string*
 
-Defined in: [index.ts:259](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L259)
+Defined in: [index.ts:267](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L267)
 
 ___
 
 ### network
 
-• `Optional` **network**: StacksNetwork
+• **network**: StacksNetwork
 
-Defined in: [index.ts:263](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L263)
+Defined in: [index.ts:271](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L271)
 
 ___
 
-### privateKey
+### publicKey
 
-• **privateKey**: *string*
+• **publicKey**: *string*
 
-Defined in: [index.ts:262](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L262)
+Defined in: [index.ts:270](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L270)
 
 ___
 
@@ -54,7 +54,7 @@ ___
 
 • **salt**: *string*
 
-Defined in: [index.ts:260](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L260)
+Defined in: [index.ts:268](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L268)
 
 ___
 
@@ -62,4 +62,4 @@ ___
 
 • **stxToBurn**: *BN*
 
-Defined in: [index.ts:261](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L261)
+Defined in: [index.ts:269](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L269)

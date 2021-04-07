@@ -1,14 +1,22 @@
-# `@stacks/bns` Library Reference
+# Stacks.js Library Reference
 
 ## Table of contents
 
+### Enumerations
+
+- [BnsContractAddress](enums/bnscontractaddress.md)
+
 ### Interfaces
 
-- [BNSContractCallOptions](interfaces/bnscontractcalloptions.md)
-- [BNSReadOnlyOptions](interfaces/bnsreadonlyoptions.md)
+- [BnsContractCallOptions](interfaces/bnscontractcalloptions.md)
+- [BnsReadOnlyOptions](interfaces/bnsreadonlyoptions.md)
+- [CanRegisterNameOptions](interfaces/canregisternameoptions.md)
+- [GetNamePriceOptions](interfaces/getnamepriceoptions.md)
+- [GetNamespacePriceOptions](interfaces/getnamespacepriceoptions.md)
 - [ImportNameOptions](interfaces/importnameoptions.md)
 - [PreorderNameOptions](interfaces/preordernameoptions.md)
 - [PreorderNamespaceOptions](interfaces/preordernamespaceoptions.md)
+- [PriceFunction](interfaces/pricefunction.md)
 - [ReadyNamespaceOptions](interfaces/readynamespaceoptions.md)
 - [RegisterNameOptions](interfaces/registernameoptions.md)
 - [RenewNameOptions](interfaces/renewnameoptions.md)
@@ -17,90 +25,27 @@
 - [TransferNameOptions](interfaces/transfernameoptions.md)
 - [UpdateNameOptions](interfaces/updatenameoptions.md)
 
-### Type aliases
-
-- [PriceFunction](modules.md#pricefunction)
-- [Result](modules.md#result)
-
 ### Variables
 
-- [BNS\_CONTRACT\_ADDRESS](modules.md#bns_contract_address)
 - [BNS\_CONTRACT\_NAME](modules.md#bns_contract_name)
 
 ### Functions
 
+- [buildImportNameTx](modules.md#buildimportnametx)
+- [buildPreorderNameTx](modules.md#buildpreordernametx)
+- [buildPreorderNamespaceTx](modules.md#buildpreordernamespacetx)
+- [buildReadyNamespaceTx](modules.md#buildreadynamespacetx)
+- [buildRegisterNameTx](modules.md#buildregisternametx)
+- [buildRenewNameTx](modules.md#buildrenewnametx)
+- [buildRevealNamespaceTx](modules.md#buildrevealnamespacetx)
+- [buildRevokeNameTx](modules.md#buildrevokenametx)
+- [buildTransferNameTx](modules.md#buildtransfernametx)
+- [buildUpdateNameTx](modules.md#buildupdatenametx)
 - [canRegisterName](modules.md#canregistername)
 - [getNamePrice](modules.md#getnameprice)
 - [getNamespacePrice](modules.md#getnamespaceprice)
-- [importName](modules.md#importname)
-- [preorderName](modules.md#preordername)
-- [preorderNamespace](modules.md#preordernamespace)
-- [readyNamespace](modules.md#readynamespace)
-- [registerName](modules.md#registername)
-- [renewName](modules.md#renewname)
-- [revealNamespace](modules.md#revealnamespace)
-- [revokeName](modules.md#revokename)
-- [transferName](modules.md#transfername)
-- [updateName](modules.md#updatename)
-
-## Type aliases
-
-### PriceFunction
-
-Ƭ **PriceFunction**: *object*
-
-#### Type declaration:
-
-Name | Type |
-:------ | :------ |
-`b1` | BN |
-`b10` | BN |
-`b11` | BN |
-`b12` | BN |
-`b13` | BN |
-`b14` | BN |
-`b15` | BN |
-`b16` | BN |
-`b2` | BN |
-`b3` | BN |
-`b4` | BN |
-`b5` | BN |
-`b6` | BN |
-`b7` | BN |
-`b8` | BN |
-`b9` | BN |
-`base` | BN |
-`coefficient` | BN |
-`noVowelDiscount` | BN |
-`nonAlphaDiscount` | BN |
-
-Defined in: [index.ts:35](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L35)
-
-___
-
-### Result
-
-Ƭ **Result**: *object*
-
-#### Type declaration:
-
-Name | Type |
-:------ | :------ |
-`data` | *any* |
-`error`? | *string* |
-`success` | *boolean* |
-
-Defined in: [index.ts:29](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L29)
 
 ## Variables
-
-### BNS\_CONTRACT\_ADDRESS
-
-• `Const` **BNS\_CONTRACT\_ADDRESS**: *ST000000000000000000002AMW42H*= 'ST000000000000000000002AMW42H'
-
-Defined in: [index.ts:26](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L26)
-
-___
 
 ### BNS\_CONTRACT\_NAME
 
@@ -110,77 +55,14 @@ Defined in: [index.ts:27](https://github.com/blockstack/stacks.js/blob/master/pa
 
 ## Functions
 
-### canRegisterName
+### buildImportNameTx
 
-▸ **canRegisterName**(`fullyQualifiedName`: *string*, `network?`: StacksNetwork): *Promise*<boolean\>
+▸ **buildImportNameTx**(`__namedParameters`: [*ImportNameOptions*](interfaces/importnameoptions.md)): *Promise*<StacksTransaction\>
 
-Check if name can be registered
-
-#### Parameters:
-
-Name | Type | Description |
-:------ | :------ | :------ |
-`fullyQualifiedName` | *string* | the fully qualified name to check   |
-`network?` | StacksNetwork | the Stacks network to broadcast transaction to    |
-
-**Returns:** *Promise*<boolean\>
-
-that resolves to true if the operation succeeds
-
-Defined in: [index.ts:124](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L124)
-
-___
-
-### getNamePrice
-
-▸ **getNamePrice**(`fullyQualifiedName`: *string*, `network?`: StacksNetwork): *Promise*<BN\>
-
-Get price of name registration in microstacks
-
-#### Parameters:
-
-Name | Type | Description |
-:------ | :------ | :------ |
-`fullyQualifiedName` | *string* | the fully qualified name   |
-`network?` | StacksNetwork | the Stacks network to use    |
-
-**Returns:** *Promise*<BN\>
-
-that resolves to a BN object number of microstacks if the operation succeeds
-
-Defined in: [index.ts:209](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L209)
-
-___
-
-### getNamespacePrice
-
-▸ **getNamespacePrice**(`namespace`: *string*, `network?`: StacksNetwork): *Promise*<BN\>
-
-Get price of namespace registration in microstacks
-
-#### Parameters:
-
-Name | Type | Description |
-:------ | :------ | :------ |
-`namespace` | *string* | the namespace   |
-`network?` | StacksNetwork | the Stacks network to use    |
-
-**Returns:** *Promise*<BN\>
-
-that resolves to a BN object number of microstacks if the operation succeeds
-
-Defined in: [index.ts:166](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L166)
-
-___
-
-### importName
-
-▸ **importName**(`__namedParameters`: [*ImportNameOptions*](interfaces/importnameoptions.md)): *Promise*<[*Result*](modules.md#result)\>
-
-Generates and broadcasts a namespace name import transaction.
+Generates a namespace name import transaction.
 An optional step in namespace registration.
 
-Returns a Result object which will indicate if the transaction was successfully broadcasted.
+Resolves to the generated StacksTransaction
 
 #### Parameters:
 
@@ -188,21 +70,21 @@ Name | Type |
 :------ | :------ |
 `__namedParameters` | [*ImportNameOptions*](interfaces/importnameoptions.md) |
 
-**Returns:** *Promise*<[*Result*](modules.md#result)\>
+**Returns:** *Promise*<StacksTransaction\>
 
-Defined in: [index.ts:405](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L405)
+Defined in: [index.ts:408](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L408)
 
 ___
 
-### preorderName
+### buildPreorderNameTx
 
-▸ **preorderName**(`__namedParameters`: [*PreorderNameOptions*](interfaces/preordernameoptions.md)): *Promise*<[*Result*](modules.md#result)\>
+▸ **buildPreorderNameTx**(`__namedParameters`: [*PreorderNameOptions*](interfaces/preordernameoptions.md)): *Promise*<StacksTransaction\>
 
-Generates and broadcasts a name preorder transaction.
+Generates a name preorder transaction.
 First step in registering a name. This transaction does not reveal the name that is
 about to be registered. And it sets the amount of STX to be burned for the registration.
 
-Returns a Result object which will indicate if the transaction was successfully broadcasted
+Resolves to the generated StacksTransaction
 
 #### Parameters:
 
@@ -210,21 +92,21 @@ Name | Type |
 :------ | :------ |
 `__namedParameters` | [*PreorderNameOptions*](interfaces/preordernameoptions.md) |
 
-**Returns:** *Promise*<[*Result*](modules.md#result)\>
+**Returns:** *Promise*<StacksTransaction\>
 
-Defined in: [index.ts:502](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L502)
+Defined in: [index.ts:501](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L501)
 
 ___
 
-### preorderNamespace
+### buildPreorderNamespaceTx
 
-▸ **preorderNamespace**(`__namedParameters`: [*PreorderNamespaceOptions*](interfaces/preordernamespaceoptions.md)): *Promise*<[*Result*](modules.md#result)\>
+▸ **buildPreorderNamespaceTx**(`__namedParameters`: [*PreorderNamespaceOptions*](interfaces/preordernamespaceoptions.md)): *Promise*<StacksTransaction\>
 
-Generates and broadcasts a namespace preorder transaction.
+Generates a namespace preorder transaction.
 First step in registering a namespace. This transaction does not reveal the namespace that is
 about to be registered. And it sets the amount of STX to be burned for the registration.
 
-Returns a Result object which will indicate if the transaction was successfully broadcasted
+Resolves to the generated StacksTransaction
 
 #### Parameters:
 
@@ -232,21 +114,21 @@ Name | Type |
 :------ | :------ |
 `__namedParameters` | [*PreorderNamespaceOptions*](interfaces/preordernamespaceoptions.md) |
 
-**Returns:** *Promise*<[*Result*](modules.md#result)\>
+**Returns:** *Promise*<StacksTransaction\>
 
-Defined in: [index.ts:277](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L277)
+Defined in: [index.ts:285](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L285)
 
 ___
 
-### readyNamespace
+### buildReadyNamespaceTx
 
-▸ **readyNamespace**(`__namedParameters`: [*ReadyNamespaceOptions*](interfaces/readynamespaceoptions.md)): *Promise*<[*Result*](modules.md#result)\>
+▸ **buildReadyNamespaceTx**(`__namedParameters`: [*ReadyNamespaceOptions*](interfaces/readynamespaceoptions.md)): *Promise*<StacksTransaction\>
 
-Generates and broadcasts a ready namespace transaction.
+Generates a ready namespace transaction.
 Final step in namespace registration. This completes the namespace registration and
 makes the namespace available for name registrations.
 
-Returns a Result object which will indicate if the transaction was successfully broadcasted.
+Resolves to the generated StacksTransaction
 
 #### Parameters:
 
@@ -254,20 +136,20 @@ Name | Type |
 :------ | :------ |
 `__namedParameters` | [*ReadyNamespaceOptions*](interfaces/readynamespaceoptions.md) |
 
-**Returns:** *Promise*<[*Result*](modules.md#result)\>
+**Returns:** *Promise*<StacksTransaction\>
 
-Defined in: [index.ts:455](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L455)
+Defined in: [index.ts:457](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L457)
 
 ___
 
-### registerName
+### buildRegisterNameTx
 
-▸ **registerName**(`__namedParameters`: [*RegisterNameOptions*](interfaces/registernameoptions.md)): *Promise*<[*Result*](modules.md#result)\>
+▸ **buildRegisterNameTx**(`__namedParameters`: [*RegisterNameOptions*](interfaces/registernameoptions.md)): *Promise*<StacksTransaction\>
 
-Generates and broadcasts a name registration transaction.
+Generates a name registration transaction.
 Second and final step in registering a name.
 
-Returns a Result object which will indicate if the transaction was successfully broadcast
+Resolves to the generated StacksTransaction
 
 #### Parameters:
 
@@ -275,20 +157,20 @@ Name | Type |
 :------ | :------ |
 `__namedParameters` | [*RegisterNameOptions*](interfaces/registernameoptions.md) |
 
-**Returns:** *Promise*<[*Result*](modules.md#result)\>
+**Returns:** *Promise*<StacksTransaction\>
 
-Defined in: [index.ts:557](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L557)
+Defined in: [index.ts:552](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L552)
 
 ___
 
-### renewName
+### buildRenewNameTx
 
-▸ **renewName**(`__namedParameters`: [*RenewNameOptions*](interfaces/renewnameoptions.md)): *Promise*<[*Result*](modules.md#result)\>
+▸ **buildRenewNameTx**(`__namedParameters`: [*RenewNameOptions*](interfaces/renewnameoptions.md)): *Promise*<StacksTransaction\>
 
-Generates and broadcasts a name renew transaction.
+Generates a name renew transaction.
 This renews a name registration.
 
-Returns a Result object which will indicate if the transaction was successfully broadcasted
+Resolves to the generated StacksTransaction
 
 #### Parameters:
 
@@ -296,20 +178,20 @@ Name | Type |
 :------ | :------ |
 `__namedParameters` | [*RenewNameOptions*](interfaces/renewnameoptions.md) |
 
-**Returns:** *Promise*<[*Result*](modules.md#result)\>
+**Returns:** *Promise*<StacksTransaction\>
 
-Defined in: [index.ts:778](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L778)
+Defined in: [index.ts:766](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L766)
 
 ___
 
-### revealNamespace
+### buildRevealNamespaceTx
 
-▸ **revealNamespace**(`__namedParameters`: [*RevealNamespaceOptions*](interfaces/revealnamespaceoptions.md)): *Promise*<[*Result*](modules.md#result)\>
+▸ **buildRevealNamespaceTx**(`__namedParameters`: [*RevealNamespaceOptions*](interfaces/revealnamespaceoptions.md)): *Promise*<StacksTransaction\>
 
-Generates and broadcasts a namespace reveal transaction.
+Generates a namespace reveal transaction.
 Second step in registering a namespace.
 
-Returns a Result object which will indicate if the transaction was successfully broadcasted.
+Resolves to the generated StacksTransaction
 
 #### Parameters:
 
@@ -317,20 +199,20 @@ Name | Type |
 :------ | :------ |
 `__namedParameters` | [*RevealNamespaceOptions*](interfaces/revealnamespaceoptions.md) |
 
-**Returns:** *Promise*<[*Result*](modules.md#result)\>
+**Returns:** *Promise*<StacksTransaction\>
 
-Defined in: [index.ts:331](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L331)
+Defined in: [index.ts:335](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L335)
 
 ___
 
-### revokeName
+### buildRevokeNameTx
 
-▸ **revokeName**(`__namedParameters`: [*RevokeNameOptions*](interfaces/revokenameoptions.md)): *Promise*<[*Result*](modules.md#result)\>
+▸ **buildRevokeNameTx**(`__namedParameters`: [*RevokeNameOptions*](interfaces/revokenameoptions.md)): *Promise*<StacksTransaction\>
 
-Generates and broadcasts a name revoke transaction.
+Generates a name revoke transaction.
 This revokes a name registration.
 
-Returns a Result object which will indicate if the transaction was successfully broadcasted
+Resolves to the generated StacksTransaction
 
 #### Parameters:
 
@@ -338,20 +220,24 @@ Name | Type |
 :------ | :------ |
 `__namedParameters` | [*RevokeNameOptions*](interfaces/revokenameoptions.md) |
 
-**Returns:** *Promise*<[*Result*](modules.md#result)\>
+**Returns:** *Promise*<StacksTransaction\>
 
-Defined in: [index.ts:725](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L725)
+Defined in: [index.ts:717](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L717)
 
 ___
 
-### transferName
+### buildTransferNameTx
 
-▸ **transferName**(`__namedParameters`: [*TransferNameOptions*](interfaces/transfernameoptions.md)): *Promise*<[*Result*](modules.md#result)\>
+▸ **buildTransferNameTx**(`__namedParameters`: [*TransferNameOptions*](interfaces/transfernameoptions.md)): *Promise*<StacksTransaction\>
 
-Generates and broadcasts a name transfer transaction.
+Generates a name transfer transaction.
 This changes the owner of the registered name.
 
-Returns a Result object which will indicate if the transaction was successfully broadcasted
+Since the underlying NFT will be transferred,
+you will be required to add a post-condition to this
+transaction before broadcasting it.
+
+Resolves to the generated StacksTransaction
 
 #### Parameters:
 
@@ -359,20 +245,20 @@ Name | Type |
 :------ | :------ |
 `__namedParameters` | [*TransferNameOptions*](interfaces/transfernameoptions.md) |
 
-**Returns:** *Promise*<[*Result*](modules.md#result)\>
+**Returns:** *Promise*<StacksTransaction\>
 
-Defined in: [index.ts:668](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L668)
+Defined in: [index.ts:661](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L661)
 
 ___
 
-### updateName
+### buildUpdateNameTx
 
-▸ **updateName**(`__namedParameters`: [*UpdateNameOptions*](interfaces/updatenameoptions.md)): *Promise*<[*Result*](modules.md#result)\>
+▸ **buildUpdateNameTx**(`__namedParameters`: [*UpdateNameOptions*](interfaces/updatenameoptions.md)): *Promise*<StacksTransaction\>
 
-Generates and broadcasts a name update transaction.
+Generates a name update transaction.
 This changes the zonefile for the registered name.
 
-Returns a Result object which will indicate if the transaction was successfully broadcasted
+Resolves to the generated StacksTransaction
 
 #### Parameters:
 
@@ -380,6 +266,66 @@ Name | Type |
 :------ | :------ |
 `__namedParameters` | [*UpdateNameOptions*](interfaces/updatenameoptions.md) |
 
-**Returns:** *Promise*<[*Result*](modules.md#result)\>
+**Returns:** *Promise*<StacksTransaction\>
 
-Defined in: [index.ts:613](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L613)
+Defined in: [index.ts:607](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L607)
+
+___
+
+### canRegisterName
+
+▸ **canRegisterName**(`__namedParameters`: [*CanRegisterNameOptions*](interfaces/canregisternameoptions.md)): *Promise*<boolean\>
+
+Check if name can be registered
+
+#### Parameters:
+
+Name | Type |
+:------ | :------ |
+`__namedParameters` | [*CanRegisterNameOptions*](interfaces/canregisternameoptions.md) |
+
+**Returns:** *Promise*<boolean\>
+
+that resolves to true if the operation succeeds
+
+Defined in: [index.ts:122](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L122)
+
+___
+
+### getNamePrice
+
+▸ **getNamePrice**(`__namedParameters`: [*GetNamePriceOptions*](interfaces/getnamepriceoptions.md)): *Promise*<BN\>
+
+Get price of name registration in microstacks
+
+#### Parameters:
+
+Name | Type |
+:------ | :------ |
+`__namedParameters` | [*GetNamePriceOptions*](interfaces/getnamepriceoptions.md) |
+
+**Returns:** *Promise*<BN\>
+
+that resolves to a BN object number of microstacks if the operation succeeds
+
+Defined in: [index.ts:222](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L222)
+
+___
+
+### getNamespacePrice
+
+▸ **getNamespacePrice**(`__namedParameters`: [*GetNamespacePriceOptions*](interfaces/getnamespacepriceoptions.md)): *Promise*<BN\>
+
+Get price of namespace registration in microstacks
+
+#### Parameters:
+
+Name | Type |
+:------ | :------ |
+`__namedParameters` | [*GetNamespacePriceOptions*](interfaces/getnamespacepriceoptions.md) |
+
+**Returns:** *Promise*<BN\>
+
+that resolves to a BN object number of microstacks if the operation succeeds
+
+Defined in: [index.ts:171](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L171)

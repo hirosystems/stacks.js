@@ -13,7 +13,7 @@ Register name options
 
 **`param`** the private key to sign the transaction
 
-**`param`** the Stacks blockchain network to register on
+**`param`** the Stacks blockchain network to use
 
 ## Table of contents
 
@@ -21,7 +21,7 @@ Register name options
 
 - [fullyQualifiedName](registernameoptions.md#fullyqualifiedname)
 - [network](registernameoptions.md#network)
-- [privateKey](registernameoptions.md#privatekey)
+- [publicKey](registernameoptions.md#publickey)
 - [salt](registernameoptions.md#salt)
 - [zonefile](registernameoptions.md#zonefile)
 
@@ -31,23 +31,23 @@ Register name options
 
 • **fullyQualifiedName**: *string*
 
-Defined in: [index.ts:540](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L540)
+Defined in: [index.ts:535](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L535)
 
 ___
 
 ### network
 
-• `Optional` **network**: StacksNetwork
+• **network**: StacksNetwork
 
-Defined in: [index.ts:544](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L544)
+Defined in: [index.ts:539](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L539)
 
 ___
 
-### privateKey
+### publicKey
 
-• **privateKey**: *string*
+• **publicKey**: *string*
 
-Defined in: [index.ts:543](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L543)
+Defined in: [index.ts:538](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L538)
 
 ___
 
@@ -55,7 +55,7 @@ ___
 
 • **salt**: *string*
 
-Defined in: [index.ts:541](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L541)
+Defined in: [index.ts:536](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L536)
 
 ___
 
@@ -63,4 +63,4 @@ ___
 
 • **zonefile**: *string*
 
-Defined in: [index.ts:542](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L542)
+Defined in: [index.ts:537](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L537)

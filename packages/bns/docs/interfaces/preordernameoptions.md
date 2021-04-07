@@ -13,7 +13,7 @@ Preorder name options
 
 **`param`** the private key to sign the transaction
 
-**`param`** the Stacks blockchain network to register on
+**`param`** the Stacks blockchain network to use
 
 ## Table of contents
 
@@ -21,7 +21,7 @@ Preorder name options
 
 - [fullyQualifiedName](preordernameoptions.md#fullyqualifiedname)
 - [network](preordernameoptions.md#network)
-- [privateKey](preordernameoptions.md#privatekey)
+- [publicKey](preordernameoptions.md#publickey)
 - [salt](preordernameoptions.md#salt)
 - [stxToBurn](preordernameoptions.md#stxtoburn)
 
@@ -31,23 +31,23 @@ Preorder name options
 
 • **fullyQualifiedName**: *string*
 
-Defined in: [index.ts:484](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L484)
+Defined in: [index.ts:483](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L483)
 
 ___
 
 ### network
 
-• `Optional` **network**: StacksNetwork
+• **network**: StacksNetwork
 
-Defined in: [index.ts:488](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L488)
+Defined in: [index.ts:487](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L487)
 
 ___
 
-### privateKey
+### publicKey
 
-• **privateKey**: *string*
+• **publicKey**: *string*
 
-Defined in: [index.ts:487](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L487)
+Defined in: [index.ts:486](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L486)
 
 ___
 
@@ -55,7 +55,7 @@ ___
 
 • **salt**: *string*
 
-Defined in: [index.ts:485](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L485)
+Defined in: [index.ts:484](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L484)
 
 ___
 
@@ -63,4 +63,4 @@ ___
 
 • **stxToBurn**: *BN*
 
-Defined in: [index.ts:486](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L486)
+Defined in: [index.ts:485](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L485)

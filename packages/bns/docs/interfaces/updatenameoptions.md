@@ -11,7 +11,7 @@ Update name options
 
 **`param`** the private key to sign the transaction
 
-**`param`** the Stacks blockchain network to register on
+**`param`** the Stacks blockchain network to use
 
 ## Table of contents
 
@@ -19,7 +19,7 @@ Update name options
 
 - [fullyQualifiedName](updatenameoptions.md#fullyqualifiedname)
 - [network](updatenameoptions.md#network)
-- [privateKey](updatenameoptions.md#privatekey)
+- [publicKey](updatenameoptions.md#publickey)
 - [zonefile](updatenameoptions.md#zonefile)
 
 ## Properties
@@ -28,23 +28,23 @@ Update name options
 
 • **fullyQualifiedName**: *string*
 
-Defined in: [index.ts:597](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L597)
+Defined in: [index.ts:591](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L591)
 
 ___
 
 ### network
 
-• `Optional` **network**: StacksNetwork
+• **network**: StacksNetwork
 
-Defined in: [index.ts:600](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L600)
+Defined in: [index.ts:594](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L594)
 
 ___
 
-### privateKey
+### publicKey
 
-• **privateKey**: *string*
+• **publicKey**: *string*
 
-Defined in: [index.ts:599](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L599)
+Defined in: [index.ts:593](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L593)
 
 ___
 
@@ -52,4 +52,4 @@ ___
 
 • **zonefile**: *string*
 
-Defined in: [index.ts:598](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L598)
+Defined in: [index.ts:592](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L592)
