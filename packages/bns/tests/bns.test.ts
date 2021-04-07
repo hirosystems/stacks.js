@@ -12,12 +12,11 @@ import {
 } from '@stacks/transactions';
 
 import {
-  StacksMainnet, StacksTestnet
+  StacksTestnet
 } from '@stacks/network';
 
 import {
-  BNS_CONTRACT_ADDRESS,
-  BNS_CONTRACT_NAME, PriceFunction
+  BNS_CONTRACT_NAME, BnsContractAddress, PriceFunction
 } from '../src'
 
 import {bufferCVFromString, decodeFQN, getZonefileHash, uintCVFromBN} from "../src/utils";
@@ -30,7 +29,7 @@ beforeEach(() => {
 });
 
 test('canRegisterName true', async () => {
-  const fqdn = 'test.id';
+  const fullyQualifiedName = 'test.id';
 
   const trueFunctionCallResponse = responseOkCV(trueCV());
   const notRandomAddress = 'SPF0324DSC4K505TP6A8C7GAK4R95E38TGNZP7RE';
@@ -38,7 +37,7 @@ test('canRegisterName true', async () => {
   const callReadOnlyFunction = jest.fn().mockResolvedValue(trueFunctionCallResponse);
   const getAddressFromPrivateKey = jest.fn().mockReturnValue(notRandomAddress);
 
-  const network = new StacksMainnet();
+  const network = new StacksTestnet();
 
   jest.mock('@stacks/transactions', () => ({
     callReadOnlyFunction,
@@ -51,17 +50,17 @@ test('canRegisterName true', async () => {
   }));
 
   const { canRegisterName } = require('../src');
-  const result = await canRegisterName(fqdn, network);
+  const result = await canRegisterName({ fullyQualifiedName, network });
 
   const bnsFunctionName = 'can-name-be-registered';
   
   const expectedReadOnlyFunctionCallOptions = {
-    contractAddress: BNS_CONTRACT_ADDRESS,
+    contractAddress: BnsContractAddress.testnet,
     contractName: BNS_CONTRACT_NAME,
     functionName: bnsFunctionName,
     functionArgs: [
-      bufferCV(Buffer.from(fqdn.split('.')[1])),
-      bufferCV(Buffer.from(fqdn.split('.')[0])),
+      bufferCV(Buffer.from(fullyQualifiedName.split('.')[1])),
+      bufferCV(Buffer.from(fullyQualifiedName.split('.')[0])),
     ],
     senderAddress: notRandomAddress,
     network
@@ -73,7 +72,7 @@ test('canRegisterName true', async () => {
 });
 
 test('canRegisterName false', async () => {
-  const fqdn = 'test.id';
+  const fullyQualifiedName = 'test.id';
 
   const falseFunctionCallResponse = responseOkCV(falseCV());
   const notRandomAddress = 'SPF0324DSC4K505TP6A8C7GAK4R95E38TGNZP7RE';
@@ -81,7 +80,7 @@ test('canRegisterName false', async () => {
   const callReadOnlyFunction = jest.fn().mockResolvedValue(falseFunctionCallResponse);
   const getAddressFromPrivateKey = jest.fn().mockReturnValue(notRandomAddress);
 
-  const network = new StacksMainnet();
+  const network = new StacksTestnet();
 
   jest.mock('@stacks/transactions', () => ({
     callReadOnlyFunction,
@@ -94,17 +93,17 @@ test('canRegisterName false', async () => {
   }));
 
   const { canRegisterName } = require('../src');
-  const result = await canRegisterName(fqdn, network);
+  const result = await canRegisterName({ fullyQualifiedName, network} );
 
   const bnsFunctionName = 'can-name-be-registered';
   
   const expectedReadOnlyFunctionCallOptions = {
-    contractAddress: BNS_CONTRACT_ADDRESS,
+    contractAddress: BnsContractAddress.testnet,
     contractName: BNS_CONTRACT_NAME,
     functionName: bnsFunctionName,
     functionArgs: [
-      bufferCV(Buffer.from(fqdn.split('.')[1])),
-      bufferCV(Buffer.from(fqdn.split('.')[0])),
+      bufferCV(Buffer.from(fullyQualifiedName.split('.')[1])),
+      bufferCV(Buffer.from(fullyQualifiedName.split('.')[0])),
     ],
     senderAddress: notRandomAddress,
     network
@@ -116,7 +115,7 @@ test('canRegisterName false', async () => {
 });
 
 test('canRegisterName error', async () => {
-  const fqdn = 'test.id';
+  const fullyQualifiedName = 'test.id';
 
   const errorFunctionCallResponse = responseErrorCV(bufferCV(Buffer.from('error')));
   const notRandomAddress = 'SPF0324DSC4K505TP6A8C7GAK4R95E38TGNZP7RE';
@@ -124,7 +123,7 @@ test('canRegisterName error', async () => {
   const callReadOnlyFunction = jest.fn().mockResolvedValue(errorFunctionCallResponse);
   const getAddressFromPrivateKey = jest.fn().mockReturnValue(notRandomAddress);
 
-  const network = new StacksMainnet();
+  const network = new StacksTestnet();
 
   jest.mock('@stacks/transactions', () => ({
     callReadOnlyFunction,
@@ -137,17 +136,17 @@ test('canRegisterName error', async () => {
   }));
 
   const { canRegisterName } = require('../src');
-  const result = await canRegisterName(fqdn, network);
+  const result = await canRegisterName({ fullyQualifiedName, network });
 
   const bnsFunctionName = 'can-name-be-registered';
   
   const expectedReadOnlyFunctionCallOptions = {
-    contractAddress: BNS_CONTRACT_ADDRESS,
+    contractAddress: BnsContractAddress.testnet,
     contractName: BNS_CONTRACT_NAME,
     functionName: bnsFunctionName,
     functionArgs: [
-      bufferCV(Buffer.from(fqdn.split('.')[1])),
-      bufferCV(Buffer.from(fqdn.split('.')[0])),
+      bufferCV(Buffer.from(fullyQualifiedName.split('.')[1])),
+      bufferCV(Buffer.from(fullyQualifiedName.split('.')[0])),
     ],
     senderAddress: notRandomAddress,
     network
@@ -167,7 +166,7 @@ test('getNamespacePrice', async () => {
   const callReadOnlyFunction = jest.fn().mockResolvedValue(namespacePriceResponse);
   const getAddressFromPrivateKey = jest.fn().mockReturnValue(address);
 
-  const network = new StacksMainnet();
+  const network = new StacksTestnet();
 
   jest.mock('@stacks/transactions', () => ({
     callReadOnlyFunction,
@@ -180,12 +179,12 @@ test('getNamespacePrice', async () => {
   }));
 
   const { getNamespacePrice } = require('../src');
-  const result = await getNamespacePrice(namespace, network);
+  const result = await getNamespacePrice({ namespace, network });
 
   const bnsFunctionName = 'get-namespace-price';
 
   const expectedReadOnlyFunctionCallOptions = {
-    contractAddress: BNS_CONTRACT_ADDRESS,
+    contractAddress: BnsContractAddress.testnet,
     contractName: BNS_CONTRACT_NAME,
     functionName: bnsFunctionName,
       senderAddress: address,
@@ -209,7 +208,7 @@ test('getNamespacePrice error', async () => {
   const callReadOnlyFunction = jest.fn().mockResolvedValue(errorResponse);
   const getAddressFromPrivateKey = jest.fn().mockReturnValue(address);
 
-  const network = new StacksMainnet();
+  const network = new StacksTestnet();
 
   jest.mock('@stacks/transactions', () => ({
     callReadOnlyFunction,
@@ -227,7 +226,7 @@ test('getNamespacePrice error', async () => {
   const bnsFunctionName = 'get-namespace-price';
 
   const expectedReadOnlyFunctionCallOptions = {
-    contractAddress: BNS_CONTRACT_ADDRESS,
+    contractAddress: BnsContractAddress.testnet,
     contractName: BNS_CONTRACT_NAME,
     functionName: bnsFunctionName,
     senderAddress: address,
@@ -237,7 +236,7 @@ test('getNamespacePrice error', async () => {
     network
   };
 
-  await expect(getNamespacePrice(namespace, network)).rejects.toEqual(new Error('u1001'));
+  await expect(getNamespacePrice({ namespace, network })).rejects.toEqual(new Error('u1001'));
   expect(callReadOnlyFunction).toHaveBeenCalledTimes(1);
   expect(callReadOnlyFunction).toHaveBeenCalledWith(expectedReadOnlyFunctionCallOptions);
 });
@@ -253,7 +252,7 @@ test('getNamePrice', async () => {
   const callReadOnlyFunction = jest.fn().mockResolvedValue(namePriceResponse);
   const getAddressFromPrivateKey = jest.fn().mockReturnValue(address);
 
-  const network = new StacksMainnet();
+  const network = new StacksTestnet();
 
   jest.mock('@stacks/transactions', () => ({
     callReadOnlyFunction,
@@ -266,12 +265,12 @@ test('getNamePrice', async () => {
   }));
 
   const { getNamePrice } = require('../src');
-  const result = await getNamePrice(fullyQualifiedName, network);
+  const result = await getNamePrice({ fullyQualifiedName, network });
 
   const bnsFunctionName = 'get-name-price';
 
   const expectedReadOnlyFunctionCallOptions = {
-    contractAddress: BNS_CONTRACT_ADDRESS,
+    contractAddress: BnsContractAddress.testnet,
     contractName: BNS_CONTRACT_NAME,
     functionName: bnsFunctionName,
     senderAddress: address,
@@ -298,7 +297,7 @@ test('getNamePrice error', async () => {
   const callReadOnlyFunction = jest.fn().mockResolvedValue(namePriceResponse);
   const getAddressFromPrivateKey = jest.fn().mockReturnValue(address);
 
-  const network = new StacksMainnet();
+  const network = new StacksTestnet();
 
   jest.mock('@stacks/transactions', () => ({
     callReadOnlyFunction,
@@ -316,7 +315,7 @@ test('getNamePrice error', async () => {
   const bnsFunctionName = 'get-name-price';
 
   const expectedReadOnlyFunctionCallOptions = {
-    contractAddress: BNS_CONTRACT_ADDRESS,
+    contractAddress: BnsContractAddress.testnet,
     contractName: BNS_CONTRACT_NAME,
     functionName: bnsFunctionName,
     senderAddress: address,
@@ -327,7 +326,7 @@ test('getNamePrice error', async () => {
     network
   };
 
-  await expect(getNamePrice(fullyQualifiedName, network)).rejects.toEqual(new Error('u2001'));
+  await expect(getNamePrice({ fullyQualifiedName, network })).rejects.toEqual(new Error('u2001'));
   expect(callReadOnlyFunction).toHaveBeenCalledTimes(1);
   expect(callReadOnlyFunction).toHaveBeenCalledWith(expectedReadOnlyFunctionCallOptions);
 });
@@ -361,7 +360,7 @@ test('preorderNamespace', async () => {
   const bnsFunctionName = 'namespace-preorder';
 
   const expectedBNSContractCallOptions = {
-    contractAddress: BNS_CONTRACT_ADDRESS,
+    contractAddress: BnsContractAddress.testnet,
     contractName: BNS_CONTRACT_NAME,
     functionName: bnsFunctionName,
     functionArgs: [
@@ -434,7 +433,7 @@ test('revealNamespace', async () => {
   const bnsFunctionName = 'namespace-reveal';
 
   const expectedBNSContractCallOptions = {
-    contractAddress: BNS_CONTRACT_ADDRESS,
+    contractAddress: BnsContractAddress.testnet,
     contractName: BNS_CONTRACT_NAME,
     functionName: bnsFunctionName,
     functionArgs: [
@@ -481,7 +480,7 @@ test('importName', async () => {
 
   const makeUnsignedContractCall = jest.fn().mockResolvedValue({});
 
-  const network = new StacksMainnet();
+  const network = new StacksTestnet();
 
   jest.mock('@stacks/transactions', () => ({
     makeUnsignedContractCall,
@@ -504,7 +503,7 @@ test('importName', async () => {
   const bnsFunctionName = 'name-import';
 
   const expectedBNSContractCallOptions = {
-    contractAddress: BNS_CONTRACT_ADDRESS,
+    contractAddress: BnsContractAddress.testnet,
     contractName: BNS_CONTRACT_NAME,
     functionName: bnsFunctionName,
     functionArgs: [
@@ -528,7 +527,7 @@ test('readyNamespace', async () => {
 
   const makeUnsignedContractCall = jest.fn().mockResolvedValue({});
 
-  const network = new StacksMainnet();
+  const network = new StacksTestnet();
 
   jest.mock('@stacks/transactions', () => ({
     makeUnsignedContractCall,
@@ -545,7 +544,7 @@ test('readyNamespace', async () => {
   const bnsFunctionName = 'namespace-ready';
 
   const expectedBNSContractCallOptions = {
-    contractAddress: BNS_CONTRACT_ADDRESS,
+    contractAddress: BnsContractAddress.testnet,
     contractName: BNS_CONTRACT_NAME,
     functionName: bnsFunctionName,
     functionArgs: [
@@ -568,7 +567,7 @@ test('preorderName', async () => {
 
   const makeUnsignedContractCall = jest.fn().mockResolvedValue({});
 
-  const network = new StacksMainnet();
+  const network = new StacksTestnet();
 
   jest.mock('@stacks/transactions', () => ({
     makeUnsignedContractCall,
@@ -589,7 +588,7 @@ test('preorderName', async () => {
   const bnsFunctionName = 'name-preorder';
 
   const expectedBNSContractCallOptions = {
-    contractAddress: BNS_CONTRACT_ADDRESS,
+    contractAddress: BnsContractAddress.testnet,
     contractName: BNS_CONTRACT_NAME,
     functionName: bnsFunctionName,
     functionArgs: [
@@ -613,7 +612,7 @@ test('registerName', async () => {
 
   const makeUnsignedContractCall = jest.fn().mockResolvedValue({});
 
-  const network = new StacksMainnet();
+  const network = new StacksTestnet();
 
   jest.mock('@stacks/transactions', () => ({
     makeUnsignedContractCall,
@@ -635,7 +634,7 @@ test('registerName', async () => {
   const { namespace, name } = decodeFQN(fullyQualifiedName);
 
   const expectedBNSContractCallOptions = {
-    contractAddress: BNS_CONTRACT_ADDRESS,
+    contractAddress: BnsContractAddress.testnet,
     contractName: BNS_CONTRACT_NAME,
     functionName: bnsFunctionName,
     functionArgs: [
@@ -660,7 +659,7 @@ test('updateName', async () => {
 
   const makeUnsignedContractCall = jest.fn().mockResolvedValue({});
 
-  const network = new StacksMainnet();
+  const network = new StacksTestnet();
 
   jest.mock('@stacks/transactions', () => ({
     makeUnsignedContractCall,
@@ -681,7 +680,7 @@ test('updateName', async () => {
   const { namespace, name } = decodeFQN(fullyQualifiedName);
 
   const expectedBNSContractCallOptions = {
-    contractAddress: BNS_CONTRACT_ADDRESS,
+    contractAddress: BnsContractAddress.testnet,
     contractName: BNS_CONTRACT_NAME,
     functionName: bnsFunctionName,
     functionArgs: [
@@ -706,7 +705,7 @@ test('transferName', async () => {
 
   const makeUnsignedContractCall = jest.fn().mockResolvedValue({});
 
-  const network = new StacksMainnet();
+  const network = new StacksTestnet();
 
   jest.mock('@stacks/transactions', () => ({
     makeUnsignedContractCall,
@@ -728,7 +727,7 @@ test('transferName', async () => {
   const { namespace, name } = decodeFQN(fullyQualifiedName);
 
   const expectedBNSContractCallOptions = {
-    contractAddress: BNS_CONTRACT_ADDRESS,
+    contractAddress: BnsContractAddress.testnet,
     contractName: BNS_CONTRACT_NAME,
     functionName: bnsFunctionName,
     functionArgs: [
@@ -752,7 +751,7 @@ test('revokeName', async () => {
 
   const makeUnsignedContractCall = jest.fn().mockResolvedValue({});
 
-  const network = new StacksMainnet();
+  const network = new StacksTestnet();
 
   jest.mock('@stacks/transactions', () => ({
     makeUnsignedContractCall,
@@ -772,7 +771,7 @@ test('revokeName', async () => {
   const { namespace, name } = decodeFQN(fullyQualifiedName);
 
   const expectedBNSContractCallOptions = {
-    contractAddress: BNS_CONTRACT_ADDRESS,
+    contractAddress: BnsContractAddress.testnet,
     contractName: BNS_CONTRACT_NAME,
     functionName: bnsFunctionName,
     functionArgs: [
@@ -797,7 +796,7 @@ test('renewName', async () => {
 
   const makeUnsignedContractCall = jest.fn().mockResolvedValue({});
 
-  const network = new StacksMainnet();
+  const network = new StacksTestnet();
 
   jest.mock('@stacks/transactions', () => ({
     makeUnsignedContractCall,
@@ -821,7 +820,7 @@ test('renewName', async () => {
   const { namespace, name } = decodeFQN(fullyQualifiedName);
 
   const expectedBNSContractCallOptions = {
-    contractAddress: BNS_CONTRACT_ADDRESS,
+    contractAddress: BnsContractAddress.testnet,
     contractName: BNS_CONTRACT_NAME,
     functionName: bnsFunctionName,
     functionArgs: [
