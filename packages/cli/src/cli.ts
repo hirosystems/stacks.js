@@ -1915,3 +1915,11 @@ export function CLIMain() {
       });
   }
 }
+
+/* test only exports */
+export const testables =
+  process.env.NODE_ENV === 'test'
+    ? {
+        addressConvert,
+      }
+    : undefined;
