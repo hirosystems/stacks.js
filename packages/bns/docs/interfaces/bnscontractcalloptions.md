@@ -1,6 +1,6 @@
-[Stacks.js 1.0.0-beta.13 Library Reference](../README.md) / [Exports](../modules.md) / BNSContractCallOptions
+[Stacks.js 1.0.0-beta.13 Library Reference](../README.md) / [Exports](../modules.md) / BnsContractCallOptions
 
-# Interface: BNSContractCallOptions
+# Interface: BnsContractCallOptions
 
 ## Table of contents
 
@@ -10,7 +10,7 @@
 - [functionArgs](bnscontractcalloptions.md#functionargs)
 - [functionName](bnscontractcalloptions.md#functionname)
 - [network](bnscontractcalloptions.md#network)
-- [senderKey](bnscontractcalloptions.md#senderkey)
+- [publicKey](bnscontractcalloptions.md#publickey)
 
 ## Properties
 
@@ -18,7 +18,7 @@
 
 • `Optional` **attachment**: *Buffer*
 
-Defined in: [index.ts:63](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L63)
+Defined in: [index.ts:68](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L68)
 
 ___
 
@@ -26,7 +26,7 @@ ___
 
 • **functionArgs**: ClarityValue[]
 
-Defined in: [index.ts:60](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L60)
+Defined in: [index.ts:65](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L65)
 
 ___
 
@@ -34,7 +34,7 @@ ___
 
 • **functionName**: *string*
 
-Defined in: [index.ts:59](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L59)
+Defined in: [index.ts:64](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L64)
 
 ___
 
@@ -42,12 +42,12 @@ ___
 
 • **network**: StacksNetwork
 
-Defined in: [index.ts:62](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L62)
+Defined in: [index.ts:67](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L67)
 
 ___
 
-### senderKey
+### publicKey
 
-• **senderKey**: *string*
+• **publicKey**: *string*
 
-Defined in: [index.ts:61](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L61)
+Defined in: [index.ts:66](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L66)

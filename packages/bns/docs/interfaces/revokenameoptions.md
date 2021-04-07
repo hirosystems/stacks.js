@@ -9,7 +9,7 @@ Revoke name options
 
 **`param`** the private key to sign the transaction
 
-**`param`** the Stacks blockchain network to register on
+**`param`** the Stacks blockchain network to use
 
 ## Table of contents
 
@@ -17,7 +17,7 @@ Revoke name options
 
 - [fullyQualifiedName](revokenameoptions.md#fullyqualifiedname)
 - [network](revokenameoptions.md#network)
-- [privateKey](revokenameoptions.md#privatekey)
+- [publicKey](revokenameoptions.md#publickey)
 
 ## Properties
 
@@ -25,20 +25,20 @@ Revoke name options
 
 • **fullyQualifiedName**: *string*
 
-Defined in: [index.ts:710](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L710)
+Defined in: [index.ts:702](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L702)
 
 ___
 
 ### network
 
-• `Optional` **network**: StacksNetwork
+• **network**: StacksNetwork
 
-Defined in: [index.ts:712](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L712)
+Defined in: [index.ts:704](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L704)
 
 ___
 
-### privateKey
+### publicKey
 
-• **privateKey**: *string*
+• **publicKey**: *string*
 
-Defined in: [index.ts:711](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L711)
+Defined in: [index.ts:703](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L703)

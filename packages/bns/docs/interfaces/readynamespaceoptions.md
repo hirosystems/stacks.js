@@ -8,7 +8,7 @@ Ready namespace options
 
 **`param`** the private key to sign the transaction
 
-**`param`** the Stacks blockchain network to register on
+**`param`** the Stacks blockchain network to use
 
 ## Table of contents
 
@@ -16,7 +16,7 @@ Ready namespace options
 
 - [namespace](readynamespaceoptions.md#namespace)
 - [network](readynamespaceoptions.md#network)
-- [privateKey](readynamespaceoptions.md#privatekey)
+- [publicKey](readynamespaceoptions.md#publickey)
 
 ## Properties
 
@@ -24,20 +24,20 @@ Ready namespace options
 
 • **namespace**: *string*
 
-Defined in: [index.ts:439](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L439)
+Defined in: [index.ts:441](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L441)
 
 ___
 
 ### network
 
-• `Optional` **network**: StacksNetwork
+• **network**: StacksNetwork
 
-Defined in: [index.ts:441](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L441)
+Defined in: [index.ts:443](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L443)
 
 ___
 
-### privateKey
+### publicKey
 
-• **privateKey**: *string*
+• **publicKey**: *string*
 
-Defined in: [index.ts:440](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L440)
+Defined in: [index.ts:442](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L442)

@@ -15,7 +15,7 @@ Renew name options
 
 **`param`** optionally update the zonefile hash
 
-**`param`** the Stacks blockchain network to register on
+**`param`** the Stacks blockchain network to use
 
 ## Table of contents
 
@@ -24,7 +24,7 @@ Renew name options
 - [fullyQualifiedName](renewnameoptions.md#fullyqualifiedname)
 - [network](renewnameoptions.md#network)
 - [newOwnerAddress](renewnameoptions.md#newowneraddress)
-- [privateKey](renewnameoptions.md#privatekey)
+- [publicKey](renewnameoptions.md#publickey)
 - [stxToBurn](renewnameoptions.md#stxtoburn)
 - [zonefile](renewnameoptions.md#zonefile)
 
@@ -34,15 +34,15 @@ Renew name options
 
 • **fullyQualifiedName**: *string*
 
-Defined in: [index.ts:760](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L760)
+Defined in: [index.ts:748](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L748)
 
 ___
 
 ### network
 
-• `Optional` **network**: StacksNetwork
+• **network**: StacksNetwork
 
-Defined in: [index.ts:765](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L765)
+Defined in: [index.ts:751](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L751)
 
 ___
 
@@ -50,15 +50,15 @@ ___
 
 • `Optional` **newOwnerAddress**: *string*
 
-Defined in: [index.ts:763](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L763)
+Defined in: [index.ts:752](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L752)
 
 ___
 
-### privateKey
+### publicKey
 
-• **privateKey**: *string*
+• **publicKey**: *string*
 
-Defined in: [index.ts:762](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L762)
+Defined in: [index.ts:750](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L750)
 
 ___
 
@@ -66,7 +66,7 @@ ___
 
 • **stxToBurn**: *BN*
 
-Defined in: [index.ts:761](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L761)
+Defined in: [index.ts:749](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L749)
 
 ___
 
@@ -74,4 +74,4 @@ ___
 
 • `Optional` **zonefile**: *string*
 
-Defined in: [index.ts:764](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L764)
+Defined in: [index.ts:753](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L753)

@@ -1,6 +1,6 @@
-[Stacks.js 1.0.0-beta.13 Library Reference](../README.md) / [Exports](../modules.md) / BNSReadOnlyOptions
+[Stacks.js 1.0.0-beta.13 Library Reference](../README.md) / [Exports](../modules.md) / BnsReadOnlyOptions
 
-# Interface: BNSReadOnlyOptions
+# Interface: BnsReadOnlyOptions
 
 ## Table of contents
 
@@ -17,7 +17,7 @@
 
 • **functionArgs**: ClarityValue[]
 
-Defined in: [index.ts:100](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L100)
+Defined in: [index.ts:87](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L87)
 
 ___
 
@@ -25,7 +25,7 @@ ___
 
 • **functionName**: *string*
 
-Defined in: [index.ts:99](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L99)
+Defined in: [index.ts:86](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L86)
 
 ___
 
@@ -33,7 +33,7 @@ ___
 
 • **network**: StacksNetwork
 
-Defined in: [index.ts:102](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L102)
+Defined in: [index.ts:89](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L89)
 
 ___
 
@@ -41,4 +41,4 @@ ___
 
 • **senderAddress**: *string*
 
-Defined in: [index.ts:101](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L101)
+Defined in: [index.ts:88](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L88)

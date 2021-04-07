@@ -13,7 +13,7 @@ Transfer name options
 
 **`param`** the private key to sign the transaction
 
-**`param`** the Stacks blockchain network to register on
+**`param`** the Stacks blockchain network to use
 
 ## Table of contents
 
@@ -22,7 +22,7 @@ Transfer name options
 - [fullyQualifiedName](transfernameoptions.md#fullyqualifiedname)
 - [network](transfernameoptions.md#network)
 - [newOwnerAddress](transfernameoptions.md#newowneraddress)
-- [privateKey](transfernameoptions.md#privatekey)
+- [publicKey](transfernameoptions.md#publickey)
 - [zonefile](transfernameoptions.md#zonefile)
 
 ## Properties
@@ -31,15 +31,15 @@ Transfer name options
 
 • **fullyQualifiedName**: *string*
 
-Defined in: [index.ts:651](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L651)
+Defined in: [index.ts:640](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L640)
 
 ___
 
 ### network
 
-• `Optional` **network**: StacksNetwork
+• **network**: StacksNetwork
 
-Defined in: [index.ts:655](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L655)
+Defined in: [index.ts:643](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L643)
 
 ___
 
@@ -47,15 +47,15 @@ ___
 
 • **newOwnerAddress**: *string*
 
-Defined in: [index.ts:652](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L652)
+Defined in: [index.ts:641](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L641)
 
 ___
 
-### privateKey
+### publicKey
 
-• **privateKey**: *string*
+• **publicKey**: *string*
 
-Defined in: [index.ts:653](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L653)
+Defined in: [index.ts:642](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L642)
 
 ___
 
@@ -63,4 +63,4 @@ ___
 
 • `Optional` **zonefile**: *string*
 
-Defined in: [index.ts:654](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L654)
+Defined in: [index.ts:644](https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L644)
