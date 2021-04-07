@@ -105,6 +105,7 @@ import {
   parseClarityFunctionArgAnswers,
   ClarityFunctionArg,
   generateExplorerTxPageUrl,
+  isTestnetAddress,
 } from './utils';
 
 import { handleAuth, handleSignIn } from './auth';
@@ -1298,37 +1299,35 @@ async function gaiaSetHub(network: CLINetworkAdapter, args: string[]): Promise<s
 function addressConvert(network: CLINetworkAdapter, args: string[]): Promise<string> {
   const addr = args[0];
   let b58addr: string;
-  let c32addr: string;
   let testnetb58addr: string;
-  let testnetc32addr: string;
 
   if (addr.match(STACKS_ADDRESS_PATTERN)) {
-    c32addr = addr;
-    b58addr = c32check.c32ToB58(c32addr);
+    b58addr = c32check.c32ToB58(addr);
   } else if (addr.match(/[123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz]+/)) {
-    c32addr = c32check.b58ToC32(addr);
     b58addr = addr;
   } else {
     throw new Error(`Unrecognized address ${addr}`);
   }
 
-  if (network.isTestnet()) {
+  if (isTestnetAddress(b58addr)) {
+    testnetb58addr = b58addr;
+  } else if (network.isTestnet()) {
     testnetb58addr = network.coerceAddress(b58addr);
-    testnetc32addr = c32check.b58ToC32(testnetb58addr);
   }
 
   return Promise.resolve().then(() => {
+    const mainnetb58addr = network.coerceMainnetAddress(b58addr);
     const result: any = {
       mainnet: {
-        STACKS: c32addr,
-        BTC: b58addr,
+        STACKS: c32check.b58ToC32(mainnetb58addr),
+        BTC: mainnetb58addr,
       },
       testnet: undefined,
     };
 
-    if (network.isTestnet()) {
+    if (testnetb58addr) {
       result.testnet = {
-        STACKS: testnetc32addr,
+        STACKS: c32check.b58ToC32(testnetb58addr),
         BTC: testnetb58addr,
       };
     }
