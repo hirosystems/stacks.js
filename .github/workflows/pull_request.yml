@@ -35,7 +35,6 @@ jobs:
       - name: Build
         run: yarn build
       - name: Tests
-        run: yarn lerna run test --stream --parallel -- -- --coverage=false
-      # TODO: setup jest for a lerna monorepo, 
-      # - name: Upload code coverage
-      #   run: yarn lerna run codecovUpload --stream
+        run: yarn lerna run test --stream --parallel -- -- --coverage
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v1
