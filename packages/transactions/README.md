@@ -166,7 +166,7 @@ const BigNum = require('bn.js');
 const bufferReader = new BufferReader(Buffer.from(serializedTx));
 const deserializedTx = deserializeTransaction(bufferReader);
 const sponsorKey = '770287b9471081c8acd37d57190c7a70f0da2633311cc120853537362d32e67c01';
-const fee = BigNum(1000);
+const fee = new BigNum(1000);
 
 const sponsorOptions = {
   transaction: deserializedTx,
