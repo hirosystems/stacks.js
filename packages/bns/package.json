@@ -1,6 +1,6 @@
 {
   "name": "@stacks/bns",
-  "version": "1.0.0-beta.1",
+  "version": "1.4.0-alpha.0",
   "description": "Library for working with the Stacks Blockchain Naming System BNS.",
   "keywords": [
     "Stacks",
