@@ -364,7 +364,7 @@ test('preorderNamespace', async () => {
     contractName: BNS_CONTRACT_NAME,
     functionName: bnsFunctionName,
     functionArgs: [
-      bufferCV(hash160(Buffer.from(`0x${namespace}${salt}`))),
+      bufferCV(hash160(Buffer.from(`${namespace}${salt}`))),
       uintCVFromBN(stxToBurn)
     ],
     validateWithAbi: false,
@@ -592,7 +592,7 @@ test('preorderName', async () => {
     contractName: BNS_CONTRACT_NAME,
     functionName: bnsFunctionName,
     functionArgs: [
-      bufferCV(hash160(Buffer.from(`0x${fullyQualifiedName}${salt}`))),
+      bufferCV(hash160(Buffer.from(`${fullyQualifiedName}${salt}`))),
       uintCVFromBN(stxToBurn),
     ],
     publicKey,
