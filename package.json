@@ -19,8 +19,8 @@
     "@babel/preset-env": "^7.7.1",
     "@babel/preset-typescript": "^7.7.0",
     "@babel/register": "^7.7.0",
-    "@stacks/prettier-config": "^0.0.7",
     "@peculiar/webcrypto": "^1.0.21",
+    "@stacks/prettier-config": "^0.0.7",
     "@types/bn.js": "^4.11.6",
     "@types/cheerio": "^0.22.10",
     "@types/cors": "^2.8.5",
@@ -76,12 +76,13 @@
     "ts-jest": "^26.4.1",
     "ts-loader": "^6.2.1",
     "ts-node": "^8.10.2",
-    "typedoc": "^0.19.2",
+    "typedoc": "^0.20.35",
     "typescript": "^4.0.3",
     "webpack": "^4.41.2",
     "webpack-assets-manifest": "^3.1.1",
     "webpack-bundle-analyzer": "^3.6.0",
-    "webpack-cli": "^3.3.10"
+    "webpack-cli": "^3.3.10",
+    "yarn": "^1.22.10"
   },
   "dependencies": {
     "@babel/compat-data": "^7.10.1",
@@ -119,14 +120,16 @@
     "rollup": "^2.28.2"
   },
   "scripts": {
-    "bootstrap": "lerna run bootstrap",
-    "build": "lerna run build --stream",
+    "bootstrap": "lerna bootstrap",
+    "build": "lerna run build",
+    "clean": "lerna clean",
     "lint": "yarn lint:eslint && yarn lint:prettier",
     "lint:eslint": "eslint \"packages/**/src/**/*.{ts,tsx|!(d.ts)}\" -f unix",
     "lint:fix": "eslint \"packages/**/src/**/*.{ts,tsx}\" -f unix --fix",
     "lint:prettier": "prettier --check \"packages/**/src/**/*.{ts,tsx|!(d.ts)}\" *.js",
     "lint:prettier:fix": "prettier --write \"packages/**/src/**/*.{ts,tsx|!(d.ts)}\" *.js",
     "build:docs": "rimraf docs && cross-env typedoc --name \"Stacks.js $npm_package_version Library Reference\" --readme ./readme.md --tsconfig tsconfig.typedoc.json --out docs --json docs/docs.json packages/**/src",
+    "test": "lerna run test",
     "typecheck": "lerna run typecheck --parallel --no-bail --stream"
   }
 }
