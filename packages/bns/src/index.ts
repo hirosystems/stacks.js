@@ -290,7 +290,7 @@ export async function buildPreorderNamespaceTx({
   network,
 }: PreorderNamespaceOptions): Promise<StacksTransaction> {
   const bnsFunctionName = 'namespace-preorder';
-  const saltedNamespaceBuffer = Buffer.from(`0x${namespace}${salt}`);
+  const saltedNamespaceBuffer = Buffer.from(`${namespace}${salt}`);
   const hashedSaltedNamespace = hash160(saltedNamespaceBuffer);
 
   return makeBnsContractCall({
@@ -510,7 +510,7 @@ export async function buildPreorderNameTx({
   if (subdomain) {
     throw new Error('Cannot preorder a subdomain using preorderName()');
   }
-  const saltedNamesBuffer = Buffer.from(`0x${fullyQualifiedName}${salt}`);
+  const saltedNamesBuffer = Buffer.from(`${fullyQualifiedName}${salt}`);
   const hashedSaltedName = hash160(saltedNamesBuffer);
 
   return makeBnsContractCall({
