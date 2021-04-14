@@ -25,9 +25,10 @@ To migrate your app from blockstack.js to stacks.js follow the steps in the [mig
 To setup the development environment for this repository, follow these steps:
 
 1. Clone this package.
-2. Run `npm run bootstrap` to install dependencies
-3. Run `npm run build` to build packages
-4. Run `npm run test` to run tests
+2. Run `npm install` to install dependencies
+3. Run `npm run bootstrap` to [bootstrap](https://github.com/lerna/lerna/tree/main/commands/bootstrap) project
+4. Run `npm run build` to build packages
+5. Run `npm run test` to run tests
 
 ## Documentation
 
