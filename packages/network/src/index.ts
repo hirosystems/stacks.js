@@ -40,8 +40,7 @@ export class StacksMainnet implements StacksNetwork {
   version = TransactionVersion.Mainnet;
   chainId = ChainID.Mainnet;
   coreApiUrl = 'https://stacks-node-api.mainnet.stacks.co';
-  // TODO: change this when mainnet is live. BNS endpoints are not live yet.
-  bnsLookupUrl = 'https://core.blockstack.org';
+  bnsLookupUrl = 'https://stacks-node-api.mainnet.stacks.co';
   broadcastEndpoint = '/v2/transactions';
   transferFeeEstimateEndpoint = '/v2/fees/transfer';
   accountEndpoint = '/v2/accounts';

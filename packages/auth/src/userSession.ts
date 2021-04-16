@@ -250,14 +250,7 @@ export class UserSession {
 
     const nameLookupURL = `${coreNode}${NAME_LOOKUP_PATH}`;
 
-    // Temporarily use fallback lookup URLs
-    // Remove after these two are fixed:
-    // https://github.com/blockstack/stacks-blockchain-api/issues/534
-    // https://github.com/blockstack/stacks-blockchain-api/issues/517
-    const fallbackLookupURLs = [
-      `https://stacks-node-api.testnet.stacks.co${NAME_LOOKUP_PATH}`,
-      `https://registrar.testnet.stacks.co${NAME_LOOKUP_PATH}`,
-    ];
+    const fallbackLookupURLs = [`https://stacks-node-api.stacks.co${NAME_LOOKUP_PATH}`];
 
     const isValid = await verifyAuthResponse(authResponseToken, nameLookupURL, fallbackLookupURLs);
     if (!isValid) {
