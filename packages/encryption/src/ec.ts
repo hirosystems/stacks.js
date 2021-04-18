@@ -127,7 +127,7 @@ export function getHexFromBN(bnInput: BN): string {
 export function getBufferFromBN(bnInput: BN): Buffer {
   const result = bnInput.toArrayLike(Buffer, 'be', 32);
   if (result.byteLength !== 32) {
-    throw new Error('Generated a 32-byte BN for encryption. Failing.');
+    throw new Error('Failed to generate a 32-byte BN');
   }
   return result;
 }
