@@ -1647,7 +1647,7 @@ function faucetCall(_: CLINetworkAdapter, args: string[]): Promise<string> {
 
   const apiConfig = new Configuration({
     fetchApi: crossfetch,
-    basePath: 'https://stacks-node-api.blockstack.org',
+    basePath: 'https://stacks-node-api.testnet.stacks.co',
   });
 
   const faucets = new FaucetsApi(apiConfig);
