@@ -1,6 +1,6 @@
 {
   "name": "@stacks/transactions",
-  "version": "1.4.0-alpha.0",
+  "version": "1.4.1",
   "description": "Javascript library for constructing transactions on the Stacks blockchain.",
   "homepage": "https://blockstack.org",
   "license": "GPL-3.0-or-later",
