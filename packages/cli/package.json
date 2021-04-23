@@ -66,12 +66,13 @@
     "url": "git+https://github.com/blockstack/blockstack.js.git"
   },
   "scripts": {
-    "build": "tsdx build --format cjs,esm,umd",
+    "build": "tsc -b tsconfig.build.json",
+    "clean": "tsc -b tsconfig.build.json --clean",
     "dev": "ts-node --project ./tsconfig.dev.json src/index.ts",
     "test": "jest",
     "test:watch": "jest --watch --coverage=false",
     "codecovUpload": "codecov",
-    "prepublishOnly": "yarn test && yarn build"
+    "prepublishOnly": "npm run test && npm run build"
   },
   "bugs": {
     "url": "https://github.com/blockstack/blockstack.js/issues"
@@ -81,12 +82,12 @@
     "@types/express": "^4.16.1",
     "@types/express-winston": "^3.0.1",
     "@types/inquirer": "^6.5.0",
-    "@types/jest": "^24.9.0",
+    "@types/jest": "^26.0.22",
     "@types/node-fetch": "^2.5.0",
     "@types/ripemd160": "^2.0.0",
-    "jest": "^24.9.0",
+    "jest": "^26.6.3",
     "minimist": ">=1.2.3",
-    "ts-jest": "^26.4.1",
+    "ts-jest": "^26.5.5",
     "tsdx": "^0.14.0"
   },
   "dependencies": {

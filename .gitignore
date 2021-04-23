@@ -47,3 +47,4 @@ dist
 .rts2_cache_umd/
 .idea
 
+*.tsbuildinfo

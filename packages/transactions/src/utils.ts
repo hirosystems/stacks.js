@@ -86,8 +86,8 @@ export class sha512_256 extends sha512 {
     });
   }
   digest(): Buffer;
-  digest(encoding: import('crypto').HexBase64Latin1Encoding): string;
-  digest(encoding?: import('crypto').HexBase64Latin1Encoding): string | Buffer {
+  digest(encoding: BufferEncoding): string;
+  digest(encoding?: BufferEncoding): string | Buffer {
     // "SHA-512/256" truncates the digest to 32 bytes
     const buff = super.digest().slice(0, 32);
     return encoding ? buff.toString(encoding) : buff;

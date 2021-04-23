@@ -26,18 +26,18 @@
     "url": "git+https://github.com/blockstack/stacks.js.git"
   },
   "scripts": {
-    "dev": "yarn start",
-    "lint": "yarn lint:eslint && yarn lint:prettier",
+    "dev": "npm run start",
+    "lint": "npm run lint:eslint && npm run lint:prettier",
     "lint:eslint": "eslint \"src/**/*.{ts,tsx}\" -f unix",
     "lint:fix": "eslint \"src/**/*.{ts,tsx}\" -f unix --fix",
     "lint:prettier": "prettier --check \"src/**/*.{ts,tsx}\" *.js",
     "lint:prettier:fix": "prettier --write \"src/**/*.{ts,tsx}\" *.js",
     "start": "tsdx watch --verbose --noClean --onSuccess yalc publish --push",
-    "build": "tsdx build --format cjs,esm,umd",
-    "build:docs": "rimraf docs && cross-env typedoc --plugin typedoc-plugin-markdown --name \"Stacks.js $npm_package_version Library Reference\" --readme ./readme.md --tsconfig tsconfig.typedoc.json --out docs --json docs/docs.json ./src/index.ts",
+    "build": "tsc -b tsconfig.build.json",
+    "clean": "tsc -b tsconfig.build.json --clean",
     "typecheck": "tsc --noEmit",
     "typecheck:watch": "npm run typecheck -- --watch",
-    "prepublishOnly": "yarn test && yarn build",
+    "prepublishOnly": "npm run test && npm run build",
     "test": "jest",
     "test:watch": "jest --watch --coverage=false",
     "codecovUpload": "codecov"
@@ -46,13 +46,17 @@
     "url": "https://github.com/blockstack/stacks.js/issues"
   },
   "dependencies": {
-    "@stacks/network": "1.2.2",
-    "@stacks/transactions": "1.3.0",
+    "@stacks/network": "^1.2.2",
+    "@stacks/transactions": "^1.3.0",
+    "@types/bn.js": "^4.11.6",
     "bn.js": "^4.11.6"
   },
   "devDependencies": {
-    "@types/bn.js": "^4.11.6",
+    "@types/jest": "^26.0.22",
     "codecov": "^3.7.2",
+    "jest": "^26.6.3",
+    "jest-fetch-mock": "^3.0.3",
+    "ts-jest": "^26.5.5",
     "tsdx": "^0.14.0",
     "typedoc": "^0.20.34",
     "typedoc-plugin-markdown": "^3.6.0"

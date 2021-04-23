@@ -7,6 +7,9 @@
     "composite": true
   },
   "references": [
+    {
+      "path": "../common/tsconfig.build.json"
+    }
   ],
   "include": ["src/**/*"]
 }

@@ -489,7 +489,7 @@ export async function makeDIDConfiguration(
     exp: new Date(new Date().setFullYear(new Date().getFullYear() + 1)),
   };
 
-  const jwt = tokenSigner.sign(payload);
+  const jwt = tokenSigner.sign(payload as any);
   return {
     entries: [
       {

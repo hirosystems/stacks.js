@@ -7,6 +7,15 @@
     "composite": true
   },
   "references": [
+    {
+      "path": "../common/tsconfig.build.json"
+    },
+    {
+      "path": "../encryption/tsconfig.build.json"
+    },
+    {
+      "path": "../network/tsconfig.build.json"
+    }
   ],
   "include": ["src/**/*"]
 }
