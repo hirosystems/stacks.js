@@ -1,9 +1,9 @@
+import { Buffer } from '@stacks/common';
 import { BIP32Interface } from 'bitcoinjs-lib';
 import IdentityAddressOwnerNode from '../nodes/identity-address-owner-node';
 import { createSha2Hash, publicKeyToAddress } from '@stacks/encryption';
 import { parseZoneFile } from 'zone-file';
 import Identity from '../identity';
-import { AssertionError } from 'assert';
 import { Subdomains, registrars } from '../profiles';
 
 const IDENTITY_KEYCHAIN = 888;
@@ -149,7 +149,7 @@ export const makeIdentity = async (rootNode: BIP32Interface, index: number) => {
 
 export function assertIsTruthy<T>(val: any): asserts val is NonNullable<T> {
   if (!val) {
-    throw new AssertionError({ expected: true, actual: val });
+    throw new Error(`Assertion error: ${JSON.stringify({ expected: true, actual: val })}`);
   }
 }
 

@@ -2873,7 +2873,7 @@ interface CLI_COMMAND_HELP {
 
 function formatCommandHelpLines(
   commandName: string,
-  commandArgs: Array<CLI_PROP_ITEM>
+  commandArgs: CLI_PROP_ITEM[]
 ): CLI_COMMAND_HELP {
   let rawUsage = '';
   let kwUsage = '';
@@ -3191,7 +3191,7 @@ export function CLIOptAsStringArray(opts: CLI_OPTS, key: string): string[] | nul
  * Use the CLI schema to get all positional and keyword args
  * for a given command.
  */
-export function getCommandArgs(command: string, argsList: Array<string>) {
+export function getCommandArgs(command: string, argsList: string[]) {
   let commandProps = CLI_ARGS.properties[command].items;
   if (!Array.isArray(commandProps)) {
     commandProps = [commandProps];
@@ -3286,7 +3286,7 @@ export function getCommandArgs(command: string, argsList: Array<string>) {
 export interface CheckArgsSuccessType {
   success: true;
   command: string;
-  args: Array<string>;
+  args: string[];
 }
 
 export interface CheckArgsFailType {
@@ -3296,7 +3296,7 @@ export interface CheckArgsFailType {
   usage: boolean;
 }
 
-export function checkArgs(argList: Array<string>): CheckArgsSuccessType | CheckArgsFailType {
+export function checkArgs(argList: string[]): CheckArgsSuccessType | CheckArgsFailType {
   if (argList.length <= 2) {
     return {
       success: false,

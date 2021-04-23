@@ -1,3 +1,4 @@
+import { Buffer } from '@stacks/common';
 import { BIP32Interface } from 'bitcoinjs-lib';
 import { publicKeyToAddress, hashSha256Sync, hashCode } from '@stacks/encryption';
 import { getAddress } from '../utils';

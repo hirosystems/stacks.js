@@ -1,3 +1,4 @@
+import { Buffer } from '@stacks/common';
 import { bufferCV, uintCV, hash160 } from '@stacks/transactions';
 
 import BN from 'bn.js';

@@ -1,3 +1,5 @@
+// @ts-ignore
+import { Buffer } from '@stacks/common';
 import { decrypt as triplesecDecrypt } from 'triplesec';
 import { decryptMnemonic } from '@stacks/encryption';
 

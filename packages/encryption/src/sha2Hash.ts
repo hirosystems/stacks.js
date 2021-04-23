@@ -1,3 +1,4 @@
+import { Buffer } from '@stacks/common';
 import { sha256, sha512 } from 'sha.js';
 import { getCryptoLib } from './cryptoUtils';
 

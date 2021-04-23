@@ -1,3 +1,4 @@
+import { Buffer } from '@stacks/common';
 import {
   makeContractCall,
   bufferCV,
@@ -16,7 +17,6 @@ import {
   cvToString,
   ClarityValue,
   ResponseErrorCV,
-  SomeCV,
   TupleCV,
   noneCV,
   someCV,
@@ -669,7 +669,7 @@ export class StackingClient {
       network: this.network,
     }).then((responseCV: ClarityValue) => {
       if (responseCV.type === ClarityType.OptionalSome) {
-        const someCV = responseCV as SomeCV;
+        const someCV = responseCV;
         const tupleCV: TupleCV = someCV.value as TupleCV;
         const poxAddress: TupleCV = tupleCV.data['pox-addr'] as TupleCV;
         const amountMicroStx: UIntCV = tupleCV.data['amount-ustx'] as UIntCV;
@@ -719,7 +719,7 @@ export class StackingClient {
    *
    * @returns {Array<string>} a contract address and name
    */
-  parseContractId(contract: string): Array<string> {
+  parseContractId(contract: string): string[] {
     const parts = contract.split('.');
 
     if (parts.length !== 2 || !validateStacksAddress(parts[0]) || parts[1] !== 'pox') {

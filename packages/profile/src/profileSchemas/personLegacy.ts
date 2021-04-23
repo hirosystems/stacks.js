@@ -36,10 +36,10 @@ export function getPersonFromLegacyFormat(profile: any) {
       addressLocality: string;
     };
     image?: any[];
-    website?: Array<{
+    website?: {
       ['@type']: string;
       url: string;
-    }>;
+    }[];
   } = {
     '@type': 'Person',
   };

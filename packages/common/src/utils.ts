@@ -1,5 +1,20 @@
 import { Logger } from './logger';
 
+// Buffer module from NodeJS that also works in the browser https://www.npmjs.com/package/buffer
+// > The trailing slash is important, tells module lookup algorithm to use the npm module
+// > named buffer instead of the node.js core module named buffer!
+import { Buffer as BufferPolyfill } from 'buffer/';
+
+// There can be small type definition differences between the NodeJS Buffer and polyfill Buffer,
+// so export using the type definition from NodeJS (@types/node).
+import type { Buffer as NodeJSBuffer } from 'buffer';
+
+const AvailableBufferModule: typeof NodeJSBuffer =
+  // eslint-disable-next-line node/prefer-global/buffer
+  typeof Buffer !== 'undefined' ? Buffer : (BufferPolyfill as any);
+
+export { AvailableBufferModule as Buffer };
+
 /**
  *  @ignore
  */
@@ -140,25 +155,8 @@ export function makeUUID4() {
  */
 export function isSameOriginAbsoluteUrl(uri1: string, uri2: string) {
   try {
-    // The globally scoped WHATWG `URL` class is available in modern browsers and
-    // NodeJS v10 or higher. In older NodeJS versions it must be required from the
-    // `url` module.
-    let parseUrl: (url: string) => URL;
-    if (typeof URL !== 'undefined') {
-      parseUrl = url => new URL(url);
-    } else {
-      try {
-        // eslint-disable-next-line import/no-nodejs-modules, global-require
-        const nodeUrl = (require('url') as typeof import('url')).URL;
-        parseUrl = url => new nodeUrl(url);
-      } catch (error) {
-        console.log(error);
-        throw new Error('Global URL class is not available');
-      }
-    }
-
-    const parsedUri1 = parseUrl(uri1);
-    const parsedUri2 = parseUrl(uri2);
+    const parsedUri1 = new URL(uri1);
+    const parsedUri2 = new URL(uri2);
 
     const port1 =
       parseInt(parsedUri1.port || '0', 10) | 0 || (parsedUri1.protocol === 'https:' ? 443 : 80);

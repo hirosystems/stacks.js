@@ -1,3 +1,4 @@
+import { Buffer } from '@stacks/common';
 import Ripemd160Polyfill from 'ripemd160-min';
 import { isNodeCryptoAvailable } from './cryptoUtils';
 

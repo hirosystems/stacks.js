@@ -1,3 +1,4 @@
+import { Buffer } from '@stacks/common';
 import { ECPair, script, Transaction } from 'bitcoinjs-lib';
 import { TokenSigner } from 'jsontokens';
 import {

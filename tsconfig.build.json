@@ -1,14 +1,35 @@
 {
-  "extends": "./tsconfig.json",
   "compilerOptions": {
-    "target": "es6",
-    "module": "commonjs",
+    "noEmit": true,
+    "target": "ES2017",
+    "module": "CommonJS",
     "moduleResolution": "node",
-    "noEmit": false,
-    "rootDir": "./src",
-    "outDir": "./lib"
-  },
-  "include": [
-    "src/**/*"
-  ]
+    "lib": [
+      "dom",
+      "esnext"
+    ],
+    "importHelpers": false,
+    "declaration": true,
+    "sourceMap": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "pretty": true,
+    "removeComments": true,
+    "noImplicitAny": true,
+    "strictFunctionTypes": true,
+    "noImplicitThis": true,
+    "alwaysStrict": true,
+    "stripInternal": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "emitDecoratorMetadata": false,
+    "experimentalDecorators": true,
+    "allowSyntheticDefaultImports": true,
+    "suppressImplicitAnyIndexErrors": false,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "strictNullChecks": true
+  }
 }

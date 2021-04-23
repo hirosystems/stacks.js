@@ -11,3 +11,4 @@ typedoc.js
 **/*.d.ts
 docs-theme/
 node_modules
+**/tests/**

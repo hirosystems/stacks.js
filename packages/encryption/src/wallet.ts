@@ -1,3 +1,4 @@
+import { Buffer } from '@stacks/common';
 import { validateMnemonic, mnemonicToEntropy, entropyToMnemonic } from 'bip39';
 import { randomBytes, GetRandomBytes } from './cryptoRandom';
 import { createSha2Hash } from './sha2Hash';

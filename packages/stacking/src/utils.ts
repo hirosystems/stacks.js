@@ -1,3 +1,5 @@
+// @ts-ignore
+import { Buffer } from '@stacks/common';
 import { AddressHashMode } from '@stacks/transactions';
 import { address } from 'bitcoinjs-lib';
 import BN from 'bn.js';

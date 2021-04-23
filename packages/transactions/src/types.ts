@@ -1,3 +1,4 @@
+import { Buffer } from '@stacks/common';
 import {
   MAX_STRING_LENGTH_BYTES,
   MEMO_MAX_LENGTH_BYTES,

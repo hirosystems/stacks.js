@@ -1,3 +1,4 @@
+import { Buffer } from '@stacks/common';
 import { bip32, ECPair } from 'bitcoinjs-lib';
 import { getPublicKeyFromPrivate } from '@stacks/encryption';
 import { makeAuthResponse } from '@stacks/auth';

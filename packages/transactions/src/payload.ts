@@ -1,3 +1,4 @@
+import { Buffer } from '@stacks/common';
 import { COINBASE_BUFFER_LENGTH_BYTES, PayloadType, StacksMessageType } from './constants';
 
 import { BufferArray } from './utils';

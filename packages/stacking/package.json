@@ -9,61 +9,55 @@
   "author": "yknl <yukanliao@gmail.com>",
   "homepage": "https://blockstack.org",
   "license": "GPL-3.0-or-later",
-  "directories": {
-    "lib": "lib",
-    "dist": "dist",
-    "test": "__tests__"
-  },
   "files": [
-    "dist"
+    "dist",
+    "src"
   ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/blockstack/blockstack.js.git"
   },
   "scripts": {
-    "dev": "yarn start",
-    "lint": "yarn lint:eslint && yarn lint:prettier",
-    "lint:eslint": "eslint \"src/**/*.{ts,tsx}\" -f unix",
-    "lint:fix": "eslint \"src/**/*.{ts,tsx}\" -f unix --fix",
-    "lint:prettier": "prettier --check \"src/**/*.{ts,tsx}\" *.js",
-    "lint:prettier:fix": "prettier --write \"src/**/*.{ts,tsx}\" *.js",
-    "start": "tsdx watch --verbose --noClean --onSuccess yalc publish --push",
-    "build": "tsdx build --format cjs,esm,umd",
+    "start": "tsc -b tsconfig.build.json --watch --verbose",
+    "build": "npm run clean && npm run build:cjs && npm run build:esm",
+    "build:cjs": "tsc -b tsconfig.build.json",
+    "build:esm": "tsc -p tsconfig.build.json --module ES6 --outDir ./dist/esm",
+    "build:umd": "webpack --config webpack.config.js",
+    "clean": "rimraf dist && tsc -b tsconfig.build.json --clean",
     "typecheck": "tsc --noEmit",
     "typecheck:watch": "npm run typecheck -- --watch",
-    "prepublishOnly": "yarn test && yarn build",
+    "prepublishOnly": "npm run test && npm run build && npm run build:umd",
     "test": "jest",
-    "test:watch": "jest --watch --coverage=false",
-    "codecovUpload": "codecov"
+    "test:watch": "jest --watch --coverage=false"
   },
   "bugs": {
     "url": "https://github.com/blockstack/blockstack.js/issues"
   },
   "dependencies": {
+    "@stacks/common": "^1.2.2",
     "@stacks/network": "^1.2.2",
     "@stacks/transactions": "^1.4.1",
-    "axios": "^0.21.1",
-    "bignumber.js": "^9.0.1",
+    "@types/bn.js": "^4.11.6",
     "bitcoinjs-lib": "^5.2.0",
-    "bn.js": "^4.11.6",
-    "c32check": "^1.1.1",
-    "url-join": "^4.0.1"
+    "bn.js": "^4.11.6"
   },
   "devDependencies": {
-    "@types/bn.js": "^4.11.6",
-    "@types/jest": "^24.9.0",
-    "codecov": "^3.7.2",
-    "jest": "^24.9.0",
+    "@types/jest": "^26.0.22",
+    "jest": "^26.6.3",
     "jest-fetch-mock": "^3.0.3",
-    "ts-jest": "^26.4.1",
-    "tsdx": "^0.14.0"
+    "jest-module-name-mapper": "^0.1.5",
+    "rimraf": "^3.0.2",
+    "ts-jest": "^26.5.5",
+    "ts-loader": "^9.1.1",
+    "typescript": "^4.2.4",
+    "webpack": "^5.36.1",
+    "webpack-cli": "^4.6.0"
   },
   "sideEffects": false,
   "main": "dist/index.js",
-  "module": "dist/index.esm.js",
-  "typings": "dist/stacking/src/index.d.ts",
-  "umd:main": "dist/stacking.umd.production.js",
-  "unpkg": "dist/stacking.cjs.production.min.js",
+  "module": "dist/esm/index.js",
+  "typings": "dist/index.d.ts",
+  "umd:main": "dist/index.umd.js",
+  "unpkg": "dist/index.umd.js",
   "gitHead": "77b4d6d531b74996e4b7a0cbd1cf5b8358a690ce"
 }

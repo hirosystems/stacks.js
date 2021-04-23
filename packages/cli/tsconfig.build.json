@@ -1,20 +1,31 @@
 {
+  "extends": "../../tsconfig.build.json",
   "compilerOptions": {
-      "target": "es2018",
-      "module": "commonjs",
-      "esModuleInterop": false,
-      "allowSyntheticDefaultImports": false,
-      "moduleResolution": "node",
-      "declaration": true,
-      "noImplicitAny": true,
-      "outDir": "lib",
-      "sourceMap": true,
-      "skipLibCheck": true,
+    "noEmit": false,
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "tsBuildInfoFile": "./tsconfig.build.tsbuildinfo",
+    "composite": true
   },
-  "include": [
-    "src/**/*"
+  "references": [
+    {
+      "path": "../auth/tsconfig.build.json"
+    },
+    {
+      "path": "../common/tsconfig.build.json"
+    },
+    {
+      "path": "../network/tsconfig.build.json"
+    },
+    {
+      "path": "../stacking/tsconfig.build.json"
+    },
+    {
+      "path": "../storage/tsconfig.build.json"
+    },
+    {
+      "path": "../transactions/tsconfig.build.json"
+    }
   ],
-  "exclude": [
-    "node_modules/**/*"
-  ]
+  "include": ["src/**/*"]
 }
