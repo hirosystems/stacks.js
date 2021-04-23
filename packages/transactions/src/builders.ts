@@ -1,3 +1,4 @@
+import { Buffer } from '@stacks/common';
 import { StacksTransaction } from './transaction';
 
 import { StacksNetwork, StacksMainnet, StacksTestnet } from '@stacks/network';

@@ -6,7 +6,7 @@ import { encryptMnemonic } from '@stacks/encryption';
  * @param password - Password to encrypt mnemonic with
  * @return The encrypted phrase
  * */
-export async function encrypt(phrase: string, password: string): Promise<Buffer> {
+export async function encrypt(phrase: string, password: string) {
   const result = await encryptMnemonic(phrase, password);
   return result;
 }

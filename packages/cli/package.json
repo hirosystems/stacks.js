@@ -48,15 +48,10 @@
     "stacks": "./bin.js",
     "stx": "./bin.js"
   },
-  "main": "lib/index.js",
-  "directories": {
-    "lib": "lib",
-    "dist": "dist",
-    "test": "__tests__"
-  },
+  "main": "dist/index.js",
   "files": [
-    "lib",
-    "dist"
+    "dist",
+    "src"
   ],
   "publishConfig": {
     "access": "public"
@@ -66,12 +61,13 @@
     "url": "git+https://github.com/blockstack/blockstack.js.git"
   },
   "scripts": {
-    "build": "tsdx build --format cjs,esm,umd",
-    "dev": "ts-node --project ./tsconfig.dev.json src/index.ts",
+    "start": "tsc -b tsconfig.build.json --watch --verbose",
+    "build": "npm run clean && npm run build:cjs",
+    "build:cjs": "tsc -b tsconfig.build.json",
+    "clean": "rimraf dist && tsc -b tsconfig.build.json --clean",
     "test": "jest",
     "test:watch": "jest --watch --coverage=false",
-    "codecovUpload": "codecov",
-    "prepublishOnly": "yarn test && yarn build"
+    "prepublishOnly": "npm run test && npm run build"
   },
   "bugs": {
     "url": "https://github.com/blockstack/blockstack.js/issues"
@@ -81,17 +77,20 @@
     "@types/express": "^4.16.1",
     "@types/express-winston": "^3.0.1",
     "@types/inquirer": "^6.5.0",
-    "@types/jest": "^24.9.0",
+    "@types/jest": "^26.0.22",
     "@types/node-fetch": "^2.5.0",
     "@types/ripemd160": "^2.0.0",
-    "jest": "^24.9.0",
-    "minimist": ">=1.2.3",
-    "ts-jest": "^26.4.1",
-    "tsdx": "^0.14.0"
+    "jest": "^26.6.3",
+    "jest-fetch-mock": "^3.0.3",
+    "jest-module-name-mapper": "^0.1.5",
+    "rimraf": "^3.0.2",
+    "ts-jest": "^26.5.5",
+    "typescript": "^4.2.4"
   },
   "dependencies": {
     "@stacks/auth": "^1.2.3",
     "@stacks/blockchain-api-client": "^0.34.1",
+    "@stacks/common": "^1.2.2",
     "@stacks/network": "^1.2.2",
     "@stacks/stacking": "^1.4.1",
     "@stacks/storage": "^1.5.0-alpha.0",
@@ -102,7 +101,6 @@
     "bitcoinjs-lib": "^5.1.10",
     "blockstack": "^19.2.2",
     "c32check": "^0.0.6",
-    "codecov": "^3.7.2",
     "cors": "^2.8.4",
     "express": "^4.17.1",
     "express-winston": "^3.1.0",
@@ -110,8 +108,6 @@
     "jsontokens": "^2.0.2",
     "node-fetch": "^2.6.0",
     "ripemd160": "^2.0.1",
-    "ts-node": "^8.10.2",
-    "typescript": "^4.0.3",
     "winston": "^3.2.1",
     "zone-file": "^0.2.2"
   },

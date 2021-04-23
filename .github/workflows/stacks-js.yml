@@ -1,8 +1,10 @@
-name: Main commit checks
+name: stacks.js
+
 on:
   push:
     branches:
       - 'master'
+  pull_request:
 
 jobs:
   code_checks:
@@ -24,19 +26,19 @@ jobs:
           path: |
             node_modules
             */*/node_modules
-          key: ${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
+          key: ${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
 
-      - name: Install yarn dependencies
-        run: yarn --frozen-lockfile --ignore-scripts
+      - name: Install dependencies
+        run: npm i
       - name: Bootstrap
-        run: yarn lerna bootstrap
+        run: npm run bootstrap
       - name: Lint
-        run: yarn lint:prettier
+        run: npm run lint
       - name: Typecheck
-        run: yarn typecheck
+        run: npm run typecheck
       - name: Build
-        run: yarn build
+        run: npm run build
       - name: Tests
-        run: yarn lerna run test --stream --parallel -- -- --coverage
+        run: npm run lerna run test --stream --parallel -- -- --coverage
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v1

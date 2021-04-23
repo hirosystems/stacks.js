@@ -1,3 +1,4 @@
+import { Buffer } from '@stacks/common';
 import { serializeAddress, serializeLPString, createLPString } from '../types';
 import {
   BooleanCV,

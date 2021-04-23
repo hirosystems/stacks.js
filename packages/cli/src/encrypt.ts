@@ -1,3 +1,5 @@
+// @ts-ignore
+import { Buffer } from '@stacks/common';
 import * as blockstack from 'blockstack';
 
 export function encryptBackupPhrase(plaintextBuffer: string, password: string): Promise<Buffer> {

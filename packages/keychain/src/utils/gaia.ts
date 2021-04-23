@@ -1,3 +1,5 @@
+// @ts-ignore
+import { Buffer } from '@stacks/common';
 import { TokenSigner, Json } from 'jsontokens';
 import { getPublicKeyFromPrivate, ecPairToAddress, hexStringToECPair } from '@stacks/encryption';
 import randomBytes from 'randombytes';

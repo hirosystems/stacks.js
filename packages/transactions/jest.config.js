@@ -3,10 +3,10 @@ module.exports = {
   testEnvironment: 'node',
   coverageDirectory: './coverage/',
   collectCoverage: true,
+  moduleNameMapper: require('jest-module-name-mapper').default(),
   globals: {
     'ts-jest': {
-      tsConfig: './tsconfig.json',
-      babelConfig: false,
+      tsconfig: './tsconfig.json',
       diagnostics: {
         ignoreCodes: ['TS151001'],
       },

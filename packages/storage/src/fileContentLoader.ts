@@ -1,3 +1,4 @@
+import { Buffer } from '@stacks/common';
 /**
  * Retrieves the specified file from the app's data store.
  * @param {String} path - the path to the file to read

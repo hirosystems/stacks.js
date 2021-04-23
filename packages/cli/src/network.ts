@@ -1,6 +1,6 @@
 import blockstack from 'blockstack';
 import * as bitcoin from 'bitcoinjs-lib';
-const BN = require('bn.js');
+import BN = require('bn.js');
 import fetch from 'node-fetch';
 
 import { CLI_CONFIG_TYPE } from './argparse';
@@ -150,7 +150,7 @@ export class CLINetworkAdapter {
       return new Promise((resolve: any) =>
         resolve({
           units: String(this.priceUnits),
-          amount: new BN(this.priceToPay),
+          amount: new BN(this.priceToPay as string),
         } as PriceType)
       );
     }
@@ -221,6 +221,7 @@ export class CLINetworkAdapter {
             receiveFeesPeriod = this.receiveFeesPeriod!;
           }
 
+          // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
           if (namespaceInfo.reveal_block + receiveFeesPeriod > blockHeight) {
             address = namespaceInfo.address;
           }

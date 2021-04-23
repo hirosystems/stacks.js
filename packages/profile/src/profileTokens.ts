@@ -1,3 +1,4 @@
+import { Buffer } from '@stacks/common';
 import { ECPair } from 'bitcoinjs-lib';
 import { decodeToken, SECP256K1Client, TokenSigner, TokenVerifier } from 'jsontokens';
 import { TokenInterface } from 'jsontokens/lib/decode';
@@ -162,7 +163,7 @@ export function extractProfile(
       throw new Error('Unexpected token payload type of string');
     }
     if (payload.hasOwnProperty('claim')) {
-      profile = payload.claim as object;
+      profile = payload.claim as Record<string, any>;
     }
   }
 

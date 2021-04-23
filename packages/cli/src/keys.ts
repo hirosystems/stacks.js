@@ -5,6 +5,7 @@ import * as blockstack from 'blockstack';
 import * as bitcoin from 'bitcoinjs-lib';
 import * as bip39 from 'bip39';
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const c32check = require('c32check');
 
 import { getPrivateKeyAddress } from './utils';

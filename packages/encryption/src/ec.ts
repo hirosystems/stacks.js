@@ -1,3 +1,4 @@
+import { Buffer } from '@stacks/common';
 import { ec as EllipticCurve } from 'elliptic';
 import * as BN from 'bn.js';
 import { randomBytes } from './cryptoRandom';

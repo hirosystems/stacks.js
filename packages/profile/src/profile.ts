@@ -15,12 +15,10 @@ import {
 } from './profileSchemas/personUtils';
 
 // TODO: bring into this monorepo/convert to ts
-// eslint-disable-next-line @typescript-eslint/ban-ts-ignore
 // @ts-ignore
 import { makeZoneFile, parseZoneFile } from 'zone-file';
 
 // Could not find a declaration file for module
-// eslint-disable-next-line @typescript-eslint/ban-ts-ignore
 // @ts-ignore
 import * as inspector from 'schema-inspector';
 

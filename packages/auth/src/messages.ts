@@ -1,4 +1,4 @@
-// eslint-disable-next-line import/no-unassigned-import
+import { Buffer } from '@stacks/common';
 import 'cross-fetch/polyfill';
 
 import { TokenSigner, SECP256K1Client } from 'jsontokens';
@@ -179,6 +179,7 @@ export async function decryptPrivateKey(
  */
 export async function makeAuthResponse(
   privateKey: string,
+  // eslint-disable-next-line @typescript-eslint/ban-types
   profile: {} = {},
   username: string | null = null,
   metadata: AuthMetadata | null,

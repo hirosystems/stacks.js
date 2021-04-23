@@ -1,3 +1,4 @@
+import { Buffer } from '@stacks/common';
 import { mnemonicToSeed } from 'bip39';
 import { bip32, BIP32Interface } from 'bitcoinjs-lib';
 import { ChainID } from '@stacks/transactions';

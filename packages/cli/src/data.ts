@@ -3,6 +3,7 @@ import * as URL from 'url';
 import * as crypto from 'crypto';
 import * as jsontokens from 'jsontokens';
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const ZoneFile = require('zone-file');
 
 import {
@@ -35,7 +36,6 @@ function makeFakeAuthResponseToken(
     '0496345da77fb5e06757b9c4fd656bf830a3b293f245a6cc2f11f8334ebb690f1' +
     '9582124f4b07172eb61187afba4514828f866a8a223e0d5c539b2e38a59ab8bb3';
 
-  // eslint-disable-next-line
   window.localStorage.setItem('blockstack-transit-private-key', transitPrivateKey);
 
   const authResponse = blockstack.makeAuthResponse(
@@ -275,7 +275,7 @@ export function gaiaUploadProfileAll(
 
   return Promise.all(uploadPromises)
     .then(publicUrls => {
-      return { error: null, dataUrls: publicUrls! };
+      return { error: null, dataUrls: publicUrls };
     })
     .catch(e => {
       return { error: `Failed to upload: ${e.message}`, dataUrls: null };

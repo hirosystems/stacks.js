@@ -1,27 +1,20 @@
 {
+  "extends": "./tsconfig.build.json",
   "compilerOptions": {
-    "target": "esnext",
-    "module": "esnext",
-    "moduleResolution": "node",
-    "declaration": true,
-    "sourceMap": true,
-    "noEmit": true,
-    "importHelpers": true,
-    "baseUrl": "./src",
-    "allowSyntheticDefaultImports": true,
-    "skipLibCheck": true,
-    "lib": ["dom", "esnext"],
+    "baseUrl": ".",
     "paths": {
-      "@stacks/auth": ["./packages/auth/src"],
-      "@stacks/cli": ["./packages/cli/src"],
-      "@stacks/common": ["./packages/common/src"],
-      "@stacks/encryption": ["./packages/encryption/src"],
-      "@stacks/keychain": ["./packages/keychain/src"],
-      "@stacks/network": ["./packages/network/src"],
-      "@stacks/profile": ["./packages/profile/src"],
-      "@stacks/storage": ["./packages/storage/src"],
-      "@stacks/transactions": ["./packages/transactions/src"]
+      // "@stacks/*": ["./packages/*/src"],
+      "@stacks/auth": ["packages/auth/src"],
+      "@stacks/bns": ["packages/bns/src"],
+      "@stacks/cli": ["packages/cli/src"],
+      "@stacks/common": ["packages/common/src"],
+      "@stacks/encryption": ["packages/encryption/src"],
+      "@stacks/keychain": ["packages/keychain/src"],
+      "@stacks/network": ["packages/network/src"],
+      "@stacks/profile": ["packages/profile/src"],
+      "@stacks/stacking": ["packages/stacking/src"],
+      "@stacks/storage": ["packages/storage/src"],
+      "@stacks/transactions": ["packages/transactions/src"]
     }
-  },
-  "include": ["packages/**/src/**/*", "packages/**/test/**/*", "src/**/*", "tests/**/*"]
+  }
 }

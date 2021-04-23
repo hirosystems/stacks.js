@@ -1,3 +1,5 @@
+// @ts-ignore
+import { Buffer } from '@stacks/common';
 import {
   connectToGaiaHub,
   deleteFromGaiaHub,

@@ -1,3 +1,4 @@
+import { Buffer } from '@stacks/common';
 import {
   CipherTextEncoding,
   SignedCipherObject,

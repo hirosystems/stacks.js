@@ -1,3 +1,4 @@
+import { Buffer } from '@stacks/common';
 import { getCryptoLib } from './cryptoUtils';
 
 type NodeCryptoCreateCipher = typeof import('crypto').createCipheriv;

@@ -1,3 +1,4 @@
+import { Buffer } from '@stacks/common';
 import * as logger from 'winston';
 import * as bitcoinjs from 'bitcoinjs-lib';
 import * as URL from 'url';
@@ -27,6 +28,7 @@ import {
 
 import { StacksNetwork } from '@stacks/network';
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const ZoneFile = require('zone-file');
 
 import {
@@ -66,6 +68,7 @@ class CLITransactionSigner implements TransactionSigner {
   }
 
   signTransaction(_txIn: bitcoinjs.TransactionBuilder, _signingIndex: number): Promise<void> {
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
     return Promise.resolve().then(() => {});
   }
 
@@ -223,7 +226,7 @@ function isCLITransactionSigner(
 
 export function hasKeys(signer: string | CLITransactionSigner): boolean {
   if (isCLITransactionSigner(signer)) {
-    const s = signer as CLITransactionSigner;
+    const s = signer;
     return s.isComplete;
   } else {
     return true;
@@ -405,10 +408,10 @@ export function getPrivateKeyAddress(
   privateKey: string | CLITransactionSigner
 ): string {
   if (isCLITransactionSigner(privateKey)) {
-    const pkts = privateKey as CLITransactionSigner;
+    const pkts = privateKey;
     return pkts.address;
   } else {
-    const pk = privateKey as string;
+    const pk = privateKey;
     const ecKeyPair = blockstack.hexStringToECPair(pk);
     return network.coerceAddress(blockstack.ecPairToAddress(ecKeyPair));
   }
@@ -467,6 +470,7 @@ export function checkUrl(url: string): string {
 /*
  * Sign a profile into a JWT
  */
+// eslint-disable-next-line @typescript-eslint/ban-types
 export function makeProfileJWT(profileData: Object, privateKey: string): string {
   const signedToken = blockstack.signProfileToken(profileData, privateKey);
   const wrappedToken = blockstack.wrapProfileToken(signedToken);
@@ -489,7 +493,7 @@ export async function makeDIDConfiguration(
     exp: new Date(new Date().setFullYear(new Date().getFullYear() + 1)),
   };
 
-  const jwt = tokenSigner.sign(payload);
+  const jwt = tokenSigner.sign(payload as any);
   return {
     entries: [
       {

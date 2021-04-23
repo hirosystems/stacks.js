@@ -1,3 +1,4 @@
+import { Buffer } from '@stacks/common';
 import { SmartBuffer, SmartBufferOptions } from 'smart-buffer';
 
 function createEnumChecker<T extends string, TEnumValue extends number>(
