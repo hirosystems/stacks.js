@@ -1,5 +1,8 @@
 import Ajv from 'ajv';
 import * as process from 'process';
+import * as path from 'path';
+import * as os from 'os';
+
 import * as fs from 'fs';
 
 export const NAME_PATTERN = '^([0-9a-z_.+-]{3,37})$';
@@ -95,6 +98,14 @@ const CONFIG_REGTEST_DEFAULTS: CLI_CONFIG_TYPE = {
   bitcoindUsername: 'blockstack',
 };
 
+const CONFIG_LOCALNET_DEFAULTS = {
+  blockstackAPIUrl: `http://localhost:20443`,
+  blockstackNodeUrl: `http://localhost:20443`,
+  broadcastServiceUrl: `http://localhost:20443/v2/transactions`,
+  utxoServiceUrl: `http://localhost:18332`,
+  logConfig: Object.assign({}, LOG_CONFIG_DEFAULTS, { level: 'debug' }),
+};
+
 const PUBLIC_TESTNET_HOST = 'testnet-master.blockstack.org';
 
 const CONFIG_TESTNET_DEFAULTS = {
@@ -106,8 +117,8 @@ const CONFIG_TESTNET_DEFAULTS = {
 };
 
 export const DEFAULT_CONFIG_PATH = '~/.blockstack-cli.conf';
-export const DEFAULT_CONFIG_REGTEST_PATH = '~/.blockstack-cli-regtest.conf';
-export const DEFAULT_CONFIG_TESTNET_PATH = '~/.blockstack-cli-testnet.conf';
+export const DEFAULT_CONFIG_REGTEST_PATH = path.join(os.homedir(),'.blockstack-cli-regtest.conf');
+export const DEFAULT_CONFIG_TESTNET_PATH = path.join(os.homedir(),'.blockstack-cli-testnet.conf');
 
 export const DEFAULT_MAX_ID_SEARCH_INDEX = 256;
 
@@ -2768,6 +2779,8 @@ Options can be:
 
     -t                  Use the public testnet instead of mainnet.
 
+    -l                  Use the local testnet instead of mainnet.
+
     -i                  Use integration test framework instead of mainnet.
 
     -U                  Unsafe mode.  No safety checks will be performed.
@@ -2804,7 +2817,7 @@ Options can be:
                         (DANGEROUS)
 
     -T URL              Use an alternative Blockstack transaction broadcaster.
-    
+
     -X URL              Use an alternative UTXO service endpoint.
 
     -u USERNAME         A username to be passed to bitcoind RPC endpoints
@@ -3093,7 +3106,7 @@ interface CLI_OPTS {
 
 export function getCLIOpts(
   argv: string[],
-  opts: string = 'deitUxC:F:B:P:D:G:N:H:T:I:m:M:X:u:p:'
+  opts: string = 'deitlUxC:F:B:P:D:G:N:H:T:I:m:M:X:u:p:c:'
 ): CLI_OPTS {
   const optsTable: CLI_OPTS = {};
   const remainingArgv = [];
@@ -3378,10 +3391,10 @@ export function checkArgs(argList: string[]): CheckArgsSuccessType | CheckArgsFa
  * If no config file exists, then return the default config.
  *
  * @configPath (string) the path to the config file.
- * @networkType (sring) 'mainnet', 'regtest', or 'testnet'
+ * @networkType (sring) 'mainnet', 'regtest', 'localnet', or 'testnet'
  */
 export function loadConfig(configFile: string, networkType: string): CLI_CONFIG_TYPE {
-  if (networkType !== 'mainnet' && networkType !== 'testnet' && networkType != 'regtest') {
+  if (networkType !== 'mainnet' && networkType !== 'testnet' && networkType != 'regtest' && networkType != 'localnet') {
     throw new Error('Unregognized network');
   }
 
@@ -3391,6 +3404,8 @@ export function loadConfig(configFile: string, networkType: string): CLI_CONFIG_
     configRet = Object.assign({}, CONFIG_DEFAULTS);
   } else if (networkType === 'regtest') {
     configRet = Object.assign({}, CONFIG_REGTEST_DEFAULTS);
+  } else if (networkType === 'localnet') {
+    configRet = Object.assign({}, CONFIG_LOCALNET_DEFAULTS);
   } else {
     configRet = Object.assign({}, CONFIG_TESTNET_DEFAULTS);
   }
