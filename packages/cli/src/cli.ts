@@ -1647,7 +1647,7 @@ function faucetCall(_: CLINetworkAdapter, args: string[]): Promise<string> {
 
   const apiConfig = new Configuration({
     fetchApi: crossfetch,
-    basePath: 'https://stacks-node-api.blockstack.org',
+    basePath: 'https://stacks-node-api.testnet.stacks.co',
   });
 
   const faucets = new FaucetsApi(apiConfig);
@@ -1791,6 +1791,8 @@ export function CLIMain() {
     const consensusHash = CLIOptAsString(opts, 'C');
     const integration_test = CLIOptAsBool(opts, 'i');
     const testnet = CLIOptAsBool(opts, 't');
+    const localnet = CLIOptAsBool(opts, 'l');
+
     const magicBytes = CLIOptAsString(opts, 'm');
     const apiUrl = CLIOptAsString(opts, 'H');
     const transactionBroadcasterUrl = CLIOptAsString(opts, 'T');
@@ -1816,7 +1818,7 @@ export function CLIMain() {
     const priceToPay = CLIOptAsString(opts, 'P') ? CLIOptAsString(opts, 'P') : '0';
     const priceUnits = CLIOptAsString(opts, 'D');
 
-    const networkType = testnet ? 'testnet' : integration_test ? 'regtest' : 'mainnet';
+    const networkType = testnet ? 'testnet' : localnet ? 'localnet': integration_test ? 'regtest' : 'mainnet';
 
     const configData = loadConfig(configPath!, networkType);
 
@@ -1855,6 +1857,7 @@ export function CLIMain() {
         : configData.broadcastServiceUrl,
       nodeAPIUrl: nodeAPIUrl ? nodeAPIUrl : configData.blockstackNodeUrl,
     };
+
 
     // wrap command-line options
     const wrappedNetwork = getNetwork(
