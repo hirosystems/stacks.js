@@ -3,8 +3,8 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>SponsorOptions | Stacks.js 1.0.0 Library Reference</title>
-	<meta name="description" content="Documentation for Stacks.js 1.0.0 Library Reference">
+	<title>SponsorOptions | Stacks.js 1.4.1 Library Reference</title>
+	<meta name="description" content="Documentation for Stacks.js 1.4.1 Library Reference">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
 	<script async src="../assets/js/search.js" id="search-script"></script>
@@ -24,7 +24,7 @@
 						<li class="state loading">Preparing search index...</li>
 						<li class="state failure">The search index is not available</li>
 					</ul>
-					<a href="../index.html" class="title">Stacks.js 1.0.0 Library Reference</a>
+					<a href="../index.html" class="title">Stacks.js 1.4.1 Library Reference</a>
 				</div>
 				<div class="table-cell" id="tsd-widgets">
 					<div id="tsd-filter">
@@ -51,7 +51,7 @@
 		<div class="container">
 			<ul class="tsd-breadcrumb">
 				<li>
-					<a href="../modules.html">Stacks.js 1.0.0 Library Reference</a>
+					<a href="../modules.html">Stacks.js 1.4.1 Library Reference</a>
 				</li>
 				<li>
 					<a href="../modules/transactions.html">transactions</a>
@@ -72,26 +72,6 @@
 					<div class="lead">
 						<p>Sponsored transaction options</p>
 					</div>
-					<dl class="tsd-comment-tags">
-						<dt>param</dt>
-						<dd><p>the origin-signed transaction to sponsor</p>
-						</dd>
-						<dt>param</dt>
-						<dd><p>the sponsor&#39;s private key</p>
-						</dd>
-						<dt>param</dt>
-						<dd><p>the transaction fee amount to sponsor</p>
-						</dd>
-						<dt>param</dt>
-						<dd><p>the nonce of the sponsor account</p>
-						</dd>
-						<dt>param</dt>
-						<dd><p>the sponsor address hashmode</p>
-						</dd>
-						<dt>param</dt>
-						<dd><p>the Stacks blockchain network this transaction is destined for</p>
-						</dd>
-					</dl>
 				</div>
 			</section>
 			<section class="tsd-panel tsd-hierarchy">
@@ -128,9 +108,14 @@
 					<div class="tsd-signature tsd-kind-icon">fee<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">BN</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/transactions/src/builders.ts#L1094">packages/transactions/src/builders.ts:1094</a></li>
+							<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/transactions/src/builders.ts#L1084">packages/transactions/src/builders.ts:1084</a></li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>the transaction fee amount to sponsor</p>
+						</div>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="network" class="tsd-anchor"></a>
@@ -138,9 +123,14 @@
 					<div class="tsd-signature tsd-kind-icon">network<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">StacksNetwork</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/transactions/src/builders.ts#L1097">packages/transactions/src/builders.ts:1097</a></li>
+							<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/transactions/src/builders.ts#L1090">packages/transactions/src/builders.ts:1090</a></li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>the Stacks blockchain network that this transaction will ultimately be broadcast to</p>
+						</div>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="sponsoraddresshashmode" class="tsd-anchor"></a>
@@ -148,9 +138,14 @@
 					<div class="tsd-signature tsd-kind-icon">sponsor<wbr>Address<wbr>Hashmode<span class="tsd-signature-symbol">:</span> <a href="../enums/transactions.addresshashmode.html#serializep2pkh" class="tsd-signature-type" data-tsd-kind="Enumeration member">SerializeP2PKH</a><span class="tsd-signature-symbol"> | </span><a href="../enums/transactions.addresshashmode.html#serializep2sh" class="tsd-signature-type" data-tsd-kind="Enumeration member">SerializeP2SH</a><span class="tsd-signature-symbol"> | </span><a href="../enums/transactions.addresshashmode.html#serializep2wpkh" class="tsd-signature-type" data-tsd-kind="Enumeration member">SerializeP2WPKH</a><span class="tsd-signature-symbol"> | </span><a href="../enums/transactions.addresshashmode.html#serializep2wsh" class="tsd-signature-type" data-tsd-kind="Enumeration member">SerializeP2WSH</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/transactions/src/builders.ts#L1096">packages/transactions/src/builders.ts:1096</a></li>
+							<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/transactions/src/builders.ts#L1088">packages/transactions/src/builders.ts:1088</a></li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>the hashmode of the sponsor&#39;s address</p>
+						</div>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="sponsornonce" class="tsd-anchor"></a>
@@ -158,9 +153,14 @@
 					<div class="tsd-signature tsd-kind-icon">sponsor<wbr>Nonce<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">BN</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/transactions/src/builders.ts#L1095">packages/transactions/src/builders.ts:1095</a></li>
+							<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/transactions/src/builders.ts#L1086">packages/transactions/src/builders.ts:1086</a></li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>the nonce of the sponsor account</p>
+						</div>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="sponsorprivatekey" class="tsd-anchor"></a>
@@ -168,9 +168,14 @@
 					<div class="tsd-signature tsd-kind-icon">sponsor<wbr>Private<wbr>Key<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/transactions/src/builders.ts#L1093">packages/transactions/src/builders.ts:1093</a></li>
+							<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/transactions/src/builders.ts#L1082">packages/transactions/src/builders.ts:1082</a></li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>the sponsor&#39;s private key</p>
+						</div>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="transaction" class="tsd-anchor"></a>
@@ -178,9 +183,14 @@
 					<div class="tsd-signature tsd-kind-icon">transaction<span class="tsd-signature-symbol">:</span> <a href="" class="tsd-signature-type" data-tsd-kind="Class">StacksTransaction</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/transactions/src/builders.ts#L1092">packages/transactions/src/builders.ts:1092</a></li>
+							<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/transactions/src/builders.ts#L1080">packages/transactions/src/builders.ts:1080</a></li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>the origin-signed transaction</p>
+						</div>
+					</div>
 				</section>
 			</section>
 		</div>
