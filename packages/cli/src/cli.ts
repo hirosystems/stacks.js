@@ -1869,7 +1869,7 @@ export function CLIMain() {
     // wrap command-line options
     const wrappedNetwork = getNetwork(
       configData,
-      !!BLOCKSTACK_TEST || !!integration_test || !!testnet
+      !!BLOCKSTACK_TEST || !!integration_test || !!testnet || !!localnet
     );
     const blockstackNetwork = new CLINetworkAdapter(wrappedNetwork, cliOpts);
     if (magicBytes) {
