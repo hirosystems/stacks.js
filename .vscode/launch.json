@@ -12,6 +12,21 @@
             "args": ["${workspaceFolder}/tests/unitTests/src/index.ts"],
             "env": { "TS_NODE_PROJECT": "${workspaceFolder}/tests/unitTests/src/tsconfig.json" },
             "console": "integratedTerminal"
-        }
+        },
+        {
+          "type": "node",
+          "request": "launch",
+          "name": "Debug Jest Tests",
+          "cwd": "${workspaceFolder}/packages/storage",
+          "program": "${workspaceFolder}/packages/storage/node_modules/.bin/jest",
+          "args": [
+            "--runInBand",
+            "--config",
+            "${workspaceFolder}/packages/storage/jest.config.js",
+            "-t=core node preferences respected for name lookups"
+          ],
+          "console": "integratedTerminal",
+          "internalConsoleOptions": "neverOpen"
+        },
     ]
 }

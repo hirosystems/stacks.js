@@ -33,6 +33,7 @@
     "bootstrap": "lerna bootstrap",
     "build": "lerna run build",
     "clean": "lerna clean",
+    "lerna": "lerna",
     "clean:packages": "lerna run clean",
     "install:packages": "lerna run install",
     "lint": "npm run lint:eslint && npm run lint:prettier",
