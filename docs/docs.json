@@ -1,6 +1,6 @@
 {
 	"id": 0,
-	"name": "Stacks.js 1.0.0 Library Reference",
+	"name": "Stacks.js 1.4.1 Library Reference",
 	"kind": 0,
 	"flags": {},
 	"children": [
@@ -1042,7 +1042,7 @@
 			"kindString": "Module",
 			"flags": {},
 			"comment": {
-				"text": "# `@stacks/bns`\n\nA package for interacting with the [BNS contract](https://explorer.stacks.co/txid/SP000000000000000000002Q6VF78.bns?chain=mainnet)\non the Stacks blockchain.\n\n## What is BNS?\nThe [Blockchain Naming System](https://docs.blockstack.org/build-apps/references/bns)\n(BNS) is a network system that binds Stacks usernames to off-chain\nstate without relying on any central points of control.\n\n## Installation\n```\nnpm install --save @stacks/bns\n```\n\n## Example Usage\n\n```typescript\nimport { canRegisterName } from '@stacks/bns';\nimport { StacksTestnet } from '@stacks/network';\n\nconst network = new StacksMainnet();\n\nconst fullyQualifiedName = 'name.id';\nconst result = await canRegisterName({ fullyQualifiedName, network });\n```\n\n```typescript\nimport { buildRegisterNameTX } from '@stacks/bns';\nimport { StacksTestnet } from '@stacks/network';\n\nconst network = new StacksMainnet();\n\nconst name = 'name.id';\nconst salt =  'example-salt'\nconst zonefile =  'example-zonefile'\nconst publicKey = 'SPF0324DSC4K505TP6A8C7GAK4R95E38TGNZP7RE'\n\n// construct an unsigned bns register-name transaction\nconst unsignedTX = await buildRegisterNameTX({ name, salt, zonefile, publicKey, network });\n```\n\n## Docs\n[Library Reference](https://github.com/blockstack/stacks.js/blob/feat/bns-package/packages/bns/docs/modules.md)\n"
+				"text": "# `@stacks/bns`\n\nA package for interacting with the [BNS contract](https://explorer.stacks.co/txid/SP000000000000000000002Q6VF78.bns?chain=mainnet)\non the Stacks blockchain.\n\n## What is BNS?\nThe [Blockchain Naming System](https://docs.blockstack.org/build-apps/references/bns)\n(BNS) is a network system that binds Stacks usernames to off-chain\nstate without relying on any central points of control.\n\n## Installation\n```\nnpm install --save @stacks/bns\n```\n\n## Example Usage\n\n```typescript\nimport { canRegisterName } from '@stacks/bns';\nimport { StacksTestnet } from '@stacks/network';\n\nconst network = new StacksMainnet();\n\nconst fullyQualifiedName = 'name.id';\nconst result = await canRegisterName({ fullyQualifiedName, network });\n```\n\n```typescript\nimport { buildRegisterNameTX } from '@stacks/bns';\nimport { StacksTestnet } from '@stacks/network';\n\nconst network = new StacksMainnet();\n\nconst name = 'name.id';\nconst salt =  'example-salt'\nconst zonefile =  'example-zonefile'\nconst publicKey = 'SPF0324DSC4K505TP6A8C7GAK4R95E38TGNZP7RE'\n\n// construct an unsigned bns register-name transaction\nconst unsignedTX = await buildRegisterNameTX({ name, salt, zonefile, publicKey, network });\n```\n"
 			},
 			"originalName": "bns/src",
 			"children": [
@@ -37698,7 +37698,7 @@
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 619,
+									"line": 611,
 									"character": 12
 								}
 							],
@@ -37735,7 +37735,7 @@
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 603,
+									"line": 598,
 									"character": 17
 								}
 							],
@@ -37750,13 +37750,10 @@
 							"kind": 1024,
 							"kindString": "Property",
 							"flags": {},
-							"comment": {
-								"shortText": "the contract name"
-							},
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 605,
+									"line": 599,
 									"character": 14
 								}
 							],
@@ -37779,7 +37776,7 @@
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 611,
+									"line": 603,
 									"character": 5
 								}
 							],
@@ -37799,7 +37796,7 @@
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 612,
+									"line": 604,
 									"character": 19
 								}
 							],
@@ -37814,13 +37811,10 @@
 							"kind": 1024,
 							"kindString": "Property",
 							"flags": {},
-							"comment": {
-								"shortText": "the function args as a list of Clarity values"
-							},
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 609,
+									"line": 601,
 									"character": 14
 								}
 							],
@@ -37839,13 +37833,10 @@
 							"kind": 1024,
 							"kindString": "Property",
 							"flags": {},
-							"comment": {
-								"shortText": "the name of the function to be called"
-							},
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 607,
+									"line": 600,
 									"character": 14
 								}
 							],
@@ -37868,7 +37859,7 @@
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 616,
+									"line": 608,
 									"character": 9
 								}
 							],
@@ -37891,7 +37882,7 @@
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 614,
+									"line": 606,
 									"character": 7
 								}
 							],
@@ -37914,7 +37905,7 @@
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 622,
+									"line": 614,
 									"character": 19
 								}
 							],
@@ -37948,7 +37939,7 @@
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 624,
+									"line": 616,
 									"character": 16
 								}
 							],
@@ -37975,7 +37966,7 @@
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 629,
+									"line": 621,
 									"character": 11
 								}
 							],
@@ -37998,7 +37989,7 @@
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 627,
+									"line": 619,
 									"character": 17
 								}
 							],
@@ -38042,7 +38033,7 @@
 					"sources": [
 						{
 							"fileName": "packages/transactions/src/builders.ts",
-							"line": 601,
+							"line": 596,
 							"character": 36
 						}
 					],
@@ -38076,59 +38067,7 @@
 					"kindString": "Interface",
 					"flags": {},
 					"comment": {
-						"shortText": "Contract deploy transaction options",
-						"tags": [
-							{
-								"tag": "param",
-								"text": "the contract name",
-								"param": "contractName"
-							},
-							{
-								"tag": "param",
-								"text": "the code body string",
-								"param": "codeBody"
-							},
-							{
-								"tag": "param",
-								"text": "hex string sender private key used to sign transaction",
-								"param": "senderKey"
-							},
-							{
-								"tag": "param",
-								"text": "transaction fee in microstacks",
-								"param": "fee"
-							},
-							{
-								"tag": "param",
-								"text": "a nonce must be increased monotonically with each new transaction",
-								"param": "nonce"
-							},
-							{
-								"tag": "param",
-								"text": "the Stacks blockchain network this transaction is destined for",
-								"param": "network"
-							},
-							{
-								"tag": "param",
-								"text": "identify how the the transaction should be mined",
-								"param": "anchorMode"
-							},
-							{
-								"tag": "param",
-								"text": "whether post conditions must fully cover all\n                                                transferred assets",
-								"param": "postConditionMode"
-							},
-							{
-								"tag": "param",
-								"text": "an array of post conditions to add to the\n                                                 transaction",
-								"param": "postConditions"
-							},
-							{
-								"tag": "param",
-								"text": "true if another account is sponsoring the transaction fees\n",
-								"param": "sponsored"
-							}
-						]
+						"shortText": "Contract deploy transaction options"
 					},
 					"children": [
 						{
@@ -38139,10 +38078,13 @@
 							"flags": {
 								"isOptional": true
 							},
+							"comment": {
+								"shortText": "the transaction anchorMode, which specifies whether it should be\nincluded in an anchor block or a microblock"
+							},
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 455,
+									"line": 446,
 									"character": 12
 								}
 							],
@@ -38173,10 +38115,13 @@
 							"kind": 1024,
 							"kindString": "Property",
 							"flags": {},
+							"comment": {
+								"shortText": "the Clarity code to be deployed"
+							},
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 450,
+									"line": 435,
 									"character": 10
 								}
 							],
@@ -38194,7 +38139,7 @@
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 449,
+									"line": 433,
 									"character": 14
 								}
 							],
@@ -38211,10 +38156,13 @@
 							"flags": {
 								"isOptional": true
 							},
+							"comment": {
+								"shortText": "transaction fee in microstacks"
+							},
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 452,
+									"line": 439,
 									"character": 5
 								}
 							],
@@ -38231,10 +38179,13 @@
 							"flags": {
 								"isOptional": true
 							},
+							"comment": {
+								"shortText": "the network that the transaction will ultimately be broadcast to"
+							},
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 454,
+									"line": 443,
 									"character": 9
 								}
 							],
@@ -38251,10 +38202,13 @@
 							"flags": {
 								"isOptional": true
 							},
+							"comment": {
+								"shortText": "the transaction nonce, which must be increased monotonically with each new transaction"
+							},
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 453,
+									"line": 441,
 									"character": 7
 								}
 							],
@@ -38271,10 +38225,13 @@
 							"flags": {
 								"isOptional": true
 							},
+							"comment": {
+								"shortText": "the post condition mode, specifying whether or not post-conditions must fully cover all\ntransfered assets"
+							},
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 456,
+									"line": 449,
 									"character": 19
 								}
 							],
@@ -38302,10 +38259,13 @@
 							"flags": {
 								"isOptional": true
 							},
+							"comment": {
+								"shortText": "a list of post conditions to add to the transaction"
+							},
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 457,
+									"line": 451,
 									"character": 16
 								}
 							],
@@ -38324,10 +38284,13 @@
 							"kind": 1024,
 							"kindString": "Property",
 							"flags": {},
+							"comment": {
+								"shortText": "a hex string of the private key of the transaction sender"
+							},
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 451,
+									"line": 437,
 									"character": 11
 								}
 							],
@@ -38344,10 +38307,13 @@
 							"flags": {
 								"isOptional": true
 							},
+							"comment": {
+								"shortText": "set to true if another account is sponsoring the transaction (covering the transaction fee)"
+							},
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 458,
+									"line": 453,
 									"character": 11
 								}
 							],
@@ -38378,7 +38344,7 @@
 					"sources": [
 						{
 							"fileName": "packages/transactions/src/builders.ts",
-							"line": 448,
+							"line": 432,
 							"character": 38
 						}
 					]
@@ -39048,7 +39014,7 @@
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 1017,
+									"line": 1009,
 									"character": 17
 								}
 							],
@@ -39066,7 +39032,7 @@
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 1016,
+									"line": 1008,
 									"character": 14
 								}
 							],
@@ -39084,7 +39050,7 @@
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 1019,
+									"line": 1011,
 									"character": 14
 								}
 							],
@@ -39106,7 +39072,7 @@
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 1018,
+									"line": 1010,
 									"character": 14
 								}
 							],
@@ -39123,10 +39089,13 @@
 							"flags": {
 								"isOptional": true
 							},
+							"comment": {
+								"shortText": "the network that the contract which contains the function is deployed to"
+							},
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 1020,
+									"line": 1013,
 									"character": 9
 								}
 							],
@@ -39141,10 +39110,13 @@
 							"kind": 1024,
 							"kindString": "Property",
 							"flags": {},
+							"comment": {
+								"shortText": "address of the sender"
+							},
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 1021,
+									"line": 1015,
 									"character": 15
 								}
 							],
@@ -39171,7 +39143,7 @@
 					"sources": [
 						{
 							"fileName": "packages/transactions/src/builders.ts",
-							"line": 1015,
+							"line": 1007,
 							"character": 40
 						}
 					]
@@ -39330,7 +39302,7 @@
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 619,
+									"line": 611,
 									"character": 12
 								}
 							],
@@ -39372,7 +39344,7 @@
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 603,
+									"line": 598,
 									"character": 17
 								}
 							],
@@ -39392,13 +39364,10 @@
 							"kind": 1024,
 							"kindString": "Property",
 							"flags": {},
-							"comment": {
-								"shortText": "the contract name"
-							},
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 605,
+									"line": 599,
 									"character": 14
 								}
 							],
@@ -39426,7 +39395,7 @@
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 611,
+									"line": 603,
 									"character": 5
 								}
 							],
@@ -39451,7 +39420,7 @@
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 612,
+									"line": 604,
 									"character": 19
 								}
 							],
@@ -39471,13 +39440,10 @@
 							"kind": 1024,
 							"kindString": "Property",
 							"flags": {},
-							"comment": {
-								"shortText": "the function args as a list of Clarity values"
-							},
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 609,
+									"line": 601,
 									"character": 14
 								}
 							],
@@ -39501,13 +39467,10 @@
 							"kind": 1024,
 							"kindString": "Property",
 							"flags": {},
-							"comment": {
-								"shortText": "the name of the function to be called"
-							},
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 607,
+									"line": 600,
 									"character": 14
 								}
 							],
@@ -39535,7 +39498,7 @@
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 616,
+									"line": 608,
 									"character": 9
 								}
 							],
@@ -39563,7 +39526,7 @@
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 614,
+									"line": 606,
 									"character": 7
 								}
 							],
@@ -39591,7 +39554,7 @@
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 622,
+									"line": 614,
 									"character": 19
 								}
 							],
@@ -39630,7 +39593,7 @@
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 624,
+									"line": 616,
 									"character": 16
 								}
 							],
@@ -39657,7 +39620,7 @@
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 637,
+									"line": 629,
 									"character": 11
 								}
 							],
@@ -39680,7 +39643,7 @@
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 629,
+									"line": 621,
 									"character": 11
 								}
 							],
@@ -39708,7 +39671,7 @@
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 627,
+									"line": 619,
 									"character": 17
 								}
 							],
@@ -39758,7 +39721,7 @@
 					"sources": [
 						{
 							"fileName": "packages/transactions/src/builders.ts",
-							"line": 636,
+							"line": 628,
 							"character": 42
 						}
 					],
@@ -39791,7 +39754,7 @@
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 619,
+									"line": 611,
 									"character": 12
 								}
 							],
@@ -39833,7 +39796,7 @@
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 603,
+									"line": 598,
 									"character": 17
 								}
 							],
@@ -39853,13 +39816,10 @@
 							"kind": 1024,
 							"kindString": "Property",
 							"flags": {},
-							"comment": {
-								"shortText": "the contract name"
-							},
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 605,
+									"line": 599,
 									"character": 14
 								}
 							],
@@ -39887,7 +39847,7 @@
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 611,
+									"line": 603,
 									"character": 5
 								}
 							],
@@ -39912,7 +39872,7 @@
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 612,
+									"line": 604,
 									"character": 19
 								}
 							],
@@ -39932,13 +39892,10 @@
 							"kind": 1024,
 							"kindString": "Property",
 							"flags": {},
-							"comment": {
-								"shortText": "the function args as a list of Clarity values"
-							},
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 609,
+									"line": 601,
 									"character": 14
 								}
 							],
@@ -39962,13 +39919,10 @@
 							"kind": 1024,
 							"kindString": "Property",
 							"flags": {},
-							"comment": {
-								"shortText": "the name of the function to be called"
-							},
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 607,
+									"line": 600,
 									"character": 14
 								}
 							],
@@ -39996,7 +39950,7 @@
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 616,
+									"line": 608,
 									"character": 9
 								}
 							],
@@ -40024,7 +39978,7 @@
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 614,
+									"line": 606,
 									"character": 7
 								}
 							],
@@ -40047,7 +40001,7 @@
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 646,
+									"line": 638,
 									"character": 15
 								}
 							],
@@ -40070,7 +40024,7 @@
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 622,
+									"line": 614,
 									"character": 19
 								}
 							],
@@ -40109,7 +40063,7 @@
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 624,
+									"line": 616,
 									"character": 16
 								}
 							],
@@ -40136,7 +40090,7 @@
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 647,
+									"line": 639,
 									"character": 12
 								}
 							],
@@ -40157,7 +40111,7 @@
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 648,
+									"line": 640,
 									"character": 12
 								}
 							],
@@ -40183,7 +40137,7 @@
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 629,
+									"line": 621,
 									"character": 11
 								}
 							],
@@ -40211,7 +40165,7 @@
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 627,
+									"line": 619,
 									"character": 17
 								}
 							],
@@ -40263,7 +40217,7 @@
 					"sources": [
 						{
 							"fileName": "packages/transactions/src/builders.ts",
-							"line": 645,
+							"line": 637,
 							"character": 50
 						}
 					],
@@ -40288,10 +40242,13 @@
 							"kind": 1024,
 							"kindString": "Property",
 							"flags": {},
+							"comment": {
+								"shortText": "the amount to be transfered in microstacks"
+							},
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 270,
+									"line": 257,
 									"character": 8
 								}
 							],
@@ -40313,10 +40270,13 @@
 							"flags": {
 								"isOptional": true
 							},
+							"comment": {
+								"shortText": "the transaction anchorMode, which specifies whether it should be\nincluded in an anchor block or a microblock"
+							},
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 274,
+									"line": 266,
 									"character": 12
 								}
 							],
@@ -40354,10 +40314,13 @@
 							"flags": {
 								"isOptional": true
 							},
+							"comment": {
+								"shortText": "the transaction fee in microstacks"
+							},
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 271,
+									"line": 259,
 									"character": 5
 								}
 							],
@@ -40379,10 +40342,13 @@
 							"flags": {
 								"isOptional": true
 							},
+							"comment": {
+								"shortText": "an arbitrary string to include in the transaction, must be less than 34 bytes"
+							},
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 275,
+									"line": 268,
 									"character": 6
 								}
 							],
@@ -40404,10 +40370,13 @@
 							"flags": {
 								"isOptional": true
 							},
+							"comment": {
+								"shortText": "the network that the transaction will ultimately be broadcast to"
+							},
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 273,
+									"line": 263,
 									"character": 9
 								}
 							],
@@ -40429,10 +40398,13 @@
 							"flags": {
 								"isOptional": true
 							},
+							"comment": {
+								"shortText": "the transaction nonce, which must be increased monotonically with each new transaction"
+							},
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 272,
+									"line": 261,
 									"character": 7
 								}
 							],
@@ -40455,7 +40427,7 @@
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 295,
+									"line": 292,
 									"character": 15
 								}
 							],
@@ -40472,10 +40444,13 @@
 							"flags": {
 								"isOptional": true
 							},
+							"comment": {
+								"shortText": "the post condition mode, specifying whether or not post-conditions must fully cover all\ntransfered assets"
+							},
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 276,
+									"line": 271,
 									"character": 19
 								}
 							],
@@ -40508,10 +40483,13 @@
 							"flags": {
 								"isOptional": true
 							},
+							"comment": {
+								"shortText": "a list of post conditions to add to the transaction"
+							},
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 277,
+									"line": 273,
 									"character": 16
 								}
 							],
@@ -40538,7 +40516,7 @@
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 296,
+									"line": 293,
 									"character": 12
 								}
 							],
@@ -40556,10 +40534,13 @@
 							"kind": 1024,
 							"kindString": "Property",
 							"flags": {},
+							"comment": {
+								"shortText": "the address of the recipient of the token transfer"
+							},
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 269,
+									"line": 255,
 									"character": 11
 								}
 							],
@@ -40597,7 +40578,7 @@
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 297,
+									"line": 294,
 									"character": 12
 								}
 							],
@@ -40617,10 +40598,13 @@
 							"flags": {
 								"isOptional": true
 							},
+							"comment": {
+								"shortText": "set to true if another account is sponsoring the transaction (covering the transaction fee)"
+							},
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 278,
+									"line": 275,
 									"character": 11
 								}
 							],
@@ -40659,7 +40643,7 @@
 					"sources": [
 						{
 							"fileName": "packages/transactions/src/builders.ts",
-							"line": 294,
+							"line": 291,
 							"character": 51
 						}
 					],
@@ -40684,10 +40668,13 @@
 							"kind": 1024,
 							"kindString": "Property",
 							"flags": {},
+							"comment": {
+								"shortText": "the amount to be transfered in microstacks"
+							},
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 270,
+									"line": 257,
 									"character": 8
 								}
 							],
@@ -40709,10 +40696,13 @@
 							"flags": {
 								"isOptional": true
 							},
+							"comment": {
+								"shortText": "the transaction anchorMode, which specifies whether it should be\nincluded in an anchor block or a microblock"
+							},
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 274,
+									"line": 266,
 									"character": 12
 								}
 							],
@@ -40750,10 +40740,13 @@
 							"flags": {
 								"isOptional": true
 							},
+							"comment": {
+								"shortText": "the transaction fee in microstacks"
+							},
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 271,
+									"line": 259,
 									"character": 5
 								}
 							],
@@ -40775,10 +40768,13 @@
 							"flags": {
 								"isOptional": true
 							},
+							"comment": {
+								"shortText": "an arbitrary string to include in the transaction, must be less than 34 bytes"
+							},
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 275,
+									"line": 268,
 									"character": 6
 								}
 							],
@@ -40800,10 +40796,13 @@
 							"flags": {
 								"isOptional": true
 							},
+							"comment": {
+								"shortText": "the network that the transaction will ultimately be broadcast to"
+							},
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 273,
+									"line": 263,
 									"character": 9
 								}
 							],
@@ -40825,10 +40824,13 @@
 							"flags": {
 								"isOptional": true
 							},
+							"comment": {
+								"shortText": "the transaction nonce, which must be increased monotonically with each new transaction"
+							},
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 272,
+									"line": 261,
 									"character": 7
 								}
 							],
@@ -40850,10 +40852,13 @@
 							"flags": {
 								"isOptional": true
 							},
+							"comment": {
+								"shortText": "the post condition mode, specifying whether or not post-conditions must fully cover all\ntransfered assets"
+							},
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 276,
+									"line": 271,
 									"character": 19
 								}
 							],
@@ -40886,10 +40891,13 @@
 							"flags": {
 								"isOptional": true
 							},
+							"comment": {
+								"shortText": "a list of post conditions to add to the transaction"
+							},
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 277,
+									"line": 273,
 									"character": 16
 								}
 							],
@@ -40913,10 +40921,13 @@
 							"kind": 1024,
 							"kindString": "Property",
 							"flags": {},
+							"comment": {
+								"shortText": "the address of the recipient of the token transfer"
+							},
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 269,
+									"line": 255,
 									"character": 11
 								}
 							],
@@ -40954,7 +40965,7 @@
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 286,
+									"line": 283,
 									"character": 11
 								}
 							],
@@ -40971,10 +40982,13 @@
 							"flags": {
 								"isOptional": true
 							},
+							"comment": {
+								"shortText": "set to true if another account is sponsoring the transaction (covering the transaction fee)"
+							},
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 278,
+									"line": 275,
 									"character": 11
 								}
 							],
@@ -41011,7 +41025,7 @@
 					"sources": [
 						{
 							"fileName": "packages/transactions/src/builders.ts",
-							"line": 285,
+							"line": 282,
 							"character": 43
 						}
 					],
@@ -41171,39 +41185,7 @@
 					"kindString": "Interface",
 					"flags": {},
 					"comment": {
-						"shortText": "Sponsored transaction options",
-						"tags": [
-							{
-								"tag": "param",
-								"text": "the origin-signed transaction to sponsor",
-								"param": "transaction"
-							},
-							{
-								"tag": "param",
-								"text": "the sponsor's private key",
-								"param": "sponsorPrivateKey"
-							},
-							{
-								"tag": "param",
-								"text": "the transaction fee amount to sponsor",
-								"param": "fee"
-							},
-							{
-								"tag": "param",
-								"text": "the nonce of the sponsor account",
-								"param": "sponsorNonce"
-							},
-							{
-								"tag": "param",
-								"text": "the sponsor address hashmode",
-								"param": "sponsorAddressHashmode"
-							},
-							{
-								"tag": "param",
-								"text": "the Stacks blockchain network this transaction is destined for\n",
-								"param": "network"
-							}
-						]
+						"shortText": "Sponsored transaction options"
 					},
 					"children": [
 						{
@@ -41214,10 +41196,13 @@
 							"flags": {
 								"isOptional": true
 							},
+							"comment": {
+								"shortText": "the transaction fee amount to sponsor"
+							},
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 1094,
+									"line": 1084,
 									"character": 5
 								}
 							],
@@ -41234,10 +41219,13 @@
 							"flags": {
 								"isOptional": true
 							},
+							"comment": {
+								"shortText": "the Stacks blockchain network that this transaction will ultimately be broadcast to"
+							},
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 1097,
+									"line": 1090,
 									"character": 9
 								}
 							],
@@ -41254,10 +41242,13 @@
 							"flags": {
 								"isOptional": true
 							},
+							"comment": {
+								"shortText": "the hashmode of the sponsor's address"
+							},
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 1096,
+									"line": 1088,
 									"character": 24
 								}
 							],
@@ -41295,10 +41286,13 @@
 							"flags": {
 								"isOptional": true
 							},
+							"comment": {
+								"shortText": "the nonce of the sponsor account"
+							},
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 1095,
+									"line": 1086,
 									"character": 14
 								}
 							],
@@ -41313,10 +41307,13 @@
 							"kind": 1024,
 							"kindString": "Property",
 							"flags": {},
+							"comment": {
+								"shortText": "the sponsor's private key"
+							},
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 1093,
+									"line": 1082,
 									"character": 19
 								}
 							],
@@ -41331,10 +41328,13 @@
 							"kind": 1024,
 							"kindString": "Property",
 							"flags": {},
+							"comment": {
+								"shortText": "the origin-signed transaction"
+							},
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 1092,
+									"line": 1080,
 									"character": 13
 								}
 							],
@@ -41362,7 +41362,7 @@
 					"sources": [
 						{
 							"fileName": "packages/transactions/src/builders.ts",
-							"line": 1091,
+							"line": 1078,
 							"character": 31
 						}
 					]
@@ -41374,59 +41374,7 @@
 					"kindString": "Interface",
 					"flags": {},
 					"comment": {
-						"shortText": "STX token transfer transaction options",
-						"tags": [
-							{
-								"tag": "param",
-								"text": "the c32check address of the recipient or a\n                                                 principal clarity value",
-								"param": "recipientAddress"
-							},
-							{
-								"tag": "param",
-								"text": "number of tokens to transfer in microstacks",
-								"param": "amount"
-							},
-							{
-								"tag": "param",
-								"text": "transaction fee in microstacks",
-								"param": "fee"
-							},
-							{
-								"tag": "param",
-								"text": "a nonce must be increased monotonically with each new transaction",
-								"param": "nonce"
-							},
-							{
-								"tag": "param",
-								"text": "the Stacks blockchain network this transaction is destined for",
-								"param": "network"
-							},
-							{
-								"tag": "param",
-								"text": "identify how the the transaction should be mined",
-								"param": "anchorMode"
-							},
-							{
-								"tag": "param",
-								"text": "an arbitrary string to include with the transaction, must be less than\n                         34 bytes",
-								"param": "memo"
-							},
-							{
-								"tag": "param",
-								"text": "whether post conditions must fully cover all\n                                                transferred assets",
-								"param": "postConditionMode"
-							},
-							{
-								"tag": "param",
-								"text": "an array of post conditions to add to the\n                                                 transaction",
-								"param": "postConditions"
-							},
-							{
-								"tag": "param",
-								"text": "true if another account is sponsoring the transaction fees\n",
-								"param": "sponsored"
-							}
-						]
+						"shortText": "STX token transfer transaction options"
 					},
 					"children": [
 						{
@@ -41435,10 +41383,13 @@
 							"kind": 1024,
 							"kindString": "Property",
 							"flags": {},
+							"comment": {
+								"shortText": "the amount to be transfered in microstacks"
+							},
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 270,
+									"line": 257,
 									"character": 8
 								}
 							],
@@ -41455,10 +41406,13 @@
 							"flags": {
 								"isOptional": true
 							},
+							"comment": {
+								"shortText": "the transaction anchorMode, which specifies whether it should be\nincluded in an anchor block or a microblock"
+							},
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 274,
+									"line": 266,
 									"character": 12
 								}
 							],
@@ -41491,10 +41445,13 @@
 							"flags": {
 								"isOptional": true
 							},
+							"comment": {
+								"shortText": "the transaction fee in microstacks"
+							},
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 271,
+									"line": 259,
 									"character": 5
 								}
 							],
@@ -41511,10 +41468,13 @@
 							"flags": {
 								"isOptional": true
 							},
+							"comment": {
+								"shortText": "an arbitrary string to include in the transaction, must be less than 34 bytes"
+							},
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 275,
+									"line": 268,
 									"character": 6
 								}
 							],
@@ -41531,10 +41491,13 @@
 							"flags": {
 								"isOptional": true
 							},
+							"comment": {
+								"shortText": "the network that the transaction will ultimately be broadcast to"
+							},
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 273,
+									"line": 263,
 									"character": 9
 								}
 							],
@@ -41551,10 +41514,13 @@
 							"flags": {
 								"isOptional": true
 							},
+							"comment": {
+								"shortText": "the transaction nonce, which must be increased monotonically with each new transaction"
+							},
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 272,
+									"line": 261,
 									"character": 7
 								}
 							],
@@ -41571,10 +41537,13 @@
 							"flags": {
 								"isOptional": true
 							},
+							"comment": {
+								"shortText": "the post condition mode, specifying whether or not post-conditions must fully cover all\ntransfered assets"
+							},
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 276,
+									"line": 271,
 									"character": 19
 								}
 							],
@@ -41602,10 +41571,13 @@
 							"flags": {
 								"isOptional": true
 							},
+							"comment": {
+								"shortText": "a list of post conditions to add to the transaction"
+							},
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 277,
+									"line": 273,
 									"character": 16
 								}
 							],
@@ -41624,10 +41596,13 @@
 							"kind": 1024,
 							"kindString": "Property",
 							"flags": {},
+							"comment": {
+								"shortText": "the address of the recipient of the token transfer"
+							},
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 269,
+									"line": 255,
 									"character": 11
 								}
 							],
@@ -41659,10 +41634,13 @@
 							"flags": {
 								"isOptional": true
 							},
+							"comment": {
+								"shortText": "set to true if another account is sponsoring the transaction (covering the transaction fee)"
+							},
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 278,
+									"line": 275,
 									"character": 11
 								}
 							],
@@ -41693,7 +41671,7 @@
 					"sources": [
 						{
 							"fileName": "packages/transactions/src/builders.ts",
-							"line": 268,
+							"line": 253,
 							"character": 37
 						}
 					],
@@ -41825,7 +41803,7 @@
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 619,
+									"line": 611,
 									"character": 12
 								}
 							],
@@ -41867,7 +41845,7 @@
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 603,
+									"line": 598,
 									"character": 17
 								}
 							],
@@ -41887,13 +41865,10 @@
 							"kind": 1024,
 							"kindString": "Property",
 							"flags": {},
-							"comment": {
-								"shortText": "the contract name"
-							},
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 605,
+									"line": 599,
 									"character": 14
 								}
 							],
@@ -41921,7 +41896,7 @@
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 611,
+									"line": 603,
 									"character": 5
 								}
 							],
@@ -41946,7 +41921,7 @@
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 612,
+									"line": 604,
 									"character": 19
 								}
 							],
@@ -41966,13 +41941,10 @@
 							"kind": 1024,
 							"kindString": "Property",
 							"flags": {},
-							"comment": {
-								"shortText": "the function args as a list of Clarity values"
-							},
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 609,
+									"line": 601,
 									"character": 14
 								}
 							],
@@ -41996,13 +41968,10 @@
 							"kind": 1024,
 							"kindString": "Property",
 							"flags": {},
-							"comment": {
-								"shortText": "the name of the function to be called"
-							},
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 607,
+									"line": 600,
 									"character": 14
 								}
 							],
@@ -42030,7 +41999,7 @@
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 616,
+									"line": 608,
 									"character": 9
 								}
 							],
@@ -42058,7 +42027,7 @@
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 614,
+									"line": 606,
 									"character": 7
 								}
 							],
@@ -42086,7 +42055,7 @@
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 622,
+									"line": 614,
 									"character": 19
 								}
 							],
@@ -42125,7 +42094,7 @@
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 624,
+									"line": 616,
 									"character": 16
 								}
 							],
@@ -42152,7 +42121,7 @@
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 633,
+									"line": 625,
 									"character": 11
 								}
 							],
@@ -42175,7 +42144,7 @@
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 629,
+									"line": 621,
 									"character": 11
 								}
 							],
@@ -42203,7 +42172,7 @@
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 627,
+									"line": 619,
 									"character": 17
 								}
 							],
@@ -42253,7 +42222,7 @@
 					"sources": [
 						{
 							"fileName": "packages/transactions/src/builders.ts",
-							"line": 632,
+							"line": 624,
 							"character": 44
 						}
 					],
@@ -42286,7 +42255,7 @@
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 619,
+									"line": 611,
 									"character": 12
 								}
 							],
@@ -42328,7 +42297,7 @@
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 603,
+									"line": 598,
 									"character": 17
 								}
 							],
@@ -42348,13 +42317,10 @@
 							"kind": 1024,
 							"kindString": "Property",
 							"flags": {},
-							"comment": {
-								"shortText": "the contract name"
-							},
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 605,
+									"line": 599,
 									"character": 14
 								}
 							],
@@ -42382,7 +42348,7 @@
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 611,
+									"line": 603,
 									"character": 5
 								}
 							],
@@ -42407,7 +42373,7 @@
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 612,
+									"line": 604,
 									"character": 19
 								}
 							],
@@ -42427,13 +42393,10 @@
 							"kind": 1024,
 							"kindString": "Property",
 							"flags": {},
-							"comment": {
-								"shortText": "the function args as a list of Clarity values"
-							},
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 609,
+									"line": 601,
 									"character": 14
 								}
 							],
@@ -42457,13 +42420,10 @@
 							"kind": 1024,
 							"kindString": "Property",
 							"flags": {},
-							"comment": {
-								"shortText": "the name of the function to be called"
-							},
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 607,
+									"line": 600,
 									"character": 14
 								}
 							],
@@ -42491,7 +42451,7 @@
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 616,
+									"line": 608,
 									"character": 9
 								}
 							],
@@ -42519,7 +42479,7 @@
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 614,
+									"line": 606,
 									"character": 7
 								}
 							],
@@ -42542,7 +42502,7 @@
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 641,
+									"line": 633,
 									"character": 15
 								}
 							],
@@ -42565,7 +42525,7 @@
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 622,
+									"line": 614,
 									"character": 19
 								}
 							],
@@ -42604,7 +42564,7 @@
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 624,
+									"line": 616,
 									"character": 16
 								}
 							],
@@ -42631,7 +42591,7 @@
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 642,
+									"line": 634,
 									"character": 12
 								}
 							],
@@ -42657,7 +42617,7 @@
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 629,
+									"line": 621,
 									"character": 11
 								}
 							],
@@ -42685,7 +42645,7 @@
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 627,
+									"line": 619,
 									"character": 17
 								}
 							],
@@ -42736,7 +42696,7 @@
 					"sources": [
 						{
 							"fileName": "packages/transactions/src/builders.ts",
-							"line": 640,
+							"line": 632,
 							"character": 52
 						}
 					],
@@ -42761,10 +42721,13 @@
 							"kind": 1024,
 							"kindString": "Property",
 							"flags": {},
+							"comment": {
+								"shortText": "the amount to be transfered in microstacks"
+							},
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 270,
+									"line": 257,
 									"character": 8
 								}
 							],
@@ -42786,10 +42749,13 @@
 							"flags": {
 								"isOptional": true
 							},
+							"comment": {
+								"shortText": "the transaction anchorMode, which specifies whether it should be\nincluded in an anchor block or a microblock"
+							},
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 274,
+									"line": 266,
 									"character": 12
 								}
 							],
@@ -42827,10 +42793,13 @@
 							"flags": {
 								"isOptional": true
 							},
+							"comment": {
+								"shortText": "the transaction fee in microstacks"
+							},
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 271,
+									"line": 259,
 									"character": 5
 								}
 							],
@@ -42852,10 +42821,13 @@
 							"flags": {
 								"isOptional": true
 							},
+							"comment": {
+								"shortText": "an arbitrary string to include in the transaction, must be less than 34 bytes"
+							},
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 275,
+									"line": 268,
 									"character": 6
 								}
 							],
@@ -42877,10 +42849,13 @@
 							"flags": {
 								"isOptional": true
 							},
+							"comment": {
+								"shortText": "the network that the transaction will ultimately be broadcast to"
+							},
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 273,
+									"line": 263,
 									"character": 9
 								}
 							],
@@ -42902,10 +42877,13 @@
 							"flags": {
 								"isOptional": true
 							},
+							"comment": {
+								"shortText": "the transaction nonce, which must be increased monotonically with each new transaction"
+							},
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 272,
+									"line": 261,
 									"character": 7
 								}
 							],
@@ -42928,7 +42906,7 @@
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 290,
+									"line": 287,
 									"character": 15
 								}
 							],
@@ -42945,10 +42923,13 @@
 							"flags": {
 								"isOptional": true
 							},
+							"comment": {
+								"shortText": "the post condition mode, specifying whether or not post-conditions must fully cover all\ntransfered assets"
+							},
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 276,
+									"line": 271,
 									"character": 19
 								}
 							],
@@ -42981,10 +42962,13 @@
 							"flags": {
 								"isOptional": true
 							},
+							"comment": {
+								"shortText": "a list of post conditions to add to the transaction"
+							},
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 277,
+									"line": 273,
 									"character": 16
 								}
 							],
@@ -43011,7 +42995,7 @@
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 291,
+									"line": 288,
 									"character": 12
 								}
 							],
@@ -43029,10 +43013,13 @@
 							"kind": 1024,
 							"kindString": "Property",
 							"flags": {},
+							"comment": {
+								"shortText": "the address of the recipient of the token transfer"
+							},
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 269,
+									"line": 255,
 									"character": 11
 								}
 							],
@@ -43069,10 +43056,13 @@
 							"flags": {
 								"isOptional": true
 							},
+							"comment": {
+								"shortText": "set to true if another account is sponsoring the transaction (covering the transaction fee)"
+							},
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 278,
+									"line": 275,
 									"character": 11
 								}
 							],
@@ -43110,7 +43100,7 @@
 					"sources": [
 						{
 							"fileName": "packages/transactions/src/builders.ts",
-							"line": 289,
+							"line": 286,
 							"character": 53
 						}
 					],
@@ -43135,10 +43125,13 @@
 							"kind": 1024,
 							"kindString": "Property",
 							"flags": {},
+							"comment": {
+								"shortText": "the amount to be transfered in microstacks"
+							},
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 270,
+									"line": 257,
 									"character": 8
 								}
 							],
@@ -43160,10 +43153,13 @@
 							"flags": {
 								"isOptional": true
 							},
+							"comment": {
+								"shortText": "the transaction anchorMode, which specifies whether it should be\nincluded in an anchor block or a microblock"
+							},
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 274,
+									"line": 266,
 									"character": 12
 								}
 							],
@@ -43201,10 +43197,13 @@
 							"flags": {
 								"isOptional": true
 							},
+							"comment": {
+								"shortText": "the transaction fee in microstacks"
+							},
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 271,
+									"line": 259,
 									"character": 5
 								}
 							],
@@ -43226,10 +43225,13 @@
 							"flags": {
 								"isOptional": true
 							},
+							"comment": {
+								"shortText": "an arbitrary string to include in the transaction, must be less than 34 bytes"
+							},
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 275,
+									"line": 268,
 									"character": 6
 								}
 							],
@@ -43251,10 +43253,13 @@
 							"flags": {
 								"isOptional": true
 							},
+							"comment": {
+								"shortText": "the network that the transaction will ultimately be broadcast to"
+							},
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 273,
+									"line": 263,
 									"character": 9
 								}
 							],
@@ -43276,10 +43281,13 @@
 							"flags": {
 								"isOptional": true
 							},
+							"comment": {
+								"shortText": "the transaction nonce, which must be increased monotonically with each new transaction"
+							},
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 272,
+									"line": 261,
 									"character": 7
 								}
 							],
@@ -43301,10 +43309,13 @@
 							"flags": {
 								"isOptional": true
 							},
+							"comment": {
+								"shortText": "the post condition mode, specifying whether or not post-conditions must fully cover all\ntransfered assets"
+							},
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 276,
+									"line": 271,
 									"character": 19
 								}
 							],
@@ -43337,10 +43348,13 @@
 							"flags": {
 								"isOptional": true
 							},
+							"comment": {
+								"shortText": "a list of post conditions to add to the transaction"
+							},
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 277,
+									"line": 273,
 									"character": 16
 								}
 							],
@@ -43367,7 +43381,7 @@
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 282,
+									"line": 279,
 									"character": 11
 								}
 							],
@@ -43382,10 +43396,13 @@
 							"kind": 1024,
 							"kindString": "Property",
 							"flags": {},
+							"comment": {
+								"shortText": "the address of the recipient of the token transfer"
+							},
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 269,
+									"line": 255,
 									"character": 11
 								}
 							],
@@ -43422,10 +43439,13 @@
 							"flags": {
 								"isOptional": true
 							},
+							"comment": {
+								"shortText": "set to true if another account is sponsoring the transaction (covering the transaction fee)"
+							},
 							"sources": [
 								{
 									"fileName": "packages/transactions/src/builders.ts",
-									"line": 278,
+									"line": 275,
 									"character": 11
 								}
 							],
@@ -43462,7 +43482,7 @@
 					"sources": [
 						{
 							"fileName": "packages/transactions/src/builders.ts",
-							"line": 281,
+							"line": 278,
 							"character": 45
 						}
 					],
@@ -46156,7 +46176,7 @@
 					"sources": [
 						{
 							"fileName": "packages/transactions/src/builders.ts",
-							"line": 1033,
+							"line": 1027,
 							"character": 42
 						}
 					],
@@ -47393,7 +47413,7 @@
 					"sources": [
 						{
 							"fileName": "packages/transactions/src/builders.ts",
-							"line": 469,
+							"line": 464,
 							"character": 44
 						}
 					],
@@ -47463,7 +47483,7 @@
 					"sources": [
 						{
 							"fileName": "packages/transactions/src/builders.ts",
-							"line": 659,
+							"line": 651,
 							"character": 50
 						}
 					],
@@ -48419,7 +48439,7 @@
 					"sources": [
 						{
 							"fileName": "packages/transactions/src/builders.ts",
-							"line": 819,
+							"line": 811,
 							"character": 38
 						}
 					],
@@ -48484,7 +48504,7 @@
 					"sources": [
 						{
 							"fileName": "packages/transactions/src/builders.ts",
-							"line": 522,
+							"line": 517,
 							"character": 40
 						}
 					],
@@ -48539,7 +48559,7 @@
 					"sources": [
 						{
 							"fileName": "packages/transactions/src/builders.ts",
-							"line": 935,
+							"line": 927,
 							"character": 49
 						}
 					],
@@ -48655,7 +48675,7 @@
 					"sources": [
 						{
 							"fileName": "packages/transactions/src/builders.ts",
-							"line": 989,
+							"line": 981,
 							"character": 52
 						}
 					],
@@ -48772,7 +48792,7 @@
 					"sources": [
 						{
 							"fileName": "packages/transactions/src/builders.ts",
-							"line": 883,
+							"line": 875,
 							"character": 44
 						}
 					],
@@ -48864,7 +48884,7 @@
 					"sources": [
 						{
 							"fileName": "packages/transactions/src/builders.ts",
-							"line": 399,
+							"line": 396,
 							"character": 42
 						}
 					],
@@ -49004,7 +49024,7 @@
 					"sources": [
 						{
 							"fileName": "packages/transactions/src/builders.ts",
-							"line": 908,
+							"line": 900,
 							"character": 49
 						}
 					],
@@ -49106,7 +49126,7 @@
 					"sources": [
 						{
 							"fileName": "packages/transactions/src/builders.ts",
-							"line": 962,
+							"line": 954,
 							"character": 52
 						}
 					],
@@ -49209,7 +49229,7 @@
 					"sources": [
 						{
 							"fileName": "packages/transactions/src/builders.ts",
-							"line": 863,
+							"line": 855,
 							"character": 44
 						}
 					],
@@ -49287,7 +49307,7 @@
 					"sources": [
 						{
 							"fileName": "packages/transactions/src/builders.ts",
-							"line": 710,
+							"line": 702,
 							"character": 46
 						}
 					],
@@ -49352,7 +49372,7 @@
 					"sources": [
 						{
 							"fileName": "packages/transactions/src/builders.ts",
-							"line": 309,
+							"line": 306,
 							"character": 50
 						}
 					],
@@ -50218,7 +50238,7 @@
 					"sources": [
 						{
 							"fileName": "packages/transactions/src/builders.ts",
-							"line": 1109,
+							"line": 1102,
 							"character": 40
 						}
 					],
