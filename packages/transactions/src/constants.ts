@@ -38,9 +38,15 @@ enum PayloadType {
   Coinbase = 0x04,
 }
 
+/**
+ * How a transaction gets appended to the Stacks blockchain
+ */
 enum AnchorMode {
+  /** The transaction MUST be included in an anchored block */
   OnChainOnly = 0x01,
+  /** The transaction MUST be included in a microblock */
   OffChainOnly = 0x02,
+  /** The leader can choose where to include the transaction (anchored block or microblock)*/
   Any = 0x03,
 }
 

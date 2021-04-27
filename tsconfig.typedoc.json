@@ -37,13 +37,11 @@
   ],
   "typedocOptions": {
     "readme": "overview.md",
-    "mode": "file",
     "excludePrivate": true,
     "excludeProtected": true,
+    "external-modulemap": ".*\/packages\/([\\w\\-_]+)\/",
     "excludeExternals": true,
-    "excludeNotExported": false,
     "includes" : "mdincludes",
-    "includeDeclarations": false,
     "gitRevision": "master",
     "listInvalidSymbolLinks": true,
     "theme": "docs-theme"

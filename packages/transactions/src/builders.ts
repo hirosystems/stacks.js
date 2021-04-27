@@ -250,32 +250,29 @@ export interface MultiSigOptions {
 
 /**
  * STX token transfer transaction options
- *
- * @param  {String|PrincipalCV} recipientAddress - the c32check address of the recipient or a
- *                                                  principal clarity value
- * @param  {BigNum} amount - number of tokens to transfer in microstacks
- * @param  {BigNum} fee - transaction fee in microstacks
- * @param  {BigNum} nonce - a nonce must be increased monotonically with each new transaction
- * @param  {StacksNetwork} network - the Stacks blockchain network this transaction is destined for
- * @param  {anchorMode} anchorMode - identify how the the transaction should be mined
- * @param  {String} memo - an arbitrary string to include with the transaction, must be less than
- *                          34 bytes
- * @param  {PostConditionMode} postConditionMode - whether post conditions must fully cover all
- *                                                 transferred assets
- * @param  {PostCondition[]} postConditions - an array of post conditions to add to the
- *                                                  transaction
- * @param  {Boolean} sponsored - true if another account is sponsoring the transaction fees
  */
 export interface TokenTransferOptions {
+  /** the address of the recipient of the token transfer */
   recipient: string | PrincipalCV;
+  /** the amount to be transfered in microstacks */
   amount: BigNum;
+  /** the transaction fee in microstacks */
   fee?: BigNum;
+  /** the transaction nonce, which must be increased monotonically with each new transaction */
   nonce?: BigNum;
+  /** the network that the transaction will ultimately be broadcast to */
   network?: StacksNetwork;
+  /** the transaction anchorMode, which specifies whether it should be
+   * included in an anchor block or a microblock */
   anchorMode?: AnchorMode;
+  /** an arbitrary string to include in the transaction, must be less than 34 bytes */
   memo?: string;
+  /** the post condition mode, specifying whether or not post-conditions must fully cover all
+   * transfered assets */
   postConditionMode?: PostConditionMode;
+  /** a list of post conditions to add to the transaction */
   postConditions?: PostCondition[];
+  /** set to true if another account is sponsoring the transaction (covering the transaction fee) */
   sponsored?: boolean;
 }
 
@@ -432,30 +429,28 @@ export async function makeSTXTokenTransfer(
 
 /**
  * Contract deploy transaction options
- *
- * @param  {String} contractName - the contract name
- * @param  {String} codeBody - the code body string
- * @param  {String} senderKey - hex string sender private key used to sign transaction
- * @param  {BigNum} fee - transaction fee in microstacks
- * @param  {BigNum} nonce - a nonce must be increased monotonically with each new transaction
- * @param  {StacksNetwork} network - the Stacks blockchain network this transaction is destined for
- * @param  {anchorMode} anchorMode - identify how the the transaction should be mined
- * @param  {PostConditionMode} postConditionMode - whether post conditions must fully cover all
- *                                                 transferred assets
- * @param  {PostCondition[]} postConditions - an array of post conditions to add to the
- *                                                  transaction
- * @param  {Boolean} sponsored - true if another account is sponsoring the transaction fees
  */
 export interface ContractDeployOptions {
   contractName: string;
+  /** the Clarity code to be deployed */
   codeBody: string;
+  /** a hex string of the private key of the transaction sender */
   senderKey: string;
+  /** transaction fee in microstacks */
   fee?: BigNum;
+  /** the transaction nonce, which must be increased monotonically with each new transaction */
   nonce?: BigNum;
+  /** the network that the transaction will ultimately be broadcast to */
   network?: StacksNetwork;
+  /** the transaction anchorMode, which specifies whether it should be
+   * included in an anchor block or a microblock */
   anchorMode?: AnchorMode;
+  /** the post condition mode, specifying whether or not post-conditions must fully cover all
+   * transfered assets */
   postConditionMode?: PostConditionMode;
+  /** a list of post conditions to add to the transaction */
   postConditions?: PostCondition[];
+  /** set to true if another account is sponsoring the transaction (covering the transaction fee) */
   sponsored?: boolean;
 }
 
@@ -598,34 +593,32 @@ export async function makeContractDeploy(
 
 /**
  * Contract function call transaction options
- * @param  {String} contractAddress - the c32check address of the contract
- * @param  {String} contractName - the contract name
- * @param  {String} functionName - name of the function to be called
- * @param  {[ClarityValue]} functionArgs - an array of Clarity values as arguments to the function call
- * @param  {String} senderKey - hex string sender private key used to sign transaction
- * @param  {BigNum} fee - transaction fee in microstacks
- * @param  {BigNum} nonce - a nonce must be increased monotonically with each new transaction
- * @param  {StacksNetwork} network - the Stacks blockchain network this transaction is destined for
- * @param  {anchorMode} anchorMode - identify how the the transaction should be mined
- * @param  {PostConditionMode} postConditionMode - whether post conditions must fully cover all
- *                                                 transferred assets
- * @param  {PostCondition[]} postConditions - an array of post conditions to add to the
- *                                                  transaction
- * @param  {Boolean} sponsored - true if another account is sponsoring the transaction fees
  */
 export interface ContractCallOptions {
+  /** the Stacks address of the contract */
   contractAddress: string;
   contractName: string;
   functionName: string;
   functionArgs: ClarityValue[];
+  /** transaction fee in microstacks */
   fee?: BigNum;
   feeEstimateApiUrl?: string;
+  /** the transaction nonce, which must be increased monotonically with each new transaction */
   nonce?: BigNum;
+  /** the Stacks blockchain network that will ultimately be used to broadcast this transaction */
   network?: StacksNetwork;
+  /** the transaction anchorMode, which specifies whether it should be
+    * included in an anchor block or a microblock */
   anchorMode?: AnchorMode;
+  /** the post condition mode, specifying whether or not post-conditions must fully cover all
+    * transfered assets */
   postConditionMode?: PostConditionMode;
+  /** a list of post conditions to add to the transaction */
   postConditions?: PostCondition[];
+  /** set to true to validate that the supplied function args match those specified in
+   * the published contract */
   validateWithAbi?: boolean | ClarityAbi;
+  /** set to true if another account is sponsoring the transaction (covering the transaction fee) */
   sponsored?: boolean;
 }
 
@@ -1017,7 +1010,9 @@ export interface ReadOnlyFunctionOptions {
   contractAddress: string;
   functionName: string;
   functionArgs: ClarityValue[];
+  /** the network that the contract which contains the function is deployed to */
   network?: StacksNetwork;
+  /** address of the sender */
   senderAddress: string;
 }
 
@@ -1080,20 +1075,19 @@ export async function callReadOnlyFunction(
 
 /**
  * Sponsored transaction options
- *
- * @param  {StacksTransaction} transaction - the origin-signed transaction to sponsor
- * @param  {String} sponsorPrivateKey - the sponsor's private key
- * @param  {BigNum} fee - the transaction fee amount to sponsor
- * @param  {BigNum} sponsorNonce - the nonce of the sponsor account
- * @param  {AddressHashMode} sponsorAddressHashmode - the sponsor address hashmode
- * @param  {StacksNetwork} network - the Stacks blockchain network this transaction is destined for
  */
 export interface SponsorOptions {
+  /** the origin-signed transaction */
   transaction: StacksTransaction;
+  /** the sponsor's private key */
   sponsorPrivateKey: string;
+  /** the transaction fee amount to sponsor */
   fee?: BigNum;
+  /** the nonce of the sponsor account */
   sponsorNonce?: BigNum;
+  /** the hashmode of the sponsor's address */
   sponsorAddressHashmode?: AddressHashMode;
+  /** the Stacks blockchain network that this transaction will ultimately be broadcast to */
   network?: StacksNetwork;
 }
 
