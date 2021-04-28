@@ -35,24 +35,14 @@
     "@types/lodash": "^4.14.160",
     "@types/lodash-es": "4.17.0",
     "@typescript-eslint/eslint-plugin": "^4.13.0",
-    "babel-loader": "^8.1.0",
     "codecov": "^3.7.2",
     "common-tags": "^1.8.0",
-    "core-js": "^3.6.5",
     "cross-env": "^5.2.1",
     "eslint": "^6.8.0",
     "jest": "^26.6.3",
     "jest-fetch-mock": "^3.0.3",
     "jest-module-name-mapper": "^0.1.5",
-    "npm-run-all": "^4.1.5",
-    "nyc": "^15.1.0",
-    "rimraf": "^3.0.2",
-    "shx": "^0.3.2",
-    "source-map-support": "^0.5.19",
-    "ts-jest": "^26.5.5",
-    "ts-loader": "^6.2.2",
-    "ts-node": "^8.10.2",
-    "tsdx": "^0.14.0"
+    "ts-jest": "^26.5.5"
   },
   "dependencies": {
     "@stacks/common": "^1.2.2",
@@ -97,28 +87,6 @@
   },
   "bugs": {
     "url": "https://github.com/blockstack/blockstack.js.gi/issues"
-  },
-  "nyc": {
-    "all": true,
-    "cache": false,
-    "extension": [
-      ".ts"
-    ],
-    "include": [
-      "src/**/*.ts"
-    ],
-    "exclude": [
-      "**/*.d.ts"
-    ],
-    "require": [
-      "ts-node/register/transpile-only",
-      "source-map-support/register"
-    ],
-    "reporter": [
-      "text",
-      "html",
-      "lcov"
-    ]
   },
   "sideEffects": false,
   "main": "dist/index.js",

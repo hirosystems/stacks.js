@@ -50,8 +50,7 @@
     "jest-fetch-mock": "^3.0.3",
     "jest-module-name-mapper": "^0.1.5",
     "jsdom": "^16.5.3",
-    "ts-jest": "^26.5.5",
-    "tsdx": "^0.14.0"
+    "ts-jest": "^26.5.5"
   },
   "sideEffects": false,
   "main": "dist/index.js",
