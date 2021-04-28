@@ -291,6 +291,6 @@ export async function verifyAuthResponse(
       .concat(fallbackLookupURLs || [])
       .map(url => doPublicKeysMatchUsername(token, url))
   );
-  const someUsernameMatches = usernameMatchings.find(doesMatch => doesMatch);
+  const someUsernameMatches = usernameMatchings.includes(true);
   return !!someUsernameMatches && values.every(val => val);
 }
