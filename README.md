@@ -49,7 +49,7 @@ npm run lerna -- add lodash --scope @stacks/storage --dev
 
 ## Documentation
 
-Documentation for Stacks tooling is located [here](https://docs.blockstack.org/).
+Documentation for the Stacks.js packages is located [here](https://stacks-js-git-master-blockstack.vercel.app/).
 
 ## Contributing
 
