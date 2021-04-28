@@ -18,17 +18,14 @@ export class SessionDataStore {
     throw new Error('Abstract class');
   }
 
-  /* eslint-disable */
-  // @ts-ignore
   // TODO: fix, not used?
-  setSessionData(session: SessionData): boolean {
+  setSessionData(_session: SessionData): boolean {
     throw new Error('Abstract class');
   }
 
   deleteSessionData(): boolean {
     throw new Error('Abstract class');
   }
-  /* eslint-enable */
 }
 
 /**

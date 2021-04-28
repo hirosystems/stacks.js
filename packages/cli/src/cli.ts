@@ -40,6 +40,7 @@ import {
 
 import { StacksMainnet, StacksTestnet } from '@stacks/network';
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const c32check = require('c32check');
 
 import { UserData } from '@stacks/auth';
@@ -334,6 +335,7 @@ async function makeKeychain(network: CLINetworkAdapter, args: string[]): Promise
   if (args[0]) {
     mnemonic = await getBackupPhrase(args[0]);
   } else {
+    // eslint-disable-next-line @typescript-eslint/await-thenable
     mnemonic = await bip39.generateMnemonic(
       STX_WALLET_COMPATIBLE_SEED_STRENGTH,
       crypto.randomBytes
@@ -376,7 +378,7 @@ function balance(network: CLINetworkAdapter, args: string[]): Promise<string> {
       if (response.locked.startsWith('0x')) {
         lockedHex = response.locked.substr(2);
       }
-      let unlockHeight = response.unlock_height;
+      const unlockHeight = response.unlock_height;
       const balance = new BN(balanceHex, 16);
       const locked = new BN(lockedHex, 16);
       const res = {
@@ -1374,10 +1376,12 @@ function authDaemon(network: CLINetworkAdapter, args: string[]): Promise<string>
       const authServer = express();
       authServer.use(cors());
 
+      // eslint-disable-next-line @typescript-eslint/no-misused-promises
       authServer.get(/^\/auth\/*$/, (req: express.Request, res: express.Response) => {
         return handleAuth(network, mnemonic, gaiaHubUrl, profileGaiaHub, port, req, res);
       });
 
+      // eslint-disable-next-line @typescript-eslint/no-misused-promises
       authServer.get(/^\/signin\/*$/, (req: express.Request, res: express.Response) => {
         return handleSignIn(network, mnemonic, gaiaHubUrl, profileGaiaHub, req, res);
       });
@@ -1476,7 +1480,7 @@ function decryptMnemonic(network: CLINetworkAdapter, args: string[]): Promise<st
 }
 
 async function stackingStatus(network: CLINetworkAdapter, args: string[]): Promise<string> {
-  let stxAddress = args[0];
+  const stxAddress = args[0];
 
   const txNetwork = network.isMainnet() ? new StacksMainnet() : new StacksTestnet();
   const stacker = new StackingClient(stxAddress, txNetwork);
@@ -1505,10 +1509,10 @@ async function stackingStatus(network: CLINetworkAdapter, args: string[]): Promi
 }
 
 async function canStack(network: CLINetworkAdapter, args: string[]): Promise<string> {
-  let amount = new BN(args[0]);
-  let cycles = Number(args[1]);
-  let poxAddress = args[2];
-  let stxAddress = args[3];
+  const amount = new BN(args[0]);
+  const cycles = Number(args[1]);
+  const poxAddress = args[2];
+  const stxAddress = args[3];
 
   const txNetwork = network.isMainnet() ? new StacksMainnet() : new StacksTestnet();
 
@@ -1557,10 +1561,10 @@ async function canStack(network: CLINetworkAdapter, args: string[]): Promise<str
 }
 
 async function stack(network: CLINetworkAdapter, args: string[]): Promise<string> {
-  let amount = new BN(args[0]);
-  let cycles = Number(args[1]);
-  let poxAddress = args[2];
-  let privateKey = args[3];
+  const amount = new BN(args[0]);
+  const cycles = Number(args[1]);
+  const poxAddress = args[2];
+  const privateKey = args[3];
 
   // let fee = new BN(0);
   // let nonce = new BN(0);
@@ -1642,7 +1646,7 @@ async function stack(network: CLINetworkAdapter, args: string[]): Promise<string
 }
 
 function faucetCall(_: CLINetworkAdapter, args: string[]): Promise<string> {
-  let address = args[0];
+  const address = args[0];
   // console.log(address);
 
   const apiConfig = new Configuration({

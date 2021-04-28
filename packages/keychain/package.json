@@ -40,11 +40,6 @@
     "url": "https://github.com/blockstack/blockstack.js/issues"
   },
   "scripts": {
-    "lint": "npm run lint:eslint && npm run lint:prettier",
-    "lint:eslint": "eslint \"src/**/*.{ts,tsx}\" -f unix",
-    "lint:fix": "eslint \"src/**/*.{ts,tsx}\" -f unix --fix",
-    "lint:prettier": "prettier --check \"src/**/*.{ts,tsx}\" *.js",
-    "lint:prettier:fix": "prettier --write \"src/**/*.{ts,tsx}\" *.js",
     "start": "tsdx watch --verbose --noClean --onSuccess yalc publish --push",
     "build": "tsc -b tsconfig.build.json",
     "clean": "tsc -b tsconfig.build.json --clean",
@@ -58,8 +53,6 @@
   "devDependencies": {
     "@types/jest": "^26.0.22",
     "codecov": "^3.7.2",
-    "eslint": "^6.3.0",
-    "eslint-plugin-jest": "^23.8.2",
     "jest": "^26.6.3",
     "jest-fetch-mock": "^3.0.3",
     "jest-module-name-mapper": "^0.1.5",

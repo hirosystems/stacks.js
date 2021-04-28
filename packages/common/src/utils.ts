@@ -148,7 +148,7 @@ export function isSameOriginAbsoluteUrl(uri1: string, uri2: string) {
       parseUrl = url => new URL(url);
     } else {
       try {
-        // eslint-disable-next-line import/no-nodejs-modules, global-require
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
         const nodeUrl = (require('url') as typeof import('url')).URL;
         parseUrl = url => new nodeUrl(url);
       } catch (error) {

@@ -162,7 +162,7 @@ export function extractProfile(
       throw new Error('Unexpected token payload type of string');
     }
     if (payload.hasOwnProperty('claim')) {
-      profile = payload.claim as object;
+      profile = payload.claim as Record<string, any>;
     }
   }
 

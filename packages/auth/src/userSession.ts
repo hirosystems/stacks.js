@@ -262,7 +262,6 @@ export class UserSession {
       if (transitKey !== undefined && transitKey != null) {
         if (tokenPayload.private_key !== undefined && tokenPayload.private_key !== null) {
           try {
-            // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
             appPrivateKey = (await authMessages.decryptPrivateKey(
               transitKey,
               tokenPayload.private_key as string
@@ -281,7 +280,6 @@ export class UserSession {
         }
         if (coreSessionToken !== undefined && coreSessionToken !== null) {
           try {
-            // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
             coreSessionToken = (await authMessages.decryptPrivateKey(
               transitKey,
               coreSessionToken
@@ -324,8 +322,7 @@ export class UserSession {
       authResponseToken,
       hubUrl,
       coreNode: tokenPayload.blockstackAPIUrl as string,
-      // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-      // @ts-ignore
+      // @ts-expect-error
       gaiaAssociationToken,
     };
     const profileURL = tokenPayload.profile_url as string;

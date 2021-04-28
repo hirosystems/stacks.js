@@ -140,11 +140,9 @@ export class WebCryptoPartialPbkdf2 implements Pbkdf2 {
 
     for (let i = 1; i <= l; i++) {
       writeUInt32BE(block1, i, saltLength);
-      // eslint-disable-next-line no-await-in-loop
       const T = await hmacDigest(key, block1);
       let U = T;
       for (let j = 1; j < iterations; j++) {
-        // eslint-disable-next-line no-await-in-loop
         U = await hmacDigest(key, U);
         for (let k = 0; k < hLen; k++) {
           T[k] ^= U[k];

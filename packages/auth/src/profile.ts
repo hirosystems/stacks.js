@@ -21,7 +21,7 @@ export function lookupProfile(options: ProfileLookupOptions): Promise<Record<str
   if (!options.username) {
     return Promise.reject();
   }
-  let network: StacksNetwork = options.network ? options.network : new StacksMainnet();
+  const network: StacksNetwork = options.network ? options.network : new StacksMainnet();
   let lookupPromise;
   if (options.zoneFileLookupURL) {
     const url = `${options.zoneFileLookupURL.replace(/\/$/, '')}/${options.username}`;
