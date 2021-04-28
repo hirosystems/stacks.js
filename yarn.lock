@@ -2598,6 +2598,13 @@
     jsonrpc-lite "^2.2.0"
     ws "^7.3.1"
 
+"@stacks/network@1.2.2", "@stacks/network@^1.2.2":
+  version "1.2.2"
+  resolved "https://registry.yarnpkg.com/@stacks/network/-/network-1.2.2.tgz#30ca87ad6339f32eb04ed3a9dbcc2e39ed933604"
+  integrity sha512-xcWwuRrLJn9qqi3PEBcP2UPZHQztTZd31C0aVlzYHttNMir/sY9SrUqSnw45z2Jo4O9pIYYPIiPRtdV91Ho3fw==
+  dependencies:
+    "@stacks/common" "^1.2.2"
+
 "@stacks/prettier-config@^0.0.7":
   version "0.0.7"
   resolved "https://registry.npmjs.org/@stacks/prettier-config/-/prettier-config-0.0.7.tgz"
