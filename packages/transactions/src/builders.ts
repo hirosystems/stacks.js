@@ -608,10 +608,10 @@ export interface ContractCallOptions {
   /** the Stacks blockchain network that will ultimately be used to broadcast this transaction */
   network?: StacksNetwork;
   /** the transaction anchorMode, which specifies whether it should be
-    * included in an anchor block or a microblock */
+   * included in an anchor block or a microblock */
   anchorMode?: AnchorMode;
   /** the post condition mode, specifying whether or not post-conditions must fully cover all
-    * transfered assets */
+   * transfered assets */
   postConditionMode?: PostConditionMode;
   /** a list of post conditions to add to the transaction */
   postConditions?: PostCondition[];
