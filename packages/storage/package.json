@@ -1,6 +1,6 @@
 {
   "name": "@stacks/storage",
-  "version": "1.3.3",
+  "version": "1.5.0-alpha.0",
   "description": "Stacks storage library",
   "author": "yknl <yukanliao@gmail.com>",
   "homepage": "https://blockstack.org",
@@ -39,7 +39,7 @@
   "dependencies": {
     "@stacks/auth": "^1.2.3",
     "@stacks/common": "^1.2.2",
-    "@stacks/encryption": "^1.2.3"
+    "@stacks/encryption": "^1.5.0-alpha.0"
   },
   "devDependencies": {
     "@types/jest": "^24.9.0",

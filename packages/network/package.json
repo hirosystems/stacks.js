@@ -1,6 +1,6 @@
 {
   "name": "@stacks/network",
-  "version": "1.3.0-beta-1",
+  "version": "1.5.0-alpha.0",
   "description": "Library for Stacks network operations",
   "keywords": [
     "stacks",
