@@ -10,7 +10,8 @@
     "test": "tests"
   },
   "files": [
-    "dist"
+    "dist",
+    "src"
   ],
   "author": {
     "name": "Blockstack PBC",
@@ -29,17 +30,26 @@
     }
   ],
   "devDependencies": {
+    "@rollup/plugin-commonjs": "^18.0.0",
+    "@rollup/plugin-inject": "^4.0.2",
+    "@rollup/plugin-json": "^4.1.0",
+    "@rollup/plugin-node-resolve": "^11.2.1",
     "@types/common-tags": "^1.8.0",
     "@types/jest": "^26.0.22",
     "@types/lodash": "^4.14.160",
     "@types/lodash-es": "4.17.0",
+    "@types/lodash.clonedeep": "^4.5.6",
     "codecov": "^3.7.2",
     "common-tags": "^1.8.0",
     "cross-env": "^5.2.1",
     "jest": "^26.6.3",
     "jest-fetch-mock": "^3.0.3",
     "jest-module-name-mapper": "^0.1.5",
-    "ts-jest": "^26.5.5"
+    "rimraf": "^3.0.2",
+    "rollup": "^2.45.2",
+    "rollup-plugin-typescript2": "^0.30.0",
+    "ts-jest": "^26.5.5",
+    "typescript": "^4.2.4"
   },
   "dependencies": {
     "@stacks/common": "^1.2.2",
@@ -50,11 +60,11 @@
     "@types/randombytes": "^2.0.0",
     "@types/sha.js": "^2.4.0",
     "bn.js": "^4.11.9",
+    "buffer": "^6.0.3",
     "c32check": "^1.1.1",
     "cross-fetch": "^3.0.5",
     "elliptic": "^6.5.3",
-    "lodash": "^4.17.20",
-    "lodash-es": "4.17.20",
+    "lodash.clonedeep": "^4.5.0",
     "randombytes": "^2.1.0",
     "ripemd160-min": "^0.0.6",
     "sha.js": "^2.4.11",
@@ -69,7 +79,8 @@
   },
   "scripts": {
     "start": "tsdx watch --verbose --noClean --onSuccess yalc publish --push",
-    "build": "tsc -b tsconfig.build.json",
+    "build": "rimraf dist && rollup -c rollup.config.js",
+    "buildx": "npm run clean && rimraf dist && tsc -b tsconfig.build.json",
     "clean": "tsc -b tsconfig.build.json --clean",
     "typecheck": "tsc --noEmit",
     "typecheck:watch": "npm run typecheck -- --watch",
@@ -82,9 +93,9 @@
   },
   "sideEffects": false,
   "main": "dist/index.js",
-  "module": "dist/index.esm.js",
-  "typings": "dist/transactions/src/index.d.ts",
-  "umd:main": "dist/transactions.umd.production.js",
-  "unpkg": "dist/transactions.cjs.production.min.js",
+  "module": "dist/esm/index.js",
+  "typings": "dist/index.d.ts",
+  "umd:main": "dist/index.umd.js",
+  "unpkg": "dist/index.umd.js",
   "gitHead": "77b4d6d531b74996e4b7a0cbd1cf5b8358a690ce"
 }
