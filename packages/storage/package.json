@@ -32,7 +32,9 @@
   "dependencies": {
     "@stacks/auth": "^1.2.3",
     "@stacks/common": "^1.2.2",
-    "@stacks/encryption": "^1.5.0-alpha.0"
+    "@stacks/encryption": "^1.5.0-alpha.0",
+    "bitcoinjs-lib": "^5.2.0",
+    "jsontokens": "^3.0.0"
   },
   "devDependencies": {
     "@types/jest": "^26.0.22",

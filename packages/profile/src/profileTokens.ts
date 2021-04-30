@@ -104,8 +104,7 @@ export function verifyProfileToken(token: string, publicKeyOrAddress: string): T
     throw new Error("Token doesn't have a claim");
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
-  const issuerPublicKey = (payload.issuer as Record<string, string>).publicKey as string;
+  const issuerPublicKey = (payload.issuer as Record<string, string>).publicKey;
   const publicKeyBuffer = Buffer.from(issuerPublicKey, 'hex');
 
   const compressedKeyPair = ECPair.fromPublicKey(publicKeyBuffer, { compressed: true });

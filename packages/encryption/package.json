@@ -31,12 +31,12 @@
   },
   "dependencies": {
     "@stacks/common": "^1.2.2",
-    "@types/bn.js": "^5.1.0",
-    "@types/node": "^14.14.41",
+    "@types/bn.js": "^4.11.6",
+    "@types/node": "^14.14.43",
     "bip39": "^3.0.2",
-    "bitcoinjs-lib": "^5.1.10",
-    "bn.js": "^5.1.2",
-    "elliptic": "^6.5.2",
+    "bitcoinjs-lib": "^5.2.0",
+    "bn.js": "^4.12.0",
+    "elliptic": "^6.5.4",
     "randombytes": "^2.1.0",
     "ripemd160-min": "^0.0.6",
     "sha.js": "^2.4.11"

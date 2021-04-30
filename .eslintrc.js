@@ -2,8 +2,8 @@ module.exports = {
   root: true,
   parser: '@typescript-eslint/parser',
   reportUnusedDisableDirectives: true,
-  extends: '@stacks/eslint-config',
-  plugins: ['@typescript-eslint', 'node'],
+  extends: ['@stacks/eslint-config', 'plugin:import/typescript'],
+  plugins: ['@typescript-eslint', 'node', 'import'],
   parserOptions: {
     tsconfigRootDir: __dirname,
     project: ['./packages/**/tsconfig.json', './tsconfig.json'],
@@ -29,5 +29,7 @@ module.exports = {
     '@typescript-eslint/no-non-null-assertion': [0],
 
     'node/prefer-global/buffer': ['error', 'never'],
+
+    'import/no-extraneous-dependencies': ['error'],
   },
 };

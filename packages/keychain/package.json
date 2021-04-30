@@ -71,15 +71,16 @@
     "@stacks/storage": "^1.5.0-alpha.0",
     "@stacks/transactions": "^1.4.1",
     "@types/bn.js": "^4.11.6",
-    "@types/node": "^14.14.41",
+    "@types/node": "^14.14.43",
     "@types/triplesec": "^3.0.0",
     "bip32": "^2.0.4",
     "bip39": "^3.0.2",
-    "bitcoinjs-lib": "^5.1.6",
-    "bn.js": "^5.1.1",
-    "c32check": "^1.0.1",
+    "bitcoinjs-lib": "^5.2.0",
+    "bn.js": "^4.12.0",
+    "c32check": "^1.1.2",
     "jsontokens": "^3.0.0",
-    "triplesec": "^3.0.27",
+    "randombytes": "^2.1.0",
+    "triplesec": "^4.0.3",
     "zone-file": "^1.0.0"
   }
 }
