@@ -12,3 +12,4 @@ typedoc.js
 docs-theme/
 node_modules
 **/tests/**
+jest.config.js
