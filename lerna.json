@@ -6,5 +6,12 @@
   },
   "packages": [
     "packages/*"
-  ]
+  ],
+  "command": {
+    "bootstrap": {
+      "forceLocal": true,
+      "hoist": true,
+      "npmClientArgs": ["--ci"]
+    }
+  }
 }

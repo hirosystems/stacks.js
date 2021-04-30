@@ -2,8 +2,6 @@ name: stacks.js
 
 on:
   push:
-    branches:
-      - 'master'
   pull_request:
 
 jobs:

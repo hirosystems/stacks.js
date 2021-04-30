@@ -1377,14 +1377,12 @@ function authDaemon(network: CLINetworkAdapter, args: string[]): Promise<string>
       const authServer = express();
       authServer.use(cors());
 
-      // eslint-disable-next-line @typescript-eslint/no-misused-promises
       authServer.get(/^\/auth\/*$/, (req: express.Request, res: express.Response) => {
-        return handleAuth(network, mnemonic, gaiaHubUrl, profileGaiaHub, port, req, res);
+        void handleAuth(network, mnemonic, gaiaHubUrl, profileGaiaHub, port, req, res);
       });
 
-      // eslint-disable-next-line @typescript-eslint/no-misused-promises
       authServer.get(/^\/signin\/*$/, (req: express.Request, res: express.Response) => {
-        return handleSignIn(network, mnemonic, gaiaHubUrl, profileGaiaHub, req, res);
+        void handleSignIn(network, mnemonic, gaiaHubUrl, profileGaiaHub, req, res);
       });
 
       authServer.listen(port, () => console.log(`Authentication server started on ${port}`));
