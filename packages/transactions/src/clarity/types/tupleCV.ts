@@ -1,14 +1,14 @@
 import { ClarityType, ClarityValue } from '../clarityValue';
 import { isClarityName } from '../../utils';
 
-type TupleData = { [key: string]: ClarityValue };
+type TupleData<T extends ClarityValue = ClarityValue> = { [key: string]: T };
 
-interface TupleCV {
+interface TupleCV<T extends TupleData = TupleData> {
   type: ClarityType.Tuple;
-  data: TupleData;
+  data: T;
 }
 
-function tupleCV(data: TupleData): TupleCV {
+function tupleCV<T extends ClarityValue = ClarityValue>(data: TupleData<T>): TupleCV<TupleData<T>> {
   for (const key in data) {
     if (!isClarityName(key)) {
       throw new Error(`"${key}" is not a valid Clarity name`);

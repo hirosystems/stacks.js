@@ -1,11 +1,11 @@
 import { ClarityValue, ClarityType } from '../clarityValue';
 
-interface ListCV {
+interface ListCV<T extends ClarityValue = ClarityValue> {
   type: ClarityType.List;
-  list: ClarityValue[];
+  list: T[];
 }
 
-function listCV<T extends ClarityValue>(values: T[]): ListCV {
+function listCV<T extends ClarityValue = ClarityValue>(values: T[]): ListCV<T> {
   return { type: ClarityType.List, list: values };
 }
 
