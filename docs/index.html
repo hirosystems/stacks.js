@@ -80,7 +80,7 @@
 				</a>
 				<p>To migrate your app from blockstack.js to stacks.js follow the steps in the <a href="https://github.com/blockstack/stacks.js/tree/master/migration-guide.md">migration guide</a>.</p>
 				<a href="#development-environment-setup" id="development-environment-setup" style="color: inherit; text-decoration: none;">
-					<h2>Development environment setup</h2>
+					<h2>Development: environment setup</h2>
 				</a>
 				<p>To setup the development environment for this repository, follow these steps:</p>
 				<ol>
@@ -90,10 +90,22 @@
 					<li>Run <code>npm run build</code> to build packages</li>
 					<li>Run <code>npm run test</code> to run tests</li>
 				</ol>
+				<a href="#development-adding-dependencies" id="development-adding-dependencies" style="color: inherit; text-decoration: none;">
+					<h2>Development: adding dependencies</h2>
+				</a>
+				<p>This repo uses Lerna <a href="https://github.com/lerna/lerna/blob/main/doc/hoist.md">hoisting</a> for package dependencies.</p>
+				<p>In order to install a new dependency to a package, the <a href="https://github.com/lerna/lerna/tree/main/commands/add"><code>lerna add</code></a> command must be used, rather than <code>npm install &lt;package&gt;</code>.</p>
+				<p>For example, the following command installs <code>lodash</code> as a dependency to the <code>@stacks/storage</code> package:</p>
+				<pre><code class="language-shell"><span style="color: #008000"># Run within the root directory</span>
+<span style="color: #000000">npm run lerna -- add lodash --scope @stacks/storage</span>
+</code></pre>
+				<p>Add <code>--dev</code> to install as a development dependency:</p>
+				<pre><code class="language-shell"><span style="color: #000000">npm run lerna -- add lodash --scope @stacks/storage --dev</span>
+</code></pre>
 				<a href="#documentation" id="documentation" style="color: inherit; text-decoration: none;">
 					<h2>Documentation</h2>
 				</a>
-				<p>Documentation for Stacks tooling is located <a href="https://docs.blockstack.org/">here</a>.</p>
+				<p>Documentation for the Stacks.js packages is located <a href="https://stacks-js-git-master-blockstack.vercel.app/">here</a>.</p>
 				<a href="#contributing" id="contributing" style="color: inherit; text-decoration: none;">
 					<h2>Contributing</h2>
 				</a>
