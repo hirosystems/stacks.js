@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
-    "target": "esnext",
-    "module": "esnext",
+    "target": "ES2017",
+    "module": "CommonJS",
     "lib": ["dom", "esnext"],
     "jsx": "react",
     "importHelpers": true,

@@ -37,7 +37,7 @@
     "lint:fix": "eslint \"packages/**/src/**/*.{ts,tsx}\" -f unix --fix",
     "lint:prettier": "prettier --check \"packages/**/src/**/*.{ts,tsx|!(d.ts)}\" *.js",
     "lint:prettier:fix": "prettier --write \"packages/**/src/**/*.{ts,tsx|!(d.ts)}\" *.js",
-    "build:docs": "rimraf docs && cross-env typedoc --name \"Stacks.js $npm_package_version Library Reference\" --readme ./readme.md --tsconfig tsconfig.typedoc.json --out docs --json docs/docs.json packages/**/src",
+    "build:docs": "rimraf docs && typedoc --name \"Stacks.js $npm_package_version Library Reference\" --readme ./readme.md --tsconfig tsconfig.typedoc.json --out docs --json docs/docs.json packages/**/src",
     "test": "lerna run test",
     "typecheck": "lerna run typecheck --parallel --no-bail --stream"
   }
