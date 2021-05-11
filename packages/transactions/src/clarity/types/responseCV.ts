@@ -2,21 +2,21 @@ import { ClarityType, ClarityValue } from '../clarityValue';
 
 type ResponseCV = ResponseErrorCV | ResponseOkCV;
 
-interface ResponseErrorCV {
+interface ResponseErrorCV<T extends ClarityValue = ClarityValue> {
   readonly type: ClarityType.ResponseErr;
-  readonly value: ClarityValue;
+  readonly value: T;
 }
 
-interface ResponseOkCV {
+interface ResponseOkCV<T extends ClarityValue = ClarityValue> {
   readonly type: ClarityType.ResponseOk;
-  readonly value: ClarityValue;
+  readonly value: T;
 }
 
-function responseErrorCV(value: ClarityValue): ResponseErrorCV {
+function responseErrorCV<T extends ClarityValue = ClarityValue>(value: T): ResponseErrorCV<T> {
   return { type: ClarityType.ResponseErr, value };
 }
 
-function responseOkCV(value: ClarityValue): ResponseOkCV {
+function responseOkCV<T extends ClarityValue = ClarityValue>(value: T): ResponseOkCV<T> {
   return { type: ClarityType.ResponseOk, value };
 }
 

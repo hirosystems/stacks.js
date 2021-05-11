@@ -1,24 +1,30 @@
 import { ClarityType, ClarityValue } from '../clarityValue';
 
-type OptionalCV = NoneCV | SomeCV;
+type OptionalCV<T extends ClarityValue = ClarityValue> = NoneCV | SomeCV<T>;
 
 interface NoneCV {
   readonly type: ClarityType.OptionalNone;
 }
 
-interface SomeCV {
+interface SomeCV<T extends ClarityValue = ClarityValue> {
   readonly type: ClarityType.OptionalSome;
-  readonly value: ClarityValue;
+  readonly value: T;
 }
 
-const noneCV = (): OptionalCV => ({ type: ClarityType.OptionalNone });
-const someCV = (value: ClarityValue): OptionalCV => ({ type: ClarityType.OptionalSome, value });
-const optionalCVOf = (value?: ClarityValue): OptionalCV => {
+function noneCV(): NoneCV {
+  return { type: ClarityType.OptionalNone };
+}
+
+function someCV<T extends ClarityValue = ClarityValue>(value: T): OptionalCV<T> {
+  return { type: ClarityType.OptionalSome, value };
+}
+
+function optionalCVOf<T extends ClarityValue = ClarityValue>(value?: T): OptionalCV<T> {
   if (value) {
     return someCV(value);
   } else {
     return noneCV();
   }
-};
+}
 
 export { OptionalCV, NoneCV, SomeCV, noneCV, someCV, optionalCVOf };

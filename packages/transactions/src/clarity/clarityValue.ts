@@ -1,7 +1,6 @@
 import { Buffer } from '@stacks/common';
 import {
   BooleanCV,
-  OptionalCV,
   BufferCV,
   IntCV,
   UIntCV,
@@ -13,6 +12,8 @@ import {
   TupleCV,
   StringAsciiCV,
   StringUtf8CV,
+  NoneCV,
+  SomeCV,
 } from '.';
 
 import { principalToString } from './types/principalCV';
@@ -42,7 +43,6 @@ export enum ClarityType {
 
 export type ClarityValue =
   | BooleanCV
-  | OptionalCV
   | BufferCV
   | IntCV
   | UIntCV
@@ -50,6 +50,8 @@ export type ClarityValue =
   | ContractPrincipalCV
   | ResponseErrorCV
   | ResponseOkCV
+  | NoneCV
+  | SomeCV
   | ListCV
   | TupleCV
   | StringAsciiCV

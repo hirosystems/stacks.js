@@ -1,5 +1,5 @@
 import { oneLineTrim } from 'common-tags';
-import { deserializeAddress } from '../src/types';
+import { addressToString, deserializeAddress } from '../src/types';
 import {
   ClarityValue,
   serializeCV,
@@ -26,6 +26,10 @@ import {
   StringAsciiCV,
   stringUtf8CV,
   StringUtf8CV,
+  BufferCV,
+  SomeCV,
+  ListCV,
+  StandardPrincipalCV,
 } from '../src/clarity';
 import { BufferReader } from '../src/bufferReader';
 import { cvToString, cvToJSON } from '../src/clarity/clarityValue';
@@ -39,6 +43,124 @@ function serializeDeserialize<T extends ClarityValue>(value: T): ClarityValue {
 }
 
 describe('Clarity Types', () => {
+
+  test('Deserialize with type generics', () => {
+    const serializedClarityValue = '0x0c00000003096e616d6573706163650200000003666f6f0a70726f706572746965730c000000061963616e2d7570646174652d70726963652d66756e6374696f6e030b6c61756e636865642d61740a0100000000000000000000000000000006086c69666574696d65010000000000000000000000000000000c106e616d6573706163652d696d706f7274051a164247d6f2b425ac5771423ae6c80c754f7172b00e70726963652d66756e6374696f6e0c0000000504626173650100000000000000000000000000000001076275636b6574730b00000010010000000000000000000000000000000101000000000000000000000000000000010100000000000000000000000000000001010000000000000000000000000000000101000000000000000000000000000000010100000000000000000000000000000001010000000000000000000000000000000101000000000000000000000000000000010100000000000000000000000000000001010000000000000000000000000000000101000000000000000000000000000000010100000000000000000000000000000001010000000000000000000000000000000101000000000000000000000000000000010100000000000000000000000000000001010000000000000000000000000000000105636f6566660100000000000000000000000000000001116e6f2d766f77656c2d646973636f756e740100000000000000000000000000000001116e6f6e616c7068612d646973636f756e7401000000000000000000000000000000010b72657665616c65642d61740100000000000000000000000000000003067374617475730d000000057265616479';
+
+    // The old way of deserializing without type generics - verbose, hard to read, frustrating to define 🤢
+    function parseWithManualTypeAssertions() {
+      const deserializedCv = deserializeCV(serializedClarityValue);
+      const clVal = deserializedCv as TupleCV;
+      const namespaceCV = clVal.data['namespace'] as BufferCV;
+      const statusCV = clVal.data['status'] as StringAsciiCV;
+      const properties = clVal.data['properties'] as TupleCV;
+      const launchedAtCV = properties.data['launched-at'] as SomeCV;
+      const launchAtIntCV = launchedAtCV.value as UIntCV;
+      const lifetimeCV = properties.data['lifetime'] as IntCV;
+      const revealedAtCV = properties.data['revealed-at'] as IntCV;
+      const addressCV = properties.data[
+        'namespace-import'
+      ] as StandardPrincipalCV;
+      const priceFunction = properties.data['price-function'] as TupleCV;
+      const baseCV = priceFunction.data['base'] as IntCV;
+      const coeffCV = priceFunction.data['coeff'] as IntCV;
+      const noVowelDiscountCV = priceFunction.data['no-vowel-discount'] as IntCV;
+      const nonalphaDiscountCV = priceFunction.data['nonalpha-discount'] as IntCV;
+      const bucketsCV = priceFunction.data['buckets'] as ListCV;
+      const buckets: number[] = [];
+      const listCV = bucketsCV.list;
+      for (let i = 0; i < listCV.length; i++) {
+        const cv = listCV[i] as UIntCV;
+        buckets.push(cv.value.toNumber());
+      }
+      return {
+        namespace: namespaceCV.buffer.toString(),
+        status: statusCV.data,
+        launchedAt: launchAtIntCV.value.toNumber(),
+        lifetime: lifetimeCV.value.toNumber(),
+        revealedAt: revealedAtCV.value.toNumber(),
+        address: addressToString(addressCV.address),
+        base: baseCV.value.toNumber(),
+        coeff: coeffCV.value.toNumber(),
+        noVowelDiscount: noVowelDiscountCV.value.toNumber(),
+        nonalphaDiscount: nonalphaDiscountCV.value.toNumber(),
+        buckets
+      };
+    }
+
+    // The new way of deserializing with type generics 🙂
+    function parseWithTypeDefinition() {
+      // (tuple
+      //   (namespace (buff 3)) 
+      //   (status (string-ascii 5))
+      //   (properties (tuple
+      //     (launched-at (optional uint))
+      //     (namespace-import principal)
+      //     (lifetime uint)
+      //     (revealed-at uint)
+      //     (price-function (tuple
+      //       (base uint) 
+      //       (coeff uint)
+      //       (no-vowel-discount uint)
+      //       (nonalpha-discount uint)
+      //       (buckets (list 16 uint))
+      // 
+      // Easily map the Clarity type string above to the Typescript definition:
+      type BnsNamespaceCV = TupleCV<{
+        ['namespace']: BufferCV;
+        ['status']: StringAsciiCV;
+        ['properties']: TupleCV<{
+          ['launched-at']: SomeCV<UIntCV>;
+          ['namespace-import']: StandardPrincipalCV;
+          ['lifetime']: IntCV;
+          ['revealed-at']: IntCV;
+          ['price-function']: TupleCV<{
+            ['base']: IntCV;
+            ['coeff']: IntCV;
+            ['no-vowel-discount']: IntCV;
+            ['nonalpha-discount']: IntCV;
+            ['buckets']: ListCV<UIntCV>;
+          }>;
+        }>;
+      }>;
+      const cv = deserializeCV<BnsNamespaceCV>(serializedClarityValue);
+      // easy, fully-typed access into the Clarity value properties
+      const namespaceProps = cv.data.properties.data;
+      const priceProps = namespaceProps['price-function'].data;
+      return {
+        namespace: cv.data.namespace.buffer.toString(),
+        status: cv.data.status.data,
+        launchedAt: namespaceProps['launched-at'].value.value.toNumber(),
+        lifetime: namespaceProps.lifetime.value.toNumber(),
+        revealedAt: namespaceProps['revealed-at'].value.toNumber(),
+        address: addressToString(namespaceProps['namespace-import'].address),
+        base: priceProps.base.value.toNumber(),
+        coeff: priceProps.coeff.value.toNumber(),
+        noVowelDiscount: priceProps['no-vowel-discount'].value.toNumber(),
+        nonalphaDiscount: priceProps['nonalpha-discount'].value.toNumber(),
+        buckets: priceProps.buckets.list.map(b => b.value.toNumber()),
+      };
+    }
+
+    const parsed1 = parseWithManualTypeAssertions();
+    const parsed2 = parseWithTypeDefinition()
+    const expected = {
+      namespace: 'foo',
+      status: 'ready',
+      launchedAt: 6,
+      lifetime: 12,
+      revealedAt: 3,
+      address: 'STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6',
+      base: 1,
+      coeff: 1,
+      noVowelDiscount: 1,
+      nonalphaDiscount: 1,
+      buckets: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    };
+    expect(parsed1).toEqual(expected);
+    expect(parsed2).toEqual(expected);
+  });
+
   describe('Serialize Then Deserialize', () => {
     test('TrueCV', () => {
       const t = trueCV();

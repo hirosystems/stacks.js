@@ -163,9 +163,7 @@ export function cvToHex(cv: ClarityValue) {
  * @param {string} hex - the hex encoded string with or without `0x` prefix
  */
 export function hexToCV(hex: string) {
-  const hexWithoutPrefix = hex.startsWith('0x') ? hex.slice(2) : hex;
-  const bufferCV = Buffer.from(hexWithoutPrefix, 'hex');
-  return deserializeCV(bufferCV);
+  return deserializeCV(hex);
 }
 /**
  * Read only function response object
