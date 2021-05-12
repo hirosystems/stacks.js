@@ -19,18 +19,46 @@ export class InvalidAddressError extends Error {
   }
 }
 
+export const BitcoinNetworkVersion = {
+  mainnet: {
+    P2PKH: 0x00, // 0
+    P2SH: 0x05, // 5
+  },
+  testnet: {
+    P2PKH: 0x6f, // 111
+    P2SH: 0xc4, // 196
+  },
+} as const;
+
 export function btcAddressVersionToHashMode(btcAddressVersion: number): AddressHashMode {
   switch (btcAddressVersion) {
-    case 0: // btc mainnet P2PKH
+    case BitcoinNetworkVersion.mainnet.P2PKH:
       return AddressHashMode.SerializeP2PKH;
-    case 111: // btc mainnet P2PKH
+    case BitcoinNetworkVersion.testnet.P2PKH:
       return AddressHashMode.SerializeP2PKH;
-    case 5: // btc mainnet P2SH
+    case BitcoinNetworkVersion.mainnet.P2SH:
       return AddressHashMode.SerializeP2SH;
-    case 196: // btc testnet P2SH
+    case BitcoinNetworkVersion.testnet.P2SH:
       return AddressHashMode.SerializeP2SH;
     default:
       throw new Error('Invalid pox address version');
+  }
+}
+
+export function hashModeToBtcAddressVersion(
+  hashMode: AddressHashMode,
+  network: 'mainnet' | 'testnet'
+): number {
+  if (!['mainnet', 'testnet'].includes(network)) {
+    throw new Error(`Invalid network argument: ${network}`);
+  }
+  switch (hashMode) {
+    case AddressHashMode.SerializeP2PKH:
+      return BitcoinNetworkVersion[network].P2PKH;
+    case AddressHashMode.SerializeP2SH:
+      return BitcoinNetworkVersion[network].P2SH;
+    default:
+      throw new Error(`Invalid pox address hash mode: ${hashMode}`);
   }
 }
 
@@ -55,6 +83,22 @@ export function decodeBtcAddress(btcAddress: string) {
     hashMode,
     data: b58Result.hash,
   };
+}
+
+export function poxAddressToBtcAddress(
+  version: Buffer,
+  hashBytes: Buffer,
+  network: 'mainnet' | 'testnet'
+) {
+  if (version.byteLength !== 1) {
+    throw new Error(`Invalid byte length for version buffer: ${version.toString('hex')}`);
+  }
+  if (hashBytes.byteLength !== 20) {
+    throw new Error(`Invalid byte length for hashBytes: ${hashBytes.toString('hex')}`);
+  }
+  const btcNetworkVersion = hashModeToBtcAddressVersion(version[0], network);
+  const btcAddress = address.toBase58Check(hashBytes, btcNetworkVersion);
+  return btcAddress;
 }
 
 export function getBTCAddress(version: Buffer, checksum: Buffer) {

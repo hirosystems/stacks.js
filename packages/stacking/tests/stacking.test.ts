@@ -16,7 +16,7 @@ import {
   intCV,
 } from '@stacks/transactions';
 import { address as btcAddress } from 'bitcoinjs-lib';
-import { decodeBtcAddress, getAddressHashMode, InvalidAddressError } from '../src/utils';
+import { decodeBtcAddress, getAddressHashMode, InvalidAddressError, poxAddressToBtcAddress } from '../src/utils';
 
 beforeEach(() => {
   fetchMock.resetMocks();
@@ -893,3 +893,52 @@ test('pox address hash mode', async () => {
   expect(() => decodeBtcAddress(p2wsh)).toThrowError(InvalidAddressError);
   expect(() => decodeBtcAddress(p2wshTestnet)).toThrowError(InvalidAddressError);
 })
+
+
+test('pox address to btc address', () => {
+  const vectors: {
+    version: Buffer;
+    hashBytes: Buffer;
+    network: 'mainnet' | 'testnet';
+    expectedBtcAddr: string;
+  }[] = [
+    {
+      version: Buffer.from([0x01]),
+      hashBytes: Buffer.from('07366658d1e5f0f75c585a17b618b776f4f10a6b', 'hex'),
+      network: 'mainnet',
+      expectedBtcAddr: '32M9pegJxqXBoxXSKBN1s7HJUR2YMkMaFg'
+    },
+    {
+      version: Buffer.from([0x01]),
+      hashBytes: Buffer.from('9b24b88b1334b0a17a99c09470c4df06ffd3ea22', 'hex'),
+      network: 'mainnet',
+      expectedBtcAddr: '3FqLegt1Lo1JuhiBAQQiM5WwDdmefTo5zd',
+    },
+    {
+      version: Buffer.from([0x00]),
+      hashBytes: Buffer.from('fde9c82d7bc43f55e9054438470c3ca8d6e7237f', 'hex'),
+      network: 'mainnet',
+      expectedBtcAddr: '1Q9a1zGPfJ4oH5Xaz5wc7BdvWV21fSNkkr',
+    },
+    {
+      version: Buffer.from([0x00]),
+      hashBytes: Buffer.from('5dc795522f81dcb7eb774a0b8e84b612e3edc141', 'hex'),
+      network: 'testnet',
+      expectedBtcAddr: 'mp4pEBdJiMh6aL5Uhs6nZX1XhyZ4V2xrzg',
+    },
+    {
+      version: Buffer.from([0x01]),
+      hashBytes: Buffer.from('3149c3eba2d21cfdeea56894866b8f4cd11b72ad', 'hex'),
+      network: 'testnet',
+      expectedBtcAddr: '2MwjqTzEJodSaoehcxRSqfWrvJMGZHq4tdC',
+    }
+  ];
+
+  vectors.forEach(item => {
+    const btcAddress = poxAddressToBtcAddress(item.version, item.hashBytes, item.network);
+    expect(btcAddress).toBe(item.expectedBtcAddr);
+    const decodedAddress = decodeBtcAddress(btcAddress);
+    expect(decodedAddress.hashMode).toBe(item.version[0]);
+    expect(decodedAddress.data.toString('hex')).toBe(item.hashBytes.toString('hex'));
+  });
+});
