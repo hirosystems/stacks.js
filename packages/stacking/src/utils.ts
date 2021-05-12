@@ -1,6 +1,12 @@
 // @ts-ignore
 import { Buffer } from '@stacks/common';
-import { AddressHashMode } from '@stacks/transactions';
+import {
+  AddressHashMode,
+  BufferCV,
+  ClarityType,
+  ClarityValue,
+  TupleCV,
+} from '@stacks/transactions';
 import { address } from 'bitcoinjs-lib';
 import BN from 'bn.js';
 import { StackingErrors } from './constants';
@@ -85,11 +91,43 @@ export function decodeBtcAddress(btcAddress: string) {
   };
 }
 
-export function poxAddressToBtcAddress(
-  version: Buffer,
-  hashBytes: Buffer,
-  network: 'mainnet' | 'testnet'
-) {
+export function extractPoxAddressFromClarityValue(poxAddrClarityValue: ClarityValue) {
+  const clarityValue = poxAddrClarityValue as TupleCV;
+  if (clarityValue.type !== ClarityType.Tuple || !clarityValue.data) {
+    throw new Error('Invalid argument, expected ClarityValue to be a TupleCV');
+  }
+  if (!('version' in clarityValue.data) || !('hashbytes' in clarityValue.data)) {
+    throw new Error(
+      'Invalid argument, expected Clarity tuple value to contain `version` and `hashbytes` keys'
+    );
+  }
+  const versionCV = clarityValue.data['version'] as BufferCV;
+  const hashBytesCV = clarityValue.data['hashbytes'] as BufferCV;
+  if (versionCV.type !== ClarityType.Buffer || hashBytesCV.type !== ClarityType.Buffer) {
+    throw new Error(
+      'Invalid argument, expected Clarity tuple value to contain `version` and `hashbytes` buffers'
+    );
+  }
+  return {
+    version: versionCV.buffer,
+    hashBytes: hashBytesCV.buffer,
+  };
+}
+
+export type PoxAddressArgs =
+  | [version: Buffer, hashBytes: Buffer, network: 'mainnet' | 'testnet']
+  | [poxAddrClarityValue: ClarityValue, network: 'mainnet' | 'testnet'];
+
+export function poxAddressToBtcAddress(...args: PoxAddressArgs): string {
+  let version: Buffer, hashBytes: Buffer, network: 'mainnet' | 'testnet';
+  if (args.length === 3) {
+    [version, hashBytes, network] = args;
+  } else if (args.length === 2) {
+    ({ version, hashBytes } = extractPoxAddressFromClarityValue(args[0]));
+    network = args[1];
+  } else {
+    throw new Error('Invalid arguments');
+  }
   if (version.byteLength !== 1) {
     throw new Error(`Invalid byte length for version buffer: ${version.toString('hex')}`);
   }

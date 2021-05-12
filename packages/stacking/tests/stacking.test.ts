@@ -14,6 +14,8 @@ import {
   trueCV,
   responseErrorCV,
   intCV,
+  TupleCV,
+  ClarityType,
 } from '@stacks/transactions';
 import { address as btcAddress } from 'bitcoinjs-lib';
 import { decodeBtcAddress, getAddressHashMode, InvalidAddressError, poxAddressToBtcAddress } from '../src/utils';
@@ -940,5 +942,26 @@ test('pox address to btc address', () => {
     const decodedAddress = decodeBtcAddress(btcAddress);
     expect(decodedAddress.hashMode).toBe(item.version[0]);
     expect(decodedAddress.data.toString('hex')).toBe(item.hashBytes.toString('hex'));
+  });
+
+  vectors.forEach(item => {
+    const clarityValue: TupleCV = {
+      type: ClarityType.Tuple,
+      data: {
+        version: {
+          type: ClarityType.Buffer,
+          buffer: item.version,
+        },
+        hashbytes: {
+          type: ClarityType.Buffer,
+          buffer: item.hashBytes,
+        },
+      },
+    };
+    const btcAddress = poxAddressToBtcAddress(clarityValue, item.network);
+    expect(btcAddress).toBe(item.expectedBtcAddr);
+    const decodedAddress = decodeBtcAddress(btcAddress);
+    expect(decodedAddress.hashMode).toBe(item.version[0]);
+    expect(decodedAddress.data.toString('hex')).toBe(item.hashBytes.toString('hex')); 
   });
 });
