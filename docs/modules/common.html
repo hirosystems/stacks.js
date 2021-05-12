@@ -10,7 +10,6 @@
 	<script async src="../assets/js/search.js" id="search-script"></script>
 </head>
 <body>
-<link rel="stylesheet" href="../assets/css/custom-style.css">
 <header>
 	<div class="tsd-page-toolbar">
 		<div class="container">
@@ -40,6 +39,8 @@
 							</div>
 							<input type="checkbox" id="tsd-filter-inherited" checked />
 							<label class="tsd-widget" for="tsd-filter-inherited">Inherited</label>
+							<input type="checkbox" id="tsd-filter-externals" checked />
+							<label class="tsd-widget" for="tsd-filter-externals">Externals</label>
 						</div>
 					</div>
 					<a href="#" class="tsd-widget menu no-caption" data-toggle="menu">Menu</a>
@@ -82,13 +83,6 @@
 				<section class="tsd-panel tsd-index-panel">
 					<div class="tsd-index-content">
 						<section class="tsd-index-section ">
-							<h3>References</h3>
-							<ul class="tsd-index-list">
-								<li class="tsd-kind-reference tsd-parent-kind-module"><a href="common.html#buffer" class="tsd-kind-icon">Buffer</a></li>
-								<li class="tsd-kind-reference tsd-parent-kind-module"><a href="common.html#getbase64outputlength" class="tsd-kind-icon">get<wbr>Base64<wbr>Output<wbr>Length</a></li>
-							</ul>
-						</section>
-						<section class="tsd-index-section ">
 							<h3>Enumerations</h3>
 							<ul class="tsd-index-list">
 								<li class="tsd-kind-enum tsd-parent-kind-module"><a href="../enums/common.chainid.html" class="tsd-kind-icon">ChainID</a></li>
@@ -101,20 +95,65 @@
 								<li class="tsd-kind-interface tsd-parent-kind-module"><a href="../interfaces/common.huberrordetails.html" class="tsd-kind-icon">Hub<wbr>Error<wbr>Details</a></li>
 							</ul>
 						</section>
+						<section class="tsd-index-section ">
+							<h3>Variables</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-variable tsd-parent-kind-module"><a href="common.html#buffer" class="tsd-kind-icon">Buffer</a></li>
+							</ul>
+						</section>
+						<section class="tsd-index-section ">
+							<h3>Functions</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-function tsd-parent-kind-module"><a href="common.html#getbase64outputlength" class="tsd-kind-icon">get<wbr>Base64<wbr>Output<wbr>Length</a></li>
+							</ul>
+						</section>
 					</div>
 				</section>
 			</section>
 			<section class="tsd-panel-group tsd-member-group ">
-				<h2>References</h2>
-				<section class="tsd-panel tsd-member tsd-kind-reference tsd-parent-kind-module">
+				<h2>Variables</h2>
+				<section class="tsd-panel tsd-member tsd-kind-variable tsd-parent-kind-module">
 					<a name="buffer" class="tsd-anchor"></a>
-					<h3>Buffer</h3>
-					Re-exports <a href="">Buffer</a>
+					<h3><span class="tsd-flag ts-flagConst">Const</span> Buffer</h3>
+					<div class="tsd-signature tsd-kind-icon">Buffer<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">typeof </span><span class="tsd-signature-type">NodeJSBuffer</span><span class="tsd-signature-symbol"> = ...</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/common/src/utils.ts#L12">packages/common/src/utils.ts:12</a></li>
+						</ul>
+					</aside>
 				</section>
-				<section class="tsd-panel tsd-member tsd-kind-reference tsd-parent-kind-module">
+			</section>
+			<section class="tsd-panel-group tsd-member-group ">
+				<h2>Functions</h2>
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module">
 					<a name="getbase64outputlength" class="tsd-anchor"></a>
 					<h3>get<wbr>Base64<wbr>Output<wbr>Length</h3>
-					Re-exports <a href="">getBase64OutputLength</a>
+					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module">
+						<li class="tsd-signature tsd-kind-icon">get<wbr>Base64<wbr>Output<wbr>Length<span class="tsd-signature-symbol">(</span>inputByteLength<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/common/src/utils.ts#L78">packages/common/src/utils.ts:78</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Calculate the base64 encoded string length for a given input length.
+										This is equivalent to the byte length when the string is ASCII or UTF8-8
+									encoded.</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>inputByteLength: <span class="tsd-signature-type">number</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
+						</li>
+					</ul>
 				</section>
 			</section>
 		</div>
@@ -175,12 +214,6 @@
 					<li class="current tsd-kind-module">
 						<a href="common.html" class="tsd-kind-icon">common</a>
 						<ul>
-							<li class=" tsd-kind-reference tsd-parent-kind-module">
-								<a href="common.html#buffer" class="tsd-kind-icon">Buffer</a>
-							</li>
-							<li class=" tsd-kind-reference tsd-parent-kind-module">
-								<a href="common.html#getbase64outputlength" class="tsd-kind-icon">get<wbr>Base64<wbr>Output<wbr>Length</a>
-							</li>
 							<li class=" tsd-kind-enum tsd-parent-kind-module">
 								<a href="../enums/common.chainid.html" class="tsd-kind-icon">ChainID</a>
 							</li>
@@ -189,6 +222,12 @@
 							</li>
 							<li class=" tsd-kind-interface tsd-parent-kind-module">
 								<a href="../interfaces/common.huberrordetails.html" class="tsd-kind-icon">Hub<wbr>Error<wbr>Details</a>
+							</li>
+							<li class=" tsd-kind-variable tsd-parent-kind-module">
+								<a href="common.html#buffer" class="tsd-kind-icon">Buffer</a>
+							</li>
+							<li class=" tsd-kind-function tsd-parent-kind-module">
+								<a href="common.html#getbase64outputlength" class="tsd-kind-icon">get<wbr>Base64<wbr>Output<wbr>Length</a>
 							</li>
 						</ul>
 					</li>

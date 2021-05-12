@@ -1,6 +1,6 @@
 import blockstack from 'blockstack';
 import * as bitcoin from 'bitcoinjs-lib';
-import BN = require('bn.js');
+import BN from 'bn.js';
 import fetch from 'node-fetch';
 
 import { CLI_CONFIG_TYPE } from './argparse';
