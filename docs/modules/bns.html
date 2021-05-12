@@ -10,7 +10,6 @@
 	<script async src="../assets/js/search.js" id="search-script"></script>
 </head>
 <body>
-<link rel="stylesheet" href="../assets/css/custom-style.css">
 <header>
 	<div class="tsd-page-toolbar">
 		<div class="container">
@@ -40,6 +39,8 @@
 							</div>
 							<input type="checkbox" id="tsd-filter-inherited" checked />
 							<label class="tsd-widget" for="tsd-filter-inherited">Inherited</label>
+							<input type="checkbox" id="tsd-filter-externals" checked />
+							<label class="tsd-widget" for="tsd-filter-externals">Externals</label>
 						</div>
 					</div>
 					<a href="#" class="tsd-widget menu no-caption" data-toggle="menu">Menu</a>
@@ -148,7 +149,6 @@
 						<section class="tsd-index-section ">
 							<h3>Functions</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-function tsd-parent-kind-module"><a href="bns.html#buffercvfromstring" class="tsd-kind-icon">bufferCVFrom<wbr>String</a></li>
 								<li class="tsd-kind-function tsd-parent-kind-module"><a href="bns.html#buildimportnametx" class="tsd-kind-icon">build<wbr>Import<wbr>Name<wbr>Tx</a></li>
 								<li class="tsd-kind-function tsd-parent-kind-module"><a href="bns.html#buildpreordernametx" class="tsd-kind-icon">build<wbr>Preorder<wbr>Name<wbr>Tx</a></li>
 								<li class="tsd-kind-function tsd-parent-kind-module"><a href="bns.html#buildpreordernamespacetx" class="tsd-kind-icon">build<wbr>Preorder<wbr>Namespace<wbr>Tx</a></li>
@@ -160,11 +160,8 @@
 								<li class="tsd-kind-function tsd-parent-kind-module"><a href="bns.html#buildtransfernametx" class="tsd-kind-icon">build<wbr>Transfer<wbr>Name<wbr>Tx</a></li>
 								<li class="tsd-kind-function tsd-parent-kind-module"><a href="bns.html#buildupdatenametx" class="tsd-kind-icon">build<wbr>Update<wbr>Name<wbr>Tx</a></li>
 								<li class="tsd-kind-function tsd-parent-kind-module"><a href="bns.html#canregistername" class="tsd-kind-icon">can<wbr>Register<wbr>Name</a></li>
-								<li class="tsd-kind-function tsd-parent-kind-module"><a href="bns.html#decodefqn" class="tsd-kind-icon">decodeFQN</a></li>
 								<li class="tsd-kind-function tsd-parent-kind-module"><a href="bns.html#getnameprice" class="tsd-kind-icon">get<wbr>Name<wbr>Price</a></li>
 								<li class="tsd-kind-function tsd-parent-kind-module"><a href="bns.html#getnamespaceprice" class="tsd-kind-icon">get<wbr>Namespace<wbr>Price</a></li>
-								<li class="tsd-kind-function tsd-parent-kind-module"><a href="bns.html#getzonefilehash" class="tsd-kind-icon">get<wbr>Zonefile<wbr>Hash</a></li>
-								<li class="tsd-kind-function tsd-parent-kind-module"><a href="bns.html#uintcvfrombn" class="tsd-kind-icon">uintCVFromBN</a></li>
 							</ul>
 						</section>
 					</div>
@@ -186,33 +183,10 @@
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Functions</h2>
 				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module">
-					<a name="buffercvfromstring" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagConst">Const</span> bufferCVFrom<wbr>String</h3>
-					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module">
-						<li class="tsd-signature tsd-kind-icon">bufferCVFrom<wbr>String<span class="tsd-signature-symbol">(</span>string<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">BufferCV</span></li>
-					</ul>
-					<ul class="tsd-descriptions">
-						<li class="tsd-description">
-							<aside class="tsd-sources">
-								<ul>
-									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/utils.ts#L33">packages/bns/src/utils.ts:33</a></li>
-								</ul>
-							</aside>
-							<h4 class="tsd-parameters-title">Parameters</h4>
-							<ul class="tsd-parameters">
-								<li>
-									<h5>string: <span class="tsd-signature-type">string</span></h5>
-								</li>
-							</ul>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">BufferCV</span></h4>
-						</li>
-					</ul>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module">
 					<a name="buildimportnametx" class="tsd-anchor"></a>
 					<h3>build<wbr>Import<wbr>Name<wbr>Tx</h3>
 					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module">
-						<li class="tsd-signature tsd-kind-icon">build<wbr>Import<wbr>Name<wbr>Tx<span class="tsd-signature-symbol">(</span>__namedParameters<span class="tsd-signature-symbol">: </span><a href="../interfaces/bns.importnameoptions.html" class="tsd-signature-type" data-tsd-kind="Interface">ImportNameOptions</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">StacksTransaction</span><span class="tsd-signature-symbol">&gt;</span></li>
+						<li class="tsd-signature tsd-kind-icon">build<wbr>Import<wbr>Name<wbr>Tx<span class="tsd-signature-symbol">(</span>__namedParameters<span class="tsd-signature-symbol">: </span><a href="../interfaces/bns.importnameoptions.html" class="tsd-signature-type" data-tsd-kind="Interface">ImportNameOptions</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../classes/transactions.stackstransaction.html" class="tsd-signature-type" data-tsd-kind="Class">StacksTransaction</a><span class="tsd-signature-symbol">&gt;</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
@@ -234,7 +208,7 @@
 									<h5>__namedParameters: <a href="../interfaces/bns.importnameoptions.html" class="tsd-signature-type" data-tsd-kind="Interface">ImportNameOptions</a></h5>
 								</li>
 							</ul>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">StacksTransaction</span><span class="tsd-signature-symbol">&gt;</span></h4>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../classes/transactions.stackstransaction.html" class="tsd-signature-type" data-tsd-kind="Class">StacksTransaction</a><span class="tsd-signature-symbol">&gt;</span></h4>
 						</li>
 					</ul>
 				</section>
@@ -242,7 +216,7 @@
 					<a name="buildpreordernametx" class="tsd-anchor"></a>
 					<h3>build<wbr>Preorder<wbr>Name<wbr>Tx</h3>
 					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module">
-						<li class="tsd-signature tsd-kind-icon">build<wbr>Preorder<wbr>Name<wbr>Tx<span class="tsd-signature-symbol">(</span>__namedParameters<span class="tsd-signature-symbol">: </span><a href="../interfaces/bns.preordernameoptions.html" class="tsd-signature-type" data-tsd-kind="Interface">PreorderNameOptions</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">StacksTransaction</span><span class="tsd-signature-symbol">&gt;</span></li>
+						<li class="tsd-signature tsd-kind-icon">build<wbr>Preorder<wbr>Name<wbr>Tx<span class="tsd-signature-symbol">(</span>__namedParameters<span class="tsd-signature-symbol">: </span><a href="../interfaces/bns.preordernameoptions.html" class="tsd-signature-type" data-tsd-kind="Interface">PreorderNameOptions</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../classes/transactions.stackstransaction.html" class="tsd-signature-type" data-tsd-kind="Class">StacksTransaction</a><span class="tsd-signature-symbol">&gt;</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
@@ -265,7 +239,7 @@
 									<h5>__namedParameters: <a href="../interfaces/bns.preordernameoptions.html" class="tsd-signature-type" data-tsd-kind="Interface">PreorderNameOptions</a></h5>
 								</li>
 							</ul>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">StacksTransaction</span><span class="tsd-signature-symbol">&gt;</span></h4>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../classes/transactions.stackstransaction.html" class="tsd-signature-type" data-tsd-kind="Class">StacksTransaction</a><span class="tsd-signature-symbol">&gt;</span></h4>
 						</li>
 					</ul>
 				</section>
@@ -273,7 +247,7 @@
 					<a name="buildpreordernamespacetx" class="tsd-anchor"></a>
 					<h3>build<wbr>Preorder<wbr>Namespace<wbr>Tx</h3>
 					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module">
-						<li class="tsd-signature tsd-kind-icon">build<wbr>Preorder<wbr>Namespace<wbr>Tx<span class="tsd-signature-symbol">(</span>__namedParameters<span class="tsd-signature-symbol">: </span><a href="../interfaces/bns.preordernamespaceoptions.html" class="tsd-signature-type" data-tsd-kind="Interface">PreorderNamespaceOptions</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">StacksTransaction</span><span class="tsd-signature-symbol">&gt;</span></li>
+						<li class="tsd-signature tsd-kind-icon">build<wbr>Preorder<wbr>Namespace<wbr>Tx<span class="tsd-signature-symbol">(</span>__namedParameters<span class="tsd-signature-symbol">: </span><a href="../interfaces/bns.preordernamespaceoptions.html" class="tsd-signature-type" data-tsd-kind="Interface">PreorderNamespaceOptions</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../classes/transactions.stackstransaction.html" class="tsd-signature-type" data-tsd-kind="Class">StacksTransaction</a><span class="tsd-signature-symbol">&gt;</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
@@ -296,7 +270,7 @@
 									<h5>__namedParameters: <a href="../interfaces/bns.preordernamespaceoptions.html" class="tsd-signature-type" data-tsd-kind="Interface">PreorderNamespaceOptions</a></h5>
 								</li>
 							</ul>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">StacksTransaction</span><span class="tsd-signature-symbol">&gt;</span></h4>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../classes/transactions.stackstransaction.html" class="tsd-signature-type" data-tsd-kind="Class">StacksTransaction</a><span class="tsd-signature-symbol">&gt;</span></h4>
 						</li>
 					</ul>
 				</section>
@@ -304,7 +278,7 @@
 					<a name="buildreadynamespacetx" class="tsd-anchor"></a>
 					<h3>build<wbr>Ready<wbr>Namespace<wbr>Tx</h3>
 					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module">
-						<li class="tsd-signature tsd-kind-icon">build<wbr>Ready<wbr>Namespace<wbr>Tx<span class="tsd-signature-symbol">(</span>__namedParameters<span class="tsd-signature-symbol">: </span><a href="../interfaces/bns.readynamespaceoptions.html" class="tsd-signature-type" data-tsd-kind="Interface">ReadyNamespaceOptions</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">StacksTransaction</span><span class="tsd-signature-symbol">&gt;</span></li>
+						<li class="tsd-signature tsd-kind-icon">build<wbr>Ready<wbr>Namespace<wbr>Tx<span class="tsd-signature-symbol">(</span>__namedParameters<span class="tsd-signature-symbol">: </span><a href="../interfaces/bns.readynamespaceoptions.html" class="tsd-signature-type" data-tsd-kind="Interface">ReadyNamespaceOptions</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../classes/transactions.stackstransaction.html" class="tsd-signature-type" data-tsd-kind="Class">StacksTransaction</a><span class="tsd-signature-symbol">&gt;</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
@@ -327,7 +301,7 @@
 									<h5>__namedParameters: <a href="../interfaces/bns.readynamespaceoptions.html" class="tsd-signature-type" data-tsd-kind="Interface">ReadyNamespaceOptions</a></h5>
 								</li>
 							</ul>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">StacksTransaction</span><span class="tsd-signature-symbol">&gt;</span></h4>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../classes/transactions.stackstransaction.html" class="tsd-signature-type" data-tsd-kind="Class">StacksTransaction</a><span class="tsd-signature-symbol">&gt;</span></h4>
 						</li>
 					</ul>
 				</section>
@@ -335,7 +309,7 @@
 					<a name="buildregisternametx" class="tsd-anchor"></a>
 					<h3>build<wbr>Register<wbr>Name<wbr>Tx</h3>
 					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module">
-						<li class="tsd-signature tsd-kind-icon">build<wbr>Register<wbr>Name<wbr>Tx<span class="tsd-signature-symbol">(</span>__namedParameters<span class="tsd-signature-symbol">: </span><a href="../interfaces/bns.registernameoptions.html" class="tsd-signature-type" data-tsd-kind="Interface">RegisterNameOptions</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">StacksTransaction</span><span class="tsd-signature-symbol">&gt;</span></li>
+						<li class="tsd-signature tsd-kind-icon">build<wbr>Register<wbr>Name<wbr>Tx<span class="tsd-signature-symbol">(</span>__namedParameters<span class="tsd-signature-symbol">: </span><a href="../interfaces/bns.registernameoptions.html" class="tsd-signature-type" data-tsd-kind="Interface">RegisterNameOptions</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../classes/transactions.stackstransaction.html" class="tsd-signature-type" data-tsd-kind="Class">StacksTransaction</a><span class="tsd-signature-symbol">&gt;</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
@@ -357,7 +331,7 @@
 									<h5>__namedParameters: <a href="../interfaces/bns.registernameoptions.html" class="tsd-signature-type" data-tsd-kind="Interface">RegisterNameOptions</a></h5>
 								</li>
 							</ul>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">StacksTransaction</span><span class="tsd-signature-symbol">&gt;</span></h4>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../classes/transactions.stackstransaction.html" class="tsd-signature-type" data-tsd-kind="Class">StacksTransaction</a><span class="tsd-signature-symbol">&gt;</span></h4>
 						</li>
 					</ul>
 				</section>
@@ -365,7 +339,7 @@
 					<a name="buildrenewnametx" class="tsd-anchor"></a>
 					<h3>build<wbr>Renew<wbr>Name<wbr>Tx</h3>
 					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module">
-						<li class="tsd-signature tsd-kind-icon">build<wbr>Renew<wbr>Name<wbr>Tx<span class="tsd-signature-symbol">(</span>__namedParameters<span class="tsd-signature-symbol">: </span><a href="../interfaces/bns.renewnameoptions.html" class="tsd-signature-type" data-tsd-kind="Interface">RenewNameOptions</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">StacksTransaction</span><span class="tsd-signature-symbol">&gt;</span></li>
+						<li class="tsd-signature tsd-kind-icon">build<wbr>Renew<wbr>Name<wbr>Tx<span class="tsd-signature-symbol">(</span>__namedParameters<span class="tsd-signature-symbol">: </span><a href="../interfaces/bns.renewnameoptions.html" class="tsd-signature-type" data-tsd-kind="Interface">RenewNameOptions</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../classes/transactions.stackstransaction.html" class="tsd-signature-type" data-tsd-kind="Class">StacksTransaction</a><span class="tsd-signature-symbol">&gt;</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
@@ -387,7 +361,7 @@
 									<h5>__namedParameters: <a href="../interfaces/bns.renewnameoptions.html" class="tsd-signature-type" data-tsd-kind="Interface">RenewNameOptions</a></h5>
 								</li>
 							</ul>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">StacksTransaction</span><span class="tsd-signature-symbol">&gt;</span></h4>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../classes/transactions.stackstransaction.html" class="tsd-signature-type" data-tsd-kind="Class">StacksTransaction</a><span class="tsd-signature-symbol">&gt;</span></h4>
 						</li>
 					</ul>
 				</section>
@@ -395,7 +369,7 @@
 					<a name="buildrevealnamespacetx" class="tsd-anchor"></a>
 					<h3>build<wbr>Reveal<wbr>Namespace<wbr>Tx</h3>
 					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module">
-						<li class="tsd-signature tsd-kind-icon">build<wbr>Reveal<wbr>Namespace<wbr>Tx<span class="tsd-signature-symbol">(</span>__namedParameters<span class="tsd-signature-symbol">: </span><a href="../interfaces/bns.revealnamespaceoptions.html" class="tsd-signature-type" data-tsd-kind="Interface">RevealNamespaceOptions</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">StacksTransaction</span><span class="tsd-signature-symbol">&gt;</span></li>
+						<li class="tsd-signature tsd-kind-icon">build<wbr>Reveal<wbr>Namespace<wbr>Tx<span class="tsd-signature-symbol">(</span>__namedParameters<span class="tsd-signature-symbol">: </span><a href="../interfaces/bns.revealnamespaceoptions.html" class="tsd-signature-type" data-tsd-kind="Interface">RevealNamespaceOptions</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../classes/transactions.stackstransaction.html" class="tsd-signature-type" data-tsd-kind="Class">StacksTransaction</a><span class="tsd-signature-symbol">&gt;</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
@@ -417,7 +391,7 @@
 									<h5>__namedParameters: <a href="../interfaces/bns.revealnamespaceoptions.html" class="tsd-signature-type" data-tsd-kind="Interface">RevealNamespaceOptions</a></h5>
 								</li>
 							</ul>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">StacksTransaction</span><span class="tsd-signature-symbol">&gt;</span></h4>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../classes/transactions.stackstransaction.html" class="tsd-signature-type" data-tsd-kind="Class">StacksTransaction</a><span class="tsd-signature-symbol">&gt;</span></h4>
 						</li>
 					</ul>
 				</section>
@@ -425,7 +399,7 @@
 					<a name="buildrevokenametx" class="tsd-anchor"></a>
 					<h3>build<wbr>Revoke<wbr>Name<wbr>Tx</h3>
 					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module">
-						<li class="tsd-signature tsd-kind-icon">build<wbr>Revoke<wbr>Name<wbr>Tx<span class="tsd-signature-symbol">(</span>__namedParameters<span class="tsd-signature-symbol">: </span><a href="../interfaces/bns.revokenameoptions.html" class="tsd-signature-type" data-tsd-kind="Interface">RevokeNameOptions</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">StacksTransaction</span><span class="tsd-signature-symbol">&gt;</span></li>
+						<li class="tsd-signature tsd-kind-icon">build<wbr>Revoke<wbr>Name<wbr>Tx<span class="tsd-signature-symbol">(</span>__namedParameters<span class="tsd-signature-symbol">: </span><a href="../interfaces/bns.revokenameoptions.html" class="tsd-signature-type" data-tsd-kind="Interface">RevokeNameOptions</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../classes/transactions.stackstransaction.html" class="tsd-signature-type" data-tsd-kind="Class">StacksTransaction</a><span class="tsd-signature-symbol">&gt;</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
@@ -447,7 +421,7 @@
 									<h5>__namedParameters: <a href="../interfaces/bns.revokenameoptions.html" class="tsd-signature-type" data-tsd-kind="Interface">RevokeNameOptions</a></h5>
 								</li>
 							</ul>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">StacksTransaction</span><span class="tsd-signature-symbol">&gt;</span></h4>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../classes/transactions.stackstransaction.html" class="tsd-signature-type" data-tsd-kind="Class">StacksTransaction</a><span class="tsd-signature-symbol">&gt;</span></h4>
 						</li>
 					</ul>
 				</section>
@@ -455,7 +429,7 @@
 					<a name="buildtransfernametx" class="tsd-anchor"></a>
 					<h3>build<wbr>Transfer<wbr>Name<wbr>Tx</h3>
 					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module">
-						<li class="tsd-signature tsd-kind-icon">build<wbr>Transfer<wbr>Name<wbr>Tx<span class="tsd-signature-symbol">(</span>__namedParameters<span class="tsd-signature-symbol">: </span><a href="../interfaces/bns.transfernameoptions.html" class="tsd-signature-type" data-tsd-kind="Interface">TransferNameOptions</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">StacksTransaction</span><span class="tsd-signature-symbol">&gt;</span></li>
+						<li class="tsd-signature tsd-kind-icon">build<wbr>Transfer<wbr>Name<wbr>Tx<span class="tsd-signature-symbol">(</span>__namedParameters<span class="tsd-signature-symbol">: </span><a href="../interfaces/bns.transfernameoptions.html" class="tsd-signature-type" data-tsd-kind="Interface">TransferNameOptions</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../classes/transactions.stackstransaction.html" class="tsd-signature-type" data-tsd-kind="Class">StacksTransaction</a><span class="tsd-signature-symbol">&gt;</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
@@ -480,7 +454,7 @@
 									<h5>__namedParameters: <a href="../interfaces/bns.transfernameoptions.html" class="tsd-signature-type" data-tsd-kind="Interface">TransferNameOptions</a></h5>
 								</li>
 							</ul>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">StacksTransaction</span><span class="tsd-signature-symbol">&gt;</span></h4>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../classes/transactions.stackstransaction.html" class="tsd-signature-type" data-tsd-kind="Class">StacksTransaction</a><span class="tsd-signature-symbol">&gt;</span></h4>
 						</li>
 					</ul>
 				</section>
@@ -488,7 +462,7 @@
 					<a name="buildupdatenametx" class="tsd-anchor"></a>
 					<h3>build<wbr>Update<wbr>Name<wbr>Tx</h3>
 					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module">
-						<li class="tsd-signature tsd-kind-icon">build<wbr>Update<wbr>Name<wbr>Tx<span class="tsd-signature-symbol">(</span>__namedParameters<span class="tsd-signature-symbol">: </span><a href="../interfaces/bns.updatenameoptions.html" class="tsd-signature-type" data-tsd-kind="Interface">UpdateNameOptions</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">StacksTransaction</span><span class="tsd-signature-symbol">&gt;</span></li>
+						<li class="tsd-signature tsd-kind-icon">build<wbr>Update<wbr>Name<wbr>Tx<span class="tsd-signature-symbol">(</span>__namedParameters<span class="tsd-signature-symbol">: </span><a href="../interfaces/bns.updatenameoptions.html" class="tsd-signature-type" data-tsd-kind="Interface">UpdateNameOptions</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../classes/transactions.stackstransaction.html" class="tsd-signature-type" data-tsd-kind="Class">StacksTransaction</a><span class="tsd-signature-symbol">&gt;</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
@@ -510,7 +484,7 @@
 									<h5>__namedParameters: <a href="../interfaces/bns.updatenameoptions.html" class="tsd-signature-type" data-tsd-kind="Interface">UpdateNameOptions</a></h5>
 								</li>
 							</ul>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">StacksTransaction</span><span class="tsd-signature-symbol">&gt;</span></h4>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../classes/transactions.stackstransaction.html" class="tsd-signature-type" data-tsd-kind="Class">StacksTransaction</a><span class="tsd-signature-symbol">&gt;</span></h4>
 						</li>
 					</ul>
 				</section>
@@ -540,40 +514,6 @@
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">&gt;</span></h4>
 							<p>that resolves to true if the operation succeeds</p>
-						</li>
-					</ul>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module">
-					<a name="decodefqn" class="tsd-anchor"></a>
-					<h3>decodeFQN</h3>
-					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module">
-						<li class="tsd-signature tsd-kind-icon">decodeFQN<span class="tsd-signature-symbol">(</span>fqdn<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>name<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>namespace<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>subdomain<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> }</span></li>
-					</ul>
-					<ul class="tsd-descriptions">
-						<li class="tsd-description">
-							<aside class="tsd-sources">
-								<ul>
-									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/utils.ts#L6">packages/bns/src/utils.ts:6</a></li>
-								</ul>
-							</aside>
-							<h4 class="tsd-parameters-title">Parameters</h4>
-							<ul class="tsd-parameters">
-								<li>
-									<h5>fqdn: <span class="tsd-signature-type">string</span></h5>
-								</li>
-							</ul>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-symbol">{ </span>name<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>namespace<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>subdomain<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> }</span></h4>
-							<ul class="tsd-parameters">
-								<li class="tsd-parameter">
-									<h5>name<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></h5>
-								</li>
-								<li class="tsd-parameter">
-									<h5>namespace<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></h5>
-								</li>
-								<li class="tsd-parameter">
-									<h5><span class="tsd-flag ts-flagOptional">Optional</span> subdomain<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span></h5>
-								</li>
-							</ul>
 						</li>
 					</ul>
 				</section>
@@ -632,52 +572,6 @@
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">BN</span><span class="tsd-signature-symbol">&gt;</span></h4>
 							<p>that resolves to a BN object number of microstacks if the operation succeeds</p>
-						</li>
-					</ul>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module">
-					<a name="getzonefilehash" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagConst">Const</span> get<wbr>Zonefile<wbr>Hash</h3>
-					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module">
-						<li class="tsd-signature tsd-kind-icon">get<wbr>Zonefile<wbr>Hash<span class="tsd-signature-symbol">(</span>zonefile<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Buffer</span></li>
-					</ul>
-					<ul class="tsd-descriptions">
-						<li class="tsd-description">
-							<aside class="tsd-sources">
-								<ul>
-									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/utils.ts#L37">packages/bns/src/utils.ts:37</a></li>
-								</ul>
-							</aside>
-							<h4 class="tsd-parameters-title">Parameters</h4>
-							<ul class="tsd-parameters">
-								<li>
-									<h5>zonefile: <span class="tsd-signature-type">string</span></h5>
-								</li>
-							</ul>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Buffer</span></h4>
-						</li>
-					</ul>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module">
-					<a name="uintcvfrombn" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagConst">Const</span> uintCVFromBN</h3>
-					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module">
-						<li class="tsd-signature tsd-kind-icon">uintCVFromBN<span class="tsd-signature-symbol">(</span>int<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">BN</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">UIntCV</span></li>
-					</ul>
-					<ul class="tsd-descriptions">
-						<li class="tsd-description">
-							<aside class="tsd-sources">
-								<ul>
-									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/utils.ts#L35">packages/bns/src/utils.ts:35</a></li>
-								</ul>
-							</aside>
-							<h4 class="tsd-parameters-title">Parameters</h4>
-							<ul class="tsd-parameters">
-								<li>
-									<h5>int: <span class="tsd-signature-type">BN</span></h5>
-								</li>
-							</ul>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">UIntCV</span></h4>
 						</li>
 					</ul>
 				</section>
@@ -789,9 +683,6 @@
 								<a href="bns.html#bns_contract_name" class="tsd-kind-icon">BNS_<wbr>CONTRACT_<wbr>NAME</a>
 							</li>
 							<li class=" tsd-kind-function tsd-parent-kind-module">
-								<a href="bns.html#buffercvfromstring" class="tsd-kind-icon">bufferCVFrom<wbr>String</a>
-							</li>
-							<li class=" tsd-kind-function tsd-parent-kind-module">
 								<a href="bns.html#buildimportnametx" class="tsd-kind-icon">build<wbr>Import<wbr>Name<wbr>Tx</a>
 							</li>
 							<li class=" tsd-kind-function tsd-parent-kind-module">
@@ -825,19 +716,10 @@
 								<a href="bns.html#canregistername" class="tsd-kind-icon">can<wbr>Register<wbr>Name</a>
 							</li>
 							<li class=" tsd-kind-function tsd-parent-kind-module">
-								<a href="bns.html#decodefqn" class="tsd-kind-icon">decodeFQN</a>
-							</li>
-							<li class=" tsd-kind-function tsd-parent-kind-module">
 								<a href="bns.html#getnameprice" class="tsd-kind-icon">get<wbr>Name<wbr>Price</a>
 							</li>
 							<li class=" tsd-kind-function tsd-parent-kind-module">
 								<a href="bns.html#getnamespaceprice" class="tsd-kind-icon">get<wbr>Namespace<wbr>Price</a>
-							</li>
-							<li class=" tsd-kind-function tsd-parent-kind-module">
-								<a href="bns.html#getzonefilehash" class="tsd-kind-icon">get<wbr>Zonefile<wbr>Hash</a>
-							</li>
-							<li class=" tsd-kind-function tsd-parent-kind-module">
-								<a href="bns.html#uintcvfrombn" class="tsd-kind-icon">uintCVFromBN</a>
 							</li>
 						</ul>
 					</li>

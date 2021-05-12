@@ -10,7 +10,6 @@
 	<script async src="../assets/js/search.js" id="search-script"></script>
 </head>
 <body>
-<link rel="stylesheet" href="../assets/css/custom-style.css">
 <header>
 	<div class="tsd-page-toolbar">
 		<div class="container">
@@ -40,6 +39,8 @@
 							</div>
 							<input type="checkbox" id="tsd-filter-inherited" checked />
 							<label class="tsd-widget" for="tsd-filter-inherited">Inherited</label>
+							<input type="checkbox" id="tsd-filter-externals" checked />
+							<label class="tsd-widget" for="tsd-filter-externals">Externals</label>
 						</div>
 					</div>
 					<a href="#" class="tsd-widget menu no-caption" data-toggle="menu">Menu</a>
@@ -82,74 +83,227 @@
 				<section class="tsd-panel tsd-index-panel">
 					<div class="tsd-index-content">
 						<section class="tsd-index-section ">
-							<h3>References</h3>
+							<h3>Classes</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-reference tsd-parent-kind-module"><a href="profile.html#profile-1" class="tsd-kind-icon">Profile</a></li>
-								<li class="tsd-kind-reference tsd-parent-kind-module"><a href="profile.html#extractprofile" class="tsd-kind-icon">extract<wbr>Profile</a></li>
-								<li class="tsd-kind-reference tsd-parent-kind-module"><a href="profile.html#signprofiletoken" class="tsd-kind-icon">sign<wbr>Profile<wbr>Token</a></li>
-								<li class="tsd-kind-reference tsd-parent-kind-module"><a href="profile.html#verifyprofiletoken" class="tsd-kind-icon">verify<wbr>Profile<wbr>Token</a></li>
-								<li class="tsd-kind-reference tsd-parent-kind-module"><a href="profile.html#wrapprofiletoken" class="tsd-kind-icon">wrap<wbr>Profile<wbr>Token</a></li>
+								<li class="tsd-kind-class tsd-parent-kind-module"><a href="../classes/profile.profile-1.html" class="tsd-kind-icon">Profile</a></li>
 							</ul>
 						</section>
 						<section class="tsd-index-section ">
 							<h3>Functions</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-function tsd-parent-kind-module"><a href="profile.html#getname" class="tsd-kind-icon">get<wbr>Name</a></li>
+								<li class="tsd-kind-function tsd-parent-kind-module"><a href="profile.html#extractprofile" class="tsd-kind-icon">extract<wbr>Profile</a></li>
+								<li class="tsd-kind-function tsd-parent-kind-module"><a href="profile.html#signprofiletoken" class="tsd-kind-icon">sign<wbr>Profile<wbr>Token</a></li>
+								<li class="tsd-kind-function tsd-parent-kind-module"><a href="profile.html#verifyprofiletoken" class="tsd-kind-icon">verify<wbr>Profile<wbr>Token</a></li>
+								<li class="tsd-kind-function tsd-parent-kind-module"><a href="profile.html#wrapprofiletoken" class="tsd-kind-icon">wrap<wbr>Profile<wbr>Token</a></li>
 							</ul>
 						</section>
 					</div>
 				</section>
 			</section>
 			<section class="tsd-panel-group tsd-member-group ">
-				<h2>References</h2>
-				<section class="tsd-panel tsd-member tsd-kind-reference tsd-parent-kind-module">
-					<a name="profile-1" class="tsd-anchor"></a>
-					<h3>Profile</h3>
-					Re-exports <a href="">Profile</a>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-reference tsd-parent-kind-module">
-					<a name="extractprofile" class="tsd-anchor"></a>
-					<h3>extract<wbr>Profile</h3>
-					Re-exports <a href="">extractProfile</a>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-reference tsd-parent-kind-module">
-					<a name="signprofiletoken" class="tsd-anchor"></a>
-					<h3>sign<wbr>Profile<wbr>Token</h3>
-					Re-exports <a href="">signProfileToken</a>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-reference tsd-parent-kind-module">
-					<a name="verifyprofiletoken" class="tsd-anchor"></a>
-					<h3>verify<wbr>Profile<wbr>Token</h3>
-					Re-exports <a href="">verifyProfileToken</a>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-reference tsd-parent-kind-module">
-					<a name="wrapprofiletoken" class="tsd-anchor"></a>
-					<h3>wrap<wbr>Profile<wbr>Token</h3>
-					Re-exports <a href="">wrapProfileToken</a>
-				</section>
-			</section>
-			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Functions</h2>
 				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module">
-					<a name="getname" class="tsd-anchor"></a>
-					<h3>get<wbr>Name</h3>
+					<a name="extractprofile" class="tsd-anchor"></a>
+					<h3>extract<wbr>Profile</h3>
 					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module">
-						<li class="tsd-signature tsd-kind-icon">get<wbr>Name<span class="tsd-signature-symbol">(</span>profile<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span></li>
+						<li class="tsd-signature tsd-kind-icon">extract<wbr>Profile<span class="tsd-signature-symbol">(</span>token<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, publicKeyOrAddress<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Record</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/profile/src/profileSchemas/personUtils.ts#L1">packages/profile/src/profileSchemas/personUtils.ts:1</a></li>
+									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/profile/src/profileTokens.ts#L147">packages/profile/src/profileTokens.ts:147</a></li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Extracts a profile from an encoded token and optionally verifies it,
+									if <code>publicKeyOrAddress</code> is provided.</p>
+								</div>
+								<dl class="tsd-comment-tags">
+									<dt>throws</dt>
+									<dd><p>{Error} - if the token isn&#39;t signed by the provided <code>publicKeyOrAddress</code></p>
+									</dd>
+								</dl>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>token: <span class="tsd-signature-type">string</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>the token to be extracted</p>
+									</div>
+								</li>
+								<li>
+									<h5>publicKeyOrAddress: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span><span class="tsd-signature-symbol"> = null</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>the public key or address of the
+										keypair that is thought to have signed the token</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Record</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span></h4>
+							<ul>
+								<li>the profile extracted from the encoded token</li>
+							</ul>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module">
+					<a name="signprofiletoken" class="tsd-anchor"></a>
+					<h3>sign<wbr>Profile<wbr>Token</h3>
+					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module">
+						<li class="tsd-signature tsd-kind-icon">sign<wbr>Profile<wbr>Token<span class="tsd-signature-symbol">(</span>profile<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span>, privateKey<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, subject<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">any</span>, issuer<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">any</span>, signingAlgorithm<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span>, issuedAt<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">Date</span>, expiresAt<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">Date</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/profile/src/profileTokens.ts#L20">packages/profile/src/profileTokens.ts:20</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Signs a profile token</p>
+								</div>
+							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
 									<h5>profile: <span class="tsd-signature-type">any</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>the JSON of the profile to be signed</p>
+									</div>
+								</li>
+								<li>
+									<h5>privateKey: <span class="tsd-signature-type">string</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>the signing private key</p>
+									</div>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> subject: <span class="tsd-signature-type">any</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>the entity that the information is about</p>
+									</div>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> issuer: <span class="tsd-signature-type">any</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>the entity that is issuing the token</p>
+									</div>
+								</li>
+								<li>
+									<h5>signingAlgorithm: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> = &#x27;ES256K&#x27;</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>the signing algorithm to use</p>
+									</div>
+								</li>
+								<li>
+									<h5>issuedAt: <span class="tsd-signature-type">Date</span><span class="tsd-signature-symbol"> = ...</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>the time of issuance of the token</p>
+									</div>
+								</li>
+								<li>
+									<h5>expiresAt: <span class="tsd-signature-type">Date</span><span class="tsd-signature-symbol"> = ...</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>the time of expiration of the token</p>
+									</div>
 								</li>
 							</ul>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">any</span></h4>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4>
+							<ul>
+								<li>the signed profile token</li>
+							</ul>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module">
+					<a name="verifyprofiletoken" class="tsd-anchor"></a>
+					<h3>verify<wbr>Profile<wbr>Token</h3>
+					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module">
+						<li class="tsd-signature tsd-kind-icon">verify<wbr>Profile<wbr>Token<span class="tsd-signature-symbol">(</span>token<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, publicKeyOrAddress<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">TokenInterface</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/profile/src/profileTokens.ts#L77">packages/profile/src/profileTokens.ts:77</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Verifies a profile token</p>
+								</div>
+								<dl class="tsd-comment-tags">
+									<dt>throws</dt>
+									<dd><p>{Error} - throws an error if token verification fails</p>
+									</dd>
+								</dl>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>token: <span class="tsd-signature-type">string</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>the token to be verified</p>
+									</div>
+								</li>
+								<li>
+									<h5>publicKeyOrAddress: <span class="tsd-signature-type">string</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>the public key or address of the
+										keypair that is thought to have signed the token</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">TokenInterface</span></h4>
+							<ul>
+								<li>the verified, decoded profile token</li>
+							</ul>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module">
+					<a name="wrapprofiletoken" class="tsd-anchor"></a>
+					<h3>wrap<wbr>Profile<wbr>Token</h3>
+					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module">
+						<li class="tsd-signature tsd-kind-icon">wrap<wbr>Profile<wbr>Token<span class="tsd-signature-symbol">(</span>token<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>decodedToken<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">TokenInterface</span><span class="tsd-signature-symbol">; </span>token<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> }</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/profile/src/profileTokens.ts#L62">packages/profile/src/profileTokens.ts:62</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Wraps a token for a profile token file</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>token: <span class="tsd-signature-type">string</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>the token to be wrapped</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-symbol">{ </span>decodedToken<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">TokenInterface</span><span class="tsd-signature-symbol">; </span>token<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> }</span></h4>
+							<ul>
+								<li>including <code>token</code> and <code>decodedToken</code></li>
+							</ul>
+							<ul class="tsd-parameters">
+								<li class="tsd-parameter">
+									<h5>decoded<wbr>Token<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">TokenInterface</span></h5>
+								</li>
+								<li class="tsd-parameter">
+									<h5>token<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></h5>
+								</li>
+							</ul>
 						</li>
 					</ul>
 				</section>
@@ -224,23 +378,20 @@
 					<li class="current tsd-kind-module">
 						<a href="profile.html" class="tsd-kind-icon">profile</a>
 						<ul>
-							<li class=" tsd-kind-reference tsd-parent-kind-module">
-								<a href="profile.html#profile-1" class="tsd-kind-icon">Profile</a>
-							</li>
-							<li class=" tsd-kind-reference tsd-parent-kind-module">
-								<a href="profile.html#extractprofile" class="tsd-kind-icon">extract<wbr>Profile</a>
-							</li>
-							<li class=" tsd-kind-reference tsd-parent-kind-module">
-								<a href="profile.html#signprofiletoken" class="tsd-kind-icon">sign<wbr>Profile<wbr>Token</a>
-							</li>
-							<li class=" tsd-kind-reference tsd-parent-kind-module">
-								<a href="profile.html#verifyprofiletoken" class="tsd-kind-icon">verify<wbr>Profile<wbr>Token</a>
-							</li>
-							<li class=" tsd-kind-reference tsd-parent-kind-module">
-								<a href="profile.html#wrapprofiletoken" class="tsd-kind-icon">wrap<wbr>Profile<wbr>Token</a>
+							<li class=" tsd-kind-class tsd-parent-kind-module">
+								<a href="../classes/profile.profile-1.html" class="tsd-kind-icon">Profile</a>
 							</li>
 							<li class=" tsd-kind-function tsd-parent-kind-module">
-								<a href="profile.html#getname" class="tsd-kind-icon">get<wbr>Name</a>
+								<a href="profile.html#extractprofile" class="tsd-kind-icon">extract<wbr>Profile</a>
+							</li>
+							<li class=" tsd-kind-function tsd-parent-kind-module">
+								<a href="profile.html#signprofiletoken" class="tsd-kind-icon">sign<wbr>Profile<wbr>Token</a>
+							</li>
+							<li class=" tsd-kind-function tsd-parent-kind-module">
+								<a href="profile.html#verifyprofiletoken" class="tsd-kind-icon">verify<wbr>Profile<wbr>Token</a>
+							</li>
+							<li class=" tsd-kind-function tsd-parent-kind-module">
+								<a href="profile.html#wrapprofiletoken" class="tsd-kind-icon">wrap<wbr>Profile<wbr>Token</a>
 							</li>
 						</ul>
 					</li>
