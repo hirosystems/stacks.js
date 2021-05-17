@@ -53,6 +53,7 @@ const txOptions = {
   memo: 'test memo',
   nonce: new BigNum(0), // set a nonce manually if you don't want builder to fetch from a Stacks node
   fee: new BigNum(200), // set a tx fee if you don't want the builder to estimate
+  anchorMode: AnchorMode.Any
 };
 
 const transaction = await makeSTXTokenTransfer(txOptions);
@@ -67,7 +68,7 @@ broadcastTransaction(transaction, network);
 ## Smart Contract Deploy Transaction
 
 ```javascript
-import { makeContractDeploy, broadcastTransaction } from '@stacks/transactions';
+import { makeContractDeploy, broadcastTransaction, AnchorMode } from '@stacks/transactions';
 import { StacksTestnet, StacksMainnet } from '@stacks/network';
 const BigNum = require('bn.js');
 
@@ -89,7 +90,7 @@ broadcastTransaction(transaction, network);
 ## Smart Contract Function Call
 
 ```javascript
-import { makeContractCall, BufferCV, broadcastTransaction } from '@stacks/transactions';
+import { makeContractCall, BufferCV, broadcastTransaction, AnchorMode } from '@stacks/transactions';
 import { StacksTestnet, StacksMainnet } from '@stacks/network';
 const BigNum = require('bn.js');
 
@@ -114,6 +115,7 @@ const txOptions = {
   validateWithAbi: true,
   network,
   postConditions,
+  anchorMode: AnchorMode.Any,
 };
 
 const transaction = await makeContractCall(txOptions);
@@ -134,7 +136,7 @@ const abi: ClarityAbi = JSON.parse(readFileSync('abi.json').toString());
 To generate a sponsored transaction, first create and sign the transaction as the origin. The `sponsored` property in the options object must be set to true.
 
 ```javascript
-import { makeContractCall, BufferCV } from '@stacks/transactions';
+import { makeContractCall, BufferCV, AnchorMode } from '@stacks/transactions';
 const BigNum = require('bn.js');
 
 const txOptions = {
@@ -145,6 +147,7 @@ const txOptions = {
   senderKey: 'b244296d5907de9864c0b0d51f98a13c52890be0404e83f273144cd5b9960eed01',
   validateWithAbi: true,
   sponsored: true,
+  anchorMode: AnchorMode.Any,
 };
 
 const transaction = await makeContractCall(txOptions);
@@ -195,6 +198,7 @@ import {
   TransactionSigner,
   standardPrincipalCV,
   BufferReader,
+  AnchorMode,
 } from '@stacks/transactions';
 const BigNum = require('bn.js');
 
@@ -224,6 +228,7 @@ const transaction = await makeUnsignedSTXTokenTransfer({
   memo,
   numSignatures: 2, // number of signature required
   publicKeys: pubKeyStrings, // public key string array with >= numSignatures elements
+  anchorMode: AnchorMode.Any,
 });
 
 const serializedTx = transaction.serialize();
