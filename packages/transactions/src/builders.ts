@@ -264,7 +264,7 @@ export interface TokenTransferOptions {
   network?: StacksNetwork;
   /** the transaction anchorMode, which specifies whether it should be
    * included in an anchor block or a microblock */
-  anchorMode?: AnchorMode;
+  anchorMode: AnchorMode;
   /** an arbitrary string to include in the transaction, must be less than 34 bytes */
   memo?: string;
   /** the post condition mode, specifying whether or not post-conditions must fully cover all
@@ -311,7 +311,6 @@ export async function makeUnsignedSTXTokenTransfer(
     fee: new BigNum(0),
     nonce: new BigNum(0),
     network: new StacksMainnet(),
-    anchorMode: AnchorMode.Any,
     postConditionMode: PostConditionMode.Deny,
     memo: '',
     sponsored: false,
@@ -363,7 +362,7 @@ export async function makeUnsignedSTXTokenTransfer(
     payload,
     lpPostConditions,
     options.postConditionMode,
-    defaultOptions.anchorMode,
+    options.anchorMode,
     options.network.chainId
   );
 
@@ -444,7 +443,7 @@ export interface ContractDeployOptions {
   network?: StacksNetwork;
   /** the transaction anchorMode, which specifies whether it should be
    * included in an anchor block or a microblock */
-  anchorMode?: AnchorMode;
+  anchorMode: AnchorMode;
   /** the post condition mode, specifying whether or not post-conditions must fully cover all
    * transfered assets */
   postConditionMode?: PostConditionMode;
@@ -522,7 +521,6 @@ export async function makeContractDeploy(
     fee: new BigNum(0),
     nonce: new BigNum(0),
     network: new StacksMainnet(),
-    anchorMode: AnchorMode.Any,
     postConditionMode: PostConditionMode.Deny,
     sponsored: false,
   };
@@ -609,7 +607,7 @@ export interface ContractCallOptions {
   network?: StacksNetwork;
   /** the transaction anchorMode, which specifies whether it should be
    * included in an anchor block or a microblock */
-  anchorMode?: AnchorMode;
+  anchorMode: AnchorMode;
   /** the post condition mode, specifying whether or not post-conditions must fully cover all
    * transfered assets */
   postConditionMode?: PostConditionMode;
@@ -707,7 +705,6 @@ export async function makeUnsignedContractCall(
     fee: new BigNum(0),
     nonce: new BigNum(0),
     network: new StacksMainnet(),
-    anchorMode: AnchorMode.Any,
     postConditionMode: PostConditionMode.Deny,
     sponsored: false,
   };

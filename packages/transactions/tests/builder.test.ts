@@ -40,6 +40,7 @@ import {
   TxRejectedReason,
   AuthType,
   AddressHashMode,
+  AnchorMode,
 } from '../src/constants';
 
 import { StacksTestnet, StacksMainnet } from '@stacks/network';
@@ -72,7 +73,8 @@ test('Make STX token transfer with set tx fee', async () => {
     senderKey,
     fee,
     nonce,
-    memo: memo,
+    memo,
+    anchorMode: AnchorMode.Any
   });
 
   const serialized = transaction.serialize().toString('hex');
@@ -104,6 +106,7 @@ test('Make STX token transfer with fee estimate', async () => {
     nonce,
     senderKey,
     memo,
+    anchorMode: AnchorMode.Any
   });
 
   const fee = new BigNum(transaction.serialize().byteLength * estimateFeeRate);
@@ -140,6 +143,7 @@ test('Make STX token transfer with testnet', async () => {
     nonce,
     network: new StacksTestnet(),
     memo: memo,
+    anchorMode: AnchorMode.Any
   });
 
   const serialized = transaction.serialize().toString('hex');
@@ -178,6 +182,7 @@ test('Make STX token transfer with post conditions', async () => {
     nonce,
     memo,
     postConditions,
+    anchorMode: AnchorMode.Any
   });
 
   const serialized = transaction.serialize().toString('hex');
@@ -220,6 +225,7 @@ test('Make Multi-Sig STX token transfer', async () => {
     memo: memo,
     numSignatures: 2,
     publicKeys: pubKeyStrings,
+    anchorMode: AnchorMode.Any
   });
 
   const serializedTx = transaction.serialize();
@@ -276,6 +282,7 @@ test('addSignature to an unsigned transaction', async () => {
     fee,
     nonce,
     publicKey,
+    anchorMode: AnchorMode.Any
   });
 
   const nullSignature = (unsignedTx.auth.spendingCondition as any).signature.data;
@@ -307,6 +314,7 @@ test('Make smart contract deploy', async () => {
     fee,
     nonce,
     network: new StacksTestnet(),
+    anchorMode: AnchorMode.Any
   });
 
   const serialized = transaction.serialize().toString('hex');
@@ -345,6 +353,7 @@ test('Make contract-call', async () => {
     fee,
     nonce: new BigNum(1),
     network: new StacksTestnet(),
+    anchorMode: AnchorMode.Any
   });
 
   const serialized = transaction.serialize().toString('hex');
@@ -424,6 +433,7 @@ test('Make contract-call with post conditions', async () => {
     network: new StacksTestnet(),
     postConditions,
     postConditionMode: PostConditionMode.Deny,
+    anchorMode: AnchorMode.Any
   });
 
   const serialized = transaction.serialize().toString('hex');
@@ -467,6 +477,7 @@ test('Make contract-call with post condition allow mode', async () => {
     nonce: new BigNum(1),
     network: new StacksTestnet(),
     postConditionMode: PostConditionMode.Allow,
+    anchorMode: AnchorMode.Any
   });
 
   const serialized = transaction.serialize().toString('hex');
@@ -498,6 +509,7 @@ test('addSignature to an unsigned contract call transaction', async () => {
     nonce: new BigNum(1),
     network: new StacksTestnet(),
     postConditionMode: PostConditionMode.Allow,
+    anchorMode: AnchorMode.Any
   });
 
   const nullSignature = (unsignedTx.auth.spendingCondition as any).signature.data;
@@ -543,6 +555,7 @@ test('make a multi-sig contract call', async () => {
     nonce: new BigNum(1),
     network: new StacksTestnet(),
     postConditionMode: PostConditionMode.Allow,
+    anchorMode: AnchorMode.Any
   });
 
   expect(tx.auth.spendingCondition!.signer).toEqual(
@@ -568,6 +581,7 @@ test('Estimate token transfer fee', async () => {
     fee,
     nonce,
     memo,
+    anchorMode: AnchorMode.Any
   });
 
   const transactionByteLength = transaction.serialize().byteLength;
@@ -612,6 +626,7 @@ test('Make STX token transfer with fetch account nonce', async () => {
     fee,
     memo,
     network,
+    anchorMode: AnchorMode.Any
   });
 
   expect(fetchMock.mock.calls.length).toEqual(2);
@@ -644,6 +659,7 @@ test('Make sponsored STX token transfer', async () => {
     nonce,
     memo: memo,
     sponsored: true,
+    anchorMode: AnchorMode.Any
   });
 
   const preSponsorSerialized = transaction.serialize().toString('hex');
@@ -709,6 +725,7 @@ test('Make sponsored STX token transfer with sponsor fee estimate', async () => 
     nonce,
     memo: memo,
     sponsored: true,
+    anchorMode: AnchorMode.Any
   });
 
   const sponsorFee = new BigNum(transaction.serialize().byteLength * estimateFeeRate);
@@ -768,6 +785,7 @@ test('Make sponsored STX token transfer with set tx fee', async () => {
     nonce,
     network,
     sponsored: true,
+    anchorMode: AnchorMode.Any
   });
 
   const sponsorOptions = {
@@ -820,6 +838,7 @@ test('Make sponsored contract deploy with sponsor fee estimate', async () => {
     nonce,
     network,
     sponsored: true,
+    anchorMode: AnchorMode.Any
   });
 
   const sponsorOptions = {
@@ -878,6 +897,7 @@ test('Make sponsored contract call with sponsor nonce fetch', async () => {
     nonce,
     network,
     sponsored: true,
+    anchorMode: AnchorMode.Any
   });
 
   const sponsorOptions = {
@@ -927,6 +947,7 @@ test('Transaction broadcast success', async () => {
     fee,
     nonce,
     memo,
+    anchorMode: AnchorMode.Any
   });
 
   fetchMock.mockOnce('success');
@@ -957,6 +978,7 @@ test('Transaction broadcast with attachment', async () => {
     fee,
     nonce,
     memo,
+    anchorMode: AnchorMode.Any
   });
 
   fetchMock.mockOnce('success');
@@ -989,6 +1011,7 @@ test('Transaction broadcast returns error', async () => {
     fee,
     nonce,
     memo,
+    anchorMode: AnchorMode.Any
   });
 
   const rejection = {
@@ -1027,6 +1050,7 @@ test('Transaction broadcast fails', async () => {
     fee,
     nonce,
     memo,
+    anchorMode: AnchorMode.Any
   });
 
   fetchMock.mockOnce('test', { status: 400 });
@@ -1059,6 +1083,7 @@ test('Make contract-call with network ABI validation', async () => {
     network: new StacksTestnet(),
     validateWithAbi: true,
     postConditionMode: PostConditionMode.Allow,
+    anchorMode: AnchorMode.Any
   });
 
   expect(fetchMock.mock.calls.length).toEqual(1);
@@ -1088,6 +1113,7 @@ test('Make contract-call with provided ABI validation', async () => {
     nonce: new BigNum(1),
     validateWithAbi: abi,
     postConditionMode: PostConditionMode.Allow,
+    anchorMode: AnchorMode.Any
   });
 });
 
@@ -1119,6 +1145,7 @@ test('Make contract-call with network ABI validation failure', async () => {
       network: new StacksTestnet(),
       validateWithAbi: true,
       postConditionMode: PostConditionMode.Allow,
+      anchorMode: AnchorMode.Any
     });
   } catch (e) {
     error = e;
