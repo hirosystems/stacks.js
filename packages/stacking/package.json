@@ -1,6 +1,6 @@
 {
   "name": "@stacks/stacking",
-  "version": "1.4.1",
+  "version": "2.0.0-beta.0",
   "description": "Library for Stacking.",
   "keywords": [
     "Stacks",
@@ -34,9 +34,9 @@
     "url": "https://github.com/blockstack/blockstack.js/issues"
   },
   "dependencies": {
-    "@stacks/common": "^1.2.2",
+    "@stacks/common": "^2.0.0-beta.0",
     "@stacks/network": "^1.2.2",
-    "@stacks/transactions": "^1.4.1",
+    "@stacks/transactions": "^2.0.0-beta.0",
     "@types/bn.js": "^4.11.6",
     "bitcoinjs-lib": "^5.2.0",
     "bn.js": "^4.12.0"
