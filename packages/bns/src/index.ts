@@ -1,5 +1,6 @@
 import { Buffer } from '@stacks/common';
 import {
+  AnchorMode,
   bufferCV,
   callReadOnlyFunction,
   ClarityType,
@@ -78,6 +79,7 @@ async function makeBnsContractCall(options: BnsContractCallOptions): Promise<Sta
     publicKey: options.publicKey,
     validateWithAbi: false,
     network: options.network,
+    anchorMode: AnchorMode.Any,
   };
 
   return makeUnsignedContractCall(txOptions);

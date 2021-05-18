@@ -21,6 +21,7 @@ import {
   noneCV,
   someCV,
   validateStacksAddress,
+  AnchorMode,
 } from '@stacks/transactions';
 import { StacksNetwork } from '@stacks/network';
 import BN from 'bn.js';
@@ -507,6 +508,7 @@ export class StackingClient {
       ],
       validateWithAbi: true,
       network,
+      anchorMode: AnchorMode.Any,
     };
     return txOptions;
   }
@@ -552,6 +554,7 @@ export class StackingClient {
       ],
       validateWithAbi: true,
       network,
+      anchorMode: AnchorMode.Any,
     };
     return txOptions;
   }
@@ -596,6 +599,7 @@ export class StackingClient {
       ],
       validateWithAbi: true,
       network,
+      anchorMode: AnchorMode.Any,
     };
 
     if (nonce) {
@@ -631,6 +635,7 @@ export class StackingClient {
       functionArgs: [address, uintCV(rewardCycle)],
       validateWithAbi: true,
       network,
+      anchorMode: AnchorMode.Any,
     };
     return txOptions;
   }
@@ -645,6 +650,7 @@ export class StackingClient {
       functionArgs: [],
       validateWithAbi: true,
       network,
+      anchorMode: AnchorMode.Any,
     };
     return txOptions;
   }

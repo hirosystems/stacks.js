@@ -9,6 +9,7 @@ import {
   PostConditionMode,
   getAddressFromPrivateKey,
   PostCondition,
+  AnchorMode,
 } from '@stacks/transactions';
 import { StacksTestnet, StacksNetwork } from '@stacks/network';
 
@@ -25,6 +26,7 @@ interface ContractCallOptions {
   postConditions?: PostCondition[];
   postConditionMode?: PostConditionMode;
   network?: StacksNetwork;
+  anchorMode: AnchorMode;
 }
 
 interface ContractDeployOptions {
@@ -35,6 +37,7 @@ interface ContractDeployOptions {
   postConditions?: PostCondition[];
   postConditionMode?: PostConditionMode;
   network?: StacksNetwork;
+  anchorMode: AnchorMode;
 }
 
 interface STXTransferOptions {
@@ -45,6 +48,7 @@ interface STXTransferOptions {
   postConditions?: PostCondition[];
   postConditionMode?: PostConditionMode;
   network?: StacksNetwork;
+  anchorMode: AnchorMode;
 }
 
 export class WalletSigner {
@@ -88,6 +92,7 @@ export class WalletSigner {
     nonce,
     postConditionMode,
     postConditions,
+    anchorMode,
   }: ContractCallOptions) {
     const tx = await makeContractCall({
       contractAddress,
@@ -99,6 +104,7 @@ export class WalletSigner {
       network: this.getNetwork(),
       postConditionMode,
       postConditions,
+      anchorMode
     });
     return tx;
   }
@@ -109,6 +115,7 @@ export class WalletSigner {
     nonce,
     postConditionMode,
     postConditions,
+    anchorMode
   }: ContractDeployOptions) {
     const tx = await makeContractDeploy({
       contractName,
@@ -118,6 +125,7 @@ export class WalletSigner {
       nonce: new BN(nonce),
       postConditionMode,
       postConditions,
+      anchorMode
     });
     return tx;
   }
@@ -129,6 +137,7 @@ export class WalletSigner {
     nonce,
     postConditionMode,
     postConditions,
+    anchorMode,
   }: STXTransferOptions) {
     const tx = await makeSTXTokenTransfer({
       recipient,
@@ -139,6 +148,7 @@ export class WalletSigner {
       nonce: new BN(nonce),
       postConditionMode,
       postConditions,
+      anchorMode,
     });
     return tx;
   }
