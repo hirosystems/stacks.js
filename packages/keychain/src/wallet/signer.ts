@@ -104,7 +104,7 @@ export class WalletSigner {
       network: this.getNetwork(),
       postConditionMode,
       postConditions,
-      anchorMode
+      anchorMode,
     });
     return tx;
   }
@@ -115,7 +115,7 @@ export class WalletSigner {
     nonce,
     postConditionMode,
     postConditions,
-    anchorMode
+    anchorMode,
   }: ContractDeployOptions) {
     const tx = await makeContractDeploy({
       contractName,
@@ -125,7 +125,7 @@ export class WalletSigner {
       nonce: new BN(nonce),
       postConditionMode,
       postConditions,
-      anchorMode
+      anchorMode,
     });
     return tx;
   }
