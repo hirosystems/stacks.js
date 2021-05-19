@@ -9,6 +9,7 @@ import {
   bufferCV,
   hash160,
   standardPrincipalCV,
+  AnchorMode,
 } from '@stacks/transactions';
 
 import {
@@ -345,7 +346,8 @@ test('preorderNamespace', async () => {
     makeUnsignedContractCall,
     bufferCV: jest.requireActual('@stacks/transactions').bufferCV,
     uintCV: jest.requireActual('@stacks/transactions').uintCV,
-    hash160: jest.requireActual('@stacks/transactions').hash160
+    hash160: jest.requireActual('@stacks/transactions').hash160,
+    AnchorMode: jest.requireActual('@stacks/transactions').AnchorMode,
   }));
 
   const { buildPreorderNamespaceTx } = require('../src');
@@ -369,7 +371,8 @@ test('preorderNamespace', async () => {
     ],
     validateWithAbi: false,
     publicKey,
-    network
+    network,
+    anchorMode: AnchorMode.Any,
   };
 
   expect(makeUnsignedContractCall).toHaveBeenCalledTimes(1);
@@ -416,7 +419,8 @@ test('revealNamespace', async () => {
     bufferCV: jest.requireActual('@stacks/transactions').bufferCV,
     uintCV: jest.requireActual('@stacks/transactions').uintCV,
     standardPrincipalCV: jest.requireActual('@stacks/transactions').standardPrincipalCV,
-    hash160: jest.requireActual('@stacks/transactions').hash160
+    hash160: jest.requireActual('@stacks/transactions').hash160,
+    AnchorMode: jest.requireActual('@stacks/transactions').AnchorMode,
   }));
 
   const { buildRevealNamespaceTx } = require('../src');
@@ -464,7 +468,8 @@ test('revealNamespace', async () => {
     ],
     validateWithAbi: false,
     publicKey,
-    network
+    network,
+    anchorMode: AnchorMode.Any,
   };
 
   expect(makeUnsignedContractCall).toHaveBeenCalledTimes(1);
@@ -487,7 +492,8 @@ test('importName', async () => {
     bufferCV: jest.requireActual('@stacks/transactions').bufferCV,
     uintCV: jest.requireActual('@stacks/transactions').uintCV,
     standardPrincipalCV: jest.requireActual('@stacks/transactions').standardPrincipalCV,
-    hash160: jest.requireActual('@stacks/transactions').hash160
+    hash160: jest.requireActual('@stacks/transactions').hash160,
+    AnchorMode: jest.requireActual('@stacks/transactions').AnchorMode,
   }));
 
   const { buildImportNameTx } = require('../src');
@@ -515,6 +521,7 @@ test('importName', async () => {
     publicKey,
     network,
     validateWithAbi: false,
+    anchorMode: AnchorMode.Any,
   };
 
   expect(makeUnsignedContractCall).toHaveBeenCalledTimes(1);
@@ -532,6 +539,7 @@ test('readyNamespace', async () => {
   jest.mock('@stacks/transactions', () => ({
     makeUnsignedContractCall,
     bufferCV: jest.requireActual('@stacks/transactions').bufferCV,
+    AnchorMode: jest.requireActual('@stacks/transactions').AnchorMode,
   }));
 
   const { buildReadyNamespaceTx } = require('../src');
@@ -553,6 +561,7 @@ test('readyNamespace', async () => {
     publicKey,
     network,
     validateWithAbi: false,
+    anchorMode: AnchorMode.Any,
   };
 
   expect(makeUnsignedContractCall).toHaveBeenCalledTimes(1);
@@ -574,6 +583,7 @@ test('preorderName', async () => {
     bufferCV: jest.requireActual('@stacks/transactions').bufferCV,
     uintCV: jest.requireActual('@stacks/transactions').uintCV,
     hash160: jest.requireActual('@stacks/transactions').hash160,
+    AnchorMode: jest.requireActual('@stacks/transactions').AnchorMode,
   }));
 
   const { buildPreorderNameTx } = require('../src');
@@ -598,6 +608,7 @@ test('preorderName', async () => {
     publicKey,
     network,
     validateWithAbi: false,
+    anchorMode: AnchorMode.Any,
   };
 
   expect(makeUnsignedContractCall).toHaveBeenCalledTimes(1);
@@ -618,6 +629,7 @@ test('registerName', async () => {
     makeUnsignedContractCall,
     bufferCV: jest.requireActual('@stacks/transactions').bufferCV,
     hash160: jest.requireActual('@stacks/transactions').hash160,
+    AnchorMode: jest.requireActual('@stacks/transactions').AnchorMode,
   }));
 
   const { buildRegisterNameTx } = require('../src');
@@ -646,6 +658,7 @@ test('registerName', async () => {
     publicKey,
     network,
     validateWithAbi: false,
+    anchorMode: AnchorMode.Any,
   };
 
   expect(makeUnsignedContractCall).toHaveBeenCalledTimes(1);
@@ -665,6 +678,7 @@ test('updateName', async () => {
     makeUnsignedContractCall,
     bufferCV: jest.requireActual('@stacks/transactions').bufferCV,
     hash160: jest.requireActual('@stacks/transactions').hash160,
+    AnchorMode: jest.requireActual('@stacks/transactions').AnchorMode,
   }));
 
   const { buildUpdateNameTx } = require('../src');
@@ -691,6 +705,7 @@ test('updateName', async () => {
     publicKey,
     network,
     validateWithAbi: false,
+    anchorMode: AnchorMode.Any,
   };
 
   expect(makeUnsignedContractCall).toHaveBeenCalledTimes(1);
@@ -711,6 +726,7 @@ test('transferName', async () => {
     makeUnsignedContractCall,
     bufferCV: jest.requireActual('@stacks/transactions').bufferCV,
     hash160: jest.requireActual('@stacks/transactions').hash160,
+    AnchorMode: jest.requireActual('@stacks/transactions').AnchorMode,
   }));
 
   const { buildTransferNameTx } = require('../src');
@@ -739,6 +755,7 @@ test('transferName', async () => {
     publicKey,
     network,
     validateWithAbi: false,
+    anchorMode: AnchorMode.Any,
   };
 
   expect(makeUnsignedContractCall).toHaveBeenCalledTimes(1);
@@ -757,6 +774,7 @@ test('revokeName', async () => {
     makeUnsignedContractCall,
     bufferCV: jest.requireActual('@stacks/transactions').bufferCV,
     hash160: jest.requireActual('@stacks/transactions').hash160,
+    AnchorMode: jest.requireActual('@stacks/transactions').AnchorMode,
   }));
 
   const { buildRevokeNameTx } = require('../src');
@@ -781,6 +799,7 @@ test('revokeName', async () => {
     publicKey,
     network,
     validateWithAbi: false,
+    anchorMode: AnchorMode.Any,
   };
 
   expect(makeUnsignedContractCall).toHaveBeenCalledTimes(1);
@@ -803,6 +822,7 @@ test('renewName', async () => {
     bufferCV: jest.requireActual('@stacks/transactions').bufferCV,
     uintCV: jest.requireActual('@stacks/transactions').uintCV,
     hash160: jest.requireActual('@stacks/transactions').hash160,
+    AnchorMode: jest.requireActual('@stacks/transactions').AnchorMode,
   }));
 
   const { buildRenewNameTx } = require('../src');
@@ -833,6 +853,7 @@ test('renewName', async () => {
     publicKey,
     network,
     validateWithAbi: false,
+    anchorMode: AnchorMode.Any,
   };
 
   expect(makeUnsignedContractCall).toHaveBeenCalledTimes(1);

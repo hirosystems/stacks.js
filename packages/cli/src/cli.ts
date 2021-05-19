@@ -37,6 +37,7 @@ import {
   TxBroadcastResult,
   getAddressFromPrivateKey,
   TransactionVersion,
+  AnchorMode,
 } from '@stacks/transactions';
 
 import { StacksMainnet, StacksTestnet } from '@stacks/network';
@@ -560,6 +561,7 @@ async function sendTokens(network: CLINetworkAdapter, args: string[]): Promise<s
     nonce,
     memo,
     network: txNetwork,
+    anchorMode: AnchorMode.Any,
   };
 
   const tx: StacksTransaction = await makeSTXTokenTransfer(options);
@@ -619,6 +621,7 @@ async function contractDeploy(network: CLINetworkAdapter, args: string[]): Promi
     nonce,
     network: txNetwork,
     postConditionMode: PostConditionMode.Allow,
+    anchorMode: AnchorMode.Any,
   };
 
   const tx = await makeContractDeploy(options);
@@ -699,6 +702,7 @@ async function contractFunctionCall(network: CLINetworkAdapter, args: string[]):
         nonce,
         network: txNetwork,
         postConditionMode: PostConditionMode.Allow,
+        anchorMode: AnchorMode.Any,
       };
 
       return makeContractCall(options);
