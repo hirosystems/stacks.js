@@ -37,5 +37,6 @@ const zonefile =  'example-zonefile'
 const publicKey = 'SPF0324DSC4K505TP6A8C7GAK4R95E38TGNZP7RE'
 
 // construct an unsigned bns register-name transaction
+// note: builder functions build transactions with AnchorMode set to Any
 const unsignedTX = await buildRegisterNameTX({ name, salt, zonefile, publicKey, network });
 ```
