@@ -10,6 +10,10 @@ npm install @stacks/stacking bn.js
 
 ## Initialization
 
+Initialize a `StackingClient` to interact with the Stacking contract.
+
+*Note: the `StackingClient` sets its transactions `AnchorMode` to `Any`.*
+
 ```typescript
 import { getNonce } from '@stacks/transactions';
 import { StacksTestnet, StacksMainnet } from '@stacks/network';
