@@ -16,6 +16,7 @@ import {
   intCV,
   TupleCV,
   ClarityType,
+  AnchorMode,
 } from '@stacks/transactions';
 import { address as btcAddress } from 'bitcoinjs-lib';
 import { decodeBtcAddress, getAddressHashMode, InvalidAddressError, poxAddressToBtcAddress } from '../src/utils';
@@ -187,6 +188,7 @@ test('stack stx', async () => {
     tupleCV: jest.requireActual('@stacks/transactions').tupleCV,
     uintCV: jest.requireActual('@stacks/transactions').uintCV,
     AddressHashMode: jest.requireActual('@stacks/transactions').AddressHashMode,
+    AnchorMode: jest.requireActual('@stacks/transactions').AnchorMode,
     validateStacksAddress: jest.requireActual('@stacks/transactions').validateStacksAddress,
   }))
 
@@ -228,7 +230,8 @@ test('stack stx', async () => {
     ],
     validateWithAbi: true,
     network,
-    senderKey: privateKey
+    senderKey: privateKey,
+    anchorMode: AnchorMode.Any,
   };
 
   expect(fetchMock.mock.calls[0][0]).toEqual(network.getPoxInfoUrl());
@@ -261,6 +264,7 @@ test('delegate stx', async () => {
     uintCV: jest.requireActual('@stacks/transactions').uintCV,
     someCV: jest.requireActual('@stacks/transactions').someCV,
     AddressHashMode: jest.requireActual('@stacks/transactions').AddressHashMode,
+    AnchorMode: jest.requireActual('@stacks/transactions').AnchorMode,
     standardPrincipalCV: jest.requireActual('@stacks/transactions').standardPrincipalCV,
     validateStacksAddress: jest.requireActual('@stacks/transactions').validateStacksAddress,
   }));
@@ -303,7 +307,8 @@ test('delegate stx', async () => {
     ],
     validateWithAbi: true,
     network,
-    senderKey: privateKey
+    senderKey: privateKey,
+    anchorMode: AnchorMode.Any,
   };
 
   expect(fetchMock.mock.calls[0][0]).toEqual(network.getPoxInfoUrl());
@@ -333,6 +338,7 @@ test('delegate stx with empty optional parameters', async () => {
     tupleCV: jest.requireActual('@stacks/transactions').tupleCV,
     uintCV: jest.requireActual('@stacks/transactions').uintCV,
     AddressHashMode: jest.requireActual('@stacks/transactions').AddressHashMode,
+    AnchorMode: jest.requireActual('@stacks/transactions').AnchorMode,
     standardPrincipalCV: jest.requireActual('@stacks/transactions').standardPrincipalCV,
     noneCV: jest.requireActual('@stacks/transactions').noneCV,
     validateStacksAddress: jest.requireActual('@stacks/transactions').validateStacksAddress,
@@ -370,7 +376,8 @@ test('delegate stx with empty optional parameters', async () => {
     ],
     validateWithAbi: true,
     network,
-    senderKey: privateKey
+    senderKey: privateKey,
+    anchorMode: AnchorMode.Any,
   };
 
   expect(fetchMock.mock.calls[0][0]).toEqual(network.getPoxInfoUrl());
@@ -404,6 +411,7 @@ test('delegate stack stx with one delegator', async () => {
     uintCV: jest.requireActual('@stacks/transactions').uintCV,
     getNonce: jest.requireActual('@stacks/transactions').getNonce,
     AddressHashMode: jest.requireActual('@stacks/transactions').AddressHashMode,
+    AnchorMode: jest.requireActual('@stacks/transactions').AnchorMode,
     standardPrincipalCV: jest.requireActual('@stacks/transactions').standardPrincipalCV,
     getAddressFromPrivateKey: jest.requireActual('@stacks/transactions').getAddressFromPrivateKey,
     validateStacksAddress: jest.requireActual('@stacks/transactions').validateStacksAddress,
@@ -457,7 +465,8 @@ test('delegate stack stx with one delegator', async () => {
     ],
     validateWithAbi: true,
     network,
-    senderKey: privateKey
+    senderKey: privateKey,
+    anchorMode: AnchorMode.Any,
   };
 
   expect(fetchMock.mock.calls[0][0]).toEqual(network.getPoxInfoUrl());
@@ -492,6 +501,7 @@ test('delegate stack stx with set nonce', async () => {
     uintCV: jest.requireActual('@stacks/transactions').uintCV,
     getNonce: jest.requireActual('@stacks/transactions').getNonce,
     AddressHashMode: jest.requireActual('@stacks/transactions').AddressHashMode,
+    AnchorMode: jest.requireActual('@stacks/transactions').AnchorMode,
     standardPrincipalCV: jest.requireActual('@stacks/transactions').standardPrincipalCV,
     getAddressFromPrivateKey: jest.requireActual('@stacks/transactions').getAddressFromPrivateKey,
     validateStacksAddress: jest.requireActual('@stacks/transactions').validateStacksAddress,
@@ -548,6 +558,7 @@ test('delegate stack stx with set nonce', async () => {
     network,
     senderKey: privateKey,
     nonce,
+    anchorMode: AnchorMode.Any,
   };
 
   expect(fetchMock.mock.calls[0][0]).toEqual(network.getPoxInfoUrl());
@@ -577,6 +588,7 @@ test('delegator commit', async () => {
     tupleCV: jest.requireActual('@stacks/transactions').tupleCV,
     uintCV: jest.requireActual('@stacks/transactions').uintCV,
     AddressHashMode: jest.requireActual('@stacks/transactions').AddressHashMode,
+    AnchorMode: jest.requireActual('@stacks/transactions').AnchorMode,
     standardPrincipalCV: jest.requireActual('@stacks/transactions').standardPrincipalCV,
     validateStacksAddress: jest.requireActual('@stacks/transactions').validateStacksAddress,
   }));
@@ -615,7 +627,8 @@ test('delegator commit', async () => {
     ],
     validateWithAbi: true,
     network,
-    senderKey: privateKey
+    senderKey: privateKey,
+    anchorMode: AnchorMode.Any,
   };
 
   expect(fetchMock.mock.calls[0][0]).toEqual(network.getPoxInfoUrl());
@@ -643,6 +656,7 @@ test('revoke delegate stx', async () => {
     tupleCV: jest.requireActual('@stacks/transactions').tupleCV,
     uintCV: jest.requireActual('@stacks/transactions').uintCV,
     AddressHashMode: jest.requireActual('@stacks/transactions').AddressHashMode,
+    AnchorMode: jest.requireActual('@stacks/transactions').AnchorMode,
     standardPrincipalCV: jest.requireActual('@stacks/transactions').standardPrincipalCV,
     validateStacksAddress: jest.requireActual('@stacks/transactions').validateStacksAddress,
   }));
@@ -667,7 +681,8 @@ test('revoke delegate stx', async () => {
     functionArgs: [],
     validateWithAbi: true,
     network,
-    senderKey: privateKey
+    senderKey: privateKey,
+    anchorMode: AnchorMode.Any
   };
 
   expect(fetchMock.mock.calls[0][0]).toEqual(network.getPoxInfoUrl());
