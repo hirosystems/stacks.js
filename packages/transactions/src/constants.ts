@@ -39,7 +39,7 @@ enum PayloadType {
 }
 
 /**
- * How a transaction should get appended to the Stacks blockchain. 
+ * How a transaction should get appended to the Stacks blockchain.
  *
  * In the Stacks blockchain, there are two kinds of blocks: anchored
  * blocks and streaming microblocks. A transactions AnchorMode specifies
