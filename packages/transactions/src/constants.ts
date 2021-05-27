@@ -39,7 +39,15 @@ enum PayloadType {
 }
 
 /**
- * How a transaction gets appended to the Stacks blockchain
+ * How a transaction should get appended to the Stacks blockchain. 
+ *
+ * In the Stacks blockchain, there are two kinds of blocks: anchored
+ * blocks and streaming microblocks. A transactions AnchorMode specifies
+ * which kind of block it should be included in.
+ *
+ * For more information about the kinds of Stacks blocks and the various
+ * AnchorModes, check out {@link https://github.com/stacksgov/sips/blob/main/sips/sip-001/sip-001-burn-election.md SIP 001} and
+ * {@link https://github.com/stacksgov/sips/blob/main/sips/sip-005/sip-005-blocks-and-transactions.md SIP 005}
  */
 enum AnchorMode {
   /** The transaction MUST be included in an anchored block */
