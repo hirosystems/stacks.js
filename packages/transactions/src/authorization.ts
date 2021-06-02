@@ -33,7 +33,7 @@ import {
 } from './keys';
 
 import { BufferReader } from './bufferReader';
-import { DeserializationError, SigningError } from './errors';
+import { DeserializationError, SigningError, VerificationError } from './errors';
 
 export interface MessageSignature {
   readonly type: StacksMessageType.MessageSignature;
@@ -479,7 +479,7 @@ function verifySingleSig(
   initialSigHash: string,
   authType: AuthType
 ): string {
-  const { nextSigHash } = nextVerification(
+  const { pubKey, nextSigHash } = nextVerification(
     initialSigHash,
     authType,
     condition.fee,
@@ -488,7 +488,13 @@ function verifySingleSig(
     condition.signature
   );
 
-  // TODO: verify pub key
+  // address version arg doesn't matter for signer hash generation
+  const addrBytes = addressFromPublicKeys(0, condition.hashMode, 1, [pubKey]).hash160;
+
+  if (addrBytes !== condition.signer)
+    throw new VerificationError(
+      `Signer hash does not equal hash of public key(s): ${addrBytes} != ${condition.signer}`
+    );
 
   return nextSigHash;
 }
