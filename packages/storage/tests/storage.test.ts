@@ -339,7 +339,7 @@ test('getFile unencrypted, unsigned - multi-reader', async () => {
     expire_block: 581432,
     blockchain: 'bitcoin',
     last_txid: 'f7fa811518566b1914a098c3bd61a810aee56390815bd608490b0860ac1b5b4d',
-    address: '16zVUoP7f15nfTiHw2UNiX8NT5SWYqwNv3',
+    address: 'SP10VG75GE4PE0VBA3KD3NVKSYEMM3YV9V17HJ32N',
     zonefile_hash: '98f42e11026d42d394b3424d4d7f0cccd6f376e2',
   };
   const nameRecordContent = JSON.stringify(nameRecord);
