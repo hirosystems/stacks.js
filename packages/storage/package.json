@@ -1,6 +1,6 @@
 {
   "name": "@stacks/storage",
-  "version": "2.0.0-beta.0",
+  "version": "2.0.0-beta.1",
   "description": "Stacks storage library",
   "author": "yknl <yukanliao@gmail.com>",
   "homepage": "https://blockstack.org",
