@@ -499,7 +499,7 @@ test('profileLookUp', async () => {
   const mockZonefile = {
     zonefile:
       '$ORIGIN ryan.id\n$TTL 3600\n_http._tcp IN URI 10 1 "https://blockstack.s3.amazonaws.com/ryan.id"\n',
-    address: '19MoWG8u88L6t766j7Vne21Mg4wHsCQ7vk',
+    address: 'SP3AMDH2ZZB8XQK467V9HV5CRQF2RPBZ4MDMSBHJZ',
   };
 
   fetchMock
