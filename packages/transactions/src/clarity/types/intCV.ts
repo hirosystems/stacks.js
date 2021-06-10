@@ -1,6 +1,6 @@
 import { Buffer } from '@stacks/common';
 import BigNum from 'bn.js';
-import { CLARITY_INT_BYTE_SIZE, CLARITY_INT_SIZE } from '../../constants';
+import { CLARITY_INT_SIZE } from '../../constants';
 import { ClarityType } from '../clarityValue';
 
 const MAX_U128 = new BigNum(2).pow(new BigNum(128)).sub(new BigNum(1));
@@ -31,23 +31,14 @@ function valueToBN(value: unknown, signed: boolean): BigNum {
     return new BigNum(value.toString());
   }
   if (value instanceof Uint8Array || Buffer.isBuffer(value)) {
-    let bn: BigNum;
     if (signed) {
-      if (value.byteLength < CLARITY_INT_BYTE_SIZE) {
-        const paddedBytes = new Uint8Array(CLARITY_INT_BYTE_SIZE);
-        // Extend sign-bit while padding to full byte length.
-        if (value[0] >>> 7) {
-          paddedBytes.fill(0xff);
-        }
-        paddedBytes.set(value, CLARITY_INT_BYTE_SIZE - value.byteLength);
-        bn = new BigNum(paddedBytes, 'be').fromTwos(CLARITY_INT_SIZE);
-      } else {
-        bn = new BigNum(value, 'be').fromTwos(CLARITY_INT_SIZE);
-      }
+      // Allow byte arrays smaller than 128-bits to be passed.
+      // This allows positive signed ints like `0x08` (8) or negative signed
+      // ints like `0xf8` (-8) to be passed without having to pad to 16 bytes.
+      return new BigNum(value, 'be').fromTwos(value.byteLength * 8);
     } else {
-      bn = new BigNum(value, 'be');
+      return new BigNum(value, 'be');
     }
-    return bn;
   }
   if (value instanceof BigNum || BigNum.isBN(value)) {
     return value;
