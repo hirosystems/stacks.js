@@ -220,11 +220,14 @@ describe('Clarity Types', () => {
         [-10n, '-10', '0xfffffffffffffffffffffffffffffff6'],
         ['-10', '-10', '0xfffffffffffffffffffffffffffffff6'],
         ['0xfff6', '-10', '0xfffffffffffffffffffffffffffffff6'],
+        ['0xf6', '-10', '0xfffffffffffffffffffffffffffffff6'],
         [new BN(-10), '-10', '0xfffffffffffffffffffffffffffffff6'],
         [Buffer.from([0xff, 0xf6]), '-10', '0xfffffffffffffffffffffffffffffff6'],
         [Buffer.from([0xf6]), '-10', '0xfffffffffffffffffffffffffffffff6'],
         [Buffer.from([0xff, 0xfe]), '-2', '0xfffffffffffffffffffffffffffffffe'],
         [Buffer.from([0xfe]), '-2', '0xfffffffffffffffffffffffffffffffe'],
+        [Uint8Array.of(0xff, 0xfe), '-2', '0xfffffffffffffffffffffffffffffffe'],
+        [Uint8Array.of(0xfe), '-2', '0xfffffffffffffffffffffffffffffffe'],
         [-200, '-200', '0xffffffffffffffffffffffffffffff38'],
         [Buffer.from([0xff, 0x38]), '-200', '0xffffffffffffffffffffffffffffff38'],
         [200, '200', '0x000000000000000000000000000000c8'],
@@ -232,9 +235,12 @@ describe('Clarity Types', () => {
         [10n, '10', '0x0000000000000000000000000000000a'],
         ['10', '10', '0x0000000000000000000000000000000a'],
         ['0x0a', '10', '0x0000000000000000000000000000000a'],
+        ['0x000a', '10', '0x0000000000000000000000000000000a'],
         [new BN(10), '10', '0x0000000000000000000000000000000a'],
         [Buffer.from([0x0a]), '10', '0x0000000000000000000000000000000a'],
-        [Buffer.from([0x00, 0x0a]), '10', '0x0000000000000000000000000000000a']
+        [Buffer.from([0x00, 0x0a]), '10', '0x0000000000000000000000000000000a'],
+        [Uint8Array.of(0x0a), '10', '0x0000000000000000000000000000000a'],
+        [Uint8Array.of(0x00, 0x0a), '10', '0x0000000000000000000000000000000a']
       ]
     )('IntCV - value %o is serialized to %o', (num, expectedInt, expectedHex) => {
       const numCV = intCV(num);
