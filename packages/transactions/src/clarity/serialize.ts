@@ -17,6 +17,7 @@ import {
 import { BufferArray } from '../utils';
 import { SerializationError } from '../errors';
 import { StringAsciiCV, StringUtf8CV } from './types/stringCV';
+import { CLARITY_INT_BYTE_SIZE, CLARITY_INT_SIZE } from '../constants';
 
 function bufferWithTypeID(typeId: ClarityType, buffer: Buffer): Buffer {
   const id = Buffer.from([typeId]);
@@ -41,8 +42,13 @@ function serializeBufferCV(cv: BufferCV): Buffer {
   return bufferWithTypeID(cv.type, Buffer.concat([length, cv.buffer]));
 }
 
-function serializeIntCV(cv: IntCV | UIntCV): Buffer {
-  const buffer = cv.value.toArrayLike(Buffer, 'be', 16);
+function serializeIntCV(cv: IntCV): Buffer {
+  const buffer = cv.value.toTwos(CLARITY_INT_SIZE).toArrayLike(Buffer, 'be', CLARITY_INT_BYTE_SIZE);
+  return bufferWithTypeID(cv.type, buffer);
+}
+
+function serializeUIntCV(cv: UIntCV): Buffer {
+  const buffer = cv.value.toArrayLike(Buffer, 'be', CLARITY_INT_BYTE_SIZE);
   return bufferWithTypeID(cv.type, buffer);
 }
 
@@ -131,8 +137,9 @@ export function serializeCV(value: ClarityValue): Buffer {
       return serializeOptionalCV(value);
     case ClarityType.Buffer:
       return serializeBufferCV(value);
-    case ClarityType.Int:
     case ClarityType.UInt:
+      return serializeUIntCV(value);
+    case ClarityType.Int:
       return serializeIntCV(value);
     case ClarityType.PrincipalStandard:
       return serializeStandardPrincipalCV(value);
