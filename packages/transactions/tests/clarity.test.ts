@@ -223,6 +223,8 @@ describe('Clarity Types', () => {
         [new BN(-10), '-10', '0xfffffffffffffffffffffffffffffff6'],
         [Buffer.from([0xff, 0xf6]), '-10', '0xfffffffffffffffffffffffffffffff6'],
         [Buffer.from([0xf6]), '-10', '0xfffffffffffffffffffffffffffffff6'],
+        [Buffer.from([0xff, 0xfe]), '-2', '0xfffffffffffffffffffffffffffffffe'],
+        [Buffer.from([0xfe]), '-2', '0xfffffffffffffffffffffffffffffffe'],
         [-200, '-200', '0xffffffffffffffffffffffffffffff38'],
         [Buffer.from([0xff, 0x38]), '-200', '0xffffffffffffffffffffffffffffff38'],
         [200, '200', '0x000000000000000000000000000000c8'],
