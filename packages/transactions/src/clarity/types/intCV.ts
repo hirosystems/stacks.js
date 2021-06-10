@@ -3,8 +3,8 @@ import BigNum from 'bn.js';
 import { CLARITY_INT_SIZE } from '../../constants';
 import { ClarityType } from '../clarityValue';
 
-const MAX_U128 = new BigNum(2).pow(new BigNum(128)).sub(new BigNum(1));
-const MAX_I128 = new BigNum(2).pow(new BigNum(127)).sub(new BigNum(1));
+const MAX_U128 = new BigNum(2).pow(new BigNum(128)).subn(1);
+const MAX_I128 = new BigNum(2).pow(new BigNum(127)).subn(1);
 const MIN_I128 = new BigNum(-2).pow(new BigNum(127));
 
 interface IntCV {
