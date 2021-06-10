@@ -32,7 +32,8 @@ import {
   StandardPrincipalCV,
 } from '../src/clarity';
 import { BufferReader } from '../src/bufferReader';
-import { cvToString, cvToJSON, getCVTypeString } from '../src/clarity/clarityValue';
+import { cvToString, cvToJSON, cvToValue } from '../src/clarity/clarityValue';
+import BN from 'bn.js';
 
 const ADDRESS = 'SP2JXKMSH007NPYAQHKJPQMAQYAD90NQGTVJVQ02B';
 
@@ -193,16 +194,169 @@ describe('Clarity Types', () => {
       expect(serializedDeserialized).toEqual(buf);
     });
 
-    test('IntCV', () => {
-      const int = intCV(10);
-      const serializedDeserialized = serializeDeserialize(int) as IntCV;
-      expect(cvToString(serializedDeserialized)).toEqual(cvToString(int));
+    test('IntCV - simple value serialization', () => {
+      const intPositiveTen = intCV(10);
+      expect(intPositiveTen.value.toString()).toEqual('10');
+      expect(cvToString(intPositiveTen)).toEqual('10');
+      const serializedDeserializedPositive = serializeDeserialize(intPositiveTen) as IntCV;
+      expect(cvToString(serializedDeserializedPositive)).toEqual(cvToString(intPositiveTen));
+
+      const intNegativeTen = intCV(-10);
+      expect(intNegativeTen.value.toString()).toEqual('-10');
+      const serializedDeserializedNegative = serializeDeserialize(intNegativeTen) as IntCV;
+      expect(cvToString(serializedDeserializedNegative)).toEqual(cvToString(intNegativeTen));
+
+      expect(() => {
+        // @ts-expect-error ts(2322) Type 'string' is not assignable to type 'number'
+        intCV(['example string array']);
+      }).toThrowError(TypeError);
     });
 
-    test('UIntCV', () => {
+    test.each(
+      [
+        [1, '1', '0x00000000000000000000000000000001'],
+        [-1, '-1', '0xffffffffffffffffffffffffffffffff'],
+        [-10, '-10', '0xfffffffffffffffffffffffffffffff6'],
+        [-10n, '-10', '0xfffffffffffffffffffffffffffffff6'],
+        ['-10', '-10', '0xfffffffffffffffffffffffffffffff6'],
+        ['0xfff6', '-10', '0xfffffffffffffffffffffffffffffff6'],
+        [new BN(-10), '-10', '0xfffffffffffffffffffffffffffffff6'],
+        [Buffer.from([0xff, 0xf6]), '-10', '0xfffffffffffffffffffffffffffffff6'],
+        [Buffer.from([0xf6]), '-10', '0xfffffffffffffffffffffffffffffff6'],
+        [-200, '-200', '0xffffffffffffffffffffffffffffff38'],
+        [Buffer.from([0xff, 0x38]), '-200', '0xffffffffffffffffffffffffffffff38'],
+        [200, '200', '0x000000000000000000000000000000c8'],
+        [10, '10', '0x0000000000000000000000000000000a'],
+        [10n, '10', '0x0000000000000000000000000000000a'],
+        ['10', '10', '0x0000000000000000000000000000000a'],
+        ['0x0a', '10', '0x0000000000000000000000000000000a'],
+        [new BN(10), '10', '0x0000000000000000000000000000000a'],
+        [Buffer.from([0x0a]), '10', '0x0000000000000000000000000000000a'],
+        [Buffer.from([0x00, 0x0a]), '10', '0x0000000000000000000000000000000a']
+      ]
+    )('IntCV - value %o is serialized to %o', (num, expectedInt, expectedHex) => {
+      const numCV = intCV(num);
+      expect(numCV.value.toString()).toBe(expectedInt);
+      const serialized = serializeCV(numCV);
+      expect('0x' + serialized.slice(1).toString('hex')).toBe(expectedHex);
+      expect(cvToString(deserializeCV(serialized))).toBe(expectedInt);
+    });
+    
+    test('IntCV - bounds', () => {
+      // Max 128-bit signed integer
+      const maxSigned128 = intCV((2n ** 127n) - 1n);
+      expect(maxSigned128.value.toString()).toBe('170141183460469231731687303715884105727');
+      const serializedMax = serializeCV(maxSigned128);
+      expect('0x' + serializedMax.slice(1).toString('hex')).toBe('0x7fffffffffffffffffffffffffffffff');
+      const serializedDeserializedMax = serializeDeserialize(maxSigned128) as IntCV;
+      expect(cvToString(serializedDeserializedMax)).toBe(cvToString(maxSigned128));
+
+      // Min 128-bit signed integer
+      const minSigned128 = intCV((-2n) ** 127n);
+      expect(minSigned128.value.toString()).toBe('-170141183460469231731687303715884105728');
+      const serializedMin = serializeCV(minSigned128);
+      expect('0x' + serializedMin.slice(1).toString('hex')).toBe('0x80000000000000000000000000000000');
+      const serializedDeserializedMin = serializeDeserialize(minSigned128) as IntCV;
+      expect(cvToString(serializedDeserializedMin)).toBe(cvToString(minSigned128));
+
+      // Out of bounds, too large
+      expect(() => intCV(2n ** 127n)).toThrow(RangeError);
+
+      // Out of bounds, too small
+      expect(() => intCV(((-2n) ** 127n) - 1n)).toThrow(RangeError);
+    });
+
+    test('UIntCV - simple value serialization', () => {
       const uint = uintCV(10);
+      expect(uint.value.toString()).toBe('10');
+      const serialized1 = serializeCV(uint);
+      expect('0x' + serialized1.slice(1).toString('hex')).toBe('0x0000000000000000000000000000000a');
       const serializedDeserialized = serializeDeserialize(uint) as UIntCV;
-      expect(cvToString(serializedDeserialized)).toEqual(cvToString(uint));
+      expect(cvToString(serializedDeserialized)).toBe(cvToString(uint));
+
+      const uint2 = uintCV('0x0a');
+      const serialized2 = serializeCV(uint2);
+      expect('0x' + serialized2.slice(1).toString('hex')).toBe('0x0000000000000000000000000000000a');
+      expect(cvToString(serializeDeserialize(uint2))).toBe(cvToString(uint));
+    });
+
+    test('UIntCV - bounds', () => {
+      // Max 128-bit integer
+      const max128 = uintCV((2n ** 128n) - 1n);
+      expect(max128.value.toString()).toBe('340282366920938463463374607431768211455');
+      const serializedMax = serializeCV(max128);
+      expect('0x' + serializedMax.slice(1).toString('hex')).toBe('0xffffffffffffffffffffffffffffffff');
+      const serializedDeserializedMax = serializeDeserialize(max128) as IntCV;
+      expect(cvToString(serializedDeserializedMax)).toBe(cvToString(max128));
+
+      // Min 128-bit integer
+      const min128 = uintCV(0);
+      expect(min128.value.toString()).toBe('0');
+      const serializedMin = serializeCV(min128);
+      expect('0x' + serializedMin.slice(1).toString('hex')).toBe('0x00000000000000000000000000000000');
+      const serializedDeserializedMin = serializeDeserialize(min128) as IntCV;
+      expect(cvToString(serializedDeserializedMin)).toBe(cvToString(min128));
+
+      // Out of bounds, too large
+      expect(() => uintCV(2n ** 128n)).toThrow(RangeError);
+
+      // Out of bounds, too small
+      expect(() => uintCV(-1)).toThrow(RangeError);
+    });
+
+    test.each(
+      [
+        [200, '200', '0x000000000000000000000000000000c8'],
+        [10, '10', '0x0000000000000000000000000000000a'],
+        [10n, '10', '0x0000000000000000000000000000000a'],
+        ['10', '10', '0x0000000000000000000000000000000a'],
+        ['0x0a', '10', '0x0000000000000000000000000000000a'],
+        [new BN(10), '10', '0x0000000000000000000000000000000a'],
+        [Buffer.from([0x0a]), '10', '0x0000000000000000000000000000000a'],
+        [Buffer.from([0x00, 0x0a]), '10', '0x0000000000000000000000000000000a']
+      ]
+    )('UIntCV - value %o is serialized to %o', (num, expectedInt, expectedHex) => {
+      const numCV = uintCV(num);
+      expect(numCV.value.toString()).toBe(expectedInt);
+      const serialized = serializeCV(numCV);
+      expect('0x' + serialized.slice(1).toString('hex')).toBe(expectedHex);
+      expect(cvToString(deserializeCV(serialized))).toBe('u' + expectedInt);
+    });
+
+    test('Clarity integer to js value', () => {
+      // 53 bits is max safe integer and max supported by bn.js `toNumber()`
+
+      const maxSafeInt = (2n ** 53n) - 1n;
+      const unsafeLargeIntSize = maxSafeInt + 1n;
+      expect(maxSafeInt.toString()).toBe(Number.MAX_SAFE_INTEGER.toString());
+
+      const minSafeInt = -((2n ** 53n) - 1n);
+      const unsafeMinIntSize = minSafeInt - 1n;
+      expect(minSafeInt.toString()).toBe(Number.MIN_SAFE_INTEGER.toString());
+
+      const smallBitsUInt1 = cvToValue(uintCV(maxSafeInt));
+      expect(smallBitsUInt1.toString()).toBe(maxSafeInt.toString());
+      expect(typeof smallBitsUInt1).toBe('number');
+
+      const smallBitsInt1 = cvToValue(intCV(maxSafeInt));
+      expect(smallBitsInt1.toString()).toBe(maxSafeInt.toString());
+      expect(typeof smallBitsInt1).toBe('number');
+
+      const smallBitsInt2 = cvToValue(intCV(minSafeInt));
+      expect(smallBitsInt2.toString()).toBe(minSafeInt.toString());
+      expect(typeof smallBitsInt2).toBe('number');
+
+      const largeBitsUInt1 = cvToValue(uintCV(unsafeLargeIntSize));
+      expect(largeBitsUInt1.toString()).toBe(unsafeLargeIntSize.toString());
+      expect(typeof largeBitsUInt1).toBe('string');
+
+      const largeBitsInt1 = cvToValue(intCV(unsafeLargeIntSize));
+      expect(largeBitsInt1.toString()).toBe(unsafeLargeIntSize.toString());
+      expect(typeof largeBitsInt1).toBe('string');
+
+      const largeBitsInt2 = cvToValue(intCV(unsafeMinIntSize));
+      expect(largeBitsInt2.toString()).toBe(unsafeMinIntSize.toString());
+      expect(typeof largeBitsInt2).toBe('string');
     });
 
     test('Standard Principal', () => {

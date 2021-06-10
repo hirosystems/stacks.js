@@ -17,7 +17,6 @@ import {
 } from '.';
 
 import { principalToString } from './types/principalCV';
-import { CLARITY_INT_SIZE } from '../constants';
 
 /**
  * Type IDs corresponding to each of the Clarity value types as described here:
@@ -64,7 +63,7 @@ export function cvToString(val: ClarityValue, encoding: 'tryAscii' | 'hex' = 'he
     case ClarityType.BoolFalse:
       return 'false';
     case ClarityType.Int:
-      return val.value.fromTwos(CLARITY_INT_SIZE).toString();
+      return val.value.toString();
     case ClarityType.UInt:
       return `u${val.value.toString()}`;
     case ClarityType.Buffer:
@@ -106,9 +105,17 @@ export function cvToValue(val: ClarityValue): any {
     case ClarityType.BoolFalse:
       return false;
     case ClarityType.Int:
-      return val.value.fromTwos(CLARITY_INT_SIZE).toNumber();
     case ClarityType.UInt:
-      return val.value.toNumber();
+      // If the integer can be represented in 53 bits or less, return a js native `number`,
+      // otherwise return a string quoted integer.
+      // TODO: This is odd and surprising behavior. It was initially implemented for backward compatibility
+      //       but eventually should be replaced by always returning the same type, probably either a native
+      //       js `bigint` or a string quoted integer.
+      if (val.value.bitLength() <= 53) {
+        return val.value.toNumber();
+      } else {
+        return val.value.toString();
+      }
     case ClarityType.Buffer:
       return `0x${val.buffer.toString('hex')}`;
     case ClarityType.OptionalNone:
