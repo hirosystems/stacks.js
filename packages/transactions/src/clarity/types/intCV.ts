@@ -20,9 +20,13 @@ function valueToBN(value: unknown, signed: boolean): BigNum {
     return new BigNum(value);
   }
   if (typeof value === 'string') {
+    // If hex string then convert to buffer then fall through to the buffer condition
     if (value.toLowerCase().startsWith('0x')) {
-      // Convert to buffer then fall through to the buffer condition
-      value = Buffer.from(value.slice(2), 'hex');
+      // Trim '0x' hex-prefix
+      let hex = value.slice(2);
+      // Allow odd-length strings like `0xf` -- some libs output these, or even just `0x${num.toString(16)}`
+      hex = hex.padStart(hex.length + (hex.length % 2), '0');
+      value = Buffer.from(hex, 'hex');
     } else {
       return new BigNum(value);
     }
