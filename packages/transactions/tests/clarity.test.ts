@@ -210,6 +210,11 @@ describe('Clarity Types', () => {
         // @ts-expect-error ts(2322) Type 'string' is not assignable to type 'number'
         intCV(['example string array']);
       }).toThrowError(TypeError);
+
+      expect(() => intCV(NaN)).toThrowError(RangeError);
+      expect(() => intCV(Infinity)).toThrowError(RangeError);
+      expect(() => intCV(3.1415)).toThrowError(RangeError);
+      expect(() => intCV('3.1415')).toThrowError(RangeError);
     });
 
     test.each(
@@ -231,8 +236,10 @@ describe('Clarity Types', () => {
         [-200, '-200', '0xffffffffffffffffffffffffffffff38'],
         [Buffer.from([0xff, 0x38]), '-200', '0xffffffffffffffffffffffffffffff38'],
         [200, '200', '0x000000000000000000000000000000c8'],
+        [2e2, '200', '0x000000000000000000000000000000c8'],
         [10, '10', '0x0000000000000000000000000000000a'],
         [10n, '10', '0x0000000000000000000000000000000a'],
+        [1e1, '10', '0x0000000000000000000000000000000a'],
         ['10', '10', '0x0000000000000000000000000000000a'],
         ['0x0a', '10', '0x0000000000000000000000000000000a'],
         ['0x000a', '10', '0x0000000000000000000000000000000a'],

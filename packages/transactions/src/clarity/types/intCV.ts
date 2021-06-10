@@ -15,7 +15,7 @@ interface IntCV {
 function valueToBN(value: unknown, signed: boolean): BigNum {
   if (typeof value === 'number') {
     if (!Number.isInteger(value)) {
-      throw new TypeError(`Invalid value. Values of type 'number' must be an integer.`);
+      throw new RangeError(`Invalid value. Values of type 'number' must be an integer.`);
     }
     return new BigNum(value);
   }
@@ -28,7 +28,15 @@ function valueToBN(value: unknown, signed: boolean): BigNum {
       hex = hex.padStart(hex.length + (hex.length % 2), '0');
       value = Buffer.from(hex, 'hex');
     } else {
-      return new BigNum(value);
+      const bn = new BigNum(value);
+      // Prevent bn.js from accepting non-integer input and doing strange things. For example:
+      // `new BigNum('3.1415').toString() === '281415'`
+      if (bn.toString() !== value) {
+        throw new RangeError(
+          `Invalid value. String integer '${value}' is parsed as '${bn.toString()}'.`
+        );
+      }
+      return bn;
     }
   }
   if (typeof value === 'bigint') {
