@@ -331,7 +331,7 @@ export function getGlobalObjects<K extends Extract<keyof Window, string>>(
   return result;
 }
 
-export type IntegerType = number | string | bigint | Uint8Array | BufferPolyfill | BN;
+export type IntegerType = number | string | bigint | Uint8Array | BN;
 
 // eslint-disable-next-line node/prefer-global/buffer
 export function intToBytes(value: IntegerType, signed: boolean, byteLength: number): Buffer {
