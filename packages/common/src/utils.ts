@@ -371,7 +371,7 @@ export function intToBigInt(value: IntegerType, signed: boolean): bigint {
         return BigInt(value);
       } catch (error) {
         if (error instanceof SyntaxError) {
-          throw new RangeError(`Invalid value. String integer '${value}' is not finite.`)
+          throw new RangeError(`Invalid value. String integer '${value}' is not finite.`);
         }
       }
     }
