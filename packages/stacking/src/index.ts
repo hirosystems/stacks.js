@@ -1,4 +1,4 @@
-import { Buffer } from '@stacks/common';
+import { Buffer, IntegerType, intToBigInt } from '@stacks/common';
 import {
   makeContractCall,
   bufferCV,
@@ -99,68 +99,64 @@ export interface StackingEligibility {
 
 /**
  * Lock stx check options
- *
- * @param  {string} poxAddress - the reward Bitcoin address
- * @param  {number} cycles - number of cycles to lock
  */
 export interface CanLockStxOptions {
+  /** the reward Bitcoin address */
   poxAddress: string;
+  /** number of cycles to lock */
   cycles: number;
 }
 
 /**
  * Lock stx options
- *
- * @param  {string} key - private key to sign transaction
- * @param  {string} poxAddress - the reward Bitcoin address
- * @param  {number} cycles - number of cycles to lock
- * @param  {BN} amountMicroStx - number of microstacks to lock
- * @param  {number} burnBlockHeight - the burnchain block height to begin lock
  */
 export interface LockStxOptions {
+  /** private key to sign transaction */
   privateKey: string;
+  /** number of cycles to lock */
   cycles: number;
+  /** the reward Bitcoin address */
   poxAddress: string;
-  amountMicroStx: BN;
+  /** number of microstacks to lock */
+  amountMicroStx: IntegerType;
+  /** the burnchain block height to begin lock */
   burnBlockHeight: number;
 }
 
 /**
  * Delegate stx options
- *
- * @param  {BN} amountMicroStx - number of microstacks to delegate
- * @param  {string} delegateTo - the STX address of the delegatee
- * @param  {number | optional} untilBurnBlockHeight - the burnchain block height after which delegation is revoked
- * @param  {string | optional} poxAddress - the reward Bitcoin address of the delegator
- * @param  {string} privateKey - private key to sign transaction
  */
 export interface DelegateStxOptions {
-  amountMicroStx: BN;
+  /** number of microstacks to delegate */
+  amountMicroStx: IntegerType;
+  /** the STX address of the delegatee */
   delegateTo: string;
+  /** the burnchain block height after which delegation is revoked */
   untilBurnBlockHeight?: number;
+  /** the reward Bitcoin address of the delegator */
   poxAddress?: string;
+  /** private key to sign transaction */
   privateKey: string;
 }
 
 /**
  * Delegate stack stx options
- *
- * @param  {string} stacker - the STX address of the delegator
- * @param  {BN} amountMicroStx - number of microstacks to lock
- * @param  {string} poxAddress - the reward Bitcoin address of the delegator
- * @param  {number} burnBlockHeight - the burnchain block height to begin lock
- * @param  {number} cycles - number of cycles to lock
- * @param  {string} privateKey - private key to sign transaction
- * @param  {BN | optional} nonce - nonce for the transaction
  */
 export interface DelegateStackStxOptions {
+  /** the STX address of the delegator */
   stacker: string;
-  amountMicroStx: BN;
+  /** number of microstacks to lock */
+  amountMicroStx: IntegerType;
+  /** the reward Bitcoin address of the delegator */
   poxAddress: string;
+  /** the burnchain block height to begin lock */
   burnBlockHeight: number;
+  /** number of cycles to lock */
   cycles: number;
+  /** private key to sign transaction */
   privateKey: string;
-  nonce?: BN;
+  /** nonce for the transaction */
+  nonce?: IntegerType;
 }
 
 export interface StackAggregationCommitOptions {
@@ -526,7 +522,7 @@ export class StackingClient {
   }: {
     cycles: number;
     poxAddress: string;
-    amountMicroStx: BN;
+    amountMicroStx: IntegerType;
     contract: string;
     burnBlockHeight: number;
   }) {
@@ -544,12 +540,7 @@ export class StackingClient {
       contractName,
       functionName: 'stack-stx',
       // sum of uStx, address, burn_block_height, num_cycles
-      functionArgs: [
-        uintCV(amountMicroStx.toString(10)),
-        address,
-        uintCV(burnBlockHeight),
-        uintCV(cycles),
-      ],
+      functionArgs: [uintCV(amountMicroStx), address, uintCV(burnBlockHeight), uintCV(cycles)],
       validateWithAbi: true,
       network,
       anchorMode: AnchorMode.Any,
@@ -565,7 +556,7 @@ export class StackingClient {
     poxAddress,
   }: {
     contract: string;
-    amountMicroStx: BN;
+    amountMicroStx: IntegerType;
     delegateTo: string;
     untilBurnBlockHeight?: number;
     poxAddress?: string;
@@ -591,7 +582,7 @@ export class StackingClient {
       contractName,
       functionName: 'delegate-stx',
       functionArgs: [
-        uintCV(amountMicroStx.toString(10)),
+        uintCV(amountMicroStx),
         standardPrincipalCV(delegateTo),
         untilBurnBlockHeight ? someCV(uintCV(untilBurnBlockHeight)) : noneCV(),
         address ? address : noneCV(),
@@ -614,11 +605,11 @@ export class StackingClient {
   }: {
     contract: string;
     stacker: string;
-    amountMicroStx: BN;
+    amountMicroStx: IntegerType;
     poxAddress: string;
     burnBlockHeight: number;
     cycles: number;
-    nonce?: BN;
+    nonce?: IntegerType;
   }) {
     const { hashMode, data } = decodeBtcAddress(poxAddress);
     const hashModeBuffer = bufferCV(new BN(hashMode, 10).toArrayLike(Buffer));
@@ -636,7 +627,7 @@ export class StackingClient {
       functionName: 'delegate-stack-stx',
       functionArgs: [
         standardPrincipalCV(stacker),
-        uintCV(amountMicroStx.toString(10)),
+        uintCV(amountMicroStx),
         address,
         uintCV(burnBlockHeight),
         uintCV(cycles),
@@ -756,10 +747,10 @@ export class StackingClient {
    *
    * @returns {StacksTransaction} that resolves to a transaction object if the operation succeeds
    */
-  modifyLockTxFee({ tx, amountMicroStx }: { tx: StacksTransaction; amountMicroStx: BN }) {
+  modifyLockTxFee({ tx, amountMicroStx }: { tx: StacksTransaction; amountMicroStx: IntegerType }) {
     const fee = tx.auth.getFee();
     (tx.payload as ContractCallPayload).functionArgs[0] = uintCV(
-      amountMicroStx.sub(new BN(fee.toString()))
+      intToBigInt(amountMicroStx, false) - fee
     );
     return tx;
   }

@@ -1,4 +1,4 @@
-import { Buffer } from '@stacks/common';
+import { Buffer, IntegerType } from '@stacks/common';
 import {
   AnchorMode,
   bufferCV,
@@ -15,6 +15,7 @@ import {
   ResponseErrorCV,
   StacksTransaction,
   standardPrincipalCV,
+  uintCV,
   someCV,
   noneCV,
   UnsignedContractCallOptions,
@@ -32,9 +33,7 @@ import {
 
 import { StacksNetwork } from '@stacks/network';
 
-import { bufferCVFromString, decodeFQN, getZonefileHash, uintCVFromBN } from './utils';
-
-import BN from 'bn.js';
+import { bufferCVFromString, decodeFQN, getZonefileHash } from './utils';
 
 import { ChainID } from '@stacks/common';
 
@@ -58,26 +57,26 @@ function getAddressVersion(network: StacksNetwork) {
 }
 
 export interface PriceFunction {
-  base: BN;
-  coefficient: BN;
-  b1: BN;
-  b2: BN;
-  b3: BN;
-  b4: BN;
-  b5: BN;
-  b6: BN;
-  b7: BN;
-  b8: BN;
-  b9: BN;
-  b10: BN;
-  b11: BN;
-  b12: BN;
-  b13: BN;
-  b14: BN;
-  b15: BN;
-  b16: BN;
-  nonAlphaDiscount: BN;
-  noVowelDiscount: BN;
+  base: IntegerType;
+  coefficient: IntegerType;
+  b1: IntegerType;
+  b2: IntegerType;
+  b3: IntegerType;
+  b4: IntegerType;
+  b5: IntegerType;
+  b6: IntegerType;
+  b7: IntegerType;
+  b8: IntegerType;
+  b9: IntegerType;
+  b10: IntegerType;
+  b11: IntegerType;
+  b12: IntegerType;
+  b13: IntegerType;
+  b14: IntegerType;
+  b15: IntegerType;
+  b16: IntegerType;
+  nonAlphaDiscount: IntegerType;
+  noVowelDiscount: IntegerType;
 }
 
 export interface BnsContractCallOptions {
@@ -279,18 +278,17 @@ export async function getNamePrice({
 
 /**
  * Preorder namespace options
- *
- * @param  {String} namespace - the namespace to preorder
- * @param  {String} salt - salt used to generate the preorder namespace hash
- * @param  {BN} stxToBurn - amount of STX to burn for the registration
- * @param  {String} publicKey - the private key to sign the transaction
- * @param  {StacksNetwork} network - the Stacks blockchain network to use
  */
 export interface PreorderNamespaceOptions {
+  /** the namespace to preorder */
   namespace: string;
+  /** salt used to generate the preorder namespace hash */
   salt: string;
-  stxToBurn: BN;
+  /** amount of STX to burn for the registration */
+  stxToBurn: IntegerType;
+  /** the private key to sign the transaction */
   publicKey: string;
+  /** the Stacks blockchain network to use */
   network: StacksNetwork;
 }
 
@@ -324,7 +322,7 @@ export async function buildPreorderNamespaceTx({
 
   return makeBnsContractCall({
     functionName: bnsFunctionName,
-    functionArgs: [bufferCV(hashedSaltedNamespace), uintCVFromBN(stxToBurn)],
+    functionArgs: [bufferCV(hashedSaltedNamespace), uintCV(stxToBurn)],
     publicKey,
     network,
     postConditions: [burnSTXPostCondition],
@@ -333,22 +331,21 @@ export async function buildPreorderNamespaceTx({
 
 /**
  * Reveal namespace options
- *
- * @param  {String} namespace - the namespace to reveal
- * @param  {String} salt - salt used to generate the preorder namespace hash
- * @param  {PriceFunction} priceFunction - an object containing the price function for the namespace
- * @param  {BN} lifeTime - the number of blocks name registrations are valid for in the namespace
- * @param  {String} namespaceImportAddress - the STX address used for name imports
- * @param  {String} publicKey - the private key to sign the transaction
- * @param  {StacksNetwork} network - the Stacks blockchain network to use
  */
 export interface RevealNamespaceOptions {
+  /** the namespace to reveal */
   namespace: string;
+  /** salt used to generate the preorder namespace hash */
   salt: string;
+  /** an object containing the price function for the namespace */
   priceFunction: PriceFunction;
-  lifetime: BN;
+  /** the number of blocks name registrations are valid for in the namespace */
+  lifetime: IntegerType;
+  /** the STX address used for name imports */
   namespaceImportAddress: string;
+  /** the key to sign the transaction */
   publicKey: string;
+  /** the Stacks blockchain network to use */
   network: StacksNetwork;
 }
 
@@ -378,27 +375,27 @@ export async function buildRevealNamespaceTx({
     functionArgs: [
       bufferCVFromString(namespace),
       bufferCVFromString(salt),
-      uintCVFromBN(priceFunction.base),
-      uintCVFromBN(priceFunction.coefficient),
-      uintCVFromBN(priceFunction.b1),
-      uintCVFromBN(priceFunction.b2),
-      uintCVFromBN(priceFunction.b3),
-      uintCVFromBN(priceFunction.b4),
-      uintCVFromBN(priceFunction.b5),
-      uintCVFromBN(priceFunction.b6),
-      uintCVFromBN(priceFunction.b7),
-      uintCVFromBN(priceFunction.b8),
-      uintCVFromBN(priceFunction.b9),
-      uintCVFromBN(priceFunction.b10),
-      uintCVFromBN(priceFunction.b11),
-      uintCVFromBN(priceFunction.b12),
-      uintCVFromBN(priceFunction.b13),
-      uintCVFromBN(priceFunction.b14),
-      uintCVFromBN(priceFunction.b15),
-      uintCVFromBN(priceFunction.b16),
-      uintCVFromBN(priceFunction.nonAlphaDiscount),
-      uintCVFromBN(priceFunction.noVowelDiscount),
-      uintCVFromBN(lifetime),
+      uintCV(priceFunction.base),
+      uintCV(priceFunction.coefficient),
+      uintCV(priceFunction.b1),
+      uintCV(priceFunction.b2),
+      uintCV(priceFunction.b3),
+      uintCV(priceFunction.b4),
+      uintCV(priceFunction.b5),
+      uintCV(priceFunction.b6),
+      uintCV(priceFunction.b7),
+      uintCV(priceFunction.b8),
+      uintCV(priceFunction.b9),
+      uintCV(priceFunction.b10),
+      uintCV(priceFunction.b11),
+      uintCV(priceFunction.b12),
+      uintCV(priceFunction.b13),
+      uintCV(priceFunction.b14),
+      uintCV(priceFunction.b15),
+      uintCV(priceFunction.b16),
+      uintCV(priceFunction.nonAlphaDiscount),
+      uintCV(priceFunction.noVowelDiscount),
+      uintCV(lifetime),
       standardPrincipalCV(namespaceImportAddress),
     ],
     publicKey,
@@ -501,19 +498,17 @@ export async function buildReadyNamespaceTx({
 
 /**
  * Preorder name options
- *
- * @param  {String} fullyQualifiedName - the fully qualified name to preorder including the
- *                                        namespace (myName.id)
- * @param  {String} salt - salt used to generate the preorder name hash
- * @param  {BN} stxToBurn - amount of STX to burn for the registration
- * @param  {String} publicKey - the private key to sign the transaction
- * @param  {StacksNetwork} network - the Stacks blockchain network to use
  */
 export interface PreorderNameOptions {
+  /** the fully qualified name to preorder including the namespace (myName.id) */
   fullyQualifiedName: string;
+  /** salt used to generate the preorder name hash */
   salt: string;
-  stxToBurn: BN;
+  /** amount of STX to burn for the registration */
+  stxToBurn: IntegerType;
+  /** the private key to sign the transaction */
   publicKey: string;
+  /** the Stacks blockchain network to use */
   network: StacksNetwork;
 }
 
@@ -551,7 +546,7 @@ export async function buildPreorderNameTx({
 
   return makeBnsContractCall({
     functionName: bnsFunctionName,
-    functionArgs: [bufferCV(hashedSaltedName), uintCVFromBN(stxToBurn)],
+    functionArgs: [bufferCV(hashedSaltedName), uintCV(stxToBurn)],
     publicKey,
     network,
     postConditions: [burnSTXPostCondition],
@@ -788,21 +783,19 @@ export async function buildRevokeNameTx({
 
 /**
  * Renew name options
- *
- * @param  {String} fullyQualifiedName - the fully qualified name to renew including the
- *                                        namespace (myName.id)
- * @param  {BN} stxToBurn - amount of STX to burn for the registration
- * @param  {String} publicKey - the private key to sign the transaction
- * @param  {String} newOwnerAddress - optionally choose a new owner address
- * @param  {String} zonefileHash - optionally update the zonefile hash
- * @param  {StacksNetwork} network - the Stacks blockchain network to use
  */
 export interface RenewNameOptions {
+  /** the fully qualified name to renew including the namespace (myName.id) */
   fullyQualifiedName: string;
-  stxToBurn: BN;
+  /** amount of STX to burn for the registration */
+  stxToBurn: IntegerType;
+  /** the private key to sign the transaction */
   publicKey: string;
+  /** the Stacks blockchain network to use */
   network: StacksNetwork;
+  /** optionally choose a new owner address */
   newOwnerAddress?: string;
+  /** optionally update the zonefile hash */
   zonefile?: string;
 }
 
@@ -833,7 +826,7 @@ export async function buildRenewNameTx({
   const functionArgs = [
     bufferCVFromString(namespace),
     bufferCVFromString(name),
-    uintCVFromBN(stxToBurn),
+    uintCV(stxToBurn),
     newOwnerAddress ? someCV(standardPrincipalCV(newOwnerAddress)) : noneCV(),
     zonefile ? someCV(bufferCV(getZonefileHash(zonefile))) : noneCV(),
   ];
