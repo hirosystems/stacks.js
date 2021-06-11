@@ -333,14 +333,6 @@ export function getGlobalObjects<K extends Extract<keyof Window, string>>(
 
 export type IntegerType = number | string | bigint | Uint8Array | BufferPolyfill | BN;
 
-/*
-export function BigInt(value: any): bigint {
-  let bigInt = BigInt(value);
-  bigInt = Object.assign(bigInt, { toJSON: () => bigInt.toString() });
-  return bigInt;
-}
-*/
-
 // eslint-disable-next-line node/prefer-global/buffer
 export function intToBytes(value: IntegerType, signed: boolean, byteLength: number): Buffer {
   return intToBN(value, signed).toArrayLike(AvailableBufferModule, 'be', byteLength);
