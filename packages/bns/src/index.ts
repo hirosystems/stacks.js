@@ -15,6 +15,8 @@ import {
   ResponseErrorCV,
   StacksTransaction,
   standardPrincipalCV,
+  someCV,
+  noneCV,
   UnsignedContractCallOptions,
 } from '@stacks/transactions';
 
@@ -677,12 +679,9 @@ export async function buildTransferNameTx({
   const functionArgs = [
     bufferCVFromString(namespace),
     bufferCVFromString(name),
-    bufferCVFromString(newOwnerAddress),
+    standardPrincipalCV(newOwnerAddress),
+    zonefile ? someCV(bufferCV(getZonefileHash(zonefile))): noneCV()
   ];
-
-  if (zonefile) {
-    functionArgs.push(bufferCV(getZonefileHash(zonefile)));
-  }
 
   return makeBnsContractCall({
     functionName: bnsFunctionName,
@@ -784,16 +783,9 @@ export async function buildRenewNameTx({
     bufferCVFromString(namespace),
     bufferCVFromString(name),
     uintCVFromBN(stxToBurn),
+    newOwnerAddress ? someCV(standardPrincipalCV(newOwnerAddress)) : noneCV(),
+    zonefile ? someCV(bufferCV(getZonefileHash(zonefile))): noneCV()
   ];
-
-  if (newOwnerAddress) {
-    functionArgs.push(bufferCVFromString(newOwnerAddress));
-  }
-
-  if (zonefile) {
-    const zonefileHash = getZonefileHash(zonefile);
-    functionArgs.push(bufferCV(zonefileHash));
-  }
 
   return makeBnsContractCall({
     functionName: bnsFunctionName,
