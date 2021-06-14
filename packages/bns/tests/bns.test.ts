@@ -9,7 +9,8 @@ import {
   bufferCV,
   hash160,
   standardPrincipalCV,
-  AnchorMode,
+  noneCV,
+  AnchorMode, someCV,
 } from '@stacks/transactions';
 
 import {
@@ -725,6 +726,8 @@ test('transferName', async () => {
   jest.mock('@stacks/transactions', () => ({
     makeUnsignedContractCall,
     bufferCV: jest.requireActual('@stacks/transactions').bufferCV,
+    someCV: jest.requireActual('@stacks/transactions').someCV,
+    standardPrincipalCV: jest.requireActual('@stacks/transactions').standardPrincipalCV,
     hash160: jest.requireActual('@stacks/transactions').hash160,
     AnchorMode: jest.requireActual('@stacks/transactions').AnchorMode,
   }));
@@ -749,8 +752,60 @@ test('transferName', async () => {
     functionArgs: [
       bufferCVFromString(namespace),
       bufferCVFromString(name),
-      bufferCVFromString(newOwnerAddress),
-      bufferCV(getZonefileHash(zonefile)),
+      standardPrincipalCV(newOwnerAddress),
+      someCV(bufferCV(getZonefileHash(zonefile))),
+    ],
+    publicKey,
+    network,
+    validateWithAbi: false,
+    anchorMode: AnchorMode.Any,
+  };
+
+  expect(makeUnsignedContractCall).toHaveBeenCalledTimes(1);
+  expect(makeUnsignedContractCall).toHaveBeenCalledWith(expectedBNSContractCallOptions);
+});
+
+test('transferName optionalArguments', async () => {
+  const fullyQualifiedName = 'test.id';
+  const newOwnerAddress = 'SPF0324DSC4K505TP6A8C7GAK4R95E38TGNZP7RE';
+  const zonefile = undefined;
+  const publicKey = '03ef788b3830c00abe8f64f62dc32fc863bc0b2cafeb073b6c8e1c7657d9c2c3ab';
+
+  const makeUnsignedContractCall = jest.fn().mockResolvedValue({});
+
+  const network = new StacksTestnet();
+
+  jest.mock('@stacks/transactions', () => ({
+    makeUnsignedContractCall,
+    bufferCV: jest.requireActual('@stacks/transactions').bufferCV,
+    noneCV: jest.requireActual('@stacks/transactions').noneCV,
+    standardPrincipalCV: jest.requireActual('@stacks/transactions').standardPrincipalCV,
+    hash160: jest.requireActual('@stacks/transactions').hash160,
+    AnchorMode: jest.requireActual('@stacks/transactions').AnchorMode,
+  }));
+
+  const { buildTransferNameTx } = require('../src');
+  await buildTransferNameTx({
+    fullyQualifiedName,
+    newOwnerAddress,
+    publicKey,
+    zonefile,
+    network
+  });
+
+  const bnsFunctionName = 'name-transfer';
+
+  const { namespace, name } = decodeFQN(fullyQualifiedName);
+
+  const expectedBNSContractCallOptions = {
+    contractAddress: BnsContractAddress.testnet,
+    contractName: BNS_CONTRACT_NAME,
+    functionName: bnsFunctionName,
+    functionArgs: [
+      bufferCVFromString(namespace),
+      bufferCVFromString(name),
+      standardPrincipalCV(newOwnerAddress),
+      noneCV(),
     ],
     publicKey,
     network,
@@ -820,6 +875,8 @@ test('renewName', async () => {
   jest.mock('@stacks/transactions', () => ({
     makeUnsignedContractCall,
     bufferCV: jest.requireActual('@stacks/transactions').bufferCV,
+    someCV: jest.requireActual('@stacks/transactions').someCV,
+    standardPrincipalCV: jest.requireActual('@stacks/transactions').standardPrincipalCV,
     uintCV: jest.requireActual('@stacks/transactions').uintCV,
     hash160: jest.requireActual('@stacks/transactions').hash160,
     AnchorMode: jest.requireActual('@stacks/transactions').AnchorMode,
@@ -847,8 +904,63 @@ test('renewName', async () => {
       bufferCVFromString(namespace),
       bufferCVFromString(name),
       uintCVFromBN(stxToBurn),
-      bufferCVFromString(newOwnerAddress),
-      bufferCV(getZonefileHash(zonefile))
+      someCV(standardPrincipalCV(newOwnerAddress)),
+      someCV(bufferCV(getZonefileHash(zonefile)))
+    ],
+    publicKey,
+    network,
+    validateWithAbi: false,
+    anchorMode: AnchorMode.Any,
+  };
+
+  expect(makeUnsignedContractCall).toHaveBeenCalledTimes(1);
+  expect(makeUnsignedContractCall).toHaveBeenCalledWith(expectedBNSContractCallOptions);
+});
+
+test('renewName optionalArguments', async () => {
+  const fullyQualifiedName = 'test.id';
+  const stxToBurn = new BN(10);
+  const newOwnerAddress = undefined;
+  const zonefile = undefined;
+  const publicKey = '03ef788b3830c00abe8f64f62dc32fc863bc0b2cafeb073b6c8e1c7657d9c2c3ab';
+
+  const makeUnsignedContractCall = jest.fn().mockResolvedValue({});
+
+  const network = new StacksTestnet();
+
+  jest.mock('@stacks/transactions', () => ({
+    makeUnsignedContractCall,
+    bufferCV: jest.requireActual('@stacks/transactions').bufferCV,
+    noneCV: jest.requireActual('@stacks/transactions').noneCV,
+    uintCV: jest.requireActual('@stacks/transactions').uintCV,
+    hash160: jest.requireActual('@stacks/transactions').hash160,
+    AnchorMode: jest.requireActual('@stacks/transactions').AnchorMode,
+  }));
+
+  const { buildRenewNameTx } = require('../src');
+  await buildRenewNameTx({
+    fullyQualifiedName,
+    stxToBurn,
+    newOwnerAddress,
+    zonefile,
+    publicKey,
+    network
+  });
+
+  const bnsFunctionName = 'name-renewal';
+
+  const { namespace, name } = decodeFQN(fullyQualifiedName);
+
+  const expectedBNSContractCallOptions = {
+    contractAddress: BnsContractAddress.testnet,
+    contractName: BNS_CONTRACT_NAME,
+    functionName: bnsFunctionName,
+    functionArgs: [
+      bufferCVFromString(namespace),
+      bufferCVFromString(name),
+      uintCVFromBN(stxToBurn),
+      noneCV(),
+      noneCV()
     ],
     publicKey,
     network,
