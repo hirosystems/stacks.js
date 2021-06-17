@@ -10,10 +10,17 @@ import {
   hash160,
   standardPrincipalCV,
   noneCV,
-  AnchorMode, someCV,
+  AnchorMode,
+  someCV,
+  createSTXPostCondition,
+  publicKeyToAddress,
+  createStacksPublicKey,
+  FungibleConditionCode,
+  AddressVersion, createNonFungiblePostCondition, NonFungibleConditionCode, parseAssetInfoString, tupleCV,
 } from '@stacks/transactions';
 
 import {
+  StacksNetwork,
   StacksTestnet
 } from '@stacks/network';
 
@@ -24,11 +31,24 @@ import {
 import {bufferCVFromString, decodeFQN, getZonefileHash, uintCVFromBN} from "../src/utils";
 
 import BN from "bn.js";
+import { ChainID } from "@stacks/common";
 
 beforeEach(() => {
   fetchMock.resetMocks();
   jest.resetModules();
 });
+
+function getBnsContractAddress(network: StacksNetwork) {
+  if (network.chainId === ChainID.Mainnet) return BnsContractAddress.mainnet;
+  else if (network.chainId == ChainID.Testnet) return BnsContractAddress.testnet;
+  else throw new Error(`Unexpected ChainID: ${network.chainId}`);
+}
+
+function getAddressVersion(network: StacksNetwork) {
+  return network.chainId === ChainID.Mainnet
+    ? AddressVersion.MainnetSingleSig
+    : AddressVersion.TestnetSingleSig;
+}
 
 test('canRegisterName true', async () => {
   const fullyQualifiedName = 'test.id';
@@ -349,6 +369,11 @@ test('preorderNamespace', async () => {
     uintCV: jest.requireActual('@stacks/transactions').uintCV,
     hash160: jest.requireActual('@stacks/transactions').hash160,
     AnchorMode: jest.requireActual('@stacks/transactions').AnchorMode,
+    AddressVersion: jest.requireActual('@stacks/transactions').AddressVersion,
+    createStacksPublicKey: jest.requireActual('@stacks/transactions').createStacksPublicKey,
+    publicKeyToAddress: jest.requireActual('@stacks/transactions').publicKeyToAddress,
+    FungibleConditionCode: jest.requireActual('@stacks/transactions').FungibleConditionCode,
+    createSTXPostCondition: jest.requireActual('@stacks/transactions').createSTXPostCondition,
   }));
 
   const { buildPreorderNamespaceTx } = require('../src');
@@ -361,7 +386,11 @@ test('preorderNamespace', async () => {
   });
 
   const bnsFunctionName = 'namespace-preorder';
-
+  const burnSTXPostCondition = createSTXPostCondition(
+    publicKeyToAddress(getAddressVersion(network), createStacksPublicKey(publicKey)),
+    FungibleConditionCode.Equal,
+    stxToBurn
+  );
   const expectedBNSContractCallOptions = {
     contractAddress: BnsContractAddress.testnet,
     contractName: BNS_CONTRACT_NAME,
@@ -374,6 +403,7 @@ test('preorderNamespace', async () => {
     publicKey,
     network,
     anchorMode: AnchorMode.Any,
+    postConditions: [burnSTXPostCondition]
   };
 
   expect(makeUnsignedContractCall).toHaveBeenCalledTimes(1);
@@ -585,6 +615,11 @@ test('preorderName', async () => {
     uintCV: jest.requireActual('@stacks/transactions').uintCV,
     hash160: jest.requireActual('@stacks/transactions').hash160,
     AnchorMode: jest.requireActual('@stacks/transactions').AnchorMode,
+    AddressVersion: jest.requireActual('@stacks/transactions').AddressVersion,
+    createStacksPublicKey: jest.requireActual('@stacks/transactions').createStacksPublicKey,
+    publicKeyToAddress: jest.requireActual('@stacks/transactions').publicKeyToAddress,
+    FungibleConditionCode: jest.requireActual('@stacks/transactions').FungibleConditionCode,
+    createSTXPostCondition: jest.requireActual('@stacks/transactions').createSTXPostCondition,
   }));
 
   const { buildPreorderNameTx } = require('../src');
@@ -597,7 +632,11 @@ test('preorderName', async () => {
   });
 
   const bnsFunctionName = 'name-preorder';
-
+  const burnSTXPostCondition = createSTXPostCondition(
+    publicKeyToAddress(getAddressVersion(network), createStacksPublicKey(publicKey)),
+    FungibleConditionCode.Equal,
+    stxToBurn
+  );
   const expectedBNSContractCallOptions = {
     contractAddress: BnsContractAddress.testnet,
     contractName: BNS_CONTRACT_NAME,
@@ -610,6 +649,7 @@ test('preorderName', async () => {
     network,
     validateWithAbi: false,
     anchorMode: AnchorMode.Any,
+    postConditions: [burnSTXPostCondition]
   };
 
   expect(makeUnsignedContractCall).toHaveBeenCalledTimes(1);
@@ -730,6 +770,15 @@ test('transferName', async () => {
     standardPrincipalCV: jest.requireActual('@stacks/transactions').standardPrincipalCV,
     hash160: jest.requireActual('@stacks/transactions').hash160,
     AnchorMode: jest.requireActual('@stacks/transactions').AnchorMode,
+    AddressVersion: jest.requireActual('@stacks/transactions').AddressVersion,
+    createStacksPublicKey: jest.requireActual('@stacks/transactions').createStacksPublicKey,
+    publicKeyToAddress: jest.requireActual('@stacks/transactions').publicKeyToAddress,
+    FungibleConditionCode: jest.requireActual('@stacks/transactions').FungibleConditionCode,
+    createSTXPostCondition: jest.requireActual('@stacks/transactions').createSTXPostCondition,
+    NonFungibleConditionCode: jest.requireActual('@stacks/transactions').NonFungibleConditionCode,
+    parseAssetInfoString: jest.requireActual('@stacks/transactions').parseAssetInfoString,
+    tupleCV: jest.requireActual('@stacks/transactions').tupleCV,
+    createNonFungiblePostCondition: jest.requireActual('@stacks/transactions').createNonFungiblePostCondition,
   }));
 
   const { buildTransferNameTx } = require('../src');
@@ -744,7 +793,24 @@ test('transferName', async () => {
   const bnsFunctionName = 'name-transfer';
 
   const { namespace, name } = decodeFQN(fullyQualifiedName);
-
+  const nameTransferPostConditionOne = createNonFungiblePostCondition(
+    publicKeyToAddress(getAddressVersion(network), createStacksPublicKey(publicKey)),
+    NonFungibleConditionCode.DoesNotOwn,
+    parseAssetInfoString(`${getBnsContractAddress(network)}.bns::names`),
+    tupleCV({
+      name: bufferCVFromString(name),
+      namespace: bufferCVFromString(namespace)
+    })
+  );
+  const nameTransferPostConditionTwo = createNonFungiblePostCondition(
+    newOwnerAddress,
+    NonFungibleConditionCode.Owns,
+    parseAssetInfoString(`${getBnsContractAddress(network)}.bns::names`),
+    tupleCV({
+      name: bufferCVFromString(name),
+      namespace: bufferCVFromString(namespace)
+    })
+  );
   const expectedBNSContractCallOptions = {
     contractAddress: BnsContractAddress.testnet,
     contractName: BNS_CONTRACT_NAME,
@@ -759,6 +825,7 @@ test('transferName', async () => {
     network,
     validateWithAbi: false,
     anchorMode: AnchorMode.Any,
+    postConditions: [nameTransferPostConditionOne, nameTransferPostConditionTwo]
   };
 
   expect(makeUnsignedContractCall).toHaveBeenCalledTimes(1);
@@ -782,6 +849,15 @@ test('transferName optionalArguments', async () => {
     standardPrincipalCV: jest.requireActual('@stacks/transactions').standardPrincipalCV,
     hash160: jest.requireActual('@stacks/transactions').hash160,
     AnchorMode: jest.requireActual('@stacks/transactions').AnchorMode,
+    AddressVersion: jest.requireActual('@stacks/transactions').AddressVersion,
+    createStacksPublicKey: jest.requireActual('@stacks/transactions').createStacksPublicKey,
+    publicKeyToAddress: jest.requireActual('@stacks/transactions').publicKeyToAddress,
+    FungibleConditionCode: jest.requireActual('@stacks/transactions').FungibleConditionCode,
+    createSTXPostCondition: jest.requireActual('@stacks/transactions').createSTXPostCondition,
+    NonFungibleConditionCode: jest.requireActual('@stacks/transactions').NonFungibleConditionCode,
+    parseAssetInfoString: jest.requireActual('@stacks/transactions').parseAssetInfoString,
+    tupleCV: jest.requireActual('@stacks/transactions').tupleCV,
+    createNonFungiblePostCondition: jest.requireActual('@stacks/transactions').createNonFungiblePostCondition,
   }));
 
   const { buildTransferNameTx } = require('../src');
@@ -796,7 +872,24 @@ test('transferName optionalArguments', async () => {
   const bnsFunctionName = 'name-transfer';
 
   const { namespace, name } = decodeFQN(fullyQualifiedName);
-
+  const nameTransferPostConditionOne = createNonFungiblePostCondition(
+    publicKeyToAddress(getAddressVersion(network), createStacksPublicKey(publicKey)),
+    NonFungibleConditionCode.DoesNotOwn,
+    parseAssetInfoString(`${getBnsContractAddress(network)}.bns::names`),
+    tupleCV({
+      name: bufferCVFromString(name),
+      namespace: bufferCVFromString(namespace)
+    })
+  );
+  const nameTransferPostConditionTwo = createNonFungiblePostCondition(
+    newOwnerAddress,
+    NonFungibleConditionCode.Owns,
+    parseAssetInfoString(`${getBnsContractAddress(network)}.bns::names`),
+    tupleCV({
+      name: bufferCVFromString(name),
+      namespace: bufferCVFromString(namespace)
+    })
+  );
   const expectedBNSContractCallOptions = {
     contractAddress: BnsContractAddress.testnet,
     contractName: BNS_CONTRACT_NAME,
@@ -811,6 +904,7 @@ test('transferName optionalArguments', async () => {
     network,
     validateWithAbi: false,
     anchorMode: AnchorMode.Any,
+    postConditions: [nameTransferPostConditionOne, nameTransferPostConditionTwo]
   };
 
   expect(makeUnsignedContractCall).toHaveBeenCalledTimes(1);
@@ -880,6 +974,11 @@ test('renewName', async () => {
     uintCV: jest.requireActual('@stacks/transactions').uintCV,
     hash160: jest.requireActual('@stacks/transactions').hash160,
     AnchorMode: jest.requireActual('@stacks/transactions').AnchorMode,
+    AddressVersion: jest.requireActual('@stacks/transactions').AddressVersion,
+    createStacksPublicKey: jest.requireActual('@stacks/transactions').createStacksPublicKey,
+    publicKeyToAddress: jest.requireActual('@stacks/transactions').publicKeyToAddress,
+    FungibleConditionCode: jest.requireActual('@stacks/transactions').FungibleConditionCode,
+    createSTXPostCondition: jest.requireActual('@stacks/transactions').createSTXPostCondition,
   }));
 
   const { buildRenewNameTx } = require('../src');
@@ -895,7 +994,11 @@ test('renewName', async () => {
   const bnsFunctionName = 'name-renewal';
 
   const { namespace, name } = decodeFQN(fullyQualifiedName);
-
+  const burnSTXPostCondition = createSTXPostCondition(
+    publicKeyToAddress(getAddressVersion(network), createStacksPublicKey(publicKey)),
+    FungibleConditionCode.Equal,
+    stxToBurn
+  );
   const expectedBNSContractCallOptions = {
     contractAddress: BnsContractAddress.testnet,
     contractName: BNS_CONTRACT_NAME,
@@ -911,6 +1014,7 @@ test('renewName', async () => {
     network,
     validateWithAbi: false,
     anchorMode: AnchorMode.Any,
+    postConditions: [burnSTXPostCondition]
   };
 
   expect(makeUnsignedContractCall).toHaveBeenCalledTimes(1);
@@ -935,6 +1039,11 @@ test('renewName optionalArguments', async () => {
     uintCV: jest.requireActual('@stacks/transactions').uintCV,
     hash160: jest.requireActual('@stacks/transactions').hash160,
     AnchorMode: jest.requireActual('@stacks/transactions').AnchorMode,
+    AddressVersion: jest.requireActual('@stacks/transactions').AddressVersion,
+    createStacksPublicKey: jest.requireActual('@stacks/transactions').createStacksPublicKey,
+    publicKeyToAddress: jest.requireActual('@stacks/transactions').publicKeyToAddress,
+    FungibleConditionCode: jest.requireActual('@stacks/transactions').FungibleConditionCode,
+    createSTXPostCondition: jest.requireActual('@stacks/transactions').createSTXPostCondition,
   }));
 
   const { buildRenewNameTx } = require('../src');
@@ -950,7 +1059,11 @@ test('renewName optionalArguments', async () => {
   const bnsFunctionName = 'name-renewal';
 
   const { namespace, name } = decodeFQN(fullyQualifiedName);
-
+  const burnSTXPostCondition = createSTXPostCondition(
+    publicKeyToAddress(getAddressVersion(network), createStacksPublicKey(publicKey)),
+    FungibleConditionCode.Equal,
+    stxToBurn
+  );
   const expectedBNSContractCallOptions = {
     contractAddress: BnsContractAddress.testnet,
     contractName: BNS_CONTRACT_NAME,
@@ -966,6 +1079,7 @@ test('renewName optionalArguments', async () => {
     network,
     validateWithAbi: false,
     anchorMode: AnchorMode.Any,
+    postConditions: [burnSTXPostCondition]
   };
 
   expect(makeUnsignedContractCall).toHaveBeenCalledTimes(1);
