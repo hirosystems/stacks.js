@@ -57,8 +57,8 @@ export class BlockstackError extends Error {
     } else {
       bugDetails += `Stack Trace:\n${stack}`;
     }
-    message += `\nIf you believe this exception is caused by a bug in blockstack.js,
-      please file a bug report: https://github.com/blockstack/blockstack.js/issues\n\n${bugDetails}`;
+    message += `\nIf you believe this exception is caused by a bug in stacks.js,
+      please file a bug report: https://github.com/blockstack/stacks.js/issues\n\n${bugDetails}`;
     this.message = message;
     this.code = error.code;
     this.parameter = error.parameter ? error.parameter : undefined;
