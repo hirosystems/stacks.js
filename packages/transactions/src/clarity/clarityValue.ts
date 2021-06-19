@@ -171,7 +171,7 @@ export function getCVTypeString(val: ClarityValue): string {
     case ClarityType.PrincipalContract:
       return 'principal';
     case ClarityType.List:
-      return `(list ${val.list.length} ${getCVTypeString(val.list[0])})`;
+      return `(list ${val.list.length} ${val.list.length ? getCVTypeString(val.list[0]) : "UnknownType"})`;
     case ClarityType.Tuple:
       return `(tuple ${Object.keys(val.data)
         .map(key => `(${key} ${getCVTypeString(val.data[key])})`)
