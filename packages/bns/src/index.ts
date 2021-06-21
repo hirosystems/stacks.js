@@ -680,7 +680,7 @@ export async function buildTransferNameTx({
     bufferCVFromString(namespace),
     bufferCVFromString(name),
     standardPrincipalCV(newOwnerAddress),
-    zonefile ? someCV(bufferCV(getZonefileHash(zonefile))): noneCV()
+    zonefile ? someCV(bufferCV(getZonefileHash(zonefile))) : noneCV(),
   ];
 
   return makeBnsContractCall({
@@ -784,7 +784,7 @@ export async function buildRenewNameTx({
     bufferCVFromString(name),
     uintCVFromBN(stxToBurn),
     newOwnerAddress ? someCV(standardPrincipalCV(newOwnerAddress)) : noneCV(),
-    zonefile ? someCV(bufferCV(getZonefileHash(zonefile))): noneCV()
+    zonefile ? someCV(bufferCV(getZonefileHash(zonefile))) : noneCV(),
   ];
 
   return makeBnsContractCall({
