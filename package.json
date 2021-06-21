@@ -11,8 +11,8 @@
     "packages/**"
   ],
   "devDependencies": {
-    "@stacks/eslint-config": "^1.0.7",
-    "@stacks/prettier-config": "^0.0.7",
+    "@stacks/eslint-config": "^1.0.9",
+    "@stacks/prettier-config": "0.0.8",
     "@strictsoftware/typedoc-plugin-monorepo": "^0.4.2",
     "@typescript-eslint/eslint-plugin": "^4.22.0",
     "@typescript-eslint/parser": "^4.22.0",
@@ -26,7 +26,6 @@
     "typedoc": "^0.20.35",
     "typescript": "^4.2.4"
   },
-  "dependencies": {},
   "scripts": {
     "bootstrap": "lerna bootstrap",
     "build": "lerna run build",
