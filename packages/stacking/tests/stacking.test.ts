@@ -61,6 +61,58 @@ const coreInfo = {
   "exit_at_block_height": null
 }
 
+const rewardsTotalInfo = {
+  reward_recipient: 'myfTfju9XSMRusaY2qTitSEMSchsWRA441',
+  reward_amount: '450000'
+};
+
+const rewardsInfo = {
+  limit: 2,
+  offset: 0,
+  results: [
+    {
+      canonical: true,
+      burn_block_hash: '0x000000000000002083ca8303a2262d09a824cecb34b78f13a04787e4f05441d3',
+      burn_block_height: 2004622,
+      burn_amount: '0',
+      reward_recipient: 'myfTfju9XSMRusaY2qTitSEMSchsWRA441',
+      reward_amount: '20000',
+      reward_index: 0
+    },
+    {
+      canonical: true,
+      burn_block_hash: '0x000000000000002f72213de621f9daf60d76aed3902a811561d06373b2fa6123',
+      burn_block_height: 2004621,
+      burn_amount: '0',
+      reward_recipient: 'myfTfju9XSMRusaY2qTitSEMSchsWRA441',
+      reward_amount: '20000',
+      reward_index: 0
+    }
+  ]
+};
+
+const rewardHoldersInfo = {
+  limit: 2,
+  offset: 0,
+  total: 46,
+  results: [
+    {
+      canonical: true,
+      burn_block_hash: '0x000000000000002083ca8303a2262d09a824cecb34b78f13a04787e4f05441d3',
+      burn_block_height: 2004622,
+      address: 'myfTfju9XSMRusaY2qTitSEMSchsWRA441',
+      slot_index: 1
+    },
+    {
+      canonical: true,
+      burn_block_hash: '0x000000000000002083ca8303a2262d09a824cecb34b78f13a04787e4f05441d3',
+      burn_block_height: 2004622,
+      address: 'myfTfju9XSMRusaY2qTitSEMSchsWRA441',
+      slot_index: 0
+    }
+  ]
+};
+
 const blocktimeInfo = {
   testnet: {
     target_block_time: 120
@@ -803,6 +855,66 @@ test('get pox info', async () => {
   expect(fetchMock.mock.calls[0][0]).toEqual(network.getPoxInfoUrl());
   expect(responsePoxInfo).toEqual(poxInfo);
 })
+
+test('get a list of burnchain rewards for the set address', async () => {
+  const address = 'myfTfju9XSMRusaY2qTitSEMSchsWRA441';
+  const network = new StacksTestnet();
+
+  fetchMock.mockResponse(() => {
+    return Promise.resolve({
+      body: JSON.stringify(rewardsInfo),
+      status: 200
+    })
+  })
+
+  const { StackingClient } = require('../src');
+  const client = new StackingClient(address, network);
+  const options = {limit: 2, offset: 0};
+  const response = await client.getRewardsForBtcAddress(options);
+
+  expect(fetchMock.mock.calls[0][0]).toEqual(network.getRewardsUrl(address, options));
+  expect(response).toEqual(rewardsInfo);
+});
+
+test('get the burnchain rewards total for the set address', async () => {
+  const address = 'myfTfju9XSMRusaY2qTitSEMSchsWRA441';
+  const network = new StacksTestnet();
+
+  fetchMock.mockResponse(() => {
+    return Promise.resolve({
+      body: JSON.stringify(rewardsTotalInfo),
+      status: 200
+    })
+  });
+
+  const { StackingClient } = require('../src');
+  const client = new StackingClient(address, network);
+  const response = await client.getRewardsTotalForBtcAddress();
+
+  expect(fetchMock.mock.calls[0][0]).toEqual(network.getRewardsTotalUrl(address));
+  expect(response).toEqual(rewardsTotalInfo);
+});
+
+test('get a list of burnchain reward holders for the set address ', async () => {
+  const address = 'myfTfju9XSMRusaY2qTitSEMSchsWRA441';
+  const network = new StacksTestnet();
+
+  fetchMock.mockResponse(() => {
+    return Promise.resolve({
+      body: JSON.stringify(rewardHoldersInfo),
+      status: 200
+    })
+  })
+
+  const { StackingClient } = require('../src');
+  const client = new StackingClient(address, network);
+  const options = {limit: 2, offset: 0};
+  const response = await client.getRewardHoldersForBtcAddress(options);
+
+  expect(fetchMock.mock.calls[0][0]).toEqual(network.getRewardHoldersUrl(address, options));
+  expect(response).toEqual(rewardHoldersInfo);
+});
+
 
 test('get target block time info', async () => {
   const address = 'ST3XKKN4RPV69NN1PHFDNX3TYKXT7XPC4N8KC1ARH';

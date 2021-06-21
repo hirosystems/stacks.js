@@ -31,6 +31,9 @@ export interface StacksNetwork {
   getInfoUrl: () => string;
   getBlockTimeInfoUrl: () => string;
   getPoxInfoUrl: () => string;
+  getRewardsUrl: (address: string, options?: any) => string;
+  getRewardHoldersUrl: (address: string, options?: any) => string;
+  getRewardsTotalUrl: (address: string) => string;
   getStackerInfoUrl: (contractAddress: string, contractName: string) => string;
 
   /**
@@ -83,6 +86,22 @@ export class StacksMainnet implements StacksNetwork {
   getInfoUrl = () => `${this.coreApiUrl}/v2/info`;
   getBlockTimeInfoUrl = () => `${this.coreApiUrl}/extended/v1/info/network_block_times`;
   getPoxInfoUrl = () => `${this.coreApiUrl}/v2/pox`;
+  getRewardsUrl = (address: string, options?: any) => {
+    let url = `${this.coreApiUrl}/extended/v1/burnchain/rewards/${address}`;
+    if (options) {
+      url = `${url}?limit=${options.limit}&offset=${options.offset}`;
+    }
+    return url;
+  };
+  getRewardsTotalUrl = (address: string) =>
+    `${this.coreApiUrl}/extended/v1/burnchain/rewards/${address}/total`;
+  getRewardHoldersUrl = (address: string, options?: any) => {
+    let url = `${this.coreApiUrl}/extended/v1/burnchain/reward_slot_holders/${address}`;
+    if (options) {
+      url = `${url}?limit=${options.limit}&offset=${options.offset}`;
+    }
+    return url;
+  };
   getStackerInfoUrl = (contractAddress: string, contractName: string) =>
     `${this.coreApiUrl}${this.readOnlyFunctionCallEndpoint}
     ${contractAddress}/${contractName}/get-stacker-info`;
