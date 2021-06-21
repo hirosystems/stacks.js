@@ -23,6 +23,11 @@ import {
   validateStacksAddress,
   AnchorMode,
 } from '@stacks/transactions';
+import {
+  BurnchainRewardListResponse,
+  BurnchainRewardsTotal,
+  BurnchainRewardSlotHolderListResponse,
+} from '@stacks/stacks-blockchain-api-types';
 import { StacksNetwork } from '@stacks/network';
 import BN from 'bn.js';
 import { StackingErrors } from './constants';
@@ -76,6 +81,15 @@ export interface CoreInfo {
 export interface BalanceInfo {
   balance: string;
   nonce: number;
+}
+
+export interface RewardsError {
+  error: string;
+}
+
+export interface RewardOptions {
+  limit: number;
+  offset: number;
 }
 
 export interface StackingEligibility {
@@ -228,6 +242,40 @@ export class StackingClient {
         return poxInfo.reward_cycle_length * targetBlockTime;
       }
     );
+  }
+
+  /**
+   * Get the total burnchain rewards total for the set address
+   *
+   * @returns {Promise<TotalRewardsResponse | RewardsError>} that resolves to TotalRewardsResponse or RewardsError
+   */
+  async getRewardsTotalForBtcAddress(): Promise<BurnchainRewardsTotal | RewardsError> {
+    const url = this.network.getRewardsTotalUrl(this.address);
+    return fetchPrivate(url).then(res => res.json());
+  }
+
+  /**
+   * Get burnchain rewards for the set address
+   *
+   * @returns {Promise<RewardsResponse | RewardsError>} that resolves to RewardsResponse or RewardsError
+   */
+  async getRewardsForBtcAddress(
+    options?: RewardOptions
+  ): Promise<BurnchainRewardListResponse | RewardsError> {
+    const url = `${this.network.getRewardsUrl(this.address, options)}`;
+    return fetchPrivate(url).then(res => res.json());
+  }
+
+  /**
+   * Get burnchain rewards holders for the set address
+   *
+   * @returns {Promise<RewardHoldersResponse | RewardsError>} that resolves to RewardHoldersResponse or RewardsError
+   */
+  async getRewardHoldersForBtcAddress(
+    options?: RewardOptions
+  ): Promise<BurnchainRewardSlotHolderListResponse | RewardsError> {
+    const url = `${this.network.getRewardHoldersUrl(this.address, options)}`;
+    return fetchPrivate(url).then(res => res.json());
   }
 
   /**
