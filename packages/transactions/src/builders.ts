@@ -1199,14 +1199,8 @@ export async function callReadOnlyFunction(
 
   const options = Object.assign(defaultOptions, readOnlyFunctionOptions);
 
-  const {
-    contractName,
-    contractAddress,
-    functionName,
-    functionArgs,
-    network,
-    senderAddress,
-  } = options;
+  const { contractName, contractAddress, functionName, functionArgs, network, senderAddress } =
+    options;
 
   const url = network.getReadOnlyFunctionCallApiUrl(contractAddress, contractName, functionName);
 
