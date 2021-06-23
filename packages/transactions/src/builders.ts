@@ -139,13 +139,172 @@ export async function estimateTransfer(
   return feeRate.mul(txBytes);
 }
 
-export type TxBroadcastResultOk = string;
-export type TxBroadcastResultRejected = {
+export type SerializationRejection = {
   error: string;
-  reason: TxRejectedReason;
-  reason_data: any;
+  reason: TxRejectedReason.Serialization;
+  reason_data: {
+    message: string;
+  }
   txid: string;
 };
+
+export type DeserializationRejection = {
+  error: string;
+  reason: TxRejectedReason.Deserialization;
+  reason_data: {
+    message: string;
+  }
+  txid: string;
+};
+
+export type SignatureValidationRejection = {
+  error: string;
+  reason: TxRejectedReason.SignatureValidation;
+  reason_data: {
+    message: string;
+  }
+  txid: string;
+};
+
+export type BadNonceRejection = {
+  error: string;
+  reason: TxRejectedReason.BadNonce;
+  reason_data: {
+    expected: number;
+    actual: number;
+    is_origin: boolean;
+    principal: boolean;
+  }
+  txid: string;
+};
+
+export type FeeTooLowRejection = {
+  error: string;
+  reason: TxRejectedReason.FeeTooLow;
+  reason_data: {
+    expected: number;
+    actual: number;
+  }
+  txid: string;
+};
+
+export type NotEnoughFundsRejection = {
+  error: string;
+  reason: TxRejectedReason.NotEnoughFunds;
+  reason_data: {
+    expected: string;
+    actual: string;
+  }
+  txid: string;
+};
+
+export type NoSuchContractRejection = {
+  error: string;
+  reason: TxRejectedReason.NoSuchContract;
+  txid: string;
+};
+
+export type NoSuchPublicFunctionRejection = {
+  error: string;
+  reason: TxRejectedReason.NoSuchPublicFunction;
+  txid: string;
+};
+
+export type BadFunctionArgumentRejection = {
+  error: string;
+  reason: TxRejectedReason.BadFunctionArgument;
+  reason_data: {
+    message: string;
+  }
+  txid: string;
+};
+
+export type ContractAlreadyExistsRejection = {
+  error: string;
+  reason: TxRejectedReason.ContractAlreadyExists;
+  reason_data: {
+    contract_identifier: string;
+  }
+  txid: string;
+};
+
+export type PoisonMicroblocksDoNotConflictRejection = {
+  error: string;
+  reason: TxRejectedReason.PoisonMicroblocksDoNotConflict;
+  txid: string;
+};
+
+export type PoisonMicroblockHasUnknownPubKeyHashRejection = {
+  error: string;
+  reason: TxRejectedReason.PoisonMicroblockHasUnknownPubKeyHash;
+  txid: string;
+};
+
+export type PoisonMicroblockIsInvalidRejection = {
+  error: string;
+  reason: TxRejectedReason.PoisonMicroblockIsInvalid;
+  txid: string;
+};
+
+export type BadAddressVersionByteRejection = {
+  error: string;
+  reason: TxRejectedReason.BadAddressVersionByte;
+  txid: string;
+};
+
+export type NoCoinbaseViaMempoolRejection = {
+  error: string;
+  reason: TxRejectedReason.NoCoinbaseViaMempool;
+  txid: string;
+};
+
+export type ServerFailureNoSuchChainTipRejection = {
+  error: string;
+  reason: TxRejectedReason.ServerFailureNoSuchChainTip;
+  txid: string;
+};
+
+export type ServerFailureDatabaseRejection = {
+  error: string;
+  reason: TxRejectedReason.ServerFailureDatabase;
+  reason_data: {
+    message: string;
+  }
+  txid: string;
+};
+
+export type ServerFailureOtherRejection = {
+  error: string;
+  reason: TxRejectedReason.ServerFailureOther;
+  reason_data: {
+    message: string;
+  }
+  txid: string;
+};
+
+export type TxBroadcastResultOk = {
+  txid: string;
+};
+
+export type TxBroadcastResultRejected =   SerializationRejection |
+  DeserializationRejection |
+  SignatureValidationRejection |
+  BadNonceRejection |
+  FeeTooLowRejection |
+  NotEnoughFundsRejection |
+  NoSuchContractRejection |
+  NoSuchPublicFunctionRejection |
+  BadFunctionArgumentRejection |
+  ContractAlreadyExistsRejection |
+  PoisonMicroblocksDoNotConflictRejection |
+  PoisonMicroblockHasUnknownPubKeyHashRejection |
+  PoisonMicroblockIsInvalidRejection |
+  BadAddressVersionByteRejection |
+  NoCoinbaseViaMempoolRejection |
+  ServerFailureNoSuchChainTipRejection |
+  ServerFailureDatabaseRejection |
+  ServerFailureOtherRejection;
+
 export type TxBroadcastResult = TxBroadcastResultOk | TxBroadcastResultRejected;
 
 /**
@@ -201,11 +360,10 @@ export async function broadcastRawTransaction(
   }
 
   const text = await response.text();
-  try {
-    return JSON.parse(text) as TxBroadcastResult;
-  } catch (e) {
-    return text;
-  }
+  return {
+    // Replace extra quotes around txid string
+    txid: text.replace(/["]+/g, ''),
+  } as TxBroadcastResult;
 }
 
 /**
