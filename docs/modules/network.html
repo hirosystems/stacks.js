@@ -79,12 +79,14 @@
 					<a href="#usage" id="usage" style="color: inherit; text-decoration: none;">
 						<h2>Usage</h2>
 					</a>
-					<p>Creating a Stacks mainnet, testnet or mocknet network</p>
+					<p>Creating a Stacks mainnet, testnet, regtest or mocknet network</p>
 					<pre><code class="language-typescript"><span style="color: #AF00DB">import</span><span style="color: #000000"> { </span><span style="color: #001080">StacksMainnet</span><span style="color: #000000">, </span><span style="color: #001080">StacksTestnet</span><span style="color: #000000">, </span><span style="color: #001080">StacksMocknet</span><span style="color: #000000"> } </span><span style="color: #AF00DB">from</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;@stacks/network&#039;</span><span style="color: #000000">;</span>
 
 <span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">network</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #795E26">StacksMainnet</span><span style="color: #000000">();</span>
 
 <span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">testnet</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #795E26">StacksTestnet</span><span style="color: #000000">();</span>
+
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">regtest</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #795E26">StacksRegtest</span><span style="color: #000000">();</span>
 
 <span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">mocknet</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #795E26">StacksMocknet</span><span style="color: #000000">();</span>
 </code></pre>
@@ -137,6 +139,7 @@
 							<ul class="tsd-index-list">
 								<li class="tsd-kind-class tsd-parent-kind-module"><a href="../classes/network.stacksmainnet.html" class="tsd-kind-icon">Stacks<wbr>Mainnet</a></li>
 								<li class="tsd-kind-class tsd-parent-kind-module"><a href="../classes/network.stacksmocknet.html" class="tsd-kind-icon">Stacks<wbr>Mocknet</a></li>
+								<li class="tsd-kind-class tsd-parent-kind-module"><a href="../classes/network.stacksregtest.html" class="tsd-kind-icon">Stacks<wbr>Regtest</a></li>
 								<li class="tsd-kind-class tsd-parent-kind-module"><a href="../classes/network.stackstestnet.html" class="tsd-kind-icon">Stacks<wbr>Testnet</a></li>
 							</ul>
 						</section>
@@ -223,6 +226,9 @@
 								<a href="../classes/network.stacksmocknet.html" class="tsd-kind-icon">Stacks<wbr>Mocknet</a>
 							</li>
 							<li class=" tsd-kind-class tsd-parent-kind-module">
+								<a href="../classes/network.stacksregtest.html" class="tsd-kind-icon">Stacks<wbr>Regtest</a>
+							</li>
+							<li class=" tsd-kind-class tsd-parent-kind-module">
 								<a href="../classes/network.stackstestnet.html" class="tsd-kind-icon">Stacks<wbr>Testnet</a>
 							</li>
 							<li class=" tsd-kind-interface tsd-parent-kind-module">
@@ -258,12 +264,14 @@
 				<li class="tsd-kind-function"><span class="tsd-kind-icon">Function</span></li>
 				<li class="tsd-kind-function tsd-has-type-parameter"><span class="tsd-kind-icon">Function with type parameter</span></li>
 				<li class="tsd-kind-type-alias"><span class="tsd-kind-icon">Type alias</span></li>
-			</ul>
-			<ul class="tsd-legend">
-				<li class="tsd-kind-enum"><span class="tsd-kind-icon">Enumeration</span></li>
+				<li class="tsd-kind-type-alias tsd-has-type-parameter"><span class="tsd-kind-icon">Type alias with type parameter</span></li>
 			</ul>
 			<ul class="tsd-legend">
 				<li class="tsd-kind-interface"><span class="tsd-kind-icon">Interface</span></li>
+				<li class="tsd-kind-interface tsd-has-type-parameter"><span class="tsd-kind-icon">Interface with type parameter</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-enum"><span class="tsd-kind-icon">Enumeration</span></li>
 			</ul>
 			<ul class="tsd-legend">
 				<li class="tsd-kind-class"><span class="tsd-kind-icon">Class</span></li>

@@ -107,3 +107,9 @@ export class StacksMocknet extends StacksMainnet implements StacksNetwork {
   chainId = ChainID.Testnet;
   coreApiUrl = 'http://localhost:3999';
 }
+
+export class StacksRegtest extends StacksMainnet implements StacksNetwork {
+  version = TransactionVersion.Testnet;
+  chainId = ChainID.Testnet;
+  coreApiUrl = 'https://stacks-node-api.regtest.stacks.co';
+}

@@ -71,8 +71,14 @@
 			<section class="tsd-panel tsd-comment">
 				<div class="tsd-comment tsd-typography">
 					<div class="lead">
-						<p>How a transaction gets appended to the Stacks blockchain</p>
+						<p>How a transaction should get appended to the Stacks blockchain.</p>
 					</div>
+					<p>In the Stacks blockchain, there are two kinds of blocks: anchored
+						blocks and streaming microblocks. A transactions AnchorMode specifies
+					which kind of block it should be included in.</p>
+					<p>For more information about the kinds of Stacks blocks and the various
+						AnchorModes, check out <a href="https://github.com/stacksgov/sips/blob/main/sips/sip-001/sip-001-burn-election.md" class="external">SIP 001</a> and
+					<a href="https://github.com/stacksgov/sips/blob/main/sips/sip-005/sip-005-blocks-and-transactions.md" class="external">SIP 005</a></p>
 				</div>
 			</section>
 			<section class="tsd-panel-group tsd-index-group">
@@ -98,7 +104,7 @@
 					<div class="tsd-signature tsd-kind-icon">Any<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol"> = 3</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/transactions/src/constants.ts#L50">packages/transactions/src/constants.ts:50</a></li>
+							<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/transactions/src/constants.ts#L58">packages/transactions/src/constants.ts:58</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -113,7 +119,7 @@
 					<div class="tsd-signature tsd-kind-icon">Off<wbr>Chain<wbr>Only<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol"> = 2</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/transactions/src/constants.ts#L48">packages/transactions/src/constants.ts:48</a></li>
+							<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/transactions/src/constants.ts#L56">packages/transactions/src/constants.ts:56</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -128,7 +134,7 @@
 					<div class="tsd-signature tsd-kind-icon">On<wbr>Chain<wbr>Only<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol"> = 1</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/transactions/src/constants.ts#L46">packages/transactions/src/constants.ts:46</a></li>
+							<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/transactions/src/constants.ts#L54">packages/transactions/src/constants.ts:54</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -249,12 +255,14 @@
 				<li class="tsd-kind-function"><span class="tsd-kind-icon">Function</span></li>
 				<li class="tsd-kind-function tsd-has-type-parameter"><span class="tsd-kind-icon">Function with type parameter</span></li>
 				<li class="tsd-kind-type-alias"><span class="tsd-kind-icon">Type alias</span></li>
-			</ul>
-			<ul class="tsd-legend">
-				<li class="tsd-kind-enum"><span class="tsd-kind-icon">Enumeration</span></li>
+				<li class="tsd-kind-type-alias tsd-has-type-parameter"><span class="tsd-kind-icon">Type alias with type parameter</span></li>
 			</ul>
 			<ul class="tsd-legend">
 				<li class="tsd-kind-interface"><span class="tsd-kind-icon">Interface</span></li>
+				<li class="tsd-kind-interface tsd-has-type-parameter"><span class="tsd-kind-icon">Interface with type parameter</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-enum"><span class="tsd-kind-icon">Enumeration</span></li>
 			</ul>
 			<ul class="tsd-legend">
 				<li class="tsd-kind-class"><span class="tsd-kind-icon">Class</span></li>

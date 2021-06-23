@@ -105,6 +105,7 @@
 <span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">publicKey</span><span style="color: #000000"> = </span><span style="color: #A31515">&#039;SPF0324DSC4K505TP6A8C7GAK4R95E38TGNZP7RE&#039;</span>
 
 <span style="color: #008000">// construct an unsigned bns register-name transaction</span>
+<span style="color: #008000">// note: builder functions build transactions with AnchorMode set to Any</span>
 <span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">unsignedTX</span><span style="color: #000000"> = </span><span style="color: #AF00DB">await</span><span style="color: #000000"> </span><span style="color: #795E26">buildRegisterNameTX</span><span style="color: #000000">({ </span><span style="color: #001080">name</span><span style="color: #000000">, </span><span style="color: #001080">salt</span><span style="color: #000000">, </span><span style="color: #001080">zonefile</span><span style="color: #000000">, </span><span style="color: #001080">publicKey</span><span style="color: #000000">, </span><span style="color: #001080">network</span><span style="color: #000000"> });</span>
 </code></pre>
 				</div>
@@ -175,7 +176,7 @@
 					<div class="tsd-signature tsd-kind-icon">BNS_<wbr>CONTRACT_<wbr>NAME<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">&quot;bns&quot;</span><span class="tsd-signature-symbol"> = &#x27;bns&#x27;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L28">packages/bns/src/index.ts:28</a></li>
+							<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L31">packages/bns/src/index.ts:31</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -192,7 +193,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L409">packages/bns/src/index.ts:409</a></li>
+									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L413">packages/bns/src/index.ts:413</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -222,7 +223,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L502">packages/bns/src/index.ts:502</a></li>
+									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L506">packages/bns/src/index.ts:506</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -253,7 +254,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L286">packages/bns/src/index.ts:286</a></li>
+									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L290">packages/bns/src/index.ts:290</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -284,7 +285,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L458">packages/bns/src/index.ts:458</a></li>
+									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L462">packages/bns/src/index.ts:462</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -315,7 +316,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L553">packages/bns/src/index.ts:553</a></li>
+									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L557">packages/bns/src/index.ts:557</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -345,7 +346,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L767">packages/bns/src/index.ts:767</a></li>
+									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L768">packages/bns/src/index.ts:768</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -375,7 +376,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L336">packages/bns/src/index.ts:336</a></li>
+									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L340">packages/bns/src/index.ts:340</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -405,7 +406,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L718">packages/bns/src/index.ts:718</a></li>
+									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L719">packages/bns/src/index.ts:719</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -435,7 +436,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L662">packages/bns/src/index.ts:662</a></li>
+									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L666">packages/bns/src/index.ts:666</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -468,7 +469,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L608">packages/bns/src/index.ts:608</a></li>
+									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L612">packages/bns/src/index.ts:612</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -498,7 +499,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L123">packages/bns/src/index.ts:123</a></li>
+									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L127">packages/bns/src/index.ts:127</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -527,7 +528,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L223">packages/bns/src/index.ts:223</a></li>
+									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L227">packages/bns/src/index.ts:227</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -556,7 +557,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L172">packages/bns/src/index.ts:172</a></li>
+									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/bns/src/index.ts#L176">packages/bns/src/index.ts:176</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -766,12 +767,14 @@
 				<li class="tsd-kind-function"><span class="tsd-kind-icon">Function</span></li>
 				<li class="tsd-kind-function tsd-has-type-parameter"><span class="tsd-kind-icon">Function with type parameter</span></li>
 				<li class="tsd-kind-type-alias"><span class="tsd-kind-icon">Type alias</span></li>
-			</ul>
-			<ul class="tsd-legend">
-				<li class="tsd-kind-enum"><span class="tsd-kind-icon">Enumeration</span></li>
+				<li class="tsd-kind-type-alias tsd-has-type-parameter"><span class="tsd-kind-icon">Type alias with type parameter</span></li>
 			</ul>
 			<ul class="tsd-legend">
 				<li class="tsd-kind-interface"><span class="tsd-kind-icon">Interface</span></li>
+				<li class="tsd-kind-interface tsd-has-type-parameter"><span class="tsd-kind-icon">Interface with type parameter</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-enum"><span class="tsd-kind-icon">Enumeration</span></li>
 			</ul>
 			<ul class="tsd-legend">
 				<li class="tsd-kind-class"><span class="tsd-kind-icon">Class</span></li>
