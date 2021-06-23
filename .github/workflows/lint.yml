@@ -1,12 +1,12 @@
-name: stacks.js
+name: Lint
 
 on:
   push:
-  pull_request:
+    branches:
+      - '**'
 
 jobs:
-  code_checks:
-    name: Code Checks
+  lint:
     runs-on: ubuntu-latest
     env:
       NODE_OPTIONS: --max-old-space-size=4096
@@ -23,7 +23,7 @@ jobs:
         with:
           path: |
             node_modules
-            */*/node_modules
+            packages/*/node_modules
           key: ${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
 
       - name: Install dependencies
@@ -34,15 +34,3 @@ jobs:
 
       - name: Lint
         run: npm run lint
-
-      - name: Typecheck
-        run: npm run typecheck
-
-      - name: Build
-        run: npm run build
-
-      - name: Tests
-        run: npm run lerna run test --stream --parallel -- -- --coverage
-
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v1
