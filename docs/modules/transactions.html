@@ -121,6 +121,7 @@
 <span style="color: #000000">  </span><span style="color: #001080">memo:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;test memo&#039;</span><span style="color: #000000">,</span>
 <span style="color: #000000">  </span><span style="color: #001080">nonce:</span><span style="color: #000000"> </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #795E26">BigNum</span><span style="color: #000000">(</span><span style="color: #098658">0</span><span style="color: #000000">), </span><span style="color: #008000">// set a nonce manually if you don&#039;t want builder to fetch from a Stacks node</span>
 <span style="color: #000000">  </span><span style="color: #001080">fee:</span><span style="color: #000000"> </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #795E26">BigNum</span><span style="color: #000000">(</span><span style="color: #098658">200</span><span style="color: #000000">), </span><span style="color: #008000">// set a tx fee if you don&#039;t want the builder to estimate</span>
+<span style="color: #000000">  </span><span style="color: #001080">anchorMode:</span><span style="color: #000000"> </span><span style="color: #001080">AnchorMode</span><span style="color: #000000">.</span><span style="color: #001080">Any</span>
 <span style="color: #000000">};</span>
 
 <span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">transaction</span><span style="color: #000000"> = </span><span style="color: #AF00DB">await</span><span style="color: #000000"> </span><span style="color: #795E26">makeSTXTokenTransfer</span><span style="color: #000000">(</span><span style="color: #001080">txOptions</span><span style="color: #000000">);</span>
@@ -134,7 +135,7 @@
 					<a href="#smart-contract-deploy-transaction" id="smart-contract-deploy-transaction" style="color: inherit; text-decoration: none;">
 						<h2>Smart Contract Deploy Transaction</h2>
 					</a>
-					<pre><code class="language-javascript"><span style="color: #AF00DB">import</span><span style="color: #000000"> { </span><span style="color: #001080">makeContractDeploy</span><span style="color: #000000">, </span><span style="color: #001080">broadcastTransaction</span><span style="color: #000000"> } </span><span style="color: #AF00DB">from</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;@stacks/transactions&#039;</span><span style="color: #000000">;</span>
+					<pre><code class="language-javascript"><span style="color: #AF00DB">import</span><span style="color: #000000"> { </span><span style="color: #001080">makeContractDeploy</span><span style="color: #000000">, </span><span style="color: #001080">broadcastTransaction</span><span style="color: #000000">, </span><span style="color: #001080">AnchorMode</span><span style="color: #000000"> } </span><span style="color: #AF00DB">from</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;@stacks/transactions&#039;</span><span style="color: #000000">;</span>
 <span style="color: #AF00DB">import</span><span style="color: #000000"> { </span><span style="color: #001080">StacksTestnet</span><span style="color: #000000">, </span><span style="color: #001080">StacksMainnet</span><span style="color: #000000"> } </span><span style="color: #AF00DB">from</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;@stacks/network&#039;</span><span style="color: #000000">;</span>
 <span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">BigNum</span><span style="color: #000000"> = </span><span style="color: #795E26">require</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;bn.js&#039;</span><span style="color: #000000">);</span>
 
@@ -155,7 +156,7 @@
 					<a href="#smart-contract-function-call" id="smart-contract-function-call" style="color: inherit; text-decoration: none;">
 						<h2>Smart Contract Function Call</h2>
 					</a>
-					<pre><code class="language-javascript"><span style="color: #AF00DB">import</span><span style="color: #000000"> { </span><span style="color: #001080">makeContractCall</span><span style="color: #000000">, </span><span style="color: #001080">BufferCV</span><span style="color: #000000">, </span><span style="color: #001080">broadcastTransaction</span><span style="color: #000000"> } </span><span style="color: #AF00DB">from</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;@stacks/transactions&#039;</span><span style="color: #000000">;</span>
+					<pre><code class="language-javascript"><span style="color: #AF00DB">import</span><span style="color: #000000"> { </span><span style="color: #001080">makeContractCall</span><span style="color: #000000">, </span><span style="color: #001080">BufferCV</span><span style="color: #000000">, </span><span style="color: #001080">broadcastTransaction</span><span style="color: #000000">, </span><span style="color: #001080">AnchorMode</span><span style="color: #000000"> } </span><span style="color: #AF00DB">from</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;@stacks/transactions&#039;</span><span style="color: #000000">;</span>
 <span style="color: #AF00DB">import</span><span style="color: #000000"> { </span><span style="color: #001080">StacksTestnet</span><span style="color: #000000">, </span><span style="color: #001080">StacksMainnet</span><span style="color: #000000"> } </span><span style="color: #AF00DB">from</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;@stacks/network&#039;</span><span style="color: #000000">;</span>
 <span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">BigNum</span><span style="color: #000000"> = </span><span style="color: #795E26">require</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;bn.js&#039;</span><span style="color: #000000">);</span>
 
@@ -180,6 +181,7 @@
 <span style="color: #000000">  </span><span style="color: #001080">validateWithAbi:</span><span style="color: #000000"> </span><span style="color: #0000FF">true</span><span style="color: #000000">,</span>
 <span style="color: #000000">  </span><span style="color: #001080">network</span><span style="color: #000000">,</span>
 <span style="color: #000000">  </span><span style="color: #001080">postConditions</span><span style="color: #000000">,</span>
+<span style="color: #000000">  </span><span style="color: #001080">anchorMode:</span><span style="color: #000000"> </span><span style="color: #001080">AnchorMode</span><span style="color: #000000">.</span><span style="color: #001080">Any</span><span style="color: #000000">,</span>
 <span style="color: #000000">};</span>
 
 <span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">transaction</span><span style="color: #000000"> = </span><span style="color: #AF00DB">await</span><span style="color: #000000"> </span><span style="color: #795E26">makeContractCall</span><span style="color: #000000">(</span><span style="color: #001080">txOptions</span><span style="color: #000000">);</span>
@@ -195,7 +197,7 @@
 						<h2>Sponsoring Transactions</h2>
 					</a>
 					<p>To generate a sponsored transaction, first create and sign the transaction as the origin. The <code>sponsored</code> property in the options object must be set to true.</p>
-					<pre><code class="language-javascript"><span style="color: #AF00DB">import</span><span style="color: #000000"> { </span><span style="color: #001080">makeContractCall</span><span style="color: #000000">, </span><span style="color: #001080">BufferCV</span><span style="color: #000000"> } </span><span style="color: #AF00DB">from</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;@stacks/transactions&#039;</span><span style="color: #000000">;</span>
+					<pre><code class="language-javascript"><span style="color: #AF00DB">import</span><span style="color: #000000"> { </span><span style="color: #001080">makeContractCall</span><span style="color: #000000">, </span><span style="color: #001080">BufferCV</span><span style="color: #000000">, </span><span style="color: #001080">AnchorMode</span><span style="color: #000000"> } </span><span style="color: #AF00DB">from</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;@stacks/transactions&#039;</span><span style="color: #000000">;</span>
 <span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">BigNum</span><span style="color: #000000"> = </span><span style="color: #795E26">require</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;bn.js&#039;</span><span style="color: #000000">);</span>
 
 <span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">txOptions</span><span style="color: #000000"> = {</span>
@@ -206,6 +208,7 @@
 <span style="color: #000000">  </span><span style="color: #001080">senderKey:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;b244296d5907de9864c0b0d51f98a13c52890be0404e83f273144cd5b9960eed01&#039;</span><span style="color: #000000">,</span>
 <span style="color: #000000">  </span><span style="color: #001080">validateWithAbi:</span><span style="color: #000000"> </span><span style="color: #0000FF">true</span><span style="color: #000000">,</span>
 <span style="color: #000000">  </span><span style="color: #001080">sponsored:</span><span style="color: #000000"> </span><span style="color: #0000FF">true</span><span style="color: #000000">,</span>
+<span style="color: #000000">  </span><span style="color: #001080">anchorMode:</span><span style="color: #000000"> </span><span style="color: #001080">AnchorMode</span><span style="color: #000000">.</span><span style="color: #001080">Any</span><span style="color: #000000">,</span>
 <span style="color: #000000">};</span>
 
 <span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">transaction</span><span style="color: #000000"> = </span><span style="color: #AF00DB">await</span><span style="color: #000000"> </span><span style="color: #795E26">makeContractCall</span><span style="color: #000000">(</span><span style="color: #001080">txOptions</span><span style="color: #000000">);</span>
@@ -251,6 +254,7 @@
 <span style="color: #000000">  </span><span style="color: #001080">TransactionSigner</span><span style="color: #000000">,</span>
 <span style="color: #000000">  </span><span style="color: #001080">standardPrincipalCV</span><span style="color: #000000">,</span>
 <span style="color: #000000">  </span><span style="color: #001080">BufferReader</span><span style="color: #000000">,</span>
+<span style="color: #000000">  </span><span style="color: #001080">AnchorMode</span><span style="color: #000000">,</span>
 <span style="color: #000000">} </span><span style="color: #AF00DB">from</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;@stacks/transactions&#039;</span><span style="color: #000000">;</span>
 <span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">BigNum</span><span style="color: #000000"> = </span><span style="color: #795E26">require</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;bn.js&#039;</span><span style="color: #000000">);</span>
 
@@ -280,6 +284,7 @@
 <span style="color: #000000">  </span><span style="color: #001080">memo</span><span style="color: #000000">,</span>
 <span style="color: #000000">  </span><span style="color: #001080">numSignatures:</span><span style="color: #000000"> </span><span style="color: #098658">2</span><span style="color: #000000">, </span><span style="color: #008000">// number of signature required</span>
 <span style="color: #000000">  </span><span style="color: #001080">publicKeys:</span><span style="color: #000000"> </span><span style="color: #001080">pubKeyStrings</span><span style="color: #000000">, </span><span style="color: #008000">// public key string array with &gt;= numSignatures elements</span>
+<span style="color: #000000">  </span><span style="color: #001080">anchorMode:</span><span style="color: #000000"> </span><span style="color: #001080">AnchorMode</span><span style="color: #000000">.</span><span style="color: #001080">Any</span><span style="color: #000000">,</span>
 <span style="color: #000000">});</span>
 
 <span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">serializedTx</span><span style="color: #000000"> = </span><span style="color: #001080">transaction</span><span style="color: #000000">.</span><span style="color: #795E26">serialize</span><span style="color: #000000">();</span>
@@ -588,7 +593,7 @@
 								<li class="tsd-kind-interface tsd-parent-kind-module"><a href="../interfaces/transactions.intcv.html" class="tsd-kind-icon">IntCV</a></li>
 								<li class="tsd-kind-interface tsd-parent-kind-module"><a href="../interfaces/transactions.lengthprefixedlist.html" class="tsd-kind-icon">Length<wbr>Prefixed<wbr>List</a></li>
 								<li class="tsd-kind-interface tsd-parent-kind-module"><a href="../interfaces/transactions.lengthprefixedstring.html" class="tsd-kind-icon">Length<wbr>Prefixed<wbr>String</a></li>
-								<li class="tsd-kind-interface tsd-parent-kind-module"><a href="../interfaces/transactions.listcv.html" class="tsd-kind-icon">ListCV</a></li>
+								<li class="tsd-kind-interface tsd-parent-kind-module tsd-has-type-parameter"><a href="../interfaces/transactions.listcv.html" class="tsd-kind-icon">ListCV</a></li>
 								<li class="tsd-kind-interface tsd-parent-kind-module"><a href="../interfaces/transactions.memostring.html" class="tsd-kind-icon">Memo<wbr>String</a></li>
 								<li class="tsd-kind-interface tsd-parent-kind-module"><a href="../interfaces/transactions.messagesignature.html" class="tsd-kind-icon">Message<wbr>Signature</a></li>
 								<li class="tsd-kind-interface tsd-parent-kind-module"><a href="../interfaces/transactions.multisigoptions.html" class="tsd-kind-icon">Multi<wbr>Sig<wbr>Options</a></li>
@@ -598,15 +603,15 @@
 								<li class="tsd-kind-interface tsd-parent-kind-module"><a href="../interfaces/transactions.readonlyfunctionerrorresponse.html" class="tsd-kind-icon">Read<wbr>Only<wbr>Function<wbr>Error<wbr>Response</a></li>
 								<li class="tsd-kind-interface tsd-parent-kind-module"><a href="../interfaces/transactions.readonlyfunctionoptions.html" class="tsd-kind-icon">Read<wbr>Only<wbr>Function<wbr>Options</a></li>
 								<li class="tsd-kind-interface tsd-parent-kind-module"><a href="../interfaces/transactions.readonlyfunctionsuccessresponse.html" class="tsd-kind-icon">Read<wbr>Only<wbr>Function<wbr>Success<wbr>Response</a></li>
-								<li class="tsd-kind-interface tsd-parent-kind-module"><a href="../interfaces/transactions.responseerrorcv.html" class="tsd-kind-icon">Response<wbr>ErrorCV</a></li>
-								<li class="tsd-kind-interface tsd-parent-kind-module"><a href="../interfaces/transactions.responseokcv.html" class="tsd-kind-icon">Response<wbr>OkCV</a></li>
+								<li class="tsd-kind-interface tsd-parent-kind-module tsd-has-type-parameter"><a href="../interfaces/transactions.responseerrorcv.html" class="tsd-kind-icon">Response<wbr>ErrorCV</a></li>
+								<li class="tsd-kind-interface tsd-parent-kind-module tsd-has-type-parameter"><a href="../interfaces/transactions.responseokcv.html" class="tsd-kind-icon">Response<wbr>OkCV</a></li>
 								<li class="tsd-kind-interface tsd-parent-kind-module"><a href="../interfaces/transactions.signedcontractcalloptions.html" class="tsd-kind-icon">Signed<wbr>Contract<wbr>Call<wbr>Options</a></li>
 								<li class="tsd-kind-interface tsd-parent-kind-module"><a href="../interfaces/transactions.signedmultisigcontractcalloptions.html" class="tsd-kind-icon">Signed<wbr>Multi<wbr>Sig<wbr>Contract<wbr>Call<wbr>Options</a></li>
 								<li class="tsd-kind-interface tsd-parent-kind-module"><a href="../interfaces/transactions.signedmultisigtokentransferoptions.html" class="tsd-kind-icon">Signed<wbr>Multi<wbr>Sig<wbr>Token<wbr>Transfer<wbr>Options</a></li>
 								<li class="tsd-kind-interface tsd-parent-kind-module"><a href="../interfaces/transactions.signedtokentransferoptions.html" class="tsd-kind-icon">Signed<wbr>Token<wbr>Transfer<wbr>Options</a></li>
 								<li class="tsd-kind-interface tsd-parent-kind-module"><a href="../interfaces/transactions.singlesigspendingcondition.html" class="tsd-kind-icon">Single<wbr>Sig<wbr>Spending<wbr>Condition</a></li>
 								<li class="tsd-kind-interface tsd-parent-kind-module"><a href="../interfaces/transactions.smartcontractpayload.html" class="tsd-kind-icon">Smart<wbr>Contract<wbr>Payload</a></li>
-								<li class="tsd-kind-interface tsd-parent-kind-module"><a href="../interfaces/transactions.somecv.html" class="tsd-kind-icon">SomeCV</a></li>
+								<li class="tsd-kind-interface tsd-parent-kind-module tsd-has-type-parameter"><a href="../interfaces/transactions.somecv.html" class="tsd-kind-icon">SomeCV</a></li>
 								<li class="tsd-kind-interface tsd-parent-kind-module"><a href="../interfaces/transactions.sponsoroptions.html" class="tsd-kind-icon">Sponsor<wbr>Options</a></li>
 								<li class="tsd-kind-interface tsd-parent-kind-module"><a href="../interfaces/transactions.stacksprivatekey.html" class="tsd-kind-icon">Stacks<wbr>Private<wbr>Key</a></li>
 								<li class="tsd-kind-interface tsd-parent-kind-module"><a href="../interfaces/transactions.stackspublickey.html" class="tsd-kind-icon">Stacks<wbr>Public<wbr>Key</a></li>
@@ -618,7 +623,7 @@
 								<li class="tsd-kind-interface tsd-parent-kind-module"><a href="../interfaces/transactions.tokentransferpayload.html" class="tsd-kind-icon">Token<wbr>Transfer<wbr>Payload</a></li>
 								<li class="tsd-kind-interface tsd-parent-kind-module"><a href="../interfaces/transactions.transactionauthfield.html" class="tsd-kind-icon">Transaction<wbr>Auth<wbr>Field</a></li>
 								<li class="tsd-kind-interface tsd-parent-kind-module"><a href="../interfaces/transactions.truecv.html" class="tsd-kind-icon">TrueCV</a></li>
-								<li class="tsd-kind-interface tsd-parent-kind-module"><a href="../interfaces/transactions.tuplecv.html" class="tsd-kind-icon">TupleCV</a></li>
+								<li class="tsd-kind-interface tsd-parent-kind-module tsd-has-type-parameter"><a href="../interfaces/transactions.tuplecv.html" class="tsd-kind-icon">TupleCV</a></li>
 								<li class="tsd-kind-interface tsd-parent-kind-module"><a href="../interfaces/transactions.uintcv.html" class="tsd-kind-icon">UIntCV</a></li>
 								<li class="tsd-kind-interface tsd-parent-kind-module"><a href="../interfaces/transactions.unsignedcontractcalloptions.html" class="tsd-kind-icon">Unsigned<wbr>Contract<wbr>Call<wbr>Options</a></li>
 								<li class="tsd-kind-interface tsd-parent-kind-module"><a href="../interfaces/transactions.unsignedmultisigcontractcalloptions.html" class="tsd-kind-icon">Unsigned<wbr>Multi<wbr>Sig<wbr>Contract<wbr>Call<wbr>Options</a></li>
@@ -648,7 +653,7 @@
 								<li class="tsd-kind-type-alias tsd-parent-kind-module"><a href="transactions.html#clarityabitypeunion" class="tsd-kind-icon">Clarity<wbr>Abi<wbr>Type<wbr>Union</a></li>
 								<li class="tsd-kind-type-alias tsd-parent-kind-module"><a href="transactions.html#clarityvalue" class="tsd-kind-icon">Clarity<wbr>Value</a></li>
 								<li class="tsd-kind-type-alias tsd-parent-kind-module"><a href="transactions.html#multisighashmode" class="tsd-kind-icon">Multi<wbr>Sig<wbr>Hash<wbr>Mode</a></li>
-								<li class="tsd-kind-type-alias tsd-parent-kind-module"><a href="transactions.html#optionalcv" class="tsd-kind-icon">OptionalCV</a></li>
+								<li class="tsd-kind-type-alias tsd-parent-kind-module tsd-has-type-parameter"><a href="transactions.html#optionalcv" class="tsd-kind-icon">OptionalCV</a></li>
 								<li class="tsd-kind-type-alias tsd-parent-kind-module"><a href="transactions.html#postcondition" class="tsd-kind-icon">Post<wbr>Condition</a></li>
 								<li class="tsd-kind-type-alias tsd-parent-kind-module"><a href="transactions.html#postconditionprincipal" class="tsd-kind-icon">Post<wbr>Condition<wbr>Principal</a></li>
 								<li class="tsd-kind-type-alias tsd-parent-kind-module"><a href="transactions.html#principalcv" class="tsd-kind-icon">PrincipalCV</a></li>
@@ -721,7 +726,7 @@
 								<li class="tsd-kind-function tsd-parent-kind-module"><a href="transactions.html#cvtovalue" class="tsd-kind-icon">cv<wbr>ToValue</a></li>
 								<li class="tsd-kind-function tsd-parent-kind-module"><a href="transactions.html#deserializeaddress" class="tsd-kind-icon">deserialize<wbr>Address</a></li>
 								<li class="tsd-kind-function tsd-parent-kind-module"><a href="transactions.html#deserializeassetinfo" class="tsd-kind-icon">deserialize<wbr>Asset<wbr>Info</a></li>
-								<li class="tsd-kind-function tsd-parent-kind-module"><a href="transactions.html#deserializecv" class="tsd-kind-icon">deserializeCV</a></li>
+								<li class="tsd-kind-function tsd-parent-kind-module tsd-has-type-parameter"><a href="transactions.html#deserializecv" class="tsd-kind-icon">deserializeCV</a></li>
 								<li class="tsd-kind-function tsd-parent-kind-module"><a href="transactions.html#deserializelplist" class="tsd-kind-icon">deserializeLPList</a></li>
 								<li class="tsd-kind-function tsd-parent-kind-module"><a href="transactions.html#deserializelpstring" class="tsd-kind-icon">deserializeLPString</a></li>
 								<li class="tsd-kind-function tsd-parent-kind-module"><a href="transactions.html#deserializememostring" class="tsd-kind-icon">deserialize<wbr>Memo<wbr>String</a></li>
@@ -800,8 +805,8 @@
 								<li class="tsd-kind-function tsd-parent-kind-module"><a href="transactions.html#publickeyfromsignature" class="tsd-kind-icon">public<wbr>Key<wbr>From<wbr>Signature</a></li>
 								<li class="tsd-kind-function tsd-parent-kind-module"><a href="transactions.html#publickeytoaddress" class="tsd-kind-icon">public<wbr>Key<wbr>ToAddress</a></li>
 								<li class="tsd-kind-function tsd-parent-kind-module"><a href="transactions.html#publickeytostring" class="tsd-kind-icon">public<wbr>Key<wbr>ToString</a></li>
-								<li class="tsd-kind-function tsd-parent-kind-module"><a href="transactions.html#responseerrorcv-1" class="tsd-kind-icon">response<wbr>ErrorCV</a></li>
-								<li class="tsd-kind-function tsd-parent-kind-module"><a href="transactions.html#responseokcv-1" class="tsd-kind-icon">response<wbr>OkCV</a></li>
+								<li class="tsd-kind-function tsd-parent-kind-module tsd-has-type-parameter"><a href="transactions.html#responseerrorcv-1" class="tsd-kind-icon">response<wbr>ErrorCV</a></li>
+								<li class="tsd-kind-function tsd-parent-kind-module tsd-has-type-parameter"><a href="transactions.html#responseokcv-1" class="tsd-kind-icon">response<wbr>OkCV</a></li>
 								<li class="tsd-kind-function tsd-parent-kind-module"><a href="transactions.html#rightpadhextolength" class="tsd-kind-icon">right<wbr>Pad<wbr>Hex<wbr>ToLength</a></li>
 								<li class="tsd-kind-function tsd-parent-kind-module"><a href="transactions.html#serializeaddress" class="tsd-kind-icon">serialize<wbr>Address</a></li>
 								<li class="tsd-kind-function tsd-parent-kind-module"><a href="transactions.html#serializeassetinfo" class="tsd-kind-icon">serialize<wbr>Asset<wbr>Info</a></li>
@@ -819,14 +824,14 @@
 								<li class="tsd-kind-function tsd-parent-kind-module"><a href="transactions.html#serializestacksmessage" class="tsd-kind-icon">serialize<wbr>Stacks<wbr>Message</a></li>
 								<li class="tsd-kind-function tsd-parent-kind-module"><a href="transactions.html#serializetransactionauthfield" class="tsd-kind-icon">serialize<wbr>Transaction<wbr>Auth<wbr>Field</a></li>
 								<li class="tsd-kind-function tsd-parent-kind-module"><a href="transactions.html#signwithkey" class="tsd-kind-icon">sign<wbr>With<wbr>Key</a></li>
-								<li class="tsd-kind-function tsd-parent-kind-module"><a href="transactions.html#somecv-1" class="tsd-kind-icon">someCV</a></li>
+								<li class="tsd-kind-function tsd-parent-kind-module tsd-has-type-parameter"><a href="transactions.html#somecv-1" class="tsd-kind-icon">someCV</a></li>
 								<li class="tsd-kind-function tsd-parent-kind-module"><a href="transactions.html#sponsortransaction" class="tsd-kind-icon">sponsor<wbr>Transaction</a></li>
 								<li class="tsd-kind-function tsd-parent-kind-module"><a href="transactions.html#standardprincipalcv-1" class="tsd-kind-icon">standard<wbr>PrincipalCV</a></li>
 								<li class="tsd-kind-function tsd-parent-kind-module"><a href="transactions.html#standardprincipalcvfromaddress" class="tsd-kind-icon">standard<wbr>PrincipalCVFrom<wbr>Address</a></li>
 								<li class="tsd-kind-function tsd-parent-kind-module"><a href="transactions.html#stringasciicv-1" class="tsd-kind-icon">string<wbr>AsciiCV</a></li>
 								<li class="tsd-kind-function tsd-parent-kind-module"><a href="transactions.html#stringutf8cv-1" class="tsd-kind-icon">string<wbr>Utf8CV</a></li>
 								<li class="tsd-kind-function tsd-parent-kind-module"><a href="transactions.html#truecv-1" class="tsd-kind-icon">trueCV</a></li>
-								<li class="tsd-kind-function tsd-parent-kind-module"><a href="transactions.html#tuplecv-1" class="tsd-kind-icon">tupleCV</a></li>
+								<li class="tsd-kind-function tsd-parent-kind-module tsd-has-type-parameter"><a href="transactions.html#tuplecv-1" class="tsd-kind-icon">tupleCV</a></li>
 								<li class="tsd-kind-function tsd-parent-kind-module"><a href="transactions.html#txidfromdata" class="tsd-kind-icon">txid<wbr>From<wbr>Data</a></li>
 								<li class="tsd-kind-function tsd-parent-kind-module"><a href="transactions.html#uintcv-1" class="tsd-kind-icon">uintCV</a></li>
 								<li class="tsd-kind-function tsd-parent-kind-module"><a href="transactions.html#validatecontractcall" class="tsd-kind-icon">validate<wbr>Contract<wbr>Call</a></li>
@@ -1106,10 +1111,10 @@
 				<section class="tsd-panel tsd-member tsd-kind-type-alias tsd-parent-kind-module">
 					<a name="clarityvalue" class="tsd-anchor"></a>
 					<h3>Clarity<wbr>Value</h3>
-					<div class="tsd-signature tsd-kind-icon">Clarity<wbr>Value<span class="tsd-signature-symbol">:</span> <a href="transactions.html#booleancv" class="tsd-signature-type" data-tsd-kind="Type alias">BooleanCV</a><span class="tsd-signature-symbol"> | </span><a href="transactions.html#optionalcv" class="tsd-signature-type" data-tsd-kind="Type alias">OptionalCV</a><span class="tsd-signature-symbol"> | </span><a href="../interfaces/transactions.buffercv.html" class="tsd-signature-type" data-tsd-kind="Interface">BufferCV</a><span class="tsd-signature-symbol"> | </span><a href="../interfaces/transactions.intcv.html" class="tsd-signature-type" data-tsd-kind="Interface">IntCV</a><span class="tsd-signature-symbol"> | </span><a href="../interfaces/transactions.uintcv.html" class="tsd-signature-type" data-tsd-kind="Interface">UIntCV</a><span class="tsd-signature-symbol"> | </span><a href="../interfaces/transactions.standardprincipalcv.html" class="tsd-signature-type" data-tsd-kind="Interface">StandardPrincipalCV</a><span class="tsd-signature-symbol"> | </span><a href="../interfaces/transactions.contractprincipalcv.html" class="tsd-signature-type" data-tsd-kind="Interface">ContractPrincipalCV</a><span class="tsd-signature-symbol"> | </span><a href="../interfaces/transactions.responseerrorcv.html" class="tsd-signature-type" data-tsd-kind="Interface">ResponseErrorCV</a><span class="tsd-signature-symbol"> | </span><a href="../interfaces/transactions.responseokcv.html" class="tsd-signature-type" data-tsd-kind="Interface">ResponseOkCV</a><span class="tsd-signature-symbol"> | </span><a href="../interfaces/transactions.listcv.html" class="tsd-signature-type" data-tsd-kind="Interface">ListCV</a><span class="tsd-signature-symbol"> | </span><a href="../interfaces/transactions.tuplecv.html" class="tsd-signature-type" data-tsd-kind="Interface">TupleCV</a><span class="tsd-signature-symbol"> | </span><a href="../interfaces/transactions.stringasciicv.html" class="tsd-signature-type" data-tsd-kind="Interface">StringAsciiCV</a><span class="tsd-signature-symbol"> | </span><a href="../interfaces/transactions.stringutf8cv.html" class="tsd-signature-type" data-tsd-kind="Interface">StringUtf8CV</a></div>
+					<div class="tsd-signature tsd-kind-icon">Clarity<wbr>Value<span class="tsd-signature-symbol">:</span> <a href="transactions.html#booleancv" class="tsd-signature-type" data-tsd-kind="Type alias">BooleanCV</a><span class="tsd-signature-symbol"> | </span><a href="../interfaces/transactions.buffercv.html" class="tsd-signature-type" data-tsd-kind="Interface">BufferCV</a><span class="tsd-signature-symbol"> | </span><a href="../interfaces/transactions.intcv.html" class="tsd-signature-type" data-tsd-kind="Interface">IntCV</a><span class="tsd-signature-symbol"> | </span><a href="../interfaces/transactions.uintcv.html" class="tsd-signature-type" data-tsd-kind="Interface">UIntCV</a><span class="tsd-signature-symbol"> | </span><a href="../interfaces/transactions.standardprincipalcv.html" class="tsd-signature-type" data-tsd-kind="Interface">StandardPrincipalCV</a><span class="tsd-signature-symbol"> | </span><a href="../interfaces/transactions.contractprincipalcv.html" class="tsd-signature-type" data-tsd-kind="Interface">ContractPrincipalCV</a><span class="tsd-signature-symbol"> | </span><a href="../interfaces/transactions.responseerrorcv.html" class="tsd-signature-type" data-tsd-kind="Interface">ResponseErrorCV</a><span class="tsd-signature-symbol"> | </span><a href="../interfaces/transactions.responseokcv.html" class="tsd-signature-type" data-tsd-kind="Interface">ResponseOkCV</a><span class="tsd-signature-symbol"> | </span><a href="../interfaces/transactions.nonecv.html" class="tsd-signature-type" data-tsd-kind="Interface">NoneCV</a><span class="tsd-signature-symbol"> | </span><a href="../interfaces/transactions.somecv.html" class="tsd-signature-type" data-tsd-kind="Interface">SomeCV</a><span class="tsd-signature-symbol"> | </span><a href="../interfaces/transactions.listcv.html" class="tsd-signature-type" data-tsd-kind="Interface">ListCV</a><span class="tsd-signature-symbol"> | </span><a href="../interfaces/transactions.tuplecv.html" class="tsd-signature-type" data-tsd-kind="Interface">TupleCV</a><span class="tsd-signature-symbol"> | </span><a href="../interfaces/transactions.stringasciicv.html" class="tsd-signature-type" data-tsd-kind="Interface">StringAsciiCV</a><span class="tsd-signature-symbol"> | </span><a href="../interfaces/transactions.stringutf8cv.html" class="tsd-signature-type" data-tsd-kind="Interface">StringUtf8CV</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/transactions/src/clarity/clarityValue.ts#L43">packages/transactions/src/clarity/clarityValue.ts:43</a></li>
+							<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/transactions/src/clarity/clarityValue.ts#L44">packages/transactions/src/clarity/clarityValue.ts:44</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -1119,19 +1124,25 @@
 					<div class="tsd-signature tsd-kind-icon">Multi<wbr>Sig<wbr>Hash<wbr>Mode<span class="tsd-signature-symbol">:</span> <a href="../enums/transactions.addresshashmode.html#serializep2sh" class="tsd-signature-type" data-tsd-kind="Enumeration member">SerializeP2SH</a><span class="tsd-signature-symbol"> | </span><a href="../enums/transactions.addresshashmode.html#serializep2wsh" class="tsd-signature-type" data-tsd-kind="Enumeration member">SerializeP2WSH</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/transactions/src/constants.ts#L90">packages/transactions/src/constants.ts:90</a></li>
+							<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/transactions/src/constants.ts#L98">packages/transactions/src/constants.ts:98</a></li>
 						</ul>
 					</aside>
 				</section>
-				<section class="tsd-panel tsd-member tsd-kind-type-alias tsd-parent-kind-module">
+				<section class="tsd-panel tsd-member tsd-kind-type-alias tsd-parent-kind-module tsd-has-type-parameter">
 					<a name="optionalcv" class="tsd-anchor"></a>
 					<h3>OptionalCV</h3>
-					<div class="tsd-signature tsd-kind-icon">OptionalCV<span class="tsd-signature-symbol">:</span> <a href="../interfaces/transactions.nonecv.html" class="tsd-signature-type" data-tsd-kind="Interface">NoneCV</a><span class="tsd-signature-symbol"> | </span><a href="../interfaces/transactions.somecv.html" class="tsd-signature-type" data-tsd-kind="Interface">SomeCV</a></div>
+					<div class="tsd-signature tsd-kind-icon">OptionalCV&lt;T&gt;<span class="tsd-signature-symbol">:</span> <a href="../interfaces/transactions.nonecv.html" class="tsd-signature-type" data-tsd-kind="Interface">NoneCV</a><span class="tsd-signature-symbol"> | </span><a href="../interfaces/transactions.somecv.html" class="tsd-signature-type" data-tsd-kind="Interface">SomeCV</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span></div>
 					<aside class="tsd-sources">
 						<ul>
 							<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/transactions/src/clarity/types/optionalCV.ts#L3">packages/transactions/src/clarity/types/optionalCV.ts:3</a></li>
 						</ul>
 					</aside>
+					<h4 class="tsd-type-parameters-title">Type parameters</h4>
+					<ul class="tsd-type-parameters">
+						<li>
+							<h4>T<span class="tsd-signature-symbol">: </span><a href="transactions.html#clarityvalue" class="tsd-signature-type" data-tsd-kind="Type alias">ClarityValue</a> = <a href="transactions.html#clarityvalue" class="tsd-signature-type" data-tsd-kind="Type alias">ClarityValue</a></h4>
+						</li>
+					</ul>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-type-alias tsd-parent-kind-module">
 					<a name="postcondition" class="tsd-anchor"></a>
@@ -1169,7 +1180,7 @@
 					<div class="tsd-signature tsd-kind-icon">Read<wbr>Only<wbr>Function<wbr>Response<span class="tsd-signature-symbol">:</span> <a href="../interfaces/transactions.readonlyfunctionsuccessresponse.html" class="tsd-signature-type" data-tsd-kind="Interface">ReadOnlyFunctionSuccessResponse</a><span class="tsd-signature-symbol"> | </span><a href="../interfaces/transactions.readonlyfunctionerrorresponse.html" class="tsd-signature-type" data-tsd-kind="Interface">ReadOnlyFunctionErrorResponse</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/transactions/src/utils.ts#L187">packages/transactions/src/utils.ts:187</a></li>
+							<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/transactions/src/utils.ts#L185">packages/transactions/src/utils.ts:185</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -1189,7 +1200,7 @@
 					<div class="tsd-signature tsd-kind-icon">Single<wbr>Sig<wbr>Hash<wbr>Mode<span class="tsd-signature-symbol">:</span> <a href="../enums/transactions.addresshashmode.html#serializep2pkh" class="tsd-signature-type" data-tsd-kind="Enumeration member">SerializeP2PKH</a><span class="tsd-signature-symbol"> | </span><a href="../enums/transactions.addresshashmode.html#serializep2wpkh" class="tsd-signature-type" data-tsd-kind="Enumeration member">SerializeP2WPKH</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/transactions/src/constants.ts#L89">packages/transactions/src/constants.ts:89</a></li>
+							<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/transactions/src/constants.ts#L97">packages/transactions/src/constants.ts:97</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -1329,7 +1340,7 @@
 					<div class="tsd-signature tsd-kind-icon">DEFAULT_<wbr>TRANSACTION_<wbr>VERSION<span class="tsd-signature-symbol">:</span> <a href="../enums/transactions.transactionversion.html#mainnet" class="tsd-signature-type" data-tsd-kind="Enumeration member">Mainnet</a><span class="tsd-signature-symbol"> = ...</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/transactions/src/constants.ts#L58">packages/transactions/src/constants.ts:58</a></li>
+							<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/transactions/src/constants.ts#L66">packages/transactions/src/constants.ts:66</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -1683,7 +1694,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/transactions/src/builders.ts#L1028">packages/transactions/src/builders.ts:1028</a></li>
+									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/transactions/src/builders.ts#L1025">packages/transactions/src/builders.ts:1025</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -2389,7 +2400,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/transactions/src/clarity/clarityValue.ts#L138">packages/transactions/src/clarity/clarityValue.ts:138</a></li>
+									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/transactions/src/clarity/clarityValue.ts#L140">packages/transactions/src/clarity/clarityValue.ts:140</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -2412,7 +2423,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/transactions/src/clarity/clarityValue.ts#L58">packages/transactions/src/clarity/clarityValue.ts:58</a></li>
+									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/transactions/src/clarity/clarityValue.ts#L60">packages/transactions/src/clarity/clarityValue.ts:60</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -2438,7 +2449,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/transactions/src/clarity/clarityValue.ts#L100">packages/transactions/src/clarity/clarityValue.ts:100</a></li>
+									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/transactions/src/clarity/clarityValue.ts#L102">packages/transactions/src/clarity/clarityValue.ts:102</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -2497,11 +2508,11 @@
 						</li>
 					</ul>
 				</section>
-				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module">
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module tsd-has-type-parameter">
 					<a name="deserializecv" class="tsd-anchor"></a>
 					<h3>deserializeCV</h3>
-					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module">
-						<li class="tsd-signature tsd-kind-icon">deserializeCV<span class="tsd-signature-symbol">(</span>buffer<span class="tsd-signature-symbol">: </span><a href="../classes/transactions.bufferreader.html" class="tsd-signature-type" data-tsd-kind="Class">BufferReader</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Buffer</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="transactions.html#clarityvalue" class="tsd-signature-type" data-tsd-kind="Type alias">ClarityValue</a></li>
+					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module tsd-has-type-parameter">
+						<li class="tsd-signature tsd-kind-icon">deserializeCV&lt;T&gt;<span class="tsd-signature-symbol">(</span>serializedClarityValue<span class="tsd-signature-symbol">: </span><a href="../classes/transactions.bufferreader.html" class="tsd-signature-type" data-tsd-kind="Class">BufferReader</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Buffer</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">T</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
@@ -2510,13 +2521,19 @@
 									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/transactions/src/clarity/deserialize.ts#L24">packages/transactions/src/clarity/deserialize.ts:24</a></li>
 								</ul>
 							</aside>
+							<h4 class="tsd-type-parameters-title">Type parameters</h4>
+							<ul class="tsd-type-parameters">
+								<li>
+									<h4>T<span class="tsd-signature-symbol">: </span><a href="transactions.html#clarityvalue" class="tsd-signature-type" data-tsd-kind="Type alias">ClarityValue</a> = <a href="transactions.html#clarityvalue" class="tsd-signature-type" data-tsd-kind="Type alias">ClarityValue</a></h4>
+								</li>
+							</ul>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>buffer: <a href="../classes/transactions.bufferreader.html" class="tsd-signature-type" data-tsd-kind="Class">BufferReader</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Buffer</span></h5>
+									<h5>serializedClarityValue: <a href="../classes/transactions.bufferreader.html" class="tsd-signature-type" data-tsd-kind="Class">BufferReader</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Buffer</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span></h5>
 								</li>
 							</ul>
-							<h4 class="tsd-returns-title">Returns <a href="transactions.html#clarityvalue" class="tsd-signature-type" data-tsd-kind="Type alias">ClarityValue</a></h4>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">T</span></h4>
 						</li>
 					</ul>
 				</section>
@@ -2807,7 +2824,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/transactions/src/transaction.ts#L253">packages/transactions/src/transaction.ts:253</a></li>
+									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/transactions/src/transaction.ts#L252">packages/transactions/src/transaction.ts:252</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -2917,7 +2934,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/transactions/src/builders.ts#L465">packages/transactions/src/builders.ts:465</a></li>
+									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/transactions/src/builders.ts#L464">packages/transactions/src/builders.ts:464</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -2955,7 +2972,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/transactions/src/builders.ts#L652">packages/transactions/src/builders.ts:652</a></li>
+									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/transactions/src/builders.ts#L650">packages/transactions/src/builders.ts:650</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -3180,7 +3197,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/transactions/src/clarity/clarityValue.ts#L149">packages/transactions/src/clarity/clarityValue.ts:149</a></li>
+									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/transactions/src/clarity/clarityValue.ts#L151">packages/transactions/src/clarity/clarityValue.ts:151</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -3804,7 +3821,7 @@
 					<a name="listcv-1" class="tsd-anchor"></a>
 					<h3>listCV</h3>
 					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module tsd-has-type-parameter">
-						<li class="tsd-signature tsd-kind-icon">listCV&lt;T&gt;<span class="tsd-signature-symbol">(</span>values<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../interfaces/transactions.listcv.html" class="tsd-signature-type" data-tsd-kind="Interface">ListCV</a></li>
+						<li class="tsd-signature tsd-kind-icon">listCV&lt;T&gt;<span class="tsd-signature-symbol">(</span>values<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../interfaces/transactions.listcv.html" class="tsd-signature-type" data-tsd-kind="Interface">ListCV</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
@@ -3816,7 +3833,7 @@
 							<h4 class="tsd-type-parameters-title">Type parameters</h4>
 							<ul class="tsd-type-parameters">
 								<li>
-									<h4>T<span class="tsd-signature-symbol">: </span><a href="transactions.html#clarityvalue" class="tsd-signature-type" data-tsd-kind="Type alias">ClarityValue</a></h4>
+									<h4>T<span class="tsd-signature-symbol">: </span><a href="transactions.html#clarityvalue" class="tsd-signature-type" data-tsd-kind="Type alias">ClarityValue</a> = <a href="transactions.html#clarityvalue" class="tsd-signature-type" data-tsd-kind="Type alias">ClarityValue</a></h4>
 								</li>
 							</ul>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -3825,7 +3842,7 @@
 									<h5>values: <span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">[]</span></h5>
 								</li>
 							</ul>
-							<h4 class="tsd-returns-title">Returns <a href="../interfaces/transactions.listcv.html" class="tsd-signature-type" data-tsd-kind="Interface">ListCV</a></h4>
+							<h4 class="tsd-returns-title">Returns <a href="../interfaces/transactions.listcv.html" class="tsd-signature-type" data-tsd-kind="Interface">ListCV</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span></h4>
 						</li>
 					</ul>
 				</section>
@@ -3839,7 +3856,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/transactions/src/builders.ts#L812">packages/transactions/src/builders.ts:812</a></li>
+									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/transactions/src/builders.ts#L809">packages/transactions/src/builders.ts:809</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -3871,7 +3888,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/transactions/src/builders.ts#L518">packages/transactions/src/builders.ts:518</a></li>
+									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/transactions/src/builders.ts#L517">packages/transactions/src/builders.ts:517</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -3903,7 +3920,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/transactions/src/builders.ts#L928">packages/transactions/src/builders.ts:928</a></li>
+									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/transactions/src/builders.ts#L925">packages/transactions/src/builders.ts:925</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -3959,7 +3976,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/transactions/src/builders.ts#L982">packages/transactions/src/builders.ts:982</a></li>
+									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/transactions/src/builders.ts#L979">packages/transactions/src/builders.ts:979</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -4015,7 +4032,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/transactions/src/builders.ts#L876">packages/transactions/src/builders.ts:876</a></li>
+									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/transactions/src/builders.ts#L873">packages/transactions/src/builders.ts:873</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -4088,7 +4105,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/transactions/src/builders.ts#L397">packages/transactions/src/builders.ts:397</a></li>
+									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/transactions/src/builders.ts#L396">packages/transactions/src/builders.ts:396</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -4152,7 +4169,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/transactions/src/builders.ts#L901">packages/transactions/src/builders.ts:901</a></li>
+									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/transactions/src/builders.ts#L898">packages/transactions/src/builders.ts:898</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -4202,7 +4219,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/transactions/src/builders.ts#L955">packages/transactions/src/builders.ts:955</a></li>
+									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/transactions/src/builders.ts#L952">packages/transactions/src/builders.ts:952</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -4252,7 +4269,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/transactions/src/builders.ts#L856">packages/transactions/src/builders.ts:856</a></li>
+									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/transactions/src/builders.ts#L853">packages/transactions/src/builders.ts:853</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -4296,7 +4313,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/transactions/src/builders.ts#L703">packages/transactions/src/builders.ts:703</a></li>
+									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/transactions/src/builders.ts#L701">packages/transactions/src/builders.ts:701</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -4440,9 +4457,9 @@
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module">
 					<a name="nonecv-1" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagConst">Const</span> noneCV</h3>
+					<h3>noneCV</h3>
 					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module">
-						<li class="tsd-signature tsd-kind-icon">noneCV<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="transactions.html#optionalcv" class="tsd-signature-type" data-tsd-kind="Type alias">OptionalCV</a></li>
+						<li class="tsd-signature tsd-kind-icon">noneCV<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../interfaces/transactions.nonecv.html" class="tsd-signature-type" data-tsd-kind="Interface">NoneCV</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
@@ -4451,7 +4468,7 @@
 									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/transactions/src/clarity/types/optionalCV.ts#L14">packages/transactions/src/clarity/types/optionalCV.ts:14</a></li>
 								</ul>
 							</aside>
-							<h4 class="tsd-returns-title">Returns <a href="transactions.html#optionalcv" class="tsd-signature-type" data-tsd-kind="Type alias">OptionalCV</a></h4>
+							<h4 class="tsd-returns-title">Returns <a href="../interfaces/transactions.nonecv.html" class="tsd-signature-type" data-tsd-kind="Interface">NoneCV</a></h4>
 						</li>
 					</ul>
 				</section>
@@ -4575,7 +4592,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/transactions/src/utils.ts#L195">packages/transactions/src/utils.ts:195</a></li>
+									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/transactions/src/utils.ts#L193">packages/transactions/src/utils.ts:193</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -4813,11 +4830,11 @@
 						</li>
 					</ul>
 				</section>
-				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module">
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module tsd-has-type-parameter">
 					<a name="responseerrorcv-1" class="tsd-anchor"></a>
 					<h3>response<wbr>ErrorCV</h3>
-					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module">
-						<li class="tsd-signature tsd-kind-icon">response<wbr>ErrorCV<span class="tsd-signature-symbol">(</span>value<span class="tsd-signature-symbol">: </span><a href="transactions.html#clarityvalue" class="tsd-signature-type" data-tsd-kind="Type alias">ClarityValue</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../interfaces/transactions.responseerrorcv.html" class="tsd-signature-type" data-tsd-kind="Interface">ResponseErrorCV</a></li>
+					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module tsd-has-type-parameter">
+						<li class="tsd-signature tsd-kind-icon">response<wbr>ErrorCV&lt;T&gt;<span class="tsd-signature-symbol">(</span>value<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../interfaces/transactions.responseerrorcv.html" class="tsd-signature-type" data-tsd-kind="Interface">ResponseErrorCV</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
@@ -4826,21 +4843,27 @@
 									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/transactions/src/clarity/types/responseCV.ts#L15">packages/transactions/src/clarity/types/responseCV.ts:15</a></li>
 								</ul>
 							</aside>
+							<h4 class="tsd-type-parameters-title">Type parameters</h4>
+							<ul class="tsd-type-parameters">
+								<li>
+									<h4>T<span class="tsd-signature-symbol">: </span><a href="transactions.html#clarityvalue" class="tsd-signature-type" data-tsd-kind="Type alias">ClarityValue</a> = <a href="transactions.html#clarityvalue" class="tsd-signature-type" data-tsd-kind="Type alias">ClarityValue</a></h4>
+								</li>
+							</ul>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>value: <a href="transactions.html#clarityvalue" class="tsd-signature-type" data-tsd-kind="Type alias">ClarityValue</a></h5>
+									<h5>value: <span class="tsd-signature-type">T</span></h5>
 								</li>
 							</ul>
-							<h4 class="tsd-returns-title">Returns <a href="../interfaces/transactions.responseerrorcv.html" class="tsd-signature-type" data-tsd-kind="Interface">ResponseErrorCV</a></h4>
+							<h4 class="tsd-returns-title">Returns <a href="../interfaces/transactions.responseerrorcv.html" class="tsd-signature-type" data-tsd-kind="Interface">ResponseErrorCV</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span></h4>
 						</li>
 					</ul>
 				</section>
-				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module">
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module tsd-has-type-parameter">
 					<a name="responseokcv-1" class="tsd-anchor"></a>
 					<h3>response<wbr>OkCV</h3>
-					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module">
-						<li class="tsd-signature tsd-kind-icon">response<wbr>OkCV<span class="tsd-signature-symbol">(</span>value<span class="tsd-signature-symbol">: </span><a href="transactions.html#clarityvalue" class="tsd-signature-type" data-tsd-kind="Type alias">ClarityValue</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../interfaces/transactions.responseokcv.html" class="tsd-signature-type" data-tsd-kind="Interface">ResponseOkCV</a></li>
+					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module tsd-has-type-parameter">
+						<li class="tsd-signature tsd-kind-icon">response<wbr>OkCV&lt;T&gt;<span class="tsd-signature-symbol">(</span>value<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../interfaces/transactions.responseokcv.html" class="tsd-signature-type" data-tsd-kind="Interface">ResponseOkCV</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
@@ -4849,13 +4872,19 @@
 									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/transactions/src/clarity/types/responseCV.ts#L19">packages/transactions/src/clarity/types/responseCV.ts:19</a></li>
 								</ul>
 							</aside>
+							<h4 class="tsd-type-parameters-title">Type parameters</h4>
+							<ul class="tsd-type-parameters">
+								<li>
+									<h4>T<span class="tsd-signature-symbol">: </span><a href="transactions.html#clarityvalue" class="tsd-signature-type" data-tsd-kind="Type alias">ClarityValue</a> = <a href="transactions.html#clarityvalue" class="tsd-signature-type" data-tsd-kind="Type alias">ClarityValue</a></h4>
+								</li>
+							</ul>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>value: <a href="transactions.html#clarityvalue" class="tsd-signature-type" data-tsd-kind="Type alias">ClarityValue</a></h5>
+									<h5>value: <span class="tsd-signature-type">T</span></h5>
 								</li>
 							</ul>
-							<h4 class="tsd-returns-title">Returns <a href="../interfaces/transactions.responseokcv.html" class="tsd-signature-type" data-tsd-kind="Interface">ResponseOkCV</a></h4>
+							<h4 class="tsd-returns-title">Returns <a href="../interfaces/transactions.responseokcv.html" class="tsd-signature-type" data-tsd-kind="Interface">ResponseOkCV</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span></h4>
 						</li>
 					</ul>
 				</section>
@@ -5256,26 +5285,32 @@
 						</li>
 					</ul>
 				</section>
-				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module">
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module tsd-has-type-parameter">
 					<a name="somecv-1" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagConst">Const</span> someCV</h3>
-					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module">
-						<li class="tsd-signature tsd-kind-icon">someCV<span class="tsd-signature-symbol">(</span>value<span class="tsd-signature-symbol">: </span><a href="transactions.html#clarityvalue" class="tsd-signature-type" data-tsd-kind="Type alias">ClarityValue</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="transactions.html#optionalcv" class="tsd-signature-type" data-tsd-kind="Type alias">OptionalCV</a></li>
+					<h3>someCV</h3>
+					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module tsd-has-type-parameter">
+						<li class="tsd-signature tsd-kind-icon">someCV&lt;T&gt;<span class="tsd-signature-symbol">(</span>value<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="transactions.html#optionalcv" class="tsd-signature-type" data-tsd-kind="Type alias">OptionalCV</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/transactions/src/clarity/types/optionalCV.ts#L15">packages/transactions/src/clarity/types/optionalCV.ts:15</a></li>
+									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/transactions/src/clarity/types/optionalCV.ts#L18">packages/transactions/src/clarity/types/optionalCV.ts:18</a></li>
 								</ul>
 							</aside>
+							<h4 class="tsd-type-parameters-title">Type parameters</h4>
+							<ul class="tsd-type-parameters">
+								<li>
+									<h4>T<span class="tsd-signature-symbol">: </span><a href="transactions.html#clarityvalue" class="tsd-signature-type" data-tsd-kind="Type alias">ClarityValue</a> = <a href="transactions.html#clarityvalue" class="tsd-signature-type" data-tsd-kind="Type alias">ClarityValue</a></h4>
+								</li>
+							</ul>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>value: <a href="transactions.html#clarityvalue" class="tsd-signature-type" data-tsd-kind="Type alias">ClarityValue</a></h5>
+									<h5>value: <span class="tsd-signature-type">T</span></h5>
 								</li>
 							</ul>
-							<h4 class="tsd-returns-title">Returns <a href="transactions.html#optionalcv" class="tsd-signature-type" data-tsd-kind="Type alias">OptionalCV</a></h4>
+							<h4 class="tsd-returns-title">Returns <a href="transactions.html#optionalcv" class="tsd-signature-type" data-tsd-kind="Type alias">OptionalCV</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span></h4>
 						</li>
 					</ul>
 				</section>
@@ -5289,7 +5324,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/transactions/src/builders.ts#L1103">packages/transactions/src/builders.ts:1103</a></li>
+									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/transactions/src/builders.ts#L1094">packages/transactions/src/builders.ts:1094</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -5420,11 +5455,11 @@
 						</li>
 					</ul>
 				</section>
-				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module">
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module tsd-has-type-parameter">
 					<a name="tuplecv-1" class="tsd-anchor"></a>
 					<h3>tupleCV</h3>
-					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module">
-						<li class="tsd-signature tsd-kind-icon">tupleCV<span class="tsd-signature-symbol">(</span>data<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">TupleData</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../interfaces/transactions.tuplecv.html" class="tsd-signature-type" data-tsd-kind="Interface">TupleCV</a></li>
+					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module tsd-has-type-parameter">
+						<li class="tsd-signature tsd-kind-icon">tupleCV&lt;T&gt;<span class="tsd-signature-symbol">(</span>data<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">TupleData</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../interfaces/transactions.tuplecv.html" class="tsd-signature-type" data-tsd-kind="Interface">TupleCV</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TupleData</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
@@ -5433,13 +5468,19 @@
 									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/transactions/src/clarity/types/tupleCV.ts#L11">packages/transactions/src/clarity/types/tupleCV.ts:11</a></li>
 								</ul>
 							</aside>
+							<h4 class="tsd-type-parameters-title">Type parameters</h4>
+							<ul class="tsd-type-parameters">
+								<li>
+									<h4>T<span class="tsd-signature-symbol">: </span><a href="transactions.html#clarityvalue" class="tsd-signature-type" data-tsd-kind="Type alias">ClarityValue</a> = <a href="transactions.html#clarityvalue" class="tsd-signature-type" data-tsd-kind="Type alias">ClarityValue</a></h4>
+								</li>
+							</ul>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>data: <span class="tsd-signature-type">TupleData</span></h5>
+									<h5>data: <span class="tsd-signature-type">TupleData</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span></h5>
 								</li>
 							</ul>
-							<h4 class="tsd-returns-title">Returns <a href="../interfaces/transactions.tuplecv.html" class="tsd-signature-type" data-tsd-kind="Interface">TupleCV</a></h4>
+							<h4 class="tsd-returns-title">Returns <a href="../interfaces/transactions.tuplecv.html" class="tsd-signature-type" data-tsd-kind="Interface">TupleCV</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TupleData</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span></h4>
 						</li>
 					</ul>
 				</section>
@@ -5537,7 +5578,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/transactions/src/utils.ts#L203">packages/transactions/src/utils.ts:203</a></li>
+									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/transactions/src/utils.ts#L201">packages/transactions/src/utils.ts:201</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -5768,7 +5809,7 @@
 							<li class=" tsd-kind-interface tsd-parent-kind-module">
 								<a href="../interfaces/transactions.lengthprefixedstring.html" class="tsd-kind-icon">Length<wbr>Prefixed<wbr>String</a>
 							</li>
-							<li class=" tsd-kind-interface tsd-parent-kind-module">
+							<li class=" tsd-kind-interface tsd-parent-kind-module tsd-has-type-parameter">
 								<a href="../interfaces/transactions.listcv.html" class="tsd-kind-icon">ListCV</a>
 							</li>
 							<li class=" tsd-kind-interface tsd-parent-kind-module">
@@ -5798,10 +5839,10 @@
 							<li class=" tsd-kind-interface tsd-parent-kind-module">
 								<a href="../interfaces/transactions.readonlyfunctionsuccessresponse.html" class="tsd-kind-icon">Read<wbr>Only<wbr>Function<wbr>Success<wbr>Response</a>
 							</li>
-							<li class=" tsd-kind-interface tsd-parent-kind-module">
+							<li class=" tsd-kind-interface tsd-parent-kind-module tsd-has-type-parameter">
 								<a href="../interfaces/transactions.responseerrorcv.html" class="tsd-kind-icon">Response<wbr>ErrorCV</a>
 							</li>
-							<li class=" tsd-kind-interface tsd-parent-kind-module">
+							<li class=" tsd-kind-interface tsd-parent-kind-module tsd-has-type-parameter">
 								<a href="../interfaces/transactions.responseokcv.html" class="tsd-kind-icon">Response<wbr>OkCV</a>
 							</li>
 							<li class=" tsd-kind-interface tsd-parent-kind-module">
@@ -5822,7 +5863,7 @@
 							<li class=" tsd-kind-interface tsd-parent-kind-module">
 								<a href="../interfaces/transactions.smartcontractpayload.html" class="tsd-kind-icon">Smart<wbr>Contract<wbr>Payload</a>
 							</li>
-							<li class=" tsd-kind-interface tsd-parent-kind-module">
+							<li class=" tsd-kind-interface tsd-parent-kind-module tsd-has-type-parameter">
 								<a href="../interfaces/transactions.somecv.html" class="tsd-kind-icon">SomeCV</a>
 							</li>
 							<li class=" tsd-kind-interface tsd-parent-kind-module">
@@ -5858,7 +5899,7 @@
 							<li class=" tsd-kind-interface tsd-parent-kind-module">
 								<a href="../interfaces/transactions.truecv.html" class="tsd-kind-icon">TrueCV</a>
 							</li>
-							<li class=" tsd-kind-interface tsd-parent-kind-module">
+							<li class=" tsd-kind-interface tsd-parent-kind-module tsd-has-type-parameter">
 								<a href="../interfaces/transactions.tuplecv.html" class="tsd-kind-icon">TupleCV</a>
 							</li>
 							<li class=" tsd-kind-interface tsd-parent-kind-module">
@@ -5933,7 +5974,7 @@
 							<li class=" tsd-kind-type-alias tsd-parent-kind-module">
 								<a href="transactions.html#multisighashmode" class="tsd-kind-icon">Multi<wbr>Sig<wbr>Hash<wbr>Mode</a>
 							</li>
-							<li class=" tsd-kind-type-alias tsd-parent-kind-module">
+							<li class=" tsd-kind-type-alias tsd-parent-kind-module tsd-has-type-parameter">
 								<a href="transactions.html#optionalcv" class="tsd-kind-icon">OptionalCV</a>
 							</li>
 							<li class=" tsd-kind-type-alias tsd-parent-kind-module">
@@ -6122,7 +6163,7 @@
 							<li class=" tsd-kind-function tsd-parent-kind-module">
 								<a href="transactions.html#deserializeassetinfo" class="tsd-kind-icon">deserialize<wbr>Asset<wbr>Info</a>
 							</li>
-							<li class=" tsd-kind-function tsd-parent-kind-module">
+							<li class=" tsd-kind-function tsd-parent-kind-module tsd-has-type-parameter">
 								<a href="transactions.html#deserializecv" class="tsd-kind-icon">deserializeCV</a>
 							</li>
 							<li class=" tsd-kind-function tsd-parent-kind-module">
@@ -6359,10 +6400,10 @@
 							<li class=" tsd-kind-function tsd-parent-kind-module">
 								<a href="transactions.html#publickeytostring" class="tsd-kind-icon">public<wbr>Key<wbr>ToString</a>
 							</li>
-							<li class=" tsd-kind-function tsd-parent-kind-module">
+							<li class=" tsd-kind-function tsd-parent-kind-module tsd-has-type-parameter">
 								<a href="transactions.html#responseerrorcv-1" class="tsd-kind-icon">response<wbr>ErrorCV</a>
 							</li>
-							<li class=" tsd-kind-function tsd-parent-kind-module">
+							<li class=" tsd-kind-function tsd-parent-kind-module tsd-has-type-parameter">
 								<a href="transactions.html#responseokcv-1" class="tsd-kind-icon">response<wbr>OkCV</a>
 							</li>
 							<li class=" tsd-kind-function tsd-parent-kind-module">
@@ -6416,7 +6457,7 @@
 							<li class=" tsd-kind-function tsd-parent-kind-module">
 								<a href="transactions.html#signwithkey" class="tsd-kind-icon">sign<wbr>With<wbr>Key</a>
 							</li>
-							<li class=" tsd-kind-function tsd-parent-kind-module">
+							<li class=" tsd-kind-function tsd-parent-kind-module tsd-has-type-parameter">
 								<a href="transactions.html#somecv-1" class="tsd-kind-icon">someCV</a>
 							</li>
 							<li class=" tsd-kind-function tsd-parent-kind-module">
@@ -6437,7 +6478,7 @@
 							<li class=" tsd-kind-function tsd-parent-kind-module">
 								<a href="transactions.html#truecv-1" class="tsd-kind-icon">trueCV</a>
 							</li>
-							<li class=" tsd-kind-function tsd-parent-kind-module">
+							<li class=" tsd-kind-function tsd-parent-kind-module tsd-has-type-parameter">
 								<a href="transactions.html#tuplecv-1" class="tsd-kind-icon">tupleCV</a>
 							</li>
 							<li class=" tsd-kind-function tsd-parent-kind-module">
@@ -6470,12 +6511,14 @@
 				<li class="tsd-kind-function"><span class="tsd-kind-icon">Function</span></li>
 				<li class="tsd-kind-function tsd-has-type-parameter"><span class="tsd-kind-icon">Function with type parameter</span></li>
 				<li class="tsd-kind-type-alias"><span class="tsd-kind-icon">Type alias</span></li>
-			</ul>
-			<ul class="tsd-legend">
-				<li class="tsd-kind-enum"><span class="tsd-kind-icon">Enumeration</span></li>
+				<li class="tsd-kind-type-alias tsd-has-type-parameter"><span class="tsd-kind-icon">Type alias with type parameter</span></li>
 			</ul>
 			<ul class="tsd-legend">
 				<li class="tsd-kind-interface"><span class="tsd-kind-icon">Interface</span></li>
+				<li class="tsd-kind-interface tsd-has-type-parameter"><span class="tsd-kind-icon">Interface with type parameter</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-enum"><span class="tsd-kind-icon">Enumeration</span></li>
 			</ul>
 			<ul class="tsd-legend">
 				<li class="tsd-kind-class"><span class="tsd-kind-icon">Class</span></li>
