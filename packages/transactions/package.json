@@ -62,7 +62,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/blockstack/blockstack.js.gi.git"
+    "url": "git+https://github.com/blockstack/blockstack.js.git"
   },
   "scripts": {
     "start": "tsc -b tsconfig.build.json --watch --verbose",
