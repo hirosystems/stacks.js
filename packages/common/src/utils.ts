@@ -389,3 +389,7 @@ export function intToBigInt(value: IntegerType, signed: boolean): bigint {
     `Invalid value type. Must be a number, bigint, integer-string, hex-string, BN.js instance, or Buffer.`
   );
 }
+
+export function with0x(value: string): string {
+  return !value.startsWith('0x') ? `0x${value}` : value;
+}
