@@ -3,7 +3,6 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      // "@stacks/*": ["./packages/*/src"],
       "@stacks/auth": ["packages/auth/src"],
       "@stacks/bns": ["packages/bns/src"],
       "@stacks/cli": ["packages/cli/src"],
@@ -14,7 +13,8 @@
       "@stacks/profile": ["packages/profile/src"],
       "@stacks/stacking": ["packages/stacking/src"],
       "@stacks/storage": ["packages/storage/src"],
-      "@stacks/transactions": ["packages/transactions/src"]
+      "@stacks/transactions": ["packages/transactions/src"],
+      "@stacks/wallet-sdk": ["packages/wallet-sdk/src"]
     }
   }
 }

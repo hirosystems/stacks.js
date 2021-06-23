@@ -1,4 +1,3 @@
-// @ts-ignore
 import { Buffer } from '@stacks/common';
 import {
   AddressHashMode,

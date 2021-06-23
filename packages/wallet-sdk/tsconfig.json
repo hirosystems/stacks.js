@@ -1,26 +1,4 @@
 {
-  "compilerOptions": {
-    "target": "es6",
-    "module": "es2015",
-    "moduleResolution": "node",
-    "declaration": true,
-    "outDir": "./lib",
-    "strict": true,
-    "skipLibCheck": true,
-    "baseUrl": "./src",
-    "allowSyntheticDefaultImports": true,
-    "lib": ["es2017", "dom"],
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "noImplicitReturns": true,
-    "noImplicitAny": true,
-    "noImplicitThis": true,
-    "alwaysStrict": true,
-    "sourceMap": true,
-    "paths": {
-      "@stacks/encryption": ["../../encryption/src"],
-      "@stacks/transactions": ["../../transactions/src"]
-    }
-  },
-  "include": ["./src/**/*"]
+  "extends": "../../tsconfig.json",
+  "include": ["src/**/*"]
 }
