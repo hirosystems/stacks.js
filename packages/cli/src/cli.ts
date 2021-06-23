@@ -1825,7 +1825,13 @@ export function CLIMain() {
     const priceToPay = CLIOptAsString(opts, 'P') ? CLIOptAsString(opts, 'P') : '0';
     const priceUnits = CLIOptAsString(opts, 'D');
 
-    const networkType = testnet ? 'testnet' : localnet ? 'localnet': integration_test ? 'regtest' : 'mainnet';
+    const networkType = testnet
+      ? 'testnet'
+      : localnet
+      ? 'localnet'
+      : integration_test
+      ? 'regtest'
+      : 'mainnet';
 
     const configData = loadConfig(configPath!, networkType);
 
@@ -1864,7 +1870,6 @@ export function CLIMain() {
         : configData.broadcastServiceUrl,
       nodeAPIUrl: nodeAPIUrl ? nodeAPIUrl : configData.blockstackNodeUrl,
     };
-
 
     // wrap command-line options
     const wrappedNetwork = getNetwork(
