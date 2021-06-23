@@ -117,8 +117,8 @@ const CONFIG_TESTNET_DEFAULTS = {
 };
 
 export const DEFAULT_CONFIG_PATH = '~/.blockstack-cli.conf';
-export const DEFAULT_CONFIG_REGTEST_PATH = path.join(os.homedir(),'.blockstack-cli-regtest.conf');
-export const DEFAULT_CONFIG_TESTNET_PATH = path.join(os.homedir(),'.blockstack-cli-testnet.conf');
+export const DEFAULT_CONFIG_REGTEST_PATH = path.join(os.homedir(), '.blockstack-cli-regtest.conf');
+export const DEFAULT_CONFIG_TESTNET_PATH = path.join(os.homedir(), '.blockstack-cli-testnet.conf');
 
 export const DEFAULT_MAX_ID_SEARCH_INDEX = 256;
 
@@ -3394,7 +3394,12 @@ export function checkArgs(argList: string[]): CheckArgsSuccessType | CheckArgsFa
  * @networkType (sring) 'mainnet', 'regtest', 'localnet', or 'testnet'
  */
 export function loadConfig(configFile: string, networkType: string): CLI_CONFIG_TYPE {
-  if (networkType !== 'mainnet' && networkType !== 'testnet' && networkType != 'regtest' && networkType != 'localnet') {
+  if (
+    networkType !== 'mainnet' &&
+    networkType !== 'testnet' &&
+    networkType != 'regtest' &&
+    networkType != 'localnet'
+  ) {
     throw new Error('Unregognized network');
   }
 
