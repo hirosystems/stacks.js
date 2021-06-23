@@ -1,7 +1,9 @@
 import { BIP32Interface } from 'bip32';
-import { createSha2Hash, ecPairToHexString } from '@stacks/encryption';
-import { assertIsTruthy } from './utils';
+import { Buffer } from 'buffer';
 import { ECPair } from 'bitcoinjs-lib';
+import { createSha2Hash, ecPairToHexString } from '@stacks/encryption';
+
+import { assertIsTruthy } from './utils';
 import { Account } from './models/account';
 import { WalletKeys } from './models/wallet';
 

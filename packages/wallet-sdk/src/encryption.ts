@@ -8,6 +8,7 @@ import { decrypt as triplesecDecrypt } from 'triplesec';
  * @param password - Password for data
  * @return the raw mnemonic phrase
  */
+// eslint-disable-next-line node/prefer-global/buffer
 export function decrypt(dataBuffer: Buffer | string, password: string): Promise<string> {
   return decryptMnemonic(dataBuffer, password, triplesecDecrypt);
 }
@@ -18,6 +19,7 @@ export function decrypt(dataBuffer: Buffer | string, password: string): Promise<
  * @param password - Password to encrypt mnemonic with
  * @return The encrypted phrase
  * */
+// eslint-disable-next-line node/prefer-global/buffer
 export function encrypt(phrase: string, password: string): Promise<Buffer> {
   return encryptMnemonic(phrase, password);
 }
