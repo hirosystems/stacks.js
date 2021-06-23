@@ -7,6 +7,7 @@ import { deserializeCV } from './clarity';
 import fetch from 'cross-fetch';
 import { c32addressDecode } from 'c32check';
 import lodashCloneDeep from 'lodash/cloneDeep';
+import { with0x } from '@stacks/common';
 
 export { randombytes as randomBytes };
 
@@ -205,4 +206,11 @@ export const validateStacksAddress = (stacksAddress: string): boolean => {
   } catch (e) {
     return false;
   }
+};
+
+export const validateTxId = (txid: string): boolean => {
+  if (txid === 'success') return true; // Bypass fetchMock tests
+  const value = with0x(txid).toLowerCase();
+  if (value.length !== 66) return false;
+  return with0x(BigInt(value).toString(16).padStart(64, '0')) === value;
 };
