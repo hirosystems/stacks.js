@@ -7,17 +7,28 @@ import {
   StacksTestnet,
 } from '@stacks/network';
 
-test('network test-- coreApiUrl', () => {
-  const mainnet = new StacksMainnet();
-  expect(mainnet.coreApiUrl).toBe(HIRO_MAINNET_DEFAULT);
-
-  const testnet = new StacksTestnet();
-  expect(testnet.coreApiUrl).toBe(HIRO_TESTNET_DEFAULT);
-
-  const mocknet = new StacksMocknet();
-  expect(mocknet.coreApiUrl).toBe(HIRO_MOCKNET_DEFAULT);
-
-  const customURL = 'customeURL';
-  const customNET = new StacksMainnet({ url: customURL });
-  expect(customNET.coreApiUrl).toBe(customURL);
+describe('Setting coreApiUrl', () => {
+  test('it sets mainnet default url', () => {
+    const mainnet = new StacksMainnet();
+    expect(mainnet.coreApiUrl).toEqual(HIRO_MAINNET_DEFAULT);
+  });
+  test('it sets testnet url', () => {
+    const testnet = new StacksTestnet();
+    expect(testnet.coreApiUrl).toEqual(HIRO_TESTNET_DEFAULT);
+  });
+  test('it sets mocknet url', () => {
+    const mocknet = new StacksMocknet();
+    expect(mocknet.coreApiUrl).toEqual(HIRO_MOCKNET_DEFAULT);
+  });
+  test('it sets custom url', () => {
+    const customURL = 'https://customurl.com';
+    const customNET = new StacksMainnet({ url: customURL });
+    expect(customNET.coreApiUrl).toEqual(customURL);
+  });
+  test('it prevents changing url after initialisation', () => {
+    const network = new StacksMainnet({ url: 'https://legiturl.com' });
+    // @ts-ignore
+    expect(() => (network.coreApiUrl = 'https://dodgyurl.com')).toThrowError();
+    expect(network.coreApiUrl).toEqual('https://legiturl.com');
+  });
 });
