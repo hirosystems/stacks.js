@@ -1,9 +1,17 @@
 import { TransactionVersion, ChainID, fetchPrivate } from '@stacks/common';
 
+export const HIRO_MAINNET_DEFAULT = 'https://stacks-node-api.mainnet.stacks.co';
+export const HIRO_TESTNET_DEFAULT = 'https://stacks-node-api.testnet.stacks.co';
+export const HIRO_MOCKNET_DEFAULT = 'http://localhost:3999';
+
+export interface NetworkUrl {
+  url: string;
+}
+
 export interface StacksNetwork {
   version: TransactionVersion;
   chainId: ChainID;
-  coreApiUrl: string;
+  readonly coreApiUrl: string;
   bnsLookupUrl: string;
   broadcastEndpoint: string;
   transferFeeEstimateEndpoint: string;
@@ -39,13 +47,17 @@ export interface StacksNetwork {
 export class StacksMainnet implements StacksNetwork {
   version = TransactionVersion.Mainnet;
   chainId = ChainID.Mainnet;
-  coreApiUrl = 'https://stacks-node-api.mainnet.stacks.co';
+  readonly coreApiUrl;
   bnsLookupUrl = 'https://stacks-node-api.mainnet.stacks.co';
   broadcastEndpoint = '/v2/transactions';
   transferFeeEstimateEndpoint = '/v2/fees/transfer';
   accountEndpoint = '/v2/accounts';
   contractAbiEndpoint = '/v2/contracts/interface';
   readOnlyFunctionCallEndpoint = '/v2/contracts/call-read';
+
+  constructor(networkUrl: NetworkUrl = { url: HIRO_MAINNET_DEFAULT }) {
+    this.coreApiUrl = networkUrl.url;
+  }
 
   isMainnet = () => this.version === TransactionVersion.Mainnet;
   getBroadcastApiUrl = () => `${this.coreApiUrl}${this.broadcastEndpoint}`;
@@ -99,11 +111,17 @@ export class StacksMainnet implements StacksNetwork {
 export class StacksTestnet extends StacksMainnet implements StacksNetwork {
   version = TransactionVersion.Testnet;
   chainId = ChainID.Testnet;
-  coreApiUrl = 'https://stacks-node-api.testnet.stacks.co';
+
+  constructor(networkUrl: NetworkUrl = { url: HIRO_TESTNET_DEFAULT }) {
+    super(networkUrl);
+  }
 }
 
 export class StacksMocknet extends StacksMainnet implements StacksNetwork {
   version = TransactionVersion.Testnet;
   chainId = ChainID.Testnet;
-  coreApiUrl = 'http://localhost:3999';
+
+  constructor(networkUrl: NetworkUrl = { url: HIRO_MOCKNET_DEFAULT }) {
+    super(networkUrl);
+  }
 }

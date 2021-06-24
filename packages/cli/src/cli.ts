@@ -337,7 +337,6 @@ async function makeKeychain(network: CLINetworkAdapter, args: string[]): Promise
   if (args[0]) {
     mnemonic = await getBackupPhrase(args[0]);
   } else {
-    // eslint-disable-next-line @typescript-eslint/await-thenable
     mnemonic = await bip39.generateMnemonic(
       STX_WALLET_COMPATIBLE_SEED_STRENGTH,
       crypto.randomBytes
