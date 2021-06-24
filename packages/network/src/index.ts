@@ -4,14 +4,13 @@ export const HIRO_MAINNET_DEFAULT = 'https://stacks-node-api.mainnet.stacks.co';
 export const HIRO_TESTNET_DEFAULT = 'https://stacks-node-api.testnet.stacks.co';
 export const HIRO_MOCKNET_DEFAULT = 'http://localhost:3999';
 
-export interface NetworkUrl {
+export interface NetworkConfig {
   url: string;
 }
 
 export interface StacksNetwork {
   version: TransactionVersion;
   chainId: ChainID;
-  readonly coreApiUrl: string;
   bnsLookupUrl: string;
   broadcastEndpoint: string;
   transferFeeEstimateEndpoint: string;
@@ -47,18 +46,24 @@ export interface StacksNetwork {
 export class StacksMainnet implements StacksNetwork {
   version = TransactionVersion.Mainnet;
   chainId = ChainID.Mainnet;
-  readonly coreApiUrl;
   bnsLookupUrl = 'https://stacks-node-api.mainnet.stacks.co';
   broadcastEndpoint = '/v2/transactions';
   transferFeeEstimateEndpoint = '/v2/fees/transfer';
   accountEndpoint = '/v2/accounts';
   contractAbiEndpoint = '/v2/contracts/interface';
   readOnlyFunctionCallEndpoint = '/v2/contracts/call-read';
+  private _coreApiUrl: string;
 
-  constructor(networkUrl: NetworkUrl = { url: HIRO_MAINNET_DEFAULT }) {
-    this.coreApiUrl = networkUrl.url;
+  get coreApiUrl() {
+    return this._coreApiUrl;
+  }
+  set coreApiUrl(_url: string) {
+    throw new Error('Cannot modify property `coreApiUrl` after object initialization');
   }
 
+  constructor(networkUrl: NetworkConfig = { url: HIRO_MAINNET_DEFAULT }) {
+    this._coreApiUrl = networkUrl.url;
+  }
   isMainnet = () => this.version === TransactionVersion.Mainnet;
   getBroadcastApiUrl = () => `${this.coreApiUrl}${this.broadcastEndpoint}`;
   getTransferFeeEstimateApiUrl = () => `${this.coreApiUrl}${this.transferFeeEstimateEndpoint}`;
@@ -112,7 +117,7 @@ export class StacksTestnet extends StacksMainnet implements StacksNetwork {
   version = TransactionVersion.Testnet;
   chainId = ChainID.Testnet;
 
-  constructor(networkUrl: NetworkUrl = { url: HIRO_TESTNET_DEFAULT }) {
+  constructor(networkUrl: NetworkConfig = { url: HIRO_TESTNET_DEFAULT }) {
     super(networkUrl);
   }
 }
@@ -121,7 +126,7 @@ export class StacksMocknet extends StacksMainnet implements StacksNetwork {
   version = TransactionVersion.Testnet;
   chainId = ChainID.Testnet;
 
-  constructor(networkUrl: NetworkUrl = { url: HIRO_MOCKNET_DEFAULT }) {
+  constructor(networkUrl: NetworkConfig = { url: HIRO_MOCKNET_DEFAULT }) {
     super(networkUrl);
   }
 }
