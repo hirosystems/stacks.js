@@ -370,7 +370,15 @@ function balance(network: CLINetworkAdapter, args: string[]): Promise<string> {
   txNetwork.coreApiUrl = network.legacyNetwork.blockstackAPIUrl;
 
   return fetch(txNetwork.getAccountApiUrl(address))
-    .then(response => response.json())
+    .then(response => {
+      if (response.status === 404) {
+        return Promise.reject({
+          status: response.status,
+          error: response.statusText,
+        });
+      }
+      return response.json();
+    })
     .then(response => {
       let balanceHex = response.balance;
       if (response.balance.startsWith('0x')) {
@@ -390,7 +398,8 @@ function balance(network: CLINetworkAdapter, args: string[]): Promise<string> {
         nonce: response.nonce,
       };
       return Promise.resolve(JSONStringify(res));
-    });
+    })
+    .catch(error => error);
 }
 
 /*
