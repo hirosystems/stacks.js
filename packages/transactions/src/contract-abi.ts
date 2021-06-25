@@ -328,7 +328,7 @@ function matchType(cv: ClarityValue, abiType: ClarityAbiType): boolean {
     case ClarityType.List:
       return (
         union.id == ClarityAbiTypeId.ClarityAbiTypeList &&
-        union.type.list.length === cv.list.length &&
+        union.type.list.length >= cv.list.length &&
         cv.list.every(val => matchType(val, union.type.list.type))
       );
     case ClarityType.Tuple:
