@@ -60,6 +60,90 @@ test('ABI validation', () => {
   validateContractCall(payload, TEST_ABI);
 });
 
+test('ABI validation should accept list length less than specified in arguments type', () => {
+  const contractAddress = 'ST3KC0MTNW34S1ZXD36JYKFD3JJMWA01M55DSJ4JE';
+  const contractName = 'test';
+  const functionName = 'tuple-test';
+  const functionArgs = [
+    tupleCV({
+      key1: trueCV(),
+      key2: intCV(-1),
+      key3: uintCV(1),
+      key4: standardPrincipalCV('SP2JXKMSH007NPYAQHKJPQMAQYAD90NQGTVJVQ02B'),
+      key5: bufferCVFromString('foo'),
+      key6: someCV(falseCV()),
+      key7: responseOkCV(trueCV()),
+      key8: listCV([trueCV()]), // Should accept list length less than specified in arguments type
+      key9: stringAsciiCV('Hello World'),
+      key10: stringUtf8CV('Hello World'),
+    }),
+  ];
+
+  const payload = createContractCallPayload(
+    contractAddress,
+    contractName,
+    functionName,
+    functionArgs
+  );
+
+  validateContractCall(payload, TEST_ABI);
+});
+
+test('ABI validation should not accept list length more than specified in arguments type', () => {
+  const contractAddress = 'ST3KC0MTNW34S1ZXD36JYKFD3JJMWA01M55DSJ4JE';
+  const contractName = 'test';
+  const functionName = 'tuple-test';
+  const functionArgs = [
+    tupleCV({
+      key1: trueCV(),
+      key2: intCV(-1),
+      key3: uintCV(1),
+      key4: standardPrincipalCV('SP2JXKMSH007NPYAQHKJPQMAQYAD90NQGTVJVQ02B'),
+      key5: bufferCVFromString('foo'),
+      key6: someCV(falseCV()),
+      key7: responseOkCV(trueCV()),
+      key8: listCV([trueCV(), falseCV(), falseCV()]),
+      key9: stringAsciiCV('Hello World'),
+      key10: stringUtf8CV('Hello World'),
+    }),
+  ];
+
+  const payload = createContractCallPayload(
+    contractAddress,
+    contractName,
+    functionName,
+    functionArgs
+  );
+
+  expect(() => validateContractCall(payload, TEST_ABI)).toThrow(
+    // Don't forget to include spaces at the end of each line of this multiline string
+    oneLineTrim`
+    Clarity function \`tuple-test\` expects argument 1 to be of type 
+      (tuple 
+        (key1 bool) 
+        (key2 int) 
+        (key3 uint) 
+        (key4 principal) 
+        (key5 (buff 3)) 
+        (key6 (optional bool)) 
+        (key7 (response bool bool)) 
+        (key8 (list 2 bool)) 
+        (key9 (string-ascii 11)) 
+        (key10 (string-utf8 11))), not 
+      (tuple 
+        (key1 bool) 
+        (key2 int) 
+        (key3 uint) 
+        (key4 principal) 
+        (key5 (buff 3)) 
+        (key6 (optional bool)) 
+        (key7 (response bool UnknownType)) 
+        (key8 (list 3 bool)) 
+        (key9 (string-ascii 11)) 
+        (key10 (string-utf8 11)))`
+  );
+});
+
 test('ABI validation buffer', () => {
   const contractAddress = 'ST3KC0MTNW34S1ZXD36JYKFD3JJMWA01M55DSJ4JE';
   const contractName = 'test';
