@@ -238,7 +238,7 @@ test('stack stx', async () => {
   expect(makeContractCall).toHaveBeenCalledTimes(1);
   expect(makeContractCall).toHaveBeenCalledWith(expectedContractCallOptions);
   expect(broadcastTransaction).toHaveBeenCalledTimes(1);
-  expect(broadcastTransaction).toHaveBeenCalledWith(transaction, network);
+  expect(broadcastTransaction).toHaveBeenCalledWith(transaction);
   expect(stackingResults).toEqual(broadcastResponse);
 })
 
@@ -315,7 +315,7 @@ test('delegate stx', async () => {
   expect(makeContractCall).toHaveBeenCalledTimes(1);
   expect(makeContractCall).toHaveBeenCalledWith(expectedContractCallOptions);
   expect(broadcastTransaction).toHaveBeenCalledTimes(1);
-  expect(broadcastTransaction).toHaveBeenCalledWith(transaction, network);
+  expect(broadcastTransaction).toHaveBeenCalledWith(transaction);
   expect(delegateResults).toEqual(broadcastResponse);
 })
 
@@ -384,7 +384,7 @@ test('delegate stx with empty optional parameters', async () => {
   expect(makeContractCall).toHaveBeenCalledTimes(1);
   expect(makeContractCall).toHaveBeenCalledWith(expectedContractCallOptions);
   expect(broadcastTransaction).toHaveBeenCalledTimes(1);
-  expect(broadcastTransaction).toHaveBeenCalledWith(transaction, network);
+  expect(broadcastTransaction).toHaveBeenCalledWith(transaction);
   expect(delegateResults).toEqual(broadcastResponse);
 })
 
@@ -473,7 +473,7 @@ test('delegate stack stx with one delegator', async () => {
   expect(makeContractCall).toHaveBeenCalledTimes(1);
   expect(makeContractCall).toHaveBeenCalledWith(expectedContractCallOptions);
   expect(broadcastTransaction).toHaveBeenCalledTimes(1);
-  expect(broadcastTransaction).toHaveBeenCalledWith(transaction, network);
+  expect(broadcastTransaction).toHaveBeenCalledWith(transaction);
   expect(delegateResults).toEqual(broadcastResponse);
 })
 
@@ -565,7 +565,7 @@ test('delegate stack stx with set nonce', async () => {
   expect(makeContractCall).toHaveBeenCalledTimes(1);
   expect(makeContractCall).toHaveBeenCalledWith(expectedContractCallOptions);
   expect(broadcastTransaction).toHaveBeenCalledTimes(1);
-  expect(broadcastTransaction).toHaveBeenCalledWith(transaction, network);
+  expect(broadcastTransaction).toHaveBeenCalledWith(transaction);
   expect(delegateResults).toEqual(broadcastResponse);
 })
 
@@ -635,7 +635,7 @@ test('delegator commit', async () => {
   expect(makeContractCall).toHaveBeenCalledTimes(1);
   expect(makeContractCall).toHaveBeenCalledWith(expectedContractCallOptions);
   expect(broadcastTransaction).toHaveBeenCalledTimes(1);
-  expect(broadcastTransaction).toHaveBeenCalledWith(transaction, network);
+  expect(broadcastTransaction).toHaveBeenCalledWith(transaction);
   expect(delegateResults).toEqual(broadcastResponse);
 })
 
@@ -689,7 +689,7 @@ test('revoke delegate stx', async () => {
   expect(makeContractCall).toHaveBeenCalledTimes(1);
   expect(makeContractCall).toHaveBeenCalledWith(expectedContractCallOptions);
   expect(broadcastTransaction).toHaveBeenCalledTimes(1);
-  expect(broadcastTransaction).toHaveBeenCalledWith(transaction, network);
+  expect(broadcastTransaction).toHaveBeenCalledWith(transaction);
   expect(revokeDelegateResults).toEqual(broadcastResponse);
 })
 

@@ -352,7 +352,7 @@ export class StackingClient {
       senderKey: privateKey,
     });
 
-    return broadcastTransaction(tx, txOptions.network as StacksNetwork);
+    return broadcastTransaction(tx);
   }
 
   /**
@@ -385,7 +385,7 @@ export class StackingClient {
       senderKey: privateKey,
     });
 
-    return broadcastTransaction(tx, txOptions.network as StacksNetwork);
+    return broadcastTransaction(tx);
   }
 
   /**
@@ -421,7 +421,7 @@ export class StackingClient {
       senderKey: privateKey,
     });
 
-    return broadcastTransaction(tx, txOptions.network as StacksNetwork);
+    return broadcastTransaction(tx);
   }
 
   /**
@@ -449,7 +449,7 @@ export class StackingClient {
       senderKey: privateKey,
     });
 
-    return broadcastTransaction(tx, txOptions.network as StacksNetwork);
+    return broadcastTransaction(tx);
   }
 
   /**
@@ -470,7 +470,7 @@ export class StackingClient {
       senderKey: privateKey,
     });
 
-    return broadcastTransaction(tx, txOptions.network as StacksNetwork);
+    return broadcastTransaction(tx);
   }
 
   getStackOptions({

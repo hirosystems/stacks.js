@@ -33,6 +33,7 @@ import { BufferReader } from './bufferReader';
 
 import BigNum from 'bn.js';
 import { SerializationError, SigningError } from './errors';
+import { StacksNetwork, StacksTestnet } from '@stacks/network';
 
 export class StacksTransaction {
   version: TransactionVersion;
@@ -42,8 +43,9 @@ export class StacksTransaction {
   payload: Payload;
   postConditionMode: PostConditionMode;
   postConditions: LengthPrefixedList;
-
+  network: StacksNetwork;
   constructor(
+    network: StacksNetwork,
     version: TransactionVersion,
     auth: Authorization,
     payload: Payload,
@@ -58,6 +60,7 @@ export class StacksTransaction {
     this.chainId = chainId ?? DEFAULT_CHAIN_ID;
     this.postConditionMode = postConditionMode ?? PostConditionMode.Deny;
     this.postConditions = postConditions ?? createLPList([]);
+    this.network = network;
 
     if (anchorMode) {
       this.anchorMode = anchorMode;
@@ -277,6 +280,7 @@ export function deserializeTransaction(data: BufferReader | Buffer | string) {
   const payload = deserializePayload(bufferReader);
 
   return new StacksTransaction(
+    new StacksTestnet(),
     version,
     auth,
     payload,
