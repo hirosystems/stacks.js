@@ -42,8 +42,6 @@ export function getPublicKeyFromPrivate(privateKey: string | Buffer) {
   const privateKeyBuffer = Buffer.isBuffer(privateKey)
     ? privateKey
     : Buffer.from(privateKey, 'hex');
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const realBuffer = require('buffer').Buffer;
   const keyPair = ECPair.fromPrivateKey(privateKeyBuffer);
   return keyPair.publicKey.toString('hex');
 }
