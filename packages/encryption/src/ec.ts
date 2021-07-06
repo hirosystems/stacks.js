@@ -48,6 +48,14 @@ export type SignedCipherObject = {
 /**
  * @ignore
  */
+export enum InvalidPublicKeyReason {
+  InvalidFormat = 'InvalidFormat',
+  IsNotPoint = 'IsNotPoint',
+}
+
+/**
+ * @ignore
+ */
 export async function aes256CbcEncrypt(
   iv: Buffer,
   key: Buffer,
@@ -99,6 +107,58 @@ function sharedSecretToKeys(sharedSecret: Buffer): { encryptionKey: Buffer; hmac
     encryptionKey: hashedSecret.slice(0, 32),
     hmacKey: hashedSecret.slice(32),
   };
+}
+
+/**
+ * @ignore
+ */
+function allHexChars(maybe: string): boolean {
+  return maybe.match(/^[0-9a-f]+$/i) !== null;
+}
+
+/**
+ * @ignore
+ */
+function isValidPublicKey(pub: string): {
+  result: boolean;
+  reason: string | null;
+  reason_data: string | null;
+} {
+  const invalidFormat = {
+    result: false,
+    reason_data: 'Invalid public key format',
+    reason: InvalidPublicKeyReason.InvalidFormat,
+  };
+  const invalidPoint = {
+    result: false,
+    reason_data: 'Public key is not a point',
+    reason: InvalidPublicKeyReason.IsNotPoint,
+  };
+  if (pub.length !== 66 && pub.length !== 130) return invalidFormat;
+
+  const firstByte = pub.slice(0, 2);
+
+  // uncompressed public key
+  if (pub.length === 130 && firstByte !== '04') return invalidFormat;
+
+  // compressed public key
+  if (pub.length === 66 && firstByte !== '02' && firstByte !== '03') return invalidFormat;
+
+  if (!allHexChars(pub)) return invalidFormat;
+
+  // validate the public key
+  const secp256k1 = new EllipticCurve('secp256k1');
+  try {
+    const keyPair = secp256k1.keyFromPublic(Buffer.from(pub, 'hex'));
+    const result = keyPair.validate();
+    return {
+      result: result.result,
+      reason_data: result.reason,
+      reason: result.result ? null : InvalidPublicKeyReason.IsNotPoint,
+    };
+  } catch (e) {
+    return invalidPoint;
+  }
 }
 
 /**
@@ -261,6 +321,10 @@ export async function encryptECIES(
   wasString: boolean,
   cipherTextEncoding?: CipherTextEncoding
 ): Promise<CipherObject> {
+  const validity = isValidPublicKey(publicKey);
+  if (!validity.result) {
+    throw validity;
+  }
   const ecPK = ecurve.keyFromPublic(publicKey, 'hex').getPublic();
   const ephemeralSK = ecurve.genKeyPair();
   const ephemeralPK = Buffer.from(ephemeralSK.getPublic().encodeCompressed());

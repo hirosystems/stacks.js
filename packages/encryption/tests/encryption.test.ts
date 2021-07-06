@@ -318,6 +318,114 @@ test('encrypt-to-decrypt fails on bad mac', async () => {
   }
 })
 
+test('Should be able to prevent a public key twist attack for secp256k1', async () => {
+  const curve = new elliptic.ec('secp256k1');
+  // Pick a bad point to generate a public key.
+  // If a bad point can be passed it's possible to perform a twist attack.
+  const point = curve.keyFromPublic({
+    x: '14',
+    y: '16',
+  });
+  const badPublicKey = point.getPublic('hex');
+  try {
+    const testString = 'all work and no play makes jack a dull boy';
+    await encryptECIES(badPublicKey, Buffer.from(testString), true);
+    expect(false).toEqual(true);
+  } catch (error) {
+    expect(error.reason).toEqual('IsNotPoint');
+  }
+})
+
+test('Should be able to accept public key with valid point on secp256k', async () => {
+  const curve = new elliptic.ec('secp256k1');
+  // Pick a valid point on secp256k to generate a public key.
+  const point = curve.keyFromPublic({
+    x: '0C6047F9441ED7D6D3045406E95C07CD85C778E4B8CEF3CA7ABAC09B95C709EE5',
+    y: '1AE168FEA63DC339A3C58419466CEAEEF7F632653266D0E1236431A950CFE52A'
+  });
+  const goodPublicKey = point.getPublic('hex');
+  try {
+    const testString = 'all work and no play makes jack a dull boy';
+    // encryptECIES should not throw invalid point exception
+    await encryptECIES(goodPublicKey, Buffer.from(testString), true);
+    expect(true).toEqual(true);
+  } catch (error) {
+    expect(error.reason).toEqual('IsNotPoint');
+  }
+})
+
+test('Should reject public key having invalid length', async () => {
+  const invalidPublicKey = '0273d28f9951ce46538951e3697c62588a87f1f1f295de4a14fdd4c780fc52cfe69';
+  try {
+    const testString = 'all work and no play makes jack a dull boy';
+    await encryptECIES(invalidPublicKey, Buffer.from(testString), true);
+    //Should throw invalid format exception
+    expect(false).toEqual(true);
+  } catch (error) {
+    expect(error.reason).toEqual('InvalidFormat');
+  }
+})
+
+test('Should accept public key having valid length', async () => {
+  const publicKey = '027d28f9951ce46538951e3697c62588a87f1f1f295de4a14fdd4c780fc52cfe69';
+  try {
+    const testString = 'all work and no play makes jack a dull boy';
+    await encryptECIES(publicKey, Buffer.from(testString), true);
+    // Should not throw invalid format exception
+    expect(true).toEqual(true);
+  } catch (error) {
+    expect(error.reason).toEqual('InvalidFormat');
+  }
+})
+
+test('Should reject invalid uncompressed public key', async () => {
+  const invalidPublicKey = '02ad90e5b6bc86b3ec7fac2c5fbda7423fc8ef0d58df594c773fa05e2c281b2bfe877677c668bd13603944e34f4818ee03cadd81a88542b8b4d5431264180e2c28';
+  try {
+    const testString = 'all work and no play makes jack a dull boy';
+    await encryptECIES(invalidPublicKey, Buffer.from(testString), true);
+    // Should throw invalid format exception
+    expect(false).toEqual(true);
+  } catch (error) {
+    expect(error.reason).toEqual('InvalidFormat');
+  }
+})
+
+test('Should accept valid uncompressed public key', async () => {
+  const publicKey = '04ad90e5b6bc86b3ec7fac2c5fbda7423fc8ef0d58df594c773fa05e2c281b2bfe877677c668bd13603944e34f4818ee03cadd81a88542b8b4d5431264180e2c28';
+  try {
+    const testString = 'all work and no play makes jack a dull boy';
+    await encryptECIES(publicKey, Buffer.from(testString), true);
+    // Should not throw invalid format exception
+    expect(true).toEqual(true);
+  } catch (error) {
+    expect(error.reason).toEqual('InvalidFormat');
+  }
+})
+
+test('Should reject invalid compressed public key', async () => {
+  const invalidPublicKey = '017d28f9951ce46538951e3697c62588a87f1f1f295de4a14fdd4c780fc52cfe69';
+  try {
+    const testString = 'all work and no play makes jack a dull boy';
+    await encryptECIES(invalidPublicKey, Buffer.from(testString), true);
+    // Should throw invalid format exception
+    expect(false).toEqual(true);
+  } catch (error) {
+    expect(error.reason).toEqual('InvalidFormat');
+  }
+})
+
+test('Should accept valid compressed public key', async () => {
+  const publicKey = '027d28f9951ce46538951e3697c62588a87f1f1f295de4a14fdd4c780fc52cfe69';
+  try {
+    const testString = 'all work and no play makes jack a dull boy';
+    await encryptECIES(publicKey, Buffer.from(testString), true);
+    // Should not throw invalid format exception
+    expect(true).toEqual(true);
+  } catch (error) {
+    expect(error.reason).toEqual('InvalidFormat');
+  }
+})
+
 test('sign-to-verify-works', async () => {
   const testString = 'all work and no play makes jack a dull boy'
   let sigObj = await signECDSA(privateKey, testString)
