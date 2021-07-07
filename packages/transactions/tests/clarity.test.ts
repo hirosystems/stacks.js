@@ -32,7 +32,7 @@ import {
   StandardPrincipalCV,
 } from '../src/clarity';
 import { BufferReader } from '../src/bufferReader';
-import { cvToString, cvToJSON, cvToValue } from '../src/clarity/clarityValue';
+import { cvToString, cvToJSON, cvToValue, getCVTypeString } from '../src/clarity/clarityValue';
 import BN from 'bn.js';
 
 const ADDRESS = 'SP2JXKMSH007NPYAQHKJPQMAQYAD90NQGTVJVQ02B';
