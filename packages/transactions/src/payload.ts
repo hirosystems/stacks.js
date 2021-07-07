@@ -1,4 +1,4 @@
-import { Buffer } from '@stacks/common';
+import { Buffer, IntegerType, intToBigInt, intToBytes } from '@stacks/common';
 import { COINBASE_BUFFER_LENGTH_BYTES, PayloadType, StacksMessageType } from './constants';
 
 import { BufferArray } from './utils';
@@ -19,7 +19,6 @@ import {
 
 import { ClarityValue, serializeCV, deserializeCV } from './clarity/';
 
-import BigNum from 'bn.js';
 import { BufferReader } from './bufferReader';
 import { PrincipalCV, principalCV } from './clarity/types/principalCV';
 
@@ -34,13 +33,20 @@ export interface TokenTransferPayload {
   readonly type: StacksMessageType.Payload;
   readonly payloadType: PayloadType.TokenTransfer;
   readonly recipient: PrincipalCV;
-  readonly amount: BigNum;
+  readonly amount: bigint;
   readonly memo: MemoString;
 }
 
+export type PayloadInput =
+  | (TokenTransferPayload | (Omit<TokenTransferPayload, 'amount'> & { amount: IntegerType }))
+  | ContractCallPayload
+  | SmartContractPayload
+  | PoisonPayload
+  | CoinbasePayload;
+
 export function createTokenTransferPayload(
   recipient: string | PrincipalCV,
-  amount: BigNum,
+  amount: IntegerType,
   memo?: string | MemoString
 ): TokenTransferPayload {
   if (typeof recipient === 'string') {
@@ -54,7 +60,7 @@ export function createTokenTransferPayload(
     type: StacksMessageType.Payload,
     payloadType: PayloadType.TokenTransfer,
     recipient,
-    amount,
+    amount: intToBigInt(amount, false),
     memo: memo ?? createMemoString(''),
   };
 }
@@ -142,14 +148,14 @@ export function createCoinbasePayload(coinbaseBuffer: Buffer): CoinbasePayload {
   return { type: StacksMessageType.Payload, payloadType: PayloadType.Coinbase, coinbaseBuffer };
 }
 
-export function serializePayload(payload: Payload): Buffer {
+export function serializePayload(payload: PayloadInput): Buffer {
   const bufferArray: BufferArray = new BufferArray();
   bufferArray.appendByte(payload.payloadType);
 
   switch (payload.payloadType) {
     case PayloadType.TokenTransfer:
       bufferArray.push(serializeCV(payload.recipient));
-      bufferArray.push(payload.amount.toArrayLike(Buffer, 'be', 8));
+      bufferArray.push(intToBytes(payload.amount, false, 8));
       bufferArray.push(serializeStacksMessage(payload.memo));
       break;
     case PayloadType.ContractCall:
@@ -186,7 +192,7 @@ export function deserializePayload(bufferReader: BufferReader): Payload {
   switch (payloadType) {
     case PayloadType.TokenTransfer:
       const recipient = deserializeCV(bufferReader) as PrincipalCV;
-      const amount = new BigNum(bufferReader.readBuffer(8));
+      const amount = intToBigInt(bufferReader.readBuffer(8), false);
       const memo = deserializeMemoString(bufferReader);
       return createTokenTransferPayload(recipient, amount, memo);
     case PayloadType.ContractCall:

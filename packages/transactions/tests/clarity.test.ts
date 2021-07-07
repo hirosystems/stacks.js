@@ -68,23 +68,23 @@ describe('Clarity Types', () => {
       const noVowelDiscountCV = priceFunction.data['no-vowel-discount'] as IntCV;
       const nonalphaDiscountCV = priceFunction.data['nonalpha-discount'] as IntCV;
       const bucketsCV = priceFunction.data['buckets'] as ListCV;
-      const buckets: number[] = [];
+      const buckets: string[] = [];
       const listCV = bucketsCV.list;
       for (let i = 0; i < listCV.length; i++) {
         const cv = listCV[i] as UIntCV;
-        buckets.push(cv.value.toNumber());
+        buckets.push(cv.value.toString());
       }
       return {
         namespace: namespaceCV.buffer.toString(),
         status: statusCV.data,
-        launchedAt: launchAtIntCV.value.toNumber(),
-        lifetime: lifetimeCV.value.toNumber(),
-        revealedAt: revealedAtCV.value.toNumber(),
+        launchedAt: launchAtIntCV.value.toString(),
+        lifetime: lifetimeCV.value.toString(),
+        revealedAt: revealedAtCV.value.toString(),
         address: addressToString(addressCV.address),
-        base: baseCV.value.toNumber(),
-        coeff: coeffCV.value.toNumber(),
-        noVowelDiscount: noVowelDiscountCV.value.toNumber(),
-        nonalphaDiscount: nonalphaDiscountCV.value.toNumber(),
+        base: baseCV.value.toString(),
+        coeff: coeffCV.value.toString(),
+        noVowelDiscount: noVowelDiscountCV.value.toString(),
+        nonalphaDiscount: nonalphaDiscountCV.value.toString(),
         buckets
       };
     }
@@ -131,15 +131,15 @@ describe('Clarity Types', () => {
       return {
         namespace: cv.data.namespace.buffer.toString(),
         status: cv.data.status.data,
-        launchedAt: namespaceProps['launched-at'].value.value.toNumber(),
-        lifetime: namespaceProps.lifetime.value.toNumber(),
-        revealedAt: namespaceProps['revealed-at'].value.toNumber(),
+        launchedAt: namespaceProps['launched-at'].value.value.toString(),
+        lifetime: namespaceProps.lifetime.value.toString(),
+        revealedAt: namespaceProps['revealed-at'].value.toString(),
         address: addressToString(namespaceProps['namespace-import'].address),
-        base: priceProps.base.value.toNumber(),
-        coeff: priceProps.coeff.value.toNumber(),
-        noVowelDiscount: priceProps['no-vowel-discount'].value.toNumber(),
-        nonalphaDiscount: priceProps['nonalpha-discount'].value.toNumber(),
-        buckets: priceProps.buckets.list.map(b => b.value.toNumber()),
+        base: priceProps.base.value.toString(),
+        coeff: priceProps.coeff.value.toString(),
+        noVowelDiscount: priceProps['no-vowel-discount'].value.toString(),
+        nonalphaDiscount: priceProps['nonalpha-discount'].value.toString(),
+        buckets: priceProps.buckets.list.map(b => b.value.toString()),
       };
     }
 
@@ -148,15 +148,15 @@ describe('Clarity Types', () => {
     const expected = {
       namespace: 'foo',
       status: 'ready',
-      launchedAt: 6,
-      lifetime: 12,
-      revealedAt: 3,
+      launchedAt: '6',
+      lifetime: '12',
+      revealedAt: '3',
       address: 'STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6',
-      base: 1,
-      coeff: 1,
-      noVowelDiscount: 1,
-      nonalphaDiscount: 1,
-      buckets: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+      base: '1',
+      coeff: '1',
+      noVowelDiscount: '1',
+      nonalphaDiscount: '1',
+      buckets: ['1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1'],
     };
     expect(parsed1).toEqual(expected);
     expect(parsed2).toEqual(expected);
@@ -340,7 +340,7 @@ describe('Clarity Types', () => {
       expect(cvToString(deserializeCV(serialized))).toBe('u' + expectedInt);
     });
 
-    test('Clarity integer to js value', () => {
+    test('Clarity integer to JSON value', () => {
       // 53 bits is max safe integer and max supported by bn.js `toNumber()`
 
       const maxSafeInt = (2n ** 53n) - 1n;
@@ -351,27 +351,27 @@ describe('Clarity Types', () => {
       const unsafeMinIntSize = minSafeInt - 1n;
       expect(minSafeInt.toString()).toBe(Number.MIN_SAFE_INTEGER.toString());
 
-      const smallBitsUInt1 = cvToValue(uintCV(maxSafeInt));
+      const smallBitsUInt1 = cvToValue(uintCV(maxSafeInt), true);
       expect(smallBitsUInt1.toString()).toBe(maxSafeInt.toString());
       expect(typeof smallBitsUInt1).toBe('number');
 
-      const smallBitsInt1 = cvToValue(intCV(maxSafeInt));
+      const smallBitsInt1 = cvToValue(intCV(maxSafeInt), true);
       expect(smallBitsInt1.toString()).toBe(maxSafeInt.toString());
       expect(typeof smallBitsInt1).toBe('number');
 
-      const smallBitsInt2 = cvToValue(intCV(minSafeInt));
+      const smallBitsInt2 = cvToValue(intCV(minSafeInt), true);
       expect(smallBitsInt2.toString()).toBe(minSafeInt.toString());
       expect(typeof smallBitsInt2).toBe('number');
 
-      const largeBitsUInt1 = cvToValue(uintCV(unsafeLargeIntSize));
+      const largeBitsUInt1 = cvToValue(uintCV(unsafeLargeIntSize), true);
       expect(largeBitsUInt1.toString()).toBe(unsafeLargeIntSize.toString());
       expect(typeof largeBitsUInt1).toBe('string');
 
-      const largeBitsInt1 = cvToValue(intCV(unsafeLargeIntSize));
+      const largeBitsInt1 = cvToValue(intCV(unsafeLargeIntSize), true);
       expect(largeBitsInt1.toString()).toBe(unsafeLargeIntSize.toString());
       expect(typeof largeBitsInt1).toBe('string');
 
-      const largeBitsInt2 = cvToValue(intCV(unsafeMinIntSize));
+      const largeBitsInt2 = cvToValue(intCV(unsafeMinIntSize), true);
       expect(largeBitsInt2.toString()).toBe(unsafeMinIntSize.toString());
       expect(typeof largeBitsInt2).toBe('string');
     });

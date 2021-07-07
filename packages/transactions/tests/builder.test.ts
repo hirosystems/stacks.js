@@ -47,8 +47,6 @@ import { StacksTestnet, StacksMainnet } from '@stacks/network';
 
 import { bufferCV, standardPrincipalCV, bufferCVFromString, serializeCV } from '../src/clarity';
 
-import BigNum from 'bn.js';
-
 import { ClarityAbi } from '../src/contract-abi';
 import { createStacksPrivateKey, pubKeyfromPrivKey, publicKeyToString } from '../src/keys';
 import { TransactionSigner } from '../src/signer';
@@ -61,9 +59,9 @@ beforeEach(() => {
 
 test('Make STX token transfer with set tx fee', async () => {
   const recipient = standardPrincipalCV('SP3FGQ8Z7JY9BWYZ5WM53E0M9NK7WHJF0691NZ159');
-  const amount = new BigNum(12345);
-  const fee = new BigNum(0);
-  const nonce = new BigNum(0);
+  const amount = 12345;
+  const fee = 0;
+  const nonce = 0;
   const senderKey = 'edf9aee84d9b7abc145504dde6726c64f369d37ee34ded868fabd876c26570bc01';
   const memo = 'test memo';
 
@@ -92,9 +90,9 @@ test('Make STX token transfer with set tx fee', async () => {
 test('Make STX token transfer with fee estimate', async () => {
   const apiUrl = `${DEFAULT_CORE_NODE_API_URL}/v2/fees/transfer`;
   const recipient = standardPrincipalCV('SP3FGQ8Z7JY9BWYZ5WM53E0M9NK7WHJF0691NZ159');
-  const amount = new BigNum(12345);
+  const amount = 12345;
   const estimateFeeRate = 1;
-  const nonce = new BigNum(0);
+  const nonce = 0;
   const senderKey = 'edf9aee84d9b7abc145504dde6726c64f369d37ee34ded868fabd876c26570bc01';
   const memo = 'test memo';
 
@@ -109,9 +107,9 @@ test('Make STX token transfer with fee estimate', async () => {
     anchorMode: AnchorMode.Any
   });
 
-  const fee = new BigNum(transaction.serialize().byteLength * estimateFeeRate);
+  const fee = transaction.serialize().byteLength * estimateFeeRate;
 
-  expect(transaction.auth.spendingCondition?.fee?.toNumber()).toEqual(fee.toNumber());
+  expect(transaction.auth.spendingCondition?.fee?.toString()).toEqual(fee.toString());
 
   const serialized = transaction.serialize().toString('hex');
 
@@ -129,9 +127,9 @@ test('Make STX token transfer with fee estimate', async () => {
 
 test('Make STX token transfer with testnet', async () => {
   const recipient = standardPrincipalCV('SP3FGQ8Z7JY9BWYZ5WM53E0M9NK7WHJF0691NZ159');
-  const amount = new BigNum(12345);
-  const fee = new BigNum(0);
-  const nonce = new BigNum(0);
+  const amount = 12345;
+  const fee = 0;
+  const nonce = 0;
   const senderKey = 'edf9aee84d9b7abc145504dde6726c64f369d37ee34ded868fabd876c26570bc01';
   const memo = 'test memo';
 
@@ -160,9 +158,9 @@ test('Make STX token transfer with testnet', async () => {
 
 test('Make STX token transfer with post conditions', async () => {
   const recipientAddress = 'SP3FGQ8Z7JY9BWYZ5WM53E0M9NK7WHJF0691NZ159';
-  const amount = new BigNum(12345);
-  const fee = new BigNum(0);
-  const nonce = new BigNum(0);
+  const amount = 12345;
+  const fee = 0;
+  const nonce = 0;
   const senderKey = 'edf9aee84d9b7abc145504dde6726c64f369d37ee34ded868fabd876c26570bc01';
   const memo = 'test memo';
 
@@ -170,7 +168,7 @@ test('Make STX token transfer with post conditions', async () => {
     makeStandardSTXPostCondition(
       recipientAddress,
       FungibleConditionCode.GreaterEqual,
-      new BigNum(54321)
+      54321
     ),
   ];
 
@@ -199,9 +197,9 @@ test('Make STX token transfer with post conditions', async () => {
 
 test('Make Multi-Sig STX token transfer', async () => {
   const recipient = standardPrincipalCV('SP3FGQ8Z7JY9BWYZ5WM53E0M9NK7WHJF0691NZ159');
-  const amount = new BigNum(2500000);
-  const fee = new BigNum(0);
-  const nonce = new BigNum(0);
+  const amount = 2500000;
+  const fee = 0;
+  const nonce = 0;
   const memo = 'test memo';
 
   const authType = AuthType.Standard;
@@ -243,13 +241,13 @@ test('Make Multi-Sig STX token transfer', async () => {
   expect(deserializedTx.auth.authType).toBe(authType);
 
   expect(deserializedTx.auth.spendingCondition!.hashMode).toBe(addressHashMode);
-  expect(deserializedTx.auth.spendingCondition!.nonce.toNumber()).toBe(nonce.toNumber());
-  expect(deserializedTx.auth.spendingCondition!.fee.toNumber()).toBe(fee.toNumber());
+  expect(deserializedTx.auth.spendingCondition!.nonce.toString()).toBe(nonce.toString());
+  expect(deserializedTx.auth.spendingCondition!.fee.toString()).toBe(fee.toString());
   expect(deserializedTx.auth.spendingCondition!.signer).toEqual(
     'a23ea89d6529ac48ac766f720e480beec7f19273'
   );
   const deserializedPayload = deserializedTx.payload as TokenTransferPayload;
-  expect(deserializedPayload.amount.toNumber()).toBe(amount.toNumber());
+  expect(deserializedPayload.amount.toString()).toBe(amount.toString());
 
   const signer = new TransactionSigner(deserializedTx);
   signer.signOrigin(privKeys[0]);
@@ -271,9 +269,9 @@ test('Make Multi-Sig STX token transfer', async () => {
 
 test('addSignature to an unsigned transaction', async () => {
   const recipient = standardPrincipalCV('SP3FGQ8Z7JY9BWYZ5WM53E0M9NK7WHJF0691NZ159');
-  const amount = new BigNum(2500000);
-  const fee = new BigNum(0);
-  const nonce = new BigNum(0);
+  const amount = 2500000;
+  const fee = 0;
+  const nonce = 0;
   const publicKey = '021ae7f08f9eaecaaa93f7c6ceac29213bae09588c15e2aded32016b259cfd9a1f';
 
   const unsignedTx = await makeUnsignedSTXTokenTransfer({
@@ -304,8 +302,8 @@ test('Make smart contract deploy', async () => {
   const contractName = 'kv-store';
   const codeBody = fs.readFileSync('./tests/contracts/kv-store.clar').toString();
   const senderKey = 'e494f188c2d35887531ba474c433b1e41fadd8eb824aca983447fd4bb8b277a801';
-  const fee = new BigNum(0);
-  const nonce = new BigNum(0);
+  const fee = 0;
+  const nonce = 0;
 
   const transaction = await makeContractDeploy({
     contractName,
@@ -342,7 +340,7 @@ test('Make contract-call', async () => {
   const buffer = bufferCV(Buffer.from('foo'));
   const senderKey = 'e494f188c2d35887531ba474c433b1e41fadd8eb824aca983447fd4bb8b277a801';
 
-  const fee = new BigNum(0);
+  const fee = 0;
 
   const transaction = await makeContractCall({
     contractAddress,
@@ -351,7 +349,7 @@ test('Make contract-call', async () => {
     functionArgs: [buffer],
     senderKey,
     fee,
-    nonce: new BigNum(1),
+    nonce: 1,
     network: new StacksTestnet(),
     anchorMode: AnchorMode.Any
   });
@@ -380,31 +378,31 @@ test('Make contract-call with post conditions', async () => {
   const info = createAssetInfo(assetAddress, assetContractName, assetName);
   const tokenAssetName = 'token-asset-name';
 
-  const fee = new BigNum(0);
+  const fee = 0;
 
   const postConditions = [
     makeStandardSTXPostCondition(
       postConditionAddress,
       FungibleConditionCode.GreaterEqual,
-      new BigNum(10)
+      10
     ),
     makeContractSTXPostCondition(
       contractAddress,
       contractName,
       FungibleConditionCode.GreaterEqual,
-      new BigNum(12345)
+      12345
     ),
     makeStandardFungiblePostCondition(
       postConditionAddress,
       FungibleConditionCode.Less,
-      new BigNum(1000),
+      1000,
       info
     ),
     makeContractFungiblePostCondition(
       postConditionAddress,
       contractName,
       FungibleConditionCode.Equal,
-      new BigNum(1),
+      1,
       info
     ),
     makeStandardNonFungiblePostCondition(
@@ -429,7 +427,7 @@ test('Make contract-call with post conditions', async () => {
     functionArgs: [buffer],
     senderKey,
     fee,
-    nonce: new BigNum(1),
+    nonce: 1,
     network: new StacksTestnet(),
     postConditions,
     postConditionMode: PostConditionMode.Deny,
@@ -465,7 +463,7 @@ test('Make contract-call with post condition allow mode', async () => {
   const buffer = bufferCV(Buffer.from('foo'));
   const senderKey = 'e494f188c2d35887531ba474c433b1e41fadd8eb824aca983447fd4bb8b277a801';
 
-  const fee = new BigNum(0);
+  const fee = 0;
 
   const transaction = await makeContractCall({
     contractAddress,
@@ -474,7 +472,7 @@ test('Make contract-call with post condition allow mode', async () => {
     functionArgs: [buffer],
     senderKey,
     fee,
-    nonce: new BigNum(1),
+    nonce: 1,
     network: new StacksTestnet(),
     postConditionMode: PostConditionMode.Allow,
     anchorMode: AnchorMode.Any
@@ -496,7 +494,7 @@ test('addSignature to an unsigned contract call transaction', async () => {
   const contractName = 'kv-store';
   const functionName = 'get-value';
   const buffer = bufferCV(Buffer.from('foo'));
-  const fee = new BigNum(0);
+  const fee = 0;
   const publicKey = '021ae7f08f9eaecaaa93f7c6ceac29213bae09588c15e2aded32016b259cfd9a1f';
 
   const unsignedTx = await makeUnsignedContractCall({
@@ -506,7 +504,7 @@ test('addSignature to an unsigned contract call transaction', async () => {
     functionArgs: [buffer],
     publicKey,
     fee,
-    nonce: new BigNum(1),
+    nonce: 1,
     network: new StacksTestnet(),
     postConditionMode: PostConditionMode.Allow,
     anchorMode: AnchorMode.Any
@@ -532,7 +530,7 @@ test('make a multi-sig contract call', async () => {
   const contractName = 'kv-store';
   const functionName = 'get-value';
   const buffer = bufferCV(Buffer.from('foo'));
-  const fee = new BigNum(0);
+  const fee = 0;
   const privKeyStrings = [
     '6d430bb91222408e7706c9001cfaeb91b08c2be6d5ac95779ab52c6b431950e001',
     '2a584d899fed1d24e26b524f202763c8ab30260167429f157f1c119f550fa6af01',
@@ -552,7 +550,7 @@ test('make a multi-sig contract call', async () => {
     numSignatures: 3,
     signerKeys: privKeyStrings,
     fee,
-    nonce: new BigNum(1),
+    nonce: 1,
     network: new StacksTestnet(),
     postConditionMode: PostConditionMode.Allow,
     anchorMode: AnchorMode.Any
@@ -568,9 +566,9 @@ test('Estimate token transfer fee', async () => {
   const estimateFeeRate = 1;
 
   const recipient = standardPrincipalCV('SP3FGQ8Z7JY9BWYZ5WM53E0M9NK7WHJF0691NZ159');
-  const amount = new BigNum(12345);
-  const fee = new BigNum(0);
-  const nonce = new BigNum(0);
+  const amount = 12345;
+  const fee = 0;
+  const nonce = 0;
   const senderKey = 'edf9aee84d9b7abc145504dde6726c64f369d37ee34ded868fabd876c26570bc01';
   const memo = 'test memo';
 
@@ -588,7 +586,7 @@ test('Estimate token transfer fee', async () => {
 
   fetchMock.mockOnce(`${estimateFeeRate}`);
 
-  const estimateFee = new BigNum(transactionByteLength * estimateFeeRate);
+  const estimateFee = transactionByteLength * estimateFeeRate;
   const resultEstimateFee = await estimateTransfer(transaction);
 
   fetchMock.mockOnce(`${estimateFeeRate}`);
@@ -598,15 +596,15 @@ test('Estimate token transfer fee', async () => {
   expect(fetchMock.mock.calls.length).toEqual(2);
   expect(fetchMock.mock.calls[0][0]).toEqual(apiUrl);
   expect(fetchMock.mock.calls[1][0]).toEqual(network.getTransferFeeEstimateApiUrl());
-  expect(resultEstimateFee.toNumber()).toEqual(estimateFee.toNumber());
-  expect(resultEstimateFee2.toNumber()).toEqual(estimateFee.toNumber());
+  expect(resultEstimateFee.toString()).toEqual(estimateFee.toString());
+  expect(resultEstimateFee2.toString()).toEqual(estimateFee.toString());
 });
 
 test('Make STX token transfer with fetch account nonce', async () => {
   const nonce = 123;
   const recipient = standardPrincipalCV('SP3FGQ8Z7JY9BWYZ5WM53E0M9NK7WHJF0691NZ159');
-  const amount = new BigNum(12345);
-  const fee = new BigNum(0);
+  const amount = 12345;
+  const fee = 0;
   const senderKey = 'cb3df38053d132895220b9ce471f6b676db5b9bf0b4adefb55f2118ece2478df01';
   const senderAddress = 'STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6';
   const memo = 'test memo';
@@ -632,21 +630,21 @@ test('Make STX token transfer with fetch account nonce', async () => {
   expect(fetchMock.mock.calls.length).toEqual(2);
   expect(fetchMock.mock.calls[0][0]).toEqual(apiUrl);
   expect(fetchMock.mock.calls[1][0]).toEqual(apiUrl);
-  expect(fetchNonce.toNumber()).toEqual(nonce);
-  expect(transaction.auth.spendingCondition?.nonce?.toNumber()).toEqual(nonce);
+  expect(fetchNonce.toString()).toEqual(nonce.toString());
+  expect(transaction.auth.spendingCondition?.nonce?.toString()).toEqual(nonce.toString());
 });
 
 test('Make sponsored STX token transfer', async () => {
   const recipient = standardPrincipalCV('SP3FGQ8Z7JY9BWYZ5WM53E0M9NK7WHJF0691NZ159');
-  const amount = new BigNum(12345);
-  const fee = new BigNum(50);
-  const nonce = new BigNum(2);
+  const amount = 12345;
+  const fee = 50;
+  const nonce = 2;
   const senderKey = 'edf9aee84d9b7abc145504dde6726c64f369d37ee34ded868fabd876c26570bc01';
   const memo = 'test memo';
 
   const sponsorKey = '9888d734e6e80a943a6544159e31d6c7e342f695ec867d549c569fa0028892d401';
-  const sponsorFee = new BigNum(123);
-  const sponsorNonce = new BigNum(55);
+  const sponsorFee = 123;
+  const sponsorNonce = 55;
 
   const authType = AuthType.Sponsored;
   const addressHashMode = AddressHashMode.SerializeP2PKH;
@@ -689,30 +687,30 @@ test('Make sponsored STX token transfer', async () => {
   expect(deserializedSponsorTx.auth.authType).toBe(authType);
 
   expect(deserializedSponsorTx.auth.spendingCondition!.hashMode).toBe(addressHashMode);
-  expect(deserializedSponsorTx.auth.spendingCondition!.nonce!.toNumber()).toBe(nonce.toNumber());
-  expect(deserializedSponsorTx.auth.spendingCondition!.fee!.toNumber()).toBe(fee.toNumber());
+  expect(deserializedSponsorTx.auth.spendingCondition!.nonce!.toString()).toBe(nonce.toString());
+  expect(deserializedSponsorTx.auth.spendingCondition!.fee!.toString()).toBe(fee.toString());
 
   const deserializedSponsorSpendingCondition = deserializedSponsorTx.auth.sponsorSpendingCondition!;
   expect(deserializedSponsorSpendingCondition.hashMode).toBe(addressHashMode);
-  expect(deserializedSponsorSpendingCondition.nonce!.toNumber()).toBe(sponsorNonce.toNumber());
-  expect(deserializedSponsorSpendingCondition.fee!.toNumber()).toBe(sponsorFee.toNumber());
+  expect(deserializedSponsorSpendingCondition.nonce!.toString()).toBe(sponsorNonce.toString());
+  expect(deserializedSponsorSpendingCondition.fee!.toString()).toBe(sponsorFee.toString());
 
   const deserializedPayload = deserializedSponsorTx.payload as TokenTransferPayload;
-  expect(deserializedPayload.amount.toNumber()).toBe(amount.toNumber());
+  expect(deserializedPayload.amount.toString()).toBe(amount.toString());
 });
 
 test('Make sponsored STX token transfer with sponsor fee estimate', async () => {
   const recipient = standardPrincipalCV('SP3FGQ8Z7JY9BWYZ5WM53E0M9NK7WHJF0691NZ159');
-  const amount = new BigNum(12345);
-  const fee = new BigNum(50);
+  const amount = 12345;
+  const fee = 50;
   const estimateFeeRate = 2;
-  const nonce = new BigNum(2);
+  const nonce = 2;
   const senderKey = 'edf9aee84d9b7abc145504dde6726c64f369d37ee34ded868fabd876c26570bc01';
   const memo = 'test memo';
   const network = new StacksMainnet();
 
   const sponsorKey = '9888d734e6e80a943a6544159e31d6c7e342f695ec867d549c569fa0028892d401';
-  const sponsorNonce = new BigNum(55);
+  const sponsorNonce = 55;
 
   const authType = AuthType.Sponsored;
   const addressHashMode = AddressHashMode.SerializeP2PKH;
@@ -728,7 +726,7 @@ test('Make sponsored STX token transfer with sponsor fee estimate', async () => 
     anchorMode: AnchorMode.Any
   });
 
-  const sponsorFee = new BigNum(transaction.serialize().byteLength * estimateFeeRate);
+  const sponsorFee = transaction.serialize().byteLength * estimateFeeRate;
 
   const sponsorOptions = {
     transaction,
@@ -751,31 +749,31 @@ test('Make sponsored STX token transfer with sponsor fee estimate', async () => 
   expect(deserializedSponsorTx.auth.authType).toBe(authType);
 
   expect(deserializedSponsorTx.auth.spendingCondition!.hashMode).toBe(addressHashMode);
-  expect(deserializedSponsorTx.auth.spendingCondition!.nonce!.toNumber()).toBe(nonce.toNumber());
-  expect(deserializedSponsorTx.auth.spendingCondition!.fee!.toNumber()).toBe(fee.toNumber());
+  expect(deserializedSponsorTx.auth.spendingCondition!.nonce!.toString()).toBe(nonce.toString());
+  expect(deserializedSponsorTx.auth.spendingCondition!.fee!.toString()).toBe(fee.toString());
 
   const deserializedSponsorSpendingCondition = deserializedSponsorTx.auth.sponsorSpendingCondition!;
   expect(deserializedSponsorSpendingCondition.hashMode).toBe(addressHashMode);
-  expect(deserializedSponsorSpendingCondition.nonce!.toNumber()).toBe(sponsorNonce.toNumber());
-  expect(deserializedSponsorSpendingCondition.fee!.toNumber()).toBe(sponsorFee.toNumber());
+  expect(deserializedSponsorSpendingCondition.nonce!.toString()).toBe(sponsorNonce.toString());
+  expect(deserializedSponsorSpendingCondition.fee!.toString()).toBe(sponsorFee.toString());
 
   const deserializedPayload = deserializedSponsorTx.payload as TokenTransferPayload;
-  expect(deserializedPayload.amount.toNumber()).toBe(amount.toNumber());
+  expect(deserializedPayload.amount.toString()).toBe(amount.toString());
 });
 
 test('Make sponsored STX token transfer with set tx fee', async () => {
   const recipient = 'ST2HQE346DED7F58Z54EJ26M2B9MQQ3JZ7RW6MXRJ';
-  const amount = new BigNum(113);
-  const fee = new BigNum(0);
-  const nonce = new BigNum(0);
+  const amount = 113;
+  const fee = 0;
+  const nonce = 0;
   const senderKey = '8ca861519c4fa4a08de4beaa41688f60a24b575a976cf84099f38dc099a6d74401';
   // const senderAddress = 'ST2HTEQF50SW4X8077F8RSR8WCT57QG166TVG0GCE';
   const network = new StacksTestnet();
 
   const sponsorKey = '9888d734e6e80a943a6544159e31d6c7e342f695ec867d549c569fa0028892d401';
   // const sponsorAddress = 'ST2TPJ3NEZ63MMJ8AY9S45HZ10QSH51YF93GE89GQ';
-  const sponsorNonce = new BigNum(0);
-  const sponsorFee = new BigNum(500);
+  const sponsorNonce = 0;
+  const sponsorFee = 500;
 
   const transaction = await makeSTXTokenTransfer({
     recipient,
@@ -803,29 +801,29 @@ test('Make sponsored STX token transfer with set tx fee', async () => {
   const deserializedSponsorTx = deserializeTransaction(bufferReader);
 
   expect(fetchMock.mock.calls.length).toEqual(0);
-  expect(deserializedSponsorTx.auth.spendingCondition!.nonce!.toNumber()).toBe(nonce.toNumber());
-  expect(deserializedSponsorTx.auth.spendingCondition!.fee!.toNumber()).toBe(fee.toNumber());
+  expect(deserializedSponsorTx.auth.spendingCondition!.nonce!.toString()).toBe(nonce.toString());
+  expect(deserializedSponsorTx.auth.spendingCondition!.fee!.toString()).toBe(fee.toString());
 
   const deserializedSponsorSpendingCondition = deserializedSponsorTx.auth.sponsorSpendingCondition!;
-  expect(deserializedSponsorSpendingCondition.nonce!.toNumber()).toBe(sponsorNonce.toNumber());
-  expect(deserializedSponsorSpendingCondition.fee!.toNumber()).toBe(sponsorFee.toNumber());
+  expect(deserializedSponsorSpendingCondition.nonce!.toString()).toBe(sponsorNonce.toString());
+  expect(deserializedSponsorSpendingCondition.fee!.toString()).toBe(sponsorFee.toString());
 
   const deserializedPayload = deserializedSponsorTx.payload as TokenTransferPayload;
-  expect(deserializedPayload.amount.toNumber()).toBe(amount.toNumber());
+  expect(deserializedPayload.amount.toString()).toBe(amount.toString());
 });
 
 test('Make sponsored contract deploy with sponsor fee estimate', async () => {
   const contractName = 'kv-store';
   const codeBody = fs.readFileSync('./tests/contracts/kv-store.clar').toString();
   const senderKey = '8ca861519c4fa4a08de4beaa41688f60a24b575a976cf84099f38dc099a6d74401';
-  const fee = new BigNum(0);
-  const nonce = new BigNum(0);
+  const fee = 0;
+  const nonce = 0;
   const network = new StacksTestnet();
 
   const sponsorKey = '9888d734e6e80a943a6544159e31d6c7e342f695ec867d549c569fa0028892d401';
   // const sponsorAddress = 'ST2TPJ3NEZ63MMJ8AY9S45HZ10QSH51YF93GE89GQ';
-  const sponsorNonce = new BigNum(56);
-  const sponsorFee = new BigNum(4000);
+  const sponsorNonce = 56;
+  const sponsorFee = 4000;
 
   const authType = AuthType.Sponsored;
   const addressHashMode = AddressHashMode.SerializeP2PKH;
@@ -860,13 +858,13 @@ test('Make sponsored contract deploy with sponsor fee estimate', async () => {
   expect(deserializedSponsorTx.auth.authType).toBe(authType);
 
   expect(deserializedSponsorTx.auth.spendingCondition!.hashMode).toBe(addressHashMode);
-  expect(deserializedSponsorTx.auth.spendingCondition!.nonce!.toNumber()).toBe(nonce.toNumber());
-  expect(deserializedSponsorTx.auth.spendingCondition!.fee!.toNumber()).toBe(fee.toNumber());
+  expect(deserializedSponsorTx.auth.spendingCondition!.nonce!.toString()).toBe(nonce.toString());
+  expect(deserializedSponsorTx.auth.spendingCondition!.fee!.toString()).toBe(fee.toString());
 
   const deserializedSponsorSpendingCondition = deserializedSponsorTx.auth.sponsorSpendingCondition!;
   expect(deserializedSponsorSpendingCondition.hashMode).toBe(addressHashMode);
-  expect(deserializedSponsorSpendingCondition.nonce!.toNumber()).toBe(sponsorNonce.toNumber());
-  expect(deserializedSponsorSpendingCondition.fee!.toNumber()).toBe(sponsorFee.toNumber());
+  expect(deserializedSponsorSpendingCondition.nonce!.toString()).toBe(sponsorNonce.toString());
+  expect(deserializedSponsorSpendingCondition.fee!.toString()).toBe(sponsorFee.toString());
 });
 
 test('Make sponsored contract call with sponsor nonce fetch', async () => {
@@ -875,14 +873,14 @@ test('Make sponsored contract call with sponsor nonce fetch', async () => {
   const functionName = 'get-value';
   const buffer = bufferCV(Buffer.from('foo'));
   const senderKey = 'e494f188c2d35887531ba474c433b1e41fadd8eb824aca983447fd4bb8b277a801';
-  const nonce = new BigNum(0);
+  const nonce = 0;
   const network = new StacksTestnet();
-  const fee = new BigNum(0);
-  const sponsorFee = new BigNum(1000);
+  const fee = 0;
+  const sponsorFee = 1000;
 
   const sponsorKey = '9888d734e6e80a943a6544159e31d6c7e342f695ec867d549c569fa0028892d401';
   const sponsorAddress = 'ST2TPJ3NEZ63MMJ8AY9S45HZ10QSH51YF93GE89GQ';
-  const sponsorNonce = new BigNum(55);
+  const sponsorNonce = 55;
 
   const authType = AuthType.Sponsored;
   const addressHashMode = AddressHashMode.SerializeP2PKH;
@@ -921,20 +919,20 @@ test('Make sponsored contract call with sponsor nonce fetch', async () => {
   expect(deserializedSponsorTx.auth.authType).toBe(authType);
 
   expect(deserializedSponsorTx.auth.spendingCondition!.hashMode).toBe(addressHashMode);
-  expect(deserializedSponsorTx.auth.spendingCondition!.nonce!.toNumber()).toBe(nonce.toNumber());
-  expect(deserializedSponsorTx.auth.spendingCondition!.fee!.toNumber()).toBe(fee.toNumber());
+  expect(deserializedSponsorTx.auth.spendingCondition!.nonce!.toString()).toBe(nonce.toString());
+  expect(deserializedSponsorTx.auth.spendingCondition!.fee!.toString()).toBe(fee.toString());
 
   const deserializedSponsorSpendingCondition = deserializedSponsorTx.auth.sponsorSpendingCondition!;
   expect(deserializedSponsorSpendingCondition.hashMode).toBe(addressHashMode);
-  expect(deserializedSponsorSpendingCondition.nonce!.toNumber()).toBe(sponsorNonce.toNumber());
-  expect(deserializedSponsorSpendingCondition.fee!.toNumber()).toBe(sponsorFee.toNumber());
+  expect(deserializedSponsorSpendingCondition.nonce!.toString()).toBe(sponsorNonce.toString());
+  expect(deserializedSponsorSpendingCondition.fee!.toString()).toBe(sponsorFee.toString());
 });
 
 test('Transaction broadcast success', async () => {
   const recipient = standardPrincipalCV('SP3FGQ8Z7JY9BWYZ5WM53E0M9NK7WHJF0691NZ159');
-  const amount = new BigNum(12345);
-  const fee = new BigNum(0);
-  const nonce = new BigNum(0);
+  const amount = 12345;
+  const fee = 0;
+  const nonce = 0;
   const senderKey = 'edf9aee84d9b7abc145504dde6726c64f369d37ee34ded868fabd876c26570bc01';
   const memo = 'test memo';
 
@@ -962,9 +960,9 @@ test('Transaction broadcast success', async () => {
 
 test('Transaction broadcast with attachment', async () => {
   const recipient = standardPrincipalCV('SP3FGQ8Z7JY9BWYZ5WM53E0M9NK7WHJF0691NZ159');
-  const amount = new BigNum(12345);
-  const fee = new BigNum(0);
-  const nonce = new BigNum(0);
+  const amount = 12345;
+  const fee = 0;
+  const nonce = 0;
   const senderKey = 'edf9aee84d9b7abc145504dde6726c64f369d37ee34ded868fabd876c26570bc01';
   const memo = 'test memo';
   const attachment = Buffer.from('this is an attachment...');
@@ -996,9 +994,9 @@ test('Transaction broadcast with attachment', async () => {
 
 test('Transaction broadcast returns error', async () => {
   const recipient = standardPrincipalCV('SP3FGQ8Z7JY9BWYZ5WM53E0M9NK7WHJF0691NZ159');
-  const amount = new BigNum(12345);
-  const fee = new BigNum(0);
-  const nonce = new BigNum(0);
+  const amount = 12345;
+  const fee = 0;
+  const nonce = 0;
   const senderKey = 'edf9aee84d9b7abc145504dde6726c64f369d37ee34ded868fabd876c26570bc01';
   const memo = 'test memo';
 
@@ -1035,9 +1033,9 @@ test('Transaction broadcast returns error', async () => {
 
 test('Transaction broadcast fails', async () => {
   const recipient = standardPrincipalCV('SP3FGQ8Z7JY9BWYZ5WM53E0M9NK7WHJF0691NZ159');
-  const amount = new BigNum(12345);
-  const fee = new BigNum(0);
-  const nonce = new BigNum(0);
+  const amount = 12345;
+  const fee = 0;
+  const nonce = 0;
   const senderKey = 'edf9aee84d9b7abc145504dde6726c64f369d37ee34ded868fabd876c26570bc01';
   const memo = 'test memo';
 
@@ -1065,7 +1063,7 @@ test('Make contract-call with network ABI validation', async () => {
   const buffer = bufferCV(Buffer.from('foo'));
   const senderKey = 'e494f188c2d35887531ba474c433b1e41fadd8eb824aca983447fd4bb8b277a801';
 
-  const fee = new BigNum(0);
+  const fee = 0;
 
   const network = new StacksTestnet();
 
@@ -1079,7 +1077,7 @@ test('Make contract-call with network ABI validation', async () => {
     senderKey,
     functionArgs: [buffer],
     fee,
-    nonce: new BigNum(1),
+    nonce: 1,
     network: new StacksTestnet(),
     validateWithAbi: true,
     postConditionMode: PostConditionMode.Allow,
@@ -1097,7 +1095,7 @@ test('Make contract-call with provided ABI validation', async () => {
   const buffer = bufferCV(Buffer.from('foo'));
   const senderKey = 'e494f188c2d35887531ba474c433b1e41fadd8eb824aca983447fd4bb8b277a801';
 
-  const fee = new BigNum(0);
+  const fee = 0;
 
   const abi: ClarityAbi = JSON.parse(
     fs.readFileSync('./tests/abi/kv-store-abi.json').toString()
@@ -1110,7 +1108,7 @@ test('Make contract-call with provided ABI validation', async () => {
     senderKey,
     functionArgs: [buffer],
     fee,
-    nonce: new BigNum(1),
+    nonce: 1,
     validateWithAbi: abi,
     postConditionMode: PostConditionMode.Allow,
     anchorMode: AnchorMode.Any
@@ -1124,7 +1122,7 @@ test('Make contract-call with network ABI validation failure', async () => {
   const buffer = bufferCV(Buffer.from('foo'));
   const senderKey = 'e494f188c2d35887531ba474c433b1e41fadd8eb824aca983447fd4bb8b277a801';
 
-  const fee = new BigNum(0);
+  const fee = 0;
 
   const network = new StacksTestnet();
 
@@ -1141,7 +1139,7 @@ test('Make contract-call with network ABI validation failure', async () => {
       senderKey,
       functionArgs: [buffer],
       fee,
-      nonce: new BigNum(1),
+      nonce: 1,
       network: new StacksTestnet(),
       validateWithAbi: true,
       postConditionMode: PostConditionMode.Allow,

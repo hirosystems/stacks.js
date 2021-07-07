@@ -25,7 +25,6 @@ import {
 
 import { serializeDeserialize } from './macros';
 
-import BigNum from 'bn.js';
 import { bufferCVFromString, BufferCV } from '../src/clarity';
 
 test('STX post condition serialization and deserialization', () => {
@@ -35,7 +34,7 @@ test('STX post condition serialization and deserialization', () => {
   const sp = createStandardPrincipal(address);
 
   const conditionCode = FungibleConditionCode.GreaterEqual;
-  const amount = new BigNum(1000000);
+  const amount = 1000000;
 
   const postCondition = createSTXPostCondition(sp, conditionCode, amount);
 
@@ -47,7 +46,7 @@ test('STX post condition serialization and deserialization', () => {
   expect(deserialized.principal.prefix).toBe(PostConditionPrincipalID.Standard);
   expect(addressToString(deserialized.principal.address)).toBe(address);
   expect(deserialized.conditionCode).toBe(conditionCode);
-  expect(deserialized.amount.toNumber()).toBe(amount.toNumber());
+  expect(deserialized.amount.toString()).toBe(amount.toString());
 });
 
 test('Fungible post condition serialization and deserialization', () => {
@@ -57,7 +56,7 @@ test('Fungible post condition serialization and deserialization', () => {
   const principal = createStandardPrincipal(address);
 
   const conditionCode = FungibleConditionCode.GreaterEqual;
-  const amount = new BigNum(1000000);
+  const amount = 1000000;
 
   const assetAddress = 'SP2ZP4GJDZJ1FDHTQ963F0292PE9J9752TZJ68F21';
   const assetContractName = 'contract_name';
@@ -74,7 +73,7 @@ test('Fungible post condition serialization and deserialization', () => {
   expect(deserialized.principal.prefix).toBe(PostConditionPrincipalID.Standard);
   expect(addressToString(deserialized.principal.address)).toBe(address);
   expect(deserialized.conditionCode).toBe(conditionCode);
-  expect(deserialized.amount.toNumber()).toBe(amount.toNumber());
+  expect(deserialized.amount.toString()).toBe(amount.toString());
   expect(addressToString(deserialized.assetInfo.address)).toBe(assetAddress);
   expect(deserialized.assetInfo.contractName.content).toBe(assetContractName);
   expect(deserialized.assetInfo.assetName.content).toBe(assetName);

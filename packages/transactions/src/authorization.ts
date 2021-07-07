@@ -1,4 +1,4 @@
-import { Buffer } from '@stacks/common';
+import { Buffer, IntegerType, intToBigInt, intToBytes } from '@stacks/common';
 import {
   AddressHashMode,
   AuthType,
@@ -32,7 +32,6 @@ import {
   StacksPublicKey,
 } from './keys';
 
-import BigNum from 'bn.js';
 import { BufferReader } from './bufferReader';
 import { DeserializationError, SerializationError, SigningError } from './errors';
 
@@ -168,28 +167,42 @@ export function deserializeTransactionAuthField(bufferReader: BufferReader): Tra
 export interface SingleSigSpendingCondition {
   hashMode: SingleSigHashMode;
   signer: string;
-  nonce: BigNum;
-  fee: BigNum;
+  nonce: bigint;
+  fee: bigint;
   keyEncoding: PubKeyEncoding;
   signature: MessageSignature;
+}
+
+export interface SingleSigSpendingConditionOpts
+  extends Omit<SingleSigSpendingCondition, 'nonce' | 'fee'> {
+  nonce: IntegerType;
+  fee: IntegerType;
 }
 
 export interface MultiSigSpendingCondition {
   hashMode: MultiSigHashMode;
   signer: string;
-  nonce: BigNum;
-  fee: BigNum;
+  nonce: bigint;
+  fee: bigint;
   fields: TransactionAuthField[];
   signaturesRequired: number;
 }
 
+export interface MultiSigSpendingConditionOpts
+  extends Omit<MultiSigSpendingCondition, 'nonce' | 'fee'> {
+  nonce: IntegerType;
+  fee: IntegerType;
+}
+
 export type SpendingCondition = SingleSigSpendingCondition | MultiSigSpendingCondition;
+
+export type SpendingConditionOpts = SingleSigSpendingConditionOpts | MultiSigSpendingConditionOpts;
 
 export function createSingleSigSpendingCondition(
   hashMode: SingleSigHashMode,
   pubKey: string,
-  nonce: BigNum,
-  fee: BigNum
+  nonce: IntegerType,
+  fee: IntegerType
 ): SingleSigSpendingCondition {
   // address version arg doesn't matter for signer hash generation
   const signer = addressFromPublicKeys(0, hashMode, 1, [createStacksPublicKey(pubKey)]).hash160;
@@ -200,8 +213,8 @@ export function createSingleSigSpendingCondition(
   return {
     hashMode,
     signer,
-    nonce,
-    fee,
+    nonce: intToBigInt(nonce, false),
+    fee: intToBigInt(fee, false),
     keyEncoding,
     signature: emptyMessageSignature(),
   };
@@ -211,8 +224,8 @@ export function createMultiSigSpendingCondition(
   hashMode: MultiSigHashMode,
   numSigs: number,
   pubKeys: string[],
-  nonce: BigNum,
-  fee: BigNum
+  nonce: IntegerType,
+  fee: IntegerType
 ): MultiSigSpendingCondition {
   const stacksPublicKeys = pubKeys.map(createStacksPublicKey);
 
@@ -222,21 +235,23 @@ export function createMultiSigSpendingCondition(
   return {
     hashMode,
     signer,
-    nonce,
-    fee,
+    nonce: intToBigInt(nonce, false),
+    fee: intToBigInt(fee, false),
     fields: [],
     signaturesRequired: numSigs,
   };
 }
 
-export function isSingleSig(condition: SpendingCondition): condition is SingleSigSpendingCondition {
+export function isSingleSig(
+  condition: SpendingConditionOpts
+): condition is SingleSigSpendingConditionOpts {
   return 'signature' in condition;
 }
 
-function clearCondition(condition: SpendingCondition): SpendingCondition {
+function clearCondition(condition: SpendingConditionOpts): SpendingCondition {
   const cloned = cloneDeep(condition);
-  cloned.nonce = new BigNum(0);
-  cloned.fee = new BigNum(0);
+  cloned.nonce = 0;
+  cloned.fee = 0;
 
   if (isSingleSig(cloned)) {
     cloned.signature = emptyMessageSignature();
@@ -244,26 +259,34 @@ function clearCondition(condition: SpendingCondition): SpendingCondition {
     cloned.fields = [];
   }
 
-  return cloned;
+  return {
+    ...cloned,
+    nonce: BigInt(0),
+    fee: BigInt(0),
+  };
 }
 
-export function serializeSingleSigSpendingCondition(condition: SingleSigSpendingCondition): Buffer {
+export function serializeSingleSigSpendingCondition(
+  condition: SingleSigSpendingConditionOpts
+): Buffer {
   const bufferArray: BufferArray = new BufferArray();
   bufferArray.appendByte(condition.hashMode);
   bufferArray.appendHexString(condition.signer);
-  bufferArray.push(condition.nonce.toArrayLike(Buffer, 'be', 8));
-  bufferArray.push(condition.fee.toArrayLike(Buffer, 'be', 8));
+  bufferArray.push(intToBytes(condition.nonce, false, 8));
+  bufferArray.push(intToBytes(condition.fee, false, 8));
   bufferArray.appendByte(condition.keyEncoding);
   bufferArray.push(serializeMessageSignature(condition.signature));
   return bufferArray.concatBuffer();
 }
 
-export function serializeMultiSigSpendingCondition(condition: MultiSigSpendingCondition): Buffer {
+export function serializeMultiSigSpendingCondition(
+  condition: MultiSigSpendingConditionOpts
+): Buffer {
   const bufferArray: BufferArray = new BufferArray();
   bufferArray.appendByte(condition.hashMode);
   bufferArray.appendHexString(condition.signer);
-  bufferArray.push(condition.nonce.toArrayLike(Buffer, 'be', 8));
-  bufferArray.push(condition.fee.toArrayLike(Buffer, 'be', 8));
+  bufferArray.push(intToBytes(condition.nonce, false, 8));
+  bufferArray.push(intToBytes(condition.fee, false, 8));
 
   const fields = createLPList(condition.fields);
   bufferArray.push(serializeLPList(fields));
@@ -279,8 +302,8 @@ export function deserializeSingleSigSpendingCondition(
   bufferReader: BufferReader
 ): SingleSigSpendingCondition {
   const signer = bufferReader.readBuffer(20).toString('hex');
-  const nonce = new BigNum(bufferReader.readBuffer(8).toString('hex'), 16);
-  const fee = new BigNum(bufferReader.readBuffer(8).toString('hex'), 16);
+  const nonce = BigInt('0x' + bufferReader.readBuffer(8).toString('hex'));
+  const fee = BigInt('0x' + bufferReader.readBuffer(8).toString('hex'));
 
   const keyEncoding = bufferReader.readUInt8Enum(PubKeyEncoding, n => {
     throw new DeserializationError(`Could not parse ${n} as PubKeyEncoding`);
@@ -301,8 +324,8 @@ export function deserializeMultiSigSpendingCondition(
   bufferReader: BufferReader
 ): MultiSigSpendingCondition {
   const signer = bufferReader.readBuffer(20).toString('hex');
-  const nonce = new BigNum(bufferReader.readBuffer(8).toString('hex'), 16);
-  const fee = new BigNum(bufferReader.readBuffer(8).toString('hex'), 16);
+  const nonce = BigInt('0x' + bufferReader.readBuffer(8).toString('hex'));
+  const fee = BigInt('0x' + bufferReader.readBuffer(8).toString('hex'));
 
   const fields = deserializeLPList(bufferReader, StacksMessageType.TransactionAuthField)
     .values as TransactionAuthField[];
@@ -319,7 +342,7 @@ export function deserializeMultiSigSpendingCondition(
   };
 }
 
-export function serializeSpendingCondition(condition: SpendingCondition): Buffer {
+export function serializeSpendingCondition(condition: SpendingConditionOpts): Buffer {
   if (isSingleSig(condition)) {
     return serializeSingleSigSpendingCondition(condition);
   } else {
@@ -342,8 +365,8 @@ export function deserializeSpendingCondition(bufferReader: BufferReader): Spendi
 export function makeSigHashPreSign(
   curSigHash: string,
   authType: AuthType,
-  fee: BigNum,
-  nonce: BigNum
+  fee: IntegerType,
+  nonce: IntegerType
 ): string {
   // new hash combines the previous hash and all the new data this signature will add. This
   // includes:
@@ -356,8 +379,8 @@ export function makeSigHashPreSign(
   const sigHash =
     curSigHash +
     Buffer.from([authType]).toString('hex') +
-    fee.toArrayLike(Buffer, 'be', 8).toString('hex') +
-    nonce.toArrayLike(Buffer, 'be', 8).toString('hex');
+    intToBytes(fee, false, 8).toString('hex') +
+    intToBytes(nonce, false, 8).toString('hex');
 
   if (Buffer.from(sigHash, 'hex').byteLength !== hashLength) {
     throw Error('Invalid signature hash length');
@@ -394,8 +417,8 @@ function makeSigHashPostSign(
 export function nextSignature(
   curSigHash: string,
   authType: AuthType,
-  fee: BigNum,
-  nonce: BigNum,
+  fee: IntegerType,
+  nonce: IntegerType,
   privateKey: StacksPrivateKey
 ): {
   nextSig: MessageSignature;
@@ -416,9 +439,8 @@ export function nextSignature(
 export function nextVerification(
   initialSigHash: string,
   authType: AuthType,
-  fee: BigNum,
-  nonce: BigNum,
-  // @ts-ignore
+  fee: IntegerType,
+  nonce: IntegerType,
   pubKeyEncoding: PubKeyEncoding,
   signature: MessageSignature
 ) {
@@ -440,8 +462,8 @@ function newInitialSigHash(): SpendingCondition {
   const spendingCondition = createSingleSigSpendingCondition(
     AddressHashMode.SerializeP2PKH,
     '',
-    new BigNum(0),
-    new BigNum(0)
+    0,
+    0
   );
   spendingCondition.signer = createEmptyAddress().hash160;
   spendingCondition.keyEncoding = PubKeyEncoding.Compressed;
@@ -449,7 +471,11 @@ function newInitialSigHash(): SpendingCondition {
   return spendingCondition;
 }
 
-function verify(condition: SpendingCondition, initialSigHash: string, authType: AuthType): string {
+function verify(
+  condition: SpendingConditionOpts,
+  initialSigHash: string,
+  authType: AuthType
+): string {
   if (isSingleSig(condition)) {
     return verifySingleSig(condition, initialSigHash, authType);
   } else {
@@ -459,7 +485,7 @@ function verify(condition: SpendingCondition, initialSigHash: string, authType: 
 }
 
 function verifySingleSig(
-  condition: SingleSigSpendingCondition,
+  condition: SingleSigSpendingConditionOpts,
   initialSigHash: string,
   authType: AuthType
 ): string {
@@ -484,13 +510,25 @@ export class Authorization extends Deserializable {
 
   constructor(
     authType?: AuthType,
-    spendingConditions?: SpendingCondition,
-    sponsorSpendingCondition?: SpendingCondition
+    spendingConditions?: SpendingConditionOpts,
+    sponsorSpendingCondition?: SpendingConditionOpts
   ) {
     super();
     this.authType = authType;
-    this.spendingCondition = spendingConditions;
-    this.sponsorSpendingCondition = sponsorSpendingCondition;
+    if (spendingConditions) {
+      this.spendingCondition = {
+        ...spendingConditions,
+        nonce: intToBigInt(spendingConditions.nonce, false),
+        fee: intToBigInt(spendingConditions.fee, false),
+      };
+    }
+    if (sponsorSpendingCondition) {
+      this.sponsorSpendingCondition = {
+        ...sponsorSpendingCondition,
+        nonce: intToBigInt(sponsorSpendingCondition.nonce, false),
+        fee: intToBigInt(sponsorSpendingCondition.fee, false),
+      };
+    }
   }
 
   intoInitialSighashAuth(): Authorization {
@@ -512,38 +550,42 @@ export class Authorization extends Deserializable {
     throw new Error('Authorization missing SpendingCondition');
   }
 
-  setFee(amount: BigNum) {
+  setFee(amount: IntegerType) {
     switch (this.authType) {
       case AuthType.Standard:
-        this.spendingCondition!.fee = amount;
+        this.spendingCondition!.fee = intToBigInt(amount, false);
         break;
       case AuthType.Sponsored:
-        this.sponsorSpendingCondition!.fee = amount;
+        this.sponsorSpendingCondition!.fee = intToBigInt(amount, false);
         break;
     }
   }
 
-  getFee() {
+  getFee(): bigint {
     switch (this.authType) {
       case AuthType.Standard:
         return this.spendingCondition!.fee;
       case AuthType.Sponsored:
         return this.sponsorSpendingCondition!.fee;
       default:
-        return 0;
+        return BigInt(0);
     }
   }
 
-  setNonce(nonce: BigNum) {
-    this.spendingCondition!.nonce = nonce;
+  setNonce(nonce: IntegerType) {
+    this.spendingCondition!.nonce = intToBigInt(nonce, false);
   }
 
-  setSponsorNonce(nonce: BigNum) {
-    this.sponsorSpendingCondition!.nonce = nonce;
+  setSponsorNonce(nonce: IntegerType) {
+    this.sponsorSpendingCondition!.nonce = intToBigInt(nonce, false);
   }
 
-  setSponsor(sponsorSpendingCondition: SpendingCondition) {
-    this.sponsorSpendingCondition = sponsorSpendingCondition;
+  setSponsor(sponsorSpendingCondition: SpendingConditionOpts) {
+    this.sponsorSpendingCondition = {
+      ...sponsorSpendingCondition,
+      nonce: intToBigInt(sponsorSpendingCondition.nonce, false),
+      fee: intToBigInt(sponsorSpendingCondition.fee, false),
+    };
   }
 
   verifyOrigin(initialSigHash: string): string {
@@ -613,23 +655,23 @@ export class Authorization extends Deserializable {
 }
 
 export class StandardAuthorization extends Authorization {
-  constructor(spendingCondition: SpendingCondition) {
+  constructor(spendingCondition: SpendingConditionOpts) {
     super(AuthType.Standard, spendingCondition);
   }
 }
 
 export class SponsoredAuthorization extends Authorization {
   constructor(
-    originSpendingCondition: SpendingCondition,
-    sponsorSpendingCondition?: SpendingCondition
+    originSpendingCondition: SpendingConditionOpts,
+    sponsorSpendingCondition?: SpendingConditionOpts
   ) {
     let sponsorSC = sponsorSpendingCondition;
     if (!sponsorSC) {
       sponsorSC = createSingleSigSpendingCondition(
         AddressHashMode.SerializeP2PKH,
         '0'.repeat(66),
-        new BigNum(0),
-        new BigNum(0)
+        0,
+        0
       );
     }
     super(AuthType.Sponsored, originSpendingCondition, sponsorSC);

@@ -13,14 +13,12 @@ import { serializeDeserialize } from './macros';
 
 import { trueCV, falseCV, standardPrincipalCV, contractPrincipalCV } from '../src/clarity';
 
-import BigNum from 'bn.js';
-
 import { COINBASE_BUFFER_LENGTH_BYTES, StacksMessageType } from '../src/constants';
 import { principalToString } from '../src/clarity/types/principalCV';
 
 test('STX token transfer payload serialization and deserialization', () => {
   const recipient = standardPrincipalCV('SP3FGQ8Z7JY9BWYZ5WM53E0M9NK7WHJF0691NZ159');
-  const amount = new BigNum(2500000);
+  const amount = 2500000;
 
   const payload = createTokenTransferPayload(recipient, amount, 'memo (not being included)');
 
@@ -30,7 +28,7 @@ test('STX token transfer payload serialization and deserialization', () => {
   ) as TokenTransferPayload;
   expect(deserialized.payloadType).toBe(payload.payloadType);
   expect(deserialized.recipient).toEqual(recipient);
-  expect(deserialized.amount.toNumber()).toBe(amount.toNumber());
+  expect(deserialized.amount.toString()).toBe(amount.toString());
 });
 
 test('STX token transfer payload (to contract addr)  serialization and deserialization', () => {
@@ -38,7 +36,7 @@ test('STX token transfer payload (to contract addr)  serialization and deseriali
     'SP3FGQ8Z7JY9BWYZ5WM53E0M9NK7WHJF0691NZ159',
     'contract-name'
   );
-  const amount = new BigNum(2500000);
+  const amount = 2500000;
 
   const payload = createTokenTransferPayload(recipient, amount, 'memo (not being included)');
 
@@ -48,12 +46,12 @@ test('STX token transfer payload (to contract addr)  serialization and deseriali
   ) as TokenTransferPayload;
   expect(deserialized.payloadType).toBe(payload.payloadType);
   expect(deserialized.recipient).toEqual(recipient);
-  expect(deserialized.amount.toNumber()).toBe(amount.toNumber());
+  expect(deserialized.amount.toString()).toBe(amount.toString());
 });
 
 test('STX token transfer payload (with contract principal string) serialization and deserialization', () => {
   const recipient = 'SP3FGQ8Z7JY9BWYZ5WM53E0M9NK7WHJF0691NZ159.contract-name';
-  const amount = new BigNum(2500000);
+  const amount = 2500000;
 
   const payload = createTokenTransferPayload(recipient, amount, 'memo (not being included)');
 
@@ -63,12 +61,12 @@ test('STX token transfer payload (with contract principal string) serialization 
   ) as TokenTransferPayload;
   expect(deserialized.payloadType).toBe(payload.payloadType);
   expect(principalToString(deserialized.recipient)).toEqual(recipient);
-  expect(deserialized.amount.toNumber()).toBe(amount.toNumber());
+  expect(deserialized.amount.toString()).toBe(amount.toString());
 });
 
 test('STX token transfer payload (with address principal string) serialization and deserialization', () => {
   const recipient = 'SP3FGQ8Z7JY9BWYZ5WM53E0M9NK7WHJF0691NZ159';
-  const amount = new BigNum(2500000);
+  const amount = 2500000;
 
   const payload = createTokenTransferPayload(recipient, amount, 'memo (not being included)');
 
@@ -78,7 +76,7 @@ test('STX token transfer payload (with address principal string) serialization a
   ) as TokenTransferPayload;
   expect(deserialized.payloadType).toBe(payload.payloadType);
   expect(principalToString(deserialized.recipient)).toEqual(recipient);
-  expect(deserialized.amount.toNumber()).toBe(amount.toNumber());
+  expect(deserialized.amount.toString()).toBe(amount.toString());
 });
 
 test('Contract call payload serialization and deserialization', () => {
