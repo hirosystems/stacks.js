@@ -1,5 +1,4 @@
 import { Buffer } from '@stacks/common';
-import BN from 'bn.js';
 import {
   BooleanCV,
   BufferCV,
@@ -113,12 +112,7 @@ export function cvToValue(val: ClarityValue, strictJsonCompat: boolean = false):
     case ClarityType.Int:
     case ClarityType.UInt:
       if (strictJsonCompat) {
-        const bn = new BN(val.value.toString());
-        if (bn.bitLength() <= 53) {
-          return bn.toNumber();
-        } else {
-          return val.value.toString();
-        }
+        return val.value.toString();
       } else {
         return val.value;
       }
