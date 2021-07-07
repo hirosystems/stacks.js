@@ -40,9 +40,9 @@ test('deleteFile', async () => {
 
   const appConfig = new AppConfig(['store_write'], 'http://localhost:3000');
   const userSession = new UserSession({ appConfig });
-  userSession.store.getSessionData().userData = <any>{
+  userSession.store.getSessionData().userData = {
     gaiaHubConfig,
-  };
+  } as any;
 
   const deleteFromGaiaHub = jest.fn();
   jest.mock('../src/hub', () => ({

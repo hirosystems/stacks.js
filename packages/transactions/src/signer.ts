@@ -1,9 +1,8 @@
 import { StacksTransaction } from './transaction';
 
 import { StacksPrivateKey, StacksPublicKey } from './keys';
-import { isSingleSig } from './authorization';
+import { isSingleSig, SpendingConditionOpts } from './authorization';
 import { cloneDeep } from './utils';
-import { SpendingCondition } from './authorization';
 import { AuthType } from './constants';
 import { SigningError } from './errors';
 
@@ -22,7 +21,10 @@ export class TransactionSigner {
     this.checkOverlap = true;
   }
 
-  static createSponsorSigner(transaction: StacksTransaction, spendingCondition: SpendingCondition) {
+  static createSponsorSigner(
+    transaction: StacksTransaction,
+    spendingCondition: SpendingConditionOpts
+  ) {
     if (transaction.auth.authType != AuthType.Sponsored) {
       throw new SigningError('Cannot add sponsor to non-sponsored transaction');
     }

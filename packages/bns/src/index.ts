@@ -194,7 +194,7 @@ export interface GetNamespacePriceOptions {
 export async function getNamespacePrice({
   namespace,
   network,
-}: GetNamespacePriceOptions): Promise<BN> {
+}: GetNamespacePriceOptions): Promise<bigint> {
   const bnsFunctionName = 'get-namespace-price';
 
   // Create a random address as input to read-only function call
@@ -245,7 +245,7 @@ export interface GetNamePriceOptions {
 export async function getNamePrice({
   fullyQualifiedName,
   network,
-}: GetNamePriceOptions): Promise<BN> {
+}: GetNamePriceOptions): Promise<bigint> {
   const bnsFunctionName = 'get-name-price';
   const { subdomain, namespace, name } = decodeFQN(fullyQualifiedName);
   if (subdomain) {

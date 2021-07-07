@@ -1,4 +1,5 @@
 import { readFileSync } from 'fs';
+import path from 'path';
 import { createContractCallPayload } from '../src/payload';
 
 import {
@@ -29,7 +30,7 @@ import {
 
 import { oneLineTrim } from 'common-tags';
 
-const TEST_ABI: ClarityAbi = JSON.parse(readFileSync('./tests/abi/test-abi.json').toString());
+const TEST_ABI: ClarityAbi = JSON.parse(readFileSync(path.join(__dirname, './abi/test-abi.json')).toString());
 
 test('ABI validation', () => {
   const contractAddress = 'ST3KC0MTNW34S1ZXD36JYKFD3JJMWA01M55DSJ4JE';

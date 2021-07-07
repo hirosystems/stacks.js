@@ -9,6 +9,8 @@ import { Buffer as BufferPolyfill } from 'buffer/';
 // so export using the type definition from NodeJS (@types/node).
 import type { Buffer as NodeJSBuffer } from 'buffer';
 
+import BN from 'bn.js';
+
 const AvailableBufferModule: typeof NodeJSBuffer =
   // eslint-disable-next-line node/prefer-global/buffer
   typeof Buffer !== 'undefined' ? Buffer : (BufferPolyfill as any);
@@ -327,4 +329,71 @@ export function getGlobalObjects<K extends Extract<keyof Window, string>>(
     }
   }
   return result;
+}
+
+export type IntegerType = number | string | bigint | Uint8Array | BufferPolyfill | BN;
+
+/*
+export function BigInt(value: any): bigint {
+  let bigInt = BigInt(value);
+  bigInt = Object.assign(bigInt, { toJSON: () => bigInt.toString() });
+  return bigInt;
+}
+*/
+
+// eslint-disable-next-line node/prefer-global/buffer
+export function intToBytes(value: IntegerType, signed: boolean, byteLength: number): Buffer {
+  return intToBN(value, signed).toArrayLike(AvailableBufferModule, 'be', byteLength);
+}
+
+export function intToBN(value: IntegerType, signed: boolean): BN {
+  const bigInt = intToBigInt(value, signed);
+  return new BN(bigInt.toString());
+}
+
+export function intToBigInt(value: IntegerType, signed: boolean): bigint {
+  if (typeof value === 'number') {
+    if (!Number.isInteger(value)) {
+      throw new RangeError(`Invalid value. Values of type 'number' must be an integer.`);
+    }
+    return BigInt(value);
+  }
+  if (typeof value === 'string') {
+    // If hex string then convert to buffer then fall through to the buffer condition
+    if (value.toLowerCase().startsWith('0x')) {
+      // Trim '0x' hex-prefix
+      let hex = value.slice(2);
+      // Allow odd-length strings like `0xf` -- some libs output these, or even just `0x${num.toString(16)}`
+      hex = hex.padStart(hex.length + (hex.length % 2), '0');
+      value = AvailableBufferModule.from(hex, 'hex');
+    } else {
+      try {
+        return BigInt(value);
+      } catch (error) {
+        if (error instanceof SyntaxError) {
+          throw new RangeError(`Invalid value. String integer '${value}' is not finite.`)
+        }
+      }
+    }
+  }
+  if (typeof value === 'bigint') {
+    return value;
+  }
+  if (value instanceof Uint8Array || BufferPolyfill.isBuffer(value)) {
+    if (signed) {
+      // Allow byte arrays smaller than 128-bits to be passed.
+      // This allows positive signed ints like `0x08` (8) or negative signed
+      // ints like `0xf8` (-8) to be passed without having to pad to 16 bytes.
+      const bn = new BN(value, 'be').fromTwos(value.byteLength * 8);
+      return BigInt(bn.toString());
+    } else {
+      return BigInt(new BN(value, 'be').toString());
+    }
+  }
+  if (value instanceof BN || BN.isBN(value)) {
+    return BigInt(value.toString());
+  }
+  throw new TypeError(
+    `Invalid value type. Must be a number, bigint, integer-string, hex-string, BN.js instance, or Buffer.`
+  );
 }
