@@ -353,15 +353,15 @@ describe('Clarity Types', () => {
 
       const smallBitsUInt1 = cvToValue(uintCV(maxSafeInt), true);
       expect(smallBitsUInt1.toString()).toBe(maxSafeInt.toString());
-      expect(typeof smallBitsUInt1).toBe('number');
+      expect(typeof smallBitsUInt1).toBe('string');
 
       const smallBitsInt1 = cvToValue(intCV(maxSafeInt), true);
       expect(smallBitsInt1.toString()).toBe(maxSafeInt.toString());
-      expect(typeof smallBitsInt1).toBe('number');
+      expect(typeof smallBitsInt1).toBe('string');
 
       const smallBitsInt2 = cvToValue(intCV(minSafeInt), true);
       expect(smallBitsInt2.toString()).toBe(minSafeInt.toString());
-      expect(typeof smallBitsInt2).toBe('number');
+      expect(typeof smallBitsInt2).toBe('string');
 
       const largeBitsUInt1 = cvToValue(uintCV(unsafeLargeIntSize), true);
       expect(largeBitsUInt1.toString()).toBe(unsafeLargeIntSize.toString());
@@ -688,8 +688,8 @@ describe('Clarity Types', () => {
             (j (response UnknownType bool)) (k (list 2 bool)) (l (tuple (a bool) (b bool))) 
             (m (string-ascii 11)) (n (string-utf8 9)))",
             "value":{
-              "a":{"type":"int","value":-1},
-              "b":{"type":"uint","value":1},
+              "a":{"type":"int","value":"-1"},
+              "b":{"type":"uint","value":"1"},
               "c":{"type":"(buff 4)","value":"0x74657374"},
               "d":{"type":"bool","value":true},
               "e":{"type":"(optional bool)","value":{"type":"bool","value":true}},
