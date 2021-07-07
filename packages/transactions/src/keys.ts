@@ -65,7 +65,7 @@ export function publicKeyFromSignature(
   message: string,
   messageSignature: MessageSignature,
   pubKeyEncoding = PubKeyEncoding.Compressed
-) {
+): string {
   const ec = new EC('secp256k1');
   const messageBN = ec.keyFromPrivate(message, 'hex').getPrivate().toString(10);
 

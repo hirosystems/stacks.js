@@ -216,15 +216,11 @@ export class StackingClient {
   /**
    * Get account balance
    *
-   * @returns {Promise<BN>} that resolves to a BigNum if the operation succeeds
+   * @returns promise resolves to a bigint if the operation succeeds
    */
-  async getAccountBalance(): Promise<BN> {
+  async getAccountBalance(): Promise<bigint> {
     return this.getAccountStatus().then(res => {
-      let balanceHex = res.balance;
-      if (res.balance.startsWith('0x')) {
-        balanceHex = res.balance.substr(2);
-      }
-      return new BN(balanceHex, 'hex');
+      return BigInt(res.balance);
     });
   }
 
@@ -314,9 +310,9 @@ export class StackingClient {
    * @returns {Promise<boolean>} that resolves to a bool if the operation succeeds
    */
   async hasMinimumStx(): Promise<boolean> {
-    const balance: BN = await this.getAccountBalance();
-    const min: BN = new BN((await this.getPoxInfo()).min_amount_ustx.toString());
-    return balance.gte(min);
+    const balance = await this.getAccountBalance();
+    const min = BigInt((await this.getPoxInfo()).min_amount_ustx);
+    return balance >= min;
   }
 
   /**
@@ -327,7 +323,7 @@ export class StackingClient {
    * @returns {Promise<StackingEligibility>} that resolves to a StackingEligibility object if the operation succeeds
    */
   async canStack({ poxAddress, cycles }: CanLockStxOptions): Promise<StackingEligibility> {
-    const balancePromise: Promise<BN> = this.getAccountBalance();
+    const balancePromise: Promise<bigint> = this.getAccountBalance();
     const poxInfoPromise = this.getPoxInfo();
 
     return Promise.all([balancePromise, poxInfoPromise])
@@ -736,8 +732,8 @@ export class StackingClient {
           stacked: true,
           details: {
             amount_microstx: amountMicroStx.value.toString(),
-            first_reward_cycle: firstRewardCycle.value.toNumber(),
-            lock_period: lockPeriod.value.toNumber(),
+            first_reward_cycle: Number(firstRewardCycle.value),
+            lock_period: Number(lockPeriod.value),
             unlock_height: account.unlock_height,
             pox_address: {
               version: version.buffer,
@@ -761,9 +757,9 @@ export class StackingClient {
    * @returns {StacksTransaction} that resolves to a transaction object if the operation succeeds
    */
   modifyLockTxFee({ tx, amountMicroStx }: { tx: StacksTransaction; amountMicroStx: BN }) {
-    const fee = tx.auth.getFee() as BN;
+    const fee = tx.auth.getFee();
     (tx.payload as ContractCallPayload).functionArgs[0] = uintCV(
-      new BN(amountMicroStx.toString(10), 10).sub(fee).toArrayLike(Buffer)
+      amountMicroStx.sub(new BN(fee.toString()))
     );
     return tx;
   }

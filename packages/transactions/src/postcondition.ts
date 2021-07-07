@@ -1,3 +1,5 @@
+import { IntegerType, intToBigInt, intToBytes } from '@stacks/common';
+// @ts-expect-error ts(6133): 'Buffer' is declared but its value is never read
 import { Buffer } from '@stacks/common';
 import {
   PostConditionType,
@@ -19,7 +21,6 @@ import {
   parsePrincipalString,
 } from './types';
 
-import BigNum from 'bn.js';
 import { BufferReader } from './bufferReader';
 import { ClarityValue, serializeCV, deserializeCV } from './clarity';
 import { DeserializationError } from './errors';
@@ -31,13 +32,13 @@ export interface STXPostCondition {
   readonly conditionType: PostConditionType.STX;
   readonly principal: PostConditionPrincipal;
   readonly conditionCode: FungibleConditionCode;
-  readonly amount: BigNum;
+  readonly amount: bigint;
 }
 
 export function createSTXPostCondition(
   principal: string | PostConditionPrincipal,
   conditionCode: FungibleConditionCode,
-  amount: BigNum
+  amount: IntegerType
 ): STXPostCondition {
   if (typeof principal === 'string') {
     principal = parsePrincipalString(principal);
@@ -48,7 +49,7 @@ export function createSTXPostCondition(
     conditionType: PostConditionType.STX,
     principal,
     conditionCode,
-    amount,
+    amount: intToBigInt(amount, false),
   };
 }
 
@@ -57,14 +58,14 @@ export interface FungiblePostCondition {
   readonly conditionType: PostConditionType.Fungible;
   readonly principal: PostConditionPrincipal;
   readonly conditionCode: FungibleConditionCode;
-  readonly amount: BigNum;
+  readonly amount: bigint;
   readonly assetInfo: AssetInfo;
 }
 
 export function createFungiblePostCondition(
   principal: string | PostConditionPrincipal,
   conditionCode: FungibleConditionCode,
-  amount: BigNum,
+  amount: IntegerType,
   assetInfo: string | AssetInfo
 ): FungiblePostCondition {
   if (typeof principal === 'string') {
@@ -79,7 +80,7 @@ export function createFungiblePostCondition(
     conditionType: PostConditionType.Fungible,
     principal,
     conditionCode,
-    amount,
+    amount: intToBigInt(amount, false),
     assetInfo,
   };
 }
@@ -140,7 +141,7 @@ export function serializePostCondition(postCondition: PostCondition): Buffer {
     postCondition.conditionType === PostConditionType.STX ||
     postCondition.conditionType === PostConditionType.Fungible
   ) {
-    bufferArray.push(postCondition.amount.toArrayLike(Buffer, 'be', 8));
+    bufferArray.push(intToBytes(postCondition.amount, false, 8));
   }
 
   return bufferArray.concatBuffer();
@@ -155,13 +156,13 @@ export function deserializePostCondition(bufferReader: BufferReader): PostCondit
 
   let conditionCode;
   let assetInfo;
-  let amount;
+  let amount: bigint;
   switch (postConditionType) {
     case PostConditionType.STX:
       conditionCode = bufferReader.readUInt8Enum(FungibleConditionCode, n => {
         throw new DeserializationError(`Could not read ${n} as FungibleConditionCode`);
       });
-      amount = new BigNum(bufferReader.readBuffer(8).toString('hex'), 16);
+      amount = BigInt('0x' + bufferReader.readBuffer(8).toString('hex'));
       return {
         type: StacksMessageType.PostCondition,
         conditionType: PostConditionType.STX,
@@ -174,7 +175,7 @@ export function deserializePostCondition(bufferReader: BufferReader): PostCondit
       conditionCode = bufferReader.readUInt8Enum(FungibleConditionCode, n => {
         throw new DeserializationError(`Could not read ${n} as FungibleConditionCode`);
       });
-      amount = new BigNum(bufferReader.readBuffer(8).toString('hex'), 16);
+      amount = BigInt('0x' + bufferReader.readBuffer(8).toString('hex'));
       return {
         type: StacksMessageType.PostCondition,
         conditionType: PostConditionType.Fungible,

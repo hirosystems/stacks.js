@@ -1,4 +1,5 @@
 import { Buffer } from '@stacks/common';
+import BN from 'bn.js';
 import {
   BooleanCV,
   BufferCV,
@@ -98,7 +99,12 @@ export function cvToString(val: ClarityValue, encoding: 'tryAscii' | 'hex' = 'he
   }
 }
 
-export function cvToValue(val: ClarityValue): any {
+/**
+ * @param strictJsonCompat If true then ints and uints are returned as JSON serializable numbers when
+ * less than or equal to 53 bit length, otherwise string wrapped integers when larger than 53 bits.
+ * If false, they are returned as js native `bigint`s which are _not_ JSON serializable.
+ */
+export function cvToValue(val: ClarityValue, strictJsonCompat: boolean = false): any {
   switch (val.type) {
     case ClarityType.BoolTrue:
       return true;
@@ -106,15 +112,15 @@ export function cvToValue(val: ClarityValue): any {
       return false;
     case ClarityType.Int:
     case ClarityType.UInt:
-      // If the integer can be represented in 53 bits or less, return a js native `number`,
-      // otherwise return a string quoted integer.
-      // TODO: This is odd and surprising behavior. It was initially implemented for backward compatibility
-      //       but eventually should be replaced by always returning the same type, probably either a native
-      //       js `bigint` or a string quoted integer.
-      if (val.value.bitLength() <= 53) {
-        return val.value.toNumber();
+      if (strictJsonCompat) {
+        const bn = new BN(val.value.toString());
+        if (bn.bitLength() <= 53) {
+          return bn.toNumber();
+        } else {
+          return val.value.toString();
+        }
       } else {
-        return val.value.toString();
+        return val.value;
       }
     case ClarityType.Buffer:
       return `0x${val.buffer.toString('hex')}`;
@@ -147,11 +153,11 @@ export function cvToValue(val: ClarityValue): any {
 export function cvToJSON(val: ClarityValue): any {
   switch (val.type) {
     case ClarityType.ResponseErr:
-      return { type: getCVTypeString(val), value: cvToValue(val), success: false };
+      return { type: getCVTypeString(val), value: cvToValue(val, true), success: false };
     case ClarityType.ResponseOk:
-      return { type: getCVTypeString(val), value: cvToValue(val), success: true };
+      return { type: getCVTypeString(val), value: cvToValue(val, true), success: true };
     default:
-      return { type: getCVTypeString(val), value: cvToValue(val) };
+      return { type: getCVTypeString(val), value: cvToValue(val, true) };
   }
 }
 
