@@ -1,4 +1,4 @@
-import { Buffer } from '@stacks/common';
+import { Buffer, IntegerType, intToBigInt } from '@stacks/common';
 import {
   AnchorMode,
   AuthType,
@@ -18,12 +18,12 @@ import {
   isSingleSig,
   nextSignature,
   SingleSigSpendingCondition,
-  SpendingCondition,
+  SpendingConditionOpts,
 } from './authorization';
 
 import { BufferArray, cloneDeep, txidFromData } from './utils';
 
-import { deserializePayload, Payload, serializePayload } from './payload';
+import { deserializePayload, Payload, PayloadInput, serializePayload } from './payload';
 
 import { createLPList, deserializeLPList, LengthPrefixedList, serializeLPList } from './types';
 
@@ -31,7 +31,6 @@ import { isCompressed, StacksPrivateKey, StacksPublicKey } from './keys';
 
 import { BufferReader } from './bufferReader';
 
-import BigNum from 'bn.js';
 import { SerializationError, SigningError } from './errors';
 
 export class StacksTransaction {
@@ -46,7 +45,7 @@ export class StacksTransaction {
   constructor(
     version: TransactionVersion,
     auth: Authorization,
-    payload: Payload,
+    payload: PayloadInput,
     postConditions?: LengthPrefixedList,
     postConditionMode?: PostConditionMode,
     anchorMode?: AnchorMode,
@@ -54,7 +53,14 @@ export class StacksTransaction {
   ) {
     this.version = version;
     this.auth = auth;
-    this.payload = payload;
+    if ('amount' in payload) {
+      this.payload = {
+        ...payload,
+        amount: intToBigInt(payload.amount, false),
+      };
+    } else {
+      this.payload = payload;
+    }
     this.chainId = chainId ?? DEFAULT_CHAIN_ID;
     this.postConditionMode = postConditionMode ?? PostConditionMode.Deny;
     this.postConditions = postConditions ?? createLPList([]);
@@ -146,7 +152,7 @@ export class StacksTransaction {
   }
 
   signAndAppend(
-    condition: SpendingCondition,
+    condition: SpendingConditionOpts,
     curSigHash: string,
     authType: AuthType,
     privateKey: StacksPrivateKey
@@ -178,7 +184,7 @@ export class StacksTransaction {
     return txidFromData(serialized);
   }
 
-  setSponsor(sponsorSpendingCondition: SpendingCondition) {
+  setSponsor(sponsorSpendingCondition: SpendingConditionOpts) {
     if (this.auth.authType != AuthType.Sponsored) {
       throw new SigningError('Cannot sponsor sign a non-sponsored transaction');
     }
@@ -189,27 +195,27 @@ export class StacksTransaction {
   /**
    * Set the total fee to be paid for this transaction
    *
-   * @param {BigNum} fee - the fee amount in microstacks
+   * @param fee - the fee amount in microstacks
    */
-  setFee(amount: BigNum) {
+  setFee(amount: IntegerType) {
     this.auth.setFee(amount);
   }
 
   /**
    * Set the transaction nonce
    *
-   * @param {BigNum} nonce - the nonce value
+   * @param nonce - the nonce value
    */
-  setNonce(nonce: BigNum) {
+  setNonce(nonce: IntegerType) {
     this.auth.setNonce(nonce);
   }
 
   /**
    * Set the transaction sponsor nonce
    *
-   * @param {BigNum} nonce - the sponsor nonce value
+   * @param nonce - the sponsor nonce value
    */
-  setSponsorNonce(nonce: BigNum) {
+  setSponsorNonce(nonce: IntegerType) {
     this.auth.setSponsorNonce(nonce);
   }
 

@@ -1,4 +1,4 @@
-import { Buffer } from '@stacks/common';
+import { Buffer, IntegerType, intToBigInt } from '@stacks/common';
 import { StacksTransaction } from './transaction';
 
 import { StacksNetwork, StacksMainnet, StacksTestnet } from '@stacks/network';
@@ -56,7 +56,6 @@ import { cvToHex, parseReadOnlyResponse, omit } from './utils';
 
 import { fetchPrivate } from '@stacks/common';
 
-import BigNum from 'bn.js';
 import { ClarityValue, PrincipalCV } from './clarity';
 import { validateContractCall, ClarityAbi } from './contract-abi';
 import { c32address } from 'c32check';
@@ -69,12 +68,11 @@ import { c32address } from 'c32check';
  *
  * @return a promise that resolves to an integer
  */
-export async function getNonce(address: string, network?: StacksNetwork): Promise<BigNum> {
+export async function getNonce(address: string, network?: StacksNetwork): Promise<bigint> {
   const defaultNetwork = new StacksMainnet();
   const url = network
     ? network.getAccountApiUrl(address)
     : defaultNetwork.getAccountApiUrl(address);
-
   const response = await fetchPrivate(url);
   if (!response.ok) {
     let msg = '';
@@ -85,8 +83,9 @@ export async function getNonce(address: string, network?: StacksNetwork): Promis
       `Error fetching nonce. Response ${response.status}: ${response.statusText}. Attempted to fetch ${url} and failed with the message: "${msg}"`
     );
   }
-  const result = (await response.json()) as { nonce: string };
-  return new BigNum(result.nonce);
+  const responseText = await response.text();
+  const result = JSON.parse(responseText) as { nonce: string };
+  return BigInt(result.nonce);
 }
 
 /**
@@ -100,7 +99,7 @@ export async function getNonce(address: string, network?: StacksNetwork): Promis
 export async function estimateTransfer(
   transaction: StacksTransaction,
   network?: StacksNetwork
-): Promise<BigNum> {
+): Promise<bigint> {
   if (transaction.payload.payloadType !== PayloadType.TokenTransfer) {
     throw new Error(
       `Transaction fee estimation only possible with ${
@@ -122,7 +121,6 @@ export async function estimateTransfer(
   const url = network
     ? network.getTransferFeeEstimateApiUrl()
     : defaultNetwork.getTransferFeeEstimateApiUrl();
-
   const response = await fetchPrivate(url, fetchOptions);
   if (!response.ok) {
     let msg = '';
@@ -134,9 +132,9 @@ export async function estimateTransfer(
     );
   }
   const feeRateResult = await response.text();
-  const txBytes = new BigNum(transaction.serialize().byteLength);
-  const feeRate = new BigNum(feeRateResult);
-  return feeRate.mul(txBytes);
+  const txBytes = BigInt(transaction.serialize().byteLength);
+  const feeRate = BigInt(feeRateResult);
+  return feeRate * txBytes;
 }
 
 export type TxBroadcastResultOk = string;
@@ -255,11 +253,11 @@ export interface TokenTransferOptions {
   /** the address of the recipient of the token transfer */
   recipient: string | PrincipalCV;
   /** the amount to be transfered in microstacks */
-  amount: BigNum;
+  amount: IntegerType;
   /** the transaction fee in microstacks */
-  fee?: BigNum;
+  fee?: IntegerType;
   /** the transaction nonce, which must be increased monotonically with each new transaction */
-  nonce?: BigNum;
+  nonce?: IntegerType;
   /** the network that the transaction will ultimately be broadcast to */
   network?: StacksNetwork;
   /** the transaction anchorMode, which specifies whether it should be
@@ -308,8 +306,8 @@ export async function makeUnsignedSTXTokenTransfer(
   txOptions: UnsignedTokenTransferOptions | UnsignedMultiSigTokenTransferOptions
 ): Promise<StacksTransaction> {
   const defaultOptions = {
-    fee: new BigNum(0),
-    nonce: new BigNum(0),
+    fee: BigInt(0),
+    nonce: BigInt(0),
     network: new StacksMainnet(),
     postConditionMode: PostConditionMode.Deny,
     memo: '',
@@ -366,12 +364,12 @@ export async function makeUnsignedSTXTokenTransfer(
     options.network.chainId
   );
 
-  if (!txOptions.fee) {
+  if (txOptions.fee === undefined || txOptions.fee === null) {
     const txFee = await estimateTransfer(transaction, options.network);
     transaction.setFee(txFee);
   }
 
-  if (!txOptions.nonce) {
+  if (txOptions.nonce === undefined || txOptions.nonce === null) {
     const addressVersion =
       options.network.version === TransactionVersion.Mainnet
         ? AddressVersion.MainnetSingleSig
@@ -436,9 +434,9 @@ export interface ContractDeployOptions {
   /** a hex string of the private key of the transaction sender */
   senderKey: string;
   /** transaction fee in microstacks */
-  fee?: BigNum;
+  fee?: IntegerType;
   /** the transaction nonce, which must be increased monotonically with each new transaction */
-  nonce?: BigNum;
+  nonce?: IntegerType;
   /** the network that the transaction will ultimately be broadcast to */
   network?: StacksNetwork;
   /** the transaction anchorMode, which specifies whether it should be
@@ -464,7 +462,7 @@ export interface ContractDeployOptions {
 export async function estimateContractDeploy(
   transaction: StacksTransaction,
   network?: StacksNetwork
-): Promise<BigNum> {
+): Promise<bigint> {
   if (transaction.payload.payloadType !== PayloadType.SmartContract) {
     throw new Error(
       `Contract deploy fee estimation only possible with ${
@@ -500,9 +498,9 @@ export async function estimateContractDeploy(
     );
   }
   const feeRateResult = await response.text();
-  const txBytes = new BigNum(transaction.serialize().byteLength);
-  const feeRate = new BigNum(feeRateResult);
-  return feeRate.mul(txBytes);
+  const txBytes = intToBigInt(transaction.serialize().byteLength, false);
+  const feeRate = intToBigInt(feeRateResult, false);
+  return feeRate * txBytes;
 }
 
 /**
@@ -518,8 +516,8 @@ export async function makeContractDeploy(
   txOptions: ContractDeployOptions
 ): Promise<StacksTransaction> {
   const defaultOptions = {
-    fee: new BigNum(0),
-    nonce: new BigNum(0),
+    fee: BigInt(0),
+    nonce: BigInt(0),
     network: new StacksMainnet(),
     postConditionMode: PostConditionMode.Deny,
     sponsored: false,
@@ -566,12 +564,12 @@ export async function makeContractDeploy(
     options.network.chainId
   );
 
-  if (!txOptions.fee) {
+  if (txOptions.fee === undefined || txOptions.fee === null) {
     const txFee = await estimateContractDeploy(transaction, options.network);
     transaction.setFee(txFee);
   }
 
-  if (!txOptions.nonce) {
+  if (txOptions.nonce === undefined || txOptions.nonce === null) {
     const addressVersion =
       options.network.version === TransactionVersion.Mainnet
         ? AddressVersion.MainnetSingleSig
@@ -599,10 +597,10 @@ export interface ContractCallOptions {
   functionName: string;
   functionArgs: ClarityValue[];
   /** transaction fee in microstacks */
-  fee?: BigNum;
+  fee?: IntegerType;
   feeEstimateApiUrl?: string;
   /** the transaction nonce, which must be increased monotonically with each new transaction */
-  nonce?: BigNum;
+  nonce?: IntegerType;
   /** the Stacks blockchain network that will ultimately be used to broadcast this transaction */
   network?: StacksNetwork;
   /** the transaction anchorMode, which specifies whether it should be
@@ -650,7 +648,7 @@ export interface SignedMultiSigContractCallOptions extends ContractCallOptions {
 export async function estimateContractFunctionCall(
   transaction: StacksTransaction,
   network?: StacksNetwork
-): Promise<BigNum> {
+): Promise<bigint> {
   if (transaction.payload.payloadType !== PayloadType.ContractCall) {
     throw new Error(
       `Contract call fee estimation only possible with ${
@@ -686,9 +684,9 @@ export async function estimateContractFunctionCall(
     );
   }
   const feeRateResult = await response.text();
-  const txBytes = new BigNum(transaction.serialize().byteLength);
-  const feeRate = new BigNum(feeRateResult);
-  return feeRate.mul(txBytes);
+  const txBytes = intToBigInt(transaction.serialize().byteLength, false);
+  const feeRate = intToBigInt(feeRateResult, false);
+  return feeRate * txBytes;
 }
 
 /**
@@ -702,8 +700,8 @@ export async function makeUnsignedContractCall(
   txOptions: UnsignedContractCallOptions | UnsignedMultiSigContractCallOptions
 ): Promise<StacksTransaction> {
   const defaultOptions = {
-    fee: new BigNum(0),
-    nonce: new BigNum(0),
+    fee: BigInt(0),
+    nonce: BigInt(0),
     network: new StacksMainnet(),
     postConditionMode: PostConditionMode.Deny,
     sponsored: false,
@@ -779,12 +777,12 @@ export async function makeUnsignedContractCall(
     options.network.chainId
   );
 
-  if (!txOptions.fee) {
+  if (txOptions.fee === undefined || txOptions.fee === null) {
     const txFee = await estimateContractFunctionCall(transaction, options.network);
     transaction.setFee(txFee);
   }
 
-  if (!txOptions.nonce) {
+  if (txOptions.nonce === undefined || txOptions.nonce === null) {
     const addressVersion =
       options.network.version === TransactionVersion.Mainnet
         ? AddressVersion.MainnetSingleSig
@@ -844,16 +842,14 @@ export async function makeContractCall(
  *
  * Returns a STX post condition object
  *
- * @param  {String} address - the c32check address
- * @param  {FungibleConditionCode} conditionCode - the condition code
- * @param  {BigNum} amount - the amount of STX tokens
- *
- * @return {STXPostCondition}
+ * @param address - the c32check address
+ * @param conditionCode - the condition code
+ * @param amount - the amount of STX tokens
  */
 export function makeStandardSTXPostCondition(
   address: string,
   conditionCode: FungibleConditionCode,
-  amount: BigNum
+  amount: IntegerType
 ): STXPostCondition {
   return createSTXPostCondition(createStandardPrincipal(address), conditionCode, amount);
 }
@@ -863,10 +859,10 @@ export function makeStandardSTXPostCondition(
  *
  * Returns a STX post condition object
  *
- * @param  {String} address - the c32check address of the contract
- * @param  {String} contractName - the name of the contract
- * @param  {FungibleConditionCode} conditionCode - the condition code
- * @param  {BigNum} amount - the amount of STX tokens
+ * @param address - the c32check address of the contract
+ * @param contractName - the name of the contract
+ * @param conditionCode - the condition code
+ * @param amount - the amount of STX tokens
  *
  * @return {STXPostCondition}
  */
@@ -874,7 +870,7 @@ export function makeContractSTXPostCondition(
   address: string,
   contractName: string,
   conditionCode: FungibleConditionCode,
-  amount: BigNum
+  amount: IntegerType
 ): STXPostCondition {
   return createSTXPostCondition(
     createContractPrincipal(address, contractName),
@@ -888,17 +884,15 @@ export function makeContractSTXPostCondition(
  *
  * Returns a fungible token post condition object
  *
- * @param  {String} address - the c32check address
- * @param  {FungibleConditionCode} conditionCode - the condition code
- * @param  {BigNum} amount - the amount of fungible tokens
- * @param  {AssetInfo} assetInfo - asset info describing the fungible token
- *
- * @return {FungiblePostCondition}
+ * @param address - the c32check address
+ * @param conditionCode - the condition code
+ * @param amount - the amount of fungible tokens
+ * @param assetInfo - asset info describing the fungible token
  */
 export function makeStandardFungiblePostCondition(
   address: string,
   conditionCode: FungibleConditionCode,
-  amount: BigNum,
+  amount: IntegerType,
   assetInfo: string | AssetInfo
 ): FungiblePostCondition {
   return createFungiblePostCondition(
@@ -914,19 +908,17 @@ export function makeStandardFungiblePostCondition(
  *
  * Returns a fungible token post condition object
  *
- * @param  {String} address - the c32check address
- * @param  {String} contractName - the name of the contract
- * @param  {FungibleConditionCode} conditionCode - the condition code
- * @param  {BigNum} amount - the amount of fungible tokens
- * @param  {AssetInfo} assetInfo - asset info describing the fungible token
- *
- * @return {FungiblePostCondition}
+ * @param address - the c32check address
+ * @param contractName - the name of the contract
+ * @param conditionCode - the condition code
+ * @param amount - the amount of fungible tokens
+ * @param assetInfo - asset info describing the fungible token
  */
 export function makeContractFungiblePostCondition(
   address: string,
   contractName: string,
   conditionCode: FungibleConditionCode,
-  amount: BigNum,
+  amount: IntegerType,
   assetInfo: string | AssetInfo
 ): FungiblePostCondition {
   return createFungiblePostCondition(
@@ -1067,15 +1059,15 @@ export async function callReadOnlyFunction(
 /**
  * Sponsored transaction options
  */
-export interface SponsorOptions {
+export interface SponsorOptionsOpts {
   /** the origin-signed transaction */
   transaction: StacksTransaction;
   /** the sponsor's private key */
   sponsorPrivateKey: string;
   /** the transaction fee amount to sponsor */
-  fee?: BigNum;
+  fee?: IntegerType;
   /** the nonce of the sponsor account */
-  sponsorNonce?: BigNum;
+  sponsorNonce?: IntegerType;
   /** the hashmode of the sponsor's address */
   sponsorAddressHashmode?: AddressHashMode;
   /** the Stacks blockchain network that this transaction will ultimately be broadcast to */
@@ -1085,18 +1077,18 @@ export interface SponsorOptions {
 /**
  * Constructs and signs a sponsored transaction as the sponsor
  *
- * @param  {SponsorOptions} sponsorOptions - the sponsor options object
+ * @param  {SponsorOptionsOpts} sponsorOptions - the sponsor options object
  *
  * Returns a signed sponsored transaction.
  *
  * @return {ClarityValue}
  */
 export async function sponsorTransaction(
-  sponsorOptions: SponsorOptions
+  sponsorOptions: SponsorOptionsOpts
 ): Promise<StacksTransaction> {
   const defaultOptions = {
-    fee: new BigNum(0),
-    sponsorNonce: new BigNum(0),
+    fee: 0 as IntegerType,
+    sponsorNonce: 0 as IntegerType,
     sponsorAddressHashmode: AddressHashMode.SerializeP2PKH as SingleSigHashMode,
   };
 
@@ -1108,8 +1100,8 @@ export async function sponsorTransaction(
       : new StacksTestnet());
   const sponsorPubKey = pubKeyfromPrivKey(options.sponsorPrivateKey);
 
-  if (!sponsorOptions.fee) {
-    let txFee = new BigNum(0);
+  if (sponsorOptions.fee === undefined || sponsorOptions.fee === null) {
+    let txFee = BigInt(0);
     switch (options.transaction.payload.payloadType) {
       case PayloadType.TokenTransfer:
         txFee = await estimateTransfer(options.transaction, network);
@@ -1131,7 +1123,7 @@ export async function sponsorTransaction(
     options.fee = txFee;
   }
 
-  if (!sponsorOptions.sponsorNonce) {
+  if (sponsorOptions.sponsorNonce === undefined || sponsorOptions.sponsorNonce === null) {
     const addressVersion =
       network.version === TransactionVersion.Mainnet
         ? AddressVersion.MainnetSingleSig

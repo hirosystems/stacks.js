@@ -1,5 +1,5 @@
 // @ts-ignore
-import { Buffer } from '@stacks/common';
+import { Buffer, IntegerType } from '@stacks/common';
 import {
   makeContractCall,
   makeContractDeploy,
@@ -22,7 +22,7 @@ interface ContractCallOptions {
   functionName: string;
   functionArgs: ClarityValue[];
   version: TransactionVersion;
-  nonce: number;
+  nonce: IntegerType;
   postConditions?: PostCondition[];
   postConditionMode?: PostConditionMode;
   network?: StacksNetwork;
@@ -100,7 +100,7 @@ export class WalletSigner {
       functionName,
       functionArgs,
       senderKey: this.getSTXPrivateKey().toString('hex'),
-      nonce: new BN(nonce),
+      nonce: nonce,
       network: this.getNetwork(),
       postConditionMode,
       postConditions,

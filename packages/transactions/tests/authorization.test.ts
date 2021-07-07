@@ -11,7 +11,6 @@ import {
 
 import {AddressHashMode, PubKeyEncoding} from '../src/constants';
 
-import BigNum from 'bn.js';
 import {BufferReader} from '../src/bufferReader';
 import {createStacksPrivateKey, createStacksPublicKey, signWithKey,} from '../src/keys';
 
@@ -28,8 +27,8 @@ test('ECDSA recoverable signature', () => {
 
 test('Single spending condition serialization and deserialization', () => {
   const addressHashMode = AddressHashMode.SerializeP2PKH;
-  const nonce = new BigNum(0);
-  const fee = new BigNum(0);
+  const nonce = 0;
+  const fee = 0;
   const pubKey = '03ef788b3830c00abe8f64f62dc32fc863bc0b2cafeb073b6c8e1c7657d9c2c3ab';
   // const secretKey = 'edf9aee84d9b7abc145504dde6726c64f369d37ee34ded868fabd876c26570bc01';
   const spendingCondition = createSingleSigSpendingCondition(addressHashMode, pubKey, nonce, fee);
@@ -40,15 +39,15 @@ test('Single spending condition serialization and deserialization', () => {
     new BufferReader(serialized)
   ) as SingleSigSpendingCondition;
   expect(deserialized.hashMode).toBe(addressHashMode);
-  expect(deserialized.nonce!.toNumber()).toBe(nonce.toNumber());
-  expect(deserialized.fee!.toNumber()).toBe(fee.toNumber());
+  expect(deserialized.nonce!.toString()).toBe(nonce.toString());
+  expect(deserialized.fee!.toString()).toBe(fee.toString());
   expect(deserialized.signature.data).toBe(emptySignature.data);
 });
 
 test('Single sig spending condition uncompressed', () => {
   const addressHashMode = AddressHashMode.SerializeP2PKH;
-  const nonce = new BigNum(123);
-  const fee = new BigNum(456);
+  const nonce = 123;
+  const fee = 456;
   const pubKey = '';
   const spendingCondition = createSingleSigSpendingCondition(addressHashMode, pubKey, nonce, fee);
   spendingCondition.signer = '11'.repeat(20);
@@ -81,13 +80,13 @@ test('Single sig spending condition uncompressed', () => {
   ]
   const spendingConditionBytes = Buffer.from(spendingConditionBytesHex);
 
-  expect(serializedSpendingCondition).toEqual(spendingConditionBytes);
+  expect(serializedSpendingCondition.toString('hex')).toEqual(spendingConditionBytes.toString('hex'));
 });
 
 test('Multi sig spending condition uncompressed', () => {
   const addressHashMode = AddressHashMode.SerializeP2SH;
-  const nonce = new BigNum(123);
-  const fee = new BigNum(456);
+  const nonce = 123;
+  const fee = 456;
   const pubKey = '02'.repeat(33);
   const pubKeys = [pubKey, pubKey, pubKey];
 
@@ -136,5 +135,5 @@ test('Multi sig spending condition uncompressed', () => {
 
   const spendingConditionBytes = Buffer.from(spendingConditionBytesHex);
 
-  expect(serializedSpendingCondition).toEqual(spendingConditionBytes);
+  expect(serializedSpendingCondition.toString('hex')).toEqual(spendingConditionBytes.toString('hex'));
 });
