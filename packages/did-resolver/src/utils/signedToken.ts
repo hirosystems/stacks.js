@@ -1,5 +1,5 @@
 import { Right, Left, Either } from 'monet'
-import { verifyProfileToken } from '@stacks/profile'
+import { verifyProfileToken } from '@stacks/profile/dist'
 import { fetchSignedToken } from '../api'
 import { eitherToFuture, toMainnetAddress } from './'
 import { chain, map } from 'fluture'

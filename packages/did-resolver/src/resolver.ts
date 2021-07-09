@@ -42,13 +42,13 @@ const postResolve = (
   fqn: string,
   did: string,
   network: StacksNetwork
-): FutureInstance<Error, { did: string; publicKey: string }> =>
+): FutureInstance<Error, { did: string; publicKey: string, tokenUrl: string }> =>
   eitherToFuture(decodeFQN(fqn)).pipe(
     chain(decodedFQN =>
       fetchNameInfo(network, decodedFQN).pipe(
         chain(({ status, expire_block, zonefile, address }) =>
           status === 'name-revoke'
-            ? createRejectedFuture<Error, { did: string; publicKey: string }>(
+            ? createRejectedFuture<Error, { did: string; publicKey: string, tokenUrl: string }>(
                 new DIDResolutionError(
                   DIDResolutionErrorCodes.DIDDeactivated,
                   'Underlying BNS name revoked'
@@ -100,8 +100,11 @@ const postResolve = (
                   )
                 )
                 .pipe(chain(eitherToFuture))
-                .pipe(chain(({ tokenUrl, owner }) => fetchAndVerifySignedToken(tokenUrl, owner)))
-                .pipe(map(publicKey => ({ publicKey, did })))
+                .pipe(chain(({ tokenUrl, owner }) => fetchAndVerifySignedToken(tokenUrl, owner).pipe(map(publicKey => ({
+                  publicKey,
+                  did,
+                  tokenUrl
+                })))))
         )
       )
     )

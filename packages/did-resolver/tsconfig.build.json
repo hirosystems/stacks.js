@@ -12,6 +12,9 @@
       "path": "../common/tsconfig.build.json"
     },
     {
+      "path": "../profile/tsconfig.build.json"
+    },
+    {
       "path": "../network/tsconfig.build.json"
     },
     {

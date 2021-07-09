@@ -10,7 +10,8 @@
     "node": ">=10"
   },
   "files": [
-    "js"
+    "dist",
+    "src"
   ],
   "scripts": {
     "build": "npm run clean && npm run build:cjs && npm run build:esm",
