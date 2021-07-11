@@ -18,11 +18,25 @@ import { Maybe, None, Some } from 'monet'
 import { DIDResolutionError, DIDResolutionErrorCodes } from './errors'
 
 /**
- * Wraps the fetch function to return a future instnace as opposed to a promise.
- * Used by all functions in this file
+ * This file exports a set of functions wrapping API calls to a Stacks blockchain client.
+ * @see https://blockstack.github.io/stacks-blockchain-api
  */
 
-const fetchJSON = <T>(endpoint: string): FutureInstance<Error, T> => {
+export type NameInfo = {
+  address: string
+  blockchain: string
+  expire_block: number
+  last_txid: string
+  status: string
+  zonefile: string
+  zonefile_hash: string
+}
+
+/**
+ * Wraps the fetch function to return a future instnace as opposed to a promise.
+ */
+
+export const fetchJSON = <T>(endpoint: string): FutureInstance<Error, T> => {
   return encaseP<Error, T, string>(() => fetch(endpoint).then(res => res.json() as Promise<T>))(
     endpoint
   )
@@ -30,7 +44,8 @@ const fetchJSON = <T>(endpoint: string): FutureInstance<Error, T> => {
 
 /**
  * Given a on-chain BNS name, will return the latest zonefile associated with it.
- * An optional zonefileHash argument can be passed to fetch a specific historical zonefile associated with a name
+ * An optional zonefileHash argument can be passed to fetch a specific historical zonefile as opposed
+ * to the latest one.
  *
  * @returns a future which resolves to the zonefile as a string.
  */
@@ -50,39 +65,9 @@ export const fetchZoneFileForName = (
 }
 
 /**
- * Given a c32 encoded Stacks Address, will return a BNS name associated with it (if one is found)
- * @note One principal can only map to one on-chain name, therefore we don't expect to receive multiple results here
- *
- * @returns a future which resolves to the BNS name owned by the address.
- */
-
-export const fetchNameOwnedByAddress = (
-  apiEndpoint: string,
-  address: string
-): FutureInstance<Error, string> =>
-  fetchJSON<{ names: string[] }>(`${apiEndpoint}/v1/addresses/stacks/${address}`)
-    .pipe(map(prop('names')))
-    .pipe(
-      chain(names =>
-        names?.length === 1
-          ? resolve(names[0])
-          : reject(new DIDResolutionError(DIDResolutionErrorCodes.NoMigratedNamesFound))
-      )
-    )
-
-type NameInfo = {
-  address: string
-  blockchain: string
-  expire_block: number
-  last_txid: string
-  status: string
-  zonefile: string
-  zonefile_hash: string
-}
-
-/**
- * Given a BNS name, will query a Stacks node for the latest info name state / info
- * @returns - a {@link NameInfo} object with the name state received from the BNS contract / Stacks node
+ * Given a BNS name, will query a Stacks node for the latest associated info / state.
+ * @returns - a {@link NameInfo} object listing the name's current owner, zonefile_hash, and
+ * further useful properties
  */
 
 export const fetchNameInfo = (
@@ -125,14 +110,11 @@ export const fetchNameInfo = (
   )
 }
 
-type NameResolveResult = {
-  zonefile_hash: string
-  address: string
-}
-
 /**
  * Given a BNS name, will query a the BNS contract directly for the latest state associated with a BNS name
  * A instance of a {@link StacksNetwork} object is required to interact with the contract.
+ * This private helper is required due to a bug in the HTTP API, causing the Owner of a name to not be correctly
+ * updated / returned by the {@link fetchNameInfo} call after a name transfer operation took place.
  *
  * @returns - a {@link NameInfo } object name with the state received from the BNS contract
  */
@@ -145,8 +127,9 @@ const fetchNameInfoFromContract = ({
   name: string
   namespace: string
   network: StacksNetwork
-}): FutureInstance<Error, Maybe<NameResolveResult>> => {
+}): FutureInstance<Error, Maybe<{ zonefile_hash: string; address: string }>> => {
   const bnsDeployment = network.isMainnet() ? BNS_ADDRESSES.main : BNS_ADDRESSES.test
+
   const [contractAddress, contractName] = bnsDeployment.split('.')
 
   const senderAddress = getAddressFromPublicKey(getPublicKey(makeRandomPrivKey()).data)
@@ -179,7 +162,7 @@ const fetchNameInfoFromContract = ({
 
 type SucccessFetchTxResponse = {
   tx_id: string
-  tx_status: 'success' | "pending"
+  tx_status: 'success' | 'pending'
   [k: string]: any
 }
 
@@ -191,9 +174,9 @@ type FetchTransactionResponse =
 
 /**
  * Given a Stacks transaction ID, will attempt to retrieve the corresponding transaction object
- * from a Stacks blockchain node
+ * from a Stacks blockchain node.
  *
- * @returns the corresponding Stacks transaction object if found
+ * @returns the corresponding Stacks transaction object if found, or the corresponding error
  */
 
 export const fetchTransactionById = (apiEndpoint: string, txId: string) => {
@@ -208,28 +191,6 @@ export const fetchTransactionById = (apiEndpoint: string, txId: string) => {
     })
   )
 }
-
-/**
- * Helper function, makes a GET request to the supplied endpoint.
- * Assumes the response is an array containing one JSON Web Token
- *
- * @returns the JWT at the URL if found
- */
-
-export const fetchSignedToken = (endpoint: string) =>
-  fetchJSON<any[]>(endpoint).pipe(map(el => el[0]))
-
-/**
- * Helper function, returns all names known to a Stacks node,
- * not used by the resolver directly, but as part of test code / dev helpers
- *
- * @returns an array of BNS names
- */
-
-export const fetchAllNames =
-  (apiEndpoint: string) =>
-  (page = 0) =>
-    fetchJSON<string[]>(`${apiEndpoint}/v1/names?page=${page}`)
 
 /**
  * Helper function to get the current Stacks chain height from a Stackss node.

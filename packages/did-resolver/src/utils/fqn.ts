@@ -1,6 +1,6 @@
 import { Either, Left, Right } from 'monet'
 
-type FQN = {
+export type FQN = {
   name: string
   namespace: string
   subdomain?: string
@@ -12,9 +12,10 @@ export const encodeFQN = (nameParts: FQN) => {
 }
 
 export const decodeFQN = (fqdn: string): Either<Error, FQN> => {
-  const nameParts = fqdn.split('.')
+  const nameParts = fqdn.split('.').filter(el => !!el)
+
   if (nameParts.length < 2) {
-    return Left(new Error('Invalid FQN')) // TODO Error Code
+    return Left(new Error('Invalid FQN'))
   }
 
   if (nameParts.length === 3) {

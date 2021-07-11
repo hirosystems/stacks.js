@@ -1,127 +1,101 @@
-import { identity } from 'ramda'
 import {
-  fetchAndVerifySignedToken,
   createRejectedFuture,
   decodeFQN,
   eitherToFuture,
-  encodeFQN,
   getApiUrl,
   buildDidDoc,
-  parseStacksV2DID,
+  parseStacksDID,
   isMigratedOnChainDid,
-  ensureZonefileMatchesName,
   findSubdomainZoneFileByName,
-  parseZoneFileAndExtractNameinfo,
-  mapDidToBNSName,
+  mapDidToName,
+  FQN,
+  getPublicKeyUsingZoneFile,
 } from './utils/'
-import { StacksV2DID } from './types'
-import { fetchNameInfo, getCurrentBlockNumber } from './api'
-import { chain, map, resolve as fResolve, FutureInstance, promise } from 'fluture'
-import { getPublicKeyForMigratedDid } from './migrated'
+import { fetchNameInfo, getCurrentBlockNumber, NameInfo } from './api'
+import { chain, resolve as fResolve, promise, map } from 'fluture'
+import { mapDidToMigratedName } from './migrated/migrated'
 import { Either, Right } from 'monet'
-import { DIDDocument } from 'did-resolver'
 import { StacksMainnet, StacksNetwork } from '@stacks/network'
 import { DIDResolutionError, DIDResolutionErrorCodes } from './errors'
+import { DIDType, StacksDID } from './types'
 
-const getPublicKeyForStackV2DID = (
-  did: StacksV2DID,
-  network: StacksNetwork
-): FutureInstance<Error, { publicKey: string; name: string }> =>
-  mapDidToBNSName(did, network).pipe(
-    chain(({ name, namespace, subdomain, tokenUrl }) =>
-      fetchAndVerifySignedToken(tokenUrl, did.address).pipe(
-        map(key => ({
-          publicKey: key,
-          name: encodeFQN({ name, namespace, subdomain }),
-        }))
-      )
-    )
-  )
+/**
+ * Given a BNS name, will query a Stacks blockchain client for the latest
+ * associated state, and ensure that the name has not been revoked, and
+ * that the expire_block is lower than the current block height.
+ */
 
-const postResolve = (
-  fqn: string,
-  did: string,
-  network: StacksNetwork
-): FutureInstance<Error, { did: string; publicKey: string, tokenUrl: string }> =>
+const ensureNotRevokedOrExpired = (fqn: string, network: StacksNetwork) =>
   eitherToFuture(decodeFQN(fqn)).pipe(
-    chain(decodedFQN =>
-      fetchNameInfo(network, decodedFQN).pipe(
-        chain(({ status, expire_block, zonefile, address }) =>
-          status === 'name-revoke'
-            ? createRejectedFuture<Error, { did: string; publicKey: string, tokenUrl: string }>(
+    chain(decodedFqn =>
+      fetchNameInfo(network, decodedFqn).pipe(
+        chain(nameInfo =>
+          nameInfo.status === 'name-revoke'
+            ? createRejectedFuture<Error, { nameInfo: NameInfo; fqn: FQN }>(
                 new DIDResolutionError(
                   DIDResolutionErrorCodes.DIDDeactivated,
                   'Underlying BNS name revoked'
                 )
               )
-            : getCurrentBlockNumber(getApiUrl(network))
-                .pipe(
-                  chain(currentBlock =>
-                    expire_block > currentBlock
-                      ? createRejectedFuture<Error, boolean>(
-                          new DIDResolutionError(
-                            DIDResolutionErrorCodes.DIDExpired,
-                            'Underlying BNS name expired'
-                          )
+            : getCurrentBlockNumber(getApiUrl(network)).pipe(
+                chain(currentBlock =>
+                  nameInfo.expire_block > currentBlock
+                    ? createRejectedFuture<Error, { nameInfo: NameInfo; fqn: FQN }>(
+                        new DIDResolutionError(
+                          DIDResolutionErrorCodes.DIDExpired,
+                          'Underlying BNS name expired'
                         )
-                      : fResolve(true)
-                  )
-                )
-                .pipe(
-                  map(() =>
-                    decodedFQN.subdomain
-                      ? findSubdomainZoneFileByName(zonefile, decodedFQN.subdomain)
-                      : (Right({
-                          zonefile: zonefile,
-                          subdomain: undefined,
-                          owner: address,
-                        }) as Either<
-                          Error,
-                          {
-                            zonefile: string
-                            subdomain: undefined
-                            owner: string
-                          }
-                        >)
-                  )
-                )
-                .pipe(
-                  map(v =>
-                    v.flatMap(({ zonefile, subdomain, owner }) =>
-                      ensureZonefileMatchesName({
-                        zonefile,
-                        name: decodedFQN.name,
-                        namespace: decodedFQN.namespace,
-                        subdomain,
+                      )
+                    : fResolve({
+                        fqn: decodedFqn,
+                        nameInfo,
                       })
-                        .flatMap(parseZoneFileAndExtractNameinfo)
-                        .map(nameInfo => ({ ...nameInfo, owner }))
-                    )
-                  )
                 )
-                .pipe(chain(eitherToFuture))
-                .pipe(chain(({ tokenUrl, owner }) => fetchAndVerifySignedToken(tokenUrl, owner).pipe(map(publicKey => ({
-                  publicKey,
-                  did,
-                  tokenUrl
-                })))))
+              )
         )
       )
     )
   )
 
-export const getResolver = (stacksNetwork: StacksNetwork = new StacksMainnet()) => {
-  const resolve = (did: string) =>
-    promise(
-      parseStacksV2DID(did)
-        .map(parsedDID =>
-          (isMigratedOnChainDid(parsedDID)
-            ? getPublicKeyForMigratedDid(parsedDID, stacksNetwork)
-            : getPublicKeyForStackV2DID(parsedDID, stacksNetwork)
-          ).pipe(chain(({ name }) => postResolve(name, did, stacksNetwork).pipe(map(buildDidDoc))))
-        )
-        .fold(e => createRejectedFuture<Error, DIDDocument>(e), identity)
-    )
+/**
+ * Given an on-chain / off-chain BNS name, the corresponding DID, and the associated zone file,
+ * will fetch the profile token refernced in the zone file, verify the signature, and return
+ * the associated public key if the verification succeeded.
+ */
 
-  return resolve
-}
+const getPublicKeyForName = (did: StacksDID, decodedFqn: FQN, nameRecord: NameInfo) =>
+  eitherToFuture(
+    did.metadata.type === DIDType.offChain
+      ? findSubdomainZoneFileByName(nameRecord.zonefile, decodedFqn.subdomain || '')
+      : (Right({ zonefile: nameRecord.zonefile, owner: nameRecord.address }) as Either<
+          Error,
+          { zonefile: string; owner: string }
+        >)
+  ).pipe(chain(v => getPublicKeyUsingZoneFile(v.zonefile, v.owner)))
+
+/**
+ * Returns a function resolving a Stacks DID to the corresponding DID document,
+ * configured to resolve against the specified {@link StacksNetwork}.
+ */
+
+export const buildResolve =
+  (stacksNetwork: StacksNetwork = new StacksMainnet()) =>
+  (did: string) =>
+    promise(
+      eitherToFuture(parseStacksDID(did)).pipe(
+        chain(parsedDID =>
+          (isMigratedOnChainDid(parsedDID)
+            ? mapDidToMigratedName(parsedDID, stacksNetwork)
+            : mapDidToName(parsedDID, stacksNetwork)
+          )
+            .pipe(
+              chain(mappedName =>
+                ensureNotRevokedOrExpired(mappedName, stacksNetwork).pipe(
+                  chain(({ nameInfo, fqn }) => getPublicKeyForName(parsedDID, fqn, nameInfo))
+                )
+              )
+            )
+            .pipe(map(keyAndTokenUrl => buildDidDoc({ ...keyAndTokenUrl, did })))
+        )
+      )
+    )

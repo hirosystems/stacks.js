@@ -9,10 +9,11 @@ export const stripHexPrefixIfPresent = (data: string) => {
 }
 
 export const getApiUrl = (network: StacksNetwork): string => {
-  // TODO investigate
   //@ts-ignore The accessor is defined, but not recognized by typescript for some odd reason
   return network.coreApiUrl
 }
+
+// Helper DEV functions, used to simplify / increase the redability of the code
 
 export const createRejectedFuture = <R, F>(rejectWith: R): FutureInstance<R, F> => {
   return reject(rejectWith) as FutureInstance<R, F>
@@ -21,3 +22,10 @@ export const createRejectedFuture = <R, F>(rejectWith: R): FutureInstance<R, F> 
 export const eitherToFuture = <L, R>(either: Either<L, R>): FutureInstance<L, R> => {
   return either.fold(v => createRejectedFuture<L, R>(v), resolve)
 }
+
+export const debug =
+  (prefix: string) =>
+  <T>(arg: T): T => {
+    console.log(prefix && prefix + '-', arg)
+    return arg
+  }

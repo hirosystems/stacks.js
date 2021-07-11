@@ -1,4 +1,4 @@
-import { getKeyPair } from '../../src/registrar/utils'
+import { getKeyPair } from './registrar/utils'
 
 const keyPairFromHexPrivKey = (priv: string) => getKeyPair(Buffer.from(priv, 'hex'))
 

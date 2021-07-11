@@ -4,15 +4,15 @@ import {
   registerNamespace,
   rekeyName,
   revokeName,
-} from '../../src/registrar/index'
+} from './registrar/index'
 revokeName
-import { registerSubdomain, rekeySubdomain, revokeSubdomain } from '../../src/registrar/subdomains'
-import { encodeStacksV2Did, decodeFQN, eitherToFuture, encodeFQN } from '../../src/utils/'
+import { registerSubdomain, rekeySubdomain, revokeSubdomain } from './registrar/subdomains'
+import { encodeStacksDid, decodeFQN, eitherToFuture, encodeFQN } from '../../src/utils/'
 import { fetchNameInfo } from '../../src/api'
 import { chain, map, promise } from 'fluture'
 import { testNames, testNamespace, testSubdomains } from './data'
 import { writeFileSync } from 'fs'
-import { wait } from '../../src/registrar/utils'
+import { wait } from './registrar/utils'
 import { identity } from 'ramda'
 var path = require('path')
 
@@ -148,7 +148,7 @@ export const setup = async () => {
 export const getDIDFromName = (fqn: string, network: StacksNetwork) => {
   return eitherToFuture(decodeFQN(fqn))
     .pipe(chain(fqn => fetchNameInfo(network, fqn)))
-    .pipe(map(({ address, last_txid }) => encodeStacksV2Did({ address, anchorTxId: last_txid })))
+    .pipe(map(({ address, last_txid }) => encodeStacksDid({ address, anchorTxId: last_txid })))
 }
 
 setup()

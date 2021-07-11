@@ -3,10 +3,10 @@ import { hexToCV, cvToValue } from '@stacks/transactions'
 import { stripHexPrefixIfPresent } from './'
 import { BNS_ADDRESSES } from '../constants'
 import { Left, Right, Either } from 'monet'
-import { DidType, StacksV2DID } from '../types'
+import { DIDType, StacksDID } from '../types'
 import { DIDResolutionError, DIDResolutionErrorCodes } from '../errors'
 
-const hexToAscii = (hex: string) =>
+export const hexToAscii = (hex: string) =>
   Buffer.from(stripHexPrefixIfPresent(hex), 'hex').toString('ascii')
 
 type TransactionArguments = {
@@ -15,13 +15,20 @@ type TransactionArguments = {
   zonefileHash: string
 }
 
-// TODO Differentiate between the different reasons for an invalid transaction
+/**
+ * Will ensure that the supplied Stacks Transaction object is a valid inception / anchor transaction for
+ * the supplied Stacks DID
+ * The verification rules vary depending on whether a on-chain or an off-chain DID is supplied.
+ *
+ * Please reffer to sections 3.1 and 3.2 of the DID Method specification for additonal details
+ */
+
 export const parseAndValidateTransaction =
-  (did: StacksV2DID) =>
+  (did: StacksDID) =>
   (tx: any): Either<Error, TransactionArguments> => {
     const validDidInceptionEvents = {
-      [DidType.offChain]: ['name-import', 'name-update'],
-      [DidType.onChain]: ['name-register', 'name-import'],
+      [DIDType.offChain]: ['name-import', 'name-update'],
+      [DIDType.onChain]: ['name-register', 'name-import'],
     }
 
     if (tx.tx_status !== 'success') {
@@ -35,7 +42,7 @@ export const parseAndValidateTransaction =
 
     const contractCallData = tx.contract_call
 
-    if (!contractCallData) {
+    if (tx.tx_type !== 'contract_call' || !contractCallData) {
       return Left(
         new DIDResolutionError(
           DIDResolutionErrorCodes.InvalidAnchorTx,
@@ -44,7 +51,7 @@ export const parseAndValidateTransaction =
       )
     }
 
-    if (!BNS_ADDRESSES[did.metadata.deployment] === contractCallData.contract_id) {
+    if (BNS_ADDRESSES[did.metadata.deployment] !== contractCallData.contract_id) {
       return Left(
         new DIDResolutionError(
           DIDResolutionErrorCodes.InvalidAnchorTx,
@@ -68,9 +75,8 @@ export const parseAndValidateTransaction =
   }
 
 /**
- * Extracts the namespace, name, and zonefile-hash arguments from a name-register / name-update TX
- * @returns nameInfo - the name, namespace, and zonefile-hash encoded in the TX
- * @todo Add specific error message for invalid anchor tx
+ * Extracts the namespace, name, and zonefile-hash arguments from a valid DID inception / anchor Stacks transaction objectect
+ * Returns the name, namespace, and zonefile-hash encoded in valid inception event.
  */
 
 const extractContractCallArgs = (functionArgs: Array<any>): Either<Error, TransactionArguments> => {
@@ -105,9 +111,6 @@ const extractContractCallArgs = (functionArgs: Array<any>): Either<Error, Transa
   return Right({
     name: hexToAscii(nameArg),
     namespace: hexToAscii(namespaceArg),
-    zonefileHash:
-      typeof zonefileHashArg === 'string'
-        ? stripHexPrefixIfPresent(zonefileHashArg)
-        : stripHexPrefixIfPresent(zonefileHashArg.value), // TODO Is this still the case?
+    zonefileHash: stripHexPrefixIfPresent(zonefileHashArg),
   })
 }

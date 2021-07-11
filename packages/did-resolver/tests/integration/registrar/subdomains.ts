@@ -10,9 +10,15 @@ import { getKeyPair, StacksKeyPair, waitForConfirmation, storeTokenFile } from '
 import { publicKeyToAddress } from '@stacks/transactions'
 import { promise } from 'fluture'
 import { makeProfileZoneFile, Profile, signProfileToken, wrapProfileToken } from '@stacks/profile'
-import { fetchZoneFileForName } from '../api'
-import { encodeStacksV2Did, parseZoneFileTXT, decodeFQN, encodeFQN, getApiUrl } from '../utils/'
-import { OffChainAddressVersion, SUBDOMAIN_REVOKED_ADDR } from '../constants'
+import { fetchZoneFileForName } from '../../../src/api'
+import {
+  encodeStacksDid,
+  parseZoneFileTXT,
+  decodeFQN,
+  encodeFQN,
+  getApiUrl,
+} from '../../../src/utils/'
+import { OffChainAddressVersion, SUBDOMAIN_REVOKED_ADDR } from '../../../src/constants'
 import { identity } from 'ramda'
 import { c32ToB58 } from 'c32check'
 
@@ -94,7 +100,7 @@ export const rekeySubdomain = async (
     network
   )
 
-  return encodeStacksV2Did({
+  return encodeStacksDid({
     anchorTxId: txId as string,
     address: publicKeyToAddress(
       OffChainAddressVersion.testnet,

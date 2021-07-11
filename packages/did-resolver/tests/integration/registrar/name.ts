@@ -5,7 +5,7 @@ import {
   buildRevokeNameTx,
 } from '@stacks/bns'
 import { StacksNetwork } from '@stacks/network'
-import { encodeFQN, encodeStacksV2Did } from '../utils/'
+import { encodeFQN, encodeStacksDid } from '../../../src/utils/'
 import { StacksKeyPair, waitForConfirmation, wait, storeTokenFile } from './utils'
 import {
   TransactionSigner,
@@ -122,7 +122,7 @@ export const preorderAndRegisterName = async (
   const zf = makeProfileZoneFile(fqn, await storeTokenFile(wrapProfileToken(signed)))
 
   return registerName(name, namespace, keyPair, zf, network).then(txId =>
-    encodeStacksV2Did({
+    encodeStacksDid({
       address: publicKeyToAddress(AddressVersion.TestnetSingleSig, keyPair.publicKey),
       anchorTxId: txId,
     })

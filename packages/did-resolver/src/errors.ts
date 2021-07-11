@@ -20,12 +20,12 @@ export enum DIDResolutionErrorCodes {
 
 export class DIDResolutionError extends Error {
   public constructor(code: DIDResolutionErrorCodes, message?: string) {
-    super(`${code}${message ? ': ' + message : ''}`)
+    super(`${code}: ${message ? message : ''}`)
   }
 }
 
 export class DIDParseError extends Error {
   public constructor(code: DIDParseErrorCodes, message?: string) {
-    super(`${code}${message ? ': ' + message : ''}`)
+    super(`${code}: ${message ? message : ''}`)
   }
 }

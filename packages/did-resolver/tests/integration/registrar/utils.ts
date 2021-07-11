@@ -8,10 +8,10 @@ import {
   compressPublicKey,
 } from '@stacks/transactions'
 import { StacksNetwork } from '@stacks/network'
-import { fetchTransactionById } from '../api'
+import { fetchTransactionById } from '../../../src/api'
 import Future, { chain, resolve, reject, FutureInstance } from 'fluture'
-import FormData from 'form-data'
-import { getApiUrl } from '../utils/'
+import { getApiUrl } from '../../../src/utils/'
+const FormData = require('form-data')
 
 export type StacksKeyPair = {
   privateKey: StacksPrivateKey

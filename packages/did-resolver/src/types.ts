@@ -1,4 +1,4 @@
-export enum DidType {
+export enum DIDType {
   onChain = 'onChain',
   offChain = 'offChain',
 }
@@ -8,12 +8,12 @@ export enum StacksNetworkDeployment {
   main = 'main',
 }
 
-export type StacksV2DID = {
+export type StacksDID = {
   prefix: 'did:stack:v2'
   address: string
   anchorTxId: string
   metadata: {
-    type: DidType
+    type: DIDType
     deployment: StacksNetworkDeployment
   }
 }

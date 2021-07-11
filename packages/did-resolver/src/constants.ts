@@ -1,5 +1,10 @@
 import { AddressVersion } from '@stacks/transactions'
-import { DidType, StacksNetworkDeployment } from './types'
+import { DIDType, StacksNetworkDeployment } from './types'
+
+/**
+ * These constants are referenced, and further explained in the DID method specification document
+ * @see ../docs/DID_Method_Spec.md
+ */
 
 export const DID_METHOD_PREFIX = 'did:stack:v2'
 
@@ -19,9 +24,22 @@ export const BNS_ADDRESSES = {
   test: 'ST000000000000000000002AMW42H.bns',
 }
 
+/*
+ * In order to correctly resolve migrated names, a helper clairty contract was defined and deployed.
+ * The contract calls the "resolve-principal" function defined on the BNS contract,
+ * at-block height 1 (at this point the BNS contract state only contains migrated names),
+ * to map the address to a migrted name
+ */
+
+export const GENESIS_RESOLVER_ADDRESSES = {
+  main: 'SPPJE6KB9CNCVTS9RAFHY1RSXAH381W8RKJDM9J9.BNS-migrated-helper',
+  test: 'STPJE6KB9CNCVTS9RAFHY1RSXAH381W8RJQV1YCB.BNS-migrated-helper',
+}
+
 /**
  * The ID of the Stacks transaction in which the BNS contract was deployed.
- * Used to represent DIDs based on migrated BNS names
+ * Used to represent DIDs based on migrated BNS names. In case the DID contins this transaction ID
+ * as part of it's NSI, the mapping to a BNS name happens via a call to a helper contract
  * @see - https://github.com/jolocom/stacks-did-resolver/blob/main/docs/DID_Method_Spec.md#35-migration-from-legacy-stack-v1-dids
  */
 
@@ -31,7 +49,7 @@ export const BNS_CONTRACT_DEPLOY_TXID = {
 }
 
 /**
- * Version byte used to denote off-chain DIDs. As documented here:
+ * Version bytes used to denote off-chain DIDs. As documented here:
  * @see https://github.com/jolocom/stacks-did-resolver/blob/main/docs/DID_Method_Spec.md#22-address-encoding
  */
 
@@ -42,19 +60,19 @@ export const OffChainAddressVersion = {
 
 export const versionByteToDidType = {
   [AddressVersion.MainnetSingleSig]: {
-    type: DidType.onChain,
+    type: DIDType.onChain,
     deployment: StacksNetworkDeployment.main,
   },
   [AddressVersion.TestnetSingleSig]: {
-    type: DidType.onChain,
+    type: DIDType.onChain,
     deployment: StacksNetworkDeployment.test,
   },
   [OffChainAddressVersion.mainnet]: {
-    type: DidType.offChain,
+    type: DIDType.offChain,
     deployment: StacksNetworkDeployment.main,
   },
   [OffChainAddressVersion.testnet]: {
-    type: DidType.offChain,
+    type: DIDType.offChain,
     deployment: StacksNetworkDeployment.test,
   },
 }

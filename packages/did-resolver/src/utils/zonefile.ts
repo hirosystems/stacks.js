@@ -1,37 +1,87 @@
 import { getTokenFileUrl } from '@stacks/profile'
-import { decodeFQN, eitherToFuture, fetchAndVerifySignedToken } from './'
+import { eitherToFuture, fetchAndVerifySignedToken } from './'
 import 'isomorphic-fetch'
 import { Right, Left, Either } from 'monet'
-import { chain } from 'fluture'
+import { chain, map } from 'fluture'
 import { DIDResolutionError, DIDResolutionErrorCodes } from '../errors'
 import { b58ToC32, c32ToB58 } from 'c32check'
 const { parseZoneFile } = require('zone-file')
 
-export const ensureZonefileMatchesName = ({
-  zonefile,
-  name,
-  namespace,
-  subdomain,
-}: {
-  zonefile: string
-  name: string
-  namespace: string
-  subdomain?: string
-}): Either<Error, string> => {
-  const parsedZoneFile = parseZoneFile(zonefile)
+/**
+ * Will parse the TXT resource records included in a zone file and attempt to find the
+ * nested zone file for the specified subdomain
+ */
 
-  return decodeFQN(parsedZoneFile['$origin']).flatMap(origin => {
-    if (origin.name !== name || origin.namespace !== namespace || origin.subdomain !== subdomain) {
-      return Left(
-        new DIDResolutionError(
-          DIDResolutionErrorCodes.InvalidZonefile,
-          'Zone file $ORIGIN does not match expected BNS name'
-        )
-      )
+export const findSubdomainZoneFileByName = (
+  nameZonefile: string,
+  subdomain: string
+): Either<Error, { zonefile: string; owner: string }> => {
+  const parsedZoneFile = parseZoneFile(nameZonefile)
+
+  if (parsedZoneFile.txt) {
+    const match = parsedZoneFile.txt.find((arg: { name: string }) => {
+      return arg.name === subdomain
+    })
+
+    if (match) {
+      const { owner, zonefile } = parseZoneFileTXT(match.txt)
+      return Right({
+        owner: b58ToC32(owner),
+        zonefile: Buffer.from(zonefile, 'base64').toString('ascii'),
+      })
     }
+  }
 
-    return Right(zonefile)
-  })
+  return Left(
+    new DIDResolutionError(
+      DIDResolutionErrorCodes.MissingZoneFile,
+      'No zone file found for subdomain'
+    )
+  )
+}
+
+/**
+ * Will parse the TXT resource records included in a zone file and attempt to find the
+ * nested zone file for the specified owner
+ */
+
+export const findSubdomainZoneFileByOwner = (
+  nameZonefile: string,
+  owner: string
+): Either<
+  Error,
+  {
+    zonefile: string
+    fqn: string
+  }
+> => {
+  const parsedZf = parseZoneFile(nameZonefile)
+
+  if (parsedZf.txt) {
+    const match = parsedZf.txt.find((arg: { txt: string[] }) => {
+      // Please note, 0 is the bitcoin version, equivalent to the 22 (base10) Stacks version byte
+      return parseZoneFileTXT(arg.txt).owner === c32ToB58(owner, 0)
+    })
+
+    if (match) {
+      const subdomainZoneFile = Buffer.from(
+        parseZoneFileTXT(match.txt).zonefile,
+        'base64'
+      ).toString('ascii')
+
+      return Right({
+        fqn: parseZoneFile(subdomainZoneFile).$origin,
+        zonefile: subdomainZoneFile,
+      })
+    }
+  }
+
+  return Left(
+    new DIDResolutionError(
+      DIDResolutionErrorCodes.MissingZoneFile,
+      'No zone file found for subdomain'
+    )
+  )
 }
 
 export const parseZoneFileTXT = (entries: string[]) =>
@@ -48,85 +98,19 @@ export const parseZoneFileTXT = (entries: string[]) =>
     { zonefile: '', owner: '', seqn: '0' }
   )
 
-export const findSubdomainZoneFileByName = (
-  nameZonefile: string,
-  subdomain: string
-): Either<Error, { zonefile: string; subdomain: string | undefined; owner: string }> => {
-  const parsedZoneFile = parseZoneFile(nameZonefile)
-
-  if (parsedZoneFile.txt) {
-    const match = parsedZoneFile.txt.find((arg: { name: string }) => {
-      return arg.name === subdomain
-    })
-
-    if (match) {
-      const { owner, zonefile } = parseZoneFileTXT(match.txt)
-      return Right({
-        subdomain: match.name,
-        owner: b58ToC32(owner),
-        zonefile: Buffer.from(zonefile, 'base64').toString('ascii'),
-      })
-    }
-  }
-
-  return Left(
-    new DIDResolutionError(
-      DIDResolutionErrorCodes.MissingZoneFile,
-      'No zone file found for subdomain'
-    )
-  )
-}
-
-export const findSubdomainZonefileByOwner = (
-  nameZonefile: string,
-  owner: string
-): Either<
-  Error,
-  {
-    zonefile: string
-    subdomain: string
-  }
-> => {
-  const parsedZoneFile = parseZoneFile(nameZonefile)
-
-  if (parsedZoneFile.txt) {
-    const match = parsedZoneFile.txt.find((arg: { txt: string[] }) => {
-      // Please note, 0 is the bitcoin version, equivalent to the 22 (base10) Stacks version byte
-      return parseZoneFileTXT(arg.txt).owner === c32ToB58(owner, 0)
-    })
-
-    if (match) {
-      return Right({
-        subdomain: match.name,
-        zonefile: Buffer.from(parseZoneFileTXT(match.txt).zonefile, 'base64').toString('ascii'),
-      })
-    }
-  }
-
-  return Left(
-    new DIDResolutionError(
-      DIDResolutionErrorCodes.MissingZoneFile,
-      'No zone file found for subdomain'
-    )
-  )
-}
-
-export const parseZoneFileAndExtractNameinfo = (zonefile: string) => {
-  const parsedZf = parseZoneFile(zonefile)
-
-  return decodeFQN(parsedZf['$origin']).flatMap(({ name, namespace, subdomain }) =>
-    extractTokenFileUrl(zonefile).map(url => ({
-      name,
-      namespace,
-      subdomain,
-      tokenUrl: url,
-    }))
-  )
-}
+/**
+ * Given a zone file for a BNS name, and the c32 encoded Stacks address expected name owner, this function will
+ * extract the profile token URL, fetch the referenced profile token JWS, verify the associated signature,
+ * and return the public key as well as the profile token URL in case signature verifiction succeeds
+ */
 
 export const getPublicKeyUsingZoneFile = (zf: string, ownerAddress: string) =>
-  eitherToFuture(parseZoneFileAndExtractNameinfo(zf)).pipe(
-    chain(({ tokenUrl }) => fetchAndVerifySignedToken(tokenUrl, ownerAddress))
+  eitherToFuture(extractTokenFileUrl(zf)).pipe(
+    chain(tokenUrl =>
+      fetchAndVerifySignedToken(tokenUrl, ownerAddress).pipe(
+        map(publicKey => ({ publicKey, tokenUrl }))
+      )
+    )
   )
 
 const extractTokenFileUrl = (zoneFile: string): Either<Error, string> => {

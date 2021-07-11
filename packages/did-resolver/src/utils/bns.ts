@@ -1,53 +1,41 @@
 import { StacksNetwork } from '@stacks/network'
-import { chain, map } from 'fluture'
-import { Either, Right } from 'monet'
+import { chain, map, resolve } from 'fluture'
 import { fetchTransactionById, fetchZoneFileForName } from '../api'
-import { DidType, StacksV2DID } from '../types'
+import { DIDType, StacksDID } from '../types'
 import {
-  ensureZonefileMatchesName,
-  findSubdomainZonefileByOwner,
-  parseZoneFileAndExtractNameinfo,
+  findSubdomainZoneFileByOwner,
   eitherToFuture,
   getApiUrl,
   parseAndValidateTransaction,
+  encodeFQN,
+  getPublicKeyUsingZoneFile,
 } from './'
 
-export const mapDidToBNSName = (did: StacksV2DID, network: StacksNetwork) =>
-  getZonefileForOnChainDid(did, network)
-    .pipe(map(parseZoneFileAndExtractNameinfo))
-    .pipe(chain(eitherToFuture))
+/**
+ * Given an on-chain or off-chain (not migrated) Stacks DID, will attempt to map it to it's corresponding BNS name
+ * as defined in section 3.3 of the DID method specification
+ * @see ../../docs/DID_Method_Spec.md
+ */
 
-const getZonefileForOnChainDid = (did: StacksV2DID, network: StacksNetwork) =>
+export const mapDidToName = (did: StacksDID, network: StacksNetwork) =>
+  getNameRecordForDID(did, network).pipe(
+    chain(({ zonefile, fqn }) =>
+      getPublicKeyUsingZoneFile(zonefile, did.address).pipe(map(_ => fqn))
+    )
+  )
+
+const getNameRecordForDID = (did: StacksDID, network: StacksNetwork) =>
   fetchTransactionById(getApiUrl(network), did.anchorTxId)
     .pipe(map(parseAndValidateTransaction(did)))
     .pipe(chain(eitherToFuture))
     .pipe(
-      chain(nameInfo =>
-        fetchZoneFileForName(getApiUrl(network), nameInfo)
-          .pipe(
-            map(
-              (zonefile): Either<Error, { zonefile: string; subdomain?: string }> =>
-                did.metadata.type === DidType.offChain
-                  ? findSubdomainZonefileByOwner(zonefile, did.address)
-                  : Right({
-                      zonefile,
-                      subdomain: undefined,
-                    })
-            )
+      chain(({ name, namespace, zonefileHash }) =>
+        fetchZoneFileForName(getApiUrl(network), { name, namespace, zonefileHash }).pipe(
+          chain(zonefile =>
+            did.metadata.type === DIDType.offChain
+              ? eitherToFuture(findSubdomainZoneFileByOwner(zonefile, did.address))
+              : resolve({ fqn: encodeFQN({ name, namespace }), zonefile })
           )
-          .pipe(
-            chain(relevantZf =>
-              eitherToFuture(
-                relevantZf.flatMap(({ subdomain, zonefile }) =>
-                  ensureZonefileMatchesName({
-                    name: nameInfo.name,
-                    namespace: nameInfo.namespace,
-                    subdomain,
-                    zonefile,
-                  })
-                )
-              )
-            )
-          )
+        )
       )
     )
