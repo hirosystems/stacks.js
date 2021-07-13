@@ -36,15 +36,18 @@
   ],
   "devDependencies": {
     "@types/node": "^13.13.10",
-    "yalc": "1.0.0-pre.49"
+    "yalc": "1.0.0-pre.49",
+    "@types/jest": "^26.0.22",
+    "jest": "^26.6.3",
+    "jest-fetch-mock": "^3.0.3"
   },
   "dependencies": {
-    "@stacks/auth": "^1.2.3",
-    "@stacks/common": "^1.2.2",
-    "@stacks/encryption": "^1.0.1",
-    "@stacks/profile": "^1.1.1-alpha.0",
-    "@stacks/storage": "^1.1.1-alpha.0",
-    "@stacks/transactions": "^1.1.1-alpha.0",
+    "@stacks/auth": "^2.0.0-beta.1",
+    "@stacks/common": "^2.0.0-beta.0",
+    "@stacks/encryption": "^2.0.0-beta.0",
+    "@stacks/profile": "^2.0.0-beta.1",
+    "@stacks/storage": "^2.0.0-beta.1",
+    "@stacks/transactions": "^2.0.0-beta.1",
     "bip32": "2.0.6",
     "bip39": "^3.0.2",
     "bitcoinjs-lib": "^5.1.6",

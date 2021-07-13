@@ -10,6 +10,18 @@
   "references": [
     {
       "path": "../common/tsconfig.build.json"
+    },
+    {
+      "path": "../encryption/tsconfig.build.json"
+    },
+    {
+      "path": "../profile/tsconfig.build.json"
+    },
+    {
+      "path": "../storage/tsconfig.build.json"
+    },
+    {
+      "path": "../transactions/tsconfig.build.json"
     }
   ],
   "include": ["src/**/*"]
