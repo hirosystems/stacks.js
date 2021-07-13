@@ -30,11 +30,10 @@ describe('did:stack:v2 resolver', () => {
   const { simple, revoked, rotated } = getTestDids().onChainDids
   describe('On-chain DIDs', () => {
     test('correctly resolves newly created DID', async () => {
-      const { service, ...didDoc } = await mocknetResolve(simple)
+      const didDoc = await mocknetResolve(simple)
 
-      expect(service).toHaveLength(1)
-      //@ts-ignore
-      expect(service[0].serviceEndpoint).toContain('https://ipfs.jolocom.io')
+      // expect(didDoc.service).toHaveLength(1)
+      // expect(didDoc.service[0].serviceEndpoint).toContain('https://ipfs.jolocom.io')
 
       return expect(didDoc).toStrictEqual(
         buildDidDoc({
@@ -45,11 +44,7 @@ describe('did:stack:v2 resolver', () => {
     })
 
     test('Should correctly resolve DID after the key was rotated', async () => {
-      const { service, ...didDoc } = await mocknetResolve(rotated)
-
-      expect(service).toHaveLength(1)
-      //@ts-ignore
-      expect(service[0].serviceEndpoint).toContain('https://ipfs.jolocom.io')
+      const didDoc = await mocknetResolve(rotated)
 
       return expect(didDoc).toStrictEqual(
         buildDidDoc({
@@ -76,7 +71,7 @@ describe('did:stack:v2 resolver', () => {
       }).cata(_ => '', identity)
 
       const mainnetResolve = buildResolve(new StacksMainnet())
-      const { service, ...didDoc } = await mainnetResolve(testDid)
+      const didDoc = await mainnetResolve(testDid)
 
       expect(didDoc.id).toBe(testDid)
     })
@@ -113,11 +108,7 @@ describe('did:stack:v2 resolver', () => {
     test('correctly resolve off-chain DID', async () => {
       const compressedPublicKey = compressPublicKey(testSubdomains.simple.keypair.publicKey.data)
 
-      const { service, ...didDoc } = await mocknetResolve(simple)
-
-      expect(service).toHaveLength(1)
-      //@ts-ignore
-      expect(service[0].serviceEndpoint).toContain('https://ipfs.jolocom.io')
+      const didDoc = await mocknetResolve(simple)
 
       return expect(didDoc).toStrictEqual(
         buildDidDoc({
@@ -132,11 +123,7 @@ describe('did:stack:v2 resolver', () => {
         testSubdomains.rotated.newKeypair.publicKey.data
       )
 
-      const { service, ...didDoc } = await mocknetResolve(rotated)
-
-      expect(service).toHaveLength(1)
-      //@ts-ignore
-      expect(service[0].serviceEndpoint).toContain('https://ipfs.jolocom.io')
+      const didDoc = await mocknetResolve(rotated)
 
       return expect(didDoc).toStrictEqual(
         buildDidDoc({
