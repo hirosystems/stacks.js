@@ -5,7 +5,12 @@
     "name": "Jolocom Dev",
     "email": "dev@jolocom.com"
   },
-  "repository": "https://github.com/jolocom/stacks-did-resolver.git",
+  "homepage": "https://blockstack.org",
+  "license": "GPL-3.0-or-later",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/blockstack/stacks.js.git"
+  },
   "engines": {
     "node": ">=10"
   },
@@ -13,6 +18,11 @@
     "dist",
     "src"
   ],
+  "main": "dist/index.js",
+  "module": "dist/esm/index.js",
+  "typings": "dist/index.d.ts",
+  "umd:main": "dist/index.umd.js",
+  "unpkg": "dist/index.umd.js",
   "scripts": {
     "build": "npm run clean && npm run build:cjs && npm run build:esm",
     "build:cjs": "tsc -b tsconfig.build.json",
