@@ -4,8 +4,8 @@ const b58 = require('bs58')
 export const buildDidDoc = ({
   did,
   publicKey,
-//tokenUrl,
-}: {
+}: //tokenUrl,
+{
   did: string
   publicKey: string
   tokenUrl?: string
@@ -13,7 +13,7 @@ export const buildDidDoc = ({
   // const serviceEndpSection = tokenUrl ? { service: [buildServiceEndpointSection(tokenUrl)] } : {}
 
   return {
-  //...serviceEndpSection,
+    //...serviceEndpSection,
     '@context': 'https://www.w3.org/ns/did/v1',
     id: did,
     verificationMethod: [

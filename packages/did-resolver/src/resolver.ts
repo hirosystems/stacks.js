@@ -95,7 +95,7 @@ export const buildResolve =
                 )
               )
             )
-            .pipe(map(({publicKey}) => buildDidDoc({publicKey, did })))
+            .pipe(map(({ publicKey }) => buildDidDoc({ publicKey, did })))
         )
       )
     )
