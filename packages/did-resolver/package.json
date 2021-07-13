@@ -32,7 +32,7 @@
     "prepublishOnly": "npm run test && npm run build && npm run build:umd",
     "format": "prettier \"{,!(node_modules)/**/}*.ts\" --no-semi -w",
     "test": "jest ./tests/unit/",
-    "test:watch": "jest --watch --coverage=false",
+    "test:watch": "npm run test -- --watch --coverage=false",
     "test:integration": "jest ./tests/integration/resolve.test.ts",
     "test:setup": "rm ./tests/integration/artifacts.json; ts-node ./tests/integration/setup.ts",
     "test:all": "jest ./tests/unit/ ./tests/integration/",

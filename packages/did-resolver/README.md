@@ -53,7 +53,11 @@ npm run bootstrap
 cd packages/did-resolver
 ```
 
-A set of integration / resolution tests are included in this repository. These tests rely on a local [Stacks 2.0 blockchain mocknet deployment](https://github.com/blockstack/stacks-blockchain-api/#quick-start) to register and resolve a number of test DIDs. In order to run the tests, first start the aforementioned mocknet instance in a different terminal window using:
+### Running the tests
+
+The unit tests included with this repository can be run using the `npm run test` command (`npm run test:watch` can be used to rerun all tests when relevant source files are changed). These tests can run offline, and do not depend on any additional infrastructure.
+
+In addition to the unit tests, a set of integration / e2e tests are included in this repository as well. These tests rely on a local [Stacks 2.0 blockchain mocknet deployment](https://github.com/blockstack/stacks-blockchain-api/#quick-start) to register and resolve a number of test DIDs. In order to run the tests, first start the aforementioned mocknet instance in a different terminal window using:
 
 ``` bash
 docker run -p 3999:3999 blockstack/stacks-blockchain-api-standalone mocknet
@@ -68,3 +72,5 @@ npm run test:setup
 # Once the setup is complete, you can run
 npm run test:integration
 ```
+
+Lastly, in case you would like to run both the unit and integration tests (and get a combined code coverage report), you can run `npm run test:all`. Please keep in mind that this will run the `npm run test:integration` command, and therefore assumes `npm run test:setup` has been run.
