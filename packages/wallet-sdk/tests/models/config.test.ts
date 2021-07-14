@@ -1,4 +1,3 @@
-import '../setup';
 import {
   encryptWalletConfig,
   createWalletGaiaConfig,
@@ -11,6 +10,12 @@ import {
 } from '../../src/models/wallet-config';
 import { mockWallet, mockWalletConfig, mockGaiaHubInfo } from '../mocks';
 import { decryptContent } from '@stacks/encryption';
+import fetchMock from 'jest-fetch-mock';
+
+beforeEach(() => {
+  fetchMock.resetMocks();
+  jest.resetModules();
+});
 
 const gaiaHubUrl = 'https://gaia.blockstack.org/hub';
 

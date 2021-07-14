@@ -1,24 +1,20 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
-
-const { pathsToModuleNameMapper } = require('ts-jest/utils');
-// In the following statement, replace `./tsconfig` with the path to your `tsconfig` file
-// which contains the path mapping (ie the `compilerOptions.paths` option):
-const { compilerOptions } = require('./tests/tsconfig');
-
+const path = require('path');
 module.exports = {
+  rootDir: __dirname,
   preset: 'ts-jest',
   testEnvironment: 'node',
   coverageDirectory: './coverage/',
   collectCoverage: true,
+  moduleNameMapper: require('jest-module-name-mapper').default(path.resolve(__dirname, 'tsconfig.json')),
   globals: {
     'ts-jest': {
+      tsconfig: path.resolve(__dirname, 'tsconfig.json'),
       diagnostics: {
         ignoreCodes: ['TS151001'],
       },
     },
   },
-  moduleNameMapper: pathsToModuleNameMapper(compilerOptions.paths),
   moduleFileExtensions: ['js', 'ts', 'd.ts'],
-  setupFilesAfterEnv: ['./tests/setup.ts'],
-  setupFiles: ['./tests/global-setup.ts'],
+  setupFilesAfterEnv: ['./tests/setup.js'],
+  testTimeout: 10000,
 };
