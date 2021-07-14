@@ -1,10 +1,15 @@
-import '../setup';
 import { decryptPrivateKey } from '@stacks/auth';
 import { ecPairToAddress, getPublicKeyFromPrivate, makeECPrivateKey } from '@stacks/encryption';
 import { decodeToken } from 'jsontokens';
 import { getAppPrivateKey, getGaiaAddress, makeAuthResponse } from '../../src';
 import { mockAccount, mockGaiaHubInfo } from '../mocks';
 import { ECPair } from 'bitcoinjs-lib';
+import fetchMock from 'jest-fetch-mock';
+
+beforeEach(() => {
+  fetchMock.resetMocks();
+  jest.resetModules();
+});
 
 interface Decoded {
   [key: string]: any;
