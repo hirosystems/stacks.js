@@ -4,8 +4,8 @@ Stacks DID Method Specification
 
 # Abstract
 
-Blockstack is a network for decentralized applications where users own their
-identities and data.  Blockstack utilizes a public blockchain to implement a
+Stacks is a network for decentralized applications where users own their
+identities and data. Stacks utilizes a public blockchain to implement a
 decentralized [naming
 layer](https://docs.blockstack.org/core/naming/introduction.html), which binds
 a user's human-readable username to their current public key and a pointer to
@@ -29,35 +29,35 @@ Comments regarding this document are welcome. Please file issues directly on
 
 # 1. System Overview
 
-The Blockstack DID method is specified as part of its [decentralized naming
+The Stacks DID method is specified as part of its [decentralized naming
 system](https://docs.stacks.co/build-apps/references/bns) (*BNS*).  Each
-Blockstack name has one corresponding DIDs, and each Blockstack DID corresponds
+Stacks name has one corresponding DIDs, and each Stacks DID corresponds
 to exactly one name -- even if the name was revoked by its owner or expired.
 
-Blockstack is unique among decentralized identity systems in that it is *not*
+Stacks is unique among decentralized identity systems in that it is *not*
 anchored to a specific blockchain or DLT implementation.  The system is
 designed from the ground up to be portable, and has already been live-migrated
 from the Namecoin blockchain to the Bitcoin blockchain.  The operational ethos
-of Blockstack is to leverage the must secure blockchain at all times -- that
+of Stacks is to leverage the must secure blockchain at all times -- that
 is, the one that is considered hardest to attack.
 
-The Blockstack naming system and the derived DIDs transcend the underlying
+The Stacks naming system and the derived DIDs transcend the underlying
 blockchain, and will continue to resolve to DID documents even if the system
 migrates to a new blockchain in the future.
 
 ## 1.1 DID Lifecycle
 
-Understanding how Blockstack DIDs operate requires understanding how Blockstack
-names operate. Fundamentally, a Blockstack DID is defined as a pointer to a
-*BNS name registered by an address*. The lifecycle of a Blockstack DID is
+Understanding how Stacks DIDs operate requires understanding how the Stacks
+naming layer operates. Fundamentally, a Stacks DID is defined as a pointer to a
+*BNS name registered by an address*. The lifecycle of a Stacks DID is
 therefore tied to the lifecycle of it's underlying BNS name.
 
-The Blockstack naming system differentiates between two types of names (and by
+The Stacks naming system differentiates between two types of names (and by
 extension, two types of resulting DIDs), *on-chain* and *off-chain* (elaborated
 on in the following subsections). Both on-chain and off-chain names (as well as
 the resulting DIDs) can be resolved to a set of singing keys, as well as
 additional metadata, using the BNS smart contract, and the Gaia storage
-network, as outlined in section [3.2](#32-resolving-a-stacks-did). 
+network, as outlined in section [3.2](#32-resolving-a-stacks-did).
 
 ## 1.2 On-chain DIDs
 
@@ -95,7 +95,7 @@ to the blockchain. The ownership and state for these names lives within the P2P
 network data and can be retrieved using the Atlas peer network.
 
 Like their on-chain counterparts, subdomains are globally unique, strongly
-owned, and human-readable. BNS gives them their own name state and public keys. 
+owned, and human-readable. BNS gives them their own name state and public keys.
 
 Unlike on-chain names, subdomains can be created, updated and revoked cheaply,
 because they are broadcast to the BNS network in batches (as described in
@@ -145,24 +145,28 @@ The **address** shall be a
 version byte concatenated with the RIPEMD160 hash of a SHA256 hash of a
 DER-encoded secp256k1 public key.  For example, in this Javascript snippet:
 
-``` javascript const crypto = require('crypto') const RIPEMD160 =
-require('ripemd160') const c32check = require('c32check')
+``` javascript
+const crypto = require('crypto')
+const RIPEMD160 = require('ripemd160')
+const c32check = require('c32check')
 
 const pubkey = Buffer.from(
-'042bc8aa4eb54d779c1fb8a2d5022aec8ed7fc2cc34d57356d9e1c417ce416773f45b0299ea7be347d14c69c403d9a03c8ec0ccf47533b4bee8cd002e5de81f945',
-'hex')
+  '042bc8aa4eb54d779c1fb8a2d5022aec8ed7fc2cc34d57356d9e1c417ce416773f45b0299ea7be347d14c69c403d9a03c8ec0ccf47533b4bee8cd002e5de81f945',
+  'hex'
+)
 
-const sha256Pubkey = crypto.createHash('sha256') .update(pubkey)
-.digest('hex'); //
-'18328b13b4df87cbcd190c083ef1d74487fc1383792f208f52c596b4588fb665'
+const sha256Pubkey = crypto.createHash('sha256')
+  .update(pubkey)
+  .digest('hex');
 
-const ripemd160Sha256Pubkey = new RIPEMD160() .update(Buffer.from(sha256Pubkey,
-'hex')) .digest('hex') // '1651c1a6001d4750e46be8a02cc19550d4309b71'
+const ripemd160Sha256Pubkey = new RIPEMD160()
+  .update(Buffer.from(sha256Pubkey, 'hex'))
+  .digest('hex')
 
-const versionByte = 22 const address = c32check.c32address(versionByte,
-ripemd160Sha256Pubkey) // SPB53GD600EMEM74DFMA0B61JN8D8C4VE7D2ZSJ9
+const versionByte = 22
 
-
+const address = c32check.c32address(versionByte, ripemd160Sha256Pubkey)
+// SPB53GD600EMEM74DFMA0B61JN8D8C4VE7D2ZSJ9
 ```
 
 The **transaction identifier** shall reference a valid Stacks blockchain
@@ -235,7 +239,7 @@ transaction), and the identifier of the
 [`name-register`](https://github.com/blockstack/stacks-blockchain/blob/master/src/chainstate/stacks/boot/bns.clar#L609)
 transaction which registered the name.
 
-Blockstack supplies a [reference
+Stacks supplies a [reference
 library](https://github.com/blockstack/stacks.js/tree/master/packages/bns)
 which allows developers to easily interact with the BNS smart contract (e.g.
 for the purpose of registering an on-chain name). For a usage example, see [the
@@ -311,10 +315,10 @@ Stacks DID can be derived for any registered subdomain by combining the Stacks
 address of the subdomain owner, and the identifier of the Stacks transaction
 which anchored the subdomain creation operation.
 
-Blockstack provides a reference implementation of a [subdomain
+Stacks provides a reference implementation of a [subdomain
 registrar](https://github.com/blockstack/subdomain-registrar) service which can
 be easily operated by any on-chain BNS name owner to allow for the registration
-of subdomains. 
+of subdomains.
 
 ## 3.2 Resolving a Stacks DID
 
@@ -412,7 +416,7 @@ returned, otherwise resolution fails with an error.
 As outlined in section [3.4](#34-deactivating-a-stacks-did), a Stacks DID can
 be deactivated by revoking the underlying BNS name. Deactivated DIDs should no
 longer resolve to DID Documents / public keys (also revoked BNS names can not
-be reassigned or updated in the future, rendering the DID unusable). 
+be reassigned or updated in the future, rendering the DID unusable).
 
 For on-chain names, the revocation status is tracked by the BNS smart contract
 (as can [be seen
@@ -426,7 +430,7 @@ private key.
 
 Once the DID has been mapped to the underlying BNS name and the latest name
 state is retrieved, depending on the type of DID being resolved (on-chain or
-off-chain), the appropriate revocation check is performed. 
+off-chain), the appropriate revocation check is performed.
 
 Furthermore, BNS names can also expire, and need to be periodically renewed.
 The expiration time for an on-chain name depends on the [namespace it is
@@ -444,7 +448,7 @@ by extension DID) to it's latest owner and set of public keys. As described in
 section [3.3](#33-updating-a-stacks-did), the keys associated with a Stacks DID
 can be rotated after the DID was created (e.g. by issuing a
 [`name-transfer`](https://github.com/blockstack/stacks-blockchain/blob/master/src/chainstate/stacks/boot/bns.clar#L679)
-operation designating a new owner in case of an on-chain name). 
+operation designating a new owner in case of an on-chain name).
 
 To fetch the latest keys, the Stacks network is queried for the most up to date
 zone file associated with the BNS name retrieved in step
@@ -482,7 +486,7 @@ extension with the on-chain DID) key will be updated. As described in section
 resolution process these transactions will be taken into account, and the
 latest designated set of keys will be associated with the Stacks DID.
 
-Blockstack supplies a [reference
+Stacks supplies a [reference
 library](https://github.com/blockstack/stacks.js/tree/master/packages/bns)
 enabling developers to easily interact with the BNS contract in order to
 transfer a BNS name. For examples on how to use the library to update a
@@ -533,31 +537,26 @@ file segments.
 4. Sign the resulting string with the DID's current private key.
 5. Generate and append the `sig=${base64_signature}` field to the TXT record.
 
-Sample code to generate these TXT records can be found in the [Blockstack Core
-reference implementation](https://github.com/blockstack/blockstack-core), under
-the `blockstack.lib.subdomains` package.  For example, the Python 2 program
-here generates such a TXT record:
+For example, the Python 2 program here generates such a TXT record:
 
-``` import blockstack
+```python
+import blockstack
 
-offchain_name = 'bar' onchain_name = 'foo.test' new_address =
-'1Jq3x8BAYz9Xy9AMfur5PXkDsWtmBBsNnC' seqn = 1 privk =
-'da1182302fee950e64241a4103646992b1bed7f6c4ced858282e493d57df33a501' full_name
-= '{}.{}'.format(offchain_name, onchain_name) zonefile = "$ORIGIN {}\\n$TTL
-3600\\n_http._tcp\\tIN\\tURI\\t10\\t1\\t\\"<https://gaia.blockstack.org/hub/{}/profile.json\\"\\n\\n".format>(offchain_name,
-new_address)
+offchain_name = 'bar'
+onchain_name = 'foo.test'
+new_address = '1Jq3x8BAYz9Xy9AMfur5PXkDsWtmBBsNnC'
+seqn = 1
+privk = 'da1182302fee950e64241a4103646992b1bed7f6c4ced858282e493d57df33a501'
+full_name = '{}.{}'.format(offchain_name, onchain_name)
+zonefile = "$ORIGIN {}\n$TTL 3600\n_http._tcp\tIN\tURI\t10\t1\t\"https://gaia.blockstack.org/hub/{}/profile.json\"\n\n".format(offchain_name, new_address)
 
-print blockstack.lib.subdomains.make_subdomain_txt(full_name, onchain_name,
-new_address, seqn, zonefile, privk)
-
+print blockstack.lib.subdomains.make_subdomain_txt(full_name, onchain_name, new_address, seqn, zonefile, privk)
 ```
 
 The program prints a string such as:
 
-``` bar TXT "owner=1Jq3x8BAYz9Xy9AMfur5PXkDsWtmBBsNnC" "seqn=1" "parts=1"
-"zf0=JE9SSUdJTiBiYXIKJFRUTCAzNjAwCl9odHRwLl90Y3AJSU4JVVJJCTEwCTEJImh0dHBzOi8vZ2FpYS5ibG9ja3N0YWNrLm9yZy9odWIvMUpxM3g4QkFZejlYeTlBTWZ1cjVQWGtEc1d0bUJCc05uQy9wcm9maWxlLmpzb24iCgo\\="
-"sig=QEA+88Nh6pqkXI9x3UhjIepiWEOsnO+u1bOBgqy+YyjrYIEfbYc2Q8YUY2n8sIQUPEO2wRC39bHQHAw+amxzJfkhAxcC/fZ0kYIoRlh2xPLnYkLsa5k2fCtXqkJAtsAttt/V"
-
+```
+bar TXT "owner=1Jq3x8BAYz9Xy9AMfur5PXkDsWtmBBsNnC" "seqn=1" "parts=1" "zf0=JE9SSUdJTiBiYXIKJFRUTCAzNjAwCl9odHRwLl90Y3AJSU4JVVJJCTEwCTEJImh0dHBzOi8vZ2FpYS5ibG9ja3N0YWNrLm9yZy9odWIvMUpxM3g4QkFZejlYeTlBTWZ1cjVQWGtEc1d0bUJCc05uQy9wcm9maWxlLmpzb24iCgo\=" "sig=QEA+88Nh6pqkXI9x3UhjIepiWEOsnO+u1bOBgqy+YyjrYIEfbYc2Q8YUY2n8sIQUPEO2wRC39bHQHAw+amxzJfkhAxcC/fZ0kYIoRlh2xPLnYkLsa5k2fCtXqkJAtsAttt/V"
 ```
 
 (Note that the `sig=` field will differ between invocations, due to the way
@@ -568,7 +567,7 @@ registrar will pack it along with other such records into a single zone file,
 and issue a `name-update` transaction for the on-chain name to announce them to
 the rest of the peer network.  The registrar will then propagate these TXT
 records to the peer network once the transaction confirms, thereby informing
-all Blockstack nodes of the new state of the off-chain DID.
+all Stacks nodes of the new state of the off-chain DID.
 
 ## 3.4 Deactivating a Stacks DID
 
@@ -592,9 +591,9 @@ base58-check encoding of 20 bytes of 0's), and (2) changes the zone file to
 include an unresolvable URL.  This prevents the DID from resolving, and
 prevents it from being updated in the future.
 
-## 3.5 Migration and compatibility with Blockstack v1 DIDs
+## 3.5 Migration and compatibility with Stacks v1 DIDs
 
-The previous iteration of the Blockstack `did:stack:` DID method ([defined
+The previous iteration of the Stacks `did:stack:` DID method ([defined
 here](https://github.com/blockstack/stacks-blockchain/blob/stacks-1.0/docs/blockstack-did-spec.md#blockstack-did-method-specification))
 allows users to derive a valid, resolvable `did:stack:` DID given a BNS name
 they own, similarly to the approach outlined in this document.
@@ -609,12 +608,12 @@ blockchain implemented BNS through first-order name operations (written to the
 underlying chain). In Stacks V2, the name system is instead implemented through
 a smart-contract loaded during the genesis block. The initial state of the BNS
 contract includes all names registered using the previous iteration of the
-Blockstack naming system.
+Stacks naming system.
 
 Any valid *on-chain* v1 DID (e.g.
 `did:stack:v0:15gxXgJyT5tM5A4Cbx99nwccynHYsBouzr-3`) can be easily updated to a
 valid, resolvable on-chain Stacks DID by updating the NSI part of the DID in
-accordance with the structure defined in this document. 
+accordance with the structure defined in this document.
 
 The general migration steps for such a DID are:
 
@@ -634,11 +633,11 @@ the contract deployment transaction can be used. The exact transaction
 identifiers are listed [here](../src/constants.ts#L9).
 
 Following the process described above, the example
-`did:stack:v0:15gxXgJyT5tM5A4Cbx99nwccynHYsBouzr-3` on-chain Blockstack DID
+`did:stack:v0:15gxXgJyT5tM5A4Cbx99nwccynHYsBouzr-3` on-chain Stacks DID
 would be converted to
 `did:stack:v2:SPSPY51G2MRRM6Q57Y67CDS2X293D8WTGV4V3GE2-d8a9a4528ae833e1894eee676af8d218f8facbf95e166472df2c1a64219b5dfb`
 
-In order to migrate an *off-chain* v1 Blockstack DID, the off-chain name owner
+In order to migrate an *off-chain* v1 Stacks DID, the off-chain name owner
 must request that the registrar that instantiated the name broadcasts a
 `name-update` operation anchoring the zone file. The identifier of the
 `name-update` operation can then be concatenated with the address of the
@@ -671,21 +670,21 @@ otherwise resolution fails with an error.
 
 # 4. Security Considerations
 
-This section briefly outlines possible ways to attack Blockstack's DID method,
-as well as countermeasures the Blockstack protocol and the user can take to
+This section briefly outlines possible ways to attack the Stacks DID method,
+as well as countermeasures the Stacks protocol and the user can take to
 defend against them.
 
 ## 4.1 Public Blockchain Attacks
 
-Blockstack operates on top of a public blockchain, which could be attacked by a
+Stacks operates on top of a public blockchain, which could be attacked by a
 sufficiently powerful adversary -- such as rolling back and changing the
-chain's transaction history, denying new transactions for Blockstack's name
+chain's transaction history, denying new transactions for Stacks name
 operations, or eclipsing nodes.
 
-Blockstack makes the first two attacks difficult by operating on top of the
+Stacks makes the first two attacks difficult by operating on top of the
 most secure blockchain -- currently Bitcoin.  If the blockchain is attacked, or
-a stronger blockchain comes into being, the Blockstack community would migrate
-the Blockstack network to a new blockchain.
+a stronger blockchain comes into being, the Stacks community would migrate
+the Stacks network to a new blockchain.
 
 The underlying blockchain provides some immunity towards eclipse attacks, since
 a blockchain peer expects blocks to arrive at roughly fixed intervals and
@@ -698,27 +697,27 @@ required expenditure rate (the "chain difficulty") decreases slowly enough that
 an attacker with less energy would have to spend months of time on the attack,
 giving the victim ample time to detect it.  The countermeasures the blockchain
 employs to deter eclipse attacks are beyond the scope of this document, but it
-is worth pointing out that Blockstack's DID method benefits from them since
+is worth pointing out that Stacks' DID method benefits from them since
 they also help ensure that DID creation, updates and deletions get processed in
 a timely manner.
 
-## 4.2 Blockstack Peer Network Attacks
+## 4.2 Stacks Peer Network Attacks
 
-Because Blockstack stores each DID's DDO's URL in its own peer network outside
-of its underlying blockchain, it is possible to eclipse Blockstack nodes and
+Because Stacks stores each DID's DDO's URL in its own peer network outside
+of its underlying blockchain, it is possible to eclipse Stacks nodes and
 prevent them from seeing both off-chain DID operations and updates to on-chain
-DIDs.  In an effort to make this as difficult as possible, the Blockstack peer
+DIDs.  In an effort to make this as difficult as possible, the Stacks peer
 network implements an unstructured overlay network -- nodes select a random
-sample of the peer graph as their neighbors.  Moreover, Blockstack nodes strive
+sample of the peer graph as their neighbors.  Moreover, Stacks nodes strive
 to fetch a full replica of all zone files, and pull zone files from their
 neighbors in rarest-first order to prevent zone files from getting lost while
 they are propagating.  This makes eclipsing a node maximally difficult -- an
 attacker would need to disrupt all of a the victim node's neighbor links.
 
 In addition to this protocol-level countermeasure, a user has the option of
-uploading zone files manually to their preferred Blockstack nodes.  If
+uploading zone files manually to their preferred Stacks nodes.  If
 vigilant users have access to a replica of the zone files, they can re-seed
-Blockstack nodes that do not have them.
+Stacks nodes that do not have them.
 
 ## 4.3 Stale Data and Replay Attacks
 
@@ -741,29 +740,28 @@ time they change their DDO.
 
 # 5. Privacy Considerations
 
-Blockstack's DIDs are underpinned by Blockstack IDs (human readable names), and
-every Blockstack node records where every DID's DDO is hosted.  However, users
+Stacks DIDs are underpinned by BNS namess (human readable names), and
+every Stacks node records where every DID's DDO is hosted. However, users
 have the option of encrypting their DDOs so that only a select set of other
 users can decrypt them.
 
-Blockstack's peer network and DID resolver use HTTP(S), meaning that
+Stacks peer network and DID resolver use HTTP(S), meaning that
 intermediate middleboxes like CDNs and firewalls can cache data and log
 requests.
 
 # 6. Reference Implementations
 
-Blockstack implements a [RESTful API](https://core.blockstack.org/) for
-querying DIDs.  It also implements a [reference
-library](https://github.com/blockstack/blockstack.js) for generating
-well-formed on-chain transactions, and it implements a [Python
-library](https://github.com/blockstack/blockstack/core/blob/master/blockstack/lib/subdomains.py)
-for generating off-chain DID operations.  The Blockstack node [reference
-implementation](https://github.com/blockstack/blockstack-core) is available
+Stacks nodes implement and expose a [RESTful API](https://blockstack.github.io/stacks-blockchain-api) for
+querying DIDs. It also implements a [reference
+library](https://github.com/blockstack/stacks.js/tree/master/packages/bns) for generating
+well-formed on-chain transactions, and it implements a [reference registrar](https://github.com/blockstack/subdomain-registrar)
+for generating and publishing off-chain DID operations. The Stacks node [reference
+implementation](https://github.com/blockstack/stacks-blockchain/) is available
 under the terms of the General Public Licence, version 3.
 
 # 7. Resources
 
-Many Blockstack developers communicate via the [Blockstack
+Many Stacks developers communicate via the [Blockstack
 Forum](https://forum.blockstack.org/) and via the [Blockstack
 Slack](https://blockstack.slack.com/).  Interested developers are encouraged to
 join both.
