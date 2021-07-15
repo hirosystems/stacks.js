@@ -1,5 +1,5 @@
 import { BIP32Interface } from 'bip32';
-import { Buffer } from 'buffer';
+import { Buffer } from '@stacks/common';
 import { ECPair } from 'bitcoinjs-lib';
 import { createSha2Hash, ecPairToHexString } from '@stacks/encryption';
 

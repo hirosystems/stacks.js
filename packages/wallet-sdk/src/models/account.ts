@@ -17,7 +17,7 @@ import {
 } from './profile';
 import { ECPair } from 'bitcoinjs-lib';
 import { connectToGaiaHubWithConfig, getHubInfo, makeGaiaAssociationToken } from '../utils';
-import { Buffer } from 'buffer';
+import { Buffer } from '@stacks/common';
 
 export interface Account {
   /** The private key used for STX payments */
