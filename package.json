@@ -1,4 +1,5 @@
 {
+  "type": "module",
   "name": "stacks.js",
   "version": "1.4.1",
   "private": true,
@@ -26,7 +27,10 @@
     "typedoc": "^0.20.35",
     "typescript": "^4.2.4"
   },
-  "dependencies": {},
+  "dependencies": {
+    "@blockstack/stacks-transactions": "^0.7.0",
+    "@stacks/transactions": "^2.0.0-beta.1"
+  },
   "scripts": {
     "bootstrap": "lerna bootstrap",
     "build": "lerna run build",
