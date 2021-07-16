@@ -192,6 +192,7 @@ export type ReadOnlyFunctionResponse =
  */
 export const parseReadOnlyResponse = (response: ReadOnlyFunctionResponse): ClarityValue => {
   if (response.okay) {
+    console.log({result: response.result});
     return hexToCV(response.result);
   } else {
     throw new Error(response.cause);

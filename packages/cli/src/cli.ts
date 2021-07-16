@@ -367,7 +367,9 @@ function balance(network: CLINetworkAdapter, args: string[]): Promise<string> {
 
   // temporary hack to use network config from stacks-transactions lib
   const txNetwork = network.isMainnet() ? new StacksMainnet() : new StacksTestnet();
+  console.log({apiUrl1: txNetwork.coreApiUrl})
   txNetwork.coreApiUrl = network.legacyNetwork.blockstackAPIUrl;
+  console.log({apiUrl2: txNetwork.coreApiUrl})
 
   return fetch(txNetwork.getAccountApiUrl(address))
     .then(response => response.json())
@@ -1800,6 +1802,7 @@ export function CLIMain() {
     const testnet = CLIOptAsBool(opts, 't');
     const magicBytes = CLIOptAsString(opts, 'm');
     const apiUrl = CLIOptAsString(opts, 'H');
+    console.log({apiUrl});
     const transactionBroadcasterUrl = CLIOptAsString(opts, 'T');
     const nodeAPIUrl = CLIOptAsString(opts, 'I');
     const utxoUrl = CLIOptAsString(opts, 'X');
@@ -1863,12 +1866,15 @@ export function CLIMain() {
       nodeAPIUrl: nodeAPIUrl ? nodeAPIUrl : configData.blockstackNodeUrl,
     };
 
+    console.log({cliOpts});
+
     // wrap command-line options
     const wrappedNetwork = getNetwork(
       configData,
       !!BLOCKSTACK_TEST || !!integration_test || !!testnet
     );
     const blockstackNetwork = new CLINetworkAdapter(wrappedNetwork, cliOpts);
+    console.log({blockstackNetwork});
     if (magicBytes) {
       // blockstackNetwork.MAGIC_BYTES = magicBytes;
     }

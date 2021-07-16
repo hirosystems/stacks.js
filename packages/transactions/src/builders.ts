@@ -1025,6 +1025,7 @@ export interface ReadOnlyFunctionOptions {
 export async function callReadOnlyFunction(
   readOnlyFunctionOptions: ReadOnlyFunctionOptions
 ): Promise<ClarityValue> {
+  console.log({readOnlyFunctionOptions});
   const defaultOptions = {
     network: new StacksMainnet(),
   };
@@ -1048,6 +1049,9 @@ export async function callReadOnlyFunction(
     sender: senderAddress,
     arguments: args,
   });
+
+  console.log({url});
+  console.log({body});
 
   const response = await fetchPrivate(url, {
     method: 'POST',
