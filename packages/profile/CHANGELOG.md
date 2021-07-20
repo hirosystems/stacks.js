@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.0.0-beta.0](https://github.com/blockstack/blockstack.js/compare/v2.0.0-beta.1...v3.0.0-beta.0) (2021-07-20)
+
+**Note:** Version bump only for package @stacks/profile
+
+
+
+
+
 ## [1.2.3](https://github.com/blockstack/blockstack.js/compare/v1.2.2...v1.2.3) (2021-02-25)
 
 **Note:** Version bump only for package @stacks/profile
