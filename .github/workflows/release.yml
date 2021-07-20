@@ -3,18 +3,21 @@ name: Release
 on:
   push:
     branches:
-      - '**'
+      - master
     tags-ignore:
       - '**'
     paths-ignore:
       - '**/CHANGELOG.md'
       - '**/package.json'
+      - 'docs/**'
   pull_request:
   workflow_dispatch:
 jobs:
   release:
     name: Release
     runs-on: ubuntu-latest
+    # Only run on non-PR events or only PRs that aren't from forks
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
     steps:
       - uses: actions/checkout@v2
       - name: Set Node Version
@@ -36,8 +39,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN || secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           NODE_OPTIONS: --max-old-space-size=4096
+          SEMANTIC_RELEASE_PACKAGE: ${{ github.event.repository.name }} # Always needed
         with:
           extra_plugins: |
             @semantic-release/changelog
             @semantic-release/git
-            @semantic-release/exec
