@@ -50,8 +50,9 @@ const txOptions = {
   senderKey: 'b244296d5907de9864c0b0d51f98a13c52890be0404e83f273144cd5b9960eed01',
   network,
   memo: 'test memo',
-  fee: 200n, // set a tx fee if you don't want the builder to estimate
-  anchorMode: AnchorMode.Any
+  nonce: new BigNum(0), // set a nonce manually if you don't want builder to fetch from a Stacks node
+  fee: new BigNum(200), // set a tx fee if you don't want the builder to estimate
+  anchorMode: AnchorMode.Any,
 };
 
 const transaction = await makeSTXTokenTransfer(txOptions);
@@ -60,7 +61,8 @@ const transaction = await makeSTXTokenTransfer(txOptions);
 const serializedTx = transaction.serialize().toString('hex');
 
 // broadcasting transaction to the specified network
-const result = await broadcastTransaction(transaction, network);
+const broadcastResponse = await broadcastTransaction(transaction, network);
+const txId = broadcastResponse.txid;
 ```
 
 ## Smart Contract Deploy Transaction
@@ -83,7 +85,8 @@ const txOptions = {
 
 const transaction = await makeContractDeploy(txOptions);
 
-const result = await broadcastTransaction(transaction, network);
+const broadcastResponse = await broadcastTransaction(transaction, network);
+const txId = broadcastResponse.txid;
 ```
 
 ## Smart Contract Function Call
@@ -125,7 +128,8 @@ const txOptions = {
 
 const transaction = await makeContractCall(txOptions);
 
-const result = await broadcastTransaction(transaction, network);
+const broadcastResponse = await broadcastTransaction(transaction, network);
+const txId = broadcastResponse.txid;
 ```
 
 In this example we construct a `contract-call` transaction with a post condition. We have set the `validateWithAbi` option to `true`, so the `makeContractCall` builder will attempt to fetch this contracts ABI from the specified Stacks network, and validate that the provided functionArgs match what is described in the ABI. This should help you avoid constructing invalid contract-call transactions. If you would prefer to provide your own ABI instead of fetching it from the network, the `validateWithABI` option also accepts [ClarityABI](https://github.com/blockstack/stacks-transactions-js/blob/master/src/contract-abi.ts#L231) objects, which can be constructed from ABI files like so:
@@ -188,7 +192,9 @@ const sponsoredTx = await sponsorTransaction(sponsorOptions);
 
 // for mainnet, use `StacksMainnet()`
 const network = new StacksTestnet();
-const result = await broadcastTransaction(sponsoredTx, network);
+
+const broadcastResponse = await broadcastTransaction(transaction, network);
+const txId = broadcastResponse.txid;
 ```
 
 ## Supporting multi-signature transactions

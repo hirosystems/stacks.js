@@ -4,22 +4,23 @@
 
 <!-- TOC depthFrom:2 -->
 
-- [Features](#features)
-- [Key Concepts](#key-concepts)
-  - [Secret Key](#secret-key)
-  - [Wallet](#wallet)
-  - [Account](#account)
-  - [Derivation paths](#derivation-paths)
-- [Usage](#usage)
-  - [Installation](#installation)
-  - [Generate a Secret Key](#generate-a-secret-key)
-  - [Generate a wallet](#generate-a-wallet)
-  - [Generating new accounts](#generating-new-accounts)
-  - [Restoring accounts for an existing Wallet](#restoring-accounts-for-an-existing-wallet)
-  - [Making an authentication response](#making-an-authentication-response)
-  - [Usage with `@stacks/transactions`](#usage-with-stackstransactions)
-    - [Getting an account's STX address](#getting-an-accounts-stx-address)
-    - [Signing Stacks Transactions](#signing-stacks-transactions)
+- [@stacks/wallet-sdk](#stackswallet-sdk)
+  - [Features](#features)
+  - [Key Concepts](#key-concepts)
+    - [Secret Key](#secret-key)
+    - [Wallet](#wallet)
+    - [Account](#account)
+    - [Derivation paths](#derivation-paths)
+  - [Usage](#usage)
+    - [Installation](#installation)
+    - [Generate a Secret Key](#generate-a-secret-key)
+    - [Generate a wallet](#generate-a-wallet)
+    - [Generating new accounts](#generating-new-accounts)
+    - [Restoring accounts for an existing Wallet](#restoring-accounts-for-an-existing-wallet)
+    - [Making an authentication response](#making-an-authentication-response)
+    - [Usage with `@stacks/transactions`](#usage-with-stackstransactions)
+      - [Getting an account's STX address](#getting-an-accounts-stx-address)
+      - [Signing Stacks Transactions](#signing-stacks-transactions)
 
 <!-- /TOC -->
 
@@ -215,12 +216,7 @@ const mainnetAddress = getStxAddress({ account, transactionVersion: TransactionV
 You can generate signed transactions by following the documentation from `@stacks/transactions`. Use the `stxPrivateKey` of an account as the `senderKey` option when creating a transaction.
 
 ```ts
-import {
-  makeSTXTokenTransfer,
-  makeStandardSTXPostCondition,
-  StacksMainnet,
-  broadcastTransaction,
-} from '@stacks/transactions';
+import { makeSTXTokenTransfer, StacksMainnet } from '@stacks/transactions';
 const BigNum = require('bn.js');
 
 const network = new StacksMainnet();
