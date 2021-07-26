@@ -144,8 +144,8 @@ test('Multi sig spending condition uncompressed', () => {
 // auth.rs: tx_stacks_spending_condition_p2sh() (compressed multisig)
 test('Multi sig P2SH spending condition compressed', () => {
   const addressHashMode = AddressHashMode.SerializeP2SH;
-  const nonce = new BigNum(456);
-  const fee = new BigNum(567);
+  const nonce = 456;
+  const fee = 567;
   const pubKey = '03ef2340518b5867b23598a9cf74611f8b98064f7d55cdb8c107c67b5efcbc5c77';
   const pubKeys = [pubKey, pubKey, pubKey];
 
@@ -210,8 +210,8 @@ test('Multi sig P2SH spending condition compressed', () => {
 // auth.rs: tx_stacks_spending_condition_p2wsh()
 test('Multi sig P2WSH spending condition compressed', () => {
   const addressHashMode = AddressHashMode.SerializeP2WSH;
-  const nonce = new BigNum(456);
-  const fee = new BigNum(567);
+  const nonce = 456;
+  const fee = 567;
   const pubKey = '03ef2340518b5867b23598a9cf74611f8b98064f7d55cdb8c107c67b5efcbc5c77';
   const pubKeys = [pubKey, pubKey, pubKey];
 
@@ -274,10 +274,10 @@ test('Multi sig P2WSH spending condition compressed', () => {
 
 // auth.rs: tx_stacks_auth()
 test('Spending conditions', () => {
-  const bn123 = new BigNum(123);
-  const bn345 = new BigNum(345);
-  const bn456 = new BigNum(456);
-  const bn567 = new BigNum(567);
+  const bn123 = 123;
+  const bn345 = 345;
+  const bn456 = 456;
+  const bn567 = 567;
   const signer = '11'.repeat(20);
   const signatureFF = createMessageSignature('ff'.repeat(65));
   const signatureFE = createMessageSignature('fe'.repeat(65));
