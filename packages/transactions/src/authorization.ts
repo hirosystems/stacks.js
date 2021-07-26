@@ -499,14 +499,14 @@ function verifySingleSig(
 }
 
 function verifyMultiSig(
-  condition: MultiSigSpendingCondition,
+  condition: MultiSigSpendingConditionOpts,
   initialSigHash: string,
   authType: AuthType
 ): string {
   const publicKeys: StacksPublicKey[] = [];
   let curSigHash = initialSigHash;
   let haveUncompressed = false;
-  let numSigs = new Uint16Array(1);
+  const numSigs = new Uint16Array(1);
   numSigs[0] = 0;
 
   for (const field of condition.fields) {
