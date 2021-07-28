@@ -866,7 +866,7 @@ function normalizeOptions<T>(
       }
       const sessionData = userSession.store.getSessionData();
       // Use the user specified coreNode if available, otherwise use the app specified coreNode.
-      const configuredCoreNode = sessionData.userData!.coreNode || userSession.appConfig.coreNode;
+      const configuredCoreNode = sessionData.userData?.coreNode || userSession.appConfig.coreNode;
       if (configuredCoreNode) {
         opts.zoneFileLookupURL = `${configuredCoreNode}${NAME_LOOKUP_PATH}`;
       }
