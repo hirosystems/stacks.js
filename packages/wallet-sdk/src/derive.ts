@@ -8,7 +8,7 @@ import { Account } from './models/account';
 import { WalletKeys } from './models/wallet';
 
 const DATA_DERIVATION_PATH = `m/888'/0'`;
-const WALLET_CONFIG_PATH = `m/44/5757'/0'/1`;
+const WALLET_CONFIG_PATH = `m/44'/5757'/0'/1`;
 const STX_DERIVATION_PATH = `m/44'/5757'/0'/0`;
 
 export const deriveWalletKeys = async (rootNode: BIP32Interface): Promise<WalletKeys> => {
