@@ -5,7 +5,7 @@ Library for PoX Stacking.
 ## Installation
 
 ```shell
-npm install @stacks/stacking bn.js
+npm install @stacks/stacking
 ```
 
 ## Initialization
@@ -15,32 +15,25 @@ Initialize a `StackingClient` to interact with the Stacking contract.
 *Note: the `StackingClient` sets its transactions `AnchorMode` to `Any`.*
 
 ```typescript
-import { getNonce } from '@stacks/transactions';
 import { StacksTestnet, StacksMainnet } from '@stacks/network';
 import { StackingClient } from '@stacks/stacking';
-import BN from 'bn.js';
 
-const network = new StacksTestnet();
 // for mainnet: const network = new StacksMainnet();
-const client = new StackingClient(address, network);
-
+const network = new StacksTestnet();
 // the stacks STX address
 const address = 'ST3XKKN4RPV69NN1PHFDNX3TYKXT7XPC4N8KC1ARH';
-// a BTC address for reward payouts
-const poxAddress = 'mvuYDknzDtPgGqm2GnbAbmGMLwiyW3AwFP';
-// number cycles to stack
-const cycles = 3;
-// how much to stack, in microSTX
-const amountMicroStx = new BN(100000000000);
-// private key for transaction signing
-const privateKey = 'd48f215481c16cbe6426f8e557df9b78895661971d71735126545abddcd5377001';
-// block height at which to stack
-const burnBlockHeight = 2000;
+const client = new StackingClient(address, network);
 ```
 
 ## Check stacking eligibility
 
 ```typescript
+// a BTC address for reward payouts
+const poxAddress = 'mvuYDknzDtPgGqm2GnbAbmGMLwiyW3AwFP';
+// number cycles to stack
+const cycles = 3;
+
+// Refer to initialization section to create client instance
 const stackingEligibility = await client.canStack({ poxAddress, cycles });
 
 // {
@@ -52,6 +45,18 @@ const stackingEligibility = await client.canStack({ poxAddress, cycles });
 ## Stack STX
 
 ```typescript
+// a BTC address for reward payouts
+const poxAddress = 'mvuYDknzDtPgGqm2GnbAbmGMLwiyW3AwFP';
+// number cycles to stack
+const cycles = 3;
+// how much to stack, in microSTX
+const amountMicroStx = 100000000000n;
+// private key for transaction signing
+const privateKey = 'd48f215481c16cbe6426f8e557df9b78895661971d71735126545abddcd5377001';
+// block height at which to stack
+const burnBlockHeight = 2000;
+
+// Refer to initialization section to create client instance
 const stackingResults = await client.stack({
   amountMicroStx,
   poxAddress,
@@ -139,7 +144,7 @@ const responseBalanceInfo = await client.getAccountBalance();
 
 ## Does account have sufficient STX to meet minimum threshold?
 
-```js
+```typescript
 const hasMinStxAmount = await client.hasMinimumStx();
 
 // true / false
@@ -180,8 +185,12 @@ If you are the account owner ("stacker"), you can delegate or revoke delegation 
 const delegateTo = 'ST2MCYPWTFMD2MGR5YY695EJG0G1R4J2BTJPRGM7H';
 // burn height at which the delegation relationship should be revoked (optional)
 const untilBurnBlockHeight = 5000;
+// how much to stack, in microSTX
+const amountMicroStx = 100000000000n;
+// private key for transaction signing
+const privateKey = 'd48f215481c16cbe6426f8e557df9b78895661971d71735126545abddcd5377001';
 
-const delegetateResponse = await client.delegateStx({
+const delegetateResponse = await client.delegateStx({ 
   amountMicroStx,
   delegateTo,
   untilBurnBlockHeight, // optional
@@ -196,7 +205,9 @@ const delegetateResponse = await client.delegateStx({
 #### Revoke delegation
 
 ```typescript
-// note that the parameter here is not JSON
+// private key for transaction signing
+const privateKey = 'd48f215481c16cbe6426f8e557df9b78895661971d71735126545abddcd5377001';
+
 const revokeResponse = await client.revokeDelegateStx(privateKey);
 
 // {
@@ -211,16 +222,29 @@ If you are the delegator, you can stack ("lock up") tokens for your users and co
 #### Stack delegated STX
 
 ```typescript
+import { getNonce } from '@stacks/transactions';
+import { StacksTestnet, StacksMainnet } from '@stacks/network';
+import { StackingClient } from '@stacks/stacking';
+
+// for mainnet: const network = new StacksMainnet();
+const network = new StacksTestnet();
+// the stacks STX address
+const address = 'ST3XKKN4RPV69NN1PHFDNX3TYKXT7XPC4N8KC1ARH';
 // delegators would initiate a different client
 const delegatorAddress = 'ST22X605P0QX2BJC3NXEENXDPFCNJPHE02DTX5V74';
 // delegator private key for transaction signing
 const delegatorPrivateKey = 'd48f215481c16cbe6426f8e557df9b78895661971d71735126545abddcd5377001';
 // the BTC address for reward payouts
 const delegatorBtcAddress = 'msiYwJCvXEzjgq6hDwD9ueBka6MTfN962Z';
-
+// how much to stack, in microSTX
+const amountMicroStx = 100000000000n;
+// block height at which to stack
+const burnBlockHeight = 2000;
+// number cycles to stack
+const cycles = 3;
 // if you call this method multiple times in the same block, you need to increase the nonce manually
-let nonce = getNonce(delegatorAddress, network);
-nonce = nonce.add(new BN(1));
+let nonce = await getNonce(delegatorAddress, network);
+nonce = nonce + 1n;
 
 const delegatorClient = new StackingClient(delegatorAddress, network);
 
@@ -244,6 +268,10 @@ const delegetateStackResponses = await delegatorClient.delegateStackStx({
 ```typescript
 // reward cycle id to commit to
 const rewardCycle = 12;
+// the BTC address for reward payouts
+const delegatorBtcAddress = 'msiYwJCvXEzjgq6hDwD9ueBka6MTfN962Z';
+// Private key
+const privateKeyDelegate = 'd48f215481c16cbe6426f8e557df9b78895661971d71735126545abddcd5377001';
 
 const delegetateCommitResponse = await delegatorClient.stackAggregationCommit({
   poxAddress: delegatorBtcAddress,
@@ -254,4 +282,97 @@ const delegetateCommitResponse = await delegatorClient.stackAggregationCommit({
 // {
 //   txid: '0xf6e9dbf6a26c1b73a14738606cb2232375d1b440246e6bbc14a45b3a66618481',
 // }
+```
+
+#### Get burnchain rewards
+
+```typescript
+import { StacksTestnet, StacksMainnet } from '@stacks/network';
+import { StackingClient } from '@stacks/stacking';
+
+const address = 'myfTfju9XSMRusaY2qTitSEMSchsWRA441';
+// for mainnet: const network = new StacksMainnet();
+const network = new StacksTestnet();
+const client = new StackingClient(address, network);
+const options = { limit: 2, offset: 0 };
+
+const rewards = await client.getRewardsForBtcAddress(options);
+//{
+//   limit: 2,
+//   offset: 0,
+//   results: [
+//     {
+//       canonical: true,
+//       burn_block_hash: '0x000000000000002083ca8303a2262d09a824cecb34b78f13a04787e4f05441d3',
+//       burn_block_height: 2004622,
+//       burn_amount: '0',
+//       reward_recipient: 'myfTfju9XSMRusaY2qTitSEMSchsWRA441',
+//       reward_amount: '20000',
+//       reward_index: 0
+//     },
+//     {
+//       canonical: true,
+//       burn_block_hash: '0x000000000000002f72213de621f9daf60d76aed3902a811561d06373b2fa6123',
+//       burn_block_height: 2004621,
+//       burn_amount: '0',
+//       reward_recipient: 'myfTfju9XSMRusaY2qTitSEMSchsWRA441',
+//       reward_amount: '20000',
+//       reward_index: 0
+//     }
+//   ]
+// };
+```
+
+#### Get burnchain rewards total
+
+```typescript
+import { StacksTestnet, StacksMainnet } from '@stacks/network';
+import { StackingClient } from '@stacks/stacking';
+
+const address = 'myfTfju9XSMRusaY2qTitSEMSchsWRA441';
+// for mainnet: const network = new StacksMainnet();
+const network = new StacksTestnet();
+const client = new StackingClient(address, network);
+
+const total = await client.getRewardsTotalForBtcAddress();
+//{
+// reward_recipient: 'myfTfju9XSMRusaY2qTitSEMSchsWRA441',
+// reward_amount: '0'
+//}
+```
+
+#### Get burnchain reward holders
+
+```typescript
+import { StacksTestnet, StacksMainnet } from '@stacks/network';
+import { StackingClient } from '@stacks/stacking';
+
+const address = 'myfTfju9XSMRusaY2qTitSEMSchsWRA441';
+// for mainnet: const network = new StacksMainnet();
+const network = new StacksTestnet();
+const client = new StackingClient(address, network);
+const options = { limit: 2, offset: 0 };
+
+const rewardHolders = await client.getRewardHoldersForBtcAddress(options);
+// {
+//   limit: 2,
+//   offset: 0,
+//   total: 46,
+//   results: [
+//     {
+//       canonical: true,
+//       burn_block_hash: '0x000000000000002083ca8303a2262d09a824cecb34b78f13a04787e4f05441d3',
+//       burn_block_height: 2004622,
+//       address: 'myfTfju9XSMRusaY2qTitSEMSchsWRA441',
+//       slot_index: 1
+//     },
+//     {
+//       canonical: true,
+//       burn_block_hash: '0x000000000000002083ca8303a2262d09a824cecb34b78f13a04787e4f05441d3',
+//       burn_block_height: 2004622,
+//       address: 'myfTfju9XSMRusaY2qTitSEMSchsWRA441',
+//       slot_index: 0
+//     }
+//   ]
+// };
 ```
