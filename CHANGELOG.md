@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.0.1-beta.2](https://github.com/blockstack/blockstack.js/compare/v2.0.1-beta.1...v2.0.1-beta.2) (2021-08-06)
+
+
+### Bug Fixes
+
+* fix coreNode error when fetching public data with no user session ([144754b](https://github.com/blockstack/blockstack.js/commit/144754b80f05bff1a4656be87d4ab09b4076d37c))
+
+
+
+
+
 ## [2.0.1-beta.1](https://github.com/blockstack/blockstack.js/compare/v2.0.0-beta.1...v2.0.1-beta.1) (2021-07-26)
 
 
@@ -538,4 +549,3 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 * update common package ([2132b08](https://github.com/blockstack/blockstack.js/commit/2132b082fcf67ecb9f2fa2644cf7b68defef322d))
 * update tsconfig and use tsdx ([a82dd0c](https://github.com/blockstack/blockstack.js/commit/a82dd0c84b763e38a6128624ddf9d7ae6f134f78))
 * update tsconfig and use tsdx ([01c8f82](https://github.com/blockstack/blockstack.js/commit/01c8f82f5412770de046f6c0b2b555251fd03273))
-
