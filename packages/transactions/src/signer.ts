@@ -1,4 +1,4 @@
-import { StacksTransaction } from './transaction';
+import { StacksTransaction, StacksMessageType } from './transaction';
 
 import { StacksPrivateKey, StacksPublicKey } from './keys';
 import { isSingleSig, SpendingConditionOpts } from './authorization';
@@ -56,7 +56,7 @@ export class TransactionSigner {
       const spendingCondition = this.transaction.auth.spendingCondition;
       if (
         this.checkOversign &&
-        spendingCondition.fields.length >= spendingCondition.signaturesRequired
+        spendingCondition.fields.filter((field) => field.contents.type === StacksMessageType.MessageSignature).length >= spendingCondition.signaturesRequired
       ) {
         throw new Error('Origin would have too many signatures');
       }
