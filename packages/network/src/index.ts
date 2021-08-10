@@ -13,6 +13,7 @@ export interface StacksNetwork {
   version: TransactionVersion;
   chainId: ChainID;
   bnsLookupUrl: string;
+  readonly coreApiUrl: string;
   broadcastEndpoint: string;
   transferFeeEstimateEndpoint: string;
   accountEndpoint: string;
