@@ -1,6 +1,6 @@
 # @stacks/storage
 
-Store and fetch files with Gaia, the decentralized storage system.
+Store and fetch files with [Gaia](https://docs.stacks.co/build-apps/references/gaia), the decentralized storage system.
 
 ## Installation
 
@@ -10,14 +10,25 @@ npm install @stacks/storage
 
 ## Usage
 
+### Initiate a session
+Users must authenticate to an app before the storage package will work to save or retrieve data on their behalf.
+
+See also [authentication guide](https://docs.stacks.co/build-apps/guides/authentication) using [connect](https://github.com/blockstack/connect#readme) for web apps
+
+The storage capabilities will work in cases `userSession.isUserSignedIn()` returns `true`
+
 ### Initiating a storage client
 
 ```typescript
-import { UserSession } from '@stacks/auth';
+import { UserSession, AppConfig } from '@stacks/auth';
 import { Storage } from '@stacks/storage';
 
+const privateKey = '896adae13a1bf88db0b2ec94339b62382ec6f34cd7e2ff8abae7ec271e05f9d8';
 const appConfig = new AppConfig();
 const userSession = new UserSession({ appConfig });
+userSession.store.getSessionData().userData = <any> {
+  appPrivateKey: privateKey,
+};
 const storage = new Storage({ userSession });
 ```
 
@@ -31,13 +42,15 @@ const myData = JSON.stringify({
   num: 1
 });
 
-storage.putFile('my_data.json', myData));
+const fileUrl = await storage.putFile('my_data.json', myData);
+// You'll need to save an entirely new string of modified data using putFile with the same fileName every time you want to update a record. 
+// There is no separate update method.
 ```
 
 Store data at a different path
 
 ```typescript
-storage.putFile('path/my_data.json', myData));
+const fileUrl = await storage.putFile('path/my_data.json', myData);
 ```
 
 Put file with options
@@ -53,15 +66,14 @@ const putFileOptions = {
   dangerouslyIgnoreEtag: true
 }
 
-storage.putFile('my_data.json', myData, putFileOptions));
+const fileUrl = await storage.putFile('my_data.json', myData, putFileOptions);
 ```
 
 ### Get file
 
 ```typescript
-storage.getFile('my_data.json').then((fileContent) => {
-  console.log(fileContent);
-});
+const fileContent = await storage.getFile('my_data.json');
+console.log(fileContent);
 ```
 
 Get file with options
@@ -73,21 +85,36 @@ const getFileOptions = {
   verify: false
 }
 
-storage.getFile('my_data.json', getFileOptions).then((fileContent) => {
-  console.log(fileContent);
-});
+const fileContent = await storage.getFile('my_data.json', getFileOptions);
+console.log(fileContent);
+```
+
+Get file for other user
+
+```typescript
+// Retrieve public data saved by users other than the one with the active session
+// User should have registered username via BNS
+const options = {
+  username: 'yukan.id',
+  // app: 'https://example.org',
+  decrypt: false,
+};
+// Set an additional app property within options to retrieve data for a user as saved by an app hosted at a separate domain
+
+const fileContent = await storage.getFile('my_data.json', options);
+console.log(fileContent);
 ```
 
 ### Delete file
 
 ```typescript
-storage.deleteFile('my_data.json');
+await storage.deleteFile('my_data.json');
 ```
 
 Delete the file and the corresponding signature file if signed
 
 ```typescript
-storage.deleteFile('my_data.json', { wasSigned: true });
+await storage.deleteFile('my_data.json', { wasSigned: true });
 ```
 
 ### List file
@@ -95,16 +122,17 @@ storage.deleteFile('my_data.json', { wasSigned: true });
 List all files in the user's Gaia hub
 
 ```typescript
-storage.listFiles((filename) => {
+const files: Promise<string | undefined | ArrayBuffer | null>[] = [];
+const options = { decrypt: false };
+await storage.listFiles((filename: string) => {
   if (filename === 'my_data.json') {
-    return storage.getFile(filename).then((fileContent) => {
-      console.log(fileContent);
-      // return false to stop iterating through files
-      return false;
-    })
+    files.push(storage.getFile(filename, options));
+    // return false to stop iterating through files
+    return false;
   } else {
     // return true to continue iterating
     return true;
   }
 });
+const fileContents = await Promise.all(files);
 ```
