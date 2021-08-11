@@ -250,11 +250,23 @@ test('Make Multi-Sig STX token transfer', async () => {
   expect(deserializedPayload.amount.toString()).toBe(amount.toString());
 
   const signer = new TransactionSigner(deserializedTx);
+  // sign once
   signer.signOrigin(privKeys[0]);
-  signer.signOrigin(privKeys[1]);
-  signer.appendOrigin(pubKeys[2]);
 
-  const serializedSignedTx = deserializedTx.serialize();
+  // serialize
+  const partiallySignedSerialized = deserializedTx.serialize();
+
+  // deserialize
+  const bufferReader2 = new BufferReader(partiallySignedSerialized);
+  const partiallySigned = deserializeTransaction(bufferReader2);
+
+  // finish signing with new TransactionSigner
+  const signer2 = new TransactionSigner(partiallySigned);
+  signer2.signOrigin(privKeys[1]);
+  signer2.appendOrigin(pubKeys[2]);
+
+  const serializedSignedTx = partiallySigned.serialize();
+
   const signedTx =
     '00000000010401a23ea89d6529ac48ac766f720e480beec7f19273000000000000000000000000000000000' +
     '00000030200dc8061e63a8ed7ca4712c257299b4bdc3938e34ccc01ce979dd74e5483c4f971053a12680cbf' +

@@ -1,9 +1,9 @@
 import { StacksTransaction } from './transaction';
 
 import { StacksPrivateKey, StacksPublicKey } from './keys';
-import { isSingleSig, SpendingConditionOpts } from './authorization';
+import { isSingleSig, nextVerification, SpendingConditionOpts } from './authorization';
 import { cloneDeep } from './utils';
-import { AuthType, StacksMessageType } from './constants';
+import { AuthType, PubKeyEncoding, StacksMessageType } from './constants';
 import { SigningError } from './errors';
 
 export class TransactionSigner {
@@ -19,6 +19,26 @@ export class TransactionSigner {
     this.originDone = false;
     this.checkOversign = true;
     this.checkOverlap = true;
+
+    // If multi-sig spending condition exists, iterate over
+    // auth fields and reconstruct sigHash
+    let spendingCondition = transaction.auth.spendingCondition;
+    if (spendingCondition && !isSingleSig(spendingCondition)) {
+      spendingCondition.fields.forEach(field => {
+        if (field.contents.type === StacksMessageType.MessageSignature) {
+          const signature = field.contents;
+          const nextVerify = nextVerification(
+            this.sigHash,
+            transaction.auth.authType!,
+            spendingCondition!.fee,
+            spendingCondition!.nonce,
+            PubKeyEncoding.Compressed, // always compressed for multisig
+            signature,
+          );
+          this.sigHash = nextVerify.nextSigHash;
+        }
+      }); 
+    }
   }
 
   static createSponsorSigner(
