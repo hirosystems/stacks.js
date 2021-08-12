@@ -2,7 +2,7 @@ import { StacksTransaction } from './transaction';
 
 import { StacksPrivateKey, StacksPublicKey } from './keys';
 import { isSingleSig, nextVerification, SpendingConditionOpts } from './authorization';
-import { cloneDeep } from './utils';
+import { cloneDeep, txidFromData } from './utils';
 import { AuthType, PubKeyEncoding, StacksMessageType } from './constants';
 import { SigningError } from './errors';
 
@@ -26,10 +26,14 @@ export class TransactionSigner {
     if (spendingCondition && !isSingleSig(spendingCondition)) {
       spendingCondition.fields.forEach(field => {
         if (field.contents.type === StacksMessageType.MessageSignature) {
+          if (!transaction.auth.authType) {
+            throw Error('"transaction.auth.authType" not defined');
+          }
+
           const signature = field.contents;
           const nextVerify = nextVerification(
             this.sigHash,
-            transaction.auth.authType!,
+            transaction.auth.authType,
             spendingCondition!.fee,
             spendingCondition!.nonce,
             PubKeyEncoding.Compressed, // always compressed for multisig
