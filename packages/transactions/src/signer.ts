@@ -24,6 +24,11 @@ export class TransactionSigner {
     // auth fields and reconstruct sigHash
     let spendingCondition = transaction.auth.spendingCondition;
     if (spendingCondition && !isSingleSig(spendingCondition)) {
+
+      if (spendingCondition.fields.length >= spendingCondition.signaturesRequired) {
+        throw new Error('SpendingCondition has more signatures than are expected');
+      }
+
       spendingCondition.fields.forEach(field => {
         if (field.contents.type === StacksMessageType.MessageSignature) {
           if (!transaction.auth.authType) {
