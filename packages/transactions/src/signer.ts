@@ -119,8 +119,8 @@ export class TransactionSigner {
     if (this.transaction.auth === undefined) {
       throw new SigningError('"transaction.auth" is undefined');
     }
-    if (this.transaction.auth.sponsorSpendingCondition === undefined) {
-      throw new SigningError('"transaction.auth.spendingCondition" is undefined');
+    if (this.transaction.auth.authType !== AuthType.Sponsored) {
+      throw new SigningError('"transaction.auth.authType" is not AuthType.Sponsored');
     }
 
     const nextSighash = this.transaction.signNextSponsor(this.sigHash, privateKey);

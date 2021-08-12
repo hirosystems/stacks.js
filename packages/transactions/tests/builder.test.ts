@@ -30,7 +30,7 @@ import { BufferReader } from '../src/bufferReader';
 
 import { createAssetInfo } from '../src/types';
 
-import { createTransactionAuthField, MultiSigSpendingCondition, nextSignature, SingleSigSpendingCondition } from '../src/authorization';
+import { createTransactionAuthField, MultiSigSpendingCondition, nextSignature, SingleSigSpendingCondition, SponsoredAuthorization } from '../src/authorization';
 
 import {
   DEFAULT_CORE_NODE_API_URL,
@@ -867,7 +867,7 @@ test('Make sponsored STX token transfer', async () => {
   expect(deserializedSponsorTx.auth.spendingCondition!.nonce!.toString()).toBe(nonce.toString());
   expect(deserializedSponsorTx.auth.spendingCondition!.fee!.toString()).toBe(fee.toString());
 
-  const deserializedSponsorSpendingCondition = deserializedSponsorTx.auth.sponsorSpendingCondition!;
+  const deserializedSponsorSpendingCondition = (deserializedSponsorTx.auth as SponsoredAuthorization).sponsorSpendingCondition!;
   expect(deserializedSponsorSpendingCondition.hashMode).toBe(addressHashMode);
   expect(deserializedSponsorSpendingCondition.nonce!.toString()).toBe(sponsorNonce.toString());
   expect(deserializedSponsorSpendingCondition.fee!.toString()).toBe(sponsorFee.toString());
@@ -929,7 +929,7 @@ test('Make sponsored STX token transfer with sponsor fee estimate', async () => 
   expect(deserializedSponsorTx.auth.spendingCondition!.nonce!.toString()).toBe(nonce.toString());
   expect(deserializedSponsorTx.auth.spendingCondition!.fee!.toString()).toBe(fee.toString());
 
-  const deserializedSponsorSpendingCondition = deserializedSponsorTx.auth.sponsorSpendingCondition!;
+  const deserializedSponsorSpendingCondition = (deserializedSponsorTx.auth as SponsoredAuthorization).sponsorSpendingCondition!;
   expect(deserializedSponsorSpendingCondition.hashMode).toBe(addressHashMode);
   expect(deserializedSponsorSpendingCondition.nonce!.toString()).toBe(sponsorNonce.toString());
   expect(deserializedSponsorSpendingCondition.fee!.toString()).toBe(sponsorFee.toString());
@@ -981,7 +981,7 @@ test('Make sponsored STX token transfer with set tx fee', async () => {
   expect(deserializedSponsorTx.auth.spendingCondition!.nonce!.toString()).toBe(nonce.toString());
   expect(deserializedSponsorTx.auth.spendingCondition!.fee!.toString()).toBe(fee.toString());
 
-  const deserializedSponsorSpendingCondition = deserializedSponsorTx.auth.sponsorSpendingCondition!;
+  const deserializedSponsorSpendingCondition = (deserializedSponsorTx.auth as SponsoredAuthorization).sponsorSpendingCondition!;
   expect(deserializedSponsorSpendingCondition.nonce!.toString()).toBe(sponsorNonce.toString());
   expect(deserializedSponsorSpendingCondition.fee!.toString()).toBe(sponsorFee.toString());
 
@@ -1038,7 +1038,7 @@ test('Make sponsored contract deploy with sponsor fee estimate', async () => {
   expect(deserializedSponsorTx.auth.spendingCondition!.nonce!.toString()).toBe(nonce.toString());
   expect(deserializedSponsorTx.auth.spendingCondition!.fee!.toString()).toBe(fee.toString());
 
-  const deserializedSponsorSpendingCondition = deserializedSponsorTx.auth.sponsorSpendingCondition!;
+  const deserializedSponsorSpendingCondition = (deserializedSponsorTx.auth as SponsoredAuthorization).sponsorSpendingCondition!;
   expect(deserializedSponsorSpendingCondition.hashMode).toBe(addressHashMode);
   expect(deserializedSponsorSpendingCondition.nonce!.toString()).toBe(sponsorNonce.toString());
   expect(deserializedSponsorSpendingCondition.fee!.toString()).toBe(sponsorFee.toString());
@@ -1099,7 +1099,7 @@ test('Make sponsored contract call with sponsor nonce fetch', async () => {
   expect(deserializedSponsorTx.auth.spendingCondition!.nonce!.toString()).toBe(nonce.toString());
   expect(deserializedSponsorTx.auth.spendingCondition!.fee!.toString()).toBe(fee.toString());
 
-  const deserializedSponsorSpendingCondition = deserializedSponsorTx.auth.sponsorSpendingCondition!;
+  const deserializedSponsorSpendingCondition = (deserializedSponsorTx.auth as SponsoredAuthorization).sponsorSpendingCondition!;
   expect(deserializedSponsorSpendingCondition.hashMode).toBe(addressHashMode);
   expect(deserializedSponsorSpendingCondition.nonce!.toString()).toBe(sponsorNonce.toString());
   expect(deserializedSponsorSpendingCondition.fee!.toString()).toBe(sponsorFee.toString());
