@@ -10,10 +10,10 @@ import {
 } from './payload';
 
 import {
-  StandardAuthorization,
-  SponsoredAuthorization,
   createSingleSigSpendingCondition,
   createMultiSigSpendingCondition,
+  createSponsoredAuth,
+  createStandardAuth,
 } from './authorization';
 
 import {
@@ -517,9 +517,9 @@ export async function makeUnsignedSTXTokenTransfer(
   }
 
   if (options.sponsored) {
-    authorization = new SponsoredAuthorization(spendingCondition);
+    authorization = createSponsoredAuth(spendingCondition);
   } else {
-    authorization = new StandardAuthorization(spendingCondition);
+    authorization = createStandardAuth(spendingCondition);
   }
 
   const postConditions: PostCondition[] = [];
@@ -717,9 +717,9 @@ export async function makeContractDeploy(
   );
 
   if (options.sponsored) {
-    authorization = new SponsoredAuthorization(spendingCondition);
+    authorization = createSponsoredAuth(spendingCondition);
   } else {
-    authorization = new StandardAuthorization(spendingCondition);
+    authorization = createStandardAuth(spendingCondition);
   }
 
   const postConditions: PostCondition[] = [];
@@ -930,9 +930,9 @@ export async function makeUnsignedContractCall(
   }
 
   if (options.sponsored) {
-    authorization = new SponsoredAuthorization(spendingCondition);
+    authorization = createSponsoredAuth(spendingCondition);
   } else {
-    authorization = new StandardAuthorization(spendingCondition);
+    authorization = createStandardAuth(spendingCondition);
   }
 
   const postConditions: PostCondition[] = [];
