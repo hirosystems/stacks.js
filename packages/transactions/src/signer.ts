@@ -34,16 +34,12 @@ export class TransactionSigner {
 
       spendingCondition.fields.forEach(field => {
         if (field.contents.type === StacksMessageType.MessageSignature) {
-          if (!transaction.auth.authType) {
-            throw Error('"transaction.auth.authType" not defined');
-          }
-
           const signature = field.contents;
           const nextVerify = nextVerification(
             this.sigHash,
             transaction.auth.authType,
-            spendingCondition!.fee,
-            spendingCondition!.nonce,
+            spendingCondition.fee,
+            spendingCondition.nonce,
             PubKeyEncoding.Compressed, // always compressed for multisig
             signature
           );
