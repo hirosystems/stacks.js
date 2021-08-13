@@ -196,7 +196,7 @@ export class StacksTransaction {
       throw new SigningError('Cannot sponsor sign a non-sponsored transaction');
     }
 
-    setSponsor(this.auth, sponsorSpendingCondition);
+    this.auth = setSponsor(this.auth, sponsorSpendingCondition);
   }
 
   /**
@@ -205,7 +205,7 @@ export class StacksTransaction {
    * @param fee - the fee amount in microstacks
    */
   setFee(amount: IntegerType) {
-    setFee(this.auth, amount);
+    this.auth = setFee(this.auth, amount);
   }
 
   /**
@@ -214,7 +214,7 @@ export class StacksTransaction {
    * @param nonce - the nonce value
    */
   setNonce(nonce: IntegerType) {
-    setNonce(this.auth, nonce);
+    this.auth = setNonce(this.auth, nonce);
   }
 
   /**
@@ -227,7 +227,7 @@ export class StacksTransaction {
       throw new SigningError('Cannot sponsor sign a non-sponsored transaction');
     }
 
-    setSponsorNonce(this.auth, nonce);
+    this.auth = setSponsorNonce(this.auth, nonce);
   }
 
   serialize(): Buffer {
