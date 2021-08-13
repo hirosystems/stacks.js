@@ -559,14 +559,20 @@ export function verifyOrigin(auth: Authorization, initialSigHash: string): strin
   }
 }
 
-export function setFee(auth: Authorization, amount: IntegerType) {
+export function setFee(auth: Authorization, amount: IntegerType): Authorization {
   switch (auth.authType) {
     case AuthType.Standard:
-      auth.spendingCondition.fee = intToBigInt(amount, false);
-      break;
+      let spendingCondition = {
+        ...auth.spendingCondition,
+        fee: intToBigInt(amount, false),
+      };
+      return { ...auth, spendingCondition };
     case AuthType.Sponsored:
-      auth.sponsorSpendingCondition.fee = intToBigInt(amount, false);
-      break;
+      let sponsorSpendingCondition = {
+        ...auth.sponsorSpendingCondition,
+        fee: intToBigInt(amount, false),
+      };
+      return { ...auth, sponsorSpendingCondition };
   }
 }
 
@@ -579,22 +585,43 @@ export function getFee(auth: Authorization): bigint {
   }
 }
 
-export function setNonce(auth: Authorization, nonce: IntegerType) {
-  auth.spendingCondition.nonce = intToBigInt(nonce, false);
+export function setNonce(auth: Authorization, nonce: IntegerType): Authorization {
+  let spendingCondition = {
+    ...auth.spendingCondition,
+    nonce: intToBigInt(nonce, false),
+  };
+
+  return {
+    ...auth,
+    spendingCondition,
+  };
 }
 
-export function setSponsorNonce(auth: SponsoredAuthorization, nonce: IntegerType) {
-  auth.sponsorSpendingCondition.nonce = intToBigInt(nonce, false);
+export function setSponsorNonce(auth: SponsoredAuthorization, nonce: IntegerType): Authorization {
+  let sponsorSpendingCondition = {
+    ...auth.sponsorSpendingCondition,
+    nonce: intToBigInt(nonce, false),
+  };
+
+  return {
+    ...auth,
+    sponsorSpendingCondition,
+  };
 }
 
 export function setSponsor(
   auth: SponsoredAuthorization,
   sponsorSpendingCondition: SpendingConditionOpts
-) {
-  auth.sponsorSpendingCondition = {
+): Authorization {
+  let sc = {
     ...sponsorSpendingCondition,
     nonce: intToBigInt(sponsorSpendingCondition.nonce, false),
     fee: intToBigInt(sponsorSpendingCondition.fee, false),
+  };
+
+  return {
+    ...auth,
+    sponsorSpendingCondition: sc,
   };
 }
 
