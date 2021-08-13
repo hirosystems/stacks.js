@@ -517,19 +517,12 @@ export function createSponsoredAuth(
   spendingCondition: SpendingCondition,
   sponsorSpendingCondition?: SpendingCondition
 ): Authorization {
-  if (!sponsorSpendingCondition) {
-    sponsorSpendingCondition = createSingleSigSpendingCondition(
-      AddressHashMode.SerializeP2PKH,
-      '0'.repeat(66),
-      0,
-      0
-    );
-  }
-
   return {
     authType: AuthType.Sponsored,
     spendingCondition,
-    sponsorSpendingCondition,
+    sponsorSpendingCondition: sponsorSpendingCondition
+      ? sponsorSpendingCondition
+      : createSingleSigSpendingCondition(AddressHashMode.SerializeP2PKH, '0'.repeat(66), 0, 0),
   };
 }
 
