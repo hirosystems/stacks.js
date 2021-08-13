@@ -529,7 +529,7 @@ export function createSponsoredAuth(
   return {
     authType: AuthType.Sponsored,
     spendingCondition,
-    sponsorSpendingCondition
+    sponsorSpendingCondition,
   };
 }
 
@@ -539,10 +539,7 @@ export function intoInitialSighashAuth(auth: Authorization): Authorization {
       case AuthType.Standard:
         return createStandardAuth(clearCondition(auth.spendingCondition));
       case AuthType.Sponsored:
-        return createSponsoredAuth(
-          clearCondition(auth.spendingCondition),
-          newInitialSigHash()
-        );
+        return createSponsoredAuth(clearCondition(auth.spendingCondition), newInitialSigHash());
       default:
         throw new SigningError('Unexpected authorization type for signing');
     }
@@ -590,7 +587,10 @@ export function setSponsorNonce(auth: SponsoredAuthorization, nonce: IntegerType
   auth.sponsorSpendingCondition.nonce = intToBigInt(nonce, false);
 }
 
-export function setSponsor(auth: SponsoredAuthorization, sponsorSpendingCondition: SpendingConditionOpts) {
+export function setSponsor(
+  auth: SponsoredAuthorization,
+  sponsorSpendingCondition: SpendingConditionOpts
+) {
   auth.sponsorSpendingCondition = {
     ...sponsorSpendingCondition,
     nonce: intToBigInt(sponsorSpendingCondition.nonce, false),
