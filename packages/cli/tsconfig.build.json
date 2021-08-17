@@ -25,6 +25,9 @@
     },
     {
       "path": "../transactions/tsconfig.build.json"
+    },
+    {
+      "path": "../wallet-sdk/tsconfig.build.json"
     }
   ],
   "include": ["src/**/*"]
