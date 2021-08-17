@@ -36,7 +36,7 @@
   },
   "dependencies": {
     "@stacks/common": "^2.0.1",
-    "@stacks/network": "^1.2.2",
+    "@stacks/network": "^2.0.1",
     "@stacks/transactions": "^2.0.1",
     "jsontokens": "^3.0.0",
     "schema-inspector": "^2.0.1",
