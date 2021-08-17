@@ -24,7 +24,11 @@ export const getProfileURLFromZoneFile = async (name: string) => {
   if (res.ok) {
     const nameInfo: NameInfoResponse = await res.json();
     const zone = parseZoneFile(nameInfo.zonefile);
-    return zone.uri[0].target;
+    const uri = zone.uri?.[0]?.target;
+    if (uri) {
+      return uri;
+    }
+    throw new Error(`No zonefile uri found: ${nameInfo.zonefile}`);
   }
   return;
 };

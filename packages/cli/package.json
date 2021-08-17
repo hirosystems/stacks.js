@@ -112,7 +112,7 @@
     "node-fetch": "^2.6.0",
     "ripemd160": "^2.0.1",
     "winston": "^3.2.1",
-    "zone-file": "^1.0.0"
+    "zone-file": "^2.0.0-beta.3"
   },
   "gitHead": "77b4d6d531b74996e4b7a0cbd1cf5b8358a690ce"
 }
