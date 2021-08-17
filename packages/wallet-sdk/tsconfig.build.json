@@ -22,6 +22,9 @@
     },
     {
       "path": "../transactions/tsconfig.build.json"
+    },
+    {
+      "path": "../network/tsconfig.build.json"
     }
   ],
   "include": ["src/**/*"]

@@ -88,13 +88,14 @@
     "typescript": "^4.2.4"
   },
   "dependencies": {
-    "@stacks/auth": "^1.2.3",
+    "@stacks/auth": "^2.0.1",
     "@stacks/blockchain-api-client": "^0.34.1",
     "@stacks/common": "^2.0.1",
-    "@stacks/network": "^1.2.2",
+    "@stacks/network": "^2.0.1",
     "@stacks/stacking": "^2.0.1",
     "@stacks/storage": "^2.0.1",
     "@stacks/transactions": "^2.0.1",
+    "@stacks/wallet-sdk": "^2.0.1",
     "ajv": "^4.11.5",
     "bip32": "^2.0.4",
     "bip39": "^3.0.2",
@@ -111,7 +112,7 @@
     "node-fetch": "^2.6.0",
     "ripemd160": "^2.0.1",
     "winston": "^3.2.1",
-    "zone-file": "^1.0.0"
+    "zone-file": "^2.0.0-beta.3"
   },
   "gitHead": "77b4d6d531b74996e4b7a0cbd1cf5b8358a690ce"
 }

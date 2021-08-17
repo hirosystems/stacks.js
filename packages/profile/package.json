@@ -36,11 +36,11 @@
   },
   "dependencies": {
     "@stacks/common": "^2.0.1",
-    "@stacks/network": "^1.2.2",
+    "@stacks/network": "^2.0.1",
     "@stacks/transactions": "^2.0.1",
     "jsontokens": "^3.0.0",
     "schema-inspector": "^2.0.1",
-    "zone-file": "^1.0.0"
+    "zone-file": "^2.0.0-beta.3"
   },
   "devDependencies": {
     "@types/jest": "^26.0.22",
