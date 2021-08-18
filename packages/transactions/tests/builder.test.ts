@@ -22,7 +22,7 @@ import {
   makeUnsignedContractCall
 } from '../src/builders';
 
-import { deserializeTransaction } from '../src/transaction';
+import { deserializeTransaction, StacksTransaction } from '../src/transaction';
 
 import { TokenTransferPayload } from '../src/payload';
 
@@ -30,7 +30,15 @@ import { BufferReader } from '../src/bufferReader';
 
 import { createAssetInfo } from '../src/types';
 
-import { createTransactionAuthField, MultiSigSpendingCondition, nextSignature, SingleSigSpendingCondition, SponsoredAuthorization } from '../src/authorization';
+import {
+  createMessageSignature,
+  createTransactionAuthField,
+  isSingleSig,
+  MultiSigSpendingCondition,
+  nextSignature,
+  SingleSigSpendingCondition,
+  SponsoredAuthorization
+} from '../src/authorization';
 
 import {
   DEFAULT_CORE_NODE_API_URL,
@@ -52,6 +60,21 @@ import { ClarityAbi } from '../src/contract-abi';
 import { createStacksPrivateKey, isCompressed, pubKeyfromPrivKey, publicKeyToString } from '../src/keys';
 import { TransactionSigner } from '../src/signer';
 import fetchMock from 'jest-fetch-mock';
+import { cloneDeep } from '../src/utils';
+
+function setSignature(unsignedTransaction: StacksTransaction, signature: string | Buffer): StacksTransaction {
+  const parsedSig = typeof signature === 'string' ? signature : signature.toString('hex');
+  const tx = cloneDeep(unsignedTransaction);
+  if (!tx.auth.spendingCondition) {
+    throw new Error('Cannot set signature on transaction without spending condition');
+  }
+  if (isSingleSig(tx.auth.spendingCondition)) {
+    tx.auth.spendingCondition.signature = createMessageSignature(parsedSig);
+    return tx;
+  } else {
+    throw new Error('Cannot set signature on multi-sig transaction');
+  }
+}
 
 beforeEach(() => {
   fetchMock.resetMocks();
@@ -468,7 +491,7 @@ test('addSignature to an unsigned transaction', async () => {
 
   const sig =
     '00e4ee626905ee9d04b786e2942a69504dcc0f35ca79b86fb0aafcd47a81fc3bf1547e302c3acf5c89d935a53df334316e6fcdc203cf6bed91288ebf974385398c';
-  const signedTx = unsignedTx.createTxWithSignature(sig);
+  const signedTx = setSignature(unsignedTx, sig);
   expect((signedTx.auth.spendingCondition as SingleSigSpendingCondition).signature.data).toEqual(
     sig
   );
@@ -695,7 +718,7 @@ test('addSignature to an unsigned contract call transaction', async () => {
 
   const sig =
     '00e4ee626905ee9d04b786e2942a69504dcc0f35ca79b86fb0aafcd47a81fc3bf1547e302c3acf5c89d935a53df334316e6fcdc203cf6bed91288ebf974385398c';
-  const signedTx = unsignedTx.createTxWithSignature(sig);
+  const signedTx = setSignature(unsignedTx, sig);
   expect((signedTx.auth.spendingCondition as SingleSigSpendingCondition).signature.data).toEqual(
     sig
   );
