@@ -1,9 +1,9 @@
-import { StacksTransaction, StacksMessageType } from './transaction';
+import { StacksTransaction } from './transaction';
 
 import { StacksPrivateKey, StacksPublicKey } from './keys';
 import { isSingleSig, SpendingConditionOpts } from './authorization';
 import { cloneDeep } from './utils';
-import { AuthType } from './constants';
+import { AuthType, StacksMessageType } from './constants';
 import { SigningError } from './errors';
 
 export class TransactionSigner {
