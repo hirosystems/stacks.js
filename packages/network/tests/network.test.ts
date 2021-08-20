@@ -25,10 +25,4 @@ describe('Setting coreApiUrl', () => {
     const customNET = new StacksMainnet({ url: customURL });
     expect(customNET.coreApiUrl).toEqual(customURL);
   });
-  test('it prevents changing url after initialisation', () => {
-    const network = new StacksMainnet({ url: 'https://legiturl.com' });
-    // @ts-ignore
-    expect(() => (network.coreApiUrl = 'https://dodgyurl.com')).toThrowError();
-    expect(network.coreApiUrl).toEqual('https://legiturl.com');
-  });
 });

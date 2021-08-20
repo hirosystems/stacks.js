@@ -377,8 +377,9 @@ function balance(network: CLINetworkAdapter, args: string[]): Promise<string> {
   }
 
   // temporary hack to use network config from stacks-transactions lib
-  const txNetwork = network.isMainnet() ? new StacksMainnet() : new StacksTestnet();
-  txNetwork.coreApiUrl = network.legacyNetwork.blockstackAPIUrl;
+  const txNetwork = network.isMainnet()
+    ? new StacksMainnet({ url: network.legacyNetwork.blockstackAPIUrl })
+    : new StacksTestnet({ url: network.legacyNetwork.blockstackAPIUrl });
 
   return fetch(txNetwork.getAccountApiUrl(address))
     .then(response => {
@@ -570,8 +571,9 @@ async function sendTokens(network: CLINetworkAdapter, args: string[]): Promise<s
   }
 
   // temporary hack to use network config from stacks-transactions lib
-  const txNetwork = network.isMainnet() ? new StacksMainnet() : new StacksTestnet();
-  txNetwork.coreApiUrl = network.legacyNetwork.blockstackAPIUrl;
+  const txNetwork = network.isMainnet()
+    ? new StacksMainnet({ url: network.legacyNetwork.blockstackAPIUrl })
+    : new StacksTestnet({ url: network.legacyNetwork.blockstackAPIUrl });
 
   const options: SignedTokenTransferOptions = {
     recipient: recipientAddress,
@@ -630,8 +632,9 @@ async function contractDeploy(network: CLINetworkAdapter, args: string[]): Promi
   const source = fs.readFileSync(sourceFile).toString();
 
   // temporary hack to use network config from stacks-transactions lib
-  const txNetwork = network.isMainnet() ? new StacksMainnet() : new StacksTestnet();
-  txNetwork.coreApiUrl = network.legacyNetwork.blockstackAPIUrl;
+  const txNetwork = network.isMainnet()
+    ? new StacksMainnet({ url: network.legacyNetwork.blockstackAPIUrl })
+    : new StacksTestnet({ url: network.legacyNetwork.blockstackAPIUrl });
 
   const options: ContractDeployOptions = {
     contractName,
@@ -690,8 +693,9 @@ async function contractFunctionCall(network: CLINetworkAdapter, args: string[]):
   const privateKey = args[5];
 
   // temporary hack to use network config from stacks-transactions lib
-  const txNetwork = network.isMainnet() ? new StacksMainnet() : new StacksTestnet();
-  txNetwork.coreApiUrl = network.legacyNetwork.blockstackAPIUrl;
+  const txNetwork = network.isMainnet()
+    ? new StacksMainnet({ url: network.legacyNetwork.blockstackAPIUrl })
+    : new StacksTestnet({ url: network.legacyNetwork.blockstackAPIUrl });
 
   let abi: ClarityAbi;
   let abiArgs: ClarityFunctionArg[];
@@ -776,8 +780,9 @@ async function readOnlyContractFunctionCall(
   const senderAddress = args[3];
 
   // temporary hack to use network config from stacks-transactions lib
-  const txNetwork = network.isMainnet() ? new StacksMainnet() : new StacksTestnet();
-  txNetwork.coreApiUrl = network.legacyNetwork.blockstackAPIUrl;
+  const txNetwork = network.isMainnet()
+    ? new StacksMainnet({ url: network.legacyNetwork.blockstackAPIUrl })
+    : new StacksTestnet({ url: network.legacyNetwork.blockstackAPIUrl });
 
   let abi: ClarityAbi;
   let abiArgs: ClarityFunctionArg[];

@@ -57,18 +57,13 @@ export class StacksMainnet implements StacksNetwork {
   accountEndpoint = '/v2/accounts';
   contractAbiEndpoint = '/v2/contracts/interface';
   readOnlyFunctionCallEndpoint = '/v2/contracts/call-read';
-  private _coreApiUrl: string;
 
-  get coreApiUrl() {
-    return this._coreApiUrl;
-  }
-  set coreApiUrl(_url: string) {
-    throw new Error('Cannot modify property `coreApiUrl` after object initialization');
-  }
+  readonly coreApiUrl: string;
 
   constructor(networkUrl: NetworkConfig = { url: HIRO_MAINNET_DEFAULT }) {
-    this._coreApiUrl = networkUrl.url;
+    this.coreApiUrl = networkUrl.url;
   }
+
   isMainnet = () => this.version === TransactionVersion.Mainnet;
   getBroadcastApiUrl = () => `${this.coreApiUrl}${this.broadcastEndpoint}`;
   getTransferFeeEstimateApiUrl = () => `${this.coreApiUrl}${this.transferFeeEstimateEndpoint}`;
