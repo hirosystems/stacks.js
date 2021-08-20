@@ -27,7 +27,7 @@ const mocknet = new StacksMocknet();
 Setting a custom node URL
 
 ```typescript
-network.coreApiUrl = 'https://www.mystacksnode.com/';
+const network = new StacksMainnet({ url: 'https://www.mystacksnode.com/' });
 ```
 
 Check if network is mainnet
@@ -54,22 +54,26 @@ const transaction = await makeSTXTokenTransfer(txOptions);
 Get various API URLs
 
 ```typescript
-  const txBroadcastUrl = network.getBroadcastApiUrl();
+const txBroadcastUrl = network.getBroadcastApiUrl();
 
-  const feeEstimateUrl = network.getTransferFeeEstimateApiUrl();
+const feeEstimateUrl = network.getTransferFeeEstimateApiUrl();
 
-  const address = 'SP2BS6HD7TN34V8Z5BNF8Q2AW3K8K2DPV4264CF26';
-  const accountInfoUrl = network.getAccountApiUrl(address);
+const address = 'SP2BS6HD7TN34V8Z5BNF8Q2AW3K8K2DPV4264CF26';
+const accountInfoUrl = network.getAccountApiUrl(address);
 
-  const contractName = 'hello_world';
-  const abiUrl = network.getAbiApiUrl(address, contractName);
+const contractName = 'hello_world';
+const abiUrl = network.getAbiApiUrl(address, contractName);
 
-  const functionName = 'hello';
-  const readOnlyFunctionCallUrl = network.getReadOnlyFunctionCallApiUrl(address, contractName, functionName);
+const functionName = 'hello';
+const readOnlyFunctionCallUrl = network.getReadOnlyFunctionCallApiUrl(
+  address,
+  contractName,
+  functionName
+);
 
-  const nodeInfoUrl = network.getInfoUrl();
+const nodeInfoUrl = network.getInfoUrl();
 
-  const blockTimeUrl = network.getBlockTimeInfoUrl();
+const blockTimeUrl = network.getBlockTimeInfoUrl();
 
-  const poxInfoUrl = network.getPoxInfoUrl();
+const poxInfoUrl = network.getPoxInfoUrl();
 ```
