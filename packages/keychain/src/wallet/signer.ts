@@ -67,9 +67,7 @@ export class WalletSigner {
   }
 
   getNetwork() {
-    const network = new StacksTestnet();
-    network.coreApiUrl = 'https://sidecar.staging.blockstack.xyz';
-    return network;
+    return new StacksTestnet();
   }
 
   async fetchAccount({
