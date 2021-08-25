@@ -833,6 +833,21 @@ export class Storage {
   }
 }
 
+type FileUrlOptions = {
+  path: string;
+  username: string;
+  appOrigin: string;
+  zoneFileLookupURL: string;
+};
+export function getUserAppFileUrl(options: FileUrlOptions): Promise<string | undefined> {
+  return new Storage({}).getUserAppFileUrl(
+    options.path,
+    options.username,
+    options.appOrigin,
+    options.zoneFileLookupURL
+  );
+}
+
 /**
  * @param {Object} [options=null] - options object
  * @param {String} options.username - the Blockstack ID to lookup for multi-player storage
