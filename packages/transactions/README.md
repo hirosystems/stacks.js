@@ -177,7 +177,7 @@ import {
 } from '@stacks/transactions';
 import { StacksTestnet, StacksMainnet } from '@stacks/network';
 
-const bufferReader = new BufferReader(Buffer.from(serializedTx));
+const bufferReader = new BufferReader(Buffer.from(serializedTx, 'hex'));
 const deserializedTx = deserializeTransaction(bufferReader);
 const sponsorKey = '770287b9471081c8acd37d57190c7a70f0da2633311cc120853537362d32e67c01';
 const fee = 1000n;

@@ -84,13 +84,13 @@ yarn add @stacks/wallet-sdk
 
 By default, a random 24-word Secret Key is generated, using 256 bits of entropy. You can generate a random 12-word key by passing `128` as the `entropy` argument.
 
-```ts
+```typescript
 import { generateSecretKey } from '@stacks/wallet-sdk';
 
-generateSecretKey();
+const secretKey = generateSecretKey();
 // aunt birth lounge misery utility blind holiday walnut fuel make gift parent gap picnic exact various express sphere family nerve oil drill engage youth
 
-generateSecretKey(128);
+const secretKey128 = generateSecretKey(128);
 // winter crash infant long upset beauty cram tank short remove decade ladder
 ```
 
@@ -98,7 +98,7 @@ generateSecretKey(128);
 
 Create a random Secret Key and a `Wallet` object. When a wallet is generated, the first account is automatically generated as well.
 
-```ts
+```typescript
 import { generateWallet, generateSecretKey } from '@stacks/wallet-sdk';
 
 const password = 'password';
@@ -133,7 +133,7 @@ Accounts allow users to use separate Stacks addresses from within the same walle
 
 When using `generateNewAccount`, the new account is created with next index, based on the existing accounts in a wallet. For example, if a wallet has 5 accounts, calling `generateNewAccount` will make the sixth account.
 
-```ts
+```typescript
 import { generateNewAccount } from '@stacks/wallet-sdk';
 
 const account = generateNewAccount(wallet);
@@ -141,7 +141,7 @@ const account = generateNewAccount(wallet);
 
 An `Account` is a JavaScript object with these properties:
 
-```ts
+```typescript
 interface Account {
   /** The private key used for STX payments */
   stxPrivateKey: string;
@@ -166,7 +166,7 @@ When a user restores their wallet in a new app, you can automatically restore an
 
 The private keys used to encrypt this data is derived from the path `m/44/5757'/0'/1`. This data is stored in [Gaia](https://docs.blockstack.org/build-apps/references/gaia), the decentralized storage system in the Stacks network. Users can host their own Gaia hub, and this library's API can use that Gaia hub, if provided.
 
-```ts
+```typescript
 import { restoreWalletAccounts } from '@stacks/wallet-sdk';
 
 const restoredWallet = await restoreWalletAccounts({
@@ -180,7 +180,7 @@ const restoredWallet = await restoreWalletAccounts({
 
 With an account, you can generate an authentication response, which conforms to the Stacks authentication protocol. The resulting `authResponse` is a string, representing a signed JSON web token. [Learn more about the authentication protocol](https://docs.blockstack.org/build-apps/guides/authentication#authresponse-payload-schema).
 
-```ts
+```typescript
 // The transit public key is provided in an "authentication request"
 const transitPublicKey = 'xxxx';
 
@@ -200,7 +200,7 @@ This library is meant to be used in conjunction with the [`@stacks/transactions`
 
 #### Getting an account's STX address
 
-```ts
+```typescript
 import { getStxAddress } from '@stacks/wallet-sdk';
 import { TransactionVersion } from '@stacks/transactions';
 
@@ -217,7 +217,6 @@ You can generate signed transactions by following the documentation from `@stack
 
 ```ts
 import { makeSTXTokenTransfer, StacksMainnet } from '@stacks/transactions';
-const BigNum = require('bn.js');
 
 const network = new StacksMainnet();
 
@@ -226,7 +225,7 @@ const account = wallet.accounts[0];
 
 const txOptions = {
   recipient: 'SP3FGQ8Z7JY9BWYZ5WM53E0M9NK7WHJF0691NZ159',
-  amount: new BigNum(12345),
+  amount: 12345n,
   senderKey: account.stxPrivateKey,
   network,
 };

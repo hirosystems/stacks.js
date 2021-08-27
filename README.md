@@ -13,6 +13,7 @@ This repo is home to the Stacks.js libraries which provide everything you need t
 - [`@stacks/profile`](https://github.com/blockstack/stacks.js/tree/master/packages/profile) Functions for manipulating user profiles.
 - [`@stacks/common`](https://github.com/blockstack/stacks.js/tree/master/packages/common) Common utilities used by Stacks.js packages.
 - [`@stacks/bns`](https://github.com/blockstack/stacks.js/tree/master/packages/bns) Library for interacting with the BNS contract.
+- [`@stacks/wallet-sdk`](https://github.com/blockstack/stacks.js/tree/master/packages/wallet-sdk) Library for building wallets for the Stacks blockchain.
 
 See `README` in each package directory for installation instructions and usage.
 
