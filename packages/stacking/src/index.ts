@@ -22,6 +22,7 @@ import {
   someCV,
   validateStacksAddress,
   AnchorMode,
+  getFee,
 } from '@stacks/transactions';
 import {
   BurnchainRewardListResponse,
@@ -748,7 +749,7 @@ export class StackingClient {
    * @returns {StacksTransaction} that resolves to a transaction object if the operation succeeds
    */
   modifyLockTxFee({ tx, amountMicroStx }: { tx: StacksTransaction; amountMicroStx: IntegerType }) {
-    const fee = tx.auth.getFee();
+    const fee = getFee(tx.auth);
     (tx.payload as ContractCallPayload).functionArgs[0] = uintCV(
       intToBigInt(amountMicroStx, false) - fee
     );
