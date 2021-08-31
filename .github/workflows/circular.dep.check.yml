@@ -1,0 +1,37 @@
+name: Circular dependency checks
+
+on:
+  push:
+    branches:
+      - '**'
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    env:
+      NODE_OPTIONS: --max-old-space-size=4096
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set Node Version
+        uses: actions/setup-node@v2
+        with:
+          node-version: 16
+
+      - name: Restore lerna cache
+        uses: actions/cache@v2
+        with:
+          path: |
+            node_modules
+            packages/*/node_modules
+          key: ${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
+
+      - name: Install dependencies
+        run: npm i
+
+      - name: Bootstrap
+        run: npm run bootstrap
+
+      - name: List circular dependencies
+        continue-on-error: true
+        run: npm run madge

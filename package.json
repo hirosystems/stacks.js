@@ -45,6 +45,7 @@
     "eslint-plugin-import": "^2.22.1",
     "eslint-plugin-node": "^11.1.0",
     "lerna": "^3.22.1",
+    "madge": "^5.0.1",
     "prettier": "^2.2.1",
     "rimraf": "^3.0.2",
     "typedoc": "^0.20.35",
@@ -62,6 +63,7 @@
     "lint:prettier:fix": "prettier --write \"packages/**/src/**/*.{ts,tsx|!(d.ts)}\" *.js",
     "build:docs": "rimraf docs && typedoc --name \"Stacks.js $npm_package_version Library Reference\" --readme ./readme.md --tsconfig tsconfig.typedoc.json --out docs --json docs/docs.json packages/**/src/index.ts",
     "test": "lerna run test",
-    "typecheck": "lerna run typecheck --parallel --no-bail --stream"
+    "typecheck": "lerna run typecheck --parallel --no-bail --stream",
+    "madge": "madge --circular --extensions ts --exclude 'd.ts'  packages/"
   }
 }
