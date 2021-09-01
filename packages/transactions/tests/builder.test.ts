@@ -268,6 +268,45 @@ test('Make Multi-Sig STX token transfer', async () => {
   expect(serializedSignedTx.toString('hex')).toBe(signedTx);
 });
 
+test('Should throw error if multisig transaction is oversigned', async () => {
+  const recipient = standardPrincipalCV('SP3FGQ8Z7JY9BWYZ5WM53E0M9NK7WHJF0691NZ159');
+  const amount = 2500000;
+  const fee = 0;
+  const nonce = 0;
+  const memo = 'test memo';
+
+  const privKeyStrings = [
+    '6d430bb91222408e7706c9001cfaeb91b08c2be6d5ac95779ab52c6b431950e001',
+    '2a584d899fed1d24e26b524f202763c8ab30260167429f157f1c119f550fa6af01',
+    'd5200dee706ee53ae98a03fba6cf4fdcc5084c30cfa9e1b3462dcdeaa3e0f1d201',
+  ];
+  const privKeys = privKeyStrings.map(createStacksPrivateKey);
+
+  const pubKeys = privKeyStrings.map(pubKeyfromPrivKey);
+  const pubKeyStrings = pubKeys.map(publicKeyToString);
+
+  const transaction = await makeUnsignedSTXTokenTransfer({
+    recipient,
+    amount,
+    fee,
+    nonce,
+    memo: memo,
+    numSignatures: 2,
+    publicKeys: pubKeyStrings,
+    anchorMode: AnchorMode.Any
+  });
+
+
+  const signer = new TransactionSigner(transaction);
+  signer.signOrigin(privKeys[0]);
+  signer.signOrigin(privKeys[1]);
+  expect(() => { signer.signOrigin(privKeys[2]) }).toThrow('Origin would have too many signatures');
+
+  const fields = (transaction.auth.spendingCondition as MultiSigSpendingCondition).fields;
+  fields.push({ ...fields[0] });
+  expect(() => { new TransactionSigner(transaction) }).toThrow('SpendingCondition has more signatures than are expected')
+});
+
 test('Make Multi-Sig STX token transfer with two transaction signers', async () => {
   const recipient = standardPrincipalCV('SP3FGQ8Z7JY9BWYZ5WM53E0M9NK7WHJF0691NZ159');
   const amount = 2500000;
