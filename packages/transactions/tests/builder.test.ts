@@ -30,7 +30,7 @@ import { BufferReader } from '../src/bufferReader';
 
 import { createAssetInfo } from '../src/types';
 
-import { SingleSigSpendingCondition } from '../src/authorization';
+import { createTransactionAuthField, MultiSigSpendingCondition, nextSignature, SingleSigSpendingCondition } from '../src/authorization';
 
 import {
   DEFAULT_CORE_NODE_API_URL,
@@ -41,6 +41,7 @@ import {
   AuthType,
   AddressHashMode,
   AnchorMode,
+  PubKeyEncoding,
 } from '../src/constants';
 
 import { StacksTestnet, StacksMainnet } from '@stacks/network';
@@ -48,7 +49,7 @@ import { StacksTestnet, StacksMainnet } from '@stacks/network';
 import { bufferCV, standardPrincipalCV, bufferCVFromString, serializeCV } from '../src/clarity';
 
 import { ClarityAbi } from '../src/contract-abi';
-import { createStacksPrivateKey, pubKeyfromPrivKey, publicKeyToString } from '../src/keys';
+import { createStacksPrivateKey, isCompressed, pubKeyfromPrivKey, publicKeyToString } from '../src/keys';
 import { TransactionSigner } from '../src/signer';
 import fetchMock from 'jest-fetch-mock';
 
@@ -321,8 +322,23 @@ test('Make Multi-Sig STX token transfer with two transaction signers', async () 
   const deserializedPayload = deserializedTx.payload as TokenTransferPayload;
   expect(deserializedPayload.amount.toString()).toBe(amount.toString());
 
+
+  // obtain first auth field and sign once
   const signer = new TransactionSigner(deserializedTx);
-  // sign once
+
+  const sig1 = nextSignature(
+    signer.sigHash,
+    authType,
+    deserializedTx.auth.spendingCondition!.fee,
+    deserializedTx.auth.spendingCondition!.nonce,
+    privKeys[0]
+  ).nextSig;
+
+  const compressed1 = privKeys[0].data.toString('hex').endsWith('01');
+  const field1 = createTransactionAuthField(
+    compressed1 ? PubKeyEncoding.Compressed : PubKeyEncoding.Uncompressed,
+    sig1
+  )
   signer.signOrigin(privKeys[0]);
 
   // serialize
@@ -334,8 +350,34 @@ test('Make Multi-Sig STX token transfer with two transaction signers', async () 
 
   // finish signing with new TransactionSigner
   const signer2 = new TransactionSigner(partiallySigned);
+
+  const sig2 = nextSignature(
+    signer2.sigHash,
+    authType,
+    deserializedTx.auth.spendingCondition!.fee,
+    deserializedTx.auth.spendingCondition!.nonce,
+    privKeys[1]
+  ).nextSig;
+
+  const compressed2 = privKeys[1].data.toString('hex').endsWith('01');
+  const field2 = createTransactionAuthField(
+    compressed2 ? PubKeyEncoding.Compressed : PubKeyEncoding.Uncompressed,
+    sig2
+  )
+
+  const compressedPub = isCompressed(pubKeys[2]);
+  const field3 = createTransactionAuthField(
+    compressedPub ? PubKeyEncoding.Compressed : PubKeyEncoding.Uncompressed,
+    pubKeys[2]
+  )
+
   signer2.signOrigin(privKeys[1]);
   signer2.appendOrigin(pubKeys[2]);
+
+  const spendingCondition = partiallySigned.auth.spendingCondition as MultiSigSpendingCondition;
+  expect(spendingCondition.fields[0]).toEqual(field1);
+  expect(spendingCondition.fields[1]).toEqual(field2);
+  expect(spendingCondition.fields[2]).toEqual(field3);
 
   const serializedSignedTx = partiallySigned.serialize();
 

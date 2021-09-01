@@ -2,7 +2,7 @@ import { StacksTransaction } from './transaction';
 
 import { StacksPrivateKey, StacksPublicKey } from './keys';
 import { isSingleSig, nextVerification, SpendingConditionOpts } from './authorization';
-import { cloneDeep, txidFromData } from './utils';
+import { cloneDeep } from './utils';
 import { AuthType, PubKeyEncoding, StacksMessageType } from './constants';
 import { SigningError } from './errors';
 
@@ -24,8 +24,11 @@ export class TransactionSigner {
     // auth fields and reconstruct sigHash
     let spendingCondition = transaction.auth.spendingCondition;
     if (spendingCondition && !isSingleSig(spendingCondition)) {
-
-      if (spendingCondition.fields.length >= spendingCondition.signaturesRequired) {
+      if (
+        spendingCondition.fields.filter(
+          field => field.contents.type === StacksMessageType.MessageSignature
+        ).length >= spendingCondition.signaturesRequired
+      ) {
         throw new Error('SpendingCondition has more signatures than are expected');
       }
 
@@ -42,11 +45,11 @@ export class TransactionSigner {
             spendingCondition!.fee,
             spendingCondition!.nonce,
             PubKeyEncoding.Compressed, // always compressed for multisig
-            signature,
+            signature
           );
           this.sigHash = nextVerify.nextSigHash;
         }
-      }); 
+      });
     }
   }
 
