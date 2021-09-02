@@ -555,13 +555,13 @@ export function verifyOrigin(auth: Authorization, initialSigHash: string): strin
 export function setFee(auth: Authorization, amount: IntegerType): Authorization {
   switch (auth.authType) {
     case AuthType.Standard:
-      let spendingCondition = {
+      const spendingCondition = {
         ...auth.spendingCondition,
         fee: intToBigInt(amount, false),
       };
       return { ...auth, spendingCondition };
     case AuthType.Sponsored:
-      let sponsorSpendingCondition = {
+      const sponsorSpendingCondition = {
         ...auth.sponsorSpendingCondition,
         fee: intToBigInt(amount, false),
       };
@@ -579,7 +579,7 @@ export function getFee(auth: Authorization): bigint {
 }
 
 export function setNonce(auth: Authorization, nonce: IntegerType): Authorization {
-  let spendingCondition = {
+  const spendingCondition = {
     ...auth.spendingCondition,
     nonce: intToBigInt(nonce, false),
   };
@@ -591,7 +591,7 @@ export function setNonce(auth: Authorization, nonce: IntegerType): Authorization
 }
 
 export function setSponsorNonce(auth: SponsoredAuthorization, nonce: IntegerType): Authorization {
-  let sponsorSpendingCondition = {
+  const sponsorSpendingCondition = {
     ...auth.sponsorSpendingCondition,
     nonce: intToBigInt(nonce, false),
   };
@@ -606,7 +606,7 @@ export function setSponsor(
   auth: SponsoredAuthorization,
   sponsorSpendingCondition: SpendingConditionOpts
 ): Authorization {
-  let sc = {
+  const sc = {
     ...sponsorSpendingCondition,
     nonce: intToBigInt(sponsorSpendingCondition.nonce, false),
     fee: intToBigInt(sponsorSpendingCondition.fee, false),
@@ -636,7 +636,7 @@ export function serializeAuthorization(auth: Authorization): Buffer {
 }
 
 export function deserializeAuthorization(bufferReader: BufferReader) {
-  let authType = bufferReader.readUInt8Enum(AuthType, n => {
+  const authType = bufferReader.readUInt8Enum(AuthType, n => {
     throw new DeserializationError(`Could not parse ${n} as AuthType`);
   });
 

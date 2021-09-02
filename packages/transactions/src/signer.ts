@@ -22,7 +22,7 @@ export class TransactionSigner {
 
     // If multi-sig spending condition exists, iterate over
     // auth fields and reconstruct sigHash
-    let spendingCondition = transaction.auth.spendingCondition;
+    const spendingCondition = transaction.auth.spendingCondition;
     if (spendingCondition && !isSingleSig(spendingCondition)) {
       if (
         spendingCondition.fields.filter(
