@@ -1964,5 +1964,6 @@ export const testables =
   process.env.NODE_ENV === 'test'
     ? {
         addressConvert,
+        contractFunctionCall,
       }
     : undefined;
