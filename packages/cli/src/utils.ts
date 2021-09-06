@@ -11,6 +11,8 @@ import {
   getTypeString,
   ClarityAbiType,
   isClarityAbiPrimitive,
+  isClarityAbiStringAscii,
+  isClarityAbiStringUtf8,
   isClarityAbiBuffer,
   isClarityAbiResponse,
   isClarityAbiOptional,
@@ -20,6 +22,9 @@ import {
   intCV,
   uintCV,
   bufferCVFromString,
+  stringAsciiCV,
+  stringUtf8CV,
+  someCV,
   trueCV,
   falseCV,
   standardPrincipalCV,
@@ -837,10 +842,26 @@ export function argToPrompt(arg: ClarityFunctionArg): InquirerPrompt {
       name,
       message: `Enter value for function argument "${name}" of type ${typeString}`,
     };
+  } else if (isClarityAbiStringAscii(type)) {
+    return {
+      type: 'input',
+      name,
+      message: `Enter value for function argument "${name}" of type ${typeString}`,
+    };
+  } else if (isClarityAbiStringUtf8(type)) {
+    return {
+      type: 'input',
+      name,
+      message: `Enter value for function argument "${name}" of type ${typeString}`,
+    };
   } else if (isClarityAbiResponse(type)) {
     throw new Error(`Contract function contains unsupported Clarity ABI type: ${typeString}`);
   } else if (isClarityAbiOptional(type)) {
-    throw new Error(`Contract function contains unsupported Clarity ABI type: ${typeString}`);
+    return {
+      type: 'input',
+      name,
+      message: `Enter value for function argument "${name}" of type ${typeString}`,
+    };
   } else if (isClarityAbiTuple(type)) {
     throw new Error(`Contract function contains unsupported Clarity ABI type: ${typeString}`);
   } else if (isClarityAbiList(type)) {
@@ -881,10 +902,16 @@ export function answerToClarityValue(answer: any, arg: ClarityFunctionArg): Clar
     }
   } else if (isClarityAbiBuffer(type)) {
     return bufferCVFromString(answer);
+  } else if (isClarityAbiStringAscii(type)) {
+    return stringAsciiCV(answer);
+  } else if (isClarityAbiStringUtf8(type)) {
+    return stringUtf8CV(answer);
   } else if (isClarityAbiResponse(type)) {
     throw new Error(`Contract function contains unsupported Clarity ABI type: ${typeString}`);
   } else if (isClarityAbiOptional(type)) {
-    throw new Error(`Contract function contains unsupported Clarity ABI type: ${typeString}`);
+    return someCV(
+      answerToClarityValue(answer, { name: arg.name, type: type.optional } as ClarityFunctionArg)
+    );
   } else if (isClarityAbiTuple(type)) {
     throw new Error(`Contract function contains unsupported Clarity ABI type: ${typeString}`);
   } else if (isClarityAbiList(type)) {
