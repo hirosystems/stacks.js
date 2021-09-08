@@ -320,7 +320,7 @@ test('STX token transfer transaction multi-sig uncompressed keys serialization a
   signer.signOrigin(privKeys[1]);
   signer.appendOrigin(pubKeys[2]);
 
-  transaction.verifyOrigin();
+  expect(() => transaction.verifyOrigin()).toThrow('Uncompressed keys are not allowed in this hash mode');
 
   const serialized = transaction.serialize();
   
