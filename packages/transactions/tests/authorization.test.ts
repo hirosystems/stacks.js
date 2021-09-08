@@ -9,6 +9,7 @@ import {
   SingleSigSpendingCondition,
   SponsoredAuthorization,
   StandardAuthorization,
+  serializeAuthorization,
 } from '../src/authorization';
 import { BufferArray } from '../src/utils';
 
@@ -329,21 +330,28 @@ test('Spending conditions', () => {
     const serialized1 = serializeSpendingCondition(spendingConditions[i]);
     const serialized2 = serializeSpendingCondition(spendingConditions[(i + 1) % spendingConditions.length]);
 
-    const standard = new StandardAuthorization(spendingConditions[i]);
+    const standard: StandardAuthorization = {
+      authType: AuthType.Standard,
+      spendingCondition: spendingConditions[i]
+    };
     const standardArray = new BufferArray();
     standardArray.appendByte(AuthType.Standard);
     standardArray.push(serialized1);
     const standardBytes = Buffer.from(standardArray.concatBuffer());
 
-    const sponsored = new SponsoredAuthorization(spendingConditions[i], spendingConditions[(i + 1) % spendingConditions.length]);
+    const sponsored: SponsoredAuthorization = {
+      authType: AuthType.Sponsored,
+      spendingCondition: spendingConditions[i],
+      sponsorSpendingCondition: spendingConditions[(i + 1) % spendingConditions.length]
+    };
     const sponsoredArray = new BufferArray();
     sponsoredArray.appendByte(AuthType.Sponsored);
     sponsoredArray.push(serialized1);
     sponsoredArray.push(serialized2);
     const sponsoredBytes = Buffer.from(sponsoredArray.concatBuffer());
 
-    expect(standard.serialize()).toEqual(standardBytes);
-    expect(sponsored.serialize()).toEqual(sponsoredBytes);
+    expect(serializeAuthorization(standard)).toEqual(standardBytes);
+    expect(serializeAuthorization(sponsored)).toEqual(sponsoredBytes);
   }
 
 });
