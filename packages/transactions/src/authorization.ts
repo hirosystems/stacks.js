@@ -298,6 +298,11 @@ export function deserializeSingleSigSpendingCondition(
   const keyEncoding = bufferReader.readUInt8Enum(PubKeyEncoding, n => {
     throw new DeserializationError(`Could not parse ${n} as PubKeyEncoding`);
   });
+  if (hashMode === AddressHashMode.SerializeP2WPKH && keyEncoding != PubKeyEncoding.Compressed) {
+    throw new DeserializationError(
+      'Failed to parse singlesig spending condition: incomaptible hash mode and key encoding'
+    );
+  }
   const signature = deserializeMessageSignature(bufferReader);
   return {
     hashMode,
@@ -320,7 +325,32 @@ export function deserializeMultiSigSpendingCondition(
   const fields = deserializeLPList(bufferReader, StacksMessageType.TransactionAuthField)
     .values as TransactionAuthField[];
 
+  let haveUncompressed = false;
+  const numSigs = new Uint16Array(1);
+  numSigs[0] = 0;
+
+  for (const field of fields) {
+    switch (field.contents.type) {
+      case StacksMessageType.PublicKey:
+        if (!isCompressed(field.contents)) haveUncompressed = true;
+        break;
+      case StacksMessageType.MessageSignature:
+        if (field.pubKeyEncoding === PubKeyEncoding.Uncompressed) haveUncompressed = true;
+        numSigs[0] += 1;
+        if (numSigs[0] === 65536)
+          throw new VerificationError(
+            'Failed to parse multisig spending condition: too many signatures'
+          );
+        break;
+    }
+  }
   const signaturesRequired = bufferReader.readUInt16BE();
+
+  if (numSigs[0] !== signaturesRequired)
+    throw new VerificationError(`Incorrect number of signatures`);
+
+  if (haveUncompressed && hashMode === AddressHashMode.SerializeP2SH)
+    throw new VerificationError('Uncompressed keys are not allowed in this hash mode');
 
   return {
     hashMode,
