@@ -636,29 +636,32 @@ export class Storage {
   ) {
     const gaiaHubConfig = await this.getOrSetLocalGaiaHubConnection();
     const opts = Object.assign({}, options);
-    const sessionData = this.userSession.store.getSessionData();
     if (opts.wasSigned) {
       // If signed, delete both the content file and the .sig file
       try {
         await deleteFromGaiaHub(path, gaiaHubConfig);
         await deleteFromGaiaHub(`${path}${SIGNATURE_FILE_SUFFIX}`, gaiaHubConfig);
+        const sessionData = this.userSession.store.getSessionData();
         delete sessionData.etags![path];
         this.userSession.store.setSessionData(sessionData);
       } catch (error) {
         const freshHubConfig = await this.setLocalGaiaHubConnection();
         await deleteFromGaiaHub(path, freshHubConfig);
         await deleteFromGaiaHub(`${path}${SIGNATURE_FILE_SUFFIX}`, gaiaHubConfig);
+        const sessionData = this.userSession.store.getSessionData();
         delete sessionData.etags![path];
         this.userSession.store.setSessionData(sessionData);
       }
     } else {
       try {
         await deleteFromGaiaHub(path, gaiaHubConfig);
+        const sessionData = this.userSession.store.getSessionData();
         delete sessionData.etags![path];
         this.userSession.store.setSessionData(sessionData);
       } catch (error) {
         const freshHubConfig = await this.setLocalGaiaHubConnection();
         await deleteFromGaiaHub(path, freshHubConfig);
+        const sessionData = this.userSession.store.getSessionData();
         delete sessionData.etags![path];
         this.userSession.store.setSessionData(sessionData);
       }

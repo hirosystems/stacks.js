@@ -12,7 +12,7 @@ import {
 
 import { Storage } from '../src';
 
-import { UserSession, AppConfig, UserData } from '@stacks/auth';
+import { UserSession, AppConfig, UserData, LOCALSTORAGE_SESSION_KEY } from '@stacks/auth';
 import { DoesNotExist, getAesCbcOutputLength, getBase64OutputLength, fetchPrivate } from '@stacks/common';
 import { StacksMainnet } from '@stacks/network';
 import * as util from 'util';
@@ -230,6 +230,82 @@ test('deleteFile removes etag from map', async () => {
   expect(uploadToGaiaHub.mock.calls[0][5]).toEqual(undefined);
   expect(uploadToGaiaHub.mock.calls[1][4]).toEqual(true);
   expect(uploadToGaiaHub.mock.calls[1][5]).toEqual(undefined);
+});
+
+test('Concurrent calls to deleteFile should delete etags in localStorage', async () => {
+  const dom = new jsdom.JSDOM('', { url: 'https://example.org/' }).window;
+  const globalAPIs: { [key: string]: any } = {
+    localStorage: dom.localStorage,
+    location: dom.location,
+    self: dom,
+  };
+
+  for (const globalAPI of Object.keys(globalAPIs)) {
+    (global as any)[globalAPI] = globalAPIs[globalAPI];
+  }
+
+  const privateKey = '896adae13a1bf88db0b2ec94339b62382ec6f34cd7e2ff8abae7ec271e05f9d8';
+  const gaiaHubConfig = {
+    address: '1NZNxhoxobqwsNvTb16pdeiqvFvce3Yg8U',
+    server: 'https://hub.blockstack.org',
+    token: '',
+    url_prefix: 'gaia.testblockstack.org/hub/',
+  };
+  const appConfig = new AppConfig();
+  const userSession = new UserSession({ appConfig });
+  const session = userSession.store.getSessionData();
+  session.userData = <any> {
+    gaiaHubConfig,
+    appPrivateKey: privateKey,
+  };
+  userSession.store.setSessionData(session);
+
+  const files = ['a.json', 'b.json', 'c.json', 'd.json'];
+  const fullReadUrl = 'https://gaia.testblockstack.org/hub/1NZNxhoxobqwsNvTb16pdeiqvFvce3Yg8U/file.json';
+  const uploadToGaiaHub = jest.fn().mockResolvedValue({
+    publicURL: fullReadUrl,
+    etag: 'test-tag',
+  });
+  const deleteFromGaiaHub = jest.fn();
+
+  jest.mock('../src/hub', () => ({
+    uploadToGaiaHub,
+    deleteFromGaiaHub,
+  }));
+
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const { Storage } = require('../src');
+  const storage = new Storage({ userSession });
+
+  for (let i = 0; i < files.length; i++) {
+    const myData = JSON.stringify({
+      hello: `hello-${i}`,
+      num: i,
+    });
+    await storage.putFile(files[i], myData, { encrypt: false });
+  }
+
+  fetchMock.mockResponse('', {
+    status: 202,
+  });
+
+  const promises = [];
+  for (let i = 0; i < files.length; i++) {
+    // Concurrent calls to deleteFile without await should delete etags
+    // Assuming deleting multiple files at once using parallel network calls
+    promises.push(storage.deleteFile(files[i]));
+  }
+  await Promise.all(promises);
+  const sessionData = userSession.store.getSessionData();
+  const sessionFromLocalStore = JSON.parse(localStorage.getItem(LOCALSTORAGE_SESSION_KEY) || '{}' );
+  const expectedEtags = {};
+
+  expect(sessionData.etags).toEqual(expectedEtags);
+  expect(sessionFromLocalStore.etags).toEqual(expectedEtags);
+
+  for (const globalAPI of Object.keys(globalAPIs)) {
+    delete (global as any)[globalAPI];
+  }
 });
 
 test('getFile unencrypted, unsigned', async () => {
