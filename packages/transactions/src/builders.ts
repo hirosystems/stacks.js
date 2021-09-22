@@ -1326,5 +1326,5 @@ export async function sponsorTransaction(
   );
   signer.signSponsor(privKey);
 
-  return options.transaction;
+  return signer.transaction;
 }

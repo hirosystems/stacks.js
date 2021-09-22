@@ -33,6 +33,7 @@ import { createAssetInfo } from '../src/types';
 import {
   createMessageSignature,
   createTransactionAuthField,
+  emptyMessageSignature,
   isSingleSig,
   MultiSigSpendingCondition,
   nextSignature,
@@ -894,6 +895,10 @@ test('Make sponsored STX token transfer', async () => {
   expect(deserializedSponsorSpendingCondition.hashMode).toBe(addressHashMode);
   expect(deserializedSponsorSpendingCondition.nonce!.toString()).toBe(sponsorNonce.toString());
   expect(deserializedSponsorSpendingCondition.fee!.toString()).toBe(sponsorFee.toString());
+
+  const spendingCondition = deserializedSponsorSpendingCondition as SingleSigSpendingCondition;
+  const emptySignature = emptyMessageSignature();
+  expect(spendingCondition.signature.data.toString()).not.toBe(emptySignature.data.toString());
 
   const deserializedPayload = deserializedSponsorTx.payload as TokenTransferPayload;
   expect(deserializedPayload.amount.toString()).toBe(amount.toString());
