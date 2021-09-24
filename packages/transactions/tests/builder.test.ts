@@ -24,21 +24,21 @@ import {
 
 import { deserializeTransaction, StacksTransaction } from '../src/transaction';
 
-import { TokenTransferPayload } from '../src/payload';
+import { createTokenTransferPayload, TokenTransferPayload } from '../src/payload';
 
 import { BufferReader } from '../src/bufferReader';
 
 import { createAssetInfo } from '../src/types';
 
 import {
-  createMessageSignature,
+  createMessageSignature, createSingleSigSpendingCondition, createSponsoredAuth,
   createTransactionAuthField,
   emptyMessageSignature,
   isSingleSig,
   MultiSigSpendingCondition,
   nextSignature,
   SingleSigSpendingCondition,
-  SponsoredAuthorization
+  SponsoredAuthorization, StandardAuthorization
 } from '../src/authorization';
 
 import {
@@ -50,7 +50,7 @@ import {
   AuthType,
   AddressHashMode,
   AnchorMode,
-  PubKeyEncoding,
+  PubKeyEncoding, TransactionVersion,
 } from '../src/constants';
 
 import { StacksTestnet, StacksMainnet } from '@stacks/network';
@@ -885,6 +885,40 @@ test('Make sponsored STX token transfer', async () => {
   const bufferReader = new BufferReader(sponsorSignedTxSerialized);
   const deserializedSponsorTx = deserializeTransaction(bufferReader);
 
+  // Create same sponsored transaction in steps to verify the signature contents with sponsorTransaction call
+  const payload = createTokenTransferPayload(recipient, amount, memo);
+  const baseSpendingCondition = createSingleSigSpendingCondition(
+    addressHashMode,
+    publicKeyToString(pubKeyfromPrivKey(senderKey)),
+    nonce,
+    fee
+  );
+  const sponsorSpendingCondition = createSingleSigSpendingCondition(
+    addressHashMode,
+    publicKeyToString(pubKeyfromPrivKey(sponsorKey)),
+    sponsorNonce,
+    sponsorFee
+  );
+  const authorization = createSponsoredAuth(baseSpendingCondition, sponsorSpendingCondition);
+  const transactionVersion = TransactionVersion.Mainnet;
+  const sponsoredTransaction = new StacksTransaction(transactionVersion, authorization, payload);
+
+  const signer = new TransactionSigner(sponsoredTransaction);
+  signer.signOrigin(createStacksPrivateKey(senderKey));
+  signer.signSponsor(createStacksPrivateKey(sponsorKey));
+
+  // Sponsored spending condition
+  const sponsoredTransactionClone = signer.transaction;
+  const sponsoredSpendingConditionClone = (sponsoredTransactionClone.auth as SponsoredAuthorization)
+    .sponsorSpendingCondition;
+  const sponsoredSpendingCondition = sponsoredSpendingConditionClone as SingleSigSpendingCondition;
+
+  // signer spending condition
+  const signerSpendingConditionClone = (sponsoredTransactionClone.auth as StandardAuthorization).spendingCondition;
+
+  const signerSpendingCondition = signerSpendingConditionClone as SingleSigSpendingCondition;
+
+
   expect(deserializedSponsorTx.auth.authType).toBe(authType);
 
   expect(deserializedSponsorTx.auth.spendingCondition!.hashMode).toBe(addressHashMode);
@@ -899,6 +933,18 @@ test('Make sponsored STX token transfer', async () => {
   const spendingCondition = deserializedSponsorSpendingCondition as SingleSigSpendingCondition;
   const emptySignature = emptyMessageSignature();
   expect(spendingCondition.signature.data.toString()).not.toBe(emptySignature.data.toString());
+
+  // Verify sponsored signature contents
+  expect(spendingCondition.signature.data.toString()).toBe(sponsoredSpendingCondition.signature.data.toString());
+  expect(spendingCondition.signature.type.toString()).toBe(sponsoredSpendingCondition.signature.type.toString());
+
+  const signerCreatedSpendingCondition = (sponsorSignedTx.auth as StandardAuthorization)
+    .spendingCondition;
+
+  const signersSpendingCondition = signerCreatedSpendingCondition as SingleSigSpendingCondition;
+  // Verify signers signature contents
+  expect(signersSpendingCondition.signature.data.toString()).toBe(signerSpendingCondition.signature.data.toString());
+  expect(signersSpendingCondition.signature.type.toString()).toBe(signerSpendingCondition.signature.type.toString());
 
   const deserializedPayload = deserializedSponsorTx.payload as TokenTransferPayload;
   expect(deserializedPayload.amount.toString()).toBe(amount.toString());
