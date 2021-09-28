@@ -338,10 +338,17 @@ export function resolveZoneFileToProfile(zoneFile: any, publicKeyOrAddress: stri
     } catch (e) {
       reject(e);
     }
-
+    let isProfileUrl: boolean = false;
+    try {
+      // Check if zoneFile is only a profile url as in case of subdomains it can be be a url instead of zoneFile object
+      new URL(zoneFile);
+      isProfileUrl = true;
+    } catch (_) {}
     let tokenFileUrl: string | null = null;
     if (zoneFileJson && Object.keys(zoneFileJson).length > 0) {
       tokenFileUrl = getTokenFileUrl(zoneFileJson);
+    } else if (isProfileUrl) {
+      tokenFileUrl = zoneFile;
     } else {
       let profile = null;
       try {

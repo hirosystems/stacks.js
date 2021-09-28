@@ -31,7 +31,8 @@ export function lookupProfile(options: ProfileLookupOptions): Promise<Record<str
   }
   return lookupPromise.then((responseJSON: any) => {
     if (responseJSON.hasOwnProperty('zonefile') && responseJSON.hasOwnProperty('address')) {
-      return resolveZoneFileToProfile(responseJSON.zonefile, responseJSON.address);
+      const address = responseJSON.status === 'registered_subdomain' ? '' : responseJSON.address;
+      return resolveZoneFileToProfile(responseJSON.zonefile, address);
     } else {
       throw new Error(
         'Invalid zonefile lookup response: did not contain `address`' + ' or `zonefile` field'

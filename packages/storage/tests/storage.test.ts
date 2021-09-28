@@ -367,6 +367,90 @@ test('getFile without user session', async () => {
   });
 });
 
+test('getFile username registered as subdomain', async () => {
+  const path = 'file.json';
+  const appConfig = new AppConfig();
+  const userSession = new UserSession({ appConfig });
+  const nameRecord = {
+    address: 'SP31C1RGYVJVWNYWJNRVSZQA2XN9HDEA08FB0G03S',
+    blockchain: 'stacks',
+    last_txid: '0x0b80143fae8a52f47c970c5cf935ae37cd13236887e2a470d8a6891091219986',
+    resolver: '',
+    status: 'registered_subdomain',
+    zonefile: 'https://gaia.blockstack.org/hub/1BhQxPY3N9ABXzkbr4U8J6gkvAdr9Acr8L/profile.json',
+    zonefile_hash: 'fdccd9ca23ec81f8d5ef0057eb2f72fb'
+  };
+  const nameRecordContent = JSON.stringify(nameRecord);
+
+  // const profileUrl = 'https://gaia.blockstack.org/hub/1BhQxPY3N9ABXzkbr4U8J6gkvAdr9Acr8L/profile.json'
+
+  /* eslint-disable */
+  const profileContent = [ {
+      "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NksifQ.eyJqdGkiOiIxODVlNzYxZi04NTQ0LTRhNjMtOWQyOS01NjUwMGQwYTgyNGEiLCJpYXQiOiIyMDIxLTA5LTI0VDE5OjIyOjEyLjMzN1oiLCJleHAiOiIyMDIyLTA5LTI0VDE5OjIyOjEyLjMzN1oiLCJzdWJqZWN0Ijp7InB1YmxpY0tleSI6IjAzODU0ZjQ1ZGNlMzBmNjZjZjgxNTFmMTVkNDQ1N2QwOTUzMjhiNWEwYTQ5NGI0NDIzYWRlOTgzMzc3ZWY5NDU2NiJ9LCJpc3N1ZXIiOnsicHVibGljS2V5IjoiMDM4NTRmNDVkY2UzMGY2NmNmODE1MWYxNWQ0NDU3ZDA5NTMyOGI1YTBhNDk0YjQ0MjNhZGU5ODMzNzdlZjk0NTY2In0sImNsYWltIjp7IkB0eXBlIjoiUGVyc29uIiwiQGNvbnRleHQiOiJodHRwOi8vc2NoZW1hLm9yZyIsImFwcHMiOnsiaHR0cHM6Ly9jcm9zc2NoZWNrLnBhcmFkaWdtYS5nbG9iYWwiOiJodHRwczovL2dhaWEuYmxvY2tzdGFjay5vcmcvaHViLzE4NjhuUGVGdUFOeEdDd1BXZHB3MjhGVFJnVkpDUUVzQUcvIiwiaHR0cDovL2xvY2FsaG9zdDozMDAwIjoiaHR0cHM6Ly9nYWlhLmJsb2Nrc3RhY2sub3JnL2h1Yi8xNzg0Z0c4VWhNUHhDY0FYWnlacVJHTnptdjl6Y0JWNUNqLyIsImh0dHBzOi8veGNrLmFwcCI6Imh0dHBzOi8vZ2FpYS5ibG9ja3N0YWNrLm9yZy9odWIvMUFOZGVrTDROMVV4VVh1bTQ3aFh2WEtVNkQ5S1NEeFI2QS8ifSwiYXBwc01ldGEiOnsiaHR0cHM6Ly9jcm9zc2NoZWNrLnBhcmFkaWdtYS5nbG9iYWwiOnsic3RvcmFnZSI6Imh0dHBzOi8vZ2FpYS5ibG9ja3N0YWNrLm9yZy9odWIvMTg2OG5QZUZ1QU54R0N3UFdkcHcyOEZUUmdWSkNRRXNBRy8iLCJwdWJsaWNLZXkiOiIwMzdmZDM1NTJhMzRkYmJlODhkNmMyNWEwYTExYTgzOGE4Y2U0NDM0NzZhNmZhMjRlMDcxZTUxYjdiOTg4MDYxYzEifSwiaHR0cDovL2xvY2FsaG9zdDozMDAwIjp7InN0b3JhZ2UiOiJodHRwczovL2dhaWEuYmxvY2tzdGFjay5vcmcvaHViLzE3ODRnRzhVaE1QeENjQVhaeVpxUkdOem12OXpjQlY1Q2ovIiwicHVibGljS2V5IjoiMDNiNDJjOGQwY2M3YTJhMWEyZmE5YWU2MjcyNjcyYTMzOGZiMmQxNGIyNWFiNzE4NjJkZjVlNDZlZmZmNTllMjQ2In0sImh0dHBzOi8veGNrLmFwcCI6eyJzdG9yYWdlIjoiaHR0cHM6Ly9nYWlhLmJsb2Nrc3RhY2sub3JnL2h1Yi8xQU5kZWtMNE4xVXhVWHVtNDdoWHZYS1U2RDlLU0R4UjZBLyIsInB1YmxpY0tleSI6IjAzNTlhZGZkZWVjYzFjNTY1ZmI2YzVjZWUxNTA1ZTA1NGUxZThiZDk4M2EyYzE2YTdlODBkNDk4MGVjZmU5N2FmOCJ9fX19.rvaEgls6HgtLgR5Bbkutjq9RtAoWglycX8DtuR6gpoz26zjG4NJSm3xnEHxeOnmsQ87LDKToY3Y_8fhQAxSxGA",
+      "decodedToken": {
+        "header": {
+          "typ": "JWT",
+          "alg": "ES256K"
+        },
+        "payload": {
+          "jti": "185e761f-8544-4a63-9d29-56500d0a824a",
+          "iat": "2021-09-24T19:22:12.337Z",
+          "exp": "2022-09-24T19:22:12.337Z",
+          "subject": {
+            "publicKey": "03854f45dce30f66cf8151f15d4457d095328b5a0a494b4423ade983377ef94566"
+          },
+          "issuer": {
+            "publicKey": "03854f45dce30f66cf8151f15d4457d095328b5a0a494b4423ade983377ef94566"
+          },
+          "claim": {
+            "@type": "Person",
+            "@context": "http://schema.org",
+            "apps": {
+              "https://crosscheck.paradigma.global": "https://gaia.blockstack.org/hub/1868nPeFuANxGCwPWdpw28FTRgVJCQEsAG/",
+              "http://localhost:3000": "https://gaia.blockstack.org/hub/1784gG8UhMPxCcAXZyZqRGNzmv9zcBV5Cj/",
+              "https://xck.app": "https://gaia.blockstack.org/hub/1ANdekL4N1UxUXum47hXvXKU6D9KSDxR6A/"
+            },
+            "appsMeta": {
+              "https://crosscheck.paradigma.global": {
+                "storage": "https://gaia.blockstack.org/hub/1868nPeFuANxGCwPWdpw28FTRgVJCQEsAG/",
+                "publicKey": "037fd3552a34dbbe88d6c25a0a11a838a8ce443476a6fa24e071e51b7b988061c1"
+              },
+              "http://localhost:3000": {
+                "storage": "https://gaia.blockstack.org/hub/1784gG8UhMPxCcAXZyZqRGNzmv9zcBV5Cj/",
+                "publicKey": "03b42c8d0cc7a2a1a2fa9ae6272672a338fb2d14b25ab71862df5e46efff59e246"
+              },
+              "https://xck.app": {
+                "storage": "https://gaia.blockstack.org/hub/1ANdekL4N1UxUXum47hXvXKU6D9KSDxR6A/",
+                "publicKey": "0359adfdeecc1c565fb6c5cee1505e054e1e8bd983a2c16a7e80d4980ecfe97af8"
+              }
+            }
+          }
+        },
+        "signature": "rvaEgls6HgtLgR5Bbkutjq9RtAoWglycX8DtuR6gpoz26zjG4NJSm3xnEHxeOnmsQ87LDKToY3Y_8fhQAxSxGA"
+      }
+    }
+  ]
+  /* eslint-enable */
+
+  // const fileUrl = 'https://gaia.blockstack.org/hub/1ANdekL4N1UxUXum47hXvXKU6D9KSDxR6A/file.json'
+  const fileContents = JSON.stringify({ key: 'value' });
+
+  const options = {
+    username: 'jfontirroig.xck.app',
+    app: 'https://xck.app',
+    decrypt: false,
+    verify: false,
+  };
+  fetchMock.once(nameRecordContent).once(JSON.stringify(profileContent)).once(fileContents);
+
+  const storage = new Storage({ userSession });
+
+  await storage.getFile(path, options).then(file => {
+    expect(file).toBeTruthy();
+    expect(JSON.parse(<string>file)).toEqual(JSON.parse(fileContents));
+  });
+});
+
 test('core node preferences respected for name lookups', async () => {
   const path = 'file.json';
   const gaiaHubConfig = {
