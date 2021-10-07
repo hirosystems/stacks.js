@@ -536,8 +536,7 @@ function verifyMultiSig(
   const publicKeys: StacksPublicKey[] = [];
   let curSigHash = initialSigHash;
   let haveUncompressed = false;
-  const numSigs = new Uint16Array(1);
-  numSigs[0] = 0;
+  let numSigs = 0;
 
   for (const field of condition.fields) {
     let foundPubKey: StacksPublicKey;
@@ -560,15 +559,15 @@ function verifyMultiSig(
         curSigHash = nextSigHash;
         foundPubKey = pubKey;
 
-        numSigs[0] += 1;
-        if (numSigs[0] === 65536) throw new VerificationError('Too many signatures');
+        numSigs += 1;
+        if (numSigs === 65536) throw new VerificationError('Too many signatures');
 
         break;
     }
     publicKeys.push(foundPubKey);
   }
 
-  if (numSigs[0] !== condition.signaturesRequired)
+  if (numSigs !== condition.signaturesRequired)
     throw new VerificationError('Incorrect number of signatures');
 
   if (haveUncompressed && condition.hashMode === AddressHashMode.SerializeP2SH)
