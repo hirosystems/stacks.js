@@ -606,7 +606,7 @@ export class Storage {
 
     try {
       return await uploadFn(gaiaHubConfig);
-    } catch (error) {
+    } catch (error: any) {
       // If the upload fails on first attempt, it could be due to a recoverable
       // error which may succeed by refreshing the config and retrying.
       if (isRecoverableGaiaError(error)) {
