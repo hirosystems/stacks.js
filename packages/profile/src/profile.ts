@@ -302,12 +302,21 @@ export function getTokenFileUrl(zoneFileJson: any): string | null {
   if (zoneFileJson.uri.length < 1) {
     return null;
   }
-  const firstUriRecord = zoneFileJson.uri[0];
 
-  if (!firstUriRecord.hasOwnProperty('target')) {
+  const validRecords = zoneFileJson.uri.filter(
+    (record: any) => record.hasOwnProperty('target') && record.name === '_http._tcp'
+  );
+
+  if (validRecords.length < 1) {
     return null;
   }
-  let tokenFileUrl = firstUriRecord.target;
+
+  const firstValidRecord = validRecords[0];
+
+  if (!firstValidRecord.hasOwnProperty('target')) {
+    return null;
+  }
+  let tokenFileUrl = firstValidRecord.target;
 
   if (tokenFileUrl.startsWith('https')) {
     // pass
