@@ -1,9 +1,11 @@
+import { parseZoneFile } from 'zone-file'
 import {
   signProfileToken,
   wrapProfileToken,
   verifyProfileToken,
   extractProfile,
   makeProfileZoneFile,
+  getTokenFileUrl,
 } from '../src'
 
 import { sampleProfiles } from './sampleData'
@@ -54,6 +56,20 @@ profiles.forEach(profile => {
     const expectedZoneFile = '$ORIGIN satoshi.id\n$TTL 3600\n_http._tcp	IN	URI	10	1	"https://example.com/satoshi.json"\n\n'
     const actualZoneFile = makeProfileZoneFile(origin, tokenFileUrl)
     expect(actualZoneFile).toEqual(expectedZoneFile)
+  })
+
+  test('getTokenFileUrl', () => {
+    const zoneFile = '$ORIGIN satoshi.id\n$TTL 3600\n_http._tcp	IN	URI	10	1	"https://example.com/satoshi.json"\n\n'
+    const expectedTokenFileUrl = "https://example.com/satoshi.json"
+    const actualTokenFileUrl = getTokenFileUrl(parseZoneFile(zoneFile))
+    expect(actualTokenFileUrl).toEqual(expectedTokenFileUrl)
+  })
+
+  test('getTokenFileUrl from zonefile with redirect', () => {
+    const zoneFile = '$ORIGIN satoshi.id\n$TTL 3600\n_redirect	IN	URI	10	1	"https://example.com/"\n_http._tcp	IN	URI	10	1	"https://example.com/satoshi.json"\n\n'
+    const expectedTokenFileUrl = "https://example.com/satoshi.json"
+    const actualTokenFileUrl = getTokenFileUrl(parseZoneFile(zoneFile))
+    expect(actualTokenFileUrl).toEqual(expectedTokenFileUrl)
   })
 
 });
