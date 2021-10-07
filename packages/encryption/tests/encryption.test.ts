@@ -311,7 +311,7 @@ test('encrypt-to-decrypt fails on bad mac', async () => {
   try {
     await decryptECIES(privateKey, cipherObj)
     expect(false).toEqual(true)
-  } catch (e) {
+  } catch (e: any) {
 
     expect(e.code).toEqual(ERROR_CODES.FAILED_DECRYPTION_ERROR)
     expect(e.message.indexOf('failure in MAC check')).not.toEqual(-1)
@@ -331,7 +331,7 @@ test('Should be able to prevent a public key twist attack for secp256k1', async 
     const testString = 'all work and no play makes jack a dull boy';
     await encryptECIES(badPublicKey, Buffer.from(testString), true);
     expect(false).toEqual(true);
-  } catch (error) {
+  } catch (error: any) {
     expect(error.reason).toEqual('IsNotPoint');
   }
 })
@@ -349,7 +349,7 @@ test('Should be able to accept public key with valid point on secp256k', async (
     // encryptECIES should not throw invalid point exception
     await encryptECIES(goodPublicKey, Buffer.from(testString), true);
     expect(true).toEqual(true);
-  } catch (error) {
+  } catch (error: any) {
     expect(error.reason).toEqual('IsNotPoint');
   }
 })
@@ -361,7 +361,7 @@ test('Should reject public key having invalid length', async () => {
     await encryptECIES(invalidPublicKey, Buffer.from(testString), true);
     //Should throw invalid format exception
     expect(false).toEqual(true);
-  } catch (error) {
+  } catch (error: any) {
     expect(error.reason).toEqual('InvalidFormat');
   }
 })
@@ -373,7 +373,7 @@ test('Should accept public key having valid length', async () => {
     await encryptECIES(publicKey, Buffer.from(testString), true);
     // Should not throw invalid format exception
     expect(true).toEqual(true);
-  } catch (error) {
+  } catch (error: any) {
     expect(error.reason).toEqual('InvalidFormat');
   }
 })
@@ -385,7 +385,7 @@ test('Should reject invalid uncompressed public key', async () => {
     await encryptECIES(invalidPublicKey, Buffer.from(testString), true);
     // Should throw invalid format exception
     expect(false).toEqual(true);
-  } catch (error) {
+  } catch (error: any) {
     expect(error.reason).toEqual('InvalidFormat');
   }
 })
@@ -397,7 +397,7 @@ test('Should accept valid uncompressed public key', async () => {
     await encryptECIES(publicKey, Buffer.from(testString), true);
     // Should not throw invalid format exception
     expect(true).toEqual(true);
-  } catch (error) {
+  } catch (error: any) {
     expect(error.reason).toEqual('InvalidFormat');
   }
 })
@@ -409,7 +409,7 @@ test('Should reject invalid compressed public key', async () => {
     await encryptECIES(invalidPublicKey, Buffer.from(testString), true);
     // Should throw invalid format exception
     expect(false).toEqual(true);
-  } catch (error) {
+  } catch (error: any) {
     expect(error.reason).toEqual('InvalidFormat');
   }
 })
@@ -421,7 +421,7 @@ test('Should accept valid compressed public key', async () => {
     await encryptECIES(publicKey, Buffer.from(testString), true);
     // Should not throw invalid format exception
     expect(true).toEqual(true);
-  } catch (error) {
+  } catch (error: any) {
     expect(error.reason).toEqual('InvalidFormat');
   }
 })

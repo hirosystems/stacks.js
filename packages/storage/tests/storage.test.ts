@@ -1044,7 +1044,7 @@ test('putFile throws correct error when server rejects etag', async () => {
     const options = { encrypt: false };
 
     await storage.putFile(path, content, options);
-  } catch (err) {
+  } catch (err: any) {
     expect(err.code).toEqual('precondition_failed_error');
   }
 });
@@ -1472,21 +1472,21 @@ test('putFile & getFile unencrypted, signed', async () => {
   try {
     await storage.getFile(badSigPath, decryptOptions);
     fail('Should have failed to read file.');
-  } catch (err) {
+  } catch (err: any) {
     expect(err.message.indexOf('do not match ECDSA')).toBeGreaterThanOrEqual(0);
   }
 
   try {
     await storage.getFile(noSigPath, decryptOptions);
     fail('Should have failed to read file.');
-  } catch (err) {
+  } catch (err: any) {
     expect(err.message.indexOf('obtain signature for file')).toBeGreaterThanOrEqual(0);
   }
 
   try {
     await storage.getFile(badPKPath, decryptOptions);
     fail('Should have failed to read file.');
-  } catch (err) {
+  } catch (err: any) {
     expect(err.message.indexOf('match gaia address')).toBeGreaterThanOrEqual(0);
   }
 
@@ -1496,21 +1496,21 @@ test('putFile & getFile unencrypted, signed', async () => {
   try {
     await storage.getFile(badSigPath, multiplayerDecryptOptions);
     fail('Should have failed to read file.');
-  } catch (err) {
+  } catch (err: any) {
     expect(err.message.indexOf('do not match ECDSA')).toBeGreaterThanOrEqual(0);
   }
 
   try {
     await storage.getFile(noSigPath, multiplayerDecryptOptions);
     fail('Should have failed to read file.');
-  } catch (err) {
+  } catch (err: any) {
     expect(err.message.indexOf('obtain signature for file')).toBeGreaterThanOrEqual(0);
   }
 
   try {
     await storage.getFile(badPKPath, multiplayerDecryptOptions);
     fail('Should have failed to read file.');
-  } catch (err) {
+  } catch (err: any) {
     expect(err.message.indexOf('match gaia address')).toBeGreaterThanOrEqual(0);
   }
 });
@@ -1561,7 +1561,7 @@ test('putFile oversized -- unencrypted, signed', async () => {
   try {
     await storage.putFile('file.bin', fileContent, encryptOptions);
     fail('should have thrown error with oversized content -- unencrypted, signed');
-  } catch (error) {
+  } catch (error: any) {
     expect(error.name).toEqual('PayloadTooLargeError');
   }
 });
@@ -1612,7 +1612,7 @@ test('putFile oversized -- encrypted, signed', async () => {
   try {
     await storage.putFile('file.bin', fileContent, encryptOptions);
     fail('should have thrown error with oversized content -- encrypted, signed');
-  } catch (error) {
+  } catch (error: any) {
     expect(error.name).toEqual('PayloadTooLargeError');
   }
 });
@@ -1663,7 +1663,7 @@ test('putFile oversized -- unencrypted', async () => {
   try {
     await storage.putFile('file.bin', fileContent, encryptOptions);
     fail('should have thrown error with oversized content -- unencrypted');
-  } catch (error) {
+  } catch (error: any) {
     expect(error.name).toEqual('PayloadTooLargeError');
   }
 });
@@ -1714,7 +1714,7 @@ test('putFile oversized -- encrypted', async () => {
   try {
     await storage.putFile('file.bin', fileContent, encryptOptions);
     fail('should have thrown error with oversized content -- encrypted');
-  } catch (error) {
+  } catch (error: any) {
     expect(error.name).toEqual('PayloadTooLargeError');
   }
 });
@@ -2199,7 +2199,7 @@ test('getUserAppFileUrl without user session', async () => {
   const fileUrl = 'https://gaia.blockstack.org/hub/1DDUqfKtQgYNt722wuB4Z2fPC7aiNGQa5R/file.json';
   const zoneFileLookupURL = 'https://potato/v1/names';
   const path = 'file.json';
-  const username = 'yukan.id';
+  const username = 'yukan.btc';
   const appOrigin = 'http://localhost:8080';
   const nameRecord = {
     status: 'registered',

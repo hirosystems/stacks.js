@@ -51,7 +51,7 @@ export class BlockstackError extends Error {
     if (!stack) {
       try {
         throw new Error();
-      } catch (e) {
+      } catch (e: any) {
         stack = e.stack;
       }
     } else {
