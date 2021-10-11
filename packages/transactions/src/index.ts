@@ -23,6 +23,9 @@ export {
 
 export {
   PostCondition,
+  STXPostCondition,
+  FungiblePostCondition,
+  NonFungiblePostCondition,
   createFungiblePostCondition,
   createNonFungiblePostCondition,
   createSTXPostCondition,
