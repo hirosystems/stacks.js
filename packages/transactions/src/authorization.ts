@@ -326,8 +326,7 @@ export function deserializeMultiSigSpendingCondition(
     .values as TransactionAuthField[];
 
   let haveUncompressed = false;
-  const numSigs = new Uint16Array(1);
-  numSigs[0] = 0;
+  let numSigs = 0;
 
   for (const field of fields) {
     switch (field.contents.type) {
@@ -336,8 +335,8 @@ export function deserializeMultiSigSpendingCondition(
         break;
       case StacksMessageType.MessageSignature:
         if (field.pubKeyEncoding === PubKeyEncoding.Uncompressed) haveUncompressed = true;
-        numSigs[0] += 1;
-        if (numSigs[0] === 65536)
+        numSigs += 1;
+        if (numSigs === 65536)
           throw new VerificationError(
             'Failed to parse multisig spending condition: too many signatures'
           );
@@ -346,8 +345,7 @@ export function deserializeMultiSigSpendingCondition(
   }
   const signaturesRequired = bufferReader.readUInt16BE();
 
-  if (numSigs[0] !== signaturesRequired)
-    throw new VerificationError(`Incorrect number of signatures`);
+  if (numSigs !== signaturesRequired) throw new VerificationError(`Incorrect number of signatures`);
 
   if (haveUncompressed && hashMode === AddressHashMode.SerializeP2SH)
     throw new VerificationError('Uncompressed keys are not allowed in this hash mode');
