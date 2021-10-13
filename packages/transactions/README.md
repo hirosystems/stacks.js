@@ -50,8 +50,8 @@ const txOptions = {
   senderKey: 'b244296d5907de9864c0b0d51f98a13c52890be0404e83f273144cd5b9960eed01',
   network,
   memo: 'test memo',
-  nonce: new BigNum(0), // set a nonce manually if you don't want builder to fetch from a Stacks node
-  fee: new BigNum(200), // set a tx fee if you don't want the builder to estimate
+  nonce: 0n, // set a nonce manually if you don't want builder to fetch from a Stacks node
+  fee: 200n, // set a tx fee if you don't want the builder to estimate
   anchorMode: AnchorMode.Any,
 };
 
