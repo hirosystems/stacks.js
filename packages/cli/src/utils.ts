@@ -675,6 +675,9 @@ export async function getBackupPhrase(
       if (!process.stdin.isTTY && !password) {
         // password must be given
         reject(new Error('Password argument required in non-interactive mode'));
+      } else if (process.env.password) {
+        // Do not prompt password for unit tests
+        resolve(process.env.password);
       } else {
         // prompt password
         getpass('Enter password: ', p => {
