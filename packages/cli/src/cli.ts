@@ -331,8 +331,9 @@ async function getPaymentKey(network: CLINetworkAdapter, args: string[]): Promis
  */
 async function getStacksWalletKey(network: CLINetworkAdapter, args: string[]): Promise<string> {
   const mnemonic = await getBackupPhrase(args[0]);
+  const derivationPath: string | undefined = args[1] || undefined;
   // keep the return value consistent with getOwnerKeys
-  const keyObj = await getStacksWalletKeyInfo(network, mnemonic);
+  const keyObj = await getStacksWalletKeyInfo(network, mnemonic, derivationPath);
   const keyInfo: StacksKeyInfoType[] = [];
   keyInfo.push(keyObj);
   return JSONStringify(keyInfo);
@@ -355,7 +356,8 @@ async function makeKeychain(network: CLINetworkAdapter, args: string[]): Promise
     );
   }
 
-  const stacksKeyInfo = await getStacksWalletKeyInfo(network, mnemonic);
+  const derivationPath: string | undefined = args[1] || undefined;
+  const stacksKeyInfo = await getStacksWalletKeyInfo(network, mnemonic, derivationPath);
   return JSONStringify({
     mnemonic: mnemonic,
     keyInfo: stacksKeyInfo,
@@ -1965,5 +1967,7 @@ export const testables =
     ? {
         addressConvert,
         contractFunctionCall,
+        makeKeychain,
+        getStacksWalletKey,
       }
     : undefined;

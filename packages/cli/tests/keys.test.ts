@@ -1,6 +1,7 @@
 import { getStacksWalletKeyInfo, getOwnerKeyInfo, findIdentityIndex } from '../src/keys';
 import { getNetwork, CLINetworkAdapter, CLI_NETWORK_OPTS } from '../src/network';
 import { CLI_CONFIG_TYPE } from '../src/argparse';
+import { keyInfoTests, WalletKeyInfoResult } from './derivation-path/wallet.key.info';
 
 import * as fixtures from './fixtures/keys.fixture';
 
@@ -20,6 +21,15 @@ test('getStacksWalletKeyInfo', async () => {
     btcAddress: '1Nwxfx7VoYAg2mEN35dTRw4H7gte8ajFki',
     wif: 'KxUgLbeVeFZEUUQpc3ncYn5KFB3WH5MVRv3SJ2g5yPwkrXs3QRaP',
     index: 0,
+  });
+});
+
+describe('getStacksWalletKeyInfo custom derivation path', () => {
+  test.each(keyInfoTests)('%#', async (derivationPath: string, keyInfoResult: WalletKeyInfoResult)  => {
+    const mnemonic = 'apart spin rich leader siren foil dish sausage fee pipe ethics bundle';
+    const info = await getStacksWalletKeyInfo(mainnetNetwork, mnemonic, derivationPath);
+
+    expect(info).toEqual(keyInfoResult);
   });
 });
 

@@ -1362,9 +1362,14 @@ export const CLI_ARGS = {
           type: 'string',
           realtype: '24_words_or_ciphertext',
         },
+        {
+          name: 'derivation_path',
+          type: 'string',
+          realtype: 'custom_derivation_path_string',
+        },
       ],
       minItems: 1,
-      maxItems: 1,
+      maxItems: 2,
       help:
         'Get the payment private key from a 24-word backup phrase used by the Stacks wallet.  If you provide an ' +
         'encrypted backup phrase, you will be asked for your password to decrypt it.  This command ' +
@@ -1474,9 +1479,14 @@ export const CLI_ARGS = {
           type: 'string',
           realtype: '12_words_or_ciphertext',
         },
+        {
+          name: 'derivation_path',
+          type: 'string',
+          realtype: 'custom_derivation_path_string',
+        },
       ],
       minItems: 0,
-      maxItems: 1,
+      maxItems: 2,
       help:
         'Generate the owner and payment private keys, optionally from a given 12-word ' +
         'backup phrase.  If no backup phrase is given, a new one will be generated.  If you provide ' +
