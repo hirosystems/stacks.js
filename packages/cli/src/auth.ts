@@ -420,7 +420,7 @@ export async function handleAuth(
     res.writeHead(200, { 'Content-Type': 'text/html', 'Content-Length': authPage.length });
     res.write(authPage);
     res.end();
-  } catch (e) {
+  } catch (e: any) {
     if (!errorMsg) {
       errorMsg = e.message;
     }

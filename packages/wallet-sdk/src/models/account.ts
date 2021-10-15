@@ -22,7 +22,7 @@ import { Buffer } from '@stacks/common';
 export interface Account {
   /** The private key used for STX payments */
   stxPrivateKey: string;
-  /** The private key used in Stacks 1.0 to register BNS names */
+  /** The private key used to store profile data (and in Stacks 1.0 to register BNS names) */
   dataPrivateKey: string;
   /** The salt is the same as the wallet-level salt. Used for app-specific keys */
   salt: string;

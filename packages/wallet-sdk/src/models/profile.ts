@@ -4,6 +4,8 @@ import { signProfileToken, wrapProfileToken } from '@stacks/profile';
 import { connectToGaiaHub, GaiaHubConfig, uploadToGaiaHub } from '@stacks/storage';
 import { getPublicKeyFromPrivate } from '@stacks/encryption';
 import { fetchPrivate } from '@stacks/common';
+import { StacksMainnet } from '@stacks/network';
+import { getAddressFromPrivateKey } from '@stacks/transactions';
 
 const PERSON_TYPE = 'Person';
 const CONTEXT = 'http://schema.org';
@@ -76,11 +78,15 @@ export const fetchAccountProfileUrl = async ({
   return `${gaiaHubUrl}${getGaiaAddress(account)}/profile.json`;
 };
 
-export function signProfileForUpload({ profile, account }: { profile: Profile; account: Account }) {
-  const privateKey = account.dataPrivateKey;
-  const publicKey = getPublicKeyFromPrivate(privateKey);
-
-  const token = signProfileToken(profile, privateKey, { publicKey });
+export function signProfileForUpload({
+  profile,
+  profilePrivateKey,
+}: {
+  profile: Profile;
+  profilePrivateKey: string;
+}) {
+  const publicKey = getPublicKeyFromPrivate(profilePrivateKey.slice(0, 64));
+  const token = signProfileToken(profile, profilePrivateKey, { publicKey });
   const tokenRecord = wrapProfileToken(token);
   const tokenRecords = [tokenRecord];
   return JSON.stringify(tokenRecords, null, 2);
@@ -111,6 +117,21 @@ export async function uploadProfile({
   );
 }
 
+export const selectPrivateKey = async (account: Account) => {
+  let usernameOwner: string | undefined;
+  if (account.username) {
+    const nameInfo = await new StacksMainnet().getNameInfo(account.username);
+    usernameOwner = nameInfo.address;
+  }
+  if (usernameOwner === getAddressFromPrivateKey(account.stxPrivateKey)) {
+    return account.stxPrivateKey;
+  } else if (usernameOwner === getAddressFromPrivateKey(account.dataPrivateKey)) {
+    return account.dataPrivateKey;
+  } else {
+    return account.stxPrivateKey;
+  }
+};
+
 export const signAndUploadProfile = async ({
   profile,
   gaiaHubUrl,
@@ -122,6 +143,7 @@ export const signAndUploadProfile = async ({
   account: Account;
   gaiaHubConfig?: GaiaHubConfig;
 }) => {
-  const signedProfileTokenData = signProfileForUpload({ profile, account });
+  const profilePrivateKey = await selectPrivateKey(account);
+  const signedProfileTokenData = signProfileForUpload({ profile, profilePrivateKey });
   await uploadProfile({ gaiaHubUrl, account, signedProfileTokenData, gaiaHubConfig });
 };
