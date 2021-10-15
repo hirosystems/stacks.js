@@ -5,6 +5,7 @@ on:
     branches:
       - '**'
 
+  pull_request:
 jobs:
   typecheck:
     runs-on: ubuntu-latest
