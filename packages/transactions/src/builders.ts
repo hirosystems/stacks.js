@@ -23,6 +23,7 @@ import {
   publicKeyToAddress,
   pubKeyfromPrivKey,
   publicKeyFromBuffer,
+  createStacksPublicKey,
 } from './keys';
 
 import { TransactionSigner } from './signer';
@@ -603,12 +604,10 @@ export async function makeSTXTokenTransfer(
 /**
  * Contract deploy transaction options
  */
-export interface ContractDeployOptions {
+export interface BaseContractDeployOptions {
   contractName: string;
   /** the Clarity code to be deployed */
   codeBody: string;
-  /** a hex string of the private key of the transaction sender */
-  senderKey: string;
   /** transaction fee in microstacks */
   fee?: IntegerType;
   /** the transaction nonce, which must be increased monotonically with each new transaction */
@@ -625,6 +624,16 @@ export interface ContractDeployOptions {
   postConditions?: PostCondition[];
   /** set to true if another account is sponsoring the transaction (covering the transaction fee) */
   sponsored?: boolean;
+}
+
+export interface ContractDeployOptions extends BaseContractDeployOptions {
+  /** a hex string of the private key of the transaction sender */
+  senderKey: string;
+}
+
+export interface UnsignedContractDeployOptions extends BaseContractDeployOptions {
+  /** a hex string of the public key of the transaction sender */
+  publicKey: string;
 }
 
 /**
@@ -691,6 +700,23 @@ export async function estimateContractDeploy(
 export async function makeContractDeploy(
   txOptions: ContractDeployOptions
 ): Promise<StacksTransaction> {
+  const privKey = createStacksPrivateKey(txOptions.senderKey);
+  const stacksPublicKey = getPublicKey(privKey);
+  const publicKey = publicKeyToString(stacksPublicKey);
+  const unsignedTxOptions: UnsignedContractDeployOptions = { ...txOptions, publicKey };
+  const transaction: StacksTransaction = await makeUnsignedContractDeploy(unsignedTxOptions);
+
+  if (txOptions.senderKey) {
+    const signer = new TransactionSigner(transaction);
+    signer.signOrigin(privKey);
+  }
+
+  return transaction;
+}
+
+export async function makeUnsignedContractDeploy(
+  txOptions: UnsignedContractDeployOptions
+): Promise<StacksTransaction> {
   const defaultOptions = {
     fee: BigInt(0),
     nonce: BigInt(0),
@@ -704,8 +730,7 @@ export async function makeContractDeploy(
   const payload = createSmartContractPayload(options.contractName, options.codeBody);
 
   const addressHashMode = AddressHashMode.SerializeP2PKH;
-  const privKey = createStacksPrivateKey(options.senderKey);
-  const pubKey = getPublicKey(privKey);
+  const pubKey = createStacksPublicKey(options.publicKey);
 
   let authorization = null;
 
@@ -753,11 +778,6 @@ export async function makeContractDeploy(
     const senderAddress = publicKeyToAddress(addressVersion, pubKey);
     const txNonce = await getNonce(senderAddress, options.network);
     transaction.setNonce(txNonce);
-  }
-
-  if (options.senderKey) {
-    const signer = new TransactionSigner(transaction);
-    signer.signOrigin(privKey);
   }
 
   return transaction;

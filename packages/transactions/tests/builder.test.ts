@@ -3,6 +3,7 @@ import * as fs from 'fs';
 import {
   makeUnsignedSTXTokenTransfer,
   makeContractDeploy,
+  makeUnsignedContractDeploy,
   makeContractCall,
   makeStandardSTXPostCondition,
   makeContractSTXPostCondition,
@@ -605,6 +606,67 @@ test('Make smart contract deploy', async () => {
     '292920282876616c75652076616c75652929290a2020202020202020286f6b2027747275652929290a';
 
   expect(serialized).toBe(tx);
+});
+
+test('Make smart contract deploy unsigned', async () => {
+  const contractName = 'kv-store';
+  const codeBody = fs.readFileSync('./tests/contracts/kv-store.clar').toString();
+  const publicKey = '03797dd653040d344fd048c1ad05d4cbcb2178b30c6a0c4276994795f3e833da41';
+  const fee = 0;
+  const nonce = 0;
+
+  const authType = AuthType.Standard;
+  const addressHashMode = AddressHashMode.SerializeP2PKH;
+  const transaction = await makeUnsignedContractDeploy({
+    contractName,
+    codeBody,
+    publicKey,
+    fee,
+    nonce,
+    network: new StacksTestnet(),
+    anchorMode: AnchorMode.Any
+  });
+
+  const serializedTx = transaction.serialize();
+
+  const bufferReader = new BufferReader(serializedTx);
+  const deserializedTx = deserializeTransaction(bufferReader);
+
+  expect(deserializedTx.auth.authType).toBe(authType);
+
+  expect(deserializedTx.auth.spendingCondition!.hashMode).toBe(addressHashMode);
+  expect(deserializedTx.auth.spendingCondition!.nonce!.toString()).toBe(nonce.toString());
+  expect(deserializedTx.auth.spendingCondition!.fee!.toString()).toBe(fee.toString());
+});
+
+test('Make smart contract deploy signed', async () => {
+  const contractName = 'kv-store';
+  const codeBody = fs.readFileSync('./tests/contracts/kv-store.clar').toString();
+  const senderKey = 'e494f188c2d35887531ba474c433b1e41fadd8eb824aca983447fd4bb8b277a801';
+  const fee = 0;
+  const nonce = 0;
+
+  const authType = AuthType.Standard;
+  const addressHashMode = AddressHashMode.SerializeP2PKH;
+  const transaction = await makeContractDeploy({
+    contractName,
+    codeBody,
+    senderKey,
+    fee,
+    nonce,
+    network: new StacksTestnet(),
+    anchorMode: AnchorMode.Any
+  });
+
+  const serializedTx = transaction.serialize();
+
+  const bufferReader = new BufferReader(serializedTx);
+  const deserializedTx = deserializeTransaction(bufferReader);
+  expect(deserializedTx.auth.authType).toBe(authType);
+
+  expect(deserializedTx.auth.spendingCondition!.hashMode).toBe(addressHashMode);
+  expect(deserializedTx.auth.spendingCondition!.nonce!.toString()).toBe(nonce.toString());
+  expect(deserializedTx.auth.spendingCondition!.fee!.toString()).toBe(fee.toString());
 });
 
 test('Make contract-call', async () => {
