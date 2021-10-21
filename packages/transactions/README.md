@@ -34,11 +34,7 @@ const privateKey = createStacksPrivateKey(key);
 ## STX Token Transfer Transaction
 
 ```typescript
-import {
-  makeSTXTokenTransfer,
-  broadcastTransaction,
-  AnchorMode,
-} from '@stacks/transactions';
+import { makeSTXTokenTransfer, broadcastTransaction, AnchorMode } from '@stacks/transactions';
 import { StacksTestnet, StacksMainnet } from '@stacks/network';
 
 // for mainnet, use `StacksMainnet()`
@@ -135,9 +131,7 @@ const txId = broadcastResponse.txid;
 In this example we construct a `contract-call` transaction with a post condition. We have set the `validateWithAbi` option to `true`, so the `makeContractCall` builder will attempt to fetch this contracts ABI from the specified Stacks network, and validate that the provided functionArgs match what is described in the ABI. This should help you avoid constructing invalid contract-call transactions. If you would prefer to provide your own ABI instead of fetching it from the network, the `validateWithABI` option also accepts [ClarityABI](https://github.com/blockstack/stacks-transactions-js/blob/master/src/contract-abi.ts#L231) objects, which can be constructed from ABI files like so:
 
 ```typescript
-import {
-  ClarityAbi
-} from '@stacks/transactions';
+import { ClarityAbi } from '@stacks/transactions';
 import { readFileSync } from 'fs';
 
 const abi: ClarityAbi = JSON.parse(readFileSync('abi.json').toString());
@@ -199,8 +193,8 @@ const txId = broadcastResponse.txid;
 
 ## Supporting multi-signature transactions
 
-To generate a multi-sig transaction, first create an unsigned transaction.
-The `numSignatures` and `publicKeys` properties in the options object must be set:
+Inorder to make a multi-sig transaction, out of an 'n' number of participants atleast 'm' participants must sign the transaction.
+So, to generate a multi-sig transaction, an unsigned transaction must be created and the participants in the transaction and the number of signatures required on it must be specified. This transaction is passed onto the different participants who can then add their signatures.
 
 ```typescript
 import {
@@ -214,71 +208,91 @@ import {
   BufferReader,
   AnchorMode,
 } from '@stacks/transactions';
+import { StacksTestnet } from '@stacks/network';
 
-const recipient = standardPrincipalCV('SP3FGQ8...');
+const recipient = standardPrincipalCV('SP3FGQ8...'); //recipient will receive STX from transaction signed by users A,B & C
 const amount = 2500000n;
 const fee = 0n;
 const memo = 'test memo';
 
-// private keys of the participants in the transaction
-const privKeyStrings = ['6d430bb9...', '2a584d89...', 'd5200dee...'];
+//string representing private key of user A
+const privKeyStringA = '6d430bb9...';
+const privKeyObjA = createStacksPrivateKey(privKeyStringA);
+const pubKeyObjA = pubKeyfromPrivKey(privKeyStringA);
+const pubKeyStringA = publicKeyToString(pubKeyObjA);
 
-// create private key objects from string array
-const privKeys = privKeyStrings.map(createStacksPrivateKey);
+const pubKeyStringB = '03f76589...';
+const pubKeyStringC = '03925b9c...';
 
-// corresponding public keys
-const pubKeys = privKeyStrings.map(pubKeyfromPrivKey);
+//   const network = new StacksMainnet();
+const network = new StacksTestnet();
 
-// create public key string array from objects
-const pubKeyStrings = pubKeys.map(publicKeyToString);
-
+//creating the unsigned transaction
 const transaction = await makeUnsignedSTXTokenTransfer({
   recipient,
   amount,
   fee,
   memo,
-  numSignatures: 2, // number of signature required
-  publicKeys: pubKeyStrings, // public key string array with >= numSignatures elements
+  network, //by default Mainnet, need to specify otherwise
+  numSignatures: 2, // number of signatures required
+  publicKeys: [pubKeyStringA, pubkKeyStringB, pubKeyStringC], // participants public key string array with >= numSignatures elements required
   anchorMode: AnchorMode.Any,
 });
 
+//user A will sign transaction
+const signer = new TransactionSigner(transaction);
+signer.signOrigin(privKeyObjA);
+//serializing transaction
 const serializedTx = transaction.serialize();
 ```
 
-This transaction payload can be passed along to other participants to sign. In addition to
-meeting the numSignatures requirement, the public keys of the parties who did not sign the
-transaction must be appended to the signature.
+### Transaction signing
+
+The transaction payload can be passed along to other participants to sign. Note however:
+
+- The order in which the transaction is signed matter. A change in order of signatures will result in change in the serialized transaction.
+- The numSignature requirement must be met. If an attempt is made to sign the transaction more times than that specified by numSignature, then an error will be thrown.
+- The public keys of the parties who did not sign the transaction must be added to the signed transaction.
 
 ```typescript
-// deserialize and sign transaction
+//string representing private key of user B
+const privKeyStringB = 'fc5d8565...';
+const privKeyObjB = createStacksPrivateKey(privKeyStringB);
+
+//string representing public key of user C
+const pubKeyStringC = '03925b9c...';
+const pubKeyObjC = createStacksPublicKey(pubKeyStringC);
+
+//deserialize transaction
 const bufferReader = new BufferReader(serializedTx);
 const deserializedTx = deserializeTransaction(bufferReader);
 
+//user B signs transaction
 const signer = new TransactionSigner(deserializedTx);
+signer.signOrigin(privKeyObjB);
 
-// first signature
-signer.signOrigin(privKeys[0]);
+//user B must also append the public key of any users (from the participating users)
+//that do not sign the transaction.
+signer.appendOrigin(pubKeyObjC);
 
-// second signature
-signer.signOrigin(privKeys[1]);
-
-// after meeting the numSignatures requirement, the public
-// keys of the participants who did not sign must be appended
-signer.appendOrigin(pubKeys[2]);
-
-// the serialized multi-sig tx
-const serializedSignedTx = deserializedTx.serialize();
+const serializedTx2 = deserializedTx.serialize();
 ```
+
+### Key format
+
+Note that both the public keys and the private keys must either be compressed or uncompressed, meaning if the private keys are compressed then the public keys used must also be compressed and vice versa.
+
+- a private key is usually compressed if it is 33-bytes in length and ends with the byte 0x01
+- a private key is usually uncompressed if it is 32-bytes in length
+- a public key is usually compressed if it starts with either the byte 0x02 or 0x03.
+- a public key is usually uncompressed if it starts with the byte 0x04.
 
 ## Calling Read-only Contract Functions
 
 Read-only contract functions can be called without generating or broadcasting a transaction. Instead it works via a direct API call to a Stacks node.
 
 ```typescript
-import {
-  bufferCVFromString,
-  callReadOnlyFunction,
-} from '@stacks/transactions';
+import { bufferCVFromString, callReadOnlyFunction } from '@stacks/transactions';
 import { StacksTestnet } from '@stacks/network';
 
 const contractAddress = 'ST3KC0MTNW34S1ZXD36JYKFD3JJMWA01M55DSJ4JE';
@@ -515,10 +529,7 @@ const contractNonFungiblePostCondition = makeContractNonFungiblePostCondition(
 Clarity Values represent values of Clarity contracts. If a JSON format is required the helper function `cvToJSON` can be used.
 
 ```typescript
-import {
-  cvToJSON,
-  hexToCV
-} from '@stacks/transactions';
+import { cvToJSON, hexToCV } from '@stacks/transactions';
 
-cvToJSON(hexToCV(tx.tx_result.hex))
+cvToJSON(hexToCV(tx.tx_result.hex));
 ```
