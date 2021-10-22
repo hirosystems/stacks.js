@@ -1,7 +1,6 @@
 import { TransactionVersion, ChainID, fetchPrivate } from '@stacks/common';
 
 export const HIRO_MAINNET_DEFAULT = 'https://stacks-node-api.mainnet.stacks.co';
-export const HIRO_REGTEST_DEFAULT = 'https://stacks-node-api.regtest.stacks.co';
 export const HIRO_TESTNET_DEFAULT = 'https://stacks-node-api.testnet.stacks.co';
 export const HIRO_MOCKNET_DEFAULT = 'http://localhost:3999';
 
@@ -143,15 +142,6 @@ export class StacksMocknet extends StacksMainnet implements StacksNetwork {
   chainId = ChainID.Testnet;
 
   constructor(networkUrl: NetworkConfig = { url: HIRO_MOCKNET_DEFAULT }) {
-    super(networkUrl);
-  }
-}
-
-export class StacksRegtest extends StacksMainnet implements StacksNetwork {
-  version = TransactionVersion.Testnet;
-  chainId = ChainID.Testnet;
-
-  constructor(networkUrl: NetworkConfig = { url: HIRO_REGTEST_DEFAULT }) {
     super(networkUrl);
   }
 }

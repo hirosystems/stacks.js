@@ -149,7 +149,7 @@ export async function getStacksWalletKeyInfo(
     // btcAddress = const { address } = bitcoin.payments.p2pkh({ pubkey: keyPair.publicKey });
     const { address } = bitcoin.payments.p2pkh({
       pubkey: ecPair.publicKey,
-      network: bitcoin.networks.regtest,
+      network: bitcoin.networks.testnet,
     });
     btcAddress = address!;
   } else {

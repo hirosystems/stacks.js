@@ -88,16 +88,6 @@ const CONFIG_DEFAULTS: CLI_CONFIG_TYPE = {
   logConfig: LOG_CONFIG_DEFAULTS,
 };
 
-const CONFIG_REGTEST_DEFAULTS: CLI_CONFIG_TYPE = {
-  blockstackAPIUrl: 'http://localhost:16268',
-  blockstackNodeUrl: 'http://localhost:16264',
-  broadcastServiceUrl: 'http://localhost:16269',
-  utxoServiceUrl: 'http://localhost:18332',
-  logConfig: LOG_CONFIG_DEFAULTS,
-  bitcoindPassword: 'blockstacksystem',
-  bitcoindUsername: 'blockstack',
-};
-
 const CONFIG_LOCALNET_DEFAULTS = {
   blockstackAPIUrl: `http://localhost:20443`,
   blockstackNodeUrl: `http://localhost:20443`,
@@ -117,7 +107,6 @@ const CONFIG_TESTNET_DEFAULTS = {
 };
 
 export const DEFAULT_CONFIG_PATH = '~/.blockstack-cli.conf';
-export const DEFAULT_CONFIG_REGTEST_PATH = path.join(os.homedir(), '.blockstack-cli-regtest.conf');
 export const DEFAULT_CONFIG_TESTNET_PATH = path.join(os.homedir(), '.blockstack-cli-testnet.conf');
 
 export const DEFAULT_MAX_ID_SEARCH_INDEX = 256;
@@ -3387,15 +3376,10 @@ export function checkArgs(argList: string[]): CheckArgsSuccessType | CheckArgsFa
  * If no config file exists, then return the default config.
  *
  * @configPath (string) the path to the config file.
- * @networkType (sring) 'mainnet', 'regtest', 'localnet', or 'testnet'
+ * @networkType (sring) 'mainnet', 'localnet', or 'testnet'
  */
 export function loadConfig(configFile: string, networkType: string): CLI_CONFIG_TYPE {
-  if (
-    networkType !== 'mainnet' &&
-    networkType !== 'testnet' &&
-    networkType != 'regtest' &&
-    networkType != 'localnet'
-  ) {
+  if (networkType !== 'mainnet' && networkType !== 'testnet' && networkType != 'localnet') {
     throw new Error('Unregognized network');
   }
 
@@ -3403,8 +3387,6 @@ export function loadConfig(configFile: string, networkType: string): CLI_CONFIG_
 
   if (networkType === 'mainnet') {
     configRet = Object.assign({}, CONFIG_DEFAULTS);
-  } else if (networkType === 'regtest') {
-    configRet = Object.assign({}, CONFIG_REGTEST_DEFAULTS);
   } else if (networkType === 'localnet') {
     configRet = Object.assign({}, CONFIG_LOCALNET_DEFAULTS);
   } else {

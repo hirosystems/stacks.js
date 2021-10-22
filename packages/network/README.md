@@ -10,7 +10,7 @@ npm install @stacks/network
 
 ## Usage
 
-Creating a Stacks mainnet, testnet, regtest or mocknet network
+Creating a Stacks mainnet, testnet or mocknet network
 
 ```typescript
 import { StacksMainnet, StacksTestnet, StacksMocknet } from '@stacks/network';
@@ -18,8 +18,6 @@ import { StacksMainnet, StacksTestnet, StacksMocknet } from '@stacks/network';
 const network = new StacksMainnet();
 
 const testnet = new StacksTestnet();
-
-const regtest = new StacksRegtest();
 
 const mocknet = new StacksMocknet();
 ```
