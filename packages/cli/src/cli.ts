@@ -78,7 +78,6 @@ import {
   makeAllCommandsList,
   USAGE,
   DEFAULT_CONFIG_PATH,
-  DEFAULT_CONFIG_REGTEST_PATH,
   DEFAULT_CONFIG_TESTNET_PATH,
   ID_ADDRESS_PATTERN,
   STACKS_ADDRESS_PATTERN,
@@ -372,7 +371,7 @@ function balance(network: CLINetworkAdapter, args: string[]): Promise<string> {
   let address = args[0];
 
   if (BLOCKSTACK_TEST) {
-    // force testnet address if we're in regtest or testnet mode
+    // force testnet address if we're in testnet mode
     address = network.coerceAddress(address);
   }
 
@@ -1842,8 +1841,6 @@ export function CLIMain() {
 
     const configPath = CLIOptAsString(opts, 'c')
       ? CLIOptAsString(opts, 'c')
-      : integration_test
-      ? DEFAULT_CONFIG_REGTEST_PATH
       : testnet
       ? DEFAULT_CONFIG_TESTNET_PATH
       : DEFAULT_CONFIG_PATH;
@@ -1853,13 +1850,7 @@ export function CLIMain() {
     const priceToPay = CLIOptAsString(opts, 'P') ? CLIOptAsString(opts, 'P') : '0';
     const priceUnits = CLIOptAsString(opts, 'D');
 
-    const networkType = testnet
-      ? 'testnet'
-      : localnet
-      ? 'localnet'
-      : integration_test
-      ? 'regtest'
-      : 'mainnet';
+    const networkType = testnet ? 'testnet' : localnet ? 'localnet' : 'mainnet';
 
     const configData = loadConfig(configPath!, networkType);
 
