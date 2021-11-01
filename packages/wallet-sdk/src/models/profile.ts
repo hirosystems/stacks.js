@@ -39,17 +39,6 @@ export const DEFAULT_PROFILE: Profile = {
 
 export const DEFAULT_PROFILE_FILE_NAME = 'profile.json';
 
-export const fetchAccountProfile = async ({
-  account,
-  gaiaHubUrl,
-}: {
-  account: Account;
-  gaiaHubUrl: string;
-}) => {
-  const url = await fetchAccountProfileUrl({ gaiaHubUrl, account });
-  return fetchProfileFromUrl(url);
-};
-
 export const fetchProfileFromUrl = async (profileUrl: string) => {
   try {
     const res = await fetchPrivate(profileUrl);
