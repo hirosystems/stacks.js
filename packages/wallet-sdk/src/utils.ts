@@ -44,11 +44,6 @@ export const getHubInfo = async (gaiaHubUrl: string) => {
   return data;
 };
 
-export const getHubPrefix = async (gaiaHubUrl: string) => {
-  const { read_url_prefix } = await getHubInfo(gaiaHubUrl);
-  return read_url_prefix;
-};
-
 const makeGaiaAuthToken = ({
   hubInfo,
   privateKey,
@@ -128,26 +123,4 @@ export const makeGaiaAssociationToken = ({
   const tokenSigner = new TokenSigner('ES256K', signerKeyHex);
   const token = tokenSigner.sign(payload);
   return token;
-};
-
-/**
- * When you already know the Gaia read URL, make a Gaia config that doesn't have to fetch `/hub_info`
- */
-export const convertGaiaHubConfig = ({
-  gaiaHubConfig,
-  privateKey,
-}: {
-  gaiaHubConfig: GaiaHubConfig;
-  privateKey: string;
-}): GaiaHubConfig => {
-  const address = ecPairToAddress(
-    hexStringToECPair(privateKey + (privateKey.length === 64 ? '01' : ''))
-  );
-  return {
-    url_prefix: gaiaHubConfig.url_prefix,
-    max_file_upload_size_megabytes: 100,
-    address,
-    token: 'not_used',
-    server: 'not_used',
-  };
 };

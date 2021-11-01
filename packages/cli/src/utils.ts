@@ -1,12 +1,10 @@
 import { Buffer } from '@stacks/common';
 import * as logger from 'winston';
 import * as bitcoinjs from 'bitcoinjs-lib';
-import * as URL from 'url';
 import * as readline from 'readline';
 import * as stream from 'stream';
 import * as fs from 'fs';
 import * as blockstack from 'blockstack';
-import { TokenSigner } from 'jsontokens';
 import {
   getTypeString,
   ClarityAbiType,
@@ -215,14 +213,6 @@ export class SegwitP2SHKeySigner extends CLITransactionSigner {
   }
 }
 
-export class SafetyError extends Error {
-  safetyErrors: AnyJson;
-  constructor(safetyErrors: AnyJson) {
-    super(JSONStringify(safetyErrors, true));
-    this.safetyErrors = safetyErrors;
-  }
-}
-
 function isCLITransactionSigner(
   signer: string | CLITransactionSigner
 ): signer is CLITransactionSigner {
@@ -423,13 +413,6 @@ export function getPrivateKeyAddress(
 }
 
 /*
- * Is a name a sponsored name (a subdomain)?
- */
-export function isSubdomain(name: string): boolean {
-  return !!name.match(/^[^\.]+\.[^.]+\.[^.]+$/);
-}
-
-/*
  * Get the canonical form of a hex-encoded private key
  * (i.e. strip the trailing '01' if present)
  */
@@ -441,35 +424,10 @@ export function canonicalPrivateKey(privkey: string): string {
 }
 
 /*
- * Get the sum of a set of UTXOs' values
- * @txIn (object) the transaction
- */
-export function sumUTXOs(utxos: UTXO[]): number {
-  return utxos.reduce((agg, x) => agg + x.value!, 0);
-}
-
-/*
  * Hash160 function for zone files
  */
 export function hash160(buff: Buffer): Buffer {
   return bitcoinjs.crypto.hash160(buff);
-}
-
-/*
- * Normalize a URL--remove duplicate /'s from the root of the path.
- * Throw an exception if it's not well-formed.
- */
-export function checkUrl(url: string): string {
-  const urlinfo = URL.parse(url);
-  if (!urlinfo.protocol) {
-    throw new Error(`Malformed full URL: missing scheme in ${url}`);
-  }
-
-  if (!urlinfo.path || urlinfo.path.startsWith('//')) {
-    throw new Error(`Malformed full URL: path root has multiple /'s: ${url}`);
-  }
-
-  return url;
 }
 
 /*
@@ -481,78 +439,6 @@ export function makeProfileJWT(profileData: Object, privateKey: string): string 
   const wrappedToken = blockstack.wrapProfileToken(signedToken);
   const tokenRecords = [wrappedToken];
   return JSONStringify(tokenRecords as unknown as AnyJson);
-}
-
-export async function makeDIDConfiguration(
-  network: CLINetworkAdapter,
-  blockstackID: string,
-  domain: string,
-  privateKey: string
-): Promise<{ entries: { did: string; jwt: string }[] }> {
-  const tokenSigner = new TokenSigner('ES256K', privateKey);
-  const nameInfo = await network.getNameInfo(blockstackID);
-  const did = nameInfo.did!;
-  const payload = {
-    iss: did,
-    domain,
-    exp: new Date(new Date().setFullYear(new Date().getFullYear() + 1)),
-  };
-
-  const jwt = tokenSigner.sign(payload as any);
-  return {
-    entries: [
-      {
-        did,
-        jwt,
-      },
-    ],
-  };
-}
-/*
- * Broadcast a transaction and a zone file.
- * Returns an object that encodes the success/failure of doing so.
- * If zonefile is None, then only the transaction will be sent.
- */
-export async function broadcastTransactionAndZoneFile(
-  network: CLINetworkAdapter,
-  tx: string,
-  zonefile?: string
-) {
-  let txid: string;
-  return Promise.resolve()
-    .then(() => {
-      return network.broadcastTransaction(tx);
-    })
-    .then((_txid: string) => {
-      txid = _txid;
-      if (zonefile) {
-        return network.broadcastZoneFile(zonefile, txid);
-      } else {
-        return { status: true };
-      }
-    })
-    .then(resp => {
-      if (!resp.status) {
-        return {
-          status: false,
-          error: 'Failed to broadcast zone file',
-          txid: txid,
-        };
-      } else {
-        return {
-          status: true,
-          txid: txid,
-        };
-      }
-    })
-    .catch(e => {
-      return {
-        status: false,
-        error: 'Caught exception sending transaction or zone file',
-        message: e.message,
-        stacktrace: e.stack,
-      };
-    });
 }
 
 /*

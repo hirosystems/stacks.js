@@ -6,13 +6,7 @@ import * as jsontokens from 'jsontokens';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const ZoneFile = require('zone-file');
 
-import {
-  canonicalPrivateKey,
-  getPrivateKeyAddress,
-  checkUrl,
-  SafetyError,
-  getPublicKeyFromPrivateKey,
-} from './utils';
+import { canonicalPrivateKey, getPrivateKeyAddress, getPublicKeyFromPrivateKey } from './utils';
 
 import { CLINetworkAdapter, NameInfoType } from './network';
 
@@ -280,48 +274,6 @@ export function gaiaUploadProfileAll(
     .catch(e => {
       return { error: `Failed to upload: ${e.message}`, dataUrls: null };
     });
-}
-
-/*
- * Make a zone file from a Gaia hub---reach out to the Gaia hub, get its read URL prefix,
- * and generate a zone file with the profile mapped to the Gaia hub.
- *
- * @network (object) the network connection
- * @name (string) the name that owns the zone file
- * @gaiaHubUrl (string) the URL to the gaia hub write endpoint
- * @ownerKey (string) the owner private key
- *
- * Returns a promise that resolves to the zone file with the profile URL
- */
-export function makeZoneFileFromGaiaUrl(
-  network: CLINetworkAdapter,
-  name: string,
-  gaiaHubUrl: string,
-  ownerKey: string
-) {
-  const address = getPrivateKeyAddress(network, ownerKey);
-  const mainnetAddress = network.coerceMainnetAddress(address);
-
-  return gaiaConnect(network, gaiaHubUrl, ownerKey).then(hubConfig => {
-    if (!hubConfig.url_prefix) {
-      throw new Error('Invalid hub config: no read_url_prefix defined');
-    }
-    const gaiaReadUrl = hubConfig.url_prefix.replace(/\/+$/, '');
-    const profileUrl = `${gaiaReadUrl}/${mainnetAddress}/profile.json`;
-    try {
-      checkUrl(profileUrl);
-    } catch (e) {
-      throw new SafetyError({
-        status: false,
-        error: e.message,
-        hints: [
-          'Make sure the Gaia hub read URL scheme is present and well-formed.',
-          `Check the "read_url_prefix" field of ${gaiaHubUrl}/hub_info`,
-        ],
-      });
-    }
-    return blockstack.makeProfileZoneFile(name, profileUrl);
-  });
 }
 
 /*

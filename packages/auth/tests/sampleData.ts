@@ -2,24 +2,6 @@ import * as fs from 'fs'
 
 const TEST_DATA_DIR = './tests/testData'
 
-export const sampleManifests = {
-  helloBlockstack: {
-    name: 'Hello, Blockstack',
-    short_name: 'Hello, Blockstack',
-    start_url: 'https://helloblockstack.com',
-    display: 'standalone',
-    background_color: '#fff',
-    description: 'A simple app demonstrating how to log in with Blockstack.',
-    icons: [
-      {
-        src: 'https://raw.githubusercontent.com/blockstack/blockstack-portal/master/app/images/app-hello-blockstack.png',
-        sizes: '192x192',
-        type: 'image/png'
-      }
-    ]
-  }
-}
-
 export const sampleNameRecords = {
   ryan: JSON.parse(fs.readFileSync(`${TEST_DATA_DIR}/name-records/ryan.json`, 'utf8'))
 }

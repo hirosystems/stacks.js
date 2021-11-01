@@ -17,7 +17,6 @@ import { CLINetworkAdapter } from './network';
 import * as bip32 from 'bip32';
 import { BIP32Interface } from 'bip32';
 
-export const STRENGTH = 128; // 12 words
 export const STX_WALLET_COMPATIBLE_SEED_STRENGTH = 256;
 export const DERIVATION_PATH = "m/44'/5757'/0'/0/0";
 
