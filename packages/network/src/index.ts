@@ -19,6 +19,7 @@ export interface StacksNetwork {
   accountEndpoint: string;
   contractAbiEndpoint: string;
   readOnlyFunctionCallEndpoint: string;
+  transactionEndpoint: string;
   isMainnet(): boolean;
   getBroadcastApiUrl: () => string;
   getTransferFeeEstimateApiUrl: () => string;
@@ -36,6 +37,8 @@ export interface StacksNetwork {
   getRewardHoldersUrl: (address: string, options?: any) => string;
   getRewardsTotalUrl: (address: string) => string;
   getStackerInfoUrl: (contractAddress: string, contractName: string) => string;
+  getTransactionUrl: (txId: string) => string;
+  getRawTransactionUrl: (txId: string) => string;
 
   /**
    * Get WHOIS-like information for a name, including the address that owns it,
@@ -57,6 +60,7 @@ export class StacksMainnet implements StacksNetwork {
   accountEndpoint = '/v2/accounts';
   contractAbiEndpoint = '/v2/contracts/interface';
   readOnlyFunctionCallEndpoint = '/v2/contracts/call-read';
+  transactionEndpoint = '/extended/v1/tx'
 
   readonly coreApiUrl: string;
 
@@ -101,6 +105,8 @@ export class StacksMainnet implements StacksNetwork {
   getStackerInfoUrl = (contractAddress: string, contractName: string) =>
     `${this.coreApiUrl}${this.readOnlyFunctionCallEndpoint}
     ${contractAddress}/${contractName}/get-stacker-info`;
+  getTransactionUrl = (txId: string) => `${this.coreApiUrl}${this.transactionEndpoint}/${txId}`;
+  getRawTransactionUrl = (txId: string) => `${this.getTransactionUrl(txId)}/raw`;
   getNameInfo(fullyQualifiedName: string) {
     /*
       TODO: Update to v2 API URL for name lookups
