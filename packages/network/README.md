@@ -64,6 +64,10 @@ const accountInfoUrl = network.getAccountApiUrl(address);
 const contractName = 'hello_world';
 const abiUrl = network.getAbiApiUrl(address, contractName);
 
+const transactionId = `0x6b1475e402513fdf13e5baf9262a9c97a376247a2373a6ef8f41dfc0082c323e`;
+const transactionInfoUrl = network.getTransactionUrl(transactionId);
+const rawTransactionurl = network.getRawTransactionUrl(transactionId);
+
 const functionName = 'hello';
 const readOnlyFunctionCallUrl = network.getReadOnlyFunctionCallApiUrl(
   address,
