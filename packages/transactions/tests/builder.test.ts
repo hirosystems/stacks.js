@@ -19,12 +19,13 @@ import {
   callReadOnlyFunction,
   sponsorTransaction,
   makeSTXTokenTransfer,
-  makeUnsignedContractCall
+  makeUnsignedContractCall,
+  estimateTransaction
 } from '../src/builders';
 
 import { deserializeTransaction, StacksTransaction } from '../src/transaction';
 
-import { createTokenTransferPayload, TokenTransferPayload } from '../src/payload';
+import { createTokenTransferPayload, serializePayload, TokenTransferPayload } from '../src/payload';
 
 import { BufferReader } from '../src/bufferReader';
 
@@ -835,43 +836,73 @@ test('make a multi-sig contract call', async () => {
   );
 });
 
-test('Estimate token transfer fee', async () => {
-  const apiUrl = `${DEFAULT_CORE_NODE_API_URL}/v2/fees/transfer`;
-  const estimateFeeRate = 1;
-
+test('Estimate transaction transfer fee', async () => {
   const recipient = standardPrincipalCV('SP3FGQ8Z7JY9BWYZ5WM53E0M9NK7WHJF0691NZ159');
   const amount = 12345;
   const fee = 0;
   const nonce = 0;
   const senderKey = 'edf9aee84d9b7abc145504dde6726c64f369d37ee34ded868fabd876c26570bc01';
+  const publicKey = publicKeyToString(pubKeyfromPrivKey(senderKey));
   const memo = 'test memo';
 
-  const transaction = await makeSTXTokenTransfer({
+  const transaction = await makeUnsignedSTXTokenTransfer({
     recipient,
+    publicKey,
     amount,
-    senderKey,
     fee,
     nonce,
     memo,
     anchorMode: AnchorMode.Any
   });
 
-  const transactionByteLength = transaction.serialize().byteLength;
+  const serialized = transaction.serialize();
+  const transactionByteLength = serialized.byteLength;
 
-  fetchMock.mockOnce(`${estimateFeeRate}`);
+  const mockedResponse = JSON.stringify({
+    "cost_scalar_change_by_byte": 0.00476837158203125,
+    "estimated_cost": {
+      "read_count": 19,
+      "read_length": 4814,
+      "runtime": 7175000,
+      "write_count": 2,
+      "write_length": 1020
+    },
+    "estimated_cost_scalar": 14,
+    "estimated_fee_rates": {
+      "high": 10,
+      "low": 1.2410714285714286,
+      "middle": 8.958333333333332
+    },
+    "estimated_fees": {
+      "high": 140,
+      "low": 17,
+      "middle": 125
+    }
+  });
 
-  const estimateFee = transactionByteLength * estimateFeeRate;
-  const resultEstimateFee = await estimateTransfer(transaction);
+  fetchMock.mockOnce(mockedResponse);
 
-  fetchMock.mockOnce(`${estimateFeeRate}`);
-  const network = new StacksTestnet();
-  const resultEstimateFee2 = await estimateTransfer(transaction, network);
+  const mainnet = new StacksMainnet();
+  const resultEstimateFee = await estimateTransaction(transaction, transactionByteLength, mainnet);
+
+  fetchMock.mockOnce(mockedResponse);
+
+  const testnet = new StacksTestnet();
+  const resultEstimateFee2 = await estimateTransaction(transaction, transactionByteLength, testnet);
 
   expect(fetchMock.mock.calls.length).toEqual(2);
-  expect(fetchMock.mock.calls[0][0]).toEqual(apiUrl);
-  expect(fetchMock.mock.calls[1][0]).toEqual(network.getTransferFeeEstimateApiUrl());
-  expect(resultEstimateFee.toString()).toEqual(estimateFee.toString());
-  expect(resultEstimateFee2.toString()).toEqual(estimateFee.toString());
+  expect(fetchMock.mock.calls[0][0]).toEqual(mainnet.getTransactionFeeEstimateApiUrl());
+  expect(fetchMock.mock.calls[0][1]?.body).toEqual(JSON.stringify({
+      transaction_payload: serializePayload(transaction.payload).toString('hex'),
+      estimated_len: transactionByteLength
+  }));
+  expect(fetchMock.mock.calls[1][0]).toEqual(testnet.getTransactionFeeEstimateApiUrl());
+  expect(fetchMock.mock.calls[1][1]?.body).toEqual(JSON.stringify({
+      transaction_payload: serializePayload(transaction.payload).toString('hex'),
+      estimated_len: transactionByteLength
+  }));
+  expect(resultEstimateFee).toEqual({ high: 140, low: 17, middle: 125 });
+  expect(resultEstimateFee2).toEqual({ high: 140, low: 17, middle: 125 });
 });
 
 test('Make STX token transfer with fetch account nonce', async () => {
