@@ -3,8 +3,8 @@ import { bip32, ECPair } from 'bitcoinjs-lib';
 import { getPublicKeyFromPrivate } from '@stacks/encryption';
 import { makeAuthResponse } from '@stacks/auth';
 import { getProfileURLFromZoneFile } from './utils';
-
-import { IdentityKeyPair } from './utils/index';
+import { Profile, Identity as IdentifyInterface } from './common';
+import { IdentityKeyPair } from './utils';
 import {
   makeGaiaAssociationToken,
   DEFAULT_GAIA_HUB,
@@ -12,7 +12,7 @@ import {
   connectToGaiaHubWithConfig,
 } from './utils/gaia';
 import IdentityAddressOwnerNode from './nodes/identity-address-owner-node';
-import { Profile, fetchProfile, DEFAULT_PROFILE, signAndUploadProfile } from './profiles';
+import { fetchProfile, DEFAULT_PROFILE, signAndUploadProfile } from './profiles';
 import { ecPairToAddress } from '@stacks/encryption';
 
 interface IdentityConstructorOptions {
@@ -27,7 +27,7 @@ interface RefreshOptions {
   gaiaUrl: string;
 }
 
-export class Identity {
+export class Identity implements IdentifyInterface {
   public keyPair: IdentityKeyPair;
   public address: string;
   public defaultUsername?: string;
@@ -64,7 +64,7 @@ export class Identity {
     const appPrivateKey = this.appPrivateKey(appDomain);
     const hubInfo = await getHubInfo(gaiaUrl);
     const profileUrl = await this.profileUrl(hubInfo.read_url_prefix);
-    const profile =
+    const profile: Profile =
       (await fetchProfile({ identity: this, gaiaUrl: hubInfo.read_url_prefix })) || DEFAULT_PROFILE;
     if (scopes.includes('publish_data')) {
       if (!profile.apps) {
