@@ -10,7 +10,6 @@ import {
   makeContractFungiblePostCondition,
   makeStandardNonFungiblePostCondition,
   makeContractNonFungiblePostCondition,
-  estimateTransfer,
   broadcastTransaction,
   getNonce,
   TxBroadcastResult,
@@ -113,16 +112,29 @@ test('Make STX token transfer with set tx fee', async () => {
   expect(serialized).toBe(tx);
 });
 
-test('Make STX token transfer with fee estimate', async () => {
-  const apiUrl = `${DEFAULT_CORE_NODE_API_URL}/v2/fees/transfer`;
+test.only('Make STX token transfer with fee estimate', async () => {
+  const apiUrl = `${DEFAULT_CORE_NODE_API_URL}/v2/fees/transaction`;
   const recipient = standardPrincipalCV('SP3FGQ8Z7JY9BWYZ5WM53E0M9NK7WHJF0691NZ159');
   const amount = 12345;
-  const estimateFeeRate = 1;
   const nonce = 0;
   const senderKey = 'edf9aee84d9b7abc145504dde6726c64f369d37ee34ded868fabd876c26570bc01';
   const memo = 'test memo';
 
-  fetchMock.mockOnce(`${estimateFeeRate}`);
+  const mockedResponse = JSON.stringify({
+    "cost_scalar_change_by_byte": 0.00476837158203125,
+    "estimated_cost": {
+      "read_count": 19,
+      "read_length": 4814,
+      "runtime": 7175000,
+      "write_count": 2,
+      "write_length": 1020
+    },
+    "estimated_cost_scalar": 14,
+    "estimated_fee_rates": [10, 1.2410714285714286, 8.958333333333332],
+    "estimated_fees": [200, 180, 160]
+  });
+
+  fetchMock.mockOnce(mockedResponse);
 
   const transaction = await makeSTXTokenTransfer({
     recipient,
@@ -133,9 +145,7 @@ test('Make STX token transfer with fee estimate', async () => {
     anchorMode: AnchorMode.Any
   });
 
-  const fee = transaction.serialize().byteLength * estimateFeeRate;
-
-  expect(transaction.auth.spendingCondition?.fee?.toString()).toEqual(fee.toString());
+  expect(transaction.auth.spendingCondition?.fee?.toString()).toEqual("180");
 
   const serialized = transaction.serialize().toString('hex');
 
@@ -868,16 +878,8 @@ test('Estimate transaction transfer fee', async () => {
       "write_length": 1020
     },
     "estimated_cost_scalar": 14,
-    "estimated_fee_rates": {
-      "high": 10,
-      "low": 1.2410714285714286,
-      "middle": 8.958333333333332
-    },
-    "estimated_fees": {
-      "high": 140,
-      "low": 17,
-      "middle": 125
-    }
+    "estimated_fee_rates": [10, 1.2410714285714286, 8.958333333333332],
+    "estimated_fees": [140, 17, 125]
   });
 
   fetchMock.mockOnce(mockedResponse);
@@ -901,8 +903,8 @@ test('Estimate transaction transfer fee', async () => {
       transaction_payload: serializePayload(transaction.payload).toString('hex'),
       estimated_len: transactionByteLength
   }));
-  expect(resultEstimateFee).toEqual({ high: 140, low: 17, middle: 125 });
-  expect(resultEstimateFee2).toEqual({ high: 140, low: 17, middle: 125 });
+  expect(resultEstimateFee).toEqual([140, 17, 125]);
+  expect(resultEstimateFee2).toEqual([140, 17, 125]);
 });
 
 test('Make STX token transfer with fetch account nonce', async () => {
@@ -1058,7 +1060,6 @@ test('Make sponsored STX token transfer with sponsor fee estimate', async () => 
   const recipient = standardPrincipalCV('SP3FGQ8Z7JY9BWYZ5WM53E0M9NK7WHJF0691NZ159');
   const amount = 12345;
   const fee = 50;
-  const estimateFeeRate = 2;
   const nonce = 2;
   const senderKey = 'edf9aee84d9b7abc145504dde6726c64f369d37ee34ded868fabd876c26570bc01';
   const memo = 'test memo';
@@ -1081,15 +1082,27 @@ test('Make sponsored STX token transfer with sponsor fee estimate', async () => 
     anchorMode: AnchorMode.Any
   });
 
-  const sponsorFee = transaction.serialize().byteLength * estimateFeeRate;
-
   const sponsorOptions = {
     transaction,
     sponsorPrivateKey: sponsorKey,
     sponsorNonce,
   };
 
-  fetchMock.mockOnce(`${estimateFeeRate}`);
+  const mockedResponse = JSON.stringify({
+    "cost_scalar_change_by_byte": 0.00476837158203125,
+    "estimated_cost": {
+      "read_count": 19,
+      "read_length": 4814,
+      "runtime": 7175000,
+      "write_count": 2,
+      "write_length": 1020
+    },
+    "estimated_cost_scalar": 14,
+    "estimated_fee_rates": [10, 1.2410714285714286, 8.958333333333332],
+    "estimated_fees": [140, 1, 125]
+  });
+
+  fetchMock.mockOnce(mockedResponse);
 
   const sponsorSignedTx = await sponsorTransaction(sponsorOptions);
 
@@ -1110,7 +1123,7 @@ test('Make sponsored STX token transfer with sponsor fee estimate', async () => 
   const deserializedSponsorSpendingCondition = (deserializedSponsorTx.auth as SponsoredAuthorization).sponsorSpendingCondition!;
   expect(deserializedSponsorSpendingCondition.hashMode).toBe(addressHashMode);
   expect(deserializedSponsorSpendingCondition.nonce!.toString()).toBe(sponsorNonce.toString());
-  expect(deserializedSponsorSpendingCondition.fee!.toString()).toBe(sponsorFee.toString());
+  expect(deserializedSponsorSpendingCondition.fee!.toString()).toBe("1");
 
   const deserializedPayload = deserializedSponsorTx.payload as TokenTransferPayload;
   expect(deserializedPayload.amount.toString()).toBe(amount.toString());

@@ -150,18 +150,12 @@ interface FeeEstimateResponse {
     write_length: bigint
   },
   estimated_cost_scalar: bigint,
-  estimated_fee_rates: {
-    high: bigint,
-    low: bigint,
-    middle: bigint
-  },
-  estimated_fees: FeeEstimate
-}
-
-interface FeeEstimate {
-  high: bigint,
-  middle: bigint,
-  low: bigint,
+  estimated_fee_rates: [
+    bigint, bigint, bigint
+  ],
+  estimated_fees: [
+    bigint, bigint, bigint
+  ]
 }
 
 /**
@@ -179,7 +173,7 @@ export async function estimateTransaction(
   transaction: StacksTransaction,
   estimatedLen?: number,
   network?: StacksNetwork
-): Promise<FeeEstimate> {
+): Promise<[bigint, bigint, bigint]> {
 
   const options = {
     method: 'POST',
@@ -618,7 +612,7 @@ export async function makeUnsignedSTXTokenTransfer(
   if (txOptions.fee === undefined || txOptions.fee === null) {
     const estimatedLen = transaction.serialize().byteLength;
     const txFee = await estimateTransaction(transaction, estimatedLen, options.network);
-    transaction.setFee(txFee.middle);
+    transaction.setFee(txFee[1]);
   }
 
   if (txOptions.nonce === undefined || txOptions.nonce === null) {
@@ -821,7 +815,7 @@ export async function makeContractDeploy(
   if (txOptions.fee === undefined || txOptions.fee === null) {
     const estimatedLen = transaction.serialize().byteLength;
     const txFee = await estimateTransaction(transaction, estimatedLen, options.network)
-    transaction.setFee(txFee.middle);
+    transaction.setFee(txFee[1]);
   }
 
   if (txOptions.nonce === undefined || txOptions.nonce === null) {
@@ -1037,7 +1031,7 @@ export async function makeUnsignedContractCall(
   if (txOptions.fee === undefined || txOptions.fee === null) {
     const estimatedLen = transaction.serialize().byteLength;
     const txFee = await estimateTransaction(transaction, estimatedLen, options.network);
-    transaction.setFee(txFee.middle);
+    transaction.setFee(txFee[1]);
   }
 
   if (txOptions.nonce === undefined || txOptions.nonce === null) {
@@ -1365,7 +1359,7 @@ export async function sponsorTransaction(
       case PayloadType.SmartContract:
       case PayloadType.ContractCall:
         const estimatedLen = options.transaction.serialize().byteLength;
-        txFee = (await estimateTransaction(options.transaction, estimatedLen, network)).middle;
+        txFee = (await estimateTransaction(options.transaction, estimatedLen, network))[0];
         break;
       default:
         throw new Error(
