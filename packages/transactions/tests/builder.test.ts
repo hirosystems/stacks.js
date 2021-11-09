@@ -885,12 +885,12 @@ test('Estimate transaction transfer fee', async () => {
   fetchMock.mockOnce(mockedResponse);
 
   const mainnet = new StacksMainnet();
-  const resultEstimateFee = await estimateTransaction(transaction, transactionByteLength, mainnet);
+  const resultEstimateFee = await estimateTransaction(transaction.payload, transactionByteLength, mainnet);
 
   fetchMock.mockOnce(mockedResponse);
 
   const testnet = new StacksTestnet();
-  const resultEstimateFee2 = await estimateTransaction(transaction, transactionByteLength, testnet);
+  const resultEstimateFee2 = await estimateTransaction(transaction.payload, transactionByteLength, testnet);
 
   expect(fetchMock.mock.calls.length).toEqual(2);
   expect(fetchMock.mock.calls[0][0]).toEqual(mainnet.getTransactionFeeEstimateApiUrl());
