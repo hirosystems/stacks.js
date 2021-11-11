@@ -6,7 +6,8 @@ import * as jsontokens from 'jsontokens';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const ZoneFile = require('zone-file');
 
-import { canonicalPrivateKey, getPrivateKeyAddress, getPublicKeyFromPrivateKey } from './utils';
+import { canonicalPrivateKey, getPublicKeyFromPrivateKey } from './utils';
+import { getPrivateKeyAddress } from './common';
 
 import { CLINetworkAdapter, NameInfoType } from './network';
 
