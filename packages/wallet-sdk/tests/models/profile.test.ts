@@ -74,4 +74,13 @@ describe(selectPrivateKey, () => {
     const profilePrivateKey = selectPrivateKey(account);
     expect(profilePrivateKey).toEqual(account.dataPrivateKey);
   });
+
+  test('select with username owned by a third private key', async () => {
+    const account = mockAccount;
+    account.username = "test.btc";
+    account.usernameOwnerAddress = getAddressFromPrivateKey("970c74372d8176609a95f85fd8f607538345e327477f393355dc33b95221a68401");
+    const profilePrivateKey = selectPrivateKey(account);
+    expect(profilePrivateKey).toEqual(undefined);
+  });
+
 });

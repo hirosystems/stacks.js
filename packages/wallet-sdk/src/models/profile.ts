@@ -116,7 +116,7 @@ export async function uploadProfile({
   );
 }
 
-export const selectPrivateKey = (account: Account) => {
+export const selectPrivateKey: (account: Account) => string | undefined = (account: Account) => {
   let usernameOwner: string | undefined;
   if (account.username && account.usernameOwnerAddress) {
     usernameOwner = account.usernameOwnerAddress;
@@ -125,6 +125,9 @@ export const selectPrivateKey = (account: Account) => {
     return account.stxPrivateKey;
   } else if (usernameOwner === getAddressFromPrivateKey(account.dataPrivateKey)) {
     return account.dataPrivateKey;
+  } else if (usernameOwner) {
+    // unknown private key
+    return undefined;
   } else {
     return account.stxPrivateKey;
   }
@@ -142,6 +145,13 @@ export const signAndUploadProfile = async ({
   gaiaHubConfig?: GaiaHubConfig;
 }) => {
   const profilePrivateKey = selectPrivateKey(account);
-  const signedProfileTokenData = signProfileForUpload({ profile, profilePrivateKey });
-  await uploadProfile({ gaiaHubUrl, account, signedProfileTokenData, gaiaHubConfig });
+  if (profilePrivateKey) {
+    const signedProfileTokenData = signProfileForUpload({ profile, profilePrivateKey });
+    await uploadProfile({ gaiaHubUrl, account, signedProfileTokenData, gaiaHubConfig });
+  } else {
+    console.log(
+      'Profile was not upload, because we do not know which private key to use for signing.'
+    );
+    // TODO Show we throw an error here?
+  }
 };
