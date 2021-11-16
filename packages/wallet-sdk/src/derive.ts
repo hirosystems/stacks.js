@@ -4,8 +4,8 @@ import { ECPair } from 'bitcoinjs-lib';
 import { createSha2Hash, ecPairToHexString } from '@stacks/encryption';
 
 import { assertIsTruthy } from './utils';
-import { Account } from './models/account';
-import { WalletKeys } from './models/wallet';
+import { Account } from './models/common';
+import { WalletKeys } from './models/common';
 
 const DATA_DERIVATION_PATH = `m/888'/0'`;
 const WALLET_CONFIG_PATH = `m/44/5757'/0'/1`;

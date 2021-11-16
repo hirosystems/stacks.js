@@ -1,36 +1,9 @@
 import { getProfileURLFromZoneFile } from '../utils';
-import { Account, getGaiaAddress } from './account';
 import { signProfileToken, wrapProfileToken } from '@stacks/profile';
 import { connectToGaiaHub, GaiaHubConfig, uploadToGaiaHub } from '@stacks/storage';
 import { getPublicKeyFromPrivate } from '@stacks/encryption';
 import { fetchPrivate } from '@stacks/common';
-
-const PERSON_TYPE = 'Person';
-const CONTEXT = 'http://schema.org';
-const IMAGE_TYPE = 'ImageObject';
-
-export interface ProfileImage {
-  '@type': typeof IMAGE_TYPE;
-  name: string;
-  contentUrl: string;
-}
-
-export interface Profile {
-  '@type': typeof PERSON_TYPE;
-  '@context': typeof CONTEXT;
-  apps?: {
-    [origin: string]: string;
-  };
-  appsMeta?: {
-    [origin: string]: {
-      publicKey: string;
-      storage: string;
-    };
-  };
-  name?: string;
-  image?: ProfileImage[];
-  [key: string]: any;
-}
+import { Account, Profile, getGaiaAddress } from './common';
 
 export const DEFAULT_PROFILE: Profile = {
   '@type': 'Person',

@@ -2,7 +2,7 @@ import { decryptContent } from '@stacks/encryption';
 import { GaiaHubConfig } from '@stacks/storage';
 import { fetchPrivate } from '@stacks/transactions';
 import { deriveLegacyConfigPrivateKey } from '../derive';
-import { getRootNode, Wallet } from './wallet';
+import { Wallet, getRootNode } from './common';
 
 export interface LegacyConfigApp {
   origin: string;
