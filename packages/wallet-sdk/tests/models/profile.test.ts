@@ -47,25 +47,31 @@ describe(selectPrivateKey, () => {
     const account = mockAccount;
     account.username = undefined;
 
-    fetchMock.once(JSON.stringify({address: getAddressFromPrivateKey(account.stxPrivateKey)}))
-    const profilePrivateKey = await selectPrivateKey(account);
+    const profilePrivateKey = selectPrivateKey(account);
     expect(profilePrivateKey).toEqual(account.stxPrivateKey);
-  });
+ });
+
+ test('select without username but usernameOwnerAddress', async () => {
+  const account = mockAccount;
+  account.username = undefined;
+  account.usernameOwnerAddress = getAddressFromPrivateKey(account.dataPrivateKey);
+  const profilePrivateKey = selectPrivateKey(account);
+  expect(profilePrivateKey).toEqual(account.stxPrivateKey);
+});
 
   test('select with username owned by stx private key', async () => {
     const account = mockAccount;
     account.username = "test.btc";
-    fetchMock.once(JSON.stringify({address: getAddressFromPrivateKey(account.stxPrivateKey)}))
-    const profilePrivateKey = await selectPrivateKey(account);
+    account.usernameOwnerAddress = getAddressFromPrivateKey(account.stxPrivateKey);
+    const profilePrivateKey = selectPrivateKey(account);
     expect(profilePrivateKey).toEqual(account.stxPrivateKey);
   });
 
   test('select with username owned by data private key', async () => {
     const account = mockAccount;
     account.username = "test.btc";
-
-    fetchMock.once(JSON.stringify({address: getAddressFromPrivateKey(account.dataPrivateKey)}))
-    const profilePrivateKey = await selectPrivateKey(account);
+    account.usernameOwnerAddress = getAddressFromPrivateKey(account.dataPrivateKey);
+    const profilePrivateKey = selectPrivateKey(account);
     expect(profilePrivateKey).toEqual(account.dataPrivateKey);
   });
 });

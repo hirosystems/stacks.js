@@ -28,6 +28,8 @@ export interface Account {
   salt: string;
   /** A single username registered via BNS for this account */
   username?: string;
+  /** stx address that owns the username (at time creation of this Account object) */
+  usernameOwnerAddress?: string;
   /** A profile object that is publicly associated with this account's username */
   profile?: Profile;
   /** The root of the keychain used to generate app-specific keys */

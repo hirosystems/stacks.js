@@ -117,11 +117,10 @@ export async function uploadProfile({
   );
 }
 
-export const selectPrivateKey = async (account: Account) => {
+export const selectPrivateKey = (account: Account) => {
   let usernameOwner: string | undefined;
-  if (account.username) {
-    const nameInfo = await new StacksMainnet().getNameInfo(account.username);
-    usernameOwner = nameInfo.address;
+  if (account.username && account.usernameOwnerAddress) {
+    usernameOwner = account.usernameOwnerAddress;
   }
   if (usernameOwner === getAddressFromPrivateKey(account.stxPrivateKey)) {
     return account.stxPrivateKey;
@@ -143,7 +142,7 @@ export const signAndUploadProfile = async ({
   account: Account;
   gaiaHubConfig?: GaiaHubConfig;
 }) => {
-  const profilePrivateKey = await selectPrivateKey(account);
+  const profilePrivateKey = selectPrivateKey(account);
   const signedProfileTokenData = signProfileForUpload({ profile, profilePrivateKey });
   await uploadProfile({ gaiaHubUrl, account, signedProfileTokenData, gaiaHubConfig });
 };
