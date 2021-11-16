@@ -4,7 +4,6 @@ import { signProfileToken, wrapProfileToken } from '@stacks/profile';
 import { connectToGaiaHub, GaiaHubConfig, uploadToGaiaHub } from '@stacks/storage';
 import { getPublicKeyFromPrivate } from '@stacks/encryption';
 import { fetchPrivate } from '@stacks/common';
-import { StacksMainnet } from '@stacks/network';
 import { getAddressFromPrivateKey } from '@stacks/transactions';
 
 const PERSON_TYPE = 'Person';
