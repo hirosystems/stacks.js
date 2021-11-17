@@ -130,8 +130,20 @@ test.only('Make STX token transfer with fee estimate', async () => {
       "write_length": 1020
     },
     "estimated_cost_scalar": 14,
-    "estimated_fee_rates": [10, 1.2410714285714286, 8.958333333333332],
-    "estimated_fees": [200, 180, 160]
+    "estimations": [
+      {
+        "fee": 200,
+        "fee_rate": 10
+      },
+      {
+        "fee": 180,
+        "fee_rate": 1.2410714285714286
+      },
+      {
+        "fee": 160,
+        "fee_rate": 8.958333333333332
+      },
+    ]
   });
 
   fetchMock.mockOnce(mockedResponse);
@@ -878,8 +890,20 @@ test('Estimate transaction transfer fee', async () => {
       "write_length": 1020
     },
     "estimated_cost_scalar": 14,
-    "estimated_fee_rates": [10, 1.2410714285714286, 8.958333333333332],
-    "estimated_fees": [140, 17, 125]
+    "estimations": [
+      {
+        "fee": 140,
+        "fee_rate": 10
+      },
+      {
+        "fee": 17,
+        "fee_rate": 1.2410714285714286
+      },
+      {
+        "fee": 125,
+        "fee_rate": 8.958333333333332
+      },
+    ]
   });
 
   fetchMock.mockOnce(mockedResponse);
@@ -1098,8 +1122,20 @@ test('Make sponsored STX token transfer with sponsor fee estimate', async () => 
       "write_length": 1020
     },
     "estimated_cost_scalar": 14,
-    "estimated_fee_rates": [10, 1.2410714285714286, 8.958333333333332],
-    "estimated_fees": [140, 1, 125]
+    "estimations": [
+      {
+        "fee": 140,
+        "fee_rate": 10
+      },
+      {
+        "fee": 1,
+        "fee_rate": 1.2410714285714286
+      },
+      {
+        "fee": 125,
+        "fee_rate": 8.958333333333332
+      },
+    ]
   });
 
   fetchMock.mockOnce(mockedResponse);
