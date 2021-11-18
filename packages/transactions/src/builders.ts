@@ -142,8 +142,8 @@ export async function estimateTransfer(
 }
 
 interface FeeEstimation {
-  fee: bigint,
-  fee_rate: bigint,
+  fee: number,
+  fee_rate: number,
 }
 interface FeeEstimateResponse {
   cost_scalar_change_by_byte: bigint,
@@ -1353,13 +1353,17 @@ export async function sponsorTransaction(
   const sponsorPubKey = pubKeyfromPrivKey(options.sponsorPrivateKey);
 
   if (sponsorOptions.fee === undefined || sponsorOptions.fee === null) {
-    let txFee = BigInt(0);
+    let txFee = 0;
     switch (options.transaction.payload.payloadType) {
       case PayloadType.TokenTransfer:
       case PayloadType.SmartContract:
       case PayloadType.ContractCall:
         const estimatedLen = options.transaction.serialize().byteLength;
-        txFee = (await estimateTransaction(options.transaction.payload, estimatedLen, network))[1].fee;
+        try {
+          txFee = (await estimateTransaction(options.transaction.payload, estimatedLen, network))[1].fee;
+        } catch(e) {
+          throw e;
+        }
         break;
       default:
         throw new Error(
