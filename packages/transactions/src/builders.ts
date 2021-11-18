@@ -92,7 +92,7 @@ export async function getNonce(address: string, network?: StacksNetwork): Promis
 
 /**
  * @deprecated Use the new {@link estimateTransaction} function insterad.
- * 
+ *
  * Estimate the total transaction fee in microstacks for a token transfer
  *
  * @param {StacksTransaction} transaction - the token transfer transaction to estimate fees for
@@ -142,20 +142,20 @@ export async function estimateTransfer(
 }
 
 interface FeeEstimation {
-  fee: number,
-  fee_rate: number,
+  fee: number;
+  fee_rate: number;
 }
 interface FeeEstimateResponse {
-  cost_scalar_change_by_byte: bigint,
+  cost_scalar_change_by_byte: bigint;
   estimated_cost: {
-    read_count: bigint,
-    read_length: bigint,
-    runtime: bigint,
-    write_count: bigint,
-    write_length: bigint
-  },
-  estimated_cost_scalar: bigint,
-  estimations: [FeeEstimation, FeeEstimation, FeeEstimation]
+    read_count: bigint;
+    read_length: bigint;
+    runtime: bigint;
+    write_count: bigint;
+    write_length: bigint;
+  };
+  estimated_cost_scalar: bigint;
+  estimations: [FeeEstimation, FeeEstimation, FeeEstimation];
 }
 
 /**
@@ -174,14 +174,13 @@ export async function estimateTransaction(
   estimatedLen?: number,
   network?: StacksNetwork
 ): Promise<[FeeEstimation, FeeEstimation, FeeEstimation]> {
-
   const options = {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       transaction_payload: serializePayload(transactionPayload).toString('hex'),
-      ...(estimatedLen ? { estimated_len: estimatedLen } : {})
-    })
+      ...(estimatedLen ? { estimated_len: estimatedLen } : {}),
+    }),
   };
 
   const defaultNetwork = new StacksMainnet();
@@ -699,7 +698,7 @@ export interface ContractDeployOptions {
 
 /**
  * @deprecated Use the new {@link estimateTransaction} function insterad.
- * 
+ *
  * Estimate the total transaction fee in microstacks for a contract deploy
  *
  * @param {StacksTransaction} transaction - the token transfer transaction to estimate fees for
@@ -814,7 +813,7 @@ export async function makeContractDeploy(
 
   if (txOptions.fee === undefined || txOptions.fee === null) {
     const estimatedLen = transaction.serialize().byteLength;
-    const txFee = await estimateTransaction(payload, estimatedLen, options.network)
+    const txFee = await estimateTransaction(payload, estimatedLen, options.network);
     transaction.setFee(txFee[1].fee);
   }
 
@@ -888,7 +887,7 @@ export interface SignedMultiSigContractCallOptions extends ContractCallOptions {
 
 /**
  * @deprecated Use the new {@link estimateTransaction} function insterad.
- * 
+ *
  * Estimate the total transaction fee in microstacks for a contract function call
  *
  * @param {StacksTransaction} transaction - the token transfer transaction to estimate fees for
@@ -1360,8 +1359,9 @@ export async function sponsorTransaction(
       case PayloadType.ContractCall:
         const estimatedLen = options.transaction.serialize().byteLength;
         try {
-          txFee = (await estimateTransaction(options.transaction.payload, estimatedLen, network))[1].fee;
-        } catch(e) {
+          txFee = (await estimateTransaction(options.transaction.payload, estimatedLen, network))[1]
+            .fee;
+        } catch (e) {
           throw e;
         }
         break;
