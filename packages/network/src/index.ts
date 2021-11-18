@@ -70,7 +70,8 @@ export class StacksMainnet implements StacksNetwork {
   isMainnet = () => this.version === TransactionVersion.Mainnet;
   getBroadcastApiUrl = () => `${this.coreApiUrl}${this.broadcastEndpoint}`;
   getTransferFeeEstimateApiUrl = () => `${this.coreApiUrl}${this.transferFeeEstimateEndpoint}`;
-  getTransactionFeeEstimateApiUrl = () => `${this.coreApiUrl}${this.transactionFeeEstimateEndpoint}`;
+  getTransactionFeeEstimateApiUrl = () =>
+    `${this.coreApiUrl}${this.transactionFeeEstimateEndpoint}`;
   getAccountApiUrl = (address: string) =>
     `${this.coreApiUrl}${this.accountEndpoint}/${address}?proof=0`;
   getAbiApiUrl = (address: string, contract: string) =>
