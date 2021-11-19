@@ -1,5 +1,6 @@
 import { Buffer } from '@stacks/common';
-import { serializeAddress, serializeLPString, createLPString } from '../types';
+import { serializeAddress, serializeLPString } from '../types';
+import { createLPString } from '../postcondition-types';
 import {
   BooleanCV,
   OptionalCV,
@@ -11,9 +12,9 @@ import {
   ResponseCV,
   ListCV,
   TupleCV,
-  ClarityType,
   ClarityValue,
 } from '.';
+import { ClarityType } from './constants';
 import { BufferArray } from '../utils';
 import { SerializationError } from '../errors';
 import { StringAsciiCV, StringUtf8CV } from './types/stringCV';

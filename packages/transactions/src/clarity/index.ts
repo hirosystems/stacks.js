@@ -1,11 +1,5 @@
-import {
-  ClarityValue,
-  ClarityType,
-  getCVTypeString,
-  cvToString,
-  cvToJSON,
-  cvToValue,
-} from './clarityValue';
+import { ClarityValue, getCVTypeString, cvToString, cvToJSON, cvToValue } from './clarityValue';
+import { ClarityType } from './constants';
 import { BooleanCV, TrueCV, FalseCV, trueCV, falseCV } from './types/booleanCV';
 import { IntCV, UIntCV, intCV, uintCV } from './types/intCV';
 import { BufferCV, bufferCV, bufferCVFromString } from './types/bufferCV';

@@ -21,10 +21,15 @@ import {
 
 import { ec as EC } from 'elliptic';
 
-import { MessageSignature, createMessageSignature } from './authorization';
+import {
+  MessageSignature,
+  createMessageSignature,
+  addressHashModeToVersion,
+  addressFromVersionHash,
+  addressToString,
+} from './common';
 import { BufferReader } from './bufferReader';
 import { c32address } from 'c32check';
-import { addressHashModeToVersion, addressFromVersionHash, addressToString } from './types';
 
 export interface StacksPublicKey {
   readonly type: StacksMessageType.PublicKey;

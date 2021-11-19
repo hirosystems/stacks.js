@@ -1,4 +1,4 @@
-import { ClarityType } from '../clarityValue';
+import { ClarityType } from '../constants';
 
 type BooleanCV = TrueCV | FalseCV;
 

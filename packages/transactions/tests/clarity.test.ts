@@ -1,5 +1,6 @@
 import { oneLineTrim } from 'common-tags';
-import { addressToString, deserializeAddress } from '../src/types';
+import { deserializeAddress } from '../src/types';
+import { addressToString } from '../src/common';
 import {
   ClarityValue,
   serializeCV,

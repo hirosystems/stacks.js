@@ -1,8 +1,6 @@
 import {
-  createMessageSignature,
   createMultiSigSpendingCondition,
   createSingleSigSpendingCondition,
-  createTransactionAuthField,
   deserializeSpendingCondition,
   emptyMessageSignature,
   serializeSpendingCondition,
@@ -11,6 +9,8 @@ import {
   StandardAuthorization,
   serializeAuthorization,
 } from '../src/authorization';
+import { createTransactionAuthField } from '../src/signature';
+import { createMessageSignature } from '../src/common';
 import { BufferArray } from '../src/utils';
 
 import {AddressHashMode, AuthType, PubKeyEncoding} from '../src/constants';

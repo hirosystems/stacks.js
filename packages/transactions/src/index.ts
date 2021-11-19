@@ -7,8 +7,6 @@ export {
   StandardAuthorization,
   SponsoredAuthorization,
   SpendingCondition,
-  MessageSignature,
-  createMessageSignature,
   emptyMessageSignature,
   isSingleSig,
 } from './authorization';
@@ -22,15 +20,9 @@ export {
 } from './payload';
 
 export {
-  PostCondition,
-  STXPostCondition,
-  FungiblePostCondition,
-  NonFungiblePostCondition,
   createFungiblePostCondition,
   createNonFungiblePostCondition,
   createSTXPostCondition,
-  serializePostCondition,
-  deserializePostCondition,
 } from './postcondition';
 
 export * from './clarity';
@@ -42,3 +34,6 @@ export * from './contract-abi';
 export * from './signer';
 export * from './authorization';
 export * from './utils';
+export * from './common';
+export * from './signature';
+export * from './postcondition-types';

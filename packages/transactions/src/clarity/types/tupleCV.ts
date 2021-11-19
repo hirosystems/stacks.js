@@ -1,4 +1,5 @@
-import { ClarityType, ClarityValue } from '../clarityValue';
+import { ClarityValue } from '../clarityValue';
+import { ClarityType } from '../constants';
 import { isClarityName } from '../../utils';
 
 type TupleData<T extends ClarityValue = ClarityValue> = { [key: string]: T };

@@ -1,4 +1,5 @@
-import { ClarityType, ClarityValue } from '../clarityValue';
+import { ClarityValue } from '../clarityValue';
+import { ClarityType } from '../constants';
 
 type ResponseCV = ResponseErrorCV | ResponseOkCV;
 

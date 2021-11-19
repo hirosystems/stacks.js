@@ -1,12 +1,14 @@
-import { Buffer } from '@stacks/common';
+import { Buffer, intToBytes } from '@stacks/common';
 import {
-  MAX_STRING_LENGTH_BYTES,
   MEMO_MAX_LENGTH_BYTES,
   AddressHashMode,
   AddressVersion,
   TransactionVersion,
   StacksMessageType,
   PostConditionPrincipalID,
+  PostConditionType,
+  FungibleConditionCode,
+  NonFungibleConditionCode,
 } from './constants';
 
 import { StacksPublicKey, serializePublicKey, deserializePublicKey, isCompressed } from './keys';
@@ -23,20 +25,32 @@ import {
   hashP2WPKH,
 } from './utils';
 
-import { c32addressDecode, c32address } from 'c32check';
 import { BufferReader } from './bufferReader';
-import { PostCondition, serializePostCondition, deserializePostCondition } from './postcondition';
+import {
+  PostCondition,
+  StandardPrincipal,
+  ContractPrincipal,
+  PostConditionPrincipal,
+  LengthPrefixedString,
+  AssetInfo,
+  createLPString,
+} from './postcondition-types';
 import { Payload, deserializePayload, serializePayload } from './payload';
 import { DeserializationError } from './errors';
 import {
   deserializeTransactionAuthField,
   deserializeMessageSignature,
-  MessageSignature,
   serializeMessageSignature,
   serializeTransactionAuthField,
   TransactionAuthField,
-} from './authorization';
-
+} from './signature';
+import {
+  MessageSignature,
+  Address,
+  addressHashModeToVersion,
+  addressFromVersionHash,
+} from './common';
+import { deserializeCV, serializeCV } from './clarity';
 export type StacksMessage =
   | Address
   | PostConditionPrincipal
@@ -111,69 +125,12 @@ export function deserializeStacksMessage(
   }
 }
 
-export interface Address {
-  readonly type: StacksMessageType.Address;
-  readonly version: AddressVersion;
-  readonly hash160: string;
-}
-
-export function createAddress(c32AddressString: string): Address {
-  const addressData = c32addressDecode(c32AddressString);
-  return {
-    type: StacksMessageType.Address,
-    version: addressData[0],
-    hash160: addressData[1],
-  };
-}
-
 export function createEmptyAddress(): Address {
   return {
     type: StacksMessageType.Address,
     version: AddressVersion.MainnetSingleSig,
     hash160: '0'.repeat(40),
   };
-}
-
-export function addressFromVersionHash(version: AddressVersion, hash: string): Address {
-  return { type: StacksMessageType.Address, version, hash160: hash };
-}
-
-/**
- * Translates the tx auth hash mode to the corresponding address version.
- * @see https://github.com/blockstack/stacks-blockchain/blob/master/sip/sip-005-blocks-and-transactions.md#transaction-authorization
- */
-export function addressHashModeToVersion(
-  hashMode: AddressHashMode,
-  txVersion: TransactionVersion
-): AddressVersion {
-  switch (hashMode) {
-    case AddressHashMode.SerializeP2PKH:
-      switch (txVersion) {
-        case TransactionVersion.Mainnet:
-          return AddressVersion.MainnetSingleSig;
-        case TransactionVersion.Testnet:
-          return AddressVersion.TestnetSingleSig;
-        default:
-          throw new Error(
-            `Unexpected txVersion ${JSON.stringify(txVersion)} for hashMode ${hashMode}`
-          );
-      }
-    case AddressHashMode.SerializeP2SH:
-    case AddressHashMode.SerializeP2WPKH:
-    case AddressHashMode.SerializeP2WSH:
-      switch (txVersion) {
-        case TransactionVersion.Mainnet:
-          return AddressVersion.MainnetMultiSig;
-        case TransactionVersion.Testnet:
-          return AddressVersion.TestnetMultiSig;
-        default:
-          throw new Error(
-            `Unexpected txVersion ${JSON.stringify(txVersion)} for hashMode ${hashMode}`
-          );
-      }
-    default:
-      throw new Error(`Unexpected hashMode ${JSON.stringify(hashMode)}`);
-  }
 }
 
 export function addressFromHashMode(
@@ -224,10 +181,6 @@ export function addressFromPublicKeys(
   }
 }
 
-export function addressToString(address: Address): string {
-  return c32address(address.version, address.hash160).toString();
-}
-
 export function serializeAddress(address: Address): Buffer {
   const bufferArray: BufferArray = new BufferArray();
   bufferArray.appendHexString(intToHexString(address.version, 1));
@@ -241,61 +194,6 @@ export function deserializeAddress(bufferReader: BufferReader): Address {
   const data = bufferReader.readBuffer(20).toString('hex');
 
   return { type: StacksMessageType.Address, version, hash160: data };
-}
-
-export type PostConditionPrincipal = StandardPrincipal | ContractPrincipal;
-
-export interface StandardPrincipal {
-  readonly type: StacksMessageType.Principal;
-  readonly prefix: PostConditionPrincipalID.Standard;
-  readonly address: Address;
-}
-
-export interface ContractPrincipal {
-  readonly type: StacksMessageType.Principal;
-  readonly prefix: PostConditionPrincipalID.Contract;
-  readonly address: Address;
-  readonly contractName: LengthPrefixedString;
-}
-
-/**
- * Parses a principal string for either a standard principal or contract principal.
- * @param principalString - String in the format `{address}.{contractName}`
- * @example "SP13N5TE1FBBGRZD1FCM49QDGN32WAXM2E5F8WT2G.example-contract"
- * @example "SP13N5TE1FBBGRZD1FCM49QDGN32WAXM2E5F8WT2G"
- */
-export function parsePrincipalString(
-  principalString: string
-): StandardPrincipal | ContractPrincipal {
-  if (principalString.includes('.')) {
-    const [address, contractName] = principalString.split('.');
-    return createContractPrincipal(address, contractName);
-  } else {
-    return createStandardPrincipal(principalString);
-  }
-}
-
-export function createStandardPrincipal(addressString: string): StandardPrincipal {
-  const addr = createAddress(addressString);
-  return {
-    type: StacksMessageType.Principal,
-    prefix: PostConditionPrincipalID.Standard,
-    address: addr,
-  };
-}
-
-export function createContractPrincipal(
-  addressString: string,
-  contractName: string
-): ContractPrincipal {
-  const addr = createAddress(addressString);
-  const name = createLPString(contractName);
-  return {
-    type: StacksMessageType.Principal,
-    prefix: PostConditionPrincipalID.Contract,
-    address: addr,
-    contractName: name,
-  };
 }
 
 export function serializePrincipal(principal: PostConditionPrincipal): Buffer {
@@ -323,38 +221,6 @@ export function deserializePrincipal(bufferReader: BufferReader): PostConditionP
     address,
     contractName,
   } as ContractPrincipal;
-}
-
-export interface LengthPrefixedString {
-  readonly type: StacksMessageType.LengthPrefixedString;
-  readonly content: string;
-  readonly lengthPrefixBytes: number;
-  readonly maxLengthBytes: number;
-}
-
-export function createLPString(content: string): LengthPrefixedString;
-export function createLPString(content: string, lengthPrefixBytes: number): LengthPrefixedString;
-export function createLPString(
-  content: string,
-  lengthPrefixBytes: number,
-  maxLengthBytes: number
-): LengthPrefixedString;
-export function createLPString(
-  content: string,
-  lengthPrefixBytes?: number,
-  maxLengthBytes?: number
-): LengthPrefixedString {
-  const prefixLength = lengthPrefixBytes || 1;
-  const maxLength = maxLengthBytes || MAX_STRING_LENGTH_BYTES;
-  if (exceedsMaxLengthBytes(content, maxLength)) {
-    throw new Error(`String length exceeds maximum bytes ${maxLength.toString()}`);
-  }
-  return {
-    type: StacksMessageType.LengthPrefixedString,
-    content,
-    lengthPrefixBytes: prefixLength,
-    maxLengthBytes: maxLength,
-  };
 }
 
 export function serializeLPString(lps: LengthPrefixedString) {
@@ -407,37 +273,6 @@ export function serializeMemoString(memoString: MemoString): Buffer {
 export function deserializeMemoString(bufferReader: BufferReader): MemoString {
   const content = bufferReader.readBuffer(MEMO_MAX_LENGTH_BYTES).toString();
   return { type: StacksMessageType.MemoString, content };
-}
-
-export interface AssetInfo {
-  readonly type: StacksMessageType.AssetInfo;
-  readonly address: Address;
-  readonly contractName: LengthPrefixedString;
-  readonly assetName: LengthPrefixedString;
-}
-
-/**
- * Parse a fully qualified string that identifies the token type.
- * @param id - String in the format `{address}.{contractName}::{assetName}`
- * @example "SP13N5TE1FBBGRZD1FCM49QDGN32WAXM2E5F8WT2G.example-contract::example-token"
- */
-export function parseAssetInfoString(id: string): AssetInfo {
-  const [assetAddress, assetContractName, assetTokenName] = id.split(/\.|::/);
-  const assetInfo = createAssetInfo(assetAddress, assetContractName, assetTokenName);
-  return assetInfo;
-}
-
-export function createAssetInfo(
-  addressString: string,
-  contractName: string,
-  assetName: string
-): AssetInfo {
-  return {
-    type: StacksMessageType.AssetInfo,
-    address: createAddress(addressString),
-    contractName: createLPString(contractName),
-    assetName: createLPString(assetName),
-  };
 }
 
 export function serializeAssetInfo(info: AssetInfo): Buffer {
@@ -517,4 +352,86 @@ export function deserializeLPList(
     }
   }
   return createLPList(l, lengthPrefixBytes);
+}
+
+export function serializePostCondition(postCondition: PostCondition): Buffer {
+  const bufferArray: BufferArray = new BufferArray();
+  bufferArray.appendByte(postCondition.conditionType);
+  bufferArray.push(serializePrincipal(postCondition.principal));
+
+  if (
+    postCondition.conditionType === PostConditionType.Fungible ||
+    postCondition.conditionType === PostConditionType.NonFungible
+  ) {
+    bufferArray.push(serializeAssetInfo(postCondition.assetInfo));
+  }
+
+  if (postCondition.conditionType === PostConditionType.NonFungible) {
+    bufferArray.push(serializeCV(postCondition.assetName));
+  }
+
+  bufferArray.appendByte(postCondition.conditionCode);
+
+  if (
+    postCondition.conditionType === PostConditionType.STX ||
+    postCondition.conditionType === PostConditionType.Fungible
+  ) {
+    bufferArray.push(intToBytes(postCondition.amount, false, 8));
+  }
+
+  return bufferArray.concatBuffer();
+}
+
+export function deserializePostCondition(bufferReader: BufferReader): PostCondition {
+  const postConditionType = bufferReader.readUInt8Enum(PostConditionType, n => {
+    throw new DeserializationError(`Could not read ${n} as PostConditionType`);
+  });
+
+  const principal = deserializePrincipal(bufferReader);
+
+  let conditionCode;
+  let assetInfo;
+  let amount: bigint;
+  switch (postConditionType) {
+    case PostConditionType.STX:
+      conditionCode = bufferReader.readUInt8Enum(FungibleConditionCode, n => {
+        throw new DeserializationError(`Could not read ${n} as FungibleConditionCode`);
+      });
+      amount = BigInt('0x' + bufferReader.readBuffer(8).toString('hex'));
+      return {
+        type: StacksMessageType.PostCondition,
+        conditionType: PostConditionType.STX,
+        principal,
+        conditionCode,
+        amount,
+      };
+    case PostConditionType.Fungible:
+      assetInfo = deserializeAssetInfo(bufferReader);
+      conditionCode = bufferReader.readUInt8Enum(FungibleConditionCode, n => {
+        throw new DeserializationError(`Could not read ${n} as FungibleConditionCode`);
+      });
+      amount = BigInt('0x' + bufferReader.readBuffer(8).toString('hex'));
+      return {
+        type: StacksMessageType.PostCondition,
+        conditionType: PostConditionType.Fungible,
+        principal,
+        conditionCode,
+        amount,
+        assetInfo,
+      };
+    case PostConditionType.NonFungible:
+      assetInfo = deserializeAssetInfo(bufferReader);
+      const assetName = deserializeCV(bufferReader);
+      conditionCode = bufferReader.readUInt8Enum(NonFungibleConditionCode, n => {
+        throw new DeserializationError(`Could not read ${n} as FungibleConditionCode`);
+      });
+      return {
+        type: StacksMessageType.PostCondition,
+        conditionType: PostConditionType.NonFungible,
+        principal,
+        conditionCode,
+        assetInfo,
+        assetName,
+      };
+  }
 }
