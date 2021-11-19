@@ -1,5 +1,5 @@
 import { IntegerType, intToBigInt } from '@stacks/common';
-import { ClarityType } from '../clarityValue';
+import { ClarityType } from '../constants';
 
 const MAX_U128 = BigInt(2) ** BigInt(128) - BigInt(1);
 const MIN_U128 = BigInt(0);

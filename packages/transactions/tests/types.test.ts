@@ -1,19 +1,19 @@
 import {
-  Address,
+  createLPList,
+  serializeStacksMessage,
+  deserializeLPList,
+  addressFromHashMode,
+  LengthPrefixedList,
+  addressFromPublicKeys,
+} from '../src/types';
+import {
   LengthPrefixedString,
   AssetInfo,
   createLPString,
   createAddress,
-  createLPList,
-  serializeStacksMessage,
-  deserializeLPList,
-  addressToString,
-  addressFromHashMode,
   createAssetInfo,
-  LengthPrefixedList,
-  addressFromPublicKeys,
-} from '../src/types';
-
+} from '../src/postcondition-types';
+import { Address, addressToString } from '../src/common';
 import { TransactionVersion, AddressHashMode, StacksMessageType } from '../src/constants';
 
 import { serializeDeserialize } from './macros';

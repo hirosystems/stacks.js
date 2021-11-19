@@ -1,19 +1,19 @@
 import {
-  STXPostCondition,
-  FungiblePostCondition,
-  NonFungiblePostCondition,
   createSTXPostCondition,
   createFungiblePostCondition,
   createNonFungiblePostCondition,
 } from '../src/postcondition';
 
 import {
-  addressToString,
+  STXPostCondition,
+  FungiblePostCondition,
+  NonFungiblePostCondition,
   createAssetInfo,
   createStandardPrincipal,
   createContractPrincipal,
   ContractPrincipal,
-} from '../src/types';
+} from '../src/postcondition-types';
+import { addressToString } from '../src/common';
 
 import {
   PostConditionType,

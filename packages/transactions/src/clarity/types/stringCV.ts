@@ -1,4 +1,4 @@
-import { ClarityType } from '../clarityValue';
+import { ClarityType } from '../constants';
 
 interface StringAsciiCV {
   readonly type: ClarityType.StringASCII;

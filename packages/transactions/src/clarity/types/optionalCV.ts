@@ -1,5 +1,5 @@
-import { ClarityType, ClarityValue } from '../clarityValue';
-
+import { ClarityValue } from '../clarityValue';
+import { ClarityType } from '../constants';
 type OptionalCV<T extends ClarityValue = ClarityValue> = NoneCV | SomeCV<T>;
 
 interface NoneCV {

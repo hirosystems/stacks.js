@@ -29,11 +29,11 @@ import { createTokenTransferPayload, serializePayload, TokenTransferPayload } fr
 
 import { BufferReader } from '../src/bufferReader';
 
-import { createAssetInfo } from '../src/types';
+import { createAssetInfo } from '../src/postcondition-types';
 
 import {
-  createMessageSignature, createSingleSigSpendingCondition, createSponsoredAuth,
-  createTransactionAuthField,
+  createSingleSigSpendingCondition,
+  createSponsoredAuth,
   emptyMessageSignature,
   isSingleSig,
   MultiSigSpendingCondition,
@@ -41,7 +41,8 @@ import {
   SingleSigSpendingCondition,
   SponsoredAuthorization, StandardAuthorization
 } from '../src/authorization';
-
+import { createTransactionAuthField } from '../src/signature';
+import { createMessageSignature } from '../src/common';
 import {
   DEFAULT_CORE_NODE_API_URL,
   FungibleConditionCode,

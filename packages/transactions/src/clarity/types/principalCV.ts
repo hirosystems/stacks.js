@@ -1,12 +1,7 @@
 import { Buffer } from '@stacks/common';
-import {
-  Address,
-  LengthPrefixedString,
-  createAddress,
-  createLPString,
-  addressToString,
-} from '../../types';
-import { ClarityType } from '../clarityValue';
+import { LengthPrefixedString, createAddress, createLPString } from '../../postcondition-types';
+import { Address, addressToString } from '../../common';
+import { ClarityType } from '../constants';
 
 type PrincipalCV = StandardPrincipalCV | ContractPrincipalCV;
 

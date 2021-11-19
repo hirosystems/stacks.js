@@ -1,5 +1,5 @@
 import { Buffer } from '@stacks/common';
-import { ClarityType } from '../clarityValue';
+import { ClarityType } from '../constants';
 
 interface BufferCV {
   readonly type: ClarityType.Buffer;

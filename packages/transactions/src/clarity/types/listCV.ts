@@ -1,4 +1,5 @@
-import { ClarityValue, ClarityType } from '../clarityValue';
+import { ClarityValue } from '../clarityValue';
+import { ClarityType } from '../constants';
 
 interface ListCV<T extends ClarityValue = ClarityValue> {
   type: ClarityType.List;

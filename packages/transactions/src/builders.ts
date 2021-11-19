@@ -31,14 +31,16 @@ import {
 import { TransactionSigner } from './signer';
 
 import {
-  PostCondition,
-  STXPostCondition,
-  FungiblePostCondition,
-  NonFungiblePostCondition,
   createSTXPostCondition,
   createFungiblePostCondition,
   createNonFungiblePostCondition,
 } from './postcondition';
+import {
+  PostCondition,
+  STXPostCondition,
+  FungiblePostCondition,
+  NonFungiblePostCondition,
+} from './postcondition-types';
 
 import {
   AddressHashMode,
@@ -53,7 +55,8 @@ import {
   SingleSigHashMode,
 } from './constants';
 
-import { AssetInfo, createLPList, createStandardPrincipal, createContractPrincipal } from './types';
+import { createLPList } from './types';
+import { AssetInfo, createStandardPrincipal, createContractPrincipal } from './postcondition-types';
 
 import { cvToHex, parseReadOnlyResponse, omit, validateTxId } from './utils';
 

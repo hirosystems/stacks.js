@@ -13,7 +13,6 @@ import {
 
 import {
   Authorization,
-  createTransactionAuthField,
   deserializeAuthorization,
   intoInitialSighashAuth,
   isSingleSig,
@@ -26,6 +25,7 @@ import {
   SpendingConditionOpts,
   verifyOrigin,
 } from './authorization';
+import { createTransactionAuthField } from './signature';
 
 import { BufferArray, cloneDeep, txidFromData } from './utils';
 

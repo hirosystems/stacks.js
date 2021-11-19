@@ -12,12 +12,10 @@ import {
 
 import { TokenTransferPayload, createTokenTransferPayload } from '../src/payload';
 
-import { STXPostCondition, createSTXPostCondition } from '../src/postcondition';
+import { createSTXPostCondition } from '../src/postcondition';
 
-import {
-  createLPList,
-  createStandardPrincipal
-} from '../src/types';
+import { createLPList } from '../src/types';
+import { createStandardPrincipal, STXPostCondition } from '../src/postcondition-types';
 
 import {
   DEFAULT_CHAIN_ID,

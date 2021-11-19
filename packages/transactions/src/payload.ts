@@ -4,19 +4,16 @@ import { COINBASE_BUFFER_LENGTH_BYTES, PayloadType, StacksMessageType } from './
 import { BufferArray } from './utils';
 
 import {
-  Address,
   MemoString,
-  createAddress,
   createMemoString,
-  LengthPrefixedString,
-  createLPString,
   serializeStacksMessage,
   deserializeAddress,
   deserializeLPString,
   deserializeMemoString,
   codeBodyString,
 } from './types';
-
+import { createAddress, LengthPrefixedString, createLPString } from './postcondition-types';
+import { Address } from './common';
 import { ClarityValue, serializeCV, deserializeCV } from './clarity/';
 
 import { BufferReader } from './bufferReader';
