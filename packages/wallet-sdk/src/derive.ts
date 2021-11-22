@@ -4,8 +4,9 @@ import { ECPair } from 'bitcoinjs-lib';
 import { createSha2Hash, ecPairToHexString } from '@stacks/encryption';
 
 import { assertIsTruthy } from './utils';
-import { Account } from './models/account';
-import { WalletKeys, DerivationType } from './models/wallet';
+import { Account, WalletKeys } from './models/common';
+import { StacksNetwork } from '@stacks/network';
+import { getAddressFromPrivateKey } from '@stacks/transactions';
 
 const DATA_DERIVATION_PATH = `m/888'/0'`;
 const WALLET_CONFIG_PATH = `m/44/5757'/0'/1`;
@@ -71,6 +72,45 @@ export const deriveSalt = async (rootNode: BIP32Interface) => {
   return salt;
 };
 
+export enum DerivationType {
+  Wallet,
+  Data,
+  Unknown,
+}
+
+export const selectDerivationType = async ({
+  username,
+  rootNode,
+  index,
+  network,
+}: {
+  username: string;
+  rootNode: BIP32Interface;
+  index: number;
+  network: StacksNetwork;
+}): Promise<DerivationType> => {
+  const nameInfo = await network.getNameInfo(username);
+  let stxPrivateKey = deriveStxPrivateKey({ rootNode, index });
+  let derivedAddress = getAddressFromPrivateKey(stxPrivateKey);
+  console.log(derivedAddress, nameInfo.address);
+  if (derivedAddress !== nameInfo.address) {
+    // try data private key
+    stxPrivateKey = deriveDataPrivateKey({
+      rootNode,
+      index,
+    });
+    derivedAddress = getAddressFromPrivateKey(stxPrivateKey);
+    console.log(derivedAddress, nameInfo.address);
+    if (derivedAddress !== nameInfo.address) {
+      return DerivationType.Unknown;
+    } else {
+      return DerivationType.Data;
+    }
+  } else {
+    return DerivationType.Wallet;
+  }
+};
+
 export const deriveStxPrivateKey = ({
   rootNode,
   index,
@@ -106,14 +146,12 @@ export const deriveAccount = ({
   rootNode: BIP32Interface;
   index: number;
   salt: string;
-  stxDerivationType: DerivationType;
+  stxDerivationType: DerivationType.Wallet | DerivationType.Data;
 }): Account => {
   const stxPrivateKey =
     stxDerivationType === DerivationType.Wallet
       ? deriveStxPrivateKey({ rootNode, index })
-      : stxDerivationType === DerivationType.Data
-      ? deriveDataPrivateKey({ rootNode, index })
-      : ''; // TODO throw??
+      : deriveDataPrivateKey({ rootNode, index });
   const identitiesKeychain = rootNode.derivePath(DATA_DERIVATION_PATH);
 
   const identityKeychain = identitiesKeychain.deriveHardened(index);

@@ -1,7 +1,7 @@
 import { generateMnemonic, mnemonicToSeed } from 'bip39';
 import { fromSeed } from 'bip32';
 import randomBytes from 'randombytes';
-import { Wallet, getRootNode } from './models/wallet';
+import { Wallet, getRootNode } from './models/common';
 import { encrypt } from './encryption';
 import { deriveAccount, deriveWalletKeys } from './derive';
 import { DerivationType } from '.';

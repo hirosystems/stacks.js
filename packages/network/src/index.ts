@@ -1,7 +1,6 @@
 import { TransactionVersion, ChainID, fetchPrivate } from '@stacks/common';
 
 export const HIRO_MAINNET_DEFAULT = 'https://stacks-node-api.mainnet.stacks.co';
-export const HIRO_REGTEST_DEFAULT = 'https://stacks-node-api.regtest.stacks.co';
 export const HIRO_TESTNET_DEFAULT = 'https://stacks-node-api.testnet.stacks.co';
 export const HIRO_MOCKNET_DEFAULT = 'http://localhost:3999';
 
@@ -16,12 +15,14 @@ export interface StacksNetwork {
   readonly coreApiUrl: string;
   broadcastEndpoint: string;
   transferFeeEstimateEndpoint: string;
+  transactionFeeEstimateEndpoint: string;
   accountEndpoint: string;
   contractAbiEndpoint: string;
   readOnlyFunctionCallEndpoint: string;
   isMainnet(): boolean;
   getBroadcastApiUrl: () => string;
   getTransferFeeEstimateApiUrl: () => string;
+  getTransactionFeeEstimateApiUrl: () => string;
   getAccountApiUrl: (address: string) => string;
   getAbiApiUrl: (address: string, contract: string) => string;
   getReadOnlyFunctionCallApiUrl: (
@@ -54,6 +55,7 @@ export class StacksMainnet implements StacksNetwork {
   bnsLookupUrl = 'https://stacks-node-api.mainnet.stacks.co';
   broadcastEndpoint = '/v2/transactions';
   transferFeeEstimateEndpoint = '/v2/fees/transfer';
+  transactionFeeEstimateEndpoint = '/v2/fees/transaction';
   accountEndpoint = '/v2/accounts';
   contractAbiEndpoint = '/v2/contracts/interface';
   readOnlyFunctionCallEndpoint = '/v2/contracts/call-read';
@@ -67,6 +69,8 @@ export class StacksMainnet implements StacksNetwork {
   isMainnet = () => this.version === TransactionVersion.Mainnet;
   getBroadcastApiUrl = () => `${this.coreApiUrl}${this.broadcastEndpoint}`;
   getTransferFeeEstimateApiUrl = () => `${this.coreApiUrl}${this.transferFeeEstimateEndpoint}`;
+  getTransactionFeeEstimateApiUrl = () =>
+    `${this.coreApiUrl}${this.transactionFeeEstimateEndpoint}`;
   getAccountApiUrl = (address: string) =>
     `${this.coreApiUrl}${this.accountEndpoint}/${address}?proof=0`;
   getAbiApiUrl = (address: string, contract: string) =>
@@ -143,15 +147,6 @@ export class StacksMocknet extends StacksMainnet implements StacksNetwork {
   chainId = ChainID.Testnet;
 
   constructor(networkUrl: NetworkConfig = { url: HIRO_MOCKNET_DEFAULT }) {
-    super(networkUrl);
-  }
-}
-
-export class StacksRegtest extends StacksMainnet implements StacksNetwork {
-  version = TransactionVersion.Testnet;
-  chainId = ChainID.Testnet;
-
-  constructor(networkUrl: NetworkConfig = { url: HIRO_REGTEST_DEFAULT }) {
     super(networkUrl);
   }
 }

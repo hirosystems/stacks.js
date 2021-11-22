@@ -8,10 +8,7 @@ import * as bip39 from 'bip39';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const c32check = require('c32check');
 
-import { getPrivateKeyAddress } from './utils';
-
-import { getMaxIDSearchIndex } from './cli';
-
+import { getPrivateKeyAddress, getMaxIDSearchIndex } from './common';
 import { CLINetworkAdapter } from './network';
 
 import * as bip32 from 'bip32';
@@ -149,7 +146,7 @@ export async function getStacksWalletKeyInfo(
     // btcAddress = const { address } = bitcoin.payments.p2pkh({ pubkey: keyPair.publicKey });
     const { address } = bitcoin.payments.p2pkh({
       pubkey: ecPair.publicKey,
-      network: bitcoin.networks.regtest,
+      network: bitcoin.networks.testnet,
     });
     btcAddress = address!;
   } else {

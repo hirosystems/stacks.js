@@ -3,6 +3,7 @@ import * as fs from 'fs';
 import {
   makeUnsignedSTXTokenTransfer,
   makeContractDeploy,
+  makeUnsignedContractDeploy,
   makeContractCall,
   makeStandardSTXPostCondition,
   makeContractSTXPostCondition,
@@ -10,7 +11,6 @@ import {
   makeContractFungiblePostCondition,
   makeStandardNonFungiblePostCondition,
   makeContractNonFungiblePostCondition,
-  estimateTransfer,
   broadcastTransaction,
   getNonce,
   TxBroadcastResult,
@@ -19,12 +19,13 @@ import {
   callReadOnlyFunction,
   sponsorTransaction,
   makeSTXTokenTransfer,
-  makeUnsignedContractCall
+  makeUnsignedContractCall,
+  estimateTransaction
 } from '../src/builders';
 
 import { deserializeTransaction, StacksTransaction } from '../src/transaction';
 
-import { createTokenTransferPayload, TokenTransferPayload } from '../src/payload';
+import { createTokenTransferPayload, serializePayload, TokenTransferPayload } from '../src/payload';
 
 import { BufferReader } from '../src/bufferReader';
 
@@ -112,16 +113,41 @@ test('Make STX token transfer with set tx fee', async () => {
   expect(serialized).toBe(tx);
 });
 
-test('Make STX token transfer with fee estimate', async () => {
-  const apiUrl = `${DEFAULT_CORE_NODE_API_URL}/v2/fees/transfer`;
+test.only('Make STX token transfer with fee estimate', async () => {
+  const apiUrl = `${DEFAULT_CORE_NODE_API_URL}/v2/fees/transaction`;
   const recipient = standardPrincipalCV('SP3FGQ8Z7JY9BWYZ5WM53E0M9NK7WHJF0691NZ159');
   const amount = 12345;
-  const estimateFeeRate = 1;
   const nonce = 0;
   const senderKey = 'edf9aee84d9b7abc145504dde6726c64f369d37ee34ded868fabd876c26570bc01';
   const memo = 'test memo';
 
-  fetchMock.mockOnce(`${estimateFeeRate}`);
+  const mockedResponse = JSON.stringify({
+    "cost_scalar_change_by_byte": 0.00476837158203125,
+    "estimated_cost": {
+      "read_count": 19,
+      "read_length": 4814,
+      "runtime": 7175000,
+      "write_count": 2,
+      "write_length": 1020
+    },
+    "estimated_cost_scalar": 14,
+    "estimations": [
+      {
+        "fee": 200,
+        "fee_rate": 10
+      },
+      {
+        "fee": 180,
+        "fee_rate": 1.2410714285714286
+      },
+      {
+        "fee": 160,
+        "fee_rate": 8.958333333333332
+      },
+    ]
+  });
+
+  fetchMock.mockOnce(mockedResponse);
 
   const transaction = await makeSTXTokenTransfer({
     recipient,
@@ -132,9 +158,7 @@ test('Make STX token transfer with fee estimate', async () => {
     anchorMode: AnchorMode.Any
   });
 
-  const fee = transaction.serialize().byteLength * estimateFeeRate;
-
-  expect(transaction.auth.spendingCondition?.fee?.toString()).toEqual(fee.toString());
+  expect(transaction.auth.spendingCondition?.fee?.toString()).toEqual("180");
 
   const serialized = transaction.serialize().toString('hex');
 
@@ -607,6 +631,67 @@ test('Make smart contract deploy', async () => {
   expect(serialized).toBe(tx);
 });
 
+test('Make smart contract deploy unsigned', async () => {
+  const contractName = 'kv-store';
+  const codeBody = fs.readFileSync('./tests/contracts/kv-store.clar').toString();
+  const publicKey = '03797dd653040d344fd048c1ad05d4cbcb2178b30c6a0c4276994795f3e833da41';
+  const fee = 0;
+  const nonce = 0;
+
+  const authType = AuthType.Standard;
+  const addressHashMode = AddressHashMode.SerializeP2PKH;
+  const transaction = await makeUnsignedContractDeploy({
+    contractName,
+    codeBody,
+    publicKey,
+    fee,
+    nonce,
+    network: new StacksTestnet(),
+    anchorMode: AnchorMode.Any
+  });
+
+  const serializedTx = transaction.serialize();
+
+  const bufferReader = new BufferReader(serializedTx);
+  const deserializedTx = deserializeTransaction(bufferReader);
+
+  expect(deserializedTx.auth.authType).toBe(authType);
+
+  expect(deserializedTx.auth.spendingCondition!.hashMode).toBe(addressHashMode);
+  expect(deserializedTx.auth.spendingCondition!.nonce!.toString()).toBe(nonce.toString());
+  expect(deserializedTx.auth.spendingCondition!.fee!.toString()).toBe(fee.toString());
+});
+
+test('Make smart contract deploy signed', async () => {
+  const contractName = 'kv-store';
+  const codeBody = fs.readFileSync('./tests/contracts/kv-store.clar').toString();
+  const senderKey = 'e494f188c2d35887531ba474c433b1e41fadd8eb824aca983447fd4bb8b277a801';
+  const fee = 0;
+  const nonce = 0;
+
+  const authType = AuthType.Standard;
+  const addressHashMode = AddressHashMode.SerializeP2PKH;
+  const transaction = await makeContractDeploy({
+    contractName,
+    codeBody,
+    senderKey,
+    fee,
+    nonce,
+    network: new StacksTestnet(),
+    anchorMode: AnchorMode.Any
+  });
+
+  const serializedTx = transaction.serialize();
+
+  const bufferReader = new BufferReader(serializedTx);
+  const deserializedTx = deserializeTransaction(bufferReader);
+  expect(deserializedTx.auth.authType).toBe(authType);
+
+  expect(deserializedTx.auth.spendingCondition!.hashMode).toBe(addressHashMode);
+  expect(deserializedTx.auth.spendingCondition!.nonce!.toString()).toBe(nonce.toString());
+  expect(deserializedTx.auth.spendingCondition!.fee!.toString()).toBe(fee.toString());
+});
+
 test('Make contract-call', async () => {
   const contractAddress = 'ST3KC0MTNW34S1ZXD36JYKFD3JJMWA01M55DSJ4JE';
   const contractName = 'kv-store';
@@ -835,43 +920,77 @@ test('make a multi-sig contract call', async () => {
   );
 });
 
-test('Estimate token transfer fee', async () => {
-  const apiUrl = `${DEFAULT_CORE_NODE_API_URL}/v2/fees/transfer`;
-  const estimateFeeRate = 1;
-
+test('Estimate transaction transfer fee', async () => {
   const recipient = standardPrincipalCV('SP3FGQ8Z7JY9BWYZ5WM53E0M9NK7WHJF0691NZ159');
   const amount = 12345;
   const fee = 0;
   const nonce = 0;
   const senderKey = 'edf9aee84d9b7abc145504dde6726c64f369d37ee34ded868fabd876c26570bc01';
+  const publicKey = publicKeyToString(pubKeyfromPrivKey(senderKey));
   const memo = 'test memo';
 
-  const transaction = await makeSTXTokenTransfer({
+  const transaction = await makeUnsignedSTXTokenTransfer({
     recipient,
+    publicKey,
     amount,
-    senderKey,
     fee,
     nonce,
     memo,
     anchorMode: AnchorMode.Any
   });
 
-  const transactionByteLength = transaction.serialize().byteLength;
+  const serialized = transaction.serialize();
+  const transactionByteLength = serialized.byteLength;
 
-  fetchMock.mockOnce(`${estimateFeeRate}`);
+  const mockedResponse = JSON.stringify({
+    "cost_scalar_change_by_byte": 0.00476837158203125,
+    "estimated_cost": {
+      "read_count": 19,
+      "read_length": 4814,
+      "runtime": 7175000,
+      "write_count": 2,
+      "write_length": 1020
+    },
+    "estimated_cost_scalar": 14,
+    "estimations": [
+      {
+        "fee": 140,
+        "fee_rate": 10
+      },
+      {
+        "fee": 17,
+        "fee_rate": 1.2410714285714286
+      },
+      {
+        "fee": 125,
+        "fee_rate": 8.958333333333332
+      },
+    ]
+  });
 
-  const estimateFee = transactionByteLength * estimateFeeRate;
-  const resultEstimateFee = await estimateTransfer(transaction);
+  fetchMock.mockOnce(mockedResponse);
 
-  fetchMock.mockOnce(`${estimateFeeRate}`);
-  const network = new StacksTestnet();
-  const resultEstimateFee2 = await estimateTransfer(transaction, network);
+  const mainnet = new StacksMainnet();
+  const resultEstimateFee = await estimateTransaction(transaction.payload, transactionByteLength, mainnet);
+
+  fetchMock.mockOnce(mockedResponse);
+
+  const testnet = new StacksTestnet();
+  const resultEstimateFee2 = await estimateTransaction(transaction.payload, transactionByteLength, testnet);
 
   expect(fetchMock.mock.calls.length).toEqual(2);
-  expect(fetchMock.mock.calls[0][0]).toEqual(apiUrl);
-  expect(fetchMock.mock.calls[1][0]).toEqual(network.getTransferFeeEstimateApiUrl());
-  expect(resultEstimateFee.toString()).toEqual(estimateFee.toString());
-  expect(resultEstimateFee2.toString()).toEqual(estimateFee.toString());
+  expect(fetchMock.mock.calls[0][0]).toEqual(mainnet.getTransactionFeeEstimateApiUrl());
+  expect(fetchMock.mock.calls[0][1]?.body).toEqual(JSON.stringify({
+      transaction_payload: serializePayload(transaction.payload).toString('hex'),
+      estimated_len: transactionByteLength
+  }));
+  expect(fetchMock.mock.calls[1][0]).toEqual(testnet.getTransactionFeeEstimateApiUrl());
+  expect(fetchMock.mock.calls[1][1]?.body).toEqual(JSON.stringify({
+      transaction_payload: serializePayload(transaction.payload).toString('hex'),
+      estimated_len: transactionByteLength
+  }));
+  expect(resultEstimateFee).toEqual([140, 17, 125]);
+  expect(resultEstimateFee2).toEqual([140, 17, 125]);
 });
 
 test('Make STX token transfer with fetch account nonce', async () => {
@@ -1027,7 +1146,6 @@ test('Make sponsored STX token transfer with sponsor fee estimate', async () => 
   const recipient = standardPrincipalCV('SP3FGQ8Z7JY9BWYZ5WM53E0M9NK7WHJF0691NZ159');
   const amount = 12345;
   const fee = 50;
-  const estimateFeeRate = 2;
   const nonce = 2;
   const senderKey = 'edf9aee84d9b7abc145504dde6726c64f369d37ee34ded868fabd876c26570bc01';
   const memo = 'test memo';
@@ -1050,15 +1168,39 @@ test('Make sponsored STX token transfer with sponsor fee estimate', async () => 
     anchorMode: AnchorMode.Any
   });
 
-  const sponsorFee = transaction.serialize().byteLength * estimateFeeRate;
-
   const sponsorOptions = {
     transaction,
     sponsorPrivateKey: sponsorKey,
     sponsorNonce,
   };
 
-  fetchMock.mockOnce(`${estimateFeeRate}`);
+  const mockedResponse = JSON.stringify({
+    "cost_scalar_change_by_byte": 0.00476837158203125,
+    "estimated_cost": {
+      "read_count": 19,
+      "read_length": 4814,
+      "runtime": 7175000,
+      "write_count": 2,
+      "write_length": 1020
+    },
+    "estimated_cost_scalar": 14,
+    "estimations": [
+      {
+        "fee": 140,
+        "fee_rate": 10
+      },
+      {
+        "fee": 1,
+        "fee_rate": 1.2410714285714286
+      },
+      {
+        "fee": 125,
+        "fee_rate": 8.958333333333332
+      },
+    ]
+  });
+
+  fetchMock.mockOnce(mockedResponse);
 
   const sponsorSignedTx = await sponsorTransaction(sponsorOptions);
 
@@ -1079,7 +1221,7 @@ test('Make sponsored STX token transfer with sponsor fee estimate', async () => 
   const deserializedSponsorSpendingCondition = (deserializedSponsorTx.auth as SponsoredAuthorization).sponsorSpendingCondition!;
   expect(deserializedSponsorSpendingCondition.hashMode).toBe(addressHashMode);
   expect(deserializedSponsorSpendingCondition.nonce!.toString()).toBe(sponsorNonce.toString());
-  expect(deserializedSponsorSpendingCondition.fee!.toString()).toBe(sponsorFee.toString());
+  expect(deserializedSponsorSpendingCondition.fee!.toString()).toBe("1");
 
   const deserializedPayload = deserializedSponsorTx.payload as TokenTransferPayload;
   expect(deserializedPayload.amount.toString()).toBe(amount.toString());

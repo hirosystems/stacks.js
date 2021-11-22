@@ -3,7 +3,6 @@ import {
   getPublicKeyFromPrivate,
   hashCode,
   hashSha256Sync,
-  publicKeyToAddress,
 } from '@stacks/encryption';
 import { makeAuthResponse as _makeAuthResponse } from '@stacks/auth';
 import { TransactionVersion, getAddressFromPrivateKey } from '@stacks/transactions';
@@ -12,31 +11,12 @@ import {
   DEFAULT_PROFILE,
   fetchAccountProfileUrl,
   fetchProfileFromUrl,
-  Profile,
   signAndUploadProfile,
 } from './profile';
+import { Account } from './common';
 import { ECPair } from 'bitcoinjs-lib';
 import { connectToGaiaHubWithConfig, getHubInfo, makeGaiaAssociationToken } from '../utils';
 import { Buffer } from '@stacks/common';
-
-export interface Account {
-  /** derivation path for this account's stx address.*/
-  stxDerivationPath?: string;
-  /** The private key used for STX payments */
-  stxPrivateKey: string;
-  /** The private key used to store profile data (and in Stacks 1.0 to register BNS names) */
-  dataPrivateKey: string;
-  /** The salt is the same as the wallet-level salt. Used for app-specific keys */
-  salt: string;
-  /** A single username registered via BNS for this account */
-  username?: string;
-  /** A profile object that is publicly associated with this account's username */
-  profile?: Profile;
-  /** The root of the keychain used to generate app-specific keys */
-  appsKey: string;
-  /** The index of this account in the user's wallet */
-  index: number;
-}
 
 export const getStxAddress = ({
   account,
@@ -62,12 +42,6 @@ export const getAccountDisplayName = (account: Account) => {
     return account.username.split('.')[0];
   }
   return `Account ${account.index + 1}`;
-};
-
-export const getGaiaAddress = (account: Account) => {
-  const publicKey = getPublicKeyFromPrivate(account.dataPrivateKey);
-  const address = publicKeyToAddress(publicKey);
-  return address;
 };
 
 export const getAppPrivateKey = ({

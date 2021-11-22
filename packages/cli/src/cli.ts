@@ -78,11 +78,9 @@ import {
   makeAllCommandsList,
   USAGE,
   DEFAULT_CONFIG_PATH,
-  DEFAULT_CONFIG_REGTEST_PATH,
   DEFAULT_CONFIG_TESTNET_PATH,
   ID_ADDRESS_PATTERN,
   STACKS_ADDRESS_PATTERN,
-  DEFAULT_MAX_ID_SEARCH_INDEX,
 } from './argparse';
 
 import { encryptBackupPhrase, decryptBackupPhrase } from './encrypt';
@@ -93,7 +91,6 @@ import { gaiaAuth, gaiaConnect, gaiaUploadProfileAll, getGaiaAddressFromProfile 
 
 import {
   JSONStringify,
-  getPrivateKeyAddress,
   canonicalPrivateKey,
   decodePrivateKey,
   makeProfileJWT,
@@ -112,7 +109,7 @@ import {
 
 import { handleAuth, handleSignIn } from './auth';
 import { generateNewAccount, generateWallet, getAppPrivateKey } from '@stacks/wallet-sdk';
-
+import { getMaxIDSearchIndex, setMaxIDSearchIndex, getPrivateKeyAddress } from './common';
 // global CLI options
 let txOnly = false;
 let estimateOnly = false;
@@ -120,13 +117,8 @@ let safetyChecks = true;
 let receiveFeesPeriod = 52595;
 let gracePeriod = 5000;
 let noExit = false;
-let maxIDSearchIndex = DEFAULT_MAX_ID_SEARCH_INDEX;
 
 let BLOCKSTACK_TEST = !!process.env.BLOCKSTACK_TEST;
-
-export function getMaxIDSearchIndex() {
-  return maxIDSearchIndex;
-}
 
 /*
  * Sign a profile.
@@ -356,7 +348,7 @@ function balance(network: CLINetworkAdapter, args: string[]): Promise<string> {
   let address = args[0];
 
   if (BLOCKSTACK_TEST) {
-    // force testnet address if we're in regtest or testnet mode
+    // force testnet address if we're in testnet mode
     address = network.coerceAddress(address);
   }
 
@@ -1804,8 +1796,10 @@ export function CLIMain() {
     safetyChecks = !CLIOptAsBool(opts, 'U');
     receiveFeesPeriod = opts['N'] ? parseInt(CLIOptAsString(opts, 'N')!) : receiveFeesPeriod;
     gracePeriod = opts['G'] ? parseInt(CLIOptAsString(opts, 'N')!) : gracePeriod;
-    maxIDSearchIndex = opts['M'] ? parseInt(CLIOptAsString(opts, 'M')!) : maxIDSearchIndex;
-
+    const maxIDSearchIndex = opts['M']
+      ? parseInt(CLIOptAsString(opts, 'M')!)
+      : getMaxIDSearchIndex();
+    setMaxIDSearchIndex(maxIDSearchIndex);
     const debug = CLIOptAsBool(opts, 'd');
     const consensusHash = CLIOptAsString(opts, 'C');
     const integration_test = CLIOptAsBool(opts, 'i');
@@ -1826,8 +1820,6 @@ export function CLIMain() {
 
     const configPath = CLIOptAsString(opts, 'c')
       ? CLIOptAsString(opts, 'c')
-      : integration_test
-      ? DEFAULT_CONFIG_REGTEST_PATH
       : testnet
       ? DEFAULT_CONFIG_TESTNET_PATH
       : DEFAULT_CONFIG_PATH;
@@ -1837,13 +1829,7 @@ export function CLIMain() {
     const priceToPay = CLIOptAsString(opts, 'P') ? CLIOptAsString(opts, 'P') : '0';
     const priceUnits = CLIOptAsString(opts, 'D');
 
-    const networkType = testnet
-      ? 'testnet'
-      : localnet
-      ? 'localnet'
-      : integration_test
-      ? 'regtest'
-      : 'mainnet';
+    const networkType = testnet ? 'testnet' : localnet ? 'localnet' : 'mainnet';
 
     const configData = loadConfig(configPath!, networkType);
 

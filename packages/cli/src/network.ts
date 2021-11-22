@@ -7,8 +7,6 @@ import { CLI_CONFIG_TYPE } from './argparse';
 
 import { BlockstackNetwork } from 'blockstack/lib/network';
 
-const SATOSHIS_PER_BTC = 1e8;
-
 export interface CLI_NETWORK_OPTS {
   consensusHash: string | null;
   feeRate: number | null;
@@ -121,10 +119,6 @@ export class CLINetworkAdapter {
     if (this.feeRate) {
       // override with CLI option
       return Promise.resolve(this.feeRate);
-    }
-    if (this.isTestnet()) {
-      // in regtest mode
-      return Promise.resolve(Math.floor(0.00001 * SATOSHIS_PER_BTC));
     }
     return this.legacyNetwork.getFeeRate();
   }
@@ -330,8 +324,8 @@ export class CLINetworkAdapter {
 /*
  * Instantiate a network using settings from the config file.
  */
-export function getNetwork(configData: CLI_CONFIG_TYPE, regTest: boolean): BlockstackNetwork {
-  if (regTest) {
+export function getNetwork(configData: CLI_CONFIG_TYPE, testNet: boolean): BlockstackNetwork {
+  if (testNet) {
     const network = new blockstack.network.LocalRegtest(
       configData.blockstackAPIUrl,
       configData.broadcastServiceUrl,

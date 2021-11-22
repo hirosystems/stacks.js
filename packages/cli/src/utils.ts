@@ -42,7 +42,7 @@ import {
   ID_ADDRESS_PATTERN,
 } from './argparse';
 
-import { TransactionSigner } from 'blockstack';
+import { CLITransactionSigner, isCLITransactionSigner } from './common';
 
 import { decryptBackupPhrase } from './encrypt';
 
@@ -55,29 +55,6 @@ export interface UTXO {
   confirmations?: number;
   tx_hash: string;
   tx_output_n: number;
-}
-
-class CLITransactionSigner implements TransactionSigner {
-  address: string;
-  isComplete: boolean;
-
-  constructor(address = '') {
-    this.address = address;
-    this.isComplete = false;
-  }
-
-  getAddress(): Promise<string> {
-    return Promise.resolve().then(() => this.address);
-  }
-
-  signTransaction(_txIn: bitcoinjs.TransactionBuilder, _signingIndex: number): Promise<void> {
-    // eslint-disable-next-line @typescript-eslint/no-empty-function
-    return Promise.resolve().then(() => {});
-  }
-
-  signerVersion(): number {
-    return 0;
-  }
 }
 
 export class NullSigner extends CLITransactionSigner {}
@@ -211,12 +188,6 @@ export class SegwitP2SHKeySigner extends CLITransactionSigner {
   signerVersion(): number {
     return 0;
   }
-}
-
-function isCLITransactionSigner(
-  signer: string | CLITransactionSigner
-): signer is CLITransactionSigner {
-  return (signer as CLITransactionSigner).signerVersion !== undefined;
 }
 
 export function hasKeys(signer: string | CLITransactionSigner): boolean {
@@ -392,24 +363,6 @@ export function JSONStringify(obj: AnyJson, stderr: boolean = false): string {
 export function getPublicKeyFromPrivateKey(privateKey: string): string {
   const ecKeyPair = blockstack.hexStringToECPair(privateKey);
   return ecKeyPair.publicKey.toString('hex');
-}
-
-/*
- * Get a private key's address.  Honor the 01 to compress the public key
- * @privateKey (string) the hex-encoded private key
- */
-export function getPrivateKeyAddress(
-  network: CLINetworkAdapter,
-  privateKey: string | CLITransactionSigner
-): string {
-  if (isCLITransactionSigner(privateKey)) {
-    const pkts = privateKey;
-    return pkts.address;
-  } else {
-    const pk = privateKey;
-    const ecKeyPair = blockstack.hexStringToECPair(pk);
-    return network.coerceAddress(blockstack.ecPairToAddress(ecKeyPair));
-  }
 }
 
 /*

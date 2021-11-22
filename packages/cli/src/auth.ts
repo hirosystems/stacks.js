@@ -309,7 +309,7 @@ async function getIdentityInfo(
   _appGaiaHub: string,
   _profileGaiaHub: string
 ): Promise<NamedIdentityType[]> {
-  network.setCoerceMainnetAddress(true); // for lookups in regtest
+  network.setCoerceMainnetAddress(false);
   let identities: NamedIdentityType[];
 
   try {

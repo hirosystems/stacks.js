@@ -1,5 +1,4 @@
-import { Wallet } from './wallet';
-import { Account } from './account';
+import { Account, Wallet } from './common';
 import { GaiaHubConfig, connectToGaiaHub, uploadToGaiaHub } from '@stacks/storage';
 import { decryptContent, encryptContent, getPublicKeyFromPrivate } from '@stacks/encryption';
 import { fetchPrivate } from '@stacks/common';
