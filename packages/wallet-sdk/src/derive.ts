@@ -5,7 +5,7 @@ import { createSha2Hash, ecPairToHexString } from '@stacks/encryption';
 
 import { assertIsTruthy } from './utils';
 import { Account } from './models/account';
-import { WalletKeys } from './models/wallet';
+import { WalletKeys, DerivationType } from './models/wallet';
 
 const DATA_DERIVATION_PATH = `m/888'/0'`;
 const WALLET_CONFIG_PATH = `m/44/5757'/0'/1`;
@@ -71,19 +71,49 @@ export const deriveSalt = async (rootNode: BIP32Interface) => {
   return salt;
 };
 
+export const deriveStxPrivateKey = ({
+  rootNode,
+  index,
+}: {
+  rootNode: BIP32Interface;
+  index: number;
+}) => {
+  const childKey = rootNode.derivePath(STX_DERIVATION_PATH).derive(index);
+  assertIsTruthy(childKey.privateKey);
+  const ecPair = ECPair.fromPrivateKey(childKey.privateKey);
+  return ecPairToHexString(ecPair);
+};
+
+export const deriveDataPrivateKey = ({
+  rootNode,
+  index,
+}: {
+  rootNode: BIP32Interface;
+  index: number;
+}) => {
+  const childKey = rootNode.derivePath(DATA_DERIVATION_PATH).deriveHardened(index);
+  assertIsTruthy(childKey.privateKey);
+  const ecPair = ECPair.fromPrivateKey(childKey.privateKey);
+  return ecPairToHexString(ecPair);
+};
+
 export const deriveAccount = ({
   rootNode,
   index,
   salt,
+  stxDerivationType,
 }: {
   rootNode: BIP32Interface;
   index: number;
   salt: string;
+  stxDerivationType: DerivationType;
 }): Account => {
-  const childKey = rootNode.derivePath(STX_DERIVATION_PATH).derive(index);
-  assertIsTruthy(childKey.privateKey);
-  const ecPair = ECPair.fromPrivateKey(childKey.privateKey);
-  const stxPrivateKey = ecPairToHexString(ecPair);
+  const stxPrivateKey =
+    stxDerivationType === DerivationType.Wallet
+      ? deriveStxPrivateKey({ rootNode, index })
+      : stxDerivationType === DerivationType.Data
+      ? deriveDataPrivateKey({ rootNode, index })
+      : ''; // TODO throw??
   const identitiesKeychain = rootNode.derivePath(DATA_DERIVATION_PATH);
 
   const identityKeychain = identitiesKeychain.deriveHardened(index);

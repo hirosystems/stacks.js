@@ -20,6 +20,8 @@ import { connectToGaiaHubWithConfig, getHubInfo, makeGaiaAssociationToken } from
 import { Buffer } from '@stacks/common';
 
 export interface Account {
+  /** derivation path for this account's stx address.*/
+  stxDerivationPath?: string;
   /** The private key used for STX payments */
   stxPrivateKey: string;
   /** The private key used to store profile data (and in Stacks 1.0 to register BNS names) */
@@ -28,8 +30,6 @@ export interface Account {
   salt: string;
   /** A single username registered via BNS for this account */
   username?: string;
-  /** stx address that owns the username (at time creation of this Account object) */
-  usernameOwnerAddress?: string;
   /** A profile object that is publicly associated with this account's username */
   profile?: Profile;
   /** The root of the keychain used to generate app-specific keys */

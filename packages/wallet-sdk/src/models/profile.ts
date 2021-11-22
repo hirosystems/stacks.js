@@ -4,7 +4,6 @@ import { signProfileToken, wrapProfileToken } from '@stacks/profile';
 import { connectToGaiaHub, GaiaHubConfig, uploadToGaiaHub } from '@stacks/storage';
 import { getPublicKeyFromPrivate } from '@stacks/encryption';
 import { fetchPrivate } from '@stacks/common';
-import { getAddressFromPrivateKey } from '@stacks/transactions';
 
 const PERSON_TYPE = 'Person';
 const CONTEXT = 'http://schema.org';
@@ -116,23 +115,6 @@ export async function uploadProfile({
   );
 }
 
-export const selectPrivateKey: (account: Account) => string | undefined = (account: Account) => {
-  let usernameOwner: string | undefined;
-  if (account.username && account.usernameOwnerAddress) {
-    usernameOwner = account.usernameOwnerAddress;
-  }
-  if (usernameOwner === getAddressFromPrivateKey(account.stxPrivateKey)) {
-    return account.stxPrivateKey;
-  } else if (usernameOwner === getAddressFromPrivateKey(account.dataPrivateKey)) {
-    return account.dataPrivateKey;
-  } else if (usernameOwner) {
-    // unknown private key
-    return undefined;
-  } else {
-    return account.stxPrivateKey;
-  }
-};
-
 export const signAndUploadProfile = async ({
   profile,
   gaiaHubUrl,
@@ -144,14 +126,9 @@ export const signAndUploadProfile = async ({
   account: Account;
   gaiaHubConfig?: GaiaHubConfig;
 }) => {
-  const profilePrivateKey = selectPrivateKey(account);
-  if (profilePrivateKey) {
-    const signedProfileTokenData = signProfileForUpload({ profile, profilePrivateKey });
-    await uploadProfile({ gaiaHubUrl, account, signedProfileTokenData, gaiaHubConfig });
-  } else {
-    console.log(
-      'Profile was not upload, because we do not know which private key to use for signing.'
-    );
-    // TODO Show we throw an error here?
-  }
+  const signedProfileTokenData = signProfileForUpload({
+    profile,
+    profilePrivateKey: account.stxPrivateKey,
+  });
+  await uploadProfile({ gaiaHubUrl, account, signedProfileTokenData, gaiaHubConfig });
 };

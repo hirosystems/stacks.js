@@ -1,4 +1,7 @@
-import { fromBase58 } from 'bip32';
+import { StacksNetwork } from '@stacks/network';
+import { BIP32Interface, fromBase58 } from 'bip32';
+import { getAddressFromPrivateKey } from '@stacks/transactions';
+import { deriveDataPrivateKey, deriveStxPrivateKey } from '..';
 import { deriveAccount, deriveLegacyConfigPrivateKey } from '../derive';
 import { connectToGaiaHubWithConfig, getHubInfo } from '../utils';
 import { Account } from './account';
@@ -33,6 +36,46 @@ export const getRootNode = (wallet: Wallet) => {
   return fromBase58(wallet.rootKey);
 };
 
+export enum DerivationType {
+  Wallet,
+  Data,
+  Unknown,
+}
+
+export const selectDerivationType = async ({
+  username,
+  rootNode,
+  index,
+  network,
+}: {
+  username: string;
+  rootNode: BIP32Interface;
+  index: number;
+  network: StacksNetwork;
+}): Promise<DerivationType> => {
+  const nameInfo = await network.getNameInfo(username);
+  let stxPrivateKey = deriveStxPrivateKey({ rootNode, index });
+  let derivedAddress = getAddressFromPrivateKey(stxPrivateKey);
+  console.log(derivedAddress, nameInfo.address);
+  if (derivedAddress !== nameInfo.address) {
+    // try data private key
+    stxPrivateKey = deriveDataPrivateKey({
+      rootNode,
+      index,
+    });
+    derivedAddress = getAddressFromPrivateKey(stxPrivateKey);
+    console.log(derivedAddress, nameInfo.address);
+    if (derivedAddress !== nameInfo.address) {
+      console.log(`unknown derivation path for ${username}`);
+      return DerivationType.Unknown;
+    } else {
+      return DerivationType.Data;
+    }
+  } else {
+    return DerivationType.Wallet;
+  }
+};
+
 /**
  * Restore wallet accounts by checking for encrypted WalletConfig files,
  * stored in Gaia.
@@ -43,9 +86,11 @@ export const getRootNode = (wallet: Wallet) => {
 export async function restoreWalletAccounts({
   wallet,
   gaiaHubUrl,
+  network,
 }: {
   wallet: Wallet;
   gaiaHubUrl: string;
+  network: StacksNetwork;
 }): Promise<Wallet> {
   const hubInfo = await getHubInfo(gaiaHubUrl);
   const rootNode = getRootNode(wallet);
@@ -70,20 +115,37 @@ export async function restoreWalletAccounts({
     walletConfig &&
     walletConfig.accounts.length >= (legacyWalletConfig?.identities.length || 0)
   ) {
-    const newAccounts = walletConfig.accounts.map((account, index) => {
-      let existingAccount = wallet.accounts[index];
-      if (!existingAccount) {
-        existingAccount = deriveAccount({
-          rootNode,
-          index,
-          salt: wallet.salt,
-        });
-      }
-      return {
-        ...existingAccount,
-        username: account.username,
-      };
-    });
+    const newAccounts = await Promise.all(
+      walletConfig.accounts.map(async (account, index) => {
+        let existingAccount = wallet.accounts[index];
+        let stxDerivationType = DerivationType.Wallet;
+        if (account.username) {
+          const stxDerivationTypeForUsername = await selectDerivationType({
+            username: account.username,
+            rootNode,
+            index,
+            network,
+          });
+          if (stxDerivationTypeForUsername === DerivationType.Unknown) {
+            delete account.username;
+          } else {
+            stxDerivationType = stxDerivationTypeForUsername;
+          }
+        }
+        if (!existingAccount) {
+          existingAccount = deriveAccount({
+            rootNode,
+            index,
+            salt: wallet.salt,
+            stxDerivationType,
+          });
+        }
+        return {
+          ...existingAccount,
+          username: account.username,
+        };
+      })
+    );
 
     return {
       ...wallet,
@@ -93,20 +155,37 @@ export async function restoreWalletAccounts({
 
   // Restore from legacy config, and upload a new one
   if (legacyWalletConfig) {
-    const newAccounts = legacyWalletConfig.identities.map((identity, index) => {
-      let existingAccount = wallet.accounts[index];
-      if (!existingAccount) {
-        existingAccount = deriveAccount({
-          rootNode,
-          index,
-          salt: wallet.salt,
-        });
-      }
-      return {
-        ...existingAccount,
-        username: identity.username,
-      };
-    });
+    const newAccounts = await Promise.all(
+      legacyWalletConfig.identities.map(async (identity, index) => {
+        let existingAccount = wallet.accounts[index];
+        let stxDerivationType = DerivationType.Wallet;
+        if (identity.username) {
+          const stxDerivationTypeForUsername = await selectDerivationType({
+            username: identity.username,
+            rootNode,
+            index,
+            network,
+          });
+          if (stxDerivationTypeForUsername === DerivationType.Unknown) {
+            delete identity.username;
+          } else {
+            stxDerivationType = stxDerivationTypeForUsername;
+          }
+        }
+        if (!existingAccount) {
+          existingAccount = deriveAccount({
+            rootNode,
+            index,
+            salt: wallet.salt,
+            stxDerivationType,
+          });
+        }
+        return {
+          ...existingAccount,
+          username: identity.username,
+        };
+      })
+    );
 
     const meta: Record<string, boolean> = {};
     if (legacyWalletConfig.hideWarningForReusingIdentity) {

@@ -4,6 +4,7 @@ import randomBytes from 'randombytes';
 import { Wallet, getRootNode } from './models/wallet';
 import { encrypt } from './encryption';
 import { deriveAccount, deriveWalletKeys } from './derive';
+import { DerivationType } from '.';
 
 export type AllowedKeyEntropyBits = 128 | 256;
 
@@ -49,6 +50,7 @@ export const generateNewAccount = (wallet: Wallet) => {
     rootNode: getRootNode(wallet),
     index: accountIndex,
     salt: wallet.salt,
+    stxDerivationType: DerivationType.Wallet,
   });
 
   return {

@@ -3,6 +3,7 @@ import {
   deriveAccount,
   getStxAddress,
   deriveLegacyConfigPrivateKey,
+  DerivationType
 } from '../src';
 import { mnemonicToSeed } from 'bip39';
 import { fromBase58, fromSeed } from 'bip32';
@@ -17,9 +18,9 @@ test('keys are serialized, and can be deserialized properly', async () => {
   const rootNode1 = fromSeed(rootPrivateKey);
   const derived = await deriveWalletKeys(rootNode1);
   const rootNode = fromBase58(derived.rootKey);
-  const account = deriveAccount({ rootNode, index: 0, salt: derived.salt });
+  const account = deriveAccount({ rootNode, index: 0, salt: derived.salt, stxDerivationType: DerivationType.Wallet });
   expect(getStxAddress({ account, transactionVersion: TransactionVersion.Mainnet })).toEqual(
-    'SP384CVPNDTYA0E92TKJZQTYXQHNZSWGCAG7SAPVB'
+    'SP30RZ44NTH2D95M1HSWVMM8VVHSAFY71VF3XQZ0K'
   );
 });
 

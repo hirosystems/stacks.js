@@ -1,9 +1,7 @@
 import { getPublicKeyFromPrivate } from "@stacks/encryption";
-import { getAddressFromPrivateKey } from "@stacks/transactions";
 import { TokenVerifier } from "jsontokens";
-import { DEFAULT_PROFILE, selectPrivateKey, signProfileForUpload } from "../../src/models/profile";
+import { DEFAULT_PROFILE, signProfileForUpload } from "../../src/models/profile";
 import { mockAccount } from "../mocks";
-import fetchMock from 'jest-fetch-mock';
 
 describe(signProfileForUpload, () => {
   test('sign with the stx private key', () => {
@@ -34,53 +32,6 @@ describe(signProfileForUpload, () => {
     expect(tokenVerifierData.verify(signedProfileToken.token)).toEqual(true);
     const tokenVerifierStx = new TokenVerifier('ES256k', getPublicKeyFromPrivate(account.stxPrivateKey.slice(0,64)));      
     expect(tokenVerifierStx.verify(signedProfileToken.token)).toEqual(false);
-  });
-
-});
-
-describe(selectPrivateKey, () => {
-  beforeEach(() => {
-    fetchMock.resetMocks();
-  });
-
-  test('select without username', async () => {
-    const account = mockAccount;
-    account.username = undefined;
-
-    const profilePrivateKey = selectPrivateKey(account);
-    expect(profilePrivateKey).toEqual(account.stxPrivateKey);
- });
-
- test('select without username but usernameOwnerAddress', async () => {
-  const account = mockAccount;
-  account.username = undefined;
-  account.usernameOwnerAddress = getAddressFromPrivateKey(account.dataPrivateKey);
-  const profilePrivateKey = selectPrivateKey(account);
-  expect(profilePrivateKey).toEqual(account.stxPrivateKey);
-});
-
-  test('select with username owned by stx private key', async () => {
-    const account = mockAccount;
-    account.username = "test.btc";
-    account.usernameOwnerAddress = getAddressFromPrivateKey(account.stxPrivateKey);
-    const profilePrivateKey = selectPrivateKey(account);
-    expect(profilePrivateKey).toEqual(account.stxPrivateKey);
-  });
-
-  test('select with username owned by data private key', async () => {
-    const account = mockAccount;
-    account.username = "test.btc";
-    account.usernameOwnerAddress = getAddressFromPrivateKey(account.dataPrivateKey);
-    const profilePrivateKey = selectPrivateKey(account);
-    expect(profilePrivateKey).toEqual(account.dataPrivateKey);
-  });
-
-  test('select with username owned by a third private key', async () => {
-    const account = mockAccount;
-    account.username = "test.btc";
-    account.usernameOwnerAddress = getAddressFromPrivateKey("970c74372d8176609a95f85fd8f607538345e327477f393355dc33b95221a68401");
-    const profilePrivateKey = selectPrivateKey(account);
-    expect(profilePrivateKey).toEqual(undefined);
   });
 
 });
