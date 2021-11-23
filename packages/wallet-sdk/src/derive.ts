@@ -7,6 +7,7 @@ import { assertIsTruthy } from './utils';
 import { Account, WalletKeys } from './models/common';
 import { StacksNetwork } from '@stacks/network';
 import { getAddressFromPrivateKey } from '@stacks/transactions';
+import { fetchFirstName } from './usernames';
 
 const DATA_DERIVATION_PATH = `m/888'/0'`;
 const WALLET_CONFIG_PATH = `m/44/5757'/0'/1`;
@@ -72,13 +73,64 @@ export const deriveSalt = async (rootNode: BIP32Interface) => {
   return salt;
 };
 
+/**
+ * Determines how a private key is derived for an account:
+ *
+ * Wallet => STX_DERIVATION_PATH
+ * Data => DATA_DERIVATION_PATH
+ */
 export enum DerivationType {
   Wallet,
   Data,
   Unknown,
 }
 
-export const selectDerivationType = async ({
+/**
+ * Tries to find a derivation path for the stxPrivateKey for the account
+ * defined by rootNode and index that respects the username of that account.
+ *
+ * The stxPrivateKey is used to sign the profile of the account, therefore,
+ * a username must be owned by the stxPrivateKey.
+ *
+ * If a username is provided, a lookup for the owner address
+ * on the provided network is done.
+ *
+ * If no username is provided, a lookup for names owned
+ * by the stx derivation path and by the data derivation path is done.
+ * @param selectionOptions
+ * @returns username and derivation type
+ */
+export const selectStxDerivation = async ({
+  username,
+  rootNode,
+  index,
+  network,
+}: {
+  username?: string;
+  rootNode: BIP32Interface;
+  index: number;
+  network: StacksNetwork;
+}): Promise<{ username: string | undefined; stxDerivationType: DerivationType }> => {
+  if (username) {
+    // Based on username, determine the derivation path for the stx private key
+    const stxDerivationTypeForUsername = await selectDerivationTypeForUsername({
+      username,
+      rootNode,
+      index,
+      network,
+    });
+    return { username, stxDerivationType: stxDerivationTypeForUsername };
+  } else {
+    const { username, derivationType } = await selectUsernameForAccount({
+      rootNode,
+      index,
+      network,
+    });
+    return { username, stxDerivationType: derivationType };
+  }
+};
+
+const selectDerivationTypeForUsername = async ({
   username,
   rootNode,
   index,
@@ -106,6 +158,33 @@ export const selectDerivationType = async ({
     }
   } else {
     return DerivationType.Wallet;
+  }
+};
+
+const selectUsernameForAccount = async ({
+  rootNode,
+  index,
+  network,
+}: {
+  rootNode: BIP32Interface;
+  index: number;
+  network: StacksNetwork;
+}): Promise<{ username: string | undefined; derivationType: DerivationType }> => {
+  // try to find existing usernames owned by stx derivation path
+  const address = deriveStxPrivateKey({ rootNode, index });
+  let username = await fetchFirstName(address, network);
+  if (username) {
+    return { username, derivationType: DerivationType.Wallet };
+  } else {
+    // try to find existing usernames owned by data derivation path
+    const address = deriveDataPrivateKey({ rootNode, index });
+    username = await fetchFirstName(address, network);
+    if (username) {
+      return { username, derivationType: DerivationType.Data };
+    } else {
+      // use wallet derivation for accounts without username
+      return { username: undefined, derivationType: DerivationType.Wallet };
+    }
   }
 };
 

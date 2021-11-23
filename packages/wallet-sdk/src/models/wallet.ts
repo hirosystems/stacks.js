@@ -1,12 +1,6 @@
 import { StacksNetwork } from '@stacks/network';
-import {
-  DerivationType,
-  deriveDataPrivateKey,
-  deriveStxPrivateKey,
-  selectDerivationType,
-} from '..';
+import { DerivationType, selectStxDerivation } from '..';
 import { deriveAccount, deriveLegacyConfigPrivateKey } from '../derive';
-import { fetchFirstName } from '../usernames';
 import { connectToGaiaHubWithConfig, getHubInfo } from '../utils';
 import { Wallet, getRootNode } from './common';
 import { fetchLegacyWalletConfig } from './legacy-wallet-config';
@@ -58,35 +52,18 @@ export async function restoreWalletAccounts({
     const newAccounts = await Promise.all(
       walletConfig.accounts.map(async (account, index) => {
         let existingAccount = wallet.accounts[index];
-        let username = account.username;
-        let stxDerivationType = DerivationType.Wallet;
-        if (username) {
-          // Based on username, determine the derivation path for the stx private key
-          const stxDerivationTypeForUsername = await selectDerivationType({
-            username,
-            rootNode,
-            index,
-            network,
-          });
-          stxDerivationType = stxDerivationTypeForUsername;
-        } else {
-          // try to find existing usernames owned by stx derivation path
-          const address = deriveStxPrivateKey({ rootNode, index });
-          username = await fetchFirstName(address, network);
-          if (!username) {
-            // try to find existing usernames owned by data derivation path
-            const address = deriveDataPrivateKey({ rootNode, index });
-            username = await fetchFirstName(address, network);
-            if (username) {
-              stxDerivationType = DerivationType.Data;
-            }
-          }
-        }
+        const { username, stxDerivationType } = await selectStxDerivation({
+          username: account.username,
+          rootNode,
+          index,
+          network,
+        });
         if (!existingAccount) {
           if (stxDerivationType === DerivationType.Unknown) {
-            // TODO this account index has a username
+            // This account index has a username
             // that is not owned by stx derivation path or data derivation path
             // we can't determine the stx private key :-/
+            return Promise.reject(`Username ${username} is owned by unknown private key`);
           } else {
             existingAccount = deriveAccount({
               rootNode,
@@ -114,31 +91,30 @@ export async function restoreWalletAccounts({
     const newAccounts = await Promise.all(
       legacyWalletConfig.identities.map(async (identity, index) => {
         let existingAccount = wallet.accounts[index];
-        let stxDerivationType = DerivationType.Wallet;
-        if (identity.username) {
-          const stxDerivationTypeForUsername = await selectDerivationType({
-            username: identity.username,
-            rootNode,
-            index,
-            network,
-          });
-          if (stxDerivationTypeForUsername === DerivationType.Unknown) {
-            delete identity.username;
-          } else {
-            stxDerivationType = stxDerivationTypeForUsername;
-          }
-        }
+        const { username, stxDerivationType } = await selectStxDerivation({
+          username: identity.username,
+          rootNode,
+          index,
+          network,
+        });
         if (!existingAccount) {
-          existingAccount = deriveAccount({
-            rootNode,
-            index,
-            salt: wallet.salt,
-            stxDerivationType,
-          });
+          if (stxDerivationType === DerivationType.Unknown) {
+            // This account index has a username
+            // that is not owned by stx derivation path or data derivation path
+            // we can't determine the stx private key :-/
+            return Promise.reject(`Username ${username} is owned by unknown private key`);
+          } else {
+            existingAccount = deriveAccount({
+              rootNode,
+              index,
+              salt: wallet.salt,
+              stxDerivationType,
+            });
+          }
         }
         return {
           ...existingAccount,
-          username: identity.username,
+          username,
         };
       })
     );

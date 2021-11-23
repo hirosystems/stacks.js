@@ -9,9 +9,9 @@ export const fetchFirstName = async (
     const namesResponse = await fetchPrivate(
       `${network.bnsLookupUrl}/v1/addresses/stacks/${address}`
     );
-    const names = await namesResponse.json();
-    if ((names.length || 0) > 0) {
-      return names[0];
+    const namesJson = await namesResponse.json();
+    if ((namesJson.names.length || 0) > 0) {
+      return namesJson.names[0];
     }
   } catch (e) {}
   return undefined;

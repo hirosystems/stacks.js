@@ -49,15 +49,13 @@ export const fetchAccountProfileUrl = async ({
   return `${gaiaHubUrl}${getGaiaAddress(account)}/profile.json`;
 };
 
-export function signProfileForUpload({
-  profile,
-  profilePrivateKey,
-}: {
-  profile: Profile;
-  profilePrivateKey: string;
-}) {
-  const publicKey = getPublicKeyFromPrivate(profilePrivateKey.slice(0, 64));
-  const token = signProfileToken(profile, profilePrivateKey, { publicKey });
+export function signProfileForUpload({ profile, account }: { profile: Profile; account: Account }) {
+  // the profile is always signed with the stx private key
+  // because a username (if any) is owned by the stx private key
+  const privateKey = account.stxPrivateKey;
+  const publicKey = getPublicKeyFromPrivate(privateKey.slice(0, 64));
+
+  const token = signProfileToken(profile, privateKey, { publicKey });
   const tokenRecord = wrapProfileToken(token);
   const tokenRecords = [tokenRecord];
   return JSON.stringify(tokenRecords, null, 2);
@@ -99,9 +97,6 @@ export const signAndUploadProfile = async ({
   account: Account;
   gaiaHubConfig?: GaiaHubConfig;
 }) => {
-  const signedProfileTokenData = signProfileForUpload({
-    profile,
-    profilePrivateKey: account.stxPrivateKey,
-  });
+  const signedProfileTokenData = signProfileForUpload({ profile, account });
   await uploadProfile({ gaiaHubUrl, account, signedProfileTokenData, gaiaHubConfig });
 };
