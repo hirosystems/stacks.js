@@ -92,7 +92,6 @@ export const selectDerivationType = async ({
   const nameInfo = await network.getNameInfo(username);
   let stxPrivateKey = deriveStxPrivateKey({ rootNode, index });
   let derivedAddress = getAddressFromPrivateKey(stxPrivateKey);
-  console.log(derivedAddress, nameInfo.address);
   if (derivedAddress !== nameInfo.address) {
     // try data private key
     stxPrivateKey = deriveDataPrivateKey({
@@ -100,7 +99,6 @@ export const selectDerivationType = async ({
       index,
     });
     derivedAddress = getAddressFromPrivateKey(stxPrivateKey);
-    console.log(derivedAddress, nameInfo.address);
     if (derivedAddress !== nameInfo.address) {
       return DerivationType.Unknown;
     } else {
