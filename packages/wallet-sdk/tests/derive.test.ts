@@ -130,3 +130,23 @@ test('derive derivation path with new username owned by address of data derivati
   expect(username).toEqual("public_profile_for_testing.id.blockstack");
   expect(stxDerivationType).toEqual(DerivationType.Data);
 })
+
+
+test('derive derivation path with username and without network', async () => {
+  const rootPrivateKey = await mnemonicToSeed(SECRET_KEY);
+  const rootNode = fromSeed(rootPrivateKey);
+
+  const { username, stxDerivationType } = await selectStxDerivation({ username: "public_profile_for_testing.id.blockstack", rootNode, index: 0 });
+  expect(username).toEqual("public_profile_for_testing.id.blockstack");
+  expect(stxDerivationType).toEqual(DerivationType.Unknown);
+})
+
+
+test('derive derivation path without username and without network', async () => {
+  const rootPrivateKey = await mnemonicToSeed(SECRET_KEY);
+  const rootNode = fromSeed(rootPrivateKey);
+
+  const { username, stxDerivationType } = await selectStxDerivation({ username: undefined, rootNode, index: 0 });
+  expect(username).toEqual(undefined);
+  expect(stxDerivationType).toEqual(DerivationType.Wallet);
+})

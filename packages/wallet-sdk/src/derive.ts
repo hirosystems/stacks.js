@@ -109,7 +109,7 @@ export const selectStxDerivation = async ({
   username?: string;
   rootNode: BIP32Interface;
   index: number;
-  network: StacksNetwork;
+  network?: StacksNetwork;
 }): Promise<{ username: string | undefined; stxDerivationType: DerivationType }> => {
   if (username) {
     // Based on username, determine the derivation path for the stx private key
@@ -139,25 +139,30 @@ const selectDerivationTypeForUsername = async ({
   username: string;
   rootNode: BIP32Interface;
   index: number;
-  network: StacksNetwork;
+  network?: StacksNetwork;
 }): Promise<DerivationType> => {
-  const nameInfo = await network.getNameInfo(username);
-  let stxPrivateKey = deriveStxPrivateKey({ rootNode, index });
-  let derivedAddress = getAddressFromPrivateKey(stxPrivateKey);
-  if (derivedAddress !== nameInfo.address) {
-    // try data private key
-    stxPrivateKey = deriveDataPrivateKey({
-      rootNode,
-      index,
-    });
-    derivedAddress = getAddressFromPrivateKey(stxPrivateKey);
+  if (network) {
+    const nameInfo = await network.getNameInfo(username);
+    let stxPrivateKey = deriveStxPrivateKey({ rootNode, index });
+    let derivedAddress = getAddressFromPrivateKey(stxPrivateKey);
     if (derivedAddress !== nameInfo.address) {
-      return DerivationType.Unknown;
+      // try data private key
+      stxPrivateKey = deriveDataPrivateKey({
+        rootNode,
+        index,
+      });
+      derivedAddress = getAddressFromPrivateKey(stxPrivateKey);
+      if (derivedAddress !== nameInfo.address) {
+        return DerivationType.Unknown;
+      } else {
+        return DerivationType.Data;
+      }
     } else {
-      return DerivationType.Data;
+      return DerivationType.Wallet;
     }
   } else {
-    return DerivationType.Wallet;
+    // no network to determine the derivation path
+    return DerivationType.Unknown;
   }
 };
 
@@ -168,24 +173,25 @@ const selectUsernameForAccount = async ({
 }: {
   rootNode: BIP32Interface;
   index: number;
-  network: StacksNetwork;
+  network?: StacksNetwork;
 }): Promise<{ username: string | undefined; derivationType: DerivationType }> => {
   // try to find existing usernames owned by stx derivation path
   const address = deriveStxPrivateKey({ rootNode, index });
-  let username = await fetchFirstName(address, network);
-  if (username) {
-    return { username, derivationType: DerivationType.Wallet };
-  } else {
-    // try to find existing usernames owned by data derivation path
-    const address = deriveDataPrivateKey({ rootNode, index });
-    username = await fetchFirstName(address, network);
+  if (network) {
+    let username = await fetchFirstName(address, network);
     if (username) {
-      return { username, derivationType: DerivationType.Data };
+      return { username, derivationType: DerivationType.Wallet };
     } else {
-      // use wallet derivation for accounts without username
-      return { username: undefined, derivationType: DerivationType.Wallet };
+      // try to find existing usernames owned by data derivation path
+      const address = deriveDataPrivateKey({ rootNode, index });
+      username = await fetchFirstName(address, network);
+      if (username) {
+        return { username, derivationType: DerivationType.Data };
+      }
     }
   }
+  // use wallet derivation for accounts without username
+  return { username: undefined, derivationType: DerivationType.Wallet };
 };
 
 export const deriveStxPrivateKey = ({
