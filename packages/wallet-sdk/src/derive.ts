@@ -194,6 +194,20 @@ const selectUsernameForAccount = async ({
   return { username: undefined, derivationType: DerivationType.Wallet };
 };
 
+export const derivePrivateKeyByType = ({
+  rootNode,
+  index,
+  derivationType,
+}: {
+  rootNode: BIP32Interface;
+  index: number;
+  derivationType: DerivationType;
+}): string => {
+  return derivationType === DerivationType.Wallet
+    ? deriveStxPrivateKey({ rootNode, index })
+    : deriveDataPrivateKey({ rootNode, index });
+};
+
 export const deriveStxPrivateKey = ({
   rootNode,
   index,
