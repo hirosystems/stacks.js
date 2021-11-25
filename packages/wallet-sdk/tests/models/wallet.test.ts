@@ -15,17 +15,20 @@ test("restore wallet with username", async () => {
     'update opinion media';
 
   const baseWallet = await generateWallet({ secretKey, password: 'password' });
+  const ownerPrivateKey = baseWallet.accounts[0].dataPrivateKey.slice(0, 64)
 
   fetchMock
   .once(mockGaiaHubInfo)
   .once(JSON.stringify("no found"), {status: 404}) // TODO mock fetch legacy wallet config 
   .once(JSON.stringify({address: "SP30RZ44NTH2D95M1HSWVMM8VVHSAFY71VF3XQZ0K"}))
   .once(JSON.stringify("ok")); // updateWalletConfig
+
   const wallet = await restoreWalletAccounts({
     wallet: baseWallet, gaiaHubUrl: "https://hub.gaia.com",
     network: new StacksMainnet()
   })
   expect(wallet?.accounts[0]?.username).toEqual("public_profile_for_testing.id.blockstack")
+  expect(wallet?.accounts[0]?.stxPrivateKey.slice(0,64)).toEqual(ownerPrivateKey)
 });
 
 

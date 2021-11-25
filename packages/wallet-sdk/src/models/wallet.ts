@@ -1,10 +1,5 @@
 import { StacksNetwork } from '@stacks/network';
-import {
-  DerivationType,
-  derivePrivateKeyByType,
-  deriveStxPrivateKey,
-  selectStxDerivation,
-} from '..';
+import { DerivationType, derivePrivateKeyByType, selectStxDerivation } from '..';
 import { deriveAccount, deriveLegacyConfigPrivateKey } from '../derive';
 import { connectToGaiaHubWithConfig, getHubInfo } from '../utils';
 import { Wallet, getRootNode } from './common';
