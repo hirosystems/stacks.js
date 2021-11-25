@@ -43,7 +43,6 @@ export async function restoreWalletAccounts({
     fetchWalletConfig({ wallet, gaiaHubConfig: currentGaiaConfig }),
     fetchLegacyWalletConfig({ wallet, gaiaHubConfig: legacyGaiaConfig }),
   ]);
-
   // Restore from existing config
   if (
     walletConfig &&
@@ -58,20 +57,19 @@ export async function restoreWalletAccounts({
           index,
           network,
         });
+        if (stxDerivationType === DerivationType.Unknown) {
+          // This account index has a username
+          // that is not owned by stx derivation path or data derivation path
+          // we can't determine the stx private key :-/
+          return Promise.reject(`Username ${username} is owned by unknown private key`);
+        }
         if (!existingAccount) {
-          if (stxDerivationType === DerivationType.Unknown) {
-            // This account index has a username
-            // that is not owned by stx derivation path or data derivation path
-            // we can't determine the stx private key :-/
-            return Promise.reject(`Username ${username} is owned by unknown private key`);
-          } else {
-            existingAccount = deriveAccount({
-              rootNode,
-              index,
-              salt: wallet.salt,
-              stxDerivationType,
-            });
-          }
+          existingAccount = deriveAccount({
+            rootNode,
+            index,
+            salt: wallet.salt,
+            stxDerivationType,
+          });
         }
         return {
           ...existingAccount,
@@ -97,20 +95,19 @@ export async function restoreWalletAccounts({
           index,
           network,
         });
+        if (stxDerivationType === DerivationType.Unknown) {
+          // This account index has a username
+          // that is not owned by stx derivation path or data derivation path
+          // we can't determine the stx private key :-/
+          return Promise.reject(`Username ${username} is owned by unknown private key`);
+        }
         if (!existingAccount) {
-          if (stxDerivationType === DerivationType.Unknown) {
-            // This account index has a username
-            // that is not owned by stx derivation path or data derivation path
-            // we can't determine the stx private key :-/
-            return Promise.reject(`Username ${username} is owned by unknown private key`);
-          } else {
-            existingAccount = deriveAccount({
-              rootNode,
-              index,
-              salt: wallet.salt,
-              stxDerivationType,
-            });
-          }
+          existingAccount = deriveAccount({
+            rootNode,
+            index,
+            salt: wallet.salt,
+            stxDerivationType,
+          });
         }
         return {
           ...existingAccount,
