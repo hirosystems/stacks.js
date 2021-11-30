@@ -344,46 +344,50 @@ export function intToBN(value: IntegerType, signed: boolean): BN {
 }
 
 export function intToBigInt(value: IntegerType, signed: boolean): bigint {
-  if (typeof value === 'number') {
-    if (!Number.isInteger(value)) {
+  let parsedValue = value;
+
+  if (typeof parsedValue === 'number') {
+    if (!Number.isInteger(parsedValue)) {
       throw new RangeError(`Invalid value. Values of type 'number' must be an integer.`);
     }
-    return BigInt(value);
+    return BigInt(parsedValue);
   }
-  if (typeof value === 'string') {
+  if (typeof parsedValue === 'string') {
     // If hex string then convert to buffer then fall through to the buffer condition
-    if (value.toLowerCase().startsWith('0x')) {
+    if (parsedValue.toLowerCase().startsWith('0x')) {
       // Trim '0x' hex-prefix
-      let hex = value.slice(2);
+      let hex = parsedValue.slice(2);
+
       // Allow odd-length strings like `0xf` -- some libs output these, or even just `0x${num.toString(16)}`
       hex = hex.padStart(hex.length + (hex.length % 2), '0');
-      value = AvailableBufferModule.from(hex, 'hex');
+
+      parsedValue = AvailableBufferModule.from(hex, 'hex');
     } else {
       try {
-        return BigInt(value);
+        return BigInt(parsedValue);
       } catch (error) {
         if (error instanceof SyntaxError) {
-          throw new RangeError(`Invalid value. String integer '${value}' is not finite.`);
+          throw new RangeError(`Invalid value. String integer '${parsedValue}' is not finite.`);
         }
       }
     }
   }
-  if (typeof value === 'bigint') {
-    return value;
+  if (typeof parsedValue === 'bigint') {
+    return parsedValue;
   }
-  if (value instanceof Uint8Array || BufferPolyfill.isBuffer(value)) {
+  if (parsedValue instanceof Uint8Array || AvailableBufferModule.isBuffer(parsedValue)) {
     if (signed) {
       // Allow byte arrays smaller than 128-bits to be passed.
       // This allows positive signed ints like `0x08` (8) or negative signed
       // ints like `0xf8` (-8) to be passed without having to pad to 16 bytes.
-      const bn = new BN(value, 'be').fromTwos(value.byteLength * 8);
+      const bn = new BN(parsedValue, 'be').fromTwos(parsedValue.byteLength * 8);
       return BigInt(bn.toString());
     } else {
-      return BigInt(new BN(value, 'be').toString());
+      return BigInt(new BN(parsedValue, 'be').toString());
     }
   }
-  if (value instanceof BN || BN.isBN(value)) {
-    return BigInt(value.toString());
+  if (parsedValue instanceof BN || BN.isBN(parsedValue)) {
+    return BigInt(parsedValue.toString());
   }
   throw new TypeError(
     `Invalid value type. Must be a number, bigint, integer-string, hex-string, BN.js instance, or Buffer.`
