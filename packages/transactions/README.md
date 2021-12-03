@@ -193,7 +193,7 @@ const sponsoredTx = await sponsorTransaction(sponsorOptions);
 // for mainnet, use `StacksMainnet()`
 const network = new StacksTestnet();
 
-const broadcastResponse = await broadcastTransaction(transaction, network);
+const broadcastResponse = await broadcastTransaction(sponsoredTx, network);
 const txId = broadcastResponse.txid;
 ```
 
