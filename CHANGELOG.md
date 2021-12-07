@@ -3,6 +3,57 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.0.0](https://github.com/blockstack/blockstack.js/compare/v2.0.1...v3.0.0) (2021-11-30)
+
+
+### Bug Fixes
+
+* add custom bigint pow to prevent transpilers incorrect conversion ([f0334cf](https://github.com/blockstack/blockstack.js/commit/f0334cf8581bc5aced724e8f151a826018e0f3f8))
+* avoid use of getters to enable safer serialization ([6f626a1](https://github.com/blockstack/blockstack.js/commit/6f626a120229632ee215f28bc5d2ebaa40857c43))
+* bigint -> number ([78c7960](https://github.com/blockstack/blockstack.js/commit/78c79600c1a0b7fde1af689f83a0c63f94d036aa))
+* check if spending condition has too many sigs ([6ad03fd](https://github.com/blockstack/blockstack.js/commit/6ad03fd15e218647299e44a40616501f5b8f4f91))
+* cli add missing clarity types in contract call ([a02665a](https://github.com/blockstack/blockstack.js/commit/a02665ad38cbf49e79dc315d97b23b766886eae0))
+* endpoint response type ([647833a](https://github.com/blockstack/blockstack.js/commit/647833a0ca3f61d1ce549155c94c2d2127dff772))
+* fix etags deletion from localstorage on parallel calls to delete file ([1af7a18](https://github.com/blockstack/blockstack.js/commit/1af7a18b1017981f5b44c1006d940eb4648d0491))
+* github action for generating updated docs on release ([6d9ff4d](https://github.com/blockstack/blockstack.js/commit/6d9ff4df00469bb1015e031bb04cc3423357de5b))
+* improve signOrigin oversign check; fields which are not a MessageSignature don't count in overlap check ([abe2909](https://github.com/blockstack/blockstack.js/commit/abe29096f682abb327a8134a5d4d0e7d6e20d5dc))
+* jsdom failing with init bigint ([ba4d351](https://github.com/blockstack/blockstack.js/commit/ba4d3511ae023afc325faece1a4faf7a154806cb))
+* **network:** upgrade and republish ([f061612](https://github.com/blockstack/blockstack.js/commit/f0616128699bf5634c4f0e93f913b41921e908ba))
+* remove circular dependencies form keychain package ([140f62d](https://github.com/blockstack/blockstack.js/commit/140f62ddbf56b6aeca30198164a3b2dde26fa41b))
+* remove circular dependencies from cli ([4a29e42](https://github.com/blockstack/blockstack.js/commit/4a29e42ceae7c0c4bde52d2827e234ebac2548ea))
+* remove circular dependencies from transactions ([0d0b5fb](https://github.com/blockstack/blockstack.js/commit/0d0b5fbddea4cb5e64c62481cea6feb904b583a9))
+* remove circular dependencies from wallet-sdk ([e9e626d](https://github.com/blockstack/blockstack.js/commit/e9e626d8b3b4dbfab6c39701e8b29fb6f3131ad3))
+* return correct signature in sponsored spending conditions ([e83cdc6](https://github.com/blockstack/blockstack.js/commit/e83cdc64a215f393d75808934c8bb747f8770acb))
+* review and update bns readme ([3d36f8e](https://github.com/blockstack/blockstack.js/commit/3d36f8ed2cf0387e6b39995178dcc7e9d2952755))
+* review and update cli readme ([ae8c7f7](https://github.com/blockstack/blockstack.js/commit/ae8c7f7285291b48799e784b34d13e5220e0b4be))
+* review and update encryption readme ([79735f4](https://github.com/blockstack/blockstack.js/commit/79735f44b8f5489a2840f146b4a168f46a34609f))
+* review and update keychain readme ([a834742](https://github.com/blockstack/blockstack.js/commit/a834742f72fffe63bc89a1745be87788dd6d098d))
+* review and update profile readme ([227b25a](https://github.com/blockstack/blockstack.js/commit/227b25a9f7821e986e6a8aa9afd958ec0a35c437))
+* review and update stacking readme ([d4bc99e](https://github.com/blockstack/blockstack.js/commit/d4bc99e4cdb3ad59932d1627d971da9416e252c3))
+* review and update storage readme ([d9df8f5](https://github.com/blockstack/blockstack.js/commit/d9df8f506c5fb5ead427d3717b320f8ee7ce673c))
+* review and update transactions readme ([0421590](https://github.com/blockstack/blockstack.js/commit/0421590c84fda94ae22f78e12076b9dd7533201f))
+* throw error if authType not set ([8ae3f34](https://github.com/blockstack/blockstack.js/commit/8ae3f34ce5c75236c4aeec56de2a991509cfcc13))
+* trigger workflows on external pull requests [#1114](https://github.com/blockstack/blockstack.js/issues/1114) ([8b4fdb5](https://github.com/blockstack/blockstack.js/commit/8b4fdb5bdf5e14f80e8c8169d3d281a6940ba087))
+* update getFee usage in stacking lib ([34dab52](https://github.com/blockstack/blockstack.js/commit/34dab525304426e0a0d594eb46968541900fad7c))
+* update readme for broadcastTransaction ([c575ee9](https://github.com/blockstack/blockstack.js/commit/c575ee9ee8645fea646da0ea17dabe3f2aff85af))
+* update test and fix oversign check ([a26898e](https://github.com/blockstack/blockstack.js/commit/a26898e3c6e10c779e9e4d96125241c7f412e223))
+
+
+### Features
+
+* add address/signer verification to verifySingleSig() ([589b14d](https://github.com/blockstack/blockstack.js/commit/589b14df3ae6454c202e56e60ff90bd4294c07d8))
+* add more spending condition tests ([930f34d](https://github.com/blockstack/blockstack.js/commit/930f34d3d23f24e7c849593d50a1bf469d068986))
+* add unsigned equivalent of make contract deploy ([792c2ae](https://github.com/blockstack/blockstack.js/commit/792c2ae615a1cd2dca4104b1da22293e7b2381f2))
+* add verifyMultiSig() ([0378747](https://github.com/blockstack/blockstack.js/commit/03787470ffbf87673cda7d2a9d13581992376491))
+* bring back cli command get_app_keys ([f7d2c6c](https://github.com/blockstack/blockstack.js/commit/f7d2c6c474146d6a7129b91ffac7f3e62802ceba))
+* ci job to list circular dependencies ([9816b3c](https://github.com/blockstack/blockstack.js/commit/9816b3c7ae4e9a8f7fcff219239f8b6952f70471))
+* cli add custom derivation path option ([9ba53be](https://github.com/blockstack/blockstack.js/commit/9ba53be4dd0cc09286a525017553218f8e5870b2))
+* construct TransactionSigner with partially signed multi-sig transaction ([0ada72a](https://github.com/blockstack/blockstack.js/commit/0ada72aaeaa66ade8c01243feb50ac2aab7a6e0e))
+* construct TransactionSigner with partially signed multi-sig transaction ([c0ae13f](https://github.com/blockstack/blockstack.js/commit/c0ae13fdbd49dd2034475c59952b4c9f2a595152))
+* export user app file url from storage ([28d5187](https://github.com/blockstack/blockstack.js/commit/28d5187c836318876a0115da8264ab8b66509f95))
+* multisig spending condition tests use integers, not BigNums ([e34ba2e](https://github.com/blockstack/blockstack.js/commit/e34ba2e76fabccb77b39d329bcc75bdac2b93b3e))
+
+
 ## [2.0.1](https://github.com/blockstack/blockstack.js/compare/v2.0.1-beta.2...v2.0.1) (2021-08-09)
 
 **Note:** Version bump only for package stacks.js
