@@ -545,7 +545,7 @@ export function mkdirs(path: string): void {
       if ((statInfo.mode & fs.constants.S_IFDIR) === 0) {
         throw new Error(`Not a directory: ${tmpPath}`);
       }
-    } catch (e) {
+    } catch (e: any) {
       if (e.code === 'ENOENT') {
         // need to create
         fs.mkdirSync(tmpPath);

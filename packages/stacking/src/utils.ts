@@ -72,7 +72,7 @@ export function getAddressHashMode(btcAddress: string) {
   try {
     const { version } = address.fromBase58Check(btcAddress);
     return btcAddressVersionToHashMode(version);
-  } catch (error) {
+  } catch (error: any) {
     throw new InvalidAddressError(btcAddress, error);
   }
 }
@@ -81,7 +81,7 @@ export function decodeBtcAddress(btcAddress: string) {
   let b58Result: address.Base58CheckResult;
   try {
     b58Result = address.fromBase58Check(btcAddress);
-  } catch (error) {
+  } catch (error: any) {
     throw new InvalidAddressError(btcAddress, error);
   }
   const hashMode = btcAddressVersionToHashMode(b58Result.version);

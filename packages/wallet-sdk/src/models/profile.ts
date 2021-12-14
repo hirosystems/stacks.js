@@ -50,8 +50,10 @@ export const fetchAccountProfileUrl = async ({
 };
 
 export function signProfileForUpload({ profile, account }: { profile: Profile; account: Account }) {
-  const privateKey = account.dataPrivateKey;
-  const publicKey = getPublicKeyFromPrivate(privateKey);
+  // the profile is always signed with the stx private key
+  // because a username (if any) is owned by the stx private key
+  const privateKey = account.stxPrivateKey;
+  const publicKey = getPublicKeyFromPrivate(privateKey.slice(0, 64));
 
   const token = signProfileToken(profile, privateKey, { publicKey });
   const tokenRecord = wrapProfileToken(token);
