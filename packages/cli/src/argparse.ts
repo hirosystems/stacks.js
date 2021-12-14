@@ -1970,9 +1970,9 @@ export const CLI_ARGS = {
         '      "blockHeight": 567890,\n' +
         '      "confirmations": 7,\n' +
         '    }\n' +
-        '    $ stx -H https://core.blockstack.org zonefile_push "$ZONEFILE_PATH"\n' +
+        '    $ stx -H https://stacks-node-api.stacks.co zonefile_push "$ZONEFILE_PATH"\n' +
         '    [\n' +
-        '      "https://core.blockstack.org"\n' +
+        '      "https://stacks-node-api.stacks.co"\n' +
         '    ]\n' +
         '\n',
       group: 'Blockstack ID Management',
@@ -2618,9 +2618,9 @@ export const CLI_ARGS = {
         '    }\n' +
         '    \n' +
         '    $ # send out the new zone file to a Blockstack peer\n' +
-        '    $ stx -H https://core.blockstack.org zonefile_push /tmp/zonefile.txt\n' +
+        '    $ stx -H https://stacks-node-api.stacks.co zonefile_push /tmp/zonefile.txt\n' +
         '    [\n' +
-        '      "https://core.blockstack.org"\n' +
+        '      "https://stacks-node-api.stacks.co"\n' +
         '    ]\n' +
         '\n',
       group: 'Blockstack ID Management',
@@ -2679,9 +2679,9 @@ export const CLI_ARGS = {
         '\n' +
         'Example:\n' +
         '\n' +
-        '    $ stx -H https://core.blockstack.org zonefile_push /path/to/zonefile.txt\n' +
+        '    $ stx -H https://stacks-node-api.stacks.co zonefile_push /path/to/zonefile.txt\n' +
         '    [\n' +
-        '      "https://core.blockstack.org"\n' +
+        '      "https://stacks-node-api.stacks.co"\n' +
         '    ]\n' +
         '\n',
       group: 'Peer Services',

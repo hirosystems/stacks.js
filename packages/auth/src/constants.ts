@@ -53,7 +53,7 @@ export const BLOCKSTACK_APP_PRIVATE_KEY_LABEL = 'blockstack-transit-private-key'
 /**
  * @ignore
  */
-export const DEFAULT_CORE_NODE = 'https://core.blockstack.org';
+export const DEFAULT_CORE_NODE = 'https://stacks-node-api.stacks.co';
 /**
  * @ignore
  */

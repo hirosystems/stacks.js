@@ -133,7 +133,7 @@ export class Identity implements IdentifyInterface {
   }
 
   async fetchNames() {
-    const getNamesUrl = `https://core.blockstack.org/v1/addresses/bitcoin/${this.address}`;
+    const getNamesUrl = `https://stacks-node-api.stacks.co/v1/addresses/bitcoin/${this.address}`;
     const res = await fetch(getNamesUrl);
     const data = await res.json();
     const { names }: { names: string[] } = data;
