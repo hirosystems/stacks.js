@@ -248,7 +248,7 @@ interface NameInfoResponse {
 }
 
 export const getProfileURLFromZoneFile = async (name: string) => {
-  const url = `https://core.blockstack.org/v1/names/${name}`;
+  const url = `https://stacks-node-api.stacks.co/v1/names/${name}`;
   const res = await fetch(url);
   if (res.ok) {
     const nameInfo: NameInfoResponse = await res.json();
