@@ -30,8 +30,7 @@ import {
 
 import {bufferCVFromString, decodeFQN, getZonefileHash, uintCVFromBN} from "../src/utils";
 
-import BN from "bn.js";
-import { ChainID } from "@stacks/common";
+import { ChainID } from '@stacks/common';
 
 beforeEach(() => {
   fetchMock.resetMocks();
@@ -356,7 +355,7 @@ test('getNamePrice error', async () => {
 test('preorderNamespace', async () => {
   const namespace = 'id';
   const salt = 'salt';
-  const stxToBurn = new BN(10);
+  const stxToBurn = BigInt(10);
 
   const publicKey = '03ef788b3830c00abe8f64f62dc32fc863bc0b2cafeb073b6c8e1c7657d9c2c3ab';
   const network = new StacksTestnet();
@@ -416,29 +415,29 @@ test('revealNamespace', async () => {
   const publicKey = '03ef788b3830c00abe8f64f62dc32fc863bc0b2cafeb073b6c8e1c7657d9c2c3ab';
 
   const priceFunction: PriceFunction = {
-    base: new BN(10),
-    coefficient: new BN(1),
-    b1: new BN(1),
-    b2: new BN(2),
-    b3: new BN(3),
-    b4: new BN(4),
-    b5: new BN(5),
-    b6: new BN(6),
-    b7: new BN(7),
-    b8: new BN(8),
-    b9: new BN(9),
-    b10: new BN(10),
-    b11: new BN(11),
-    b12: new BN(12),
-    b13: new BN(13),
-    b14: new BN(14),
-    b15: new BN(15),
-    b16: new BN(16),
-    nonAlphaDiscount: new BN(0),
-    noVowelDiscount: new BN(0),
+    base: BigInt(10),
+    coefficient: BigInt(1),
+    b1: BigInt(1),
+    b2: BigInt(2),
+    b3: BigInt(3),
+    b4: BigInt(4),
+    b5: BigInt(5),
+    b6: BigInt(6),
+    b7: BigInt(7),
+    b8: BigInt(8),
+    b9: BigInt(9),
+    b10: BigInt(10),
+    b11: BigInt(11),
+    b12: BigInt(12),
+    b13: BigInt(13),
+    b14: BigInt(14),
+    b15: BigInt(15),
+    b16: BigInt(16),
+    nonAlphaDiscount: BigInt(0),
+    noVowelDiscount: BigInt(0),
   }
 
-  const lifetime = new BN(10000);
+  const lifetime = BigInt(10000);
   const namespaceImportAddress = 'SPF0324DSC4K505TP6A8C7GAK4R95E38TGNZP7RE';
 
   const makeUnsignedContractCall = jest.fn().mockResolvedValue({});
@@ -602,7 +601,7 @@ test('readyNamespace', async () => {
 test('preorderName', async () => {
   const fullyQualifiedName = 'test.id';
   const salt = 'salt';
-  const stxToBurn = new BN(10);
+  const stxToBurn = BigInt(10);
   const publicKey = '03ef788b3830c00abe8f64f62dc32fc863bc0b2cafeb073b6c8e1c7657d9c2c3ab';
 
   const makeUnsignedContractCall = jest.fn().mockResolvedValue({});
@@ -957,7 +956,7 @@ test('revokeName', async () => {
 
 test('renewName', async () => {
   const fullyQualifiedName = 'test.id';
-  const stxToBurn = new BN(10);
+  const stxToBurn = BigInt(10);
   const newOwnerAddress = 'SPF0324DSC4K505TP6A8C7GAK4R95E38TGNZP7RE';
   const zonefile = 'zonefile';
   const publicKey = '03ef788b3830c00abe8f64f62dc32fc863bc0b2cafeb073b6c8e1c7657d9c2c3ab';
@@ -1023,7 +1022,7 @@ test('renewName', async () => {
 
 test('renewName optionalArguments', async () => {
   const fullyQualifiedName = 'test.id';
-  const stxToBurn = new BN(10);
+  const stxToBurn = BigInt(10);
   const newOwnerAddress = undefined;
   const zonefile = undefined;
   const publicKey = '03ef788b3830c00abe8f64f62dc32fc863bc0b2cafeb073b6c8e1c7657d9c2c3ab';

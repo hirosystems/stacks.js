@@ -6,7 +6,6 @@ import * as fs from 'fs';
 import * as winston from 'winston';
 import cors from 'cors';
 
-import BN from 'bn.js';
 import * as crypto from 'crypto';
 import * as bip39 from 'bip39';
 import express from 'express';
@@ -372,21 +371,10 @@ function balance(network: CLINetworkAdapter, args: string[]): Promise<string> {
       return response.json();
     })
     .then(response => {
-      let balanceHex = response.balance;
-      if (response.balance.startsWith('0x')) {
-        balanceHex = response.balance.substr(2);
-      }
-      let lockedHex = response.locked;
-      if (response.locked.startsWith('0x')) {
-        lockedHex = response.locked.substr(2);
-      }
-      const unlockHeight = response.unlock_height;
-      const balance = new BN(balanceHex, 16);
-      const locked = new BN(lockedHex, 16);
       const res = {
-        balance: balance.toString(10),
-        locked: locked.toString(10),
-        unlock_height: unlockHeight,
+        balance: BigInt(response.balance).toString(10),
+        locked: BigInt(response.locked).toString(10),
+        unlock_height: response.unlock_height,
         nonce: response.nonce,
       };
       return Promise.resolve(JSONStringify(res));
@@ -539,9 +527,9 @@ function getAccountHistory(network: CLINetworkAdapter, args: string[]): Promise<
  */
 async function sendTokens(network: CLINetworkAdapter, args: string[]): Promise<string> {
   const recipientAddress = args[0];
-  const tokenAmount = new BN(args[1]);
-  const fee = new BN(args[2]);
-  const nonce = new BN(args[3]);
+  const tokenAmount = BigInt(args[1]);
+  const fee = BigInt(args[2]);
+  const nonce = BigInt(args[3]);
   const privateKey = args[4];
 
   let memo = '';
@@ -605,8 +593,8 @@ async function sendTokens(network: CLINetworkAdapter, args: string[]): Promise<s
 async function contractDeploy(network: CLINetworkAdapter, args: string[]): Promise<string> {
   const sourceFile = args[0];
   const contractName = args[1];
-  const fee = new BN(args[2]);
-  const nonce = new BN(args[3]);
+  const fee = BigInt(args[2]);
+  const nonce = BigInt(args[3]);
   const privateKey = args[4];
 
   const source = fs.readFileSync(sourceFile).toString();
@@ -668,8 +656,8 @@ async function contractFunctionCall(network: CLINetworkAdapter, args: string[]):
   const contractAddress = args[0];
   const contractName = args[1];
   const functionName = args[2];
-  const fee = new BN(args[3]);
-  const nonce = new BN(args[4]);
+  const fee = BigInt(args[3]);
+  const nonce = BigInt(args[4]);
   const privateKey = args[5];
 
   // temporary hack to use network config from stacks-transactions lib
@@ -1517,7 +1505,7 @@ async function stackingStatus(network: CLINetworkAdapter, args: string[]): Promi
 }
 
 async function canStack(network: CLINetworkAdapter, args: string[]): Promise<string> {
-  const amount = new BN(args[0]);
+  const amount = BigInt(args[0]);
   const cycles = Number(args[1]);
   const poxAddress = args[2];
   const stxAddress = args[3];
@@ -1542,16 +1530,16 @@ async function canStack(network: CLINetworkAdapter, args: string[]): Promise<str
 
   return Promise.all([balancePromise, poxInfoPromise, stackingEligiblePromise])
     .then(([balance, poxInfo, stackingEligible]) => {
-      const minAmount = new BN(poxInfo.min_amount_ustx);
-      const balanceBN = new BN(balance.stx.balance);
+      const minAmount = BigInt(poxInfo.min_amount_ustx);
+      const balanceBN = BigInt(balance.stx.balance);
 
-      if (minAmount.gt(amount)) {
+      if (minAmount > amount) {
         throw new Error(
           `Stacking amount less than required minimum of ${minAmount.toString()} microstacks`
         );
       }
 
-      if (amount.gt(balanceBN)) {
+      if (amount > balanceBN) {
         throw new Error(
           `Stacking amount greater than account balance of ${balanceBN.toString()} microstacks`
         );
@@ -1569,7 +1557,7 @@ async function canStack(network: CLINetworkAdapter, args: string[]): Promise<str
 }
 
 async function stack(network: CLINetworkAdapter, args: string[]): Promise<string> {
-  const amount = new BN(args[0]);
+  const amount = BigInt(args[0]);
   const cycles = Number(args[1]);
   const poxAddress = args[2];
   const privateKey = args[3];
@@ -1610,18 +1598,18 @@ async function stack(network: CLINetworkAdapter, args: string[]): Promise<string
 
   return Promise.all([balancePromise, poxInfoPromise, coreInfoPromise, stackingEligiblePromise])
     .then(([balance, poxInfo, coreInfo, stackingEligible]) => {
-      const minAmount = new BN(poxInfo.min_amount_ustx);
-      const balanceBN = new BN(balance.stx.balance);
+      const minAmount = BigInt(poxInfo.min_amount_ustx);
+      const balanceBN = BigInt(balance.stx.balance);
       const burnChainBlockHeight = coreInfo.burn_block_height;
       const startBurnBlock = burnChainBlockHeight + 3;
 
-      if (minAmount.gt(amount)) {
+      if (minAmount > amount) {
         throw new Error(
           `Stacking amount less than required minimum of ${minAmount.toString()} microstacks`
         );
       }
 
-      if (amount.gt(balanceBN)) {
+      if (amount > balanceBN) {
         throw new Error(
           `Stacking amount greater than account balance of ${balanceBN.toString()} microstacks`
         );

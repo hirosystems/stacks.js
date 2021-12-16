@@ -1,8 +1,6 @@
 import { Buffer } from '@stacks/common';
 import { bufferCV, uintCV, hash160 } from '@stacks/transactions';
 
-import BN from 'bn.js';
-
 export function decodeFQN(fqdn: string): {
   name: string;
   namespace: string;
@@ -30,6 +28,6 @@ export function decodeFQN(fqdn: string): {
 
 export const bufferCVFromString = (string: string) => bufferCV(Buffer.from(string));
 
-export const uintCVFromBN = (int: BN) => uintCV(int.toString(10));
+export const uintCVFromBN = (int: bigint) => uintCV(int.toString(10));
 
 export const getZonefileHash = (zonefile: string) => hash160(Buffer.from(zonefile));

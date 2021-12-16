@@ -6,8 +6,7 @@ import { utils } from '@noble/secp256k1';
 import { deserializeCV } from './clarity';
 import { c32addressDecode } from 'c32check';
 import lodashCloneDeep from 'lodash.clonedeep';
-import { with0x } from '@stacks/common';
-import { bytesToHex } from '@noble/hashes/utils';
+import { bytesToHex, with0x } from '@stacks/common';
 
 /**
  * Use utils.randomBytes to replace randombytes dependency
@@ -17,6 +16,9 @@ import { bytesToHex } from '@noble/hashes/utils';
  */
 export const randomBytes = (bytesLength?: number) => Buffer.from(utils.randomBytes(bytesLength));
 
+/**
+ * @deprecated Import from `@stacks/common` instead
+ */
 export { bytesToHex };
 
 export class BufferArray {
@@ -51,11 +53,6 @@ export const leftPadHexToLength = (hexString: string, length: number): string =>
 
 export const rightPadHexToLength = (hexString: string, length: number): string =>
   hexString.padEnd(length, '0');
-
-export const intToHexString = (integer: number, lengthBytes = 8): string =>
-  integer.toString(16).padStart(lengthBytes * 2, '0');
-
-export const hexStringToInt = (hexString: string): number => parseInt(hexString, 16);
 
 export const exceedsMaxLengthBytes = (string: string, maxLengthBytes: number): boolean =>
   string ? Buffer.from(string).length > maxLengthBytes : false;

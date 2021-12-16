@@ -8,7 +8,6 @@ import {
   TupleCV,
 } from '@stacks/transactions';
 import { address } from 'bitcoinjs-lib';
-import BN from 'bn.js';
 import { StackingErrors } from './constants';
 
 export class InvalidAddressError extends Error {
@@ -140,7 +139,7 @@ export function poxAddressToBtcAddress(...args: PoxAddressArgs): string {
 }
 
 export function getBTCAddress(version: Buffer, checksum: Buffer) {
-  const btcAddress = address.toBase58Check(checksum, new BN(version).toNumber());
+  const btcAddress = address.toBase58Check(checksum, Number(version.toString()));
   return btcAddress;
 }
 

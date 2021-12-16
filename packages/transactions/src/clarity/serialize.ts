@@ -1,4 +1,4 @@
-import { Buffer } from '@stacks/common';
+import { Buffer, toTwos, toBuffer } from '@stacks/common';
 import { serializeAddress, serializeLPString } from '../types';
 import { createLPString } from '../postcondition-types';
 import {
@@ -19,7 +19,6 @@ import { BufferArray } from '../utils';
 import { SerializationError } from '../errors';
 import { StringAsciiCV, StringUtf8CV } from './types/stringCV';
 import { CLARITY_INT_BYTE_SIZE, CLARITY_INT_SIZE } from '../constants';
-import BN from 'bn.js';
 
 function bufferWithTypeID(typeId: ClarityType, buffer: Buffer): Buffer {
   const id = Buffer.from([typeId]);
@@ -45,14 +44,12 @@ function serializeBufferCV(cv: BufferCV): Buffer {
 }
 
 function serializeIntCV(cv: IntCV): Buffer {
-  const buffer = new BN(cv.value.toString())
-    .toTwos(CLARITY_INT_SIZE)
-    .toArrayLike(Buffer, 'be', CLARITY_INT_BYTE_SIZE);
+  const buffer = toBuffer(toTwos(cv.value, BigInt(CLARITY_INT_SIZE)), CLARITY_INT_BYTE_SIZE);
   return bufferWithTypeID(cv.type, buffer);
 }
 
 function serializeUIntCV(cv: UIntCV): Buffer {
-  const buffer = new BN(cv.value.toString()).toArrayLike(Buffer, 'be', CLARITY_INT_BYTE_SIZE);
+  const buffer = toBuffer(cv.value, CLARITY_INT_BYTE_SIZE);
   return bufferWithTypeID(cv.type, buffer);
 }
 

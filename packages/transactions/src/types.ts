@@ -1,4 +1,4 @@
-import { Buffer, intToBytes } from '@stacks/common';
+import { Buffer, hexToInt, intToBytes, intToHex } from '@stacks/common';
 import {
   MEMO_MAX_LENGTH_BYTES,
   AddressHashMode,
@@ -15,8 +15,6 @@ import { StacksPublicKey, serializePublicKey, deserializePublicKey, isCompressed
 
 import {
   BufferArray,
-  intToHexString,
-  hexStringToInt,
   exceedsMaxLengthBytes,
   hashP2PKH,
   rightPadHexToLength,
@@ -183,14 +181,14 @@ export function addressFromPublicKeys(
 
 export function serializeAddress(address: Address): Buffer {
   const bufferArray: BufferArray = new BufferArray();
-  bufferArray.appendHexString(intToHexString(address.version, 1));
+  bufferArray.appendHexString(intToHex(address.version, 1));
   bufferArray.appendHexString(address.hash160);
 
   return bufferArray.concatBuffer();
 }
 
 export function deserializeAddress(bufferReader: BufferReader): Address {
-  const version = hexStringToInt(bufferReader.readBuffer(1).toString('hex'));
+  const version = hexToInt(bufferReader.readBuffer(1).toString('hex'));
   const data = bufferReader.readBuffer(20).toString('hex');
 
   return { type: StacksMessageType.Address, version, hash160: data };
@@ -227,7 +225,7 @@ export function serializeLPString(lps: LengthPrefixedString) {
   const bufferArray: BufferArray = new BufferArray();
   const contentBuffer = Buffer.from(lps.content);
   const length = contentBuffer.byteLength;
-  bufferArray.appendHexString(intToHexString(length, lps.lengthPrefixBytes));
+  bufferArray.appendHexString(intToHex(length, lps.lengthPrefixBytes));
   bufferArray.push(contentBuffer);
   return bufferArray.concatBuffer();
 }
@@ -238,7 +236,7 @@ export function deserializeLPString(
   maxLength?: number
 ): LengthPrefixedString {
   prefixBytes = prefixBytes ? prefixBytes : 1;
-  const length = hexStringToInt(bufferReader.readBuffer(prefixBytes).toString('hex'));
+  const length = hexToInt(bufferReader.readBuffer(prefixBytes).toString('hex'));
   const content = bufferReader.readBuffer(length).toString();
   return createLPString(content, prefixBytes, maxLength ?? 128);
 }
@@ -312,7 +310,7 @@ export function createLPList<T extends StacksMessage>(
 export function serializeLPList(lpList: LengthPrefixedList): Buffer {
   const list = lpList.values;
   const bufferArray: BufferArray = new BufferArray();
-  bufferArray.appendHexString(intToHexString(list.length, lpList.lengthPrefixBytes));
+  bufferArray.appendHexString(intToHex(list.length, lpList.lengthPrefixBytes));
   for (let index = 0; index < list.length; index++) {
     bufferArray.push(serializeStacksMessage(list[index]));
   }
@@ -324,7 +322,7 @@ export function deserializeLPList(
   type: StacksMessageType,
   lengthPrefixBytes?: number
 ): LengthPrefixedList {
-  const length = hexStringToInt(bufferReader.readBuffer(lengthPrefixBytes || 4).toString('hex'));
+  const length = hexToInt(bufferReader.readBuffer(lengthPrefixBytes || 4).toString('hex'));
   const l: StacksMessage[] = [];
   for (let index = 0; index < length; index++) {
     switch (type) {
