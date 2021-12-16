@@ -40,9 +40,7 @@
     "@stacks/network": "^4.0.1",
     "@stacks/stacks-blockchain-api-types": "^0.61.0",
     "@stacks/transactions": "^4.0.0",
-    "@types/bn.js": "^4.11.6",
-    "bitcoinjs-lib": "^5.2.0",
-    "bn.js": "^5.2.0"
+    "bitcoinjs-lib": "^5.2.0"
   },
   "devDependencies": {
     "@types/jest": "^26.0.22",

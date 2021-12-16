@@ -14,7 +14,6 @@ import {
 import { StacksTestnet, StacksNetwork, StacksNetworkName } from '@stacks/network';
 
 import RPCClient from '@blockstack/rpc-client';
-import BN from 'bn.js';
 
 interface ContractCallOptions {
   contractName: string;
@@ -120,7 +119,7 @@ export class WalletSigner {
       codeBody: codeBody,
       senderKey: this.getSTXPrivateKey().toString('hex'),
       network: this.getNetwork(),
-      nonce: new BN(nonce),
+      nonce: BigInt(nonce),
       postConditionMode,
       postConditions,
       anchorMode,
@@ -139,11 +138,11 @@ export class WalletSigner {
   }: STXTransferOptions) {
     const tx = await makeSTXTokenTransfer({
       recipient,
-      amount: new BN(amount),
+      amount: BigInt(amount),
       memo,
       senderKey: this.getSTXPrivateKey().toString('hex'),
       network: this.getNetwork(),
-      nonce: new BN(nonce),
+      nonce: BigInt(nonce),
       postConditionMode,
       postConditions,
       anchorMode,

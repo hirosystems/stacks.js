@@ -34,7 +34,6 @@ import {
 } from '../src/clarity';
 import { BufferReader } from '../src/bufferReader';
 import { cvToString, cvToJSON, cvToValue, getCVTypeString } from '../src/clarity/clarityValue';
-import BN from 'bn.js';
 
 const ADDRESS = 'SP2JXKMSH007NPYAQHKJPQMAQYAD90NQGTVJVQ02B';
 
@@ -227,7 +226,7 @@ describe('Clarity Types', () => {
         ['-10', '-10', '0xfffffffffffffffffffffffffffffff6'],
         ['0xfff6', '-10', '0xfffffffffffffffffffffffffffffff6'],
         ['0xf6', '-10', '0xfffffffffffffffffffffffffffffff6'],
-        [new BN(-10), '-10', '0xfffffffffffffffffffffffffffffff6'],
+        [BigInt(-10), '-10', '0xfffffffffffffffffffffffffffffff6'],
         [Buffer.from([0xff, 0xf6]), '-10', '0xfffffffffffffffffffffffffffffff6'],
         [Buffer.from([0xf6]), '-10', '0xfffffffffffffffffffffffffffffff6'],
         [Buffer.from([0xff, 0xfe]), '-2', '0xfffffffffffffffffffffffffffffffe'],
@@ -246,7 +245,7 @@ describe('Clarity Types', () => {
         ['0x000a', '10', '0x0000000000000000000000000000000a'],
         ['0xa', '10', '0x0000000000000000000000000000000a'], // hex string with odd padding
         ['0x00a', '10', '0x0000000000000000000000000000000a'], // hex string with odd padding
-        [new BN(10), '10', '0x0000000000000000000000000000000a'],
+        [BigInt(10), '10', '0x0000000000000000000000000000000a'],
         [Buffer.from([0x0a]), '10', '0x0000000000000000000000000000000a'],
         [Buffer.from([0x00, 0x0a]), '10', '0x0000000000000000000000000000000a'],
         [Uint8Array.of(0x0a), '10', '0x0000000000000000000000000000000a'],
@@ -329,7 +328,7 @@ describe('Clarity Types', () => {
         [10n, '10', '0x0000000000000000000000000000000a'],
         ['10', '10', '0x0000000000000000000000000000000a'],
         ['0x0a', '10', '0x0000000000000000000000000000000a'],
-        [new BN(10), '10', '0x0000000000000000000000000000000a'],
+        [BigInt(10), '10', '0x0000000000000000000000000000000a'],
         [Buffer.from([0x0a]), '10', '0x0000000000000000000000000000000a'],
         [Buffer.from([0x00, 0x0a]), '10', '0x0000000000000000000000000000000a']
       ]

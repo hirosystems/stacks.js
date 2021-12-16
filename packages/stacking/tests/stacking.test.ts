@@ -1,6 +1,6 @@
 import { StacksTestnet } from '@stacks/network';
+import { Buffer, toBuffer } from '@stacks/common';
 import fetchMock from 'jest-fetch-mock';
-import BN from 'bn.js';
 import { StackingErrors } from '../src/constants';
 import {
   uintCV,
@@ -223,7 +223,7 @@ test('stack stx', async () => {
   const address = 'ST3XKKN4RPV69NN1PHFDNX3TYKXT7XPC4N8KC1ARH';
   const poxAddress = '1Xik14zRm29UsyS6DjhYg4iZeZqsDa8D3';
   const network = new StacksTestnet();
-  const amountMicroStx = new BN(100000000000);
+  const amountMicroStx = BigInt(100000000000);
   const cycles = 10;
   const privateKey = 'd48f215481c16cbe6426f8e557df9b78895661971d71735126545abddcd5377001';
   const burnBlockHeight = 2000;
@@ -263,7 +263,7 @@ test('stack stx', async () => {
   });
 
   const { version, hash } = btcAddress.fromBase58Check(poxAddress);
-  const versionBuffer = bufferCV(new BN(version, 10).toBuffer());
+  const versionBuffer = bufferCV(toBuffer(BigInt(version)));
   const hashbytes = bufferCV(hash);
   const poxAddressCV = tupleCV({
     hashbytes,
@@ -299,7 +299,7 @@ test('delegate stx', async () => {
   const delegateTo = 'ST2MCYPWTFMD2MGR5YY695EJG0G1R4J2BTJPRGM7H';
   const poxAddress = '1Xik14zRm29UsyS6DjhYg4iZeZqsDa8D3';
   const network = new StacksTestnet();
-  const amountMicroStx = new BN(100000000000);
+  const amountMicroStx = BigInt(100000000000);
   const untilBurnBlockHeight = 2000;
   const privateKey = 'd48f215481c16cbe6426f8e557df9b78895661971d71735126545abddcd5377001';
 
@@ -340,7 +340,7 @@ test('delegate stx', async () => {
   });
 
   const { version, hash } = btcAddress.fromBase58Check(poxAddress);
-  const versionBuffer = bufferCV(new BN(version, 10).toBuffer());
+  const versionBuffer = bufferCV(toBuffer(BigInt(version)));
   const hashbytes = bufferCV(hash);
   const poxAddressCV = tupleCV({
     hashbytes,
@@ -375,7 +375,7 @@ test('delegate stx with empty optional parameters', async () => {
   const address = 'ST3XKKN4RPV69NN1PHFDNX3TYKXT7XPC4N8KC1ARH';
   const delegateTo = 'ST2MCYPWTFMD2MGR5YY695EJG0G1R4J2BTJPRGM7H';
   const network = new StacksTestnet();
-  const amountMicroStx = new BN(100000000000);
+  const amountMicroStx = BigInt(100000000000);
   const privateKey = 'd48f215481c16cbe6426f8e557df9b78895661971d71735126545abddcd5377001';
 
   const transaction = { serialize: () => 'mocktxhex' }
@@ -445,7 +445,7 @@ test('delegate stack stx with one delegator', async () => {
   const address = 'ST2MCYPWTFMD2MGR5YY695EJG0G1R4J2BTJPRGM7H';
   const poxAddress = '1Xik14zRm29UsyS6DjhYg4iZeZqsDa8D3';
   const network = new StacksTestnet();
-  const amountMicroStx = new BN(100000000000);
+  const amountMicroStx = BigInt(100000000000);
   const burnBlockHeight = 2000;
   const cycles = 10;
   const privateKey = 'd48f215481c16cbe6426f8e557df9b78895661971d71735126545abddcd5377001';
@@ -497,7 +497,7 @@ test('delegate stack stx with one delegator', async () => {
   });
 
   const { version, hash } = btcAddress.fromBase58Check(poxAddress);
-  const versionBuffer = bufferCV(new BN(version, 10).toBuffer());
+  const versionBuffer = bufferCV(toBuffer(BigInt(version)));
   const hashbytes = bufferCV(hash);
   const poxAddressCV = tupleCV({
     hashbytes,
@@ -534,11 +534,11 @@ test('delegate stack stx with set nonce', async () => {
   const address = 'ST2MCYPWTFMD2MGR5YY695EJG0G1R4J2BTJPRGM7H';
   const poxAddress = '1Xik14zRm29UsyS6DjhYg4iZeZqsDa8D3';
   const network = new StacksTestnet();
-  const amountMicroStx = new BN(100000000000);
+  const amountMicroStx = BigInt(100000000000);
   const burnBlockHeight = 2000;
   const cycles = 10;
   const privateKey = 'd48f215481c16cbe6426f8e557df9b78895661971d71735126545abddcd5377001';
-  const nonce = new BN(1);
+  const nonce = BigInt(1);
 
   const transaction = { serialize: () => 'mocktxhex' }
   const makeContractCall = jest.fn().mockResolvedValue(transaction);
@@ -588,7 +588,7 @@ test('delegate stack stx with set nonce', async () => {
   });
 
   const { version, hash } = btcAddress.fromBase58Check(poxAddress);
-  const versionBuffer = bufferCV(new BN(version, 10).toBuffer());
+  const versionBuffer = bufferCV(toBuffer(BigInt(version)));
   const hashbytes = bufferCV(hash);
   const poxAddressCV = tupleCV({
     hashbytes,
@@ -662,7 +662,7 @@ test('delegator commit', async () => {
   });
 
   const { version, hash } = btcAddress.fromBase58Check(poxAddress);
-  const versionBuffer = bufferCV(new BN(version, 10).toBuffer());
+  const versionBuffer = bufferCV(toBuffer(BigInt(version)));
   const hashbytes = bufferCV(hash);
   const poxAddressCV = tupleCV({
     hashbytes,
@@ -953,8 +953,9 @@ test('get account balance', async () => {
   const responseBalanceInfo = await client.getAccountBalance();
 
   expect(fetchMock.mock.calls[0][0]).toEqual(network.getAccountApiUrl(address));
-  expect(responseBalanceInfo.toString()).toEqual(new BN(balanceInfo.balance.substr(2), 'hex').toString());
+  expect(responseBalanceInfo.toString()).toEqual(BigInt(balanceInfo.balance).toString());
 })
+
 test('get seconds until next cycle', async () => {
   const address = 'ST3XKKN4RPV69NN1PHFDNX3TYKXT7XPC4N8KC1ARH';
   const network = new StacksTestnet();
