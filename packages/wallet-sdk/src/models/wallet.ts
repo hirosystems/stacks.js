@@ -70,15 +70,6 @@ export async function restoreWalletAccounts({
             salt: wallet.salt,
             stxDerivationType,
           });
-        } else {
-          existingAccount = {
-            ...existingAccount,
-            stxPrivateKey: derivePrivateKeyByType({
-              rootNode,
-              index,
-              derivationType: stxDerivationType,
-            }),
-          };
         }
         return {
           ...existingAccount,
@@ -117,15 +108,6 @@ export async function restoreWalletAccounts({
             salt: wallet.salt,
             stxDerivationType,
           });
-        } else {
-          existingAccount = {
-            ...existingAccount,
-            stxPrivateKey: derivePrivateKeyByType({
-              rootNode,
-              index,
-              derivationType: stxDerivationType,
-            }),
-          };
         }
         return {
           ...existingAccount,
