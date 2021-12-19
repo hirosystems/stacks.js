@@ -176,14 +176,16 @@ const selectUsernameForAccount = async ({
   network?: StacksNetwork;
 }): Promise<{ username: string | undefined; derivationType: DerivationType }> => {
   // try to find existing usernames owned by stx derivation path
-  const address = deriveStxPrivateKey({ rootNode, index });
+  const stxPrivateKey = deriveStxPrivateKey({ rootNode, index });
+  const address = getAddressFromPrivateKey(stxPrivateKey);
   if (network) {
     let username = await fetchFirstName(address, network);
     if (username) {
       return { username, derivationType: DerivationType.Wallet };
     } else {
       // try to find existing usernames owned by data derivation path
-      const address = deriveDataPrivateKey({ rootNode, index });
+      const stxPrivateKey = deriveDataPrivateKey({ rootNode, index });
+      const address = getAddressFromPrivateKey(stxPrivateKey);
       username = await fetchFirstName(address, network);
       if (username) {
         return { username, derivationType: DerivationType.Data };
