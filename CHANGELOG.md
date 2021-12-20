@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.1.1](https://github.com/blockstack/blockstack.js/compare/v3.1.0...v3.1.1) (2021-12-20)
+
+
+### Bug Fixes
+
+* key exposed in api call, closes [#1152](https://github.com/blockstack/blockstack.js/issues/1152) ([08012b2](https://github.com/blockstack/blockstack.js/commit/08012b2728f8aad0b18f751456532dceaf1108de))
+
+
+
+
+
 # [3.1.0](https://github.com/blockstack/blockstack.js/compare/v3.0.0...v3.1.0) (2021-12-16)
 
 

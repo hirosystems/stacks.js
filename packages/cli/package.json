@@ -1,6 +1,6 @@
 {
   "name": "@stacks/cli",
-  "version": "3.1.0",
+  "version": "3.1.1",
   "description": "Stacks command line tool",
   "keywords": [
     "stacks",
@@ -95,7 +95,7 @@
     "@stacks/stacking": "^3.1.0",
     "@stacks/storage": "^3.1.0",
     "@stacks/transactions": "^3.1.0",
-    "@stacks/wallet-sdk": "^3.1.0",
+    "@stacks/wallet-sdk": "^3.1.1",
     "ajv": "^4.11.5",
     "bip32": "^2.0.4",
     "bip39": "^3.0.2",
