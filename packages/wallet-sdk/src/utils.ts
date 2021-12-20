@@ -5,7 +5,7 @@ import { AssertionError } from 'assert';
 import { parseZoneFile } from 'zone-file';
 import { GaiaHubConfig } from '@stacks/storage';
 import { TokenSigner, Json } from 'jsontokens';
-import { fetchPrivate } from '@stacks/common';
+import { ChainID, fetchPrivate } from '@stacks/common';
 
 export function assertIsTruthy<T>(val: T): asserts val is NonNullable<T> {
   if (val === undefined || val === null) {
@@ -124,3 +124,11 @@ export const makeGaiaAssociationToken = ({
   const token = tokenSigner.sign(payload);
   return token;
 };
+
+interface WhenChainIdMap<T> {
+  [ChainID.Mainnet]: T;
+  [ChainID.Testnet]: T;
+}
+export function whenChainId(chainId: ChainID) {
+  return <T>(chainIdMap: WhenChainIdMap<T>): T => chainIdMap[chainId];
+}

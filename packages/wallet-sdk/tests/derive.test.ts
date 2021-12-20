@@ -113,6 +113,7 @@ test('derive derivation path with new username owned by address of stx derivatio
   const { username, stxDerivationType } = await selectStxDerivation({ username: undefined, rootNode, index: 0, network });
   expect(username).toEqual("public_profile_for_testing.id.blockstack");
   expect(stxDerivationType).toEqual(DerivationType.Wallet);
+  expect(fetchMock.mock.calls[0][0]).toEqual(`https://stacks-node-api.mainnet.stacks.co/v1/addresses/stacks/${WALLET_ADDRESS}`);
 })
 
 
@@ -129,6 +130,8 @@ test('derive derivation path with new username owned by address of data derivati
   const { username, stxDerivationType } = await selectStxDerivation({ username: undefined, rootNode, index: 0, network });
   expect(username).toEqual("public_profile_for_testing.id.blockstack");
   expect(stxDerivationType).toEqual(DerivationType.Data);
+  expect(fetchMock.mock.calls[0][0]).toEqual(`https://stacks-node-api.mainnet.stacks.co/v1/addresses/stacks/${WALLET_ADDRESS}`);
+  expect(fetchMock.mock.calls[1][0]).toEqual(`https://stacks-node-api.mainnet.stacks.co/v1/addresses/stacks/${DATA_ADDRESS}`)
 })
 
 

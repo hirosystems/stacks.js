@@ -1,9 +1,9 @@
 import { BIP32Interface } from 'bip32';
-import { Buffer } from '@stacks/common';
+import { Buffer, ChainID, TransactionVersion } from '@stacks/common';
 import { ECPair } from 'bitcoinjs-lib';
 import { createSha2Hash, ecPairToHexString } from '@stacks/encryption';
 
-import { assertIsTruthy } from './utils';
+import { assertIsTruthy, whenChainId } from './utils';
 import { Account, WalletKeys } from './models/common';
 import { StacksNetwork } from '@stacks/network';
 import { getAddressFromPrivateKey } from '@stacks/transactions';
@@ -176,14 +176,20 @@ const selectUsernameForAccount = async ({
   network?: StacksNetwork;
 }): Promise<{ username: string | undefined; derivationType: DerivationType }> => {
   // try to find existing usernames owned by stx derivation path
-  const address = deriveStxPrivateKey({ rootNode, index });
   if (network) {
+    const txVersion = whenChainId(network.chainId)({
+      [ChainID.Mainnet]: TransactionVersion.Mainnet,
+      [ChainID.Testnet]: TransactionVersion.Testnet,
+    });
+    const stxPrivateKey = deriveStxPrivateKey({ rootNode, index });
+    const address = getAddressFromPrivateKey(stxPrivateKey, txVersion);
     let username = await fetchFirstName(address, network);
     if (username) {
       return { username, derivationType: DerivationType.Wallet };
     } else {
       // try to find existing usernames owned by data derivation path
-      const address = deriveDataPrivateKey({ rootNode, index });
+      const dataPrivateKey = deriveDataPrivateKey({ rootNode, index });
+      const address = getAddressFromPrivateKey(dataPrivateKey, txVersion);
       username = await fetchFirstName(address, network);
       if (username) {
         return { username, derivationType: DerivationType.Data };
