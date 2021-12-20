@@ -347,6 +347,16 @@ export class UserSession {
       userData.profile = tokenPayload.profile;
     }
 
+    const address = userData.profile?.stxAddress?.mainnet;
+    if (!userData.username && address) {
+      try {
+        const namesResponse = await fetchPrivate(`${coreNode}/v1/addresses/stacks/${address}`);
+        const namesJson = await namesResponse.json();
+        if ((namesJson.names.length || 0) > 0) {
+          userData.username = namesJson.names[0];
+        }
+      } catch (e) {}
+    }
     sessionData.userData = userData;
     this.store.setSessionData(sessionData);
 

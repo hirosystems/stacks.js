@@ -255,6 +255,47 @@ test('auth response with invalid private key', async () => {
   expect(pass).toBeCalledTimes(2);
 });
 
+test('auth response with populated username field', async () => {
+  const username = 'test.btc';
+  fetchMock.mockResponse(JSON.stringify({ names: [ username ] }));
+  const appPrivateKey = makeECPrivateKey();
+  const transitPrivateKey = makeECPrivateKey();
+  const transitPublicKey = getPublicKeyFromPrivate(transitPrivateKey);
+  const metadata = {};
+  const authResponse = await makeAuthResponse(
+    privateKey,
+    {
+      '@type': 'Person',
+      '@context': 'http://schema.org',
+      apps: {
+        'http://localhost:3000': 'https://gaia.blockstack.org/hub/1JoKiUKHYqXGktzEzxPtR9khSNRPfwwp6R/'
+      },
+      appsMeta: {},
+      stxAddress: {
+        testnet: 'ST7HX4ZK3T1QNXXKNY3Q65BC9MCTTETE33MRW5B5',
+        mainnet: 'SP7HX4ZK3T1QNXXKNY3Q65BC9MCTTETE331T0RJM'
+      }
+    },
+    undefined,
+    metadata,
+    undefined,
+    appPrivateKey,
+    undefined,
+    transitPublicKey,
+    undefined,
+    undefined,
+    undefined
+  );
+
+  const appConfig = new AppConfig(['store_write'], 'http://localhost:3000');
+  const blockstack = new UserSession({ appConfig });
+  blockstack.store.getSessionData().transitKey = transitPrivateKey;
+
+  const userData = await blockstack.handlePendingSignIn(authResponse);
+  expect(userData.username).toEqual(username);
+  expect(blockstack.loadUserData().username).toEqual(username);
+});
+
 test('handlePendingSignIn with authResponseToken', async () => {
   const url = `${nameLookupURL}ryan.id`;
 
