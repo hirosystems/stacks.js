@@ -4,6 +4,8 @@ export const HIRO_MAINNET_DEFAULT = 'https://stacks-node-api.mainnet.stacks.co';
 export const HIRO_TESTNET_DEFAULT = 'https://stacks-node-api.testnet.stacks.co';
 export const HIRO_MOCKNET_DEFAULT = 'http://localhost:3999';
 
+export const SYVIREAN_MAINNET_DEFAULT = 'https://mainnet.syvita.org';
+
 export interface NetworkConfig {
   url: string;
 }
@@ -148,5 +150,13 @@ export class StacksMocknet extends StacksMainnet implements StacksNetwork {
 
   constructor(networkUrl: NetworkConfig = { url: HIRO_MOCKNET_DEFAULT }) {
     super(networkUrl);
+  }
+}
+
+export class SyvireanMainnet extends StacksMainnet implements StacksNetwork {
+  constructor(
+    networkConfig: NetworkConfig = { url: SYVIREAN_MAINNET_DEFAULT }
+  ) {
+    super(networkConfig);
   }
 }
