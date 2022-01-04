@@ -6,7 +6,7 @@ import randombytes from 'randombytes';
 import { deserializeCV } from './clarity';
 import fetch from 'cross-fetch';
 import { c32addressDecode } from 'c32check';
-import lodashCloneDeep from 'lodash/cloneDeep';
+import lodashCloneDeep from 'lodash.clonedeep';
 import { with0x } from '@stacks/common';
 
 export { randombytes as randomBytes };
