@@ -1277,6 +1277,8 @@ export interface ReadOnlyFunctionOptions {
   network?: StacksNetwork;
   /** address of the sender */
   senderAddress: string;
+  /** tip height **/
+  tip?: number;
 }
 
 /**
@@ -1297,10 +1299,13 @@ export async function callReadOnlyFunction(
 
   const options = Object.assign(defaultOptions, readOnlyFunctionOptions);
 
-  const { contractName, contractAddress, functionName, functionArgs, network, senderAddress } =
+  const { contractName, contractAddress, functionName, functionArgs, network, senderAddress, tip } =
     options;
 
-  const url = network.getReadOnlyFunctionCallApiUrl(contractAddress, contractName, functionName);
+  let url = network.getReadOnlyFunctionCallApiUrl(contractAddress, contractName, functionName);
+  if (tip != null) {
+    url = url + `?tip=${tip}`;
+  }
 
   const args = functionArgs.map(arg => cvToHex(arg));
 
