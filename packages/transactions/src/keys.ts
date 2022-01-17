@@ -1,4 +1,4 @@
-import { Buffer } from '@stacks/common';
+import { Buffer, hexToBigInt } from '@stacks/common';
 import {
   AddressHashMode,
   AddressVersion,
@@ -16,10 +16,16 @@ import {
   hexStringToInt,
   intToHexString,
   leftPadHexToLength,
-  randomBytes,
 } from './utils';
-
-import { ec as EC } from 'elliptic';
+import {
+  getPublicKey as nobleGetPublicKey,
+  utils,
+  Point,
+  Signature,
+  signSync,
+} from '@noble/secp256k1';
+import { sha256 } from '@noble/hashes/sha256';
+import { hmac } from '@noble/hashes/hmac';
 
 import {
   MessageSignature,
@@ -30,6 +36,19 @@ import {
 } from './common';
 import { BufferReader } from './bufferReader';
 import { c32address } from 'c32check';
+
+/**
+ * To use secp256k1.signSync set utils.hmacSha256Sync to a function using noble-hashes
+ * secp256k1.signSync is the counter part of secp256k1.sign (async version)
+ * secp256k1.signSync is used within signWithKey in this file
+ * secp256k1.signSync is used to maintain the semantics of signWithKey while migrating from elliptic lib
+ * utils.hmacSha256Sync docs: https://github.com/paulmillr/noble-secp256k1 readme file
+ */
+utils.hmacSha256Sync = (key: Uint8Array, ...msgs: Uint8Array[]) => {
+  const h = hmac.create(sha256, key);
+  msgs.forEach(msg => h.update(msg));
+  return h.digest();
+};
 
 export interface StacksPublicKey {
   readonly type: StacksMessageType.PublicKey;
@@ -71,23 +90,11 @@ export function publicKeyFromSignature(
   messageSignature: MessageSignature,
   pubKeyEncoding = PubKeyEncoding.Compressed
 ): string {
-  const ec = new EC('secp256k1');
-  const messageBN = ec.keyFromPrivate(message, 'hex').getPrivate().toString(10);
-
   const parsedSignature = parseRecoverableSignature(messageSignature.data);
-
-  const publicKey = ec.recoverPubKey(
-    messageBN,
-    parsedSignature,
-    parsedSignature.recoveryParam,
-    'hex'
-  );
-
-  if (pubKeyEncoding == PubKeyEncoding.Uncompressed) {
-    return publicKey.encode('hex');
-  }
-
-  return publicKey.encodeCompressed('hex');
+  const signature = new Signature(hexToBigInt(parsedSignature.r), hexToBigInt(parsedSignature.s));
+  const point = Point.fromSignature(message, signature, parsedSignature.recoveryParam);
+  const compressed = pubKeyEncoding === PubKeyEncoding.Compressed;
+  return point.toHex(compressed);
 }
 
 export function publicKeyFromBuffer(data: Buffer): StacksPublicKey {
@@ -108,19 +115,38 @@ export function serializePublicKey(key: StacksPublicKey): Buffer {
   return bufferArray.concatBuffer();
 }
 
+export function isPrivateKeyCompressed(key: string | Buffer) {
+  const data = typeof key === 'string' ? Buffer.from(key, 'hex') : key;
+  let compressed = false;
+  if (data.length === 33) {
+    if (data[data.length - 1] !== 1) {
+      throw new Error(
+        'Improperly formatted private-key. 33 byte length usually ' +
+          'indicates compressed key, but last byte must be == 0x01'
+      );
+    }
+    compressed = true;
+  } else if (data.length === 32) {
+    compressed = false;
+  } else {
+    throw new Error(
+      `Improperly formatted private-key hex string: length should be 32 or 33 bytes, provided with length ${data.length}`
+    );
+  }
+  return compressed;
+}
+
 export function pubKeyfromPrivKey(privateKey: string | Buffer): StacksPublicKey {
   const privKey = createStacksPrivateKey(privateKey);
-  const ec = new EC('secp256k1');
-  const keyPair = ec.keyFromPrivate(privKey.data.toString('hex').slice(0, 64), 'hex');
-  const pubKey = keyPair.getPublic(privKey.compressed, 'hex');
-  return createStacksPublicKey(pubKey);
+  const isCompressed = isPrivateKeyCompressed(privateKey);
+  const pubKey = nobleGetPublicKey(privKey.data.slice(0, 32), isCompressed || privKey.compressed);
+  return createStacksPublicKey(utils.bytesToHex(pubKey));
 }
 
 export function compressPublicKey(publicKey: string | Buffer): StacksPublicKey {
-  const ec = new EC('secp256k1');
-  const key = ec.keyFromPublic(publicKey);
-  const pubKey = key.getPublic(true, 'hex');
-  return createStacksPublicKey(pubKey);
+  const hex = typeof publicKey === 'string' ? publicKey : utils.bytesToHex(publicKey);
+  const compressed = Point.fromHex(hex).toHex(true);
+  return createStacksPublicKey(compressed);
 }
 
 export function deserializePublicKey(bufferReader: BufferReader): StacksPublicKey {
@@ -139,45 +165,29 @@ export interface StacksPrivateKey {
 
 export function createStacksPrivateKey(key: string | Buffer): StacksPrivateKey {
   const data = typeof key === 'string' ? Buffer.from(key, 'hex') : key;
-  let compressed: boolean;
-  if (data.length === 33) {
-    if (data[data.length - 1] !== 1) {
-      throw new Error(
-        'Improperly formatted private-key. 33 byte length usually ' +
-          'indicates compressed key, but last byte must be == 0x01'
-      );
-    }
-    compressed = true;
-  } else if (data.length === 32) {
-    compressed = false;
-  } else {
-    throw new Error(
-      `Improperly formatted private-key hex string: length should be 32 or 33 bytes, provided with length ${data.length}`
-    );
-  }
+  const compressed: boolean = isPrivateKeyCompressed(key);
   return { data, compressed };
 }
 
-export function makeRandomPrivKey(entropy?: Buffer): StacksPrivateKey {
-  const ec = new EC('secp256k1');
-  const options = { entropy: entropy || randomBytes(32) };
-  const keyPair = ec.genKeyPair(options);
-  const privateKey = keyPair.getPrivate().toString('hex', 32);
-  return createStacksPrivateKey(privateKey);
+export function makeRandomPrivKey(): StacksPrivateKey {
+  return createStacksPrivateKey(utils.bytesToHex(utils.randomPrivateKey()));
 }
 
 export function signWithKey(privateKey: StacksPrivateKey, input: string): MessageSignature {
-  const ec = new EC('secp256k1');
-  const key = ec.keyFromPrivate(privateKey.data.toString('hex').slice(0, 64), 'hex');
-  const signature = key.sign(input, 'hex', { canonical: true });
+  const [rawSignature, recoveryParam] = signSync(input, privateKey.data.slice(0, 32), {
+    canonical: true,
+    recovered: true,
+  });
+  const signature = Signature.fromHex(rawSignature);
   const coordinateValueBytes = 32;
-  const r = leftPadHexToLength(signature.r.toString('hex'), coordinateValueBytes * 2);
-  const s = leftPadHexToLength(signature.s.toString('hex'), coordinateValueBytes * 2);
-  if (signature.recoveryParam === undefined || signature.recoveryParam === null) {
+  const r = leftPadHexToLength(signature.r.toString(16), coordinateValueBytes * 2);
+  const s = leftPadHexToLength(signature.s.toString(16), coordinateValueBytes * 2);
+
+  if (recoveryParam === undefined || recoveryParam === null) {
     throw new Error('"signature.recoveryParam" is not set');
   }
-  const recoveryParam = intToHexString(signature.recoveryParam, 1);
-  const recoverableSignatureString = recoveryParam + r + s;
+  const recoveryParamHex = intToHexString(recoveryParam, 1);
+  const recoverableSignatureString = recoveryParamHex + r + s;
   return createMessageSignature(recoverableSignatureString);
 }
 
