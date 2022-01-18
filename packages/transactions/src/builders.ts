@@ -1303,7 +1303,7 @@ export async function callReadOnlyFunction(
     options;
 
   let url = network.getReadOnlyFunctionCallApiUrl(contractAddress, contractName, functionName);
-  if (tip != null) {
+  if (typeof tip === 'number') {
     url = url + `?tip=${tip}`;
   }
 
