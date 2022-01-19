@@ -961,7 +961,7 @@ test('make a multi-sig contract call', async () => {
   );
 });
 
-test('Estimate transaction transfer fee', async () => {
+test.skip('Estimate transaction transfer fee', async () => {
   const recipient = standardPrincipalCV('SP3FGQ8Z7JY9BWYZ5WM53E0M9NK7WHJF0691NZ159');
   const amount = 12345;
   const fee = 0;
@@ -1183,7 +1183,7 @@ test('Make sponsored STX token transfer', async () => {
   expect(deserializedPayload.amount.toString()).toBe(amount.toString());
 });
 
-test('Make sponsored STX token transfer with sponsor fee estimate', async () => {
+test.skip('Make sponsored STX token transfer with sponsor fee estimate', async () => {
   const recipient = standardPrincipalCV('SP3FGQ8Z7JY9BWYZ5WM53E0M9NK7WHJF0691NZ159');
   const amount = 12345;
   const fee = 50;
