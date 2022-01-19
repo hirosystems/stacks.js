@@ -8,6 +8,36 @@ export interface NetworkConfig {
   url: string;
 }
 
+export type StacksNetworkConveniance = StacksNetworkName | StacksNetwork;
+
+export type StacksNetworkName = keyof typeof StacksNetworkIdentifier;
+
+export enum StacksNetworkIdentifier {
+  mainnet,
+  testnet,
+  mocknet,
+}
+
+// WIP: maybe dict as lookup (api not as clean)
+// WIP: for all methods? or possible to do iteratively?
+// WIP: makeX naming builder?
+export const makeStacksNetwork = (networkName: StacksNetworkName) => {
+  switch (StacksNetworkIdentifier[networkName]) {
+    case StacksNetworkIdentifier.mainnet:
+      return new StacksMainnet();
+    case StacksNetworkIdentifier.testnet:
+      return new StacksTestnet();
+    case StacksNetworkIdentifier.mocknet:
+      return new StacksMocknet();
+    default:
+      throw new Error(
+        `Invalid network name provided. Must be one of the following: ${Object.values(
+          StacksNetworkIdentifier
+        ).join(', ')}`
+      );
+  }
+};
+
 export interface StacksNetwork {
   version: TransactionVersion;
   chainId: ChainID;

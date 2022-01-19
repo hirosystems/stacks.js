@@ -1,70 +1,67 @@
-import { Buffer, IntegerType, intToBigInt } from '@stacks/common';
-import { StacksTransaction } from './transaction';
-
-import { StacksNetwork, StacksMainnet, StacksTestnet } from '@stacks/network';
-
+import { Buffer, fetchPrivate, IntegerType, intToBigInt } from '@stacks/common';
 import {
-  createTokenTransferPayload,
-  createSmartContractPayload,
-  createContractCallPayload,
-  serializePayload,
-  Payload,
-} from './payload';
-
+  makeStacksNetwork,
+  StacksMainnet,
+  StacksNetwork,
+  StacksNetworkConveniance,
+  StacksNetworkName,
+  StacksTestnet,
+} from '@stacks/network';
+import { c32address } from 'c32check';
 import {
-  createSingleSigSpendingCondition,
   createMultiSigSpendingCondition,
+  createSingleSigSpendingCondition,
   createSponsoredAuth,
   createStandardAuth,
 } from './authorization';
-
-import {
-  publicKeyToString,
-  createStacksPrivateKey,
-  getPublicKey,
-  publicKeyToAddress,
-  pubKeyfromPrivKey,
-  publicKeyFromBuffer,
-  createStacksPublicKey,
-} from './keys';
-
-import { TransactionSigner } from './signer';
-
-import {
-  createSTXPostCondition,
-  createFungiblePostCondition,
-  createNonFungiblePostCondition,
-} from './postcondition';
-import {
-  PostCondition,
-  STXPostCondition,
-  FungiblePostCondition,
-  NonFungiblePostCondition,
-} from './postcondition-types';
-
+import { ClarityValue, PrincipalCV } from './clarity';
 import {
   AddressHashMode,
   AddressVersion,
+  AnchorMode,
   FungibleConditionCode,
   NonFungibleConditionCode,
-  PostConditionMode,
   PayloadType,
-  AnchorMode,
+  PostConditionMode,
+  SingleSigHashMode,
   TransactionVersion,
   TxRejectedReason,
-  SingleSigHashMode,
 } from './constants';
-
+import { ClarityAbi, validateContractCall } from './contract-abi';
+import {
+  createStacksPrivateKey,
+  createStacksPublicKey,
+  getPublicKey,
+  pubKeyfromPrivKey,
+  publicKeyFromBuffer,
+  publicKeyToAddress,
+  publicKeyToString,
+} from './keys';
+import {
+  createContractCallPayload,
+  createSmartContractPayload,
+  createTokenTransferPayload,
+  Payload,
+  serializePayload,
+} from './payload';
+import {
+  createFungiblePostCondition,
+  createNonFungiblePostCondition,
+  createSTXPostCondition,
+} from './postcondition';
+import {
+  AssetInfo,
+  createContractPrincipal,
+  createStandardPrincipal,
+  FungiblePostCondition,
+  NonFungiblePostCondition,
+  PostCondition,
+  STXPostCondition,
+} from './postcondition-types';
+import { TransactionSigner } from './signer';
+import { StacksTransaction } from './transaction';
 import { createLPList } from './types';
-import { AssetInfo, createStandardPrincipal, createContractPrincipal } from './postcondition-types';
-
-import { cvToHex, parseReadOnlyResponse, omit, validateTxId } from './utils';
-
-import { fetchPrivate } from '@stacks/common';
-
-import { ClarityValue, PrincipalCV } from './clarity';
-import { validateContractCall, ClarityAbi } from './contract-abi';
-import { c32address } from 'c32check';
+import { cvToHex, omit, parseReadOnlyResponse, validateTxId } from './utils';
 
 /**
  * Lookup the nonce for an address from a core node
@@ -507,7 +504,7 @@ export interface TokenTransferOptions {
   /** the transaction nonce, which must be increased monotonically with each new transaction */
   nonce?: IntegerType;
   /** the network that the transaction will ultimately be broadcast to */
-  network?: StacksNetwork;
+  network?: StacksNetworkConveniance;
   /** the transaction anchorMode, which specifies whether it should be
    * included in an anchor block or a microblock */
   anchorMode: AnchorMode;
@@ -548,7 +545,7 @@ export interface SignedMultiSigTokenTransferOptions extends TokenTransferOptions
  *
  * @param  {UnsignedTokenTransferOptions | UnsignedMultiSigTokenTransferOptions} txOptions - an options object for the token transfer
  *
- * @return {Promis<StacksTransaction>}
+ * @return {Promise<StacksTransaction>}
  */
 export async function makeUnsignedSTXTokenTransfer(
   txOptions: UnsignedTokenTransferOptions | UnsignedMultiSigTokenTransferOptions
@@ -594,22 +591,25 @@ export async function makeUnsignedSTXTokenTransfer(
     authorization = createStandardAuth(spendingCondition);
   }
 
+  // TODO: infer network
+  const network = inferNetwork(options);
+
   const postConditions: PostCondition[] = [];
   if (options.postConditions && options.postConditions.length > 0) {
     options.postConditions.forEach(postCondition => {
       postConditions.push(postCondition);
     });
   }
-
   const lpPostConditions = createLPList(postConditions);
+
   const transaction = new StacksTransaction(
-    options.network.version,
+    network.version,
     authorization,
     payload,
     lpPostConditions,
     options.postConditionMode,
     options.anchorMode,
-    options.network.chainId
+    network.chainId
   );
 
   if (txOptions.fee === undefined || txOptions.fee === null) {
@@ -631,6 +631,29 @@ export async function makeUnsignedSTXTokenTransfer(
   return transaction;
 }
 
+function inferNetwork(
+  options: { network: StacksNetworkName | StacksNetwork } & (
+    | UnsignedTokenTransferOptions
+    | UnsignedMultiSigTokenTransferOptions
+  )
+) {
+  // todo: test if possible
+  // if (options.network instanceof StacksNetworkName) {
+  //   throw Error('just trying something');
+  // }
+  if (typeof options.network === 'object' && 'chainId' in options.network) {
+    // options.network is StacksNetwork
+    return options.network;
+  }
+  return makeStacksNetwork(options.network);
+}
+
+// function inferNetwork(
+//   options: SignedTokenTransferOptions | SignedMultiSigTokenTransferOptions
+// ): StacksNetwork {
+
+// }
+
 /**
  * Generates a signed Stacks token transfer transaction
  *
@@ -644,6 +667,7 @@ export async function makeSTXTokenTransfer(
   txOptions: SignedTokenTransferOptions | SignedMultiSigTokenTransferOptions
 ): Promise<StacksTransaction> {
   if ('senderKey' in txOptions) {
+    // txOptions is SignedTokenTransferOptions
     const publicKey = publicKeyToString(getPublicKey(createStacksPrivateKey(txOptions.senderKey)));
     const options = omit(txOptions, 'senderKey');
     const transaction = await makeUnsignedSTXTokenTransfer({ publicKey, ...options });
@@ -654,6 +678,7 @@ export async function makeSTXTokenTransfer(
 
     return transaction;
   } else {
+    // txOptions is SignedMultiSigTokenTransferOptions
     const options = omit(txOptions, 'signerKeys');
     const transaction = await makeUnsignedSTXTokenTransfer(options);
 

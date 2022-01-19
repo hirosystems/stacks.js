@@ -20,7 +20,8 @@ import {
   sponsorTransaction,
   makeSTXTokenTransfer,
   makeUnsignedContractCall,
-  estimateTransaction
+  estimateTransaction,
+  SignedTokenTransferOptions
 } from '../src/builders';
 
 import { deserializeTransaction, StacksTransaction } from '../src/transaction';
@@ -114,7 +115,7 @@ test('Make STX token transfer with set tx fee', async () => {
   expect(serialized).toBe(tx);
 });
 
-test.only('Make STX token transfer with fee estimate', async () => {
+test('Make STX token transfer with fee estimate', async () => {
   const apiUrl = `${DEFAULT_CORE_NODE_API_URL}/v2/fees/transaction`;
   const recipient = standardPrincipalCV('SP3FGQ8Z7JY9BWYZ5WM53E0M9NK7WHJF0691NZ159');
   const amount = 12345;
@@ -204,6 +205,45 @@ test('Make STX token transfer with testnet', async () => {
     '0000000000000000';
 
   expect(serialized).toBe(tx);
+});
+
+test('Make STX token transfer with testnet string identifier', async () => {
+  const transaction = await makeSTXTokenTransfer({
+    recipient: standardPrincipalCV('SP3FGQ8Z7JY9BWYZ5WM53E0M9NK7WHJF0691NZ159'),
+    amount: 12345,
+    senderKey: "edf9aee84d9b7abc145504dde6726c64f369d37ee34ded868fabd876c26570bc01",
+    fee: 0,
+    nonce: 0,
+    network: 'testnet',
+    memo: "test memo",
+    anchorMode: AnchorMode.Any
+  });
+
+  const serialized = transaction.serialize().toString('hex');
+
+  const tx =
+    '8080000000040015c31b8c1c11c515e244b75806bac48d1399c77500000000000000000000000000000000' +
+    '00014199f63f7e010141a36a4624d032758f54e08ff03b24ed2667463eb405b4d81505631b32a1f13b5737' +
+    '1f29a6095b81741b32b5864b178e3546ff2bfb3dc08682030200000000000516df0ba3e79792be7be5e50a' +
+    '370289accfc8c9e032000000000000303974657374206d656d6f0000000000000000000000000000000000' +
+    '0000000000000000';
+
+  expect(serialized).toBe(tx);
+});
+
+test('Throws making STX token transder with invalid network name', async () => {
+  const txOptions = {
+    recipient: standardPrincipalCV('SP3FGQ8Z7JY9BWYZ5WM53E0M9NK7WHJF0691NZ159'),
+    amount: 12345,
+    senderKey: "edf9aee84d9b7abc145504dde6726c64f369d37ee34ded868fabd876c26570bc01",
+    fee: 0,
+    nonce: 0,
+    network: 'invalidnet',
+    memo: "test memo",
+    anchorMode: AnchorMode.Any
+  };
+
+  expect(async () => await makeSTXTokenTransfer(txOptions as SignedTokenTransferOptions)).rejects.toThrow(Error);
 });
 
 test('Make STX token transfer with post conditions', async () => {

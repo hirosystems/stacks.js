@@ -16,5 +16,8 @@
       "@stacks/transactions": ["packages/transactions/src"],
       "@stacks/wallet-sdk": ["packages/wallet-sdk/src"]
     }
-  }
+  },
+  "exclude": [
+    "**/dist",
+  ]
 }
