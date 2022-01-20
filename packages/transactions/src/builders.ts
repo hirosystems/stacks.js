@@ -1,5 +1,6 @@
 import { Buffer, fetchPrivate, IntegerType, intToBigInt } from '@stacks/common';
 import {
+  typeIsStacksNetwork,
   makeStacksNetwork,
   StacksMainnet,
   StacksNetwork,
@@ -633,16 +634,12 @@ export async function makeUnsignedSTXTokenTransfer(
 
 function inferNetwork(
   options: { network: StacksNetworkName | StacksNetwork } & (
-    | UnsignedTokenTransferOptions
-    | UnsignedMultiSigTokenTransferOptions
+    | TokenTransferOptions
+    | BaseContractDeployOptions
+    | SponsorOptionsOpts
   )
 ) {
-  // todo: test if possible
-  // if (options.network instanceof StacksNetworkName) {
-  //   throw Error('just trying something');
-  // }
-  if (typeof options.network === 'object' && 'chainId' in options.network) {
-    // options.network is StacksNetwork
+  if (typeIsStacksNetwork(options.network)) {
     return options.network;
   }
   return makeStacksNetwork(options.network);
@@ -710,7 +707,7 @@ export interface BaseContractDeployOptions {
   /** the transaction nonce, which must be increased monotonically with each new transaction */
   nonce?: IntegerType;
   /** the network that the transaction will ultimately be broadcast to */
-  network?: StacksNetwork;
+  network?: StacksNetworkConveniance;
   /** the transaction anchorMode, which specifies whether it should be
    * included in an anchor block or a microblock */
   anchorMode: AnchorMode;
@@ -846,22 +843,24 @@ export async function makeUnsignedContractDeploy(
     authorization = createStandardAuth(spendingCondition);
   }
 
+  const network = inferNetwork(options);
+
   const postConditions: PostCondition[] = [];
   if (options.postConditions && options.postConditions.length > 0) {
     options.postConditions.forEach(postCondition => {
       postConditions.push(postCondition);
     });
   }
-
   const lpPostConditions = createLPList(postConditions);
+
   const transaction = new StacksTransaction(
-    options.network.version,
+    network.version,
     authorization,
     payload,
     lpPostConditions,
     options.postConditionMode,
     options.anchorMode,
-    options.network.chainId
+    network.chainId
   );
 
   if (txOptions.fee === undefined || txOptions.fee === null) {
@@ -898,7 +897,7 @@ export interface ContractCallOptions {
   /** the transaction nonce, which must be increased monotonically with each new transaction */
   nonce?: IntegerType;
   /** the Stacks blockchain network that will ultimately be used to broadcast this transaction */
-  network?: StacksNetwork;
+  network?: StacksNetworkConveniance;
   /** the transaction anchorMode, which specifies whether it should be
    * included in an anchor block or a microblock */
   anchorMode: AnchorMode;
@@ -1299,7 +1298,7 @@ export interface ReadOnlyFunctionOptions {
   functionName: string;
   functionArgs: ClarityValue[];
   /** the network that the contract which contains the function is deployed to */
-  network?: StacksNetwork;
+  network?: StacksNetworkConveniance;
   /** address of the sender */
   senderAddress: string;
 }
@@ -1370,7 +1369,7 @@ export interface SponsorOptionsOpts {
   /** the hashmode of the sponsor's address */
   sponsorAddressHashmode?: AddressHashMode;
   /** the Stacks blockchain network that this transaction will ultimately be broadcast to */
-  network?: StacksNetwork;
+  network?: StacksNetworkConveniance;
 }
 
 /**
@@ -1389,14 +1388,16 @@ export async function sponsorTransaction(
     fee: 0 as IntegerType,
     sponsorNonce: 0 as IntegerType,
     sponsorAddressHashmode: AddressHashMode.SerializeP2PKH as SingleSigHashMode,
+    // TODO: refactor to fromVersion method (e.g. mocknet ignored here)
+    network:
+      sponsorOptions.transaction.version === TransactionVersion.Mainnet
+        ? new StacksMainnet()
+        : new StacksTestnet(),
   };
 
   const options = Object.assign(defaultOptions, sponsorOptions);
-  const network =
-    sponsorOptions.network ??
-    (options.transaction.version === TransactionVersion.Mainnet
-      ? new StacksMainnet()
-      : new StacksTestnet());
+
+  const network = inferNetwork(options);
   const sponsorPubKey = pubKeyfromPrivKey(options.sponsorPrivateKey);
 
   if (sponsorOptions.fee === undefined || sponsorOptions.fee === null) {

@@ -8,6 +8,7 @@ export interface NetworkConfig {
   url: string;
 }
 
+// TODO: better name than Conveniance!
 export type StacksNetworkConveniance = StacksNetworkName | StacksNetwork;
 
 export type StacksNetworkName = keyof typeof StacksNetworkIdentifier;
@@ -179,4 +180,11 @@ export class StacksMocknet extends StacksMainnet implements StacksNetwork {
   constructor(networkUrl: NetworkConfig = { url: HIRO_MOCKNET_DEFAULT }) {
     super(networkUrl);
   }
+}
+
+// export function isStacksNetworkName(n: any): n is StacksNetworkName {
+// }
+
+export function typeIsStacksNetwork(n: any): n is StacksNetwork {
+  return (n as StacksNetwork).chainId !== undefined;
 }
