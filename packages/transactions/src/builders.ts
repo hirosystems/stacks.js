@@ -592,7 +592,6 @@ export async function makeUnsignedSTXTokenTransfer(
     authorization = createStandardAuth(spendingCondition);
   }
 
-  // TODO: infer network
   const network = inferNetwork(options);
 
   const postConditions: PostCondition[] = [];
@@ -644,12 +643,6 @@ function inferNetwork(
   }
   return makeStacksNetwork(options.network);
 }
-
-// function inferNetwork(
-//   options: SignedTokenTransferOptions | SignedMultiSigTokenTransferOptions
-// ): StacksNetwork {
-
-// }
 
 /**
  * Generates a signed Stacks token transfer transaction

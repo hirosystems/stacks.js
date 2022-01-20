@@ -182,9 +182,8 @@ export class StacksMocknet extends StacksMainnet implements StacksNetwork {
   }
 }
 
-// export function isStacksNetworkName(n: any): n is StacksNetworkName {
-// }
-
+// TODO: add more elegant overall type checking using kind/type properties
+//       (ideally switch compatible)
 export function typeIsStacksNetwork(n: any): n is StacksNetwork {
   return (n as StacksNetwork).chainId !== undefined;
 }
