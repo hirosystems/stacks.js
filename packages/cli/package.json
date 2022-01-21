@@ -90,6 +90,7 @@
   "dependencies": {
     "@stacks/auth": "^3.1.0",
     "@stacks/blockchain-api-client": "^0.34.1",
+    "@stacks/bns": "^3.1.0",
     "@stacks/common": "^3.0.0",
     "@stacks/network": "^3.0.0",
     "@stacks/stacking": "^3.1.0",
