@@ -37,9 +37,13 @@ import {
   TxBroadcastResult,
   getAddressFromPrivateKey,
   TransactionVersion,
+  TransactionSigner,
+  publicKeyToString,
+  pubKeyfromPrivKey,
+  createStacksPrivateKey,
   AnchorMode,
 } from '@stacks/transactions';
-
+import { buildRegisterNameTx } from '@stacks/bns';
 import { StacksMainnet, StacksTestnet } from '@stacks/network';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -1649,6 +1653,40 @@ async function stack(network: CLINetworkAdapter, args: string[]): Promise<string
     });
 }
 
+async function register(network: CLINetworkAdapter, args: string[]): Promise<string> {
+  const fullyQualifiedName = args[0];
+  const privateKey = args[1];
+  const salt = args[2];
+  const zonefile = args[3];
+  const publicKey = publicKeyToString(pubKeyfromPrivKey(privateKey));
+  const txNetwork = network.isMainnet() ? new StacksMainnet() : new StacksTestnet();
+
+  const unsignedTransaction = await buildRegisterNameTx({
+    fullyQualifiedName,
+    publicKey,
+    salt,
+    zonefile,
+    network: txNetwork,
+  });
+
+  const signer = new TransactionSigner(unsignedTransaction);
+  signer.signOrigin(createStacksPrivateKey(privateKey));
+
+  return broadcastTransaction(signer.transaction, txNetwork)
+    .then((response: TxBroadcastResult) => {
+      if (response.hasOwnProperty('error')) {
+        return response;
+      }
+      return {
+        txid: `0x${response.txid}`,
+        transaction: generateExplorerTxPageUrl(response.txid, txNetwork),
+      };
+    })
+    .catch(error => {
+      return error;
+    });
+}
+
 function faucetCall(_: CLINetworkAdapter, args: string[]): Promise<string> {
   const address = args[0];
   // console.log(address);
@@ -1760,6 +1798,7 @@ const COMMANDS: Record<string, CommandFunction> = {
   profile_store: profileStore,
   profile_verify: profileVerify,
   // 'send_btc': sendBTC,
+  register: register,
   send_tokens: sendTokens,
   stack: stack,
   stacking_status: stackingStatus,
@@ -1937,5 +1976,6 @@ export const testables =
         contractFunctionCall,
         makeKeychain,
         getStacksWalletKey,
+        register,
       }
     : undefined;

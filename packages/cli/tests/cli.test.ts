@@ -13,7 +13,7 @@ import { makekeychainTests, keyInfoTests, MakeKeychainResult, WalletKeyInfoResul
 const TEST_ABI: ClarityAbi = JSON.parse(readFileSync(path.join(__dirname, './abi/test-abi.json')).toString());
 jest.mock('inquirer');
 
-const { addressConvert, contractFunctionCall, makeKeychain, getStacksWalletKey } = testables as any;
+const { addressConvert, contractFunctionCall, makeKeychain, getStacksWalletKey, register } = testables as any;
 
 const mainnetNetwork = new CLINetworkAdapter(
   getNetwork({} as CLI_CONFIG_TYPE, false),
@@ -214,5 +214,55 @@ describe('Keychain custom derivation path', () => {
     // Unmock TTY
     process.stdin.isTTY = false;
     process.env.password = undefined;
+  });
+});
+
+describe('BNS', () => {
+  test('buildRegisterNameTx', async () => {
+    const fullyQualifiedName = 'test.id';
+    const ownerKey = '0d146cf7289dd0b6f41385b0dbc733167c5dffc6534c59cafd63a615f59095d8';
+    const salt =  'salt';
+    const zonefile = 'zonefile';
+
+    const args = [
+      fullyQualifiedName,
+      ownerKey,
+      salt,
+      zonefile,
+    ];
+
+    const mockedResponse = JSON.stringify({
+      cost_scalar_change_by_byte: 0.00476837158203125,
+      estimated_cost: {
+        read_count: 19,
+        read_length: 4814,
+        runtime: 7175000,
+        write_count: 2,
+        write_length: 1020
+      },
+      estimated_cost_scalar: 14,
+      estimations: [
+        {
+          fee: 200,
+          fee_rate: 10
+        },
+        {
+          fee: 180,
+          fee_rate: 1.2410714285714286
+        },
+        {
+          fee: 160,
+          fee_rate: 8.958333333333332
+        },
+      ]
+    });
+
+    fetchMock.mockOnce(mockedResponse);
+    fetchMock.mockOnce(JSON.stringify({ nonce: 1000 }));
+    fetchMock.mockOnce(JSON.stringify('success'));
+
+    const txResult = await register(testnetNetwork, args);
+
+    expect(txResult.txid).toEqual('0xsuccess');
   });
 });
