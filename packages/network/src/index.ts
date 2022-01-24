@@ -8,38 +8,10 @@ export interface NetworkConfig {
   url: string;
 }
 
-// TODO: better name than Conveniance!
-export type StacksNetworkConveniance = StacksNetworkName | StacksNetwork;
+const networks = ['mainnet', 'testnet', 'mocknet'] as const;
+export type StacksNetworkName = typeof networks[number];
 
-export type StacksNetworkName = keyof typeof StacksNetworkIdentifier;
-
-export enum StacksNetworkIdentifier {
-  mainnet,
-  testnet,
-  mocknet,
-}
-
-// WIP: maybe dict as lookup (api not as clean)
-// WIP: for all methods? or possible to do iteratively?
-// WIP: makeX naming builder?
-export const makeStacksNetwork = (networkName: StacksNetworkName) => {
-  switch (StacksNetworkIdentifier[networkName]) {
-    case StacksNetworkIdentifier.mainnet:
-      return new StacksMainnet();
-    case StacksNetworkIdentifier.testnet:
-      return new StacksTestnet();
-    case StacksNetworkIdentifier.mocknet:
-      return new StacksMocknet();
-    default:
-      throw new Error(
-        `Invalid network name provided. Must be one of the following: ${Object.values(
-          StacksNetworkIdentifier
-        ).join(', ')}`
-      );
-  }
-};
-
-export interface StacksNetwork {
+export interface IStacksNetwork {
   version: TransactionVersion;
   chainId: ChainID;
   bnsLookupUrl: string;
@@ -50,6 +22,7 @@ export interface StacksNetwork {
   accountEndpoint: string;
   contractAbiEndpoint: string;
   readOnlyFunctionCallEndpoint: string;
+
   isMainnet(): boolean;
   getBroadcastApiUrl: () => string;
   getTransferFeeEstimateApiUrl: () => string;
@@ -80,7 +53,7 @@ export interface StacksNetwork {
   getNameInfo: (fullyQualifiedName: string) => any;
 }
 
-export class StacksMainnet implements StacksNetwork {
+export class StacksNetwork implements IStacksNetwork {
   version = TransactionVersion.Mainnet;
   chainId = ChainID.Mainnet;
   bnsLookupUrl = 'https://stacks-node-api.mainnet.stacks.co';
@@ -93,10 +66,26 @@ export class StacksMainnet implements StacksNetwork {
 
   readonly coreApiUrl: string;
 
-  constructor(networkUrl: NetworkConfig = { url: HIRO_MAINNET_DEFAULT }) {
-    this.coreApiUrl = networkUrl.url;
+  constructor(networkConfig: NetworkConfig) {
+    this.coreApiUrl = networkConfig.url;
   }
 
+  static fromStacksNetworkName = (networkName: StacksNetworkName): IStacksNetwork => {
+    switch (networkName) {
+      case 'mainnet':
+        return new StacksMainnet();
+      case 'testnet':
+        return new StacksTestnet();
+      case 'mocknet':
+        return new StacksMocknet();
+      default:
+        throw new Error(
+          `Invalid network name provided. Must be one of the following: ${networks.join(', ')}`
+        );
+    }
+  };
+
+  ts = () => new StacksMocknet();
   isMainnet = () => this.version === TransactionVersion.Mainnet;
   getBroadcastApiUrl = () => `${this.coreApiUrl}${this.broadcastEndpoint}`;
   getTransferFeeEstimateApiUrl = () => `${this.coreApiUrl}${this.transferFeeEstimateEndpoint}`;
@@ -164,7 +153,16 @@ export class StacksMainnet implements StacksNetwork {
   }
 }
 
-export class StacksTestnet extends StacksMainnet implements StacksNetwork {
+export class StacksMainnet extends StacksNetwork implements IStacksNetwork {
+  version = TransactionVersion.Mainnet;
+  chainId = ChainID.Mainnet;
+
+  constructor(networkUrl: NetworkConfig = { url: HIRO_MAINNET_DEFAULT }) {
+    super(networkUrl);
+  }
+}
+
+export class StacksTestnet extends StacksNetwork implements IStacksNetwork {
   version = TransactionVersion.Testnet;
   chainId = ChainID.Testnet;
 
@@ -173,7 +171,7 @@ export class StacksTestnet extends StacksMainnet implements StacksNetwork {
   }
 }
 
-export class StacksMocknet extends StacksMainnet implements StacksNetwork {
+export class StacksMocknet extends StacksNetwork implements IStacksNetwork {
   version = TransactionVersion.Testnet;
   chainId = ChainID.Testnet;
 
@@ -184,6 +182,7 @@ export class StacksMocknet extends StacksMainnet implements StacksNetwork {
 
 // TODO: add more elegant overall type checking using kind/type properties
 //       (ideally switch compatible)
-export function typeIsStacksNetwork(n: any): n is StacksNetwork {
-  return (n as StacksNetwork).chainId !== undefined;
+// do we still need this?
+export function typeIsStacksNetwork(n: any): n is IStacksNetwork {
+  return (n as IStacksNetwork).chainId !== undefined;
 }

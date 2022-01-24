@@ -1,11 +1,11 @@
 import { resolveZoneFileToProfile } from '@stacks/profile';
 import { fetchPrivate } from '@stacks/common';
-import { StacksNetwork, StacksMainnet } from '@stacks/network';
+import { IStacksNetwork, StacksMainnet } from '@stacks/network';
 
 export interface ProfileLookupOptions {
   username: string;
   zoneFileLookupURL?: string;
-  network?: StacksNetwork;
+  network?: IStacksNetwork;
 }
 
 /**
@@ -21,7 +21,7 @@ export function lookupProfile(options: ProfileLookupOptions): Promise<Record<str
   if (!options.username) {
     return Promise.reject();
   }
-  const network: StacksNetwork = options.network ? options.network : new StacksMainnet();
+  const network: IStacksNetwork = options.network ? options.network : new StacksMainnet();
   let lookupPromise;
   if (options.zoneFileLookupURL) {
     const url = `${options.zoneFileLookupURL.replace(/\/$/, '')}/${options.username}`;
