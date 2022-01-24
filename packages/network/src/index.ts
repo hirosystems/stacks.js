@@ -8,8 +8,8 @@ export interface NetworkConfig {
   url: string;
 }
 
-const networks = ['mainnet', 'testnet', 'mocknet'] as const;
-export type StacksNetworkName = typeof networks[number];
+export const StacksNetworks = ['mainnet', 'testnet', 'mocknet'] as const;
+export type StacksNetworkName = typeof StacksNetworks[number];
 
 export interface IStacksNetwork {
   version: TransactionVersion;
@@ -80,7 +80,9 @@ export class StacksNetwork implements IStacksNetwork {
         return new StacksMocknet();
       default:
         throw new Error(
-          `Invalid network name provided. Must be one of the following: ${networks.join(', ')}`
+          `Invalid network name provided. Must be one of the following: ${StacksNetworks.join(
+            ', '
+          )}`
         );
     }
   };
@@ -178,11 +180,4 @@ export class StacksMocknet extends StacksNetwork implements IStacksNetwork {
   constructor(networkUrl: NetworkConfig = { url: HIRO_MOCKNET_DEFAULT }) {
     super(networkUrl);
   }
-}
-
-// TODO: add more elegant overall type checking using kind/type properties
-//       (ideally switch compatible)
-// do we still need this?
-export function typeIsStacksNetwork(n: any): n is IStacksNetwork {
-  return (n as IStacksNetwork).chainId !== undefined;
 }

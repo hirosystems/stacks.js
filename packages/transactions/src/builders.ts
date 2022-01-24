@@ -4,8 +4,8 @@ import {
   StacksMainnet,
   StacksNetwork,
   StacksNetworkName,
+  StacksNetworks,
   StacksTestnet,
-  typeIsStacksNetwork,
 } from '@stacks/network';
 import { c32address } from 'c32check';
 import {
@@ -637,10 +637,13 @@ function inferNetwork(
     | SponsorOptionsOpts
   )
 ) {
-  if (typeIsStacksNetwork(options.network)) {
-    return options.network;
+  if (StacksNetworks.includes(options.network as any)) {
+    // options.network is StacksNetworkName
+    StacksNetwork.fromStacksNetworkName(options.network as StacksNetworkName);
   }
-  return StacksNetwork.fromStacksNetworkName(options.network);
+
+  // options.network is IStacksNetwork
+  return options.network as IStacksNetwork;
 }
 
 /**
