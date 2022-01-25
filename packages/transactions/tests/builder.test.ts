@@ -672,6 +672,35 @@ test('Make smart contract deploy', async () => {
   expect(serialized).toBe(tx);
 });
 
+test('Make smart contract deploy with network string name', async () => {
+  const transaction = await makeContractDeploy({
+    contractName: "kv-store",
+    codeBody: fs.readFileSync('./tests/contracts/kv-store.clar').toString(),
+    senderKey: "e494f188c2d35887531ba474c433b1e41fadd8eb824aca983447fd4bb8b277a801",
+    fee: 0,
+    nonce: 0,
+    network: 'testnet',
+    anchorMode: AnchorMode.Any
+  });
+
+  const serialized = transaction.serialize().toString('hex');
+
+  const tx =
+    '80800000000400e6c05355e0c990ffad19a5e9bda394a9c500342900000000000000000000000000000000' +
+    '0000c9c499f85df311348f81520268e11acadb8be0df1bb8db85989f71e32db7192e2806a1179fce6bf775' +
+    '932b28976c9e78c645d7acac8eefaf416a14f4fd14a49303020000000001086b762d73746f726500000156' +
+    '28646566696e652d6d61702073746f72652028286b657920286275666620333229292920282876616c7565' +
+    '202862756666203332292929290a0a28646566696e652d7075626c696320286765742d76616c756520286b' +
+    '65792028627566662033322929290a20202020286d6174636820286d61702d6765743f2073746f72652028' +
+    '286b6579206b65792929290a2020202020202020656e74727920286f6b20286765742076616c756520656e' +
+    '74727929290a20202020202020202865727220302929290a0a28646566696e652d7075626c696320287365' +
+    '742d76616c756520286b65792028627566662033322929202876616c75652028627566662033322929290a' +
+    '2020202028626567696e0a2020202020202020286d61702d7365742073746f72652028286b6579206b6579' +
+    '292920282876616c75652076616c75652929290a2020202020202020286f6b2027747275652929290a';
+
+  expect(serialized).toBe(tx);
+});
+
 test('Make smart contract deploy unsigned', async () => {
   const contractName = 'kv-store';
   const codeBody = fs.readFileSync('./tests/contracts/kv-store.clar').toString();
@@ -751,6 +780,30 @@ test('Make contract-call', async () => {
     fee,
     nonce: 1,
     network: new StacksTestnet(),
+    anchorMode: AnchorMode.Any
+  });
+
+  const serialized = transaction.serialize().toString('hex');
+
+  const tx =
+    '80800000000400e6c05355e0c990ffad19a5e9bda394a9c500342900000000000000010000000000000000' +
+    '0000b2c4262b8716891ee4a3361b31b3847cdb3d4897538f0f7716a3720686aee96f01be6610141c6afb36' +
+    'f32c60575147b7e08191bae5cf9706c528adf46f28473e030200000000021ae6c05355e0c990ffad19a5e9' +
+    'bda394a9c5003429086b762d73746f7265096765742d76616c7565000000010200000003666f6f';
+
+  expect(serialized).toBe(tx);
+});
+
+test('Make contract-call with network string', async () => {
+  const transaction = await makeContractCall({
+    contractAddress: "ST3KC0MTNW34S1ZXD36JYKFD3JJMWA01M55DSJ4JE",
+    contractName: "kv-store",
+    functionName: "get-value",
+    functionArgs: [bufferCV(Buffer.from('foo'))],
+    senderKey: "e494f188c2d35887531ba474c433b1e41fadd8eb824aca983447fd4bb8b277a801",
+    fee: 0,
+    nonce: 1,
+    network: 'testnet',
     anchorMode: AnchorMode.Any
   });
 
@@ -1633,8 +1686,6 @@ test('Make contract-call with network ABI validation failure', async () => {
 
   const network = new StacksTestnet();
 
-  // const abi = fs.readFileSync('./tests/abi/kv-store-abi.json').toString();
-  // fetchMock.mockOnce(abi);
   fetchMock.mockOnce('failed', { status: 404 });
 
   let error;
@@ -1647,7 +1698,7 @@ test('Make contract-call with network ABI validation failure', async () => {
       functionArgs: [buffer],
       fee,
       nonce: 1,
-      network: new StacksTestnet(),
+      network: 'testnet',
       validateWithAbi: true,
       postConditionMode: PostConditionMode.Allow,
       anchorMode: AnchorMode.Any
@@ -1689,5 +1740,22 @@ test('Call read-only function', async () => {
 
   expect(fetchMock.mock.calls.length).toEqual(1);
   expect(fetchMock.mock.calls[0][0]).toEqual(apiUrl);
+  expect(result).toEqual(mockResult);
+});
+
+test('Call read-only function with network string', async () => {
+  const mockResult = bufferCVFromString('test');
+  fetchMock.mockOnce(`{"okay": true, "result": "0x${serializeCV(mockResult).toString('hex')}"}`);
+
+  const result = await callReadOnlyFunction({
+    contractAddress: "ST3KC0MTNW34S1ZXD36JYKFD3JJMWA01M55DSJ4JE",
+    contractName: "kv-store",
+    functionName: "get-value?",
+    functionArgs: [bufferCVFromString('foo')],
+    network: 'testnet',
+    senderAddress: "ST2F4BK4GZH6YFBNHYDDGN4T1RKBA7DA1BJZPJEJJ",
+  });
+
+  expect(fetchMock.mock.calls.length).toEqual(1);
   expect(result).toEqual(mockResult);
 });
