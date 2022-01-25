@@ -591,7 +591,7 @@ export async function makeUnsignedSTXTokenTransfer(
     authorization = createStandardAuth(spendingCondition);
   }
 
-  const network = inferNetwork(options);
+  const network = inferNetwork(options.network);
 
   const postConditions: PostCondition[] = [];
   if (options.postConditions && options.postConditions.length > 0) {
@@ -630,20 +630,14 @@ export async function makeUnsignedSTXTokenTransfer(
   return transaction;
 }
 
-function inferNetwork(
-  options: { network: StacksNetworkName | IStacksNetwork } & (
-    | TokenTransferOptions
-    | BaseContractDeployOptions
-    | SponsorOptionsOpts
-  )
-) {
-  if (StacksNetworks.includes(options.network as StacksNetworkName)) {
-    // options.network is StacksNetworkName
-    return StacksNetwork.fromStacksNetworkName(options.network as StacksNetworkName);
+function inferNetwork(network: StacksNetworkName | IStacksNetwork) {
+  if (StacksNetworks.includes(network as StacksNetworkName)) {
+    // network is StacksNetworkName
+    return StacksNetwork.fromStacksNetworkName(network as StacksNetworkName);
   }
 
-  // options.network is IStacksNetwork
-  return options.network as IStacksNetwork;
+  // network is IStacksNetwork
+  return network as IStacksNetwork;
 }
 
 /**
@@ -838,7 +832,7 @@ export async function makeUnsignedContractDeploy(
     authorization = createStandardAuth(spendingCondition);
   }
 
-  const network = inferNetwork(options);
+  const network = inferNetwork(options.network);
 
   const postConditions: PostCondition[] = [];
   if (options.postConditions && options.postConditions.length > 0) {
@@ -1392,7 +1386,7 @@ export async function sponsorTransaction(
 
   const options = Object.assign(defaultOptions, sponsorOptions);
 
-  const network = inferNetwork(options);
+  const network = inferNetwork(options.network);
   const sponsorPubKey = pubKeyfromPrivKey(options.sponsorPrivateKey);
 
   if (sponsorOptions.fee === undefined || sponsorOptions.fee === null) {
