@@ -1,4 +1,4 @@
-name: Circular dependency checks
+name: circular dependency checks
 
 on:
   push:
