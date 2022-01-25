@@ -48,3 +48,5 @@ dist
 .idea
 
 *.tsbuildinfo
+
+docs
