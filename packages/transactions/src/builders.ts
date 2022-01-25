@@ -637,9 +637,9 @@ function inferNetwork(
     | SponsorOptionsOpts
   )
 ) {
-  if (StacksNetworks.includes(options.network as any)) {
+  if (StacksNetworks.includes(options.network as StacksNetworkName)) {
     // options.network is StacksNetworkName
-    StacksNetwork.fromStacksNetworkName(options.network as StacksNetworkName);
+    return StacksNetwork.fromStacksNetworkName(options.network as StacksNetworkName);
   }
 
   // options.network is IStacksNetwork

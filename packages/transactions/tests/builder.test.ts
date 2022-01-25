@@ -207,7 +207,7 @@ test('Make STX token transfer with testnet', async () => {
   expect(serialized).toBe(tx);
 });
 
-test('Make STX token transfer with testnet string identifier', async () => {
+test('Make STX token transfer with testnet string name', async () => {
   const transaction = await makeSTXTokenTransfer({
     recipient: standardPrincipalCV('SP3FGQ8Z7JY9BWYZ5WM53E0M9NK7WHJF0691NZ159'),
     amount: 12345,
