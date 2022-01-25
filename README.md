@@ -1,4 +1,4 @@
-# Stacks.js [![CircleCI](https://img.shields.io/circleci/project/hirosystems/stacks.js/master.svg)](https://circleci.com/gh/hirosystems/stacks.js/tree/master)
+# Stacks.js [![Test Action](https://github.com/hirosystems/stacks.js/actions/workflows/tests.yml/badge.svg?branch=master)](https://github.com/hirosystems/stacks.js/actions/workflows/tests.yml?query=branch%3Amaster)
 
 This repo is home to the Stacks.js libraries which provide everything you need to work with the [Stacks blockchain](https://www.stacks.co/what-is-stacks).
 
