@@ -87,7 +87,6 @@ export class StacksNetwork implements IStacksNetwork {
     }
   };
 
-  ts = () => new StacksMocknet();
   isMainnet = () => this.version === TransactionVersion.Mainnet;
   getBroadcastApiUrl = () => `${this.coreApiUrl}${this.broadcastEndpoint}`;
   getTransferFeeEstimateApiUrl = () => `${this.coreApiUrl}${this.transferFeeEstimateEndpoint}`;
