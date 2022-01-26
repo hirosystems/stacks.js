@@ -11,9 +11,10 @@ import fetchMock from 'jest-fetch-mock';
 import { makekeychainTests, keyInfoTests, MakeKeychainResult, WalletKeyInfoResult } from './derivation-path/keychain';
 
 const TEST_ABI: ClarityAbi = JSON.parse(readFileSync(path.join(__dirname, './abi/test-abi.json')).toString());
+const TEST_FEE_ESTIMATE = JSON.parse(readFileSync(path.join(__dirname, './fee-estimate/test-fee-estimate.json')).toString());
 jest.mock('inquirer');
 
-const { addressConvert, contractFunctionCall, makeKeychain, getStacksWalletKey, register } = testables as any;
+const { addressConvert, contractFunctionCall, makeKeychain, getStacksWalletKey, preorder, register } = testables as any;
 
 const mainnetNetwork = new CLINetworkAdapter(
   getNetwork({} as CLI_CONFIG_TYPE, false),
@@ -231,37 +232,37 @@ describe('BNS', () => {
       zonefile,
     ];
 
-    const mockedResponse = JSON.stringify({
-      cost_scalar_change_by_byte: 0.00476837158203125,
-      estimated_cost: {
-        read_count: 19,
-        read_length: 4814,
-        runtime: 7175000,
-        write_count: 2,
-        write_length: 1020
-      },
-      estimated_cost_scalar: 14,
-      estimations: [
-        {
-          fee: 200,
-          fee_rate: 10
-        },
-        {
-          fee: 180,
-          fee_rate: 1.2410714285714286
-        },
-        {
-          fee: 160,
-          fee_rate: 8.958333333333332
-        },
-      ]
-    });
+    const mockedResponse = JSON.stringify(TEST_FEE_ESTIMATE);
 
     fetchMock.mockOnce(mockedResponse);
     fetchMock.mockOnce(JSON.stringify({ nonce: 1000 }));
     fetchMock.mockOnce(JSON.stringify('success'));
 
     const txResult = await register(testnetNetwork, args);
+
+    expect(txResult.txid).toEqual('0xsuccess');
+  });
+
+  test('buildPreorderNameTx', async () => {
+    const fullyQualifiedName = 'test.id';
+    const privateKey = '0d146cf7289dd0b6f41385b0dbc733167c5dffc6534c59cafd63a615f59095d8';
+    const salt =  'salt';
+    const stxToBurn = '1000';
+
+    const args = [
+      fullyQualifiedName,
+      privateKey,
+      salt,
+      stxToBurn,
+    ];
+
+    const mockedResponse = JSON.stringify(TEST_FEE_ESTIMATE);
+
+    fetchMock.mockOnce(mockedResponse);
+    fetchMock.mockOnce(JSON.stringify({ nonce: 1000 }));
+    fetchMock.mockOnce(JSON.stringify('success'));
+
+    const txResult = await preorder(testnetNetwork, args);
 
     expect(txResult.txid).toEqual('0xsuccess');
   });
