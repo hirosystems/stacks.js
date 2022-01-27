@@ -64,6 +64,6 @@
     "build:docs": "rimraf docs && typedoc --name \"Stacks.js $npm_package_version Library Reference\" --readme ./readme.md --tsconfig tsconfig.typedoc.json --out docs --json docs/docs.json packages/**/src/index.ts",
     "test": "lerna run test",
     "typecheck": "lerna run typecheck --parallel --no-bail --stream",
-    "madge": "madge --circular --extensions ts --exclude 'd.ts'  packages/"
+    "madge": "madge --circular --extensions ts --exclude 'd.ts' packages/"
   }
 }

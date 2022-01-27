@@ -8,7 +8,7 @@ export interface NetworkConfig {
   url: string;
 }
 
-export const StacksNetworks = ['mainnet', 'testnet', 'mocknet'] as const;
+export const StacksNetworks = ['mainnet', 'testnet'] as const;
 export type StacksNetworkName = typeof StacksNetworks[number];
 
 export interface IStacksNetwork {
@@ -70,14 +70,12 @@ export class StacksNetwork implements IStacksNetwork {
     this.coreApiUrl = networkConfig.url;
   }
 
-  static fromStacksNetworkName = (networkName: StacksNetworkName): IStacksNetwork => {
+  static fromName = (networkName: StacksNetworkName): IStacksNetwork => {
     switch (networkName) {
       case 'mainnet':
         return new StacksMainnet();
       case 'testnet':
         return new StacksTestnet();
-      case 'mocknet':
-        return new StacksMocknet();
       default:
         throw new Error(
           `Invalid network name provided. Must be one of the following: ${StacksNetworks.join(
@@ -85,6 +83,16 @@ export class StacksNetwork implements IStacksNetwork {
           )}`
         );
     }
+  };
+
+  static fromNameOrNetwork = (network: StacksNetworkName | IStacksNetwork) => {
+    if (StacksNetworks.includes(network as StacksNetworkName)) {
+      // network is StacksNetworkName
+      return StacksNetwork.fromName(network as StacksNetworkName);
+    }
+
+    // network is IStacksNetwork
+    return network as IStacksNetwork;
   };
 
   isMainnet = () => this.version === TransactionVersion.Mainnet;

@@ -1,11 +1,11 @@
 import { resolveZoneFileToProfile } from '@stacks/profile';
 import { fetchPrivate } from '@stacks/common';
-import { IStacksNetwork, StacksMainnet } from '@stacks/network';
+import { IStacksNetwork, StacksMainnet, StacksNetwork, StacksNetworkName } from '@stacks/network';
 
 export interface ProfileLookupOptions {
   username: string;
   zoneFileLookupURL?: string;
-  network?: IStacksNetwork;
+  network?: StacksNetworkName | IStacksNetwork;
 }
 
 /**
@@ -17,11 +17,17 @@ export interface ProfileLookupOptions {
  * blockstack.js [[getNameInfo]] function.
  * @returns {Promise} that resolves to a profile object
  */
-export function lookupProfile(options: ProfileLookupOptions): Promise<Record<string, any>> {
-  if (!options.username) {
-    return Promise.reject();
+export function lookupProfile(lookupOptions: ProfileLookupOptions): Promise<Record<string, any>> {
+  if (!lookupOptions.username) {
+    return Promise.reject(new Error('No username provided'));
   }
-  const network: IStacksNetwork = options.network ? options.network : new StacksMainnet();
+
+  const defaultOptions = {
+    network: new StacksMainnet(),
+  };
+  const options = Object.assign(defaultOptions, lookupOptions);
+
+  const network = StacksNetwork.fromNameOrNetwork(options.network);
   let lookupPromise;
   if (options.zoneFileLookupURL) {
     const url = `${options.zoneFileLookupURL.replace(/\/$/, '')}/${options.username}`;
