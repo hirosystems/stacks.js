@@ -444,13 +444,12 @@ export async function broadcastRawTransaction(
   // Replace extra quotes around txid string
   const txid = text.replace(/["]+/g, '');
   const isValidTxId = validateTxId(txid);
-  if (isValidTxId) {
-    return {
-      txid: txid,
-    } as TxBroadcastResult;
-  } else {
+  if (!isValidTxId) {
     throw new Error(text);
   }
+  return {
+    txid,
+  } as TxBroadcastResult;
 }
 
 /**
@@ -475,10 +474,7 @@ export async function getAbi(
 
   const response = await fetchPrivate(url, options);
   if (!response.ok) {
-    let msg = '';
-    try {
-      msg = await response.text();
-    } catch (error) {}
+    const msg = await response.text().catch(() => '');
     throw new Error(
       `Error fetching contract ABI for contract "${contractName}" at address ${address}. Response ${response.status}: ${response.statusText}. Attempted to fetch ${url} and failed with the message: "${msg}"`
     );
@@ -654,6 +650,7 @@ export async function makeSTXTokenTransfer(
   txOptions: SignedTokenTransferOptions | SignedMultiSigTokenTransferOptions
 ): Promise<StacksTransaction> {
   if ('senderKey' in txOptions) {
+    // txOptions is SignedTokenTransferOptions
     const publicKey = publicKeyToString(getPublicKey(createStacksPrivateKey(txOptions.senderKey)));
     const options = omit(txOptions, 'senderKey');
     const transaction = await makeUnsignedSTXTokenTransfer({ publicKey, ...options });
@@ -664,6 +661,7 @@ export async function makeSTXTokenTransfer(
 
     return transaction;
   } else {
+    // txOptions is SignedMultiSigTokenTransferOptions
     const options = omit(txOptions, 'signerKeys');
     const transaction = await makeUnsignedSTXTokenTransfer(options);
 
@@ -756,10 +754,7 @@ export async function estimateContractDeploy(
 
   const response = await fetchPrivate(url, fetchOptions);
   if (!response.ok) {
-    let msg = '';
-    try {
-      msg = await response.text();
-    } catch (error) {}
+    const msg = await response.text().catch(() => '');
     throw new Error(
       `Error estimating contract deploy fee. Response ${response.status}: ${response.statusText}. Attempted to fetch ${url} and failed with the message: "${msg}"`
     );
@@ -956,10 +951,7 @@ export async function estimateContractFunctionCall(
 
   const response = await fetchPrivate(url, fetchOptions);
   if (!response.ok) {
-    let msg = '';
-    try {
-      msg = await response.text();
-    } catch (error) {}
+    const msg = await response.text().catch(() => '');
     throw new Error(
       `Error estimating contract call fee. Response ${response.status}: ${response.statusText}. Attempted to fetch ${url} and failed with the message: "${msg}"`
     );
@@ -1328,10 +1320,7 @@ export async function callReadOnlyFunction(
   });
 
   if (!response.ok) {
-    let msg = '';
-    try {
-      msg = await response.text();
-    } catch (error) {}
+    const msg = await response.text().catch(() => '');
     throw new Error(
       `Error calling read-only function. Response ${response.status}: ${response.statusText}. Attempted to fetch ${url} and failed with the message: "${msg}"`
     );
