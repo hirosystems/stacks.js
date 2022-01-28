@@ -20,7 +20,8 @@ import {
   sponsorTransaction,
   makeSTXTokenTransfer,
   makeUnsignedContractCall,
-  estimateTransaction
+  estimateTransaction,
+  SignedTokenTransferOptions
 } from '../src/builders';
 
 import { deserializeTransaction, StacksTransaction } from '../src/transaction';
