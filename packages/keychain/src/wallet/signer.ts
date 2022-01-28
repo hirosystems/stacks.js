@@ -11,7 +11,7 @@ import {
   PostCondition,
   AnchorMode,
 } from '@stacks/transactions';
-import { StacksTestnet, StacksNetwork } from '@stacks/network';
+import { StacksTestnet, IStacksNetwork, StacksNetworkName } from '@stacks/network';
 
 import RPCClient from '@blockstack/rpc-client';
 import BN from 'bn.js';
@@ -25,7 +25,7 @@ interface ContractCallOptions {
   nonce: IntegerType;
   postConditions?: PostCondition[];
   postConditionMode?: PostConditionMode;
-  network?: StacksNetwork;
+  network?: StacksNetworkName | IStacksNetwork;
   anchorMode: AnchorMode;
 }
 
@@ -36,7 +36,7 @@ interface ContractDeployOptions {
   nonce: number;
   postConditions?: PostCondition[];
   postConditionMode?: PostConditionMode;
-  network?: StacksNetwork;
+  network?: StacksNetworkName | IStacksNetwork;
   anchorMode: AnchorMode;
 }
 
@@ -47,7 +47,7 @@ interface STXTransferOptions {
   nonce: number;
   postConditions?: PostCondition[];
   postConditionMode?: PostConditionMode;
-  network?: StacksNetwork;
+  network?: StacksNetworkName | IStacksNetwork;
   anchorMode: AnchorMode;
 }
 

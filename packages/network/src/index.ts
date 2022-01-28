@@ -8,7 +8,10 @@ export interface NetworkConfig {
   url: string;
 }
 
-export interface StacksNetwork {
+export const StacksNetworks = ['mainnet', 'testnet'] as const;
+export type StacksNetworkName = typeof StacksNetworks[number];
+
+export interface IStacksNetwork {
   version: TransactionVersion;
   chainId: ChainID;
   bnsLookupUrl: string;
@@ -19,6 +22,7 @@ export interface StacksNetwork {
   accountEndpoint: string;
   contractAbiEndpoint: string;
   readOnlyFunctionCallEndpoint: string;
+
   isMainnet(): boolean;
   getBroadcastApiUrl: () => string;
   getTransferFeeEstimateApiUrl: () => string;
@@ -49,7 +53,7 @@ export interface StacksNetwork {
   getNameInfo: (fullyQualifiedName: string) => any;
 }
 
-export class StacksMainnet implements StacksNetwork {
+export class StacksNetwork implements IStacksNetwork {
   version = TransactionVersion.Mainnet;
   chainId = ChainID.Mainnet;
   bnsLookupUrl = 'https://stacks-node-api.mainnet.stacks.co';
@@ -62,9 +66,34 @@ export class StacksMainnet implements StacksNetwork {
 
   readonly coreApiUrl: string;
 
-  constructor(networkUrl: NetworkConfig = { url: HIRO_MAINNET_DEFAULT }) {
-    this.coreApiUrl = networkUrl.url;
+  constructor(networkConfig: NetworkConfig) {
+    this.coreApiUrl = networkConfig.url;
   }
+
+  static fromName = (networkName: StacksNetworkName): IStacksNetwork => {
+    switch (networkName) {
+      case 'mainnet':
+        return new StacksMainnet();
+      case 'testnet':
+        return new StacksTestnet();
+      default:
+        throw new Error(
+          `Invalid network name provided. Must be one of the following: ${StacksNetworks.join(
+            ', '
+          )}`
+        );
+    }
+  };
+
+  static fromNameOrNetwork = (network: StacksNetworkName | IStacksNetwork) => {
+    if (StacksNetworks.includes(network as StacksNetworkName)) {
+      // network is StacksNetworkName
+      return StacksNetwork.fromName(network as StacksNetworkName);
+    }
+
+    // network is IStacksNetwork
+    return network as IStacksNetwork;
+  };
 
   isMainnet = () => this.version === TransactionVersion.Mainnet;
   getBroadcastApiUrl = () => `${this.coreApiUrl}${this.broadcastEndpoint}`;
@@ -133,7 +162,16 @@ export class StacksMainnet implements StacksNetwork {
   }
 }
 
-export class StacksTestnet extends StacksMainnet implements StacksNetwork {
+export class StacksMainnet extends StacksNetwork implements IStacksNetwork {
+  version = TransactionVersion.Mainnet;
+  chainId = ChainID.Mainnet;
+
+  constructor(networkUrl: NetworkConfig = { url: HIRO_MAINNET_DEFAULT }) {
+    super(networkUrl);
+  }
+}
+
+export class StacksTestnet extends StacksNetwork implements IStacksNetwork {
   version = TransactionVersion.Testnet;
   chainId = ChainID.Testnet;
 
@@ -142,7 +180,7 @@ export class StacksTestnet extends StacksMainnet implements StacksNetwork {
   }
 }
 
-export class StacksMocknet extends StacksMainnet implements StacksNetwork {
+export class StacksMocknet extends StacksNetwork implements IStacksNetwork {
   version = TransactionVersion.Testnet;
   chainId = ChainID.Testnet;
 
