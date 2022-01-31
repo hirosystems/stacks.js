@@ -1075,13 +1075,13 @@ test.skip('Estimate transaction transfer fee', async () => {
   expect(fetchMock.mock.calls.length).toEqual(2);
   expect(fetchMock.mock.calls[0][0]).toEqual(mainnet.getTransactionFeeEstimateApiUrl());
   expect(fetchMock.mock.calls[0][1]?.body).toEqual(JSON.stringify({
-      transaction_payload: serializePayload(transaction.payload).toString('hex'),
-      estimated_len: transactionByteLength
+    transaction_payload: serializePayload(transaction.payload).toString('hex'),
+    estimated_len: transactionByteLength
   }));
   expect(fetchMock.mock.calls[1][0]).toEqual(testnet.getTransactionFeeEstimateApiUrl());
   expect(fetchMock.mock.calls[1][1]?.body).toEqual(JSON.stringify({
-      transaction_payload: serializePayload(transaction.payload).toString('hex'),
-      estimated_len: transactionByteLength
+    transaction_payload: serializePayload(transaction.payload).toString('hex'),
+    estimated_len: transactionByteLength
   }));
   expect(resultEstimateFee).toEqual([140, 17, 125]);
   expect(resultEstimateFee2).toEqual([140, 17, 125]);
@@ -1515,7 +1515,51 @@ test('Transaction broadcast success', async () => {
   expect(fetchMock.mock.calls.length).toEqual(1);
   expect(fetchMock.mock.calls[0][0]).toEqual(network.getBroadcastApiUrl());
   expect(fetchMock.mock.calls[0][1]?.body).toEqual(transaction.serialize());
-  expect(response as TxBroadcastResultOk).toEqual({ txid: 'success'});
+  expect(response as TxBroadcastResultOk).toEqual({ txid: 'success' });
+});
+
+test('Transaction broadcast success with string network name', async () => {
+  const transaction = await makeSTXTokenTransfer({
+    recipient: standardPrincipalCV('SP3FGQ8Z7JY9BWYZ5WM53E0M9NK7WHJF0691NZ159'),
+    amount: 12345,
+    senderKey: "edf9aee84d9b7abc145504dde6726c64f369d37ee34ded868fabd876c26570bc01",
+    network: 'mainnet',
+    fee: 0,
+    nonce: 0,
+    memo: "test memo",
+    anchorMode: AnchorMode.Any
+  });
+
+  fetchMock.mockOnce('success');
+
+  const response: TxBroadcastResult = await broadcastTransaction(transaction, 'mainnet');
+
+  expect(fetchMock.mock.calls.length).toEqual(1);
+  expect(fetchMock.mock.calls[0][0]).toEqual(new StacksMainnet().getBroadcastApiUrl());
+  expect(fetchMock.mock.calls[0][1]?.body).toEqual(transaction.serialize());
+  expect(response as TxBroadcastResultOk).toEqual({ txid: 'success' });
+});
+
+test('Transaction broadcast success with network detection', async () => {
+  const transaction = await makeSTXTokenTransfer({
+    recipient: standardPrincipalCV('SP3FGQ8Z7JY9BWYZ5WM53E0M9NK7WHJF0691NZ159'),
+    amount: 12345,
+    senderKey: "edf9aee84d9b7abc145504dde6726c64f369d37ee34ded868fabd876c26570bc01",
+    network: 'testnet',
+    fee: 0,
+    nonce: 0,
+    memo: "test memo",
+    anchorMode: AnchorMode.Any
+  });
+
+  fetchMock.mockOnce('success');
+
+  const response: TxBroadcastResult = await broadcastTransaction(transaction);
+
+  expect(fetchMock.mock.calls.length).toEqual(1);
+  expect(fetchMock.mock.calls[0][0]).toEqual(new StacksTestnet().getBroadcastApiUrl());
+  expect(fetchMock.mock.calls[0][1]?.body).toEqual(transaction.serialize());
+  expect(response as TxBroadcastResultOk).toEqual({ txid: 'success' });
 });
 
 test('Transaction broadcast with attachment', async () => {
@@ -1549,7 +1593,7 @@ test('Transaction broadcast with attachment', async () => {
     tx: transaction.serialize().toString('hex'),
     attachment: attachment.toString('hex')
   }));
-  expect(response as TxBroadcastResultOk).toEqual({ txid: 'success'});
+  expect(response as TxBroadcastResultOk).toEqual({ txid: 'success' });
 });
 
 test('Transaction broadcast returns error', async () => {
