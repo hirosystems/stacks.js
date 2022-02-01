@@ -1,11 +1,11 @@
 import { resolveZoneFileToProfile } from '@stacks/profile';
 import { fetchPrivate } from '@stacks/common';
-import { IStacksNetwork, StacksMainnet, StacksNetwork, StacksNetworkName } from '@stacks/network';
+import { StacksMainnet, StacksNetwork, StacksNetworkName } from '@stacks/network';
 
 export interface ProfileLookupOptions {
   username: string;
   zoneFileLookupURL?: string;
-  network?: StacksNetworkName | IStacksNetwork;
+  network?: StacksNetworkName | StacksNetwork;
 }
 
 /**

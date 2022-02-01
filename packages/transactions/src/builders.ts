@@ -1,11 +1,5 @@
 import { Buffer, fetchPrivate, IntegerType, intToBigInt } from '@stacks/common';
-import {
-  IStacksNetwork,
-  StacksMainnet,
-  StacksNetwork,
-  StacksNetworkName,
-  StacksTestnet,
-} from '@stacks/network';
+import { StacksNetwork, StacksMainnet, StacksNetworkName, StacksTestnet } from '@stacks/network';
 import { c32address } from 'c32check';
 import {
   createMultiSigSpendingCondition,
@@ -66,13 +60,13 @@ import { cvToHex, omit, parseReadOnlyResponse, validateTxId } from './utils';
  * Lookup the nonce for an address from a core node
  *
  * @param {string} address - the c32check address to look up
- * @param {StacksNetworkName | IStacksNetwork} network - the Stacks network to look up address on
+ * @param {StacksNetworkName | StacksNetwork} network - the Stacks network to look up address on
  *
  * @return a promise that resolves to an integer
  */
 export async function getNonce(
   address: string,
-  network?: StacksNetworkName | IStacksNetwork
+  network?: StacksNetworkName | StacksNetwork
 ): Promise<bigint> {
   const defaultNetwork = new StacksMainnet();
   const url = network
@@ -100,13 +94,13 @@ export async function getNonce(
  * Estimate the total transaction fee in microstacks for a token transfer
  *
  * @param {StacksTransaction} transaction - the token transfer transaction to estimate fees for
- * @param {StacksNetworkName | IStacksNetwork} network - the Stacks network to estimate transaction for
+ * @param {StacksNetworkName | StacksNetwork} network - the Stacks network to estimate transaction for
  *
  * @return a promise that resolves to number of microstacks per byte
  */
 export async function estimateTransfer(
   transaction: StacksTransaction,
-  network?: StacksNetworkName | IStacksNetwork
+  network?: StacksNetworkName | StacksNetwork
 ): Promise<bigint> {
   if (transaction.payload.payloadType !== PayloadType.TokenTransfer) {
     throw new Error(
@@ -168,14 +162,14 @@ interface FeeEstimateResponse {
  * @param {number} estimatedLen - is an optional argument that provides the endpoint with an
  * estimation of the final length (in bytes) of the transaction, including any post-conditions
  * and signatures
- * @param {StacksNetworkName | IStacksNetwork} network - the Stacks network to estimate transaction fees for
+ * @param {StacksNetworkName | StacksNetwork} network - the Stacks network to estimate transaction fees for
  *
  * @return a promise that resolves to FeeEstimate
  */
 export async function estimateTransaction(
   transactionPayload: Payload,
   estimatedLen?: number,
-  network?: StacksNetworkName | IStacksNetwork
+  network?: StacksNetworkName | StacksNetwork
 ): Promise<[FeeEstimation, FeeEstimation, FeeEstimation]> {
   const options = {
     method: 'POST',
@@ -391,13 +385,13 @@ export type TxBroadcastResult = TxBroadcastResultOk | TxBroadcastResultRejected;
  * Broadcast the signed transaction to a core node
  *
  * @param {StacksTransaction} transaction - the token transfer transaction to broadcast
- * @param {StacksNetworkName | IStacksNetwork} network - the Stacks network to broadcast transaction to
+ * @param {StacksNetworkName | StacksNetwork} network - the Stacks network to broadcast transaction to
  *
  * @returns {Promise} that resolves to a response if the operation succeeds
  */
 export async function broadcastTransaction(
   transaction: StacksTransaction,
-  network?: StacksNetworkName | IStacksNetwork,
+  network?: StacksNetworkName | StacksNetwork,
   attachment?: Buffer
 ): Promise<TxBroadcastResult> {
   const rawTx = transaction.serialize();
@@ -457,14 +451,14 @@ export async function broadcastRawTransaction(
  *
  * @param {string} address - the contracts address
  * @param {string} contractName - the contracts name
- * @param {StacksNetworkName | IStacksNetwork} network - the Stacks network to broadcast transaction to
+ * @param {StacksNetworkName | StacksNetwork} network - the Stacks network to broadcast transaction to
  *
  * @returns {Promise} that resolves to a ClarityAbi if the operation succeeds
  */
 export async function getAbi(
   address: string,
   contractName: string,
-  network: StacksNetworkName | IStacksNetwork
+  network: StacksNetworkName | StacksNetwork
 ): Promise<ClarityAbi> {
   const options = {
     method: 'GET',
@@ -511,7 +505,7 @@ export interface TokenTransferOptions {
   /** the transaction nonce, which must be increased monotonically with each new transaction */
   nonce?: IntegerType;
   /** the network that the transaction will ultimately be broadcast to */
-  network?: StacksNetworkName | IStacksNetwork;
+  network?: StacksNetworkName | StacksNetwork;
   /** the transaction anchorMode, which specifies whether it should be
    * included in an anchor block or a microblock */
   anchorMode: AnchorMode;
@@ -693,7 +687,7 @@ export interface BaseContractDeployOptions {
   /** the transaction nonce, which must be increased monotonically with each new transaction */
   nonce?: IntegerType;
   /** the network that the transaction will ultimately be broadcast to */
-  network?: StacksNetworkName | IStacksNetwork;
+  network?: StacksNetworkName | StacksNetwork;
   /** the transaction anchorMode, which specifies whether it should be
    * included in an anchor block or a microblock */
   anchorMode: AnchorMode;
@@ -722,13 +716,13 @@ export interface UnsignedContractDeployOptions extends BaseContractDeployOptions
  * Estimate the total transaction fee in microstacks for a contract deploy
  *
  * @param {StacksTransaction} transaction - the token transfer transaction to estimate fees for
- * @param {StacksNetworkName | IStacksNetwork} network - the Stacks network to estimate transaction for
+ * @param {StacksNetworkName | StacksNetwork} network - the Stacks network to estimate transaction for
  *
  * @return a promise that resolves to number of microstacks per byte
  */
 export async function estimateContractDeploy(
   transaction: StacksTransaction,
-  network?: StacksNetworkName | IStacksNetwork
+  network?: StacksNetworkName | StacksNetwork
 ): Promise<bigint> {
   if (transaction.payload.payloadType !== PayloadType.SmartContract) {
     throw new Error(
@@ -878,7 +872,7 @@ export interface ContractCallOptions {
   /** the transaction nonce, which must be increased monotonically with each new transaction */
   nonce?: IntegerType;
   /** the Stacks blockchain network that will ultimately be used to broadcast this transaction */
-  network?: StacksNetworkName | IStacksNetwork;
+  network?: StacksNetworkName | StacksNetwork;
   /** the transaction anchorMode, which specifies whether it should be
    * included in an anchor block or a microblock */
   anchorMode: AnchorMode;
@@ -919,13 +913,13 @@ export interface SignedMultiSigContractCallOptions extends ContractCallOptions {
  * Estimate the total transaction fee in microstacks for a contract function call
  *
  * @param {StacksTransaction} transaction - the token transfer transaction to estimate fees for
- * @param {StacksNetworkName | IStacksNetwork} network - the Stacks network to estimate transaction for
+ * @param {StacksNetworkName | StacksNetwork} network - the Stacks network to estimate transaction for
  *
  * @return a promise that resolves to number of microstacks per byte
  */
 export async function estimateContractFunctionCall(
   transaction: StacksTransaction,
-  network?: StacksNetworkName | IStacksNetwork
+  network?: StacksNetworkName | StacksNetwork
 ): Promise<bigint> {
   if (transaction.payload.payloadType !== PayloadType.ContractCall) {
     throw new Error(
@@ -1266,7 +1260,7 @@ export function makeContractNonFungiblePostCondition(
  * @param  {String} contractName - the contract name
  * @param  {String} functionName - name of the function to be called
  * @param  {[ClarityValue]} functionArgs - an array of Clarity values as arguments to the function call
- * @param  {IStacksNetwork} network - the Stacks blockchain network this transaction is destined for
+ * @param  {StacksNetwork} network - the Stacks blockchain network this transaction is destined for
  * @param  {String} senderAddress - the c32check address of the sender
  */
 
@@ -1276,7 +1270,7 @@ export interface ReadOnlyFunctionOptions {
   functionName: string;
   functionArgs: ClarityValue[];
   /** the network that the contract which contains the function is deployed to */
-  network?: StacksNetworkName | IStacksNetwork;
+  network?: StacksNetworkName | StacksNetwork;
   /** address of the sender */
   senderAddress: string;
 }
@@ -1344,7 +1338,7 @@ export interface SponsorOptionsOpts {
   /** the hashmode of the sponsor's address */
   sponsorAddressHashmode?: AddressHashMode;
   /** the Stacks blockchain network that this transaction will ultimately be broadcast to */
-  network?: StacksNetworkName | IStacksNetwork;
+  network?: StacksNetworkName | StacksNetwork;
 }
 
 /**
