@@ -86,13 +86,11 @@ export class StacksNetwork implements IStacksNetwork {
   };
 
   static fromNameOrNetwork = (network: StacksNetworkName | IStacksNetwork) => {
-    if (StacksNetworks.includes(network as StacksNetworkName)) {
-      // network is StacksNetworkName
-      return StacksNetwork.fromName(network as StacksNetworkName);
+    if (typeof network !== 'string' && 'version' in network) {
+      return network;
     }
 
-    // network is IStacksNetwork
-    return network as IStacksNetwork;
+    return StacksNetwork.fromName(network);
   };
 
   isMainnet = () => this.version === TransactionVersion.Mainnet;
