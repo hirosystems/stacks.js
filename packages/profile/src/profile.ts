@@ -336,7 +336,10 @@ export function getTokenFileUrl(zoneFileJson: any): string | null {
  *
  * @ignore
  */
-export function resolveZoneFileToProfile(zoneFile: any, publicKeyOrAddress: string) {
+export function resolveZoneFileToProfile(
+  zoneFile: any,
+  publicKeyOrAddress: string
+): Promise<Record<string, any>> {
   return new Promise((resolve, reject) => {
     let zoneFileJson = null;
     try {
@@ -352,15 +355,11 @@ export function resolveZoneFileToProfile(zoneFile: any, publicKeyOrAddress: stri
     if (zoneFileJson && Object.keys(zoneFileJson).length > 0) {
       tokenFileUrl = getTokenFileUrl(zoneFileJson);
     } else {
-      let profile = null;
       try {
-        profile = JSON.parse(zoneFile);
-        profile = Person.fromLegacyFormat(profile).profile();
+        return resolve(Person.fromLegacyFormat(JSON.parse(zoneFile)).profile());
       } catch (error) {
-        reject(error);
+        return reject(error);
       }
-      resolve(profile);
-      return;
     }
 
     if (tokenFileUrl) {
