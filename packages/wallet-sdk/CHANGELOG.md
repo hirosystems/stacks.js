@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.2.0](https://github.com/hirosystems/stacks.js/compare/v3.1.1...v3.2.0) (2022-02-02)
+
+**Note:** Version bump only for package @stacks/wallet-sdk
+
+
+
+
+
 ## [3.1.1](https://github.com/blockstack/stacks.js/compare/v3.1.0...v3.1.1) (2021-12-20)
 
 
