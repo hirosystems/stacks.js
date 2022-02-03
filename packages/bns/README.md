@@ -128,7 +128,7 @@ const unsignedTX = await buildRegisterNameTx({
 const signer = new TransactionSigner(unsignedTX);
 signer.signOrigin(createStacksPrivateKey(privateKey));
 
-const reply: TxBroadcastResult = await broadcastTransaction(signer.transaction, network);
+const reply: TxBroadcastResult = await broadcastTransaction(signer.transaction, network, Buffer.from(zonefile));
 // reply.txid
 ```
 
@@ -170,7 +170,7 @@ const unsignedTX = await buildTransferNameTx({
 const signer = new TransactionSigner(unsignedTX);
 signer.signOrigin(createStacksPrivateKey(privateKey));
 
-const reply: TxBroadcastResult = await broadcastTransaction(signer.transaction, network);
+const reply: TxBroadcastResult = await broadcastTransaction(signer.transaction, network, Buffer.from(zonefile));
 // reply.txid
 ```
 
@@ -209,7 +209,7 @@ const unsignedTX = await buildUpdateNameTx({
 const signer = new TransactionSigner(unsignedTX);
 signer.signOrigin(createStacksPrivateKey(privateKey));
 
-const reply: TxBroadcastResult = await broadcastTransaction(signer.transaction, network);
+const reply: TxBroadcastResult = await broadcastTransaction(signer.transaction, network, Buffer.from(zonefile));
 // reply.txid
 ```
 
@@ -253,7 +253,7 @@ const unsignedTX = await buildRenewNameTx({
 const signer = new TransactionSigner(unsignedTX);
 signer.signOrigin(createStacksPrivateKey(privateKey));
 
-const reply: TxBroadcastResult = await broadcastTransaction(signer.transaction, network);
+const reply: TxBroadcastResult = await broadcastTransaction(signer.transaction, network, Buffer.from(zonefile));
 // reply.txid
 ```
 
