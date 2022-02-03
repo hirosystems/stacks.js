@@ -84,7 +84,6 @@ export interface BnsContractCallOptions {
   functionArgs: ClarityValue[];
   publicKey: string;
   network: StacksNetwork;
-  attachment?: Buffer;
   postConditions?: PostCondition[];
 }
 
