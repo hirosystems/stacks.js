@@ -5,11 +5,11 @@ on:
     branches:
       - master
     tags-ignore:
-      - '**'
+      - "**"
     paths-ignore:
-      - '**/CHANGELOG.md'
-      - '**/package.json'
-      - 'docs/**'
+      - "**/CHANGELOG.md"
+      - "**/package.json"
+      - "docs/**"
   pull_request:
   workflow_dispatch:
 jobs:
@@ -34,7 +34,7 @@ jobs:
         run: npm run build:docs
 
       - name: Semantic Release
-        uses: cycjimmy/semantic-release-action@v2
+        run: lerna version --conventional-commits --conventional-prerelease --yes
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN || secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
