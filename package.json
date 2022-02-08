@@ -5,7 +5,7 @@
   "prettier": "@stacks/prettier-config",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/blockstack/blockstack.js.git"
+    "url": "git+https://github.com/hirosystems/stacks.js.git"
   },
   "workspaces": [
     "packages/**"
@@ -35,14 +35,14 @@
     ]
   },
   "devDependencies": {
-    "@stacks/eslint-config": "^1.0.9",
-    "@stacks/prettier-config": "0.0.8",
+    "@stacks/eslint-config": "^1.2.0",
+    "@stacks/prettier-config": "^0.0.10",
     "@strictsoftware/typedoc-plugin-monorepo": "^0.4.2",
     "@typescript-eslint/eslint-plugin": "^4.22.0",
     "@typescript-eslint/parser": "^4.22.0",
-    "eslint": "^7.25.0",
+    "eslint": "^8.8.0",
     "eslint-config-prettier": "^8.3.0",
-    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-import": "^2.25.4",
     "eslint-plugin-node": "^11.1.0",
     "lerna": "^3.22.1",
     "madge": "^5.0.1",
@@ -61,7 +61,7 @@
     "lint:fix": "eslint \"packages/**/src/**/*.{ts,tsx}\" -f unix --fix",
     "lint:prettier": "prettier --check \"packages/**/src/**/*.{ts,tsx|!(d.ts)}\" *.js",
     "lint:prettier:fix": "prettier --write \"packages/**/src/**/*.{ts,tsx|!(d.ts)}\" *.js",
-    "build:docs": "rimraf docs && typedoc --name \"Stacks.js $npm_package_version Library Reference\" --readme ./readme.md --tsconfig tsconfig.typedoc.json --out docs --json docs/docs.json packages/**/src/index.ts",
+    "build:docs": "rimraf docs && typedoc --name \"stacks.js $npm_package_version Library Reference\" --readme ./readme.md --tsconfig tsconfig.typedoc.json --out docs --json docs/docs.json packages/**/src/index.ts",
     "test": "lerna run test",
     "typecheck": "lerna run typecheck --parallel --no-bail --stream",
     "madge": "madge --circular --extensions ts --exclude 'd.ts' packages/"
