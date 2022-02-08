@@ -55,7 +55,9 @@
     "randombytes": "^2.1.0",
     "ripemd160-min": "^0.0.6",
     "sha.js": "^2.4.11",
-    "smart-buffer": "^4.1.0"
+    "smart-buffer": "^4.1.0",
+    "webpack": "^5.68.0",
+    "webpack-cli": "^4.9.2"
   },
   "publishConfig": {
     "access": "public"
