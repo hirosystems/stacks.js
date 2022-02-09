@@ -34,21 +34,13 @@ const privateKey = createStacksPrivateKey(key);
 ## STX Token Transfer Transaction
 
 ```typescript
-import {
-  makeSTXTokenTransfer,
-  broadcastTransaction,
-  AnchorMode,
-} from '@stacks/transactions';
-import { StacksTestnet, StacksMainnet } from '@stacks/network';
-
-// for mainnet, use `StacksMainnet()`
-const network = new StacksTestnet();
+import { makeSTXTokenTransfer, broadcastTransaction, AnchorMode } from '@stacks/transactions';
 
 const txOptions = {
   recipient: 'SP3FGQ8Z7JY9BWYZ5WM53E0M9NK7WHJF0691NZ159',
   amount: 12345n,
   senderKey: 'b244296d5907de9864c0b0d51f98a13c52890be0404e83f273144cd5b9960eed01',
-  network,
+  network: 'testnet', // for mainnet, use 'mainnet'
   memo: 'test memo',
   nonce: 0n, // set a nonce manually if you don't want builder to fetch from a Stacks node
   fee: 200n, // set a tx fee if you don't want the builder to estimate
@@ -61,7 +53,7 @@ const transaction = await makeSTXTokenTransfer(txOptions);
 const serializedTx = transaction.serialize().toString('hex');
 
 // broadcasting transaction to the specified network
-const broadcastResponse = await broadcastTransaction(transaction, network);
+const broadcastResponse = await broadcastTransaction(transaction);
 const txId = broadcastResponse.txid;
 ```
 
@@ -135,9 +127,7 @@ const txId = broadcastResponse.txid;
 In this example we construct a `contract-call` transaction with a post condition. We have set the `validateWithAbi` option to `true`, so the `makeContractCall` builder will attempt to fetch this contracts ABI from the specified Stacks network, and validate that the provided functionArgs match what is described in the ABI. This should help you avoid constructing invalid contract-call transactions. If you would prefer to provide your own ABI instead of fetching it from the network, the `validateWithABI` option also accepts [ClarityABI](https://github.com/blockstack/stacks-transactions-js/blob/master/src/contract-abi.ts#L231) objects, which can be constructed from ABI files like so:
 
 ```typescript
-import {
-  ClarityAbi
-} from '@stacks/transactions';
+import { ClarityAbi } from '@stacks/transactions';
 import { readFileSync } from 'fs';
 
 const abi: ClarityAbi = JSON.parse(readFileSync('abi.json').toString());
@@ -275,10 +265,7 @@ const serializedSignedTx = deserializedTx.serialize();
 Read-only contract functions can be called without generating or broadcasting a transaction. Instead it works via a direct API call to a Stacks node.
 
 ```typescript
-import {
-  bufferCVFromString,
-  callReadOnlyFunction,
-} from '@stacks/transactions';
+import { bufferCVFromString, callReadOnlyFunction } from '@stacks/transactions';
 import { StacksTestnet } from '@stacks/network';
 
 const contractAddress = 'ST3KC0MTNW34S1ZXD36JYKFD3JJMWA01M55DSJ4JE';
@@ -515,10 +502,7 @@ const contractNonFungiblePostCondition = makeContractNonFungiblePostCondition(
 Clarity Values represent values of Clarity contracts. If a JSON format is required the helper function `cvToJSON` can be used.
 
 ```typescript
-import {
-  cvToJSON,
-  hexToCV
-} from '@stacks/transactions';
+import { cvToJSON, hexToCV } from '@stacks/transactions';
 
-cvToJSON(hexToCV(tx.tx_result.hex))
+cvToJSON(hexToCV(tx.tx_result.hex));
 ```
