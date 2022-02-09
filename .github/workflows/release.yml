@@ -1,3 +1,4 @@
+# based on: https://github.com/hirosystems/gh-actions-example/blob/main/.github/workflows/ci.yml
 name: release
 
 on:
@@ -9,15 +10,13 @@ on:
     paths-ignore:
       - "**/CHANGELOG.md"
       - "**/package.json"
-  pull_request:
-  workflow_dispatch:
 
 jobs:
   release:
     name: Release
     runs-on: ubuntu-latest
     # Only run on non-PR events or only PRs that aren't from forks
-    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+    if: github.event_name == 'push'
     steps:
       - uses: actions/checkout@v2
 
