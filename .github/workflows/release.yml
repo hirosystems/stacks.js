@@ -11,6 +11,7 @@ on:
       - "**/package.json"
   pull_request:
   workflow_dispatch:
+
 jobs:
   release:
     name: Release
@@ -38,9 +39,12 @@ jobs:
         run: npm run build
 
       - name: "Release: Version"
-        run: lerna version --conventional-commits --conventional-prerelease --yes
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          lerna version --conventional-commits --conventional-prerelease --yes
 
       - name: "Release: Publish"
-        run: lerna publish from-git
+        run: lerna publish from-git --yes
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
