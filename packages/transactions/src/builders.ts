@@ -1295,14 +1295,13 @@ export async function callReadOnlyFunction(
 
   const options = Object.assign(defaultOptions, readOnlyFunctionOptions);
 
-  const { contractName, contractAddress, functionName, functionArgs, network, senderAddress, tip } =
-    options;
-  
+  const { contractName, contractAddress, functionName, functionArgs, senderAddress, tip } = options;
+
   const network = StacksNetwork.fromNameOrNetwork(options.network);
   let url = network.getReadOnlyFunctionCallApiUrl(contractAddress, contractName, functionName);
-  
+
   if (typeof tip === 'number') {
-    url = url + `?tip=${tip}`;
+    url = `${url}?tip=${tip}`;
   }
 
   const args = functionArgs.map(arg => cvToHex(arg));
