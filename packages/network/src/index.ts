@@ -8,48 +8,10 @@ export interface NetworkConfig {
   url: string;
 }
 
-export interface StacksNetwork {
-  version: TransactionVersion;
-  chainId: ChainID;
-  bnsLookupUrl: string;
-  readonly coreApiUrl: string;
-  broadcastEndpoint: string;
-  transferFeeEstimateEndpoint: string;
-  transactionFeeEstimateEndpoint: string;
-  accountEndpoint: string;
-  contractAbiEndpoint: string;
-  readOnlyFunctionCallEndpoint: string;
-  isMainnet(): boolean;
-  getBroadcastApiUrl: () => string;
-  getTransferFeeEstimateApiUrl: () => string;
-  getTransactionFeeEstimateApiUrl: () => string;
-  getAccountApiUrl: (address: string) => string;
-  getAbiApiUrl: (address: string, contract: string) => string;
-  getReadOnlyFunctionCallApiUrl: (
-    contractAddress: string,
-    contractName: string,
-    functionName: string
-  ) => string;
-  getInfoUrl: () => string;
-  getBlockTimeInfoUrl: () => string;
-  getPoxInfoUrl: () => string;
-  getRewardsUrl: (address: string, options?: any) => string;
-  getRewardHoldersUrl: (address: string, options?: any) => string;
-  getRewardsTotalUrl: (address: string) => string;
-  getStackerInfoUrl: (contractAddress: string, contractName: string) => string;
+export const StacksNetworks = ['mainnet', 'testnet'] as const;
+export type StacksNetworkName = typeof StacksNetworks[number];
 
-  /**
-   * Get WHOIS-like information for a name, including the address that owns it,
-   * the block at which it expires, and the zone file anchored to it (if available).
-   *
-   * This is intended for use in third-party wallets or in DApps that register names.
-   * @param fullyQualifiedName the name to query.  Can be on-chain of off-chain.
-   * @return a promise that resolves to the WHOIS-like information
-   */
-  getNameInfo: (fullyQualifiedName: string) => any;
-}
-
-export class StacksMainnet implements StacksNetwork {
+export class StacksNetwork {
   version = TransactionVersion.Mainnet;
   chainId = ChainID.Mainnet;
   bnsLookupUrl = 'https://stacks-node-api.mainnet.stacks.co';
@@ -62,9 +24,32 @@ export class StacksMainnet implements StacksNetwork {
 
   readonly coreApiUrl: string;
 
-  constructor(networkUrl: NetworkConfig = { url: HIRO_MAINNET_DEFAULT }) {
-    this.coreApiUrl = networkUrl.url;
+  constructor(networkConfig: NetworkConfig) {
+    this.coreApiUrl = networkConfig.url;
   }
+
+  static fromName = (networkName: StacksNetworkName): StacksNetwork => {
+    switch (networkName) {
+      case 'mainnet':
+        return new StacksMainnet();
+      case 'testnet':
+        return new StacksTestnet();
+      default:
+        throw new Error(
+          `Invalid network name provided. Must be one of the following: ${StacksNetworks.join(
+            ', '
+          )}`
+        );
+    }
+  };
+
+  static fromNameOrNetwork = (network: StacksNetworkName | StacksNetwork) => {
+    if (typeof network !== 'string' && 'version' in network) {
+      return network;
+    }
+
+    return StacksNetwork.fromName(network);
+  };
 
   isMainnet = () => this.version === TransactionVersion.Mainnet;
   getBroadcastApiUrl = () => `${this.coreApiUrl}${this.broadcastEndpoint}`;
@@ -133,7 +118,16 @@ export class StacksMainnet implements StacksNetwork {
   }
 }
 
-export class StacksTestnet extends StacksMainnet implements StacksNetwork {
+export class StacksMainnet extends StacksNetwork {
+  version = TransactionVersion.Mainnet;
+  chainId = ChainID.Mainnet;
+
+  constructor(networkUrl: NetworkConfig = { url: HIRO_MAINNET_DEFAULT }) {
+    super(networkUrl);
+  }
+}
+
+export class StacksTestnet extends StacksNetwork {
   version = TransactionVersion.Testnet;
   chainId = ChainID.Testnet;
 
@@ -142,7 +136,7 @@ export class StacksTestnet extends StacksMainnet implements StacksNetwork {
   }
 }
 
-export class StacksMocknet extends StacksMainnet implements StacksNetwork {
+export class StacksMocknet extends StacksNetwork {
   version = TransactionVersion.Testnet;
   chainId = ChainID.Testnet;
 
