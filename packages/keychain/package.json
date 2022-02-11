@@ -7,13 +7,6 @@
     "Blockstack",
     "Keychain"
   ],
-  "sideEffects": false,
-  "main": "dist/index.js",
-  "module": "dist/esm/index.js",
-  "typings": "dist/index.d.ts",
-  "umd:main": "dist/index.umd.js",
-  "unpkg": "dist/index.umd.js",
-  "gitHead": "77b4d6d531b74996e4b7a0cbd1cf5b8358a690ce",
   "author": "Hank Stoever",
   "homepage": "https://blockstack.org",
   "contributors": [
@@ -38,16 +31,16 @@
   },
   "scripts": {
     "start": "tsc -b tsconfig.build.json --watch --verbose",
-    "build": "npm run clean && npm run build:cjs && npm run build:esm",
+    "build": "npm run clean && npm run build:cjs && npm run build:esm && npm run build:umd",
     "build:cjs": "tsc -b tsconfig.build.json",
     "build:esm": "tsc -p tsconfig.build.json --module ES6 --outDir ./dist/esm",
     "build:umd": "webpack --config webpack.config.js",
     "clean": "rimraf dist && tsc -b tsconfig.build.json --clean",
-    "prepublishOnly": "npm run test && npm run build && npm run build:umd",
-    "test": "jest",
-    "test:watch": "jest --watch --coverage=false",
     "typecheck": "tsc --noEmit",
-    "typecheck:watch": "npm run typecheck -- --watch"
+    "typecheck:watch": "npm run typecheck -- --watch",
+    "prepublishOnly": "npm run test && npm run build",
+    "test": "jest",
+    "test:watch": "jest --watch --coverage=false"
   },
   "devDependencies": {
     "@types/jest": "^26.0.22",
@@ -82,5 +75,12 @@
     "randombytes": "^2.1.0",
     "triplesec": "^4.0.3",
     "zone-file": "^2.0.0-beta.3"
-  }
+  },
+  "sideEffects": false,
+  "typings": "dist/index.d.ts",
+  "main": "dist/index.js",
+  "module": "dist/esm/index.js",
+  "browser": "dist/index.umd.js",
+  "umd:main": "dist/index.umd.js",
+  "unpkg": "dist/index.umd.js"
 }
