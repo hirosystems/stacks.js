@@ -1,8 +1,8 @@
+const config = require('../../configs/webpack.config');
 const path = require('path');
-const webpack = require('webpack');
+
 module.exports = {
-  mode: 'production',
-  entry: './src/index.ts',
+  ...config,
   output: {
     library: 'StacksWalletSdk',
     libraryTarget: 'umd',
@@ -11,31 +11,6 @@ module.exports = {
   },
   resolve: {
     extensions: ['.ts', '.js'],
-    fallback: {
-      crypto: false,
-      events: false,
-      stream: false,
-    },
-  },
-  plugins: [
-    new webpack.ProvidePlugin({
-      Buffer: ['buffer', 'Buffer'],
-    }),
-  ],
-  module: {
-    rules: [
-      {
-        test: /\.tsx?$/,
-        use: [
-          {
-            loader: 'ts-loader',
-            options: {
-              transpileOnly: true,
-              configFile: 'tsconfig.build.json',
-            },
-          },
-        ],
-      },
-    ],
+    fallback: {},
   },
 };
