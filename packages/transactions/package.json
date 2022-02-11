@@ -4,10 +4,6 @@
   "description": "Javascript library for constructing transactions on the Stacks blockchain.",
   "homepage": "https://blockstack.org",
   "license": "GPL-3.0-or-later",
-  "files": [
-    "dist",
-    "src"
-  ],
   "author": {
     "name": "Blockstack PBC",
     "email": "admin@blockstack.com",
