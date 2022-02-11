@@ -54,7 +54,6 @@
   "typings": "dist/index.d.ts",
   "main": "dist/index.js",
   "module": "dist/esm/index.js",
-  "browser": "dist/index.umd.js",
   "umd:main": "dist/index.umd.js",
   "unpkg": "dist/index.umd.js"
 }
