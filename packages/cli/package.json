@@ -97,7 +97,7 @@
     "@stacks/storage": "^3.2.0",
     "@stacks/transactions": "^3.2.0",
     "@stacks/wallet-sdk": "^3.2.0",
-    "ajv": "^4.11.5",
+    "ajv": "^6.12.3",
     "bip32": "^2.0.4",
     "bip39": "^3.0.2",
     "bitcoinjs-lib": "^5.2.0",
