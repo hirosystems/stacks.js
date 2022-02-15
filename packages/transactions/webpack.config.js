@@ -6,7 +6,7 @@ module.exports = {
   output: {
     library: {
       name: 'StacksTransactions',
-      type: 'umd2',
+      type: 'umd',
     },
     filename: 'index.umd.js',
     path: path.resolve(__dirname, 'dist'),
