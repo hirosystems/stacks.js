@@ -54,6 +54,7 @@
   "scripts": {
     "bootstrap": "lerna bootstrap",
     "build": "lerna run build",
+    "build:docs": "rimraf docs && typedoc --name \"Stacks.js $npm_package_version Library Reference\" --readme ./readme.md --tsconfig tsconfig.typedoc.json --out docs --json docs/docs.json packages/**/src/index.ts",
     "clean": "lerna clean",
     "lerna": "lerna",
     "lint": "npm run lint:eslint && npm run lint:prettier",
@@ -61,7 +62,7 @@
     "lint:fix": "eslint \"packages/**/src/**/*.{ts,tsx}\" -f unix --fix",
     "lint:prettier": "prettier --check \"packages/**/src/**/*.{ts,tsx|!(d.ts)}\" *.js",
     "lint:prettier:fix": "prettier --write \"packages/**/src/**/*.{ts,tsx|!(d.ts)}\" *.js",
-    "build:docs": "rimraf docs && typedoc --name \"Stacks.js $npm_package_version Library Reference\" --readme ./readme.md --tsconfig tsconfig.typedoc.json --out docs --json docs/docs.json packages/**/src/index.ts",
+    "pack": "lerna run pack",
     "test": "lerna run test",
     "typecheck": "lerna run typecheck --parallel --no-bail --stream",
     "madge": "madge --circular --extensions ts --exclude 'd.ts' packages/"

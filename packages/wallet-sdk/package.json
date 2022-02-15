@@ -28,7 +28,8 @@
   },
   "license": "MIT",
   "files": [
-    "dist"
+    "dist",
+    "src"
   ],
   "devDependencies": {
     "@types/jest": "^26.0.22",
