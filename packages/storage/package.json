@@ -34,7 +34,9 @@
     "@stacks/common": "^3.0.0",
     "@stacks/encryption": "^3.0.0",
     "bitcoinjs-lib": "^5.2.0",
-    "jsontokens": "^3.0.0"
+    "jsontokens": "^3.0.0",
+    "webpack": "^5.68.0",
+    "webpack-cli": "^4.9.2"
   },
   "devDependencies": {
     "@types/jest": "^26.0.22",

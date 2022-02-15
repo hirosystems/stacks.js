@@ -1,16 +1,15 @@
 import { Buffer } from '@stacks/common';
 import { SmartBuffer, SmartBufferOptions } from 'smart-buffer';
 
-function createEnumChecker<T extends string, TEnumValue extends number>(
-  enumVariable: { [key in T]: TEnumValue }
-): (value: number) => value is TEnumValue {
+function createEnumChecker<T extends string, TEnumValue extends number>(enumVariable: {
+  [key in T]: TEnumValue;
+}): (value: number) => value is TEnumValue {
   // Create a set of valid enum number values.
   const enumValues = Object.values<number>(enumVariable).filter(v => typeof v === 'number');
   const enumValueSet = new Set<number>(enumValues);
   return (value: number): value is TEnumValue => enumValueSet.has(value);
 }
 
-// eslint-disable-next-line @typescript-eslint/ban-types
 const enumCheckFunctions = new Map<object, (value: number) => boolean>();
 
 /**
