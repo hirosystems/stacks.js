@@ -23,6 +23,7 @@
     "lint:prettier": "prettier --check \"src/**/*.{ts,tsx}\" *.js",
     "lint:prettier:fix": "prettier --write \"src/**/*.{ts,tsx}\" *.js",
     "depcheck": "depcheck --ignores='@types/*,eslint*,safe-buffer,codecov,@typescript-eslint/*,@blockstack/*'",
+    "pack": "npm pack",
     "prepublishOnly": "npm run test && npm run build"
   },
   "license": "MIT",

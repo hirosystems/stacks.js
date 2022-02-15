@@ -4,8 +4,10 @@ const path = require('path');
 module.exports = {
   ...config,
   output: {
-    library: 'StacksKeychain',
-    libraryTarget: 'umd',
+    library: {
+      name: 'StacksKeychain',
+      type: 'umd2',
+    },
     filename: 'index.umd.js',
     path: path.resolve(__dirname, 'dist'),
   },

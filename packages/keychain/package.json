@@ -38,6 +38,7 @@
     "clean": "rimraf dist && tsc -b tsconfig.build.json --clean",
     "typecheck": "tsc --noEmit",
     "typecheck:watch": "npm run typecheck -- --watch",
+    "pack": "npm pack",
     "prepublishOnly": "npm run test && npm run build",
     "test": "jest",
     "test:watch": "jest --watch --coverage=false"

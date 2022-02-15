@@ -4,8 +4,10 @@ const path = require('path');
 module.exports = {
   ...config,
   output: {
-    library: 'StacksWalletSdk',
-    libraryTarget: 'umd',
+    library: {
+      name: 'StacksWalletSdk',
+      type: 'umd',
+    },
     filename: 'index.umd.js',
     path: path.resolve(__dirname, 'dist'),
   },

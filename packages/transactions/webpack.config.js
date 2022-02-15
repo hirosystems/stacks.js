@@ -4,8 +4,10 @@ const path = require('path');
 module.exports = {
   ...config,
   output: {
-    library: 'StacksTransactions',
-    libraryTarget: 'umd',
+    library: {
+      name: 'StacksTransactions',
+      type: 'umd2',
+    },
     filename: 'index.umd.js',
     path: path.resolve(__dirname, 'dist'),
   },
