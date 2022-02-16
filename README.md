@@ -1,4 +1,4 @@
-# Stacks.js [![Test Action](https://github.com/hirosystems/stacks.js/actions/workflows/tests.yml/badge.svg?branch=master)](https://github.com/hirosystems/stacks.js/actions/workflows/tests.yml?query=branch%3Amaster)
+# stacks.js [![Test Action](https://github.com/hirosystems/stacks.js/actions/workflows/tests.yml/badge.svg?branch=master)](https://github.com/hirosystems/stacks.js/actions/workflows/tests.yml?query=branch%3Amaster)
 
 This repo is home to the Stacks.js libraries which provide everything you need to work with the [Stacks blockchain](https://www.stacks.co/what-is-stacks).
 
@@ -19,7 +19,7 @@ See `README` in each package directory for installation instructions and usage.
 
 ## Migrating from blockstack.js
 
-To migrate your app from blockstack.js to stacks.js follow the steps in the [migration guide](https://github.com/hirosystems/stacks.js/tree/master/migration-guide.md).
+To migrate your app from blockstack.js to stacks.js follow the steps in the [migration guide](https://github.com/hirosystems/stacks.js/tree/master/.github/MIGRATION_GUIDE.md).
 
 ## Development: environment setup
 
@@ -52,7 +52,7 @@ npm run lerna -- add lodash --scope @stacks/storage --dev
 
 ## Documentation
 
-Documentation for the Stacks.js packages is located [here](https://stacks-js-git-master-blockstack.vercel.app/).
+Documentation for the Stacks.js packages is located [here](https://stacks-js.vercel.app/).
 
 ## Contributing
 

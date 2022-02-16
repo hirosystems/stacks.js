@@ -90,6 +90,7 @@
   "dependencies": {
     "@stacks/auth": "^3.2.0",
     "@stacks/blockchain-api-client": "^0.34.1",
+    "@stacks/bns": "^3.1.0",
     "@stacks/common": "^3.0.0",
     "@stacks/network": "^3.2.0",
     "@stacks/stacking": "^3.2.0",
@@ -111,6 +112,8 @@
     "jsontokens": "^3.0.0",
     "node-fetch": "^2.6.0",
     "ripemd160": "^2.0.1",
+    "webpack": "^5.68.0",
+    "webpack-cli": "^4.9.2",
     "winston": "^3.2.1",
     "zone-file": "^2.0.0-beta.3"
   },

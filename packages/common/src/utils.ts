@@ -397,3 +397,19 @@ export function intToBigInt(value: IntegerType, signed: boolean): bigint {
 export function with0x(value: string): string {
   return !value.startsWith('0x') ? `0x${value}` : value;
 }
+
+/**
+ * Converts hex input string to bigint
+ * @param hex - hex input string without 0x prefix and in big endian format
+ * @example "6c7cde4d702830c1db34ef7c19e2776f59107afef39084776fc88bc78dbb9656"
+ */
+export function hexToBigInt(hex: string): bigint {
+  if (typeof hex !== 'string')
+    throw new TypeError('hexToNumber: expected string, got ' + typeof hex);
+  // Big Endian
+  return BigInt(`0x${hex}`);
+}
+
+export function utf8ToBytes(content: string) {
+  return new TextEncoder().encode(content);
+}
