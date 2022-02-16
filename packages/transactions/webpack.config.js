@@ -10,6 +10,7 @@ module.exports = {
     },
     filename: 'index.umd.js',
     path: path.resolve(__dirname, 'dist'),
+    globalObject: 'this',
   },
   resolve: {
     extensions: ['.ts', '.js'],
