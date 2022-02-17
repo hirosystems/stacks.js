@@ -15,6 +15,7 @@ module.exports = {
   resolve: {
     extensions: ['.ts', '.js'],
     fallback: {
+      // global: require.resolve('../../configs/polyfillGlobal.js'),
       crypto: require.resolve('crypto-browserify'),
       stream: require.resolve('stream-browserify'),
       util: require.resolve('util/'),

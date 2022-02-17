@@ -14,6 +14,8 @@ module.exports = {
   },
   resolve: {
     extensions: ['.ts', '.js'],
-    fallback: {},
+    fallback: {
+      // global: require.resolve('../../configs/polyfillGlobal.js'),
+    },
   },
 };
