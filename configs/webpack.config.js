@@ -14,6 +14,15 @@ const isProduction = process.env.NODE_ENV === NODE_ENV_PRODUCTION;
 module.exports = {
   mode: isProduction ? NODE_ENV_PRODUCTION : NODE_ENV_DEVELOPMENT,
   entry: ['./src/index.ts'],
+  output: {
+    library: {
+      // name: SET IN INDIVIDUAL `webpack.config.js` FILE
+      type: isAnalyze ? 'commonjs' : 'umd',
+    },
+    filename: 'index.js',
+    path: path.resolve(process.cwd(), 'dist/umd'),
+    globalObject: 'this', // recommended for umd bundles in webpack
+  },
   plugins: [
     new webpack.ProvidePlugin({
       Buffer: ['buffer', 'Buffer'],
@@ -24,6 +33,7 @@ module.exports = {
   optimization: {
     minimize: isProduction,
   },
+  devtool: 'source-map',
   module: {
     rules: [
       {

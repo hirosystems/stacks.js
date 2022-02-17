@@ -1,24 +1,14 @@
-const config = require('../../configs/webpack.config');
-const path = require('path');
+const config = require('../../configs/webpack.config.js');
 
-module.exports = {
-  ...config,
-  output: {
-    library: {
-      name: 'StacksWalletSdk',
-      type: 'umd',
-    },
-    filename: 'index.umd.js',
-    path: path.resolve(__dirname, 'dist'),
-    globalObject: 'this',
-  },
-  resolve: {
-    extensions: ['.ts', '.js'],
-    fallback: {
-      // global: require.resolve('../../configs/polyfillGlobal.js'),
-      assert: require.resolve('assert/'),
-      crypto: require.resolve('crypto-browserify'),
-      stream: require.resolve('stream-browserify'),
-    },
+config.output.library.name = 'StacksWalletSdk';
+
+config.resolve = {
+  extensions: ['.ts', '.js'],
+  fallback: {
+    assert: require.resolve('assert/'),
+    crypto: require.resolve('crypto-browserify'),
+    stream: require.resolve('stream-browserify'),
   },
 };
+
+module.exports = config;
