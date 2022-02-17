@@ -1,4 +1,3 @@
-# top-most EditorConfig file
 root = true
 
 [*.{js,ts,json}]

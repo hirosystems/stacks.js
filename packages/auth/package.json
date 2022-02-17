@@ -46,7 +46,9 @@
     "c32check": "^1.1.3",
     "cross-fetch": "^3.1.4",
     "jsontokens": "^3.0.0",
-    "query-string": "^6.13.1"
+    "query-string": "^6.13.1",
+    "webpack": "^5.68.0",
+    "webpack-cli": "^4.9.2"
   },
   "devDependencies": {
     "@types/jest": "^26.0.22",

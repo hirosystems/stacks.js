@@ -98,7 +98,7 @@
     "@stacks/storage": "^3.2.0",
     "@stacks/transactions": "^3.2.0",
     "@stacks/wallet-sdk": "^3.2.0",
-    "ajv": "^4.11.5",
+    "ajv": "^6.12.3",
     "bip32": "^2.0.6",
     "bip39": "^3.0.2",
     "bitcoinjs-lib": "^5.2.0",
@@ -113,6 +113,8 @@
     "jsontokens": "^3.0.0",
     "node-fetch": "^2.6.0",
     "ripemd160": "^2.0.1",
+    "webpack": "^5.68.0",
+    "webpack-cli": "^4.9.2",
     "winston": "^3.2.1",
     "zone-file": "^2.0.0-beta.3"
   },

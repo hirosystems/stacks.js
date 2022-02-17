@@ -1,37 +1,6 @@
+import { StacksMainnet, StacksTestnet } from '@stacks/network';
 import * as fs from 'fs';
-
-import {
-  makeUnsignedSTXTokenTransfer,
-  makeContractDeploy,
-  makeUnsignedContractDeploy,
-  makeContractCall,
-  makeStandardSTXPostCondition,
-  makeContractSTXPostCondition,
-  makeStandardFungiblePostCondition,
-  makeContractFungiblePostCondition,
-  makeStandardNonFungiblePostCondition,
-  makeContractNonFungiblePostCondition,
-  broadcastTransaction,
-  getNonce,
-  TxBroadcastResult,
-  TxBroadcastResultOk,
-  TxBroadcastResultRejected,
-  callReadOnlyFunction,
-  sponsorTransaction,
-  makeSTXTokenTransfer,
-  makeUnsignedContractCall,
-  estimateTransaction,
-  SignedTokenTransferOptions
-} from '../src/builders';
-
-import { deserializeTransaction, StacksTransaction } from '../src/transaction';
-
-import { createTokenTransferPayload, serializePayload, TokenTransferPayload } from '../src/payload';
-
-import { BufferReader } from '../src/bufferReader';
-
-import { createAssetInfo } from '../src/postcondition-types';
-
+import fetchMock from 'jest-fetch-mock';
 import {
   createSingleSigSpendingCondition,
   createSponsoredAuth,
@@ -42,28 +11,30 @@ import {
   SingleSigSpendingCondition,
   SponsoredAuthorization, StandardAuthorization
 } from '../src/authorization';
-import { createTransactionAuthField } from '../src/signature';
+import { BufferReader } from '../src/bufferReader';
+import {
+  broadcastTransaction, callReadOnlyFunction, estimateTransaction, getNonce, makeContractCall, makeContractDeploy, makeContractFungiblePostCondition, makeContractNonFungiblePostCondition, makeContractSTXPostCondition,
+  makeStandardFungiblePostCondition, makeStandardNonFungiblePostCondition, makeStandardSTXPostCondition, makeSTXTokenTransfer,
+  makeUnsignedContractCall, makeUnsignedContractDeploy, makeUnsignedSTXTokenTransfer, SignedTokenTransferOptions, sponsorTransaction, TxBroadcastResult,
+  TxBroadcastResultOk,
+  TxBroadcastResultRejected
+} from '../src/builders';
+import { bufferCV, bufferCVFromString, serializeCV, standardPrincipalCV } from '../src/clarity';
 import { createMessageSignature } from '../src/common';
 import {
-  DEFAULT_CORE_NODE_API_URL,
+  AddressHashMode,
+  AnchorMode, AuthType, DEFAULT_CORE_NODE_API_URL,
   FungibleConditionCode,
   NonFungibleConditionCode,
-  PostConditionMode,
-  TxRejectedReason,
-  AuthType,
-  AddressHashMode,
-  AnchorMode,
-  PubKeyEncoding, TransactionVersion,
+  PostConditionMode, PubKeyEncoding, TransactionVersion, TxRejectedReason
 } from '../src/constants';
-
-import { StacksTestnet, StacksMainnet } from '@stacks/network';
-
-import { bufferCV, standardPrincipalCV, bufferCVFromString, serializeCV } from '../src/clarity';
-
 import { ClarityAbi } from '../src/contract-abi';
 import { createStacksPrivateKey, isCompressed, pubKeyfromPrivKey, publicKeyToString } from '../src/keys';
+import { createTokenTransferPayload, serializePayload, TokenTransferPayload } from '../src/payload';
+import { createAssetInfo } from '../src/postcondition-types';
+import { createTransactionAuthField } from '../src/signature';
 import { TransactionSigner } from '../src/signer';
-import fetchMock from 'jest-fetch-mock';
+import { deserializeTransaction, StacksTransaction } from '../src/transaction';
 import { cloneDeep } from '../src/utils';
 
 function setSignature(unsignedTransaction: StacksTransaction, signature: string | Buffer): StacksTransaction {
@@ -1014,7 +985,7 @@ test('make a multi-sig contract call', async () => {
   );
 });
 
-test.skip('Estimate transaction transfer fee', async () => {
+test('Estimate transaction transfer fee', async () => {
   const recipient = standardPrincipalCV('SP3FGQ8Z7JY9BWYZ5WM53E0M9NK7WHJF0691NZ159');
   const amount = 12345;
   const fee = 0;
@@ -1083,8 +1054,8 @@ test.skip('Estimate transaction transfer fee', async () => {
     transaction_payload: serializePayload(transaction.payload).toString('hex'),
     estimated_len: transactionByteLength
   }));
-  expect(resultEstimateFee).toEqual([140, 17, 125]);
-  expect(resultEstimateFee2).toEqual([140, 17, 125]);
+  expect(resultEstimateFee.map(f => f.fee)).toEqual([140, 17, 125]);
+  expect(resultEstimateFee2.map(f => f.fee)).toEqual([140, 17, 125]);
 });
 
 test('Make STX token transfer with fetch account nonce', async () => {
@@ -1236,7 +1207,7 @@ test('Make sponsored STX token transfer', async () => {
   expect(deserializedPayload.amount.toString()).toBe(amount.toString());
 });
 
-test.skip('Make sponsored STX token transfer with sponsor fee estimate', async () => {
+test('Make sponsored STX token transfer with sponsor fee estimate', async () => {
   const recipient = standardPrincipalCV('SP3FGQ8Z7JY9BWYZ5WM53E0M9NK7WHJF0691NZ159');
   const amount = 12345;
   const fee = 50;
@@ -1299,7 +1270,7 @@ test.skip('Make sponsored STX token transfer with sponsor fee estimate', async (
   const sponsorSignedTx = await sponsorTransaction(sponsorOptions);
 
   expect(fetchMock.mock.calls.length).toEqual(1);
-  expect(fetchMock.mock.calls[0][0]).toEqual(network.getTransferFeeEstimateApiUrl());
+  expect(fetchMock.mock.calls[0][0]).toEqual(network.getTransactionFeeEstimateApiUrl());
 
   const sponsorSignedTxSerialized = sponsorSignedTx.serialize();
 
