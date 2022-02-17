@@ -1981,9 +1981,9 @@ export const CLI_ARGS = {
       type: 'array',
       items: [
         {
-          name: 'blockstack_id',
+          name: 'fully-qualified-name',
           type: 'string',
-          realtype: 'on-chain-blockstack_id',
+          realtype: 'on-chain-fully-qualified-name',
           pattern: NAME_PATTERN,
         },
         {
@@ -1993,15 +1993,9 @@ export const CLI_ARGS = {
           pattern: PRIVATE_KEY_PATTERN,
         },
         {
-          name: 'payment_key',
+          name: 'salt',
           type: 'string',
-          realtype: 'private_key',
-          pattern: `${PRIVATE_KEY_PATTERN_ANY}`,
-        },
-        {
-          name: 'gaia_hub',
-          type: 'string',
-          realtype: 'url',
+          realtype: 'text',
         },
         {
           name: 'zonefile',
@@ -2010,7 +2004,7 @@ export const CLI_ARGS = {
         },
       ],
       minItems: 4,
-      maxItems: 5,
+      maxItems: 4,
       help:
         'If you are trying to register a name for a *private key*, use this command.\n' +
         '\n' +
@@ -2039,9 +2033,7 @@ export const CLI_ARGS = {
         'Example:\n' +
         '\n' +
         '    $ export OWNER="136ff26efa5db6f06b28f9c8c7a0216a1a52598045162abfe435d13036154a1b01"\n' +
-        '    $ export PAYMENT="bfeffdf57f29b0cc1fab9ea197bb1413da2561fe4b83e962c7f02fbbe2b1cd5401"\n' +
-        '    $ stx register example.id "$OWNER" "$PAYMENT" https://hub.blockstack.org\n' +
-        '    9bb908bfd4ab221f0829167a461229172184fc825a012c4e551533aa283207b1\n' +
+        '    $ stx register example.id "$OWNER" salt zonfile' +
         '\n',
       group: 'Blockstack ID Management',
     },
@@ -2473,16 +2465,10 @@ export const CLI_ARGS = {
       type: 'array',
       items: [
         {
-          name: 'blockstack_id',
+          name: 'fully-qualified-name',
           type: 'string',
-          realtype: 'on-chain-blockstack_id',
+          realtype: 'on-chain-fully-qualified-name',
           pattern: NAME_PATTERN,
-        },
-        {
-          name: 'id_address',
-          type: 'string',
-          realtype: 'id-address',
-          pattern: ID_ADDRESS_PATTERN,
         },
         {
           name: 'payment_key',
@@ -2490,9 +2476,19 @@ export const CLI_ARGS = {
           realtype: 'private_key',
           pattern: `${PRIVATE_KEY_PATTERN_ANY}`,
         },
+        {
+          name: 'salt',
+          type: 'string',
+          realtype: 'text',
+        },
+        {
+          name: 'stx_to_burn',
+          type: 'string',
+          realtype: 'number',
+        },
       ],
-      minItems: 3,
-      maxItems: 3,
+      minItems: 4,
+      maxItems: 4,
       help:
         'Generate and send `NAME_PREORDER` transaction, for a Blockstack ID to be owned ' +
         'by a given `ID_ADDRESS`.  The name cost will be paid for by the gven `PAYMENT_KEY`.  The ' +
@@ -2500,7 +2496,13 @@ export const CLI_ARGS = {
         'generating the name preorder hash.\n' +
         '\n' +
         'This is a low-level command that only experienced Blockstack developers should use.  ' +
-        'If you just want to register a name, use the "register" command.\n',
+        'If you just want to register a name, use the "register" command.\n' +
+        '\n' +
+        'Example:\n' +
+        '\n' +
+        '    $ export PAYMENT="136ff26efa5db6f06b28f9c8c7a0216a1a52598045162abfe435d13036154a1b01"\n' +
+        '    $ stx tx_preorder example.id "$PAYMENT" salt 1000' +
+        '\n',
       group: 'Blockstack ID Management',
     },
     tx_register: {
