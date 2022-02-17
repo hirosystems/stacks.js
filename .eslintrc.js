@@ -13,6 +13,7 @@ module.exports = {
       tryExtensions: ['.ts'],
     },
   },
+  ignorePatterns: ['**/*.js'],
   rules: {
     '@typescript-eslint/explicit-module-boundary-types': [0],
     '@typescript-eslint/prefer-regexp-exec': [0],
@@ -22,6 +23,7 @@ module.exports = {
     '@typescript-eslint/no-unnecessary-type-assertion': [0],
 
     // TODO: enable the `no-unsafe-*` rules
+    '@typescript-eslint/no-unsafe-argument': [0],
     '@typescript-eslint/no-unsafe-assignment': [0],
     '@typescript-eslint/no-unsafe-call': [0],
     '@typescript-eslint/no-unsafe-return': [0],

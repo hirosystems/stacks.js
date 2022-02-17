@@ -39,7 +39,9 @@
     "elliptic": "^6.5.4",
     "randombytes": "^2.1.0",
     "ripemd160-min": "^0.0.6",
-    "sha.js": "^2.4.11"
+    "sha.js": "^2.4.11",
+    "webpack": "^5.68.0",
+    "webpack-cli": "^4.9.2"
   },
   "devDependencies": {
     "@peculiar/webcrypto": "^1.1.6",

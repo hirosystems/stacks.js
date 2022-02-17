@@ -49,4 +49,8 @@ dist
 
 *.tsbuildinfo
 
+# auto-generated typedoc
 docs
+
+# from previous .npmignore
+unused
