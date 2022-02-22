@@ -16,7 +16,7 @@ module.exports = {
   entry: ['./src/index.ts'],
   output: {
     library: {
-      // name: SET IN INDIVIDUAL `webpack.config.js` FILE
+      // name: is set in package config
       type: isAnalyze ? 'commonjs' : 'umd',
     },
     filename: 'index.js',
@@ -50,5 +50,22 @@ module.exports = {
         ],
       },
     ],
+  },
+  resolve: {
+    extensions: ['.ts', '.js'],
+    alias: {
+      '@stacks/auth': '@stacks/auth/dist/umd',
+      '@stacks/bns': '@stacks/bns/dist/umd',
+      '@stacks/common': '@stacks/common/dist/umd',
+      '@stacks/encryption': '@stacks/encryption/dist/umd',
+      '@stacks/keychain': '@stacks/keychain/dist/umd',
+      '@stacks/network': '@stacks/network/dist/umd',
+      '@stacks/profile': '@stacks/profile/dist/umd',
+      '@stacks/stacking': '@stacks/stacking/dist/umd',
+      '@stacks/storage': '@stacks/storage/dist/umd',
+      '@stacks/transactions': '@stacks/transactions/dist/umd',
+      '@stacks/wallet-sdk': '@stacks/wallet-sdk/dist/umd',
+    },
+    fallback: {}, // override in package configs
   },
 };
