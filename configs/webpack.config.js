@@ -66,6 +66,6 @@ module.exports = {
       '@stacks/transactions': '@stacks/transactions/dist/umd',
       '@stacks/wallet-sdk': '@stacks/wallet-sdk/dist/umd',
     },
-    fallback: {}, // override in package configs
+    // fallback: is set in package config
   },
 };
