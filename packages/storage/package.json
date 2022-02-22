@@ -15,7 +15,7 @@
   },
   "scripts": {
     "start": "tsc -b tsconfig.build.json --watch --verbose",
-    "build": "npm run clean && npm run build:cjs && npm run build:esm && npm run build:umd",
+    "build": "npm run clean && npm run build:cjs && npm run build:esm && npm run build:umd && npm run build:polyfill",
     "build:cjs": "tsc -b tsconfig.build.json",
     "build:esm": "tsc -p tsconfig.build.json --module ES6 --outDir ./dist/esm",
     "build:umd": "webpack --config webpack.config.js",
