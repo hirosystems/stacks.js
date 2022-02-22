@@ -22,7 +22,7 @@
     "build:cjs": "tsc -b tsconfig.build.json",
     "build:esm": "tsc -p tsconfig.build.json --module ES6 --outDir ./dist/esm",
     "build:umd": "webpack --config webpack.config.js",
-    "build:polyfill": "NODE_OPTIONS=--max-old-space-size=8192 rollup -c ../../configs/rollup.config.js",
+    "build:polyfill": "NODE_OPTIONS=--max-old-space-size=8192 rollup -c ../../configs/rollup.config.js && rimraf dist/polyfill/dist",
     "clean": "rimraf dist && tsc -b tsconfig.build.json --clean",
     "typecheck": "tsc --noEmit",
     "typecheck:watch": "npm run typecheck -- --watch",
@@ -38,9 +38,7 @@
     "@types/node": "^14.14.43",
     "bn.js": "^5.2.0",
     "buffer": "^6.0.3",
-    "cross-fetch": "^3.1.4",
-    "webpack": "^5.68.0",
-    "webpack-cli": "^4.9.2"
+    "cross-fetch": "^3.1.4"
   },
   "devDependencies": {
     "@rollup/plugin-typescript": "^8.3.0",
