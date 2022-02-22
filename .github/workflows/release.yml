@@ -15,7 +15,6 @@ jobs:
   release:
     name: Release
     runs-on: ubuntu-latest
-    # Only run on non-PR events or only PRs that aren't from forks
     if: github.event_name == 'push'
     steps:
       - uses: actions/checkout@v2
