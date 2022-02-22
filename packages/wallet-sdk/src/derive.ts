@@ -214,7 +214,7 @@ export const fetchUsernameForAccountByDerivationType = async ({
   rootNode: BIP32Interface;
   index: number;
   derivationType: DerivationType.Wallet | DerivationType.Data;
-  network?: StacksNetwork;
+  network: StacksNetwork;
 }): Promise<{
   username: string | undefined;
 }> => {

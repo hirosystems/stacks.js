@@ -24,7 +24,7 @@ export async function restoreWalletAccounts({
 }: {
   wallet: Wallet;
   gaiaHubUrl: string;
-  network?: StacksNetwork;
+  network: StacksNetwork;
 }): Promise<Wallet> {
   const hubInfo = await getHubInfo(gaiaHubUrl);
   const rootNode = getRootNode(wallet);
