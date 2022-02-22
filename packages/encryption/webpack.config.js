@@ -2,12 +2,9 @@ const config = require('../../configs/webpack.config.js');
 
 config.output.library.name = 'StacksEncryption';
 
-config.resolve = {
-  extensions: ['.ts', '.js'],
-  fallback: {
-    crypto: require.resolve('crypto-browserify'),
-    stream: require.resolve('stream-browserify'),
-  },
+config.resolve.fallback = {
+  crypto: require.resolve('crypto-browserify'),
+  stream: require.resolve('stream-browserify'),
 };
 
 module.exports = config;
