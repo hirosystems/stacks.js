@@ -9,7 +9,7 @@
     "build:cjs": "tsc -b tsconfig.build.json",
     "build:esm": "tsc -p tsconfig.build.json --module ES6 --outDir ./dist/esm",
     "build:umd": "webpack --config webpack.config.js",
-    "build:rollup": "NODE_OPTIONS=--max-old-space-size=8192 rollup -c ../../configs/rollup.config.js",
+    "build:polyfill": "NODE_OPTIONS=--max-old-space-size=8192 rollup -c ../../configs/rollup.config.js",
     "build:esbuild": "node ../../configs/esbuild.mjs",
     "build:vite": "vite build --config ../../configs/vite.config.js",
     "clean": "rimraf dist && tsc -b tsconfig.build.json --clean",
