@@ -17,6 +17,41 @@ This repo is home to the Stacks.js libraries which provide everything you need t
 
 See `README` in each package directory for installation instructions and usage.
 
+## Importing & Polyfills
+
+Most of the stacks.js packages are released in multiple different forms.
+These typically include:
+
+- `commonjs` under `/dist`
+- `esm` under `/dist/esm`
+- `umd` (with all dependencies bundled and polyfilled for the browser) under `/dist/umd`
+
+- an additional `esm` bundle (with external dependecies bundled and polyfilled for the browser) under `/dist/polyfill`
+
+Build systems try to be smart and auto-detect the correct type.
+But you can specify which type to import as follows:
+
+```js
+import { generateSecretKey } from '@stacks/wallet-sdk'; // auto-detect
+import { generateSecretKey } from '@stacks/wallet-sdk/dist/polyfill'; // esm bundle
+const walletSdk = require('@stacks/wallet-sdk'); // auto-detect
+const walletSdk = require('@stacks/wallet-sdk/dist/umd'); // umd bundle
+// ...
+```
+
+The following package types have been observed to work well out-of-the-bow with common frameworks.
+
+| Framework | Type             |
+| --------- | ---------------- |
+| React     | `/dist/umd`      |
+| Vue       | `/dist/umd`      |
+| Next.js   | _auto-detect_    |
+| Svelte    | `/dist/polyfill` |
+
+For production builds it is recommended to configure the respective build system to optimize further.
+For more fine-grained control, import using `esm` and configure your build system to polyfill any necessary dependencies.
+We are currently working to get rid of many dependencies to remove the need for complex configuration.
+
 ## Migrating from blockstack.js
 
 To migrate your app from blockstack.js to stacks.js follow the steps in the [migration guide](https://github.com/hirosystems/stacks.js/tree/master/.github/MIGRATION_GUIDE.md).
