@@ -6,6 +6,7 @@ import resolve from '@rollup/plugin-node-resolve';
 import replace from '@rollup/plugin-replace';
 import typescript from '@rollup/plugin-typescript';
 import globals from 'rollup-plugin-node-globals';
+import { terser } from 'rollup-plugin-terser';
 
 export default {
   input: 'src/index.ts',
@@ -70,5 +71,6 @@ export default {
       // todo: ignore non-english wordlists (currently causes commonjs to ignore needed deps)
       // proposed regex: include: /^(?!.*wordlist(?!.*english)).*/,
     }),
+    terser(),
   ],
 };
