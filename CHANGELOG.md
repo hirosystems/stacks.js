@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.2.1-beta.0](https://github.com/hirosystems/stacks.js/compare/v3.2.0...v3.2.1-beta.0) (2022-02-23)
+
+
+### Bug Fixes
+
+* add preorder name command in cli ([ca76f06](https://github.com/hirosystems/stacks.js/commit/ca76f06cda82623ca48b3d623da6f2c5cb2851c6))
+* add register command in cli ([85c7dd9](https://github.com/hirosystems/stacks.js/commit/85c7dd9d770aba5c6a60b8702bb57239c7fd14bc))
+* use noble-secp256k1 in transaction to replace elliptic dependency ([534f1b8](https://github.com/hirosystems/stacks.js/commit/534f1b8acf5ab1267860af0d2a9f1ba19bb35303))
+
+
+
+
+
 # [3.2.0](https://github.com/blockstack/blockstack.js/compare/v3.1.1...v3.2.0) (2022-02-02)
 
 

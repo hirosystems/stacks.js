@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.2.1-beta.0](https://github.com/blockstack/blockstack.js/compare/v3.2.0...v3.2.1-beta.0) (2022-02-23)
+
+
+### Bug Fixes
+
+* add preorder name command in cli ([ca76f06](https://github.com/blockstack/blockstack.js/commit/ca76f06cda82623ca48b3d623da6f2c5cb2851c6))
+* add register command in cli ([85c7dd9](https://github.com/blockstack/blockstack.js/commit/85c7dd9d770aba5c6a60b8702bb57239c7fd14bc))
+
+
+
+
+
 # [3.2.0](https://github.com/blockstack/blockstack.js/compare/v3.1.1...v3.2.0) (2022-02-02)
 
 **Note:** Version bump only for package @stacks/cli
