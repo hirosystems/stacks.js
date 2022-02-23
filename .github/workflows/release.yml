@@ -1,3 +1,4 @@
+# based on: https://github.com/hirosystems/gh-actions-example/blob/main/.github/workflows/ci.yml
 name: release
 
 on:
@@ -5,42 +6,43 @@ on:
     branches:
       - master
     tags-ignore:
-      - '**'
+      - "**"
     paths-ignore:
-      - '**/CHANGELOG.md'
-      - '**/package.json'
-      - 'docs/**'
-  pull_request:
-  workflow_dispatch:
+      - "**/CHANGELOG.md"
+      - "**/package.json"
+
 jobs:
   release:
     name: Release
     runs-on: ubuntu-latest
-    # Only run on non-PR events or only PRs that aren't from forks
-    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+    if: github.event_name == 'push'
     steps:
       - uses: actions/checkout@v2
+
       - name: Set Node Version
         uses: actions/setup-node@v2
         with:
           node-version: 16
+
       - name: Install dependencies
-        run: npm i
+        run: npm install
 
       - name: Bootstrap
         run: npm run bootstrap
 
-      - name: Generate docs
-        run: npm run build:docs
+      - name: Test
+        run: npm run test
 
-      - name: Semantic Release
-        uses: cycjimmy/semantic-release-action@v2
+      - name: Build
+        run: npm run build
+
+      - name: "Release: Version"
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          lerna version --conventional-commits --conventional-prerelease --preid beta --yes
+
+      - name: "Release: Publish"
+        run: lerna publish from-git --pre-dist-tag beta --yes
         env:
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN || secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-          NODE_OPTIONS: --max-old-space-size=4096
-          SEMANTIC_RELEASE_PACKAGE: ${{ github.event.repository.name }} # Always needed
-        with:
-          extra_plugins: |
-            @semantic-release/changelog
-            @semantic-release/git
