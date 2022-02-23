@@ -985,7 +985,7 @@ test('make a multi-sig contract call', async () => {
   );
 });
 
-test.skip('Estimate transaction transfer fee', async () => {
+test('Estimate transaction transfer fee', async () => {
   const recipient = standardPrincipalCV('SP3FGQ8Z7JY9BWYZ5WM53E0M9NK7WHJF0691NZ159');
   const amount = 12345;
   const fee = 0;
@@ -1054,8 +1054,8 @@ test.skip('Estimate transaction transfer fee', async () => {
     transaction_payload: serializePayload(transaction.payload).toString('hex'),
     estimated_len: transactionByteLength
   }));
-  expect(resultEstimateFee).toEqual([140, 17, 125]);
-  expect(resultEstimateFee2).toEqual([140, 17, 125]);
+  expect(resultEstimateFee.map(f => f.fee)).toEqual([140, 17, 125]);
+  expect(resultEstimateFee2.map(f => f.fee)).toEqual([140, 17, 125]);
 });
 
 test('Make STX token transfer with fetch account nonce', async () => {
@@ -1207,7 +1207,7 @@ test('Make sponsored STX token transfer', async () => {
   expect(deserializedPayload.amount.toString()).toBe(amount.toString());
 });
 
-test.skip('Make sponsored STX token transfer with sponsor fee estimate', async () => {
+test('Make sponsored STX token transfer with sponsor fee estimate', async () => {
   const recipient = standardPrincipalCV('SP3FGQ8Z7JY9BWYZ5WM53E0M9NK7WHJF0691NZ159');
   const amount = 12345;
   const fee = 50;
@@ -1270,7 +1270,7 @@ test.skip('Make sponsored STX token transfer with sponsor fee estimate', async (
   const sponsorSignedTx = await sponsorTransaction(sponsorOptions);
 
   expect(fetchMock.mock.calls.length).toEqual(1);
-  expect(fetchMock.mock.calls[0][0]).toEqual(network.getTransferFeeEstimateApiUrl());
+  expect(fetchMock.mock.calls[0][0]).toEqual(network.getTransactionFeeEstimateApiUrl());
 
   const sponsorSignedTxSerialized = sponsorSignedTx.serialize();
 
