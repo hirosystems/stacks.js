@@ -25,16 +25,24 @@ jobs:
           node-version: 16
 
       - name: Install dependencies
-        run: npm install
+        run: |
+          npm install
+          git status
 
       - name: Bootstrap
-        run: npm run bootstrap
+        run: |
+          npm run bootstrap
+          git status
 
       - name: Test
-        run: npm run test
+        run: |
+          npm run test
+          git status
 
       - name: Build
-        run: npm run build
+        run: |
+          NODE_ENV=production npm run build
+          git status
 
       - name: "Release: Version"
         run: |
