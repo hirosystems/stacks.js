@@ -41,16 +41,23 @@ const walletSdk = require('@stacks/wallet-sdk/dist/umd'); // umd bundle
 
 The following package types have been observed to work well out-of-the-bow with common frameworks.
 
-| Framework | Type             |
+| Framework | Import Type      |
 | --------- | ---------------- |
 | React     | `/dist/umd`      |
-| Vue       | `/dist/umd`      |
 | Next.js   | _auto-detect_    |
+| Vue       | `/dist/umd`      |
 | Svelte    | `/dist/polyfill` |
 
 For production builds it is recommended to configure the respective build system to optimize further.
 For more fine-grained control, import using `esm` and configure your build system to polyfill any necessary dependencies.
+You could also `alias` the packages to their `/dist/<TYPE>` alternative.
+E.g., if you are already polyfilling in webpack, add a `resolve.alias` section [like this](https://github.com/janniks/stacks-wallet-web/blob/fea34ecfa667518ea9eecdf3b8161aa8e3fad1e3/webpack/webpack.config.base.js#L72-L82).
+
 We are currently working to get rid of many dependencies to remove the need for complex configuration.
+For now, if you are seeing problems, try the `/dist/umd` import.
+Otherwise, [open a new issue](https://github.com/hirosystems/stacks.js/issues/new/choose) with details on your build setup.
+
+> We're currently seeing some problems with the `/dist/polyfill` of the `@stacks/encryption` package — use the `/dist/umd` imports here instead.
 
 ## Migrating from blockstack.js
 
