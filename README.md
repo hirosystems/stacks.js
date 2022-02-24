@@ -39,7 +39,7 @@ const walletSdk = require('@stacks/wallet-sdk/dist/umd'); // umd bundle
 // ...
 ```
 
-The following package types have been observed to work well out-of-the-bow with common frameworks.
+The following package types have been observed to work well out-of-the-box with common frameworks.
 
 | Framework | Import Type      |
 | --------- | ---------------- |
