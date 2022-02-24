@@ -29,7 +29,7 @@ jobs:
 
       - name: Bootstrap
         run: |
-          npm run lerna bootstrap
+          npx lerna bootstrap
           if [[ -n $(git status -s) ]]; then
             echo "Error: file tree is not clean"
             git status
@@ -46,9 +46,9 @@ jobs:
         run: |
           git config user.name github-actions
           git config user.email github-actions@github.com
-          npm run lerna version --conventional-commits --conventional-prerelease --preid beta --yes
+          npx lerna version --conventional-commits --conventional-prerelease --preid beta --yes
 
       - name: "Release: Publish"
-        run: npm run lerna publish from-git --pre-dist-tag beta --yes
+        run: npx lerna publish from-git --pre-dist-tag beta --yes
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
