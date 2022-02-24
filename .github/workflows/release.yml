@@ -25,13 +25,11 @@ jobs:
           node-version: 16
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
       - name: Bootstrap
-        run: npm run lerna bootstrap
-
-      - name: Ensure clean tree
         run: |
+          npm run lerna bootstrap
           if [[ -n $(git status -s) ]]; then
             echo "Error: file tree is not clean"
             git status
