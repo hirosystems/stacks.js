@@ -25,32 +25,32 @@ jobs:
           node-version: 16
 
       - name: Install dependencies
-        run: |
-          npm install
-          git status
+        run: npm install
 
       - name: Bootstrap
+        run: npm run lerna bootstrap
+
+      - name: Ensure clean tree
         run: |
-          npm run bootstrap
-          git status
+          if [[ -n $(git status -s) ]]; then
+            echo "Error: file tree is not clean"
+            git status
+            exit 1
+          fi
 
       - name: Test
-        run: |
-          npm run test
-          git status
+        run: npm run test
 
       - name: Build
-        run: |
-          NODE_ENV=production npm run build
-          git status
+        run: NODE_ENV=production npm run build
 
       - name: "Release: Version"
         run: |
           git config user.name github-actions
           git config user.email github-actions@github.com
-          lerna version --conventional-commits --conventional-prerelease --preid beta --yes
+          npm run lerna version --conventional-commits --conventional-prerelease --preid beta --yes
 
       - name: "Release: Publish"
-        run: lerna publish from-git --pre-dist-tag beta --yes
+        run: npm run lerna publish from-git --pre-dist-tag beta --yes
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
