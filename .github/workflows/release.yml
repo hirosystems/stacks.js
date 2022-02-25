@@ -43,12 +43,9 @@ jobs:
         run: NODE_ENV=production npm run build
 
       - name: "Release: Version"
-        run: |
-          git config user.name github-actions
-          git config user.email github-actions@github.com
-          npx lerna version --conventional-commits --conventional-prerelease --preid beta --yes
+        run: npx lerna version --conventional-commits --conventional-prerelease --preid beta --no-git-tag-version --no-push --yes
 
       - name: "Release: Publish"
-        run: npx lerna publish from-git --pre-dist-tag beta --yes
+        run: npx lerna publish --pre-dist-tag beta --yes
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
