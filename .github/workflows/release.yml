@@ -46,9 +46,7 @@ jobs:
         run: npx lerna version --conventional-commits --conventional-prerelease --preid beta --no-push --yes
 
       - name: "Release: Publish"
-        run: |
-          git commit --all --message "commit changes for publish; should not be pushed"
-          npx lerna publish --pre-dist-tag beta --no-git-reset --yes
+        run: npx lerna publish --pre-dist-tag beta --yes
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
