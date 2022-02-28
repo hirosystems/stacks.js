@@ -43,9 +43,14 @@ jobs:
         run: NODE_ENV=production npm run build
 
       - name: "Release: Version"
-        run: npx lerna version --conventional-commits --conventional-prerelease --preid beta --no-git-tag-version --no-push --yes
+        run: npx lerna version --conventional-commits --conventional-prerelease --preid beta --no-push --yes
 
       - name: "Release: Publish"
-        run: npx lerna publish --pre-dist-tag beta --no-git-reset --yes
+        run: |
+          git commit --all --message "commit changes for publish; should not be pushed"
+          npx lerna publish --pre-dist-tag beta --no-git-reset --yes
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: "Release: Push Tag"
+        run: git push origin $(git describe --abbrev=0 --tags)
