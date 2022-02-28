@@ -1,15 +1,28 @@
 import { Buffer } from '@stacks/common';
-import { ec as EllipticCurve } from 'elliptic';
+import { getPublicKey, getSharedSecret, utils, signSync, verify, Point } from '@noble/secp256k1';
 import * as BN from 'bn.js';
-import { randomBytes } from './cryptoRandom';
 import { FailedDecryptionError } from '@stacks/common';
 import { getPublicKeyFromPrivate } from './keys';
 import { hashSha256Sync, hashSha512Sync } from './sha2Hash';
 import { createHmacSha256 } from './hmacSha256';
 import { createCipher } from './aesCipher';
 import { getAesCbcOutputLength, getBase64OutputLength } from './utils';
+import { hmac } from '@noble/hashes/hmac';
+import { sha256 } from '@noble/hashes/sha256';
+import { hexToBytes, concatBytes } from '@noble/hashes/utils';
 
-const ecurve = new EllipticCurve('secp256k1');
+/**
+ * To use secp256k1.signSync set utils.hmacSha256Sync to a function using noble-hashes
+ * secp256k1.signSync is the counter part of secp256k1.sign (async version)
+ * secp256k1.signSync is used within signECDSA in this file
+ * secp256k1.signSync is used to maintain the semantics of signECDSA while migrating from elliptic lib
+ * utils.hmacSha256Sync docs: https://github.com/paulmillr/noble-secp256k1 readme file
+ */
+utils.hmacSha256Sync = (key: Uint8Array, ...msgs: Uint8Array[]) => {
+  const h = hmac.create(sha256, key);
+  msgs.forEach(msg => h.update(msg));
+  return h.digest();
+};
 
 /**
  * Controls how the encrypted data buffer will be encoded as a string in the JSON payload.
@@ -146,15 +159,20 @@ function isValidPublicKey(pub: string): {
 
   if (!allHexChars(pub)) return invalidFormat;
 
-  // validate the public key
-  const secp256k1 = new EllipticCurve('secp256k1');
   try {
-    const keyPair = secp256k1.keyFromPublic(Buffer.from(pub, 'hex'));
-    const result = keyPair.validate();
+    // Converts public key to Point
+    const point = Point.fromHex(pub);
+
+    // Verify point on curve is valid if it conforms to equation
+    // Validate the public key
+    // Throws: Point is not on elliptic curve if point is not on curve
+    point.assertValidity();
+
+    // Validation passed
     return {
-      result: result.result,
-      reason_data: result.reason,
-      reason: result.result ? null : InvalidPublicKeyReason.IsNotPoint,
+      result: true,
+      reason_data: null,
+      reason: null,
     };
   } catch (e) {
     return invalidPoint;
@@ -325,27 +343,27 @@ export async function encryptECIES(
   if (!validity.result) {
     throw validity;
   }
-  const ecPK = ecurve.keyFromPublic(publicKey, 'hex').getPublic();
-  const ephemeralSK = ecurve.genKeyPair();
-  const ephemeralPK = Buffer.from(ephemeralSK.getPublic().encodeCompressed());
-  const sharedSecret = ephemeralSK.derive(ecPK) as BN;
-  const sharedSecretBuffer = getBufferFromBN(sharedSecret);
-  const sharedKeys = sharedSecretToKeys(sharedSecretBuffer);
-
-  const initializationVector = randomBytes(16);
+  const ephemeralPrivateKey = utils.randomPrivateKey();
+  const ephemeralPublicKey = getPublicKey(ephemeralPrivateKey, true);
+  let sharedSecret = getSharedSecret(ephemeralPrivateKey, publicKey, true);
+  // Trim the compressed mode prefix byte
+  sharedSecret = sharedSecret.slice(1);
+  const sharedKeys = sharedSecretToKeys(Buffer.from(sharedSecret));
+  const initializationVector = utils.randomBytes(16);
 
   const cipherText = await aes256CbcEncrypt(
-    initializationVector,
+    Buffer.from(initializationVector),
     sharedKeys.encryptionKey,
     content
   );
 
-  const macData = Buffer.concat([initializationVector, ephemeralPK, cipherText]);
-  const mac = await hmacSha256(sharedKeys.hmacKey, macData);
+  const macData = concatBytes(initializationVector, ephemeralPublicKey, cipherText);
+  const mac = await hmacSha256(sharedKeys.hmacKey, Buffer.from(macData));
 
   let cipherTextString: string;
+
   if (!cipherTextEncoding || cipherTextEncoding === 'hex') {
-    cipherTextString = cipherText.toString('hex');
+    cipherTextString = utils.bytesToHex(cipherText);
   } else if (cipherTextEncoding === 'base64') {
     cipherTextString = cipherText.toString('base64');
   } else {
@@ -353,11 +371,11 @@ export async function encryptECIES(
   }
 
   const result: CipherObject = {
-    iv: initializationVector.toString('hex'),
-    ephemeralPK: ephemeralPK.toString('hex'),
+    iv: utils.bytesToHex(initializationVector),
+    ephemeralPK: utils.bytesToHex(ephemeralPublicKey),
     cipherText: cipherTextString,
-    mac: mac.toString('hex'),
-    wasString: !!wasString,
+    mac: utils.bytesToHex(mac),
+    wasString,
   };
   if (cipherTextEncoding && cipherTextEncoding !== 'hex') {
     result.cipherTextEncoding = cipherTextEncoding;
@@ -381,23 +399,19 @@ export async function decryptECIES(
   privateKey: string,
   cipherObject: CipherObject
 ): Promise<Buffer | string> {
-  const ecSK = ecurve.keyFromPrivate(privateKey, 'hex');
-  let ephemeralPK = null;
-  try {
-    ephemeralPK = ecurve.keyFromPublic(cipherObject.ephemeralPK, 'hex').getPublic();
-  } catch (error) {
+  if (!cipherObject.ephemeralPK) {
     throw new FailedDecryptionError(
       'Unable to get public key from cipher object. ' +
         'You might be trying to decrypt an unencrypted object.'
     );
   }
+  const ephemeralPK = cipherObject.ephemeralPK;
+  let sharedSecret = getSharedSecret(privateKey, ephemeralPK, true);
+  // Trim the compressed mode prefix byte
+  sharedSecret = sharedSecret.slice(1);
+  const sharedKeys = sharedSecretToKeys(Buffer.from(sharedSecret));
+  const ivBuffer = hexToBytes(cipherObject.iv);
 
-  const sharedSecret = ecSK.derive(ephemeralPK) as BN;
-  const sharedSecretBuffer = getBufferFromBN(sharedSecret);
-
-  const sharedKeys = sharedSecretToKeys(sharedSecretBuffer);
-
-  const ivBuffer = Buffer.from(cipherObject.iv, 'hex');
   let cipherTextBuffer: Buffer;
 
   if (!cipherObject.cipherTextEncoding || cipherObject.cipherTextEncoding === 'hex') {
@@ -408,17 +422,18 @@ export async function decryptECIES(
     throw new Error(`Unexpected cipherTextEncoding "${cipherObject.cipherText}"`);
   }
 
-  const macData = Buffer.concat([
-    ivBuffer,
-    Buffer.from(ephemeralPK.encodeCompressed()),
-    cipherTextBuffer,
-  ]);
-  const actualMac = await hmacSha256(sharedKeys.hmacKey, macData);
-  const expectedMac = Buffer.from(cipherObject.mac, 'hex');
-  if (!equalConstTime(expectedMac, actualMac)) {
+  const macData = concatBytes(ivBuffer, hexToBytes(ephemeralPK), cipherTextBuffer);
+  const actualMac = await hmacSha256(sharedKeys.hmacKey, Buffer.from(macData));
+  const expectedMac = hexToBytes(cipherObject.mac);
+
+  if (!equalConstTime(Buffer.from(expectedMac), actualMac)) {
     throw new FailedDecryptionError('Decryption failed: failure in MAC check');
   }
-  const plainText = await aes256CbcDecrypt(ivBuffer, sharedKeys.encryptionKey, cipherTextBuffer);
+  const plainText = await aes256CbcDecrypt(
+    Buffer.from(ivBuffer),
+    sharedKeys.encryptionKey,
+    cipherTextBuffer
+  );
 
   if (cipherObject.wasString) {
     return plainText.toString();
@@ -446,13 +461,12 @@ export function signECDSA(
   signature: string;
 } {
   const contentBuffer = content instanceof Buffer ? content : Buffer.from(content);
-  const ecPrivate = ecurve.keyFromPrivate(privateKey, 'hex');
   const publicKey = getPublicKeyFromPrivate(privateKey);
   const contentHash = hashSha256Sync(contentBuffer);
-  const signature = ecPrivate.sign(contentHash);
-  const signatureString: string = signature.toDER('hex');
+  const signature = signSync(contentHash, privateKey);
+
   return {
-    signature: signatureString,
+    signature: utils.bytesToHex(signature),
     publicKey,
   };
 }
@@ -481,8 +495,6 @@ export function verifyECDSA(
   signature: string
 ): boolean {
   const contentBuffer = getBuffer(content);
-  const ecPublic = ecurve.keyFromPublic(publicKey, 'hex');
   const contentHash = hashSha256Sync(contentBuffer);
-
-  return ecPublic.verify(contentHash, <any>signature);
+  return verify(signature, contentHash, publicKey);
 }

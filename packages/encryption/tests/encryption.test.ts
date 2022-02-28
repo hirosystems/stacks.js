@@ -5,7 +5,7 @@ import {
   encryptECIES, decryptECIES, getHexFromBN, signECDSA,
   verifyECDSA,  encryptMnemonic, decryptMnemonic,
 } from '../src'
-import { ERROR_CODES, getGlobalScope } from '@stacks/common'
+import { ERROR_CODES, getGlobalScope, utf8ToBytes } from '@stacks/common';
 import * as pbkdf2 from '../src/pbkdf2'
 import * as aesCipher from '../src/aesCipher'
 import * as sha2Hash from '../src/sha2Hash'
@@ -13,6 +13,13 @@ import * as hmacSha256 from '../src/hmacSha256'
 import * as ripemd160 from '../src/hashRipemd160'
 import BN from 'bn.js'
 import { getBufferFromBN } from '../src/ec'
+import {
+  getPublicKey as nobleGetPublicKey,
+  getSharedSecret,
+  signSync as nobleSecp256k1Sign,
+  utils,
+  verify as nobleSecp256k1Verify
+} from '@noble/secp256k1';
 
 const privateKey = 'a5c61c6ca7b3e7e55edee68566aeab22e4da26baa285c7bd10e8d2218aa3b229'
 const publicKey = '027d28f9951ce46538951e3697c62588a87f1f1f295de4a14fdd4c780fc52cfe69'
@@ -550,4 +557,91 @@ test('encryptMnemonic & decryptMnemonic', async () => {
 
   expect(errorCallback).toHaveBeenCalledTimes(2)
 })
+
+test('Shared secret from a keypair should be same using elliptic or noble', () => {
+  // Consider a privateKey, publicKey pair and get shared secret using noble and then elliptic
+  // Both secret's should match noble <=> elliptic
+  //Step 1:  Get shared secret using noble secp256k1 library
+  const sharedSecretNoble = getSharedSecret(privateKey, publicKey, true);
+  // Trim the compressed mode prefix byte
+  const sharedSecretNobleBuffer = Buffer.from(sharedSecretNoble).slice(1);
+
+  //Step 2:  Get shared secret using elliptic library
+  const ecurve = new elliptic.ec('secp256k1')
+  const ecPK = ecurve.keyFromPublic(publicKey, 'hex').getPublic();
+  const keyPair = ecurve.keyFromPrivate(privateKey);
+
+  // Get shared secret using elliptic library
+  const sharedSecretEC = keyPair.derive(ecPK).toBuffer();
+
+  // Both shared secret should match to verify the compatibility
+  expect(sharedSecretNobleBuffer).toEqual(sharedSecretEC);
+});
+
+test('Sign msg using elliptic/secp256k1 and verify signature using @noble/secp256k1', () => {
+  // Maximum keypairs to try if a keypairs is not accepted by @noble/secp256k1
+  const keyPairAttempts = 8; // Normally a keypairs is accepted in first or second attempt
+
+  let nobleVerifyResult = false;
+  const ec = new elliptic.ec('secp256k1');
+
+  for (let i = 0; i < keyPairAttempts && !nobleVerifyResult; i++) {
+    // Generate keys
+    const options = { entropy: utils.randomBytes(32) };
+    const keyPair = ec.genKeyPair(options);
+
+    const msg = 'hello world';
+    const msgHex = utils.bytesToHex(utf8ToBytes(msg));
+
+    // Sign msg using elliptic/secp256k1
+    // input must be an array, or a hex-string
+    const signature = keyPair.sign(msgHex);
+
+    // Export DER encoded signature in hex format
+    const signatureHex = signature.toDER('hex');
+
+    // Verify signature using elliptic/secp256k1
+    const ellipticVerifyResult = keyPair.verify(msgHex, signatureHex);
+
+    expect(ellipticVerifyResult).toBeTruthy();
+
+    // Get public key from key-pair
+    const publicKey = keyPair.getPublic().encodeCompressed('hex');
+
+    // Verify same signature using @noble/secp256k1
+    nobleVerifyResult = nobleSecp256k1Verify(signatureHex, msgHex, publicKey);
+  }
+  // Verification result by @noble/secp256k1 should be true
+  expect(nobleVerifyResult).toBeTruthy();
+});
+
+test('Sign msg using @noble/secp256k1 and verify signature using elliptic/secp256k1', () => {
+  // Generate private key
+  const privateKey = utils.randomPrivateKey();
+
+  const msg = 'hello world';
+  const msgHex = utils.bytesToHex(utf8ToBytes(msg));
+
+  // Sign msg using @noble/secp256k1
+  // input must be a hex-string
+  const signature = nobleSecp256k1Sign(msgHex, privateKey);
+
+  const publicKey = nobleGetPublicKey(privateKey);
+
+  // Verify signature using @noble/secp256k1
+  const nobleVerifyResult = nobleSecp256k1Verify(signature, msgHex, publicKey);
+
+  // Verification result by @noble/secp256k1
+  expect(nobleVerifyResult).toBeTruthy();
+
+  // Generate keypair using private key
+  const ec = new elliptic.ec('secp256k1');
+  const keyPair = ec.keyFromPrivate(privateKey);
+
+  // Verify signature using elliptic/secp256k1
+  const ellipticVerifyResult = keyPair.verify(msgHex, signature);
+
+  // Verification result by elliptic/secp256k1 should be true
+  expect(ellipticVerifyResult).toBeTruthy();
+});
 
