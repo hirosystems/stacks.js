@@ -413,3 +413,67 @@ export function hexToBigInt(hex: string): bigint {
 export function utf8ToBytes(content: string) {
   return new TextEncoder().encode(content);
 }
+
+/*
+The `concatBytes` and `hexToBytes` methods below were taken from
+[noble-secp256k1](https://github.com/paulmillr/noble-secp256k1)
+
+Copyright (c) 2019 Paul Miller (https://paulmillr.com)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the “Software”), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+*/
+
+/**
+ * Reference: https://github.com/paulmillr/noble-secp256k1/blob/976d3b59bbd30f2d28638e5420b219fd3d829169/index.ts#L669-L682
+ * Using this function from noble-secp256k1 as its not exported by library till v1.5.5
+ * Concatenates several Uint8Arrays into one
+ * @param {byteArrays[]} Uint8Array[] array of arrays
+ * @output {Uint8Array} instance of bytes concatenated
+ */
+export function concatBytes(byteArrays: Uint8Array[]): Uint8Array {
+  const totalSize = byteArrays.reduce((len, bytes) => len + bytes.length, 0);
+  const resultArray = new Uint8Array(totalSize);
+  let offset = 0;
+  for (let i = 0; i < byteArrays.length; i++) {
+    resultArray.set(byteArrays[i], offset);
+    offset += byteArrays[i].length;
+  }
+  return resultArray;
+}
+
+/**
+ * Reference: https://github.com/paulmillr/noble-secp256k1/blob/976d3b59bbd30f2d28638e5420b219fd3d829169/index.ts#L726-L740
+ * Using this function from noble-secp256k1 as its not exported by library till v1.5.5
+ * Converts hex string to Uint8Array
+ * @param {hex} hex string without 0x prefix
+ * @output {Uint8Array} instance of bytes
+ */
+export function hexToBytes(hex: string): Uint8Array {
+  if (typeof hex !== 'string') {
+    throw new TypeError('hexToBytes: expected string, got ' + typeof hex);
+  }
+  if (hex.slice(0, 2) === '0x') {
+    throw new Error('input hex should be without 0x prefix');
+  }
+  if (hex.length % 2)
+    throw new Error(`hexToBytes: received invalid unpadded hex, got: ${hex.length}`);
+
+  const array = new Uint8Array(hex.length / 2);
+
+  for (let i = 0; i < array.length; i++) {
+    const j = i * 2;
+    const hexByte = hex.slice(j, j + 2);
+    const byte = Number.parseInt(hexByte, 16);
+    if (Number.isNaN(byte) || byte < 0) throw new Error('Invalid byte sequence');
+    array[i] = byte;
+  }
+  return array;
+}
