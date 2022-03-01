@@ -1,9 +1,8 @@
-import './setup';
-import { makeECPrivateKey, getPublicKeyFromPrivate, ecPairToAddress } from '@stacks/encryption';
 import { decryptPrivateKey } from '@stacks/auth';
+import { getPublicKeyFromPrivate, makeECPrivateKey, publicKeyToAddress } from '@stacks/encryption';
 import { decodeToken } from 'jsontokens';
-import { getIdentity, profileResponse, nameInfoResponse } from './helpers';
-import { ECPair } from 'bitcoinjs-lib';
+import { getIdentity, nameInfoResponse, profileResponse } from './helpers';
+import './setup';
 
 interface Decoded {
   [key: string]: any;
@@ -61,12 +60,12 @@ test('adds to apps in profile if publish_data scope', async () => {
   const { apps, appsMeta } = profile[0].decodedToken.payload.claim;
   expect(apps[appDomain]).not.toBeFalsy();
   const appPrivateKey = await decryptPrivateKey(transitPrivateKey, payload.private_key);
-  const challengeSigner = ECPair.fromPrivateKey(Buffer.from(appPrivateKey as string, 'hex'));
-  const expectedDomain = `https://gaia.blockstack.org/hub/${ecPairToAddress(challengeSigner)}/`;
+  const address = publicKeyToAddress(getPublicKeyFromPrivate(appPrivateKey as string, 'hex'));
+  const expectedDomain = `https://gaia.blockstack.org/hub/${address}/`;
   expect(apps[appDomain]).toEqual(expectedDomain);
   expect(appsMeta[appDomain]).not.toBeFalsy();
   expect(appsMeta[appDomain].storage).toEqual(expectedDomain);
-  expect(appsMeta[appDomain].publicKey).toEqual(challengeSigner.publicKey.toString('hex'));
+  expect(appsMeta[appDomain].publicKey).toEqual(getPublicKeyFromPrivate(appPrivateKey as string));
 });
 
 test('generates an app private key', async () => {

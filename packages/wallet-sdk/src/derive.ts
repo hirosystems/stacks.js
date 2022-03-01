@@ -1,13 +1,11 @@
-import { BIP32Interface } from 'bip32';
 import { Buffer, ChainID, TransactionVersion } from '@stacks/common';
-import { ECPair } from 'bitcoinjs-lib';
-import { createSha2Hash, ecPairToHexString } from '@stacks/encryption';
-
-import { assertIsTruthy, whenChainId } from './utils';
-import { Account, WalletKeys } from './models/common';
+import { createSha2Hash, ecPrivateKeyToHexString } from '@stacks/encryption';
 import { StacksNetwork } from '@stacks/network';
 import { getAddressFromPrivateKey } from '@stacks/transactions';
+import { BIP32Interface } from 'bip32';
+import { Account, WalletKeys } from './models/common';
 import { fetchFirstName } from './usernames';
+import { assertIsTruthy, whenChainId } from './utils';
 
 const DATA_DERIVATION_PATH = `m/888'/0'`;
 const WALLET_CONFIG_PATH = `m/44/5757'/0'/1`;
@@ -223,8 +221,7 @@ export const deriveStxPrivateKey = ({
 }) => {
   const childKey = rootNode.derivePath(STX_DERIVATION_PATH).derive(index);
   assertIsTruthy(childKey.privateKey);
-  const ecPair = ECPair.fromPrivateKey(childKey.privateKey);
-  return ecPairToHexString(ecPair);
+  return ecPrivateKeyToHexString(childKey.privateKey);
 };
 
 export const deriveDataPrivateKey = ({
@@ -236,8 +233,7 @@ export const deriveDataPrivateKey = ({
 }) => {
   const childKey = rootNode.derivePath(DATA_DERIVATION_PATH).deriveHardened(index);
   assertIsTruthy(childKey.privateKey);
-  const ecPair = ECPair.fromPrivateKey(childKey.privateKey);
-  return ecPairToHexString(ecPair);
+  return ecPrivateKeyToHexString(childKey.privateKey);
 };
 
 export const deriveAccount = ({

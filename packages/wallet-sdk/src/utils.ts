@@ -1,11 +1,9 @@
-import { hexStringToECPair } from '@stacks/encryption';
-import { getPublicKeyFromPrivate } from '@stacks/encryption';
-import { ecPairToAddress, randomBytes } from '@stacks/encryption';
-import { AssertionError } from 'assert';
-import { parseZoneFile } from 'zone-file';
-import { GaiaHubConfig } from '@stacks/storage';
-import { TokenSigner, Json } from 'jsontokens';
 import { ChainID, fetchPrivate } from '@stacks/common';
+import { getPublicKeyFromPrivate, publicKeyToAddress, randomBytes } from '@stacks/encryption';
+import { GaiaHubConfig } from '@stacks/storage';
+import { AssertionError } from 'assert';
+import { Json, TokenSigner } from 'jsontokens';
+import { parseZoneFile } from 'zone-file';
 
 export function assertIsTruthy<T>(val: T): asserts val is NonNullable<T> {
   if (val === undefined || val === null) {
@@ -82,9 +80,7 @@ export const connectToGaiaHubWithConfig = ({
 }: ConnectToGaiaOptions): GaiaHubConfig => {
   const readURL = hubInfo.read_url_prefix;
   const token = makeGaiaAuthToken({ hubInfo, privateKey, gaiaHubUrl });
-  const address = ecPairToAddress(
-    hexStringToECPair(privateKey + (privateKey.length === 64 ? '01' : ''))
-  );
+  const address = publicKeyToAddress(getPublicKeyFromPrivate(privateKey));
   return {
     url_prefix: readURL,
     max_file_upload_size_megabytes: 100,

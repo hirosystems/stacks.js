@@ -1,10 +1,9 @@
 import { decryptPrivateKey } from '@stacks/auth';
-import { ecPairToAddress, getPublicKeyFromPrivate, makeECPrivateKey } from '@stacks/encryption';
+import { getPublicKeyFromPrivate, makeECPrivateKey, publicKeyToAddress } from '@stacks/encryption';
+import fetchMock from 'jest-fetch-mock';
 import { decodeToken } from 'jsontokens';
 import { getAppPrivateKey, getGaiaAddress, makeAuthResponse } from '../../src';
 import { mockAccount, mockGaiaHubInfo } from '../mocks';
-import { ECPair } from 'bitcoinjs-lib';
-import fetchMock from 'jest-fetch-mock';
 
 beforeEach(() => {
   fetchMock.resetMocks();
@@ -83,11 +82,11 @@ describe(makeAuthResponse, () => {
     const { apps, appsMeta } = profile[0].decodedToken.payload.claim;
     expect(apps[appDomain]).not.toBeFalsy();
     const appPrivateKey = await decryptPrivateKey(transitPrivateKey, payload.private_key);
-    const challengeSigner = ECPair.fromPrivateKey(Buffer.from(appPrivateKey as string, 'hex'));
-    const expectedDomain = `https://gaia.blockstack.org/hub/${ecPairToAddress(challengeSigner)}/`;
+    const address = publicKeyToAddress(getPublicKeyFromPrivate(appPrivateKey));
+    const expectedDomain = `https://gaia.blockstack.org/hub/${address}/`;
     expect(apps[appDomain]).toEqual(expectedDomain);
     expect(appsMeta[appDomain]).not.toBeFalsy();
     expect(appsMeta[appDomain].storage).toEqual(expectedDomain);
-    expect(appsMeta[appDomain].publicKey).toEqual(challengeSigner.publicKey.toString('hex'));
+    expect(appsMeta[appDomain].publicKey).toEqual(getPublicKeyFromPrivate(appPrivateKey));
   });
 });

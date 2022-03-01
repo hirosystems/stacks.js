@@ -1,22 +1,21 @@
+import { makeAuthResponse as _makeAuthResponse } from '@stacks/auth';
+import { Buffer } from '@stacks/common';
 import {
-  ecPairToAddress,
   getPublicKeyFromPrivate,
   hashCode,
   hashSha256Sync,
+  publicKeyToAddress,
 } from '@stacks/encryption';
-import { makeAuthResponse as _makeAuthResponse } from '@stacks/auth';
-import { TransactionVersion, getAddressFromPrivateKey } from '@stacks/transactions';
+import { getAddressFromPrivateKey, TransactionVersion } from '@stacks/transactions';
 import { fromBase58 } from 'bip32';
+import { connectToGaiaHubWithConfig, getHubInfo, makeGaiaAssociationToken } from '../utils';
+import { Account } from './common';
 import {
   DEFAULT_PROFILE,
   fetchAccountProfileUrl,
   fetchProfileFromUrl,
   signAndUploadProfile,
 } from './profile';
-import { Account } from './common';
-import { ECPair } from 'bitcoinjs-lib';
-import { connectToGaiaHubWithConfig, getHubInfo, makeGaiaAssociationToken } from '../utils';
-import { Buffer } from '@stacks/common';
 
 export const getStxAddress = ({
   account,
@@ -81,15 +80,15 @@ export const makeAuthResponse = async ({
     if (!profile.apps) {
       profile.apps = {};
     }
-    const challengeSigner = ECPair.fromPrivateKey(Buffer.from(appPrivateKey, 'hex'));
-    const storageUrl = `${hubInfo.read_url_prefix}${ecPairToAddress(challengeSigner)}/`;
+    const address = publicKeyToAddress(getPublicKeyFromPrivate(appPrivateKey));
+    const storageUrl = `${hubInfo.read_url_prefix}${address}/`;
     profile.apps[appDomain] = storageUrl;
     if (!profile.appsMeta) {
       profile.appsMeta = {};
     }
     profile.appsMeta[appDomain] = {
       storage: storageUrl,
-      publicKey: challengeSigner.publicKey.toString('hex'),
+      publicKey: getPublicKeyFromPrivate(appPrivateKey),
     };
     const gaiaHubConfig = connectToGaiaHubWithConfig({
       hubInfo,
