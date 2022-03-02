@@ -90,4 +90,33 @@ describe(makeAuthResponse, () => {
     expect(appsMeta[appDomain].storage).toEqual(expectedDomain);
     expect(appsMeta[appDomain].publicKey).toEqual(challengeSigner.publicKey.toString('hex'));
   });
+
+  test('generates an auth response with appPrivateKeyFromWalletSalt', async () => {
+    const account = mockAccount;
+    const appDomain = 'https://banter.pub';
+    const transitPrivateKey = makeECPrivateKey();
+    const transitPublicKey = getPublicKeyFromPrivate(transitPrivateKey);
+    const appPrivateKeyFromWalletSalt =
+      'ab9a2ad092b910902f4a74f7aeaee874497ed9bc3f6408ed8b07e22425471fde';
+
+    fetchMock.once(mockGaiaHubInfo).once('', { status: 404 });
+
+    const authResponse = await makeAuthResponse({
+      appDomain,
+      gaiaHubUrl,
+      transitPublicKey,
+      account,
+      appPrivateKeyFromWalletSalt,
+    });
+
+    const decoded = decodeToken(authResponse);
+    const { payload } = decoded as Decoded;
+    expect(payload.profile_url).toEqual(
+      `https://gaia.blockstack.org/hub/${getGaiaAddress(account)}/profile.json`
+    );
+    const appPrivateKey = await decryptPrivateKey(transitPrivateKey, payload.private_key);
+    const expectedKey = '6f8b6a170f8b2ee57df5ead49b0f4c8acde05f9e1c4c6ef8223d6a42fabfa314';
+    expect(appPrivateKey).toEqual(expectedKey);
+    expect(payload.appPrivateKeyFromWalletSalt).toEqual(appPrivateKeyFromWalletSalt);
+  });
 });

@@ -36,4 +36,6 @@ export interface UserData {
   profile: any;
   // private: does not get sent to webapp at all.
   gaiaHubConfig?: any;
+  // Based on issue with incorrect appPrivateKey derivation see stacks-web-wallet issue #2238
+  appPrivateKeyFromWalletSalt?: string;
 }
