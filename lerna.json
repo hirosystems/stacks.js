@@ -4,16 +4,16 @@
   "publishConfig": {
     "access": "public"
   },
-  "packages": [
-    "packages/*"
-  ],
+  "packages": ["packages/*"],
   "command": {
     "bootstrap": {
       "forceLocal": true,
       "hoist": true,
-      "npmClientArgs": [
-        "--ci"
-      ]
+      "npmClientArgs": ["--ci"]
+    },
+    "version": {
+      "message": "chore(release): publish %s"
     }
-  }
+  },
+  "ignoreChanges": [".github/**", "**/*.md", "**/*.test.ts"]
 }
