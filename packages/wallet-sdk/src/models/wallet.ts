@@ -1,5 +1,5 @@
 import { StacksNetwork } from '@stacks/network';
-import { DerivationType, derivePrivateKeyByType, selectStxDerivation } from '..';
+import { DerivationType, deriveStxPrivateKey, fetchUsernameForAccountByDerivationType } from '..';
 import { deriveAccount, deriveLegacyConfigPrivateKey } from '../derive';
 import { connectToGaiaHubWithConfig, getHubInfo } from '../utils';
 import { Wallet, getRootNode } from './common';
@@ -24,7 +24,7 @@ export async function restoreWalletAccounts({
 }: {
   wallet: Wallet;
   gaiaHubUrl: string;
-  network?: StacksNetwork;
+  network: StacksNetwork;
 }): Promise<Wallet> {
   const hubInfo = await getHubInfo(gaiaHubUrl);
   const rootNode = getRootNode(wallet);
@@ -49,34 +49,27 @@ export async function restoreWalletAccounts({
     walletConfig.accounts.length >= (legacyWalletConfig?.identities.length || 0)
   ) {
     const newAccounts = await Promise.all(
-      walletConfig.accounts.map(async (account, index) => {
+      walletConfig.accounts.map(async (_, index) => {
         let existingAccount = wallet.accounts[index];
-        const { username, stxDerivationType } = await selectStxDerivation({
-          username: account.username,
+        const { username } = await fetchUsernameForAccountByDerivationType({
           rootNode,
           index,
+          derivationType: DerivationType.Wallet,
           network,
         });
-        if (stxDerivationType === DerivationType.Unknown) {
-          // This account index has a username
-          // that is not owned by stx derivation path or data derivation path
-          // we can't determine the stx private key :-/
-          return Promise.reject(`Username ${username} is owned by unknown private key`);
-        }
         if (!existingAccount) {
           existingAccount = deriveAccount({
             rootNode,
             index,
             salt: wallet.salt,
-            stxDerivationType,
+            stxDerivationType: DerivationType.Wallet,
           });
         } else {
           existingAccount = {
             ...existingAccount,
-            stxPrivateKey: derivePrivateKeyByType({
+            stxPrivateKey: deriveStxPrivateKey({
               rootNode,
               index,
-              derivationType: stxDerivationType,
             }),
           };
         }
@@ -96,34 +89,27 @@ export async function restoreWalletAccounts({
   // Restore from legacy config, and upload a new one
   if (legacyWalletConfig) {
     const newAccounts = await Promise.all(
-      legacyWalletConfig.identities.map(async (identity, index) => {
+      legacyWalletConfig.identities.map(async (_, index) => {
         let existingAccount = wallet.accounts[index];
-        const { username, stxDerivationType } = await selectStxDerivation({
-          username: identity.username,
+        const { username } = await fetchUsernameForAccountByDerivationType({
           rootNode,
           index,
+          derivationType: DerivationType.Wallet,
           network,
         });
-        if (stxDerivationType === DerivationType.Unknown) {
-          // This account index has a username
-          // that is not owned by stx derivation path or data derivation path
-          // we can't determine the stx private key :-/
-          return Promise.reject(`Username ${username} is owned by unknown private key`);
-        }
         if (!existingAccount) {
           existingAccount = deriveAccount({
             rootNode,
             index,
             salt: wallet.salt,
-            stxDerivationType,
+            stxDerivationType: DerivationType.Wallet,
           });
         } else {
           existingAccount = {
             ...existingAccount,
-            stxPrivateKey: derivePrivateKeyByType({
+            stxPrivateKey: deriveStxPrivateKey({
               rootNode,
               index,
-              derivationType: stxDerivationType,
             }),
           };
         }
