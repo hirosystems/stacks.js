@@ -5,7 +5,7 @@ import { createSha2Hash, ecPairToHexString } from '@stacks/encryption';
 
 import { assertIsTruthy, whenChainId } from './utils';
 import { Account, WalletKeys } from './models/common';
-import { StacksNetwork } from '@stacks/network';
+import { StacksMainnet, StacksNetwork } from '@stacks/network';
 import { getAddressFromPrivateKey } from '@stacks/transactions';
 import { fetchFirstName } from './usernames';
 
@@ -214,23 +214,20 @@ export const fetchUsernameForAccountByDerivationType = async ({
   rootNode: BIP32Interface;
   index: number;
   derivationType: DerivationType.Wallet | DerivationType.Data;
-  network: StacksNetwork;
+  network?: StacksNetwork;
 }): Promise<{
   username: string | undefined;
 }> => {
   // try to find existing usernames owned by given derivation path
-  if (network) {
-    const txVersion = whenChainId(network.chainId)({
-      [ChainID.Mainnet]: TransactionVersion.Mainnet,
-      [ChainID.Testnet]: TransactionVersion.Testnet,
-    });
-    const privateKey = derivePrivateKeyByType({ rootNode, index, derivationType });
-    const address = getAddressFromPrivateKey(privateKey, txVersion);
-    const username = await fetchFirstName(address, network);
-    return { username };
-  } else {
-    return { username: undefined };
-  }
+  const selectedNetwork = network ?? new StacksMainnet();
+  const txVersion = whenChainId(selectedNetwork.chainId)({
+    [ChainID.Mainnet]: TransactionVersion.Mainnet,
+    [ChainID.Testnet]: TransactionVersion.Testnet,
+  });
+  const privateKey = derivePrivateKeyByType({ rootNode, index, derivationType });
+  const address = getAddressFromPrivateKey(privateKey, txVersion);
+  const username = await fetchFirstName(address, selectedNetwork);
+  return { username };
 };
 
 export const derivePrivateKeyByType = ({

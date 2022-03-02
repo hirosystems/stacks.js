@@ -225,15 +225,16 @@ test('fetch username owned by different derivation type', async () => {
   expect(username).toEqual(undefined);
 });
 
-test('fetch username without network', async () => {
+test('fetch username defaults to mainnet', async () => {
   const rootPrivateKey = await mnemonicToSeed(SECRET_KEY);
   const rootNode = fromSeed(rootPrivateKey);
 
-  const { username } = await fetchUsernameForAccountByDerivationType({
+  fetchMock.once(JSON.stringify({ names: ['public_profile_for_testing.id.blockstack'] }));
+
+  await fetchUsernameForAccountByDerivationType({
     rootNode,
     index: 0,
     derivationType: DerivationType.Wallet,
-    network: undefined,
   });
-  expect(username).toEqual(undefined);
+  expect(fetchMock.mock.calls[0][0]).toContain('stacks-node-api.mainnet');
 });
