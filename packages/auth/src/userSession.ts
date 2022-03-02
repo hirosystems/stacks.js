@@ -328,6 +328,7 @@ export class UserSession {
       coreSessionToken,
       authResponseToken,
       hubUrl,
+      appPrivateKeyFromWalletSalt: tokenPayload.appPrivateKeyFromWalletSalt as string,
       coreNode: tokenPayload.blockstackAPIUrl as string,
       // @ts-expect-error
       gaiaAssociationToken,

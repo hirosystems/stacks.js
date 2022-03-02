@@ -189,7 +189,8 @@ export async function makeAuthResponse(
   transitPublicKey: string | null = null,
   hubUrl: string | null = null,
   blockstackAPIUrl: string | null = null,
-  associationToken: string | null = null
+  associationToken: string | null = null,
+  appPrivateKeyFromWalletSalt: string | null = null
 ): Promise<string> {
   /* Convert the private key to a public key to an issuer */
   const publicKey = SECP256K1Client.derivePublicKey(privateKey);
@@ -229,6 +230,7 @@ export async function makeAuthResponse(
       iss: makeDIDFromAddress(address),
       private_key: privateKeyPayload,
       public_keys: [publicKey],
+      appPrivateKeyFromWalletSalt,
       profile,
       username,
       core_token: coreTokenPayload,
