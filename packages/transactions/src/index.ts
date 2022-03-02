@@ -17,6 +17,7 @@ export {
   SmartContractPayload,
   PoisonPayload,
   CoinbasePayload,
+  serializePayload,
 } from './payload';
 
 export {

@@ -1,6 +1,6 @@
 import { generateMnemonic, mnemonicToSeed } from 'bip39';
 import { fromSeed } from 'bip32';
-import randomBytes from 'randombytes';
+import { randomBytes } from '@stacks/encryption';
 import { Wallet, getRootNode } from './models/common';
 import { encrypt } from './encryption';
 import { deriveAccount, deriveWalletKeys } from './derive';

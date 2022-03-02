@@ -3,6 +3,25 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.3.0](https://github.com/blockstack/blockstack.js/compare/v3.2.1-beta.0...v3.3.0) (2022-02-23)
+
+**Note:** Version bump only for package @stacks/common
+
+
+
+
+
+## [3.2.1-beta.0](https://github.com/blockstack/blockstack.js/compare/v3.2.0...v3.2.1-beta.0) (2022-02-23)
+
+
+### Bug Fixes
+
+* use noble-secp256k1 in transaction to replace elliptic dependency ([534f1b8](https://github.com/blockstack/blockstack.js/commit/534f1b8acf5ab1267860af0d2a9f1ba19bb35303))
+
+
+
+
+
 ## [2.0.1](https://github.com/blockstack/blockstack.js/compare/v2.0.1-beta.2...v2.0.1) (2021-08-09)
 
 **Note:** Version bump only for package @stacks/common
