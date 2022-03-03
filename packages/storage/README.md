@@ -13,7 +13,7 @@ npm install @stacks/storage
 ### Initiate a session
 Users must authenticate to an app before the storage package will work to save or retrieve data on their behalf.
 
-See also [authentication guide](https://docs.stacks.co/build-apps/guides/authentication) using [connect](https://github.com/blockstack/connect#readme) for web apps
+See also [authentication guide](https://docs.stacks.co/build-apps/references/authentication) using [connect](https://github.com/hirosystems/connect#readme) for web apps
 
 The storage capabilities will work in cases `userSession.isUserSignedIn()` returns `true`
 
