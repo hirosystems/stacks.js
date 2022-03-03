@@ -2,7 +2,7 @@
 
 Construct and decode authentication requests for Stacks apps. 
 
-This package provides the auth logic used by the [Stacks Connect](https://github.com/blockstack/ux/tree/master/packages/connect) library. If you're looking to integrate Stacks authentication into your web app, Stacks Connect provides a simple API and built-in user interface. See the [authentication tutorial](https://docs.blockstack.org/authentication/building-todo-app). 
+This package provides the auth logic used by the [Stacks Connect](https://github.com/hirosystems/connect) library. If you're looking to integrate Stacks authentication into your web app, Stacks Connect provides a simple API and built-in user interface. See the [authentication tutorial](https://docs.stacks.co/build-apps/references/authentication). 
 
 ## Installation
 
@@ -61,7 +61,7 @@ const authRequest = userSession.makeAuthRequest(
 
 The resulting payload can now be passed to a compatible Stacks authenticator or browser extension. If you are using Stacks connect, this is performed automatically. 
 
-If you would like to implement a Stacks authenticator, check out the reference implementation of the [Stacks browser extension](https://github.com/blockstack/ux/tree/master/packages/app).
+If you would like to implement a Stacks authenticator, check out the reference implementation of the [Stacks browser extension, Hiro Wallet](https://github.com/hirosystems/stacks-wallet-web).
 
 ### Handling an authentication response payload
 
