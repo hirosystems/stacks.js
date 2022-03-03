@@ -2,14 +2,20 @@ import { Buffer } from '@stacks/common';
 import { sha256, sha512 } from 'sha.js';
 import { ClarityValue, serializeCV } from './clarity';
 import RIPEMD160 from 'ripemd160-min';
-import randombytes from 'randombytes';
+import { utils } from '@noble/secp256k1';
 import { deserializeCV } from './clarity';
 import fetch from 'cross-fetch';
 import { c32addressDecode } from 'c32check';
 import lodashCloneDeep from 'lodash.clonedeep';
 import { with0x } from '@stacks/common';
 
-export { randombytes as randomBytes };
+/**
+ * Use utils.randomBytes to replace randombytes dependency
+ * Generates a buffer with random bytes of given length
+ * @param {bytesLength} an optional bytes length, default is 32 bytes
+ * @return {Buffer} For return type compatibility converting utils.randomBytes return value to buffer
+ */
+export const randomBytes = (bytesLength?: number) => Buffer.from(utils.randomBytes(bytesLength));
 
 export class BufferArray {
   _value: Buffer[] = [];
