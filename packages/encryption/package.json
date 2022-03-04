@@ -40,7 +40,6 @@
     "bip39": "^3.0.2",
     "bitcoinjs-lib": "^5.2.0",
     "bn.js": "^5.2.0",
-    "randombytes": "^2.1.0",
     "ripemd160-min": "^0.0.6",
     "sha.js": "^2.4.11"
   },
@@ -48,7 +47,6 @@
     "@peculiar/webcrypto": "^1.1.6",
     "@types/elliptic": "^6.4.12",
     "@types/jest": "^26.0.22",
-    "@types/randombytes": "^2.0.0",
     "@types/sha.js": "^2.4.0",
     "@types/triplesec": "^3.0.0",
     "crypto-browserify": "^3.12.0",
