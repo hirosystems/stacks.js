@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# 3.5.0-beta.0 (2022-03-14)
+
+
+### Features
+
+* add appPrivateKeyFromWalletSalt ([#1212](https://github.com/hirosystems/stacks.js/issues/1212)) ([ac3858c](https://github.com/hirosystems/stacks.js/commit/ac3858cc0c5bd6aba0ff2c71704161bb4926e387))
+
+
+
+
+
 # [3.4.0](https://github.com/hirosystems/stacks.js/compare/v3.3.0...v3.4.0) (2022-03-02)
 
 
