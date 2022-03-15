@@ -1,5 +1,7 @@
 import { generateMnemonic, mnemonicToSeed } from 'bip39';
-import { fromSeed } from 'bip32';
+// https://github.com/paulmillr/scure-bip32
+// Secure, audited & minimal implementation of BIP32 hierarchical deterministic (HD) wallets.
+import { HDKey } from '@scure/bip32';
 import { randomBytes } from '@stacks/encryption';
 import { Wallet, getRootNode } from './models/common';
 import { encrypt } from './encryption';
@@ -29,7 +31,7 @@ export const generateWallet = async ({
   const encryptedSecretKey = ciphertextBuffer.toString('hex');
 
   const rootPrivateKey = await mnemonicToSeed(secretKey);
-  const rootNode = fromSeed(rootPrivateKey);
+  const rootNode = HDKey.fromMasterSeed(rootPrivateKey);
   const walletKeys = await deriveWalletKeys(rootNode);
 
   const wallet = {

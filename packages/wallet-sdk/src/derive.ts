@@ -1,23 +1,27 @@
-import { BIP32Interface } from 'bip32';
+// https://github.com/paulmillr/scure-bip32
+// Secure, audited & minimal implementation of BIP32 hierarchical deterministic (HD) wallets.
+import { HDKey } from '@scure/bip32';
 import { Buffer, ChainID, TransactionVersion } from '@stacks/common';
+import { HARDENED_OFFSET } from './models/common';
 import { ECPair } from 'bitcoinjs-lib';
 import { createSha2Hash, ecPairToHexString } from '@stacks/encryption';
 
 import { assertIsTruthy, whenChainId } from './utils';
-import { Account, WalletKeys } from './models/common';
+import { Account, WalletKeys, BIP32Interface } from './models/common';
 import { StacksMainnet, StacksNetwork } from '@stacks/network';
-import { getAddressFromPrivateKey } from '@stacks/transactions';
+import { getAddressFromPrivateKey, bytesToHex } from '@stacks/transactions';
 import { fetchFirstName } from './usernames';
 
 const DATA_DERIVATION_PATH = `m/888'/0'`;
 const WALLET_CONFIG_PATH = `m/44/5757'/0'/1`;
 const STX_DERIVATION_PATH = `m/44'/5757'/0'/0`;
 
-export const deriveWalletKeys = async (rootNode: BIP32Interface): Promise<WalletKeys> => {
+export const deriveWalletKeys = async (rootNode: HDKey | BIP32Interface): Promise<WalletKeys> => {
+  // Keep BIP32Interface for backward compatibility with bip32
   assertIsTruthy(rootNode.privateKey);
   const derived: WalletKeys = {
     salt: await deriveSalt(rootNode),
-    rootKey: rootNode.toBase58(),
+    rootKey: rootNode instanceof HDKey ? rootNode.privateExtendedKey : rootNode.toBase58(), // Backward compatibility with bip32
     configPrivateKey: deriveConfigPrivateKey(rootNode).toString('hex'),
   };
   return derived;
@@ -34,10 +38,20 @@ export const deriveWalletKeys = async (rootNode: BIP32Interface): Promise<Wallet
  *
  * @param rootNode A keychain that was created using the wallet's seed phrase
  */
-export const deriveConfigPrivateKey = (rootNode: BIP32Interface): Buffer => {
-  const derivedConfigKey = rootNode.derivePath(WALLET_CONFIG_PATH).privateKey;
+export const deriveConfigPrivateKey = (rootNode: HDKey | BIP32Interface): Buffer => {
+  // Keep BIP32Interface for backward compatibility with bip32
+  let derivedConfigKey;
+  if (rootNode instanceof HDKey) {
+    derivedConfigKey = rootNode.derive(WALLET_CONFIG_PATH).privateKey;
+  } else {
+    // Backward compatibility with bip32
+    derivedConfigKey = rootNode.derivePath(WALLET_CONFIG_PATH).privateKey;
+  }
   if (!derivedConfigKey) {
     throw new TypeError('Unable to derive config key for wallet identities');
+  }
+  if (derivedConfigKey instanceof Uint8Array) {
+    derivedConfigKey = Buffer.from(derivedConfigKey);
   }
   return derivedConfigKey;
 };
@@ -49,22 +63,42 @@ export const deriveConfigPrivateKey = (rootNode: BIP32Interface): Buffer => {
  * The path for this key is `m/45'`
  * @param rootNode A keychain that was created using the wallet's seed phrase
  */
-export const deriveLegacyConfigPrivateKey = (rootNode: BIP32Interface): string => {
-  const derivedLegacyKey = rootNode.deriveHardened(45).privateKey;
+export const deriveLegacyConfigPrivateKey = (rootNode: HDKey | BIP32Interface): string => {
+  // Keep BIP32Interface for backward compatibility with bip32
+  let derivedLegacyKey;
+  if (rootNode instanceof HDKey) {
+    derivedLegacyKey = rootNode.deriveChild(45 + HARDENED_OFFSET).privateKey;
+  } else {
+    // Backward compatibility with bip32
+    derivedLegacyKey = rootNode.deriveHardened(45).privateKey;
+  }
   if (!derivedLegacyKey) {
     throw new TypeError('Unable to derive config key for wallet identities');
   }
-  const configPrivateKey = derivedLegacyKey.toString('hex');
-  return configPrivateKey;
+  if (derivedLegacyKey instanceof Buffer) {
+    return derivedLegacyKey.toString('hex');
+  } else {
+    return bytesToHex(derivedLegacyKey);
+  }
 };
 
 /**
  * Generate a salt, which is used for generating an app-specific private key
  * @param rootNode
  */
-export const deriveSalt = async (rootNode: BIP32Interface) => {
-  const identitiesKeychain = rootNode.derivePath(DATA_DERIVATION_PATH);
-  const publicKeyHex = Buffer.from(identitiesKeychain.publicKey.toString('hex'));
+export const deriveSalt = async (rootNode: HDKey | BIP32Interface) => {
+  // Keep BIP32Interface for backward compatibility with bip32
+  let identitiesKeychain;
+  let publicKeyHex;
+
+  if (rootNode instanceof HDKey) {
+    identitiesKeychain = rootNode.derive(DATA_DERIVATION_PATH);
+    publicKeyHex = Buffer.from(bytesToHex(identitiesKeychain.publicKey as Uint8Array));
+  } else {
+    // Backward compatibility with bip32
+    identitiesKeychain = rootNode.derivePath(DATA_DERIVATION_PATH);
+    publicKeyHex = Buffer.from(identitiesKeychain.publicKey.toString('hex'));
+  }
 
   const sha2Hash = await createSha2Hash();
   const saltData = await sha2Hash.digest(publicKeyHex, 'sha256');
@@ -111,7 +145,7 @@ export const selectStxDerivation = async ({
   network,
 }: {
   username?: string;
-  rootNode: BIP32Interface;
+  rootNode: HDKey | BIP32Interface; // Keep BIP32Interface for backward compatibility with bip32
   index: number;
   network?: StacksNetwork;
 }): Promise<{ username: string | undefined; stxDerivationType: DerivationType }> => {
@@ -141,7 +175,7 @@ const selectDerivationTypeForUsername = async ({
   network,
 }: {
   username: string;
-  rootNode: BIP32Interface;
+  rootNode: HDKey | BIP32Interface; // Keep BIP32Interface for backward compatibility with bip32
   index: number;
   network?: StacksNetwork;
 }): Promise<DerivationType> => {
@@ -175,7 +209,7 @@ const selectUsernameForAccount = async ({
   index,
   network,
 }: {
-  rootNode: BIP32Interface;
+  rootNode: HDKey | BIP32Interface; // Keep BIP32Interface for backward compatibility with bip32
   index: number;
   network?: StacksNetwork;
 }): Promise<{ username: string | undefined; derivationType: DerivationType }> => {
@@ -211,7 +245,7 @@ export const fetchUsernameForAccountByDerivationType = async ({
   derivationType,
   network,
 }: {
-  rootNode: BIP32Interface;
+  rootNode: HDKey | BIP32Interface; // Keep BIP32Interface for backward compatibility with bip32
   index: number;
   derivationType: DerivationType.Wallet | DerivationType.Data;
   network?: StacksNetwork;
@@ -235,7 +269,7 @@ export const derivePrivateKeyByType = ({
   index,
   derivationType,
 }: {
-  rootNode: BIP32Interface;
+  rootNode: HDKey | BIP32Interface; // Keep BIP32Interface for backward compatibility with bip32
   index: number;
   derivationType: DerivationType;
 }): string => {
@@ -248,12 +282,22 @@ export const deriveStxPrivateKey = ({
   rootNode,
   index,
 }: {
-  rootNode: BIP32Interface;
+  rootNode: HDKey | BIP32Interface; // Keep BIP32Interface for backward compatibility with bip32
   index: number;
 }) => {
-  const childKey = rootNode.derivePath(STX_DERIVATION_PATH).derive(index);
+  let childKey;
+  if (rootNode instanceof HDKey) {
+    childKey = rootNode.derive(STX_DERIVATION_PATH).deriveChild(index);
+  } else {
+    // Backward compatibility with bip32
+    childKey = rootNode.derivePath(STX_DERIVATION_PATH).derive(index);
+  }
   assertIsTruthy(childKey.privateKey);
-  const ecPair = ECPair.fromPrivateKey(childKey.privateKey);
+  const privateKey =
+    childKey.privateKey instanceof Uint8Array
+      ? Buffer.from(childKey.privateKey)
+      : childKey.privateKey;
+  const ecPair = ECPair.fromPrivateKey(privateKey);
   return ecPairToHexString(ecPair);
 };
 
@@ -261,12 +305,22 @@ export const deriveDataPrivateKey = ({
   rootNode,
   index,
 }: {
-  rootNode: BIP32Interface;
+  rootNode: HDKey | BIP32Interface; // Keep BIP32Interface for backward compatibility with bip32
   index: number;
 }) => {
-  const childKey = rootNode.derivePath(DATA_DERIVATION_PATH).deriveHardened(index);
+  let childKey;
+  if (rootNode instanceof HDKey) {
+    childKey = rootNode.derive(DATA_DERIVATION_PATH).deriveChild(index + HARDENED_OFFSET);
+  } else {
+    // Backward compatibility with bip32
+    childKey = rootNode.derivePath(DATA_DERIVATION_PATH).deriveHardened(index);
+  }
   assertIsTruthy(childKey.privateKey);
-  const ecPair = ECPair.fromPrivateKey(childKey.privateKey);
+  const privateKey =
+    childKey.privateKey instanceof Uint8Array
+      ? Buffer.from(childKey.privateKey)
+      : childKey.privateKey;
+  const ecPair = ECPair.fromPrivateKey(privateKey);
   return ecPairToHexString(ecPair);
 };
 
@@ -276,7 +330,7 @@ export const deriveAccount = ({
   salt,
   stxDerivationType,
 }: {
-  rootNode: BIP32Interface;
+  rootNode: HDKey | BIP32Interface; // Keep BIP32Interface for backward compatibility with bip32
   index: number;
   salt: string;
   stxDerivationType: DerivationType.Wallet | DerivationType.Data;
@@ -285,13 +339,25 @@ export const deriveAccount = ({
     stxDerivationType === DerivationType.Wallet
       ? deriveStxPrivateKey({ rootNode, index })
       : deriveDataPrivateKey({ rootNode, index });
-  const identitiesKeychain = rootNode.derivePath(DATA_DERIVATION_PATH);
+  let dataPrivateKey;
+  let appsKey;
+  if (rootNode instanceof HDKey) {
+    const identitiesKeychain = rootNode.derive(DATA_DERIVATION_PATH);
+    const identityKeychain = identitiesKeychain.deriveChild(index + HARDENED_OFFSET);
+    if (!identityKeychain.privateKey) throw new Error('Must have private key to derive identities');
+    dataPrivateKey = bytesToHex(identityKeychain.privateKey);
 
-  const identityKeychain = identitiesKeychain.deriveHardened(index);
-  if (!identityKeychain.privateKey) throw new Error('Must have private key to derive identities');
-  const dataPrivateKey = identityKeychain.privateKey.toString('hex');
+    appsKey = identityKeychain.deriveChild(0 + HARDENED_OFFSET).privateExtendedKey;
+  } else {
+    // Backward compatibility with bip32
+    const identitiesKeychain = rootNode.derivePath(DATA_DERIVATION_PATH);
 
-  const appsKey = identityKeychain.deriveHardened(0).toBase58();
+    const identityKeychain = identitiesKeychain.deriveHardened(index);
+    if (!identityKeychain.privateKey) throw new Error('Must have private key to derive identities');
+    dataPrivateKey = identityKeychain.privateKey.toString('hex');
+
+    appsKey = identityKeychain.deriveHardened(0).toBase58();
+  }
 
   return {
     stxPrivateKey,

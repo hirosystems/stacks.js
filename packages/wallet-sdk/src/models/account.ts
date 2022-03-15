@@ -5,15 +5,17 @@ import {
   hashSha256Sync,
 } from '@stacks/encryption';
 import { makeAuthResponse as _makeAuthResponse } from '@stacks/auth';
-import { TransactionVersion, getAddressFromPrivateKey } from '@stacks/transactions';
-import { fromBase58 } from 'bip32';
+import { TransactionVersion, getAddressFromPrivateKey, bytesToHex } from '@stacks/transactions';
+// https://github.com/paulmillr/scure-bip32
+// Secure, audited & minimal implementation of BIP32 hierarchical deterministic (HD) wallets.
+import { HDKey } from '@scure/bip32';
 import {
   DEFAULT_PROFILE,
   fetchAccountProfileUrl,
   fetchProfileFromUrl,
   signAndUploadProfile,
 } from './profile';
-import { Account } from './common';
+import { Account, HARDENED_OFFSET } from './common';
 import { ECPair } from 'bitcoinjs-lib';
 import { connectToGaiaHubWithConfig, getHubInfo, makeGaiaAssociationToken } from '../utils';
 import { Buffer } from '@stacks/common';
@@ -54,10 +56,10 @@ export const getAppPrivateKey = ({
   const hashBuffer = hashSha256Sync(Buffer.from(`${appDomain}${account.salt}`));
   const hash = hashBuffer.toString('hex');
   const appIndex = hashCode(hash);
-  const appsNode = fromBase58(account.appsKey);
-  const appKeychain = appsNode.deriveHardened(appIndex);
+  const appsNode = HDKey.fromExtendedKey(account.appsKey);
+  const appKeychain = appsNode.deriveChild(appIndex + HARDENED_OFFSET);
   if (!appKeychain.privateKey) throw 'Needs private key';
-  return appKeychain.privateKey.toString('hex');
+  return bytesToHex(appKeychain.privateKey);
 };
 
 export const makeAuthResponse = async ({

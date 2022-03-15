@@ -8,8 +8,11 @@ import fetch from 'cross-fetch';
 import { c32addressDecode } from 'c32check';
 import lodashCloneDeep from 'lodash.clonedeep';
 import { with0x } from '@stacks/common';
+import { bytesToHex } from '@noble/hashes/utils';
 
 export { randombytes as randomBytes };
+
+export { bytesToHex };
 
 export class BufferArray {
   _value: Buffer[] = [];
