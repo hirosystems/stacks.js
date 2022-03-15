@@ -8,6 +8,7 @@ import fetch from 'cross-fetch';
 import { c32addressDecode } from 'c32check';
 import lodashCloneDeep from 'lodash.clonedeep';
 import { with0x } from '@stacks/common';
+import { bytesToHex } from '@noble/hashes/utils';
 
 /**
  * Use utils.randomBytes to replace randombytes dependency
@@ -16,6 +17,8 @@ import { with0x } from '@stacks/common';
  * @return {Buffer} For return type compatibility converting utils.randomBytes return value to buffer
  */
 export const randomBytes = (bytesLength?: number) => Buffer.from(utils.randomBytes(bytesLength));
+
+export { bytesToHex };
 
 export class BufferArray {
   _value: Buffer[] = [];
