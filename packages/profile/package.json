@@ -1,6 +1,6 @@
 {
   "name": "@stacks/profile",
-  "version": "3.3.0",
+  "version": "3.4.1-beta.0",
   "description": "Library for Stacks profiles",
   "keywords": [
     "stacks",
@@ -37,9 +37,9 @@
     "url": "https://github.com/blockstack/blockstack.js/issues"
   },
   "dependencies": {
-    "@stacks/common": "^3.3.0",
-    "@stacks/network": "^3.3.0",
-    "@stacks/transactions": "^3.3.0",
+    "@stacks/common": "^3.4.1-beta.0",
+    "@stacks/network": "^3.4.1-beta.0",
+    "@stacks/transactions": "^3.4.1-beta.0",
     "jsontokens": "^3.0.0",
     "schema-inspector": "^2.0.1",
     "zone-file": "^2.0.0-beta.3"

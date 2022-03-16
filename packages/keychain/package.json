@@ -1,6 +1,6 @@
 {
   "name": "@stacks/keychain",
-  "version": "3.3.0",
+  "version": "3.4.1-beta.0",
   "description": "A package for managing Stacks keychains",
   "keywords": [
     "Stacks",
@@ -63,13 +63,13 @@
   },
   "dependencies": {
     "@blockstack/rpc-client": "^0.3.0-alpha.11",
-    "@stacks/auth": "^3.3.0",
-    "@stacks/common": "^3.3.0",
-    "@stacks/encryption": "^3.3.0",
-    "@stacks/network": "^3.3.0",
-    "@stacks/profile": "^3.3.0",
-    "@stacks/storage": "^3.3.0",
-    "@stacks/transactions": "^3.3.0",
+    "@stacks/auth": "^3.4.1-beta.0",
+    "@stacks/common": "^3.4.1-beta.0",
+    "@stacks/encryption": "^3.4.1-beta.0",
+    "@stacks/network": "^3.4.1-beta.0",
+    "@stacks/profile": "^3.4.1-beta.0",
+    "@stacks/storage": "^3.4.1-beta.0",
+    "@stacks/transactions": "^3.4.1-beta.0",
     "@types/bn.js": "^4.11.6",
     "@types/node": "^14.14.43",
     "@types/triplesec": "^3.0.0",

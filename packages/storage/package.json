@@ -1,6 +1,6 @@
 {
   "name": "@stacks/storage",
-  "version": "3.3.0",
+  "version": "3.4.1-beta.0",
   "description": "Stacks storage library",
   "author": "yknl <yukanliao@gmail.com>",
   "homepage": "https://blockstack.org",
@@ -32,9 +32,9 @@
     "url": "https://github.com/blockstack/blockstack.js/issues"
   },
   "dependencies": {
-    "@stacks/auth": "^3.3.0",
-    "@stacks/common": "^3.3.0",
-    "@stacks/encryption": "^3.3.0",
+    "@stacks/auth": "^3.4.1-beta.0",
+    "@stacks/common": "^3.4.1-beta.0",
+    "@stacks/encryption": "^3.4.1-beta.0",
     "bitcoinjs-lib": "^5.2.0",
     "jsontokens": "^3.0.0"
   },

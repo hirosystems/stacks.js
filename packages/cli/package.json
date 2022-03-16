@@ -1,6 +1,6 @@
 {
   "name": "@stacks/cli",
-  "version": "3.4.0",
+  "version": "3.4.1-beta.0",
   "description": "Stacks command line tool",
   "keywords": [
     "stacks",
@@ -89,15 +89,15 @@
     "webpack-bundle-analyzer": "^4.5.0"
   },
   "dependencies": {
-    "@stacks/auth": "^3.3.0",
+    "@stacks/auth": "^3.4.1-beta.0",
     "@stacks/blockchain-api-client": "^0.34.1",
-    "@stacks/bns": "^3.3.0",
-    "@stacks/common": "^3.3.0",
-    "@stacks/network": "^3.3.0",
-    "@stacks/stacking": "^3.3.0",
-    "@stacks/storage": "^3.3.0",
-    "@stacks/transactions": "^3.3.0",
-    "@stacks/wallet-sdk": "^3.4.0",
+    "@stacks/bns": "^3.4.1-beta.0",
+    "@stacks/common": "^3.4.1-beta.0",
+    "@stacks/network": "^3.4.1-beta.0",
+    "@stacks/stacking": "^3.4.1-beta.0",
+    "@stacks/storage": "^3.4.1-beta.0",
+    "@stacks/transactions": "^3.4.1-beta.0",
+    "@stacks/wallet-sdk": "^3.4.1-beta.0",
     "ajv": "^6.12.3",
     "bip32": "^2.0.6",
     "bip39": "^3.0.2",

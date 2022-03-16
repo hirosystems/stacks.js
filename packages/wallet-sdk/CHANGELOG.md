@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 3.4.1-beta.0 (2022-03-16)
+
+**Note:** Version bump only for package @stacks/wallet-sdk
+
+
+
+
+
 # [3.4.0](https://github.com/hirosystems/stacks.js/compare/v3.3.0...v3.4.0) (2022-03-02)
 
 

@@ -1,6 +1,6 @@
 {
   "name": "@stacks/wallet-sdk",
-  "version": "3.4.0",
+  "version": "3.4.1-beta.0",
   "description": "A library for generating Stacks blockchain wallets",
   "author": "Hank Stoever",
   "scripts": {
@@ -44,13 +44,13 @@
     "yalc": "1.0.0-pre.49"
   },
   "dependencies": {
-    "@stacks/auth": "^3.3.0",
-    "@stacks/common": "^3.3.0",
-    "@stacks/encryption": "^3.3.0",
-    "@stacks/network": "^3.3.0",
-    "@stacks/profile": "^3.3.0",
-    "@stacks/storage": "^3.3.0",
-    "@stacks/transactions": "^3.3.0",
+    "@stacks/auth": "^3.4.1-beta.0",
+    "@stacks/common": "^3.4.1-beta.0",
+    "@stacks/encryption": "^3.4.1-beta.0",
+    "@stacks/network": "^3.4.1-beta.0",
+    "@stacks/profile": "^3.4.1-beta.0",
+    "@stacks/storage": "^3.4.1-beta.0",
+    "@stacks/transactions": "^3.4.1-beta.0",
     "bip32": "^2.0.6",
     "bip39": "^3.0.2",
     "bitcoinjs-lib": "^5.2.0",
