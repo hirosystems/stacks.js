@@ -275,22 +275,12 @@ export async function verifyAuthRequestAndLoadManifest(token: string): Promise<a
  * @private
  * @ignore
  */
-export async function verifyAuthResponse(
-  token: string,
-  nameLookupURL: string,
-  fallbackLookupURLs?: string[]
-): Promise<boolean> {
-  const values = await Promise.all([
+export async function verifyAuthResponse(token: string): Promise<boolean> {
+  const conditions = await Promise.all([
     isExpirationDateValid(token),
     isIssuanceDateValid(token),
     doSignaturesMatchPublicKeys(token),
     doPublicKeysMatchIssuer(token),
   ]);
-  const usernameMatchings = await Promise.all(
-    [nameLookupURL]
-      .concat(fallbackLookupURLs || [])
-      .map(url => doPublicKeysMatchUsername(token, url))
-  );
-  const someUsernameMatches = usernameMatchings.includes(true);
-  return !!someUsernameMatches && values.every(val => val);
+  return conditions.every(val => val);
 }
