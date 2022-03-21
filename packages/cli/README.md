@@ -10,7 +10,7 @@ npm install @stacks/cli
 
 ## Usage
 
-See [documentation](https://docs.blockstack.org/references/stacks-cli)
+See [documentation](https://docs.hiro.so/references/stacks-cli)
 
 ### Examples
 Open the terminal to try these basic commands
