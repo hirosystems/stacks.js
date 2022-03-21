@@ -103,7 +103,8 @@ export function ecSign(messageHash: Buffer, hexPrivateKey: string | Buffer) {
  * @ignore
  */
 export function ecPrivateKeyToHexString(privateKey: Buffer) {
-  return privateKey.toString('hex');
+  // add 01 suffix for backward compatibility
+  return `${privateKey.toString('hex')}01`;
 }
 
 /**

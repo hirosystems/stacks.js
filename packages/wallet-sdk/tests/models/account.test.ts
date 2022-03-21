@@ -66,28 +66,33 @@ describe(makeAuthResponse, () => {
       account,
       scopes: ['publish_data'],
     });
-
     expect(fetchMock.mock.calls.length).toEqual(3);
+
     const decoded = decodeToken(authResponse);
     const { payload } = decoded as Decoded;
     expect(payload.profile.apps['https://banter.pub']).toEqual(
       'https://gaia.blockstack.org/hub/1DkuAChufYjTkTCejJgSztuqp5KdykpWap/'
     );
+
     const [uploadUrl, uploadRequest] = fetchMock.mock.calls[2];
     if (!uploadRequest) throw 'Expected to upload profile';
     expect(uploadUrl).toEqual(
       `https://hub.blockstack.org/store/${getGaiaAddress(account)}/profile.json`
     );
+
     const profile = JSON.parse(uploadRequest.body as string);
     const { apps, appsMeta } = profile[0].decodedToken.payload.claim;
     expect(apps[appDomain]).not.toBeFalsy();
+
     const appPrivateKey = await decryptPrivateKey(transitPrivateKey, payload.private_key);
-    const address = publicKeyToAddress(getPublicKeyFromPrivate(appPrivateKey));
+    expect(appPrivateKey).not.toBeNull();
+
+    const address = publicKeyToAddress(getPublicKeyFromPrivate(appPrivateKey!));
     const expectedDomain = `https://gaia.blockstack.org/hub/${address}/`;
     expect(apps[appDomain]).toEqual(expectedDomain);
     expect(appsMeta[appDomain]).not.toBeFalsy();
     expect(appsMeta[appDomain].storage).toEqual(expectedDomain);
-    expect(appsMeta[appDomain].publicKey).toEqual(getPublicKeyFromPrivate(appPrivateKey));
+    expect(appsMeta[appDomain].publicKey).toEqual(getPublicKeyFromPrivate(appPrivateKey!));
   });
 
   test('generates an auth response with appPrivateKeyFromWalletSalt', async () => {
