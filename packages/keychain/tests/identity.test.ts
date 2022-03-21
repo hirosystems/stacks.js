@@ -60,7 +60,7 @@ test('adds to apps in profile if publish_data scope', async () => {
   const { apps, appsMeta } = profile[0].decodedToken.payload.claim;
   expect(apps[appDomain]).not.toBeFalsy();
   const appPrivateKey = await decryptPrivateKey(transitPrivateKey, payload.private_key);
-  const address = publicKeyToAddress(getPublicKeyFromPrivate(appPrivateKey as string, 'hex'));
+  const address = publicKeyToAddress(getPublicKeyFromPrivate(appPrivateKey as string));
   const expectedDomain = `https://gaia.blockstack.org/hub/${address}/`;
   expect(apps[appDomain]).toEqual(expectedDomain);
   expect(appsMeta[appDomain]).not.toBeFalsy();
