@@ -25,7 +25,7 @@ import {
   nextHour,
 } from '@stacks/common';
 import { extractProfile } from '@stacks/profile';
-import { AuthScope, DEFAULT_PROFILE, NAME_LOOKUP_PATH } from './constants';
+import { AuthScope, DEFAULT_PROFILE } from './constants';
 import * as queryString from 'query-string';
 import { UserData } from './userData';
 import { StacksMainnet } from '@stacks/network';
@@ -237,27 +237,7 @@ export class UserSession {
       throw new Error('Unexpected token payload type of string');
     }
 
-    // Section below is removed since the config was never persisted and therefore useless
-
-    // if (isLaterVersion(tokenPayload.version as string, '1.3.0')
-    //    && tokenPayload.blockstackAPIUrl !== null && tokenPayload.blockstackAPIUrl !== undefined) {
-    //   // override globally
-    //   Logger.info(`Overriding ${config.network.blockstackAPIUrl} `
-    //     + `with ${tokenPayload.blockstackAPIUrl}`)
-    //   // TODO: this config is never saved so the user node preference
-    //   // is not respected in later sessions..
-    //   config.network.blockstackAPIUrl = tokenPayload.blockstackAPIUrl as string
-    //   coreNode = tokenPayload.blockstackAPIUrl as string
-    // }
-
-    const nameLookupURL = `${coreNode}${NAME_LOOKUP_PATH}`;
-
-    const fallbackLookupURLs = [
-      `https://stacks-node-api.stacks.co${NAME_LOOKUP_PATH}`,
-      `https://registrar.stacks.co${NAME_LOOKUP_PATH}`,
-    ].filter(url => url !== nameLookupURL);
-
-    const isValid = await verifyAuthResponse(authResponseToken, nameLookupURL, fallbackLookupURLs);
+    const isValid = await verifyAuthResponse(authResponseToken);
     if (!isValid) {
       throw new LoginFailedError('Invalid authentication response.');
     }

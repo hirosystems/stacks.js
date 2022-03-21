@@ -183,7 +183,7 @@ test('makeAuthResponse && verifyAuthResponse', async () => {
   );
   expect((decodedToken.payload as any).username).toBe(null);
 
-  await verifyAuthResponse(authResponse, nameLookupURL).then(verifiedResult => {
+  await verifyAuthResponse(authResponse).then(verifiedResult => {
     expect(verifiedResult).toBe(true);
   });
 
@@ -257,11 +257,11 @@ test('auth response with username', async () => {
     expect(verified).toBe(true);
   });
 
-  await verifyAuthResponse(authResponse, nameLookupURL).then(verifiedResult => {
+  await verifyAuthResponse(authResponse).then(verifiedResult => {
     expect(verifiedResult).toBe(true);
   });
 
-  expect(fetchMock.mock.calls.length).toEqual(2);
+  expect(fetchMock.mock.calls.length).toEqual(1);
 });
 
 test('auth response with invalid private key', async () => {
@@ -308,8 +308,6 @@ test('auth response with invalid private key', async () => {
 });
 
 test('handlePendingSignIn with authResponseToken', async () => {
-  const url = `${nameLookupURL}ryan.id`;
-
   fetchMock.mockResponse(JSON.stringify(sampleNameRecords.ryan));
 
   const appPrivateKey = makeECPrivateKey();
@@ -338,12 +336,10 @@ test('handlePendingSignIn with authResponseToken', async () => {
 
   expect(fail).toBeCalledTimes(0);
   expect(pass).toBeCalledTimes(1);
-  expect(fetchMock.mock.calls.length).toEqual(3);
-  expect(fetchMock.mock.calls[0][0]).toEqual(url);
+  expect(fetchMock.mock.calls.length).toEqual(0);
 });
 
 test('handlePendingSignIn 2', async () => {
-  const url = `${nameLookupURL}ryan.id`;
   fetchMock.mockResponse(JSON.stringify(sampleNameRecords.ryan));
 
   const appPrivateKey = makeECPrivateKey();
@@ -371,8 +367,7 @@ test('handlePendingSignIn 2', async () => {
   await blockstack.handlePendingSignIn(authResponse).then(pass).catch(fail);
   expect(fail).toBeCalledTimes(0);
   expect(pass).toBeCalledTimes(1);
-  expect(fetchMock.mock.calls.length).toEqual(3);
-  expect(fetchMock.mock.calls[0][0]).toEqual(url);
+  expect(fetchMock.mock.calls.length).toEqual(0);
 });
 
 test('handlePendingSignIn with existing user session', async () => {
