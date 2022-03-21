@@ -173,6 +173,7 @@ const restoredWallet = await restoreWalletAccounts({
   // `baseWallet` is returned from `generateWallet`
   wallet: baseWallet,
   gaiaHubUrl: 'https://hub.blockstack.org',
+  network: new StacksMainnet(),
 });
 ```
 

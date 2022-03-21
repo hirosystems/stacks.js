@@ -65,12 +65,14 @@ export const makeAuthResponse = async ({
   transitPublicKey,
   scopes = [],
   gaiaHubUrl,
+  appPrivateKeyFromWalletSalt = null,
 }: {
   account: Account;
   appDomain: string;
   transitPublicKey: string;
   scopes?: string[];
   gaiaHubUrl: string;
+  appPrivateKeyFromWalletSalt?: string | null;
 }) => {
   const appPrivateKey = getAppPrivateKey({ account, appDomain });
   const hubInfo = await getHubInfo(gaiaHubUrl);
@@ -123,6 +125,7 @@ export const makeAuthResponse = async ({
     transitPublicKey,
     gaiaHubUrl,
     undefined,
-    associationToken
+    associationToken,
+    appPrivateKeyFromWalletSalt
   );
 };

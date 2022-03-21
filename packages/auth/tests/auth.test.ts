@@ -171,6 +171,7 @@ test('makeAuthResponse && verifyAuthResponse', async () => {
   expect(authResponse).toBeTruthy();
 
   const decodedToken = decodeToken(authResponse);
+
   expect(decodedToken).toBeTruthy();
 
   const address = publicKeyToAddress(publicKey);
@@ -194,6 +195,57 @@ test('makeAuthResponse && verifyAuthResponse', async () => {
   await doPublicKeysMatchUsername(authResponse, nameLookupURL).then(verifiedResult => {
     expect(verifiedResult).toBe(true);
   });
+});
+
+test('auth response with invalid or empty appPrivateKeyFromWalletSalt', async () => {
+  let appPrivateKeyFromWalletSalt1;
+  const authResponse = await makeAuthResponse(
+    privateKey,
+    sampleProfiles.ryan,
+    null,
+    null,
+    null,
+    null,
+    undefined,
+    null,
+    null,
+    null,
+    null,
+    appPrivateKeyFromWalletSalt1
+  );
+  expect(authResponse).toBeTruthy();
+  const decodedToken = decodeToken(authResponse);
+  console.log('decodedToken', decodedToken);
+  expect(decodedToken).toBeTruthy();
+  expect((decodedToken.payload as any).appPrivateKeyFromWalletSalt).toBeNull();
+});
+
+test('auth response with valid appPrivateKeyFromWalletSalt', async () => {
+  const appPrivateKeyFromWalletSalt =
+    'ab9a2ad092b910902f4a74f7aeaee874497ed9bc3f6408ed8b07e22425471fde';
+  const authResponse = await makeAuthResponse(
+    privateKey,
+    sampleProfiles.ryan,
+    null,
+    null,
+    null,
+    null,
+    undefined,
+    null,
+    null,
+    null,
+    null,
+    appPrivateKeyFromWalletSalt
+  );
+  expect(authResponse).toBeTruthy();
+
+  const decodedToken = decodeToken(authResponse);
+  console.log('decodedToken', decodedToken);
+
+  expect(decodedToken).toBeTruthy();
+  expect((decodedToken.payload as any).appPrivateKeyFromWalletSalt).toEqual(
+    appPrivateKeyFromWalletSalt
+  );
 });
 
 test('auth response with username', async () => {

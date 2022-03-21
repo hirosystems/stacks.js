@@ -1,6 +1,6 @@
 import { Buffer, ChainID, TransactionVersion } from '@stacks/common';
 import { createSha2Hash, ecPrivateKeyToHexString } from '@stacks/encryption';
-import { StacksNetwork } from '@stacks/network';
+import { StacksMainnet, StacksNetwork } from '@stacks/network';
 import { getAddressFromPrivateKey } from '@stacks/transactions';
 import { BIP32Interface } from 'bip32';
 import { Account, WalletKeys } from './models/common';
@@ -85,7 +85,8 @@ export enum DerivationType {
 
 /**
  * Tries to find a derivation path for the stxPrivateKey for the account
- * defined by rootNode and index that respects the username of that account.
+ * defined by rootNode and index that respects the username of that account
+ * and that respects the given derivationType.
  *
  * The stxPrivateKey is used to sign the profile of the account, therefore,
  * a username must be owned by the stxPrivateKey.
@@ -95,6 +96,9 @@ export enum DerivationType {
  *
  * If no username is provided, a lookup for names owned
  * by the stx derivation path and by the data derivation path is done.
+ *
+ * If derivationType other than Unknown is given this derivation type is enforced.
+ *
  * @param selectionOptions
  * @returns username and derivation type
  */
@@ -195,7 +199,33 @@ const selectUsernameForAccount = async ({
     }
   }
   // use wallet derivation for accounts without username
+  // or without network parameter (offline)
   return { username: undefined, derivationType: DerivationType.Wallet };
+};
+
+export const fetchUsernameForAccountByDerivationType = async ({
+  rootNode,
+  index,
+  derivationType,
+  network,
+}: {
+  rootNode: BIP32Interface;
+  index: number;
+  derivationType: DerivationType.Wallet | DerivationType.Data;
+  network?: StacksNetwork;
+}): Promise<{
+  username: string | undefined;
+}> => {
+  // try to find existing usernames owned by given derivation path
+  const selectedNetwork = network ?? new StacksMainnet();
+  const txVersion = whenChainId(selectedNetwork.chainId)({
+    [ChainID.Mainnet]: TransactionVersion.Mainnet,
+    [ChainID.Testnet]: TransactionVersion.Testnet,
+  });
+  const privateKey = derivePrivateKeyByType({ rootNode, index, derivationType });
+  const address = getAddressFromPrivateKey(privateKey, txVersion);
+  const username = await fetchFirstName(address, selectedNetwork);
+  return { username };
 };
 
 export const derivePrivateKeyByType = ({
