@@ -35,9 +35,9 @@ import { signECDSA, verifyECDSA } from '@stacks/encryption';
 const privateKey = 'a5c61c6ca7b3e7e55edee68566aeab22e4da26baa285c7bd10e8d2218aa3b229';
 const testString = 'all work and no play makes jack a dull boy';
 
-const sigObj = await signECDSA(privateKey, testString);
+const sigObj = signECDSA(privateKey, testString);
 // Verify content using ECDSA
-const result = await verifyECDSA(testString, sigObj.publicKey, sigObj.signature);
+const result = verifyECDSA(testString, sigObj.publicKey, sigObj.signature);
 console.log(result); // true
 ```
 
