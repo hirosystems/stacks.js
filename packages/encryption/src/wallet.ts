@@ -1,5 +1,13 @@
 import { Buffer } from '@stacks/common';
-import { validateMnemonic, mnemonicToEntropy, entropyToMnemonic } from 'bip39';
+// https://github.com/paulmillr/scure-bip39
+// Secure, audited & minimal implementation of BIP39 mnemonic phrases.
+import { validateMnemonic, mnemonicToEntropy, entropyToMnemonic } from '@scure/bip39';
+// Word lists not imported by default as that would increase bundle sizes too much as in case of bitcoinjs/bip39
+// Use default english world list similiar to bitcoinjs/bip39
+// Backward compatible with bitcoinjs/bip39 dependency
+// Very small in size as compared to bitcoinjs/bip39 wordlist
+// Reference: https://github.com/paulmillr/scure-bip39
+import { wordlist } from '@scure/bip39/wordlists/english';
 import { randomBytes, GetRandomBytes } from './cryptoRandom';
 import { createSha2Hash } from './sha2Hash';
 import { createHmacSha256 } from './hmacSha256';
@@ -26,7 +34,10 @@ export async function encryptMnemonic(
   let mnemonicEntropy: string;
   try {
     // must be bip39 mnemonic
-    mnemonicEntropy = mnemonicToEntropy(phrase);
+    // `mnemonicToEntropy` converts mnemonic string to raw entropy in form of byte array
+    const entropyBytes = mnemonicToEntropy(phrase, wordlist);
+    // Convert byte array to hex string
+    mnemonicEntropy = Buffer.from(entropyBytes).toString('hex');
   } catch (error) {
     console.error('Invalid mnemonic phrase provided');
     console.error(error);
@@ -97,13 +108,15 @@ async function decryptMnemonicBuffer(dataBuffer: Buffer, password: string): Prom
 
   let mnemonic: string;
   try {
-    mnemonic = entropyToMnemonic(decryptedResult);
+    // Converts raw entropy in form of byte array to mnemonic string
+    mnemonic = entropyToMnemonic(decryptedResult, wordlist);
   } catch (error) {
     console.error('Error thrown by `entropyToMnemonic`');
     console.error(error);
     throw new PasswordError('Wrong password (invalid plaintext)');
   }
-  if (!validateMnemonic(mnemonic)) {
+  // Validates mnemonic for being 12-24 words contained in `wordlist`
+  if (!validateMnemonic(mnemonic, wordlist)) {
     throw new PasswordError('Wrong password (invalid plaintext)');
   }
 
