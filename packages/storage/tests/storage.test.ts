@@ -13,7 +13,13 @@ import {
 import { Storage } from '../src';
 
 import { UserSession, AppConfig, UserData, LOCALSTORAGE_SESSION_KEY } from '@stacks/auth';
-import { DoesNotExist, getAesCbcOutputLength, getBase64OutputLength, fetchPrivate } from '@stacks/common';
+import {
+  DoesNotExist,
+  getAesCbcOutputLength,
+  getBase64OutputLength,
+  fetchPrivate,
+  Buffer,
+} from '@stacks/common';
 import { StacksMainnet } from '@stacks/network';
 import * as util from 'util';
 import * as jsdom from 'jsdom';
@@ -254,14 +260,15 @@ test('Concurrent calls to deleteFile should delete etags in localStorage', async
   const appConfig = new AppConfig();
   const userSession = new UserSession({ appConfig });
   const session = userSession.store.getSessionData();
-  session.userData = <any> {
+  session.userData = <any>{
     gaiaHubConfig,
     appPrivateKey: privateKey,
   };
   userSession.store.setSessionData(session);
 
   const files = ['a.json', 'b.json', 'c.json', 'd.json'];
-  const fullReadUrl = 'https://gaia.testblockstack.org/hub/1NZNxhoxobqwsNvTb16pdeiqvFvce3Yg8U/file.json';
+  const fullReadUrl =
+    'https://gaia.testblockstack.org/hub/1NZNxhoxobqwsNvTb16pdeiqvFvce3Yg8U/file.json';
   const uploadToGaiaHub = jest.fn().mockResolvedValue({
     publicURL: fullReadUrl,
     etag: 'test-tag',
@@ -297,7 +304,7 @@ test('Concurrent calls to deleteFile should delete etags in localStorage', async
   }
   await Promise.all(promises);
   const sessionData = userSession.store.getSessionData();
-  const sessionFromLocalStore = JSON.parse(localStorage.getItem(LOCALSTORAGE_SESSION_KEY) || '{}' );
+  const sessionFromLocalStore = JSON.parse(localStorage.getItem(LOCALSTORAGE_SESSION_KEY) || '{}');
   const expectedEtags = {};
 
   expect(sessionData.etags).toEqual(expectedEtags);

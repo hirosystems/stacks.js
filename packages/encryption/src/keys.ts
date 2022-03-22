@@ -1,7 +1,7 @@
 import { hmac } from '@noble/hashes/hmac';
 import { sha256 } from '@noble/hashes/sha256';
 import { getPublicKey, signSync, utils } from '@noble/secp256k1';
-import { Buffer } from '@stacks/common';
+import { Buffer, privateKeyToBuffer, PRIVATE_KEY_COMPRESSED_LENGTH } from '@stacks/common';
 import base58 from 'bs58';
 import { hashRipemd160 } from './hashRipemd160';
 import { hashSha256Sync } from './sha2Hash';
@@ -56,61 +56,48 @@ export function publicKeyToAddress(publicKey: string | Buffer) {
  * @ignore
  */
 export function getPublicKeyFromPrivate(privateKey: string | Buffer) {
-  return Buffer.from(getPublicKey(privateKeyToBuffer(privateKey), true)).toString('hex');
+  const privateKeyBuffer = privateKeyToBuffer(privateKey);
+  const shouldCompressPublicKey = privateKeyBuffer.length == PRIVATE_KEY_COMPRESSED_LENGTH;
+  return Buffer.from(getPublicKey(privateKeyBuffer.slice(0, 32), shouldCompressPublicKey)).toString(
+    'hex'
+  );
 }
 
 /**
- * Time
- * @private
- * @ignore
- */
-function privateKeyToBuffer(privateKey: string | Buffer): Buffer {
-  const privateKeyBuffer = Buffer.isBuffer(privateKey)
-    ? privateKey
-    : Buffer.from(privateKey, 'hex');
-
-  switch (privateKeyBuffer.length) {
-    case 32:
-      return privateKeyBuffer;
-    case 33:
-      if (privateKeyBuffer[32] !== 1) {
-        throw new Error(
-          'Improperly formatted compressed private-key. 66-length hex indicates compressed key, but the last byte must be == 1'
-        );
-      }
-      return privateKeyBuffer.slice(0, 32);
-    default:
-      throw new Error(
-        'Improperly formatted compressed private-key. Private-key hex length should be 64 or 66.'
-      );
-  }
-}
-
-/**
- *
  * @ignore
  */
 export function ecSign(messageHash: Buffer, hexPrivateKey: string | Buffer) {
   return Buffer.from(
-    signSync(messageHash, privateKeyToBuffer(hexPrivateKey), {
+    signSync(messageHash, privateKeyToBuffer(hexPrivateKey).slice(0, 32), {
       der: false,
     })
   );
 }
 
 /**
- *
  * @ignore
  */
-export function ecPrivateKeyToHexString(privateKey: Buffer) {
-  // add 01 suffix for backward compatibility
-  return `${privateKey.toString('hex')}01`;
+export function ecPrivateKeyToHexString(privateKey: Buffer): string {
+  return privateKey.toString('hex');
 }
 
 /**
- *
  * @ignore
  */
-export function isValidPrivateKey(privateKey: string | Buffer) {
+export function isValidPrivateKey(privateKey: string | Buffer): boolean {
   return utils.isValidPrivateKey(privateKeyToBuffer(privateKey));
+}
+
+/**
+ * @ignore
+ */
+export function compressPrivateKey(privateKey: string | Buffer): string {
+  const privateKeyBuffer = privateKeyToBuffer(privateKey);
+
+  const compressedPrivateKeyBuffer =
+    privateKeyBuffer.length == PRIVATE_KEY_COMPRESSED_LENGTH
+      ? privateKeyBuffer
+      : Buffer.concat([privateKeyBuffer, Buffer.from([1])]);
+
+  return ecPrivateKeyToHexString(compressedPrivateKeyBuffer);
 }
