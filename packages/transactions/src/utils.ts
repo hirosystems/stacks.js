@@ -7,6 +7,9 @@ import { c32addressDecode } from 'c32check';
 import lodashCloneDeep from 'lodash.clonedeep';
 import { ClarityValue, deserializeCV, serializeCV } from './clarity';
 
+// Export verify as utility method for signature verification
+export { verify as verifySignature } from '@noble/secp256k1';
+
 /**
  * Use utils.randomBytes to replace randombytes dependency
  * Generates a buffer with random bytes of given length

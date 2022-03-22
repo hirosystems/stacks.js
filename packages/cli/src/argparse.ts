@@ -1380,6 +1380,38 @@ export const CLI_ARGS = {
         '\n',
       group: 'Key Management',
     },
+    migrate_subdomains: {
+      type: 'array',
+      items: [
+        {
+          name: 'backup_phrase',
+          type: 'string',
+          realtype: '24_words_or_ciphertext',
+        },
+        {
+          name: 'registrar_url',
+          type: 'string',
+          realtype: 'url',
+        },
+      ],
+      minItems: 1,
+      maxItems: 2,
+      help:
+        'Enable users to transfer subdomains to wallet-key addresses that correspond to all data-key addresses \n' +
+        'This command performs these steps in sequence: \n' +
+        "1. Detects whether there are any subdomains registered with the user's key and owned by data-key-derived addresses\n" +
+        '2. Prompts the user to confirm whether they want to migrate these subdomains to the corresponding wallet-key-derived addresses for their key by position\n' +
+        "3. Alerts the user to any subdomains that can't be migrated to these wallet-key-derived addresses given collision with existing usernames owned by them\n" +
+        '4. Initiates request to subdomain registrar using new transfer endpoint upon confirmation\n' +
+        '5. Displays message indicating how long the user will have to wait until request is likely fulfilled\n' +
+        '6. Displays confirmation that no subdomains are pending migration if user tries to execute command again\n' +
+        '\n' +
+        'Example\n' +
+        '\n' +
+        '    $ stx migrate_subdomains "toast canal educate tissue express melody produce later gospel victory meadow outdoor hollow catch liberty annual gasp hat hello april equip thank neck cruise" https://registrar.stacks.co\n' +
+        '\n',
+      group: 'Blockstack ID Management',
+    },
     get_zonefile: {
       type: 'array',
       items: [
