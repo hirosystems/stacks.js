@@ -13,6 +13,7 @@ import {
   ValidationError,
 } from '@stacks/common';
 import {
+  compressPrivateKey,
   ecSign,
   getPublicKeyFromPrivate,
   hashSha256Sync,
@@ -149,7 +150,7 @@ function makeLegacyAuthToken(challengeText: string, signerKeyHex: string): strin
   }
   if (parsedChallenge[0] === 'gaiahub' && parsedChallenge[3] === 'blockstack_storage_please_sign') {
     const digest = hashSha256Sync(Buffer.from(challengeText));
-    const signatureBuffer = ecSign(digest, signerKeyHex);
+    const signatureBuffer = ecSign(digest, compressPrivateKey(signerKeyHex));
     const signatureWithHash = script.signature.encode(signatureBuffer, Transaction.SIGHASH_NONE);
 
     // We only want the DER encoding so remove the sighash version byte at the end.
@@ -218,7 +219,9 @@ export async function connectToGaiaHub(
   const hubInfo = await response.json();
   const readURL = hubInfo.read_url_prefix;
   const token = makeV1GaiaAuthToken(hubInfo, challengeSignerHex, gaiaHubUrl, associationToken);
-  const address = publicKeyToAddress(getPublicKeyFromPrivate(challengeSignerHex));
+  const address = publicKeyToAddress(
+    getPublicKeyFromPrivate(compressPrivateKey(challengeSignerHex))
+  );
   return {
     url_prefix: readURL,
     max_file_upload_size_megabytes: hubInfo.max_file_upload_size_megabytes,
@@ -240,7 +243,7 @@ export async function getBucketUrl(gaiaHubUrl: string, appPrivateKey: string): P
   const responseText = await response.text();
   const responseJSON = JSON.parse(responseText);
   const readURL = responseJSON.read_url_prefix;
-  const address = publicKeyToAddress(getPublicKeyFromPrivate(appPrivateKey));
+  const address = publicKeyToAddress(getPublicKeyFromPrivate(compressPrivateKey(appPrivateKey)));
   const bucketUrl = `${readURL}${address}/`;
   return bucketUrl;
 }

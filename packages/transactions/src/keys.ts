@@ -1,4 +1,9 @@
-import { Buffer, hexToBigInt } from '@stacks/common';
+import {
+  Buffer,
+  hexToBigInt,
+  privateKeyToBuffer,
+  PRIVATE_KEY_COMPRESSED_LENGTH,
+} from '@stacks/common';
 import {
   AddressHashMode,
   AddressVersion,
@@ -115,32 +120,10 @@ export function serializePublicKey(key: StacksPublicKey): Buffer {
   return bufferArray.concatBuffer();
 }
 
-export function isPrivateKeyCompressed(key: string | Buffer) {
-  const data = typeof key === 'string' ? Buffer.from(key, 'hex') : key;
-  let compressed = false;
-  if (data.length === 33) {
-    if (data[data.length - 1] !== 1) {
-      throw new Error(
-        'Improperly formatted private-key. 33 byte length usually ' +
-          'indicates compressed key, but last byte must be == 0x01'
-      );
-    }
-    compressed = true;
-  } else if (data.length === 32) {
-    compressed = false;
-  } else {
-    throw new Error(
-      `Improperly formatted private-key hex string: length should be 32 or 33 bytes, provided with length ${data.length}`
-    );
-  }
-  return compressed;
-}
-
 export function pubKeyfromPrivKey(privateKey: string | Buffer): StacksPublicKey {
   const privKey = createStacksPrivateKey(privateKey);
-  const isCompressed = isPrivateKeyCompressed(privateKey);
-  const pubKey = nobleGetPublicKey(privKey.data.slice(0, 32), isCompressed || privKey.compressed);
-  return createStacksPublicKey(utils.bytesToHex(pubKey));
+  const publicKey = nobleGetPublicKey(privKey.data.slice(0, 32), privKey.compressed);
+  return createStacksPublicKey(utils.bytesToHex(publicKey));
 }
 
 export function compressPublicKey(publicKey: string | Buffer): StacksPublicKey {
@@ -159,13 +142,15 @@ export function deserializePublicKey(bufferReader: BufferReader): StacksPublicKe
 }
 
 export interface StacksPrivateKey {
-  data: Buffer;
+  // "compressed" private key is a misnomer: https://web.archive.org/web/20220131144208/https://www.oreilly.com/library/view/mastering-bitcoin/9781491902639/ch04.html#comp_priv
+  // it actually means: should public keys be generated as "compressed" or "uncompressed" from this private key
   compressed: boolean;
+  data: Buffer;
 }
 
 export function createStacksPrivateKey(key: string | Buffer): StacksPrivateKey {
-  const data = typeof key === 'string' ? Buffer.from(key, 'hex') : key;
-  const compressed: boolean = isPrivateKeyCompressed(key);
+  const data = privateKeyToBuffer(key);
+  const compressed = data.length == PRIVATE_KEY_COMPRESSED_LENGTH;
   return { data, compressed };
 }
 
