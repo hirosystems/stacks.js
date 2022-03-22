@@ -41,6 +41,7 @@ import {
   pubKeyfromPrivKey,
   createStacksPrivateKey,
   AnchorMode,
+  signWithKey,
 } from '@stacks/transactions';
 import { buildPreorderNameTx, buildRegisterNameTx } from '@stacks/bns';
 import { StacksMainnet, StacksTestnet } from '@stacks/network';
@@ -108,10 +109,17 @@ import {
   ClarityFunctionArg,
   generateExplorerTxPageUrl,
   isTestnetAddress,
+  subdomainOpToZFPieces,
+  SubdomainOp,
 } from './utils';
 
 import { handleAuth, handleSignIn } from './auth';
-import { generateNewAccount, generateWallet, getAppPrivateKey } from '@stacks/wallet-sdk';
+import {
+  generateNewAccount,
+  generateWallet,
+  getAppPrivateKey,
+  restoreWalletAccounts,
+} from '@stacks/wallet-sdk';
 import { getMaxIDSearchIndex, setMaxIDSearchIndex, getPrivateKeyAddress } from './common';
 // global CLI options
 let txOnly = false;
@@ -314,6 +322,165 @@ async function getStacksWalletKey(network: CLINetworkAdapter, args: string[]): P
   const keyInfo: StacksKeyInfoType[] = [];
   keyInfo.push(keyObj);
   return JSONStringify(keyInfo);
+}
+
+/**
+ * Enable users to transfer subdomains to wallet-key addresses that correspond to all data-key addresses
+ * Reference: https://github.com/hirosystems/stacks.js/issues/1209
+ * args:
+ * @mnemonic (string) the seed phrase to retrieve the privateKey & address
+ * @registrarUrl (string) URL of the registrar to use (defaults to 'https://registrar.stacks.co')
+ */
+async function migrateSubdomains(network: CLINetworkAdapter, args: string[]): Promise<string> {
+  const mnemonic: string = await getBackupPhrase(args[0]); // args[0] is the cli argument for mnemonic
+  const baseWallet = await generateWallet({ secretKey: mnemonic, password: '' });
+  const _network = network.isMainnet() ? new StacksMainnet() : new StacksTestnet();
+  const wallet = await restoreWalletAccounts({
+    wallet: baseWallet,
+    gaiaHubUrl: 'https://hub.blockstack.org',
+    network: _network,
+  });
+  console.log(
+    `Accounts found: ${wallet.accounts.length}\n(Accounts will be checked for both compressed and uncompressed public keys)`
+  );
+  const payload = { subdomains_list: <SubdomainOp[]>[] }; // Payload required by transfer endpoint
+
+  const accounts = wallet.accounts
+    .map(account => [
+      // Duplicate accounts (taking once as uncompressed, once as compressed)
+      { ...account, dataPrivateKey: account.dataPrivateKey },
+      { ...account, dataPrivateKey: account.dataPrivateKey + '01' },
+    ])
+    .flat();
+
+  for (const account of accounts) {
+    console.log('\nAccount:', account);
+
+    const txVersion = network.isMainnet() ? TransactionVersion.Mainnet : TransactionVersion.Testnet;
+
+    const dataKeyAddress = getAddressFromPrivateKey(account.dataPrivateKey, txVersion); // source
+    const walletKeyAddress = getAddressFromPrivateKey(account.stxPrivateKey, txVersion); // target
+
+    console.log(`Finding subdomains for data-key address '${dataKeyAddress}'`);
+    const namesResponse = await fetch(
+      `${_network.coreApiUrl}/v1/addresses/stacks/${dataKeyAddress}`
+    );
+    const namesJson = await namesResponse.json();
+
+    if ((namesJson.names?.length || 0) <= 0) {
+      console.log(`No subdomains found for address '${dataKeyAddress}'`);
+      continue;
+    }
+
+    const regExp = /(\..*){2,}/; // has two or more dots somewhere
+    const subDomains = namesJson.names.filter((val: string) => regExp.test(val));
+
+    if (subDomains.length === 0) console.log(`No subdomains found for address '${dataKeyAddress}'`);
+
+    for (const subdomain of subDomains) {
+      // Alerts the user to any subdomains that can't be migrated to these wallet-key-derived addresses
+      // Given collision with existing usernames owned by them
+      const namesResponse = await fetch(
+        `${_network.coreApiUrl}/v1/addresses/stacks/${walletKeyAddress}`
+      );
+      const existingNames = await namesResponse.json();
+      if (existingNames.names?.includes(subdomain)) {
+        console.log(`Error: Subdomain '${subdomain}' already exists in wallet-key address.`);
+        continue;
+      }
+
+      // Validate user owns the subdomain
+      const nameInfo = await fetch(`${_network.coreApiUrl}/v1/names/${subdomain}`);
+      const nameInfoJson = await nameInfo.json();
+      console.log('Subdomain Info: ', nameInfoJson);
+      if (nameInfoJson.address !== dataKeyAddress) {
+        console.log(`Error: The account is not the owner of the subdomain '${subdomain}'`);
+        continue;
+      }
+
+      const promptName = subdomain.replaceAll('.', '_'); // avoid confusing with nested prompt response
+      const confirmMigration: { [promptName: string]: string } = await prompt([
+        {
+          name: promptName,
+          message: `Do you want to migrate the domain '${subdomain}'`,
+          type: 'confirm',
+        },
+      ]);
+      // On 'NO', move to next account
+      if (!confirmMigration[promptName]) continue;
+
+      // Prepare migration operation
+      const [subdomainName] = subdomain.split('.'); // registrar expects only the first part of a subdomain
+      const subDomainOp: SubdomainOp = {
+        subdomainName,
+        owner: walletKeyAddress, // new owner address / wallet-key address (compressed)
+        zonefile: nameInfoJson.zonefile,
+        sequenceNumber: 1, // should be 'old sequence number + 1', but cannot find old sequence number so assuming 1. Api should calculate it again.
+      };
+
+      const subdomainPieces = subdomainOpToZFPieces(subDomainOp);
+      const textToSign = subdomainPieces.txt.join(',');
+
+      // Generate signature: https://docs.stacks.co/build-apps/references/bns#subdomain-lifecycle
+      /**
+       * *********************** IMPORTANT **********************************************
+       * If the subdomain owner wants to change the address of their subdomain,         *
+       * they need to sign a subdomain-transfer operation and                           *
+       * give it to the on-chain name owner who created the subdomain.                  *
+       * They then package it into a zone file and broadcast it.                        *
+       * *********************** IMPORTANT **********************************************
+       * subdomain operation will only be accepted if it has a later "sequence=" number,*
+       * and a valid signature in "sig=" over the transaction body .The "sig=" field    *
+       * includes both the public key and signature, and the public key must hash to    *
+       * the previous subdomain operation's "addr=" field                               *
+       * ********************************************************************************
+       */
+      const hash = crypto.createHash('sha256').update(textToSign).digest('hex');
+      const sig = signWithKey(createStacksPrivateKey(account.dataPrivateKey), hash);
+
+      // https://docs.stacks.co/build-apps/references/bns#subdomain-lifecycle
+      subDomainOp.signature = sig.data;
+
+      payload.subdomains_list.push(subDomainOp);
+    }
+  }
+
+  console.log('\nSubdomain Operation Payload:', payload);
+  if (payload.subdomains_list.length <= 0) {
+    return '"No subdomains found or selected. Canceling..."';
+  }
+
+  // Subdomains batch migration
+  // Payload contains list of subdomains that user opted for migration
+  const options = {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  };
+
+  // args[1] is the cli argument for registrarUrl to optionally replace default url
+  const registrarUrl = args[1] || 'https://registrar.stacks.co';
+  const migrationURL = `${registrarUrl}/transfer`;
+
+  console.log('Sending migration request...');
+  return fetch(migrationURL, options)
+    .then(response => {
+      if (response.status === 404) {
+        return Promise.reject({
+          status: response.status,
+          error: response.statusText,
+        });
+      }
+      return response.json();
+    })
+    .then(response => {
+      if (response.txid)
+        console.log(
+          `The transaction will take some time to complete. Track its progress using the explorer: https://explorer.stacks.co/txid/0x${response.txid}`
+        );
+      return Promise.resolve(JSONStringify(response));
+    })
+    .catch(error => error);
 }
 
 /*
@@ -1818,6 +1985,7 @@ const COMMANDS: Record<string, CommandFunction> = {
   tx_preorder: preorder,
   send_tokens: sendTokens,
   stack: stack,
+  migrate_subdomains: migrateSubdomains,
   stacking_status: stackingStatus,
   faucet: faucetCall,
 };
@@ -1856,7 +2024,7 @@ export function CLIMain() {
       ? parseInt(CLIOptAsString(opts, 'M')!)
       : getMaxIDSearchIndex();
     setMaxIDSearchIndex(maxIDSearchIndex);
-    const debug = CLIOptAsBool(opts, 'd');
+    const debug = CLIOptAsBool(opts, 'd') || Boolean(process.env.DEBUG);
     const consensusHash = CLIOptAsString(opts, 'C');
     const integration_test = CLIOptAsBool(opts, 'i');
     const testnet = CLIOptAsBool(opts, 't');
@@ -1990,11 +2158,12 @@ export const testables =
   process.env.NODE_ENV === 'test'
     ? {
         addressConvert,
-        contractFunctionCall,
-        makeKeychain,
-        getStacksWalletKey,
-        register,
-        preorder,
         canStack,
+        contractFunctionCall,
+        getStacksWalletKey,
+        makeKeychain,
+        migrateSubdomains,
+        preorder,
+        register,
       }
     : undefined;

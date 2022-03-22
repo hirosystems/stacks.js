@@ -351,9 +351,8 @@ type AnyJson = string | number | boolean | null | { [property: string]: AnyJson 
 export function JSONStringify(obj: AnyJson, stderr: boolean = false): string {
   if ((!stderr && process.stdout.isTTY) || (stderr && process.stderr.isTTY)) {
     return JSON.stringify(obj, null, 2);
-  } else {
-    return JSON.stringify(obj);
   }
+  return JSON.stringify(obj);
 }
 
 /*
@@ -774,4 +773,57 @@ export function generateExplorerTxPageUrl(txid: string, network: StacksNetwork):
 export function isTestnetAddress(address: string) {
   const addressInfo = bitcoinjs.address.fromBase58Check(address);
   return addressInfo.version === bitcoinjs.networks.testnet.pubKeyHash;
+}
+
+/**
+ * Reference: https://github.com/stacks-network/subdomain-registrar/blob/da2d144f4355bb1d67f67d1ae5f329b476d647d6/src/operations.js#L18
+ */
+export type SubdomainOp = {
+  owner: string;
+  sequenceNumber: number;
+  zonefile: string;
+  subdomainName: string;
+  signature?: string;
+};
+
+/**
+ * Reference: https://github.com/stacks-network/subdomain-registrar/blob/da2d144f4355bb1d67f67d1ae5f329b476d647d6/src/operations.js#L55
+ */
+function destructZonefile(zonefile: string) {
+  const encodedZonefile = Buffer.from(zonefile).toString('base64');
+  // we pack into 250 byte strings -- the entry "zf99=" eliminates 5 useful bytes,
+  // and the max is 255.
+  const pieces = 1 + Math.floor(encodedZonefile.length / 250);
+  const destructed = [];
+  for (let i = 0; i < pieces; i++) {
+    const startIndex = i * 250;
+    const currentPiece = encodedZonefile.slice(startIndex, startIndex + 250);
+    if (currentPiece.length > 0) {
+      destructed.push(currentPiece);
+    }
+  }
+  return destructed;
+}
+
+/**
+ * Reference: https://github.com/stacks-network/subdomain-registrar/blob/da2d144f4355bb1d67f67d1ae5f329b476d647d6/src/operations.js#L71
+ */
+export function subdomainOpToZFPieces(operation: SubdomainOp) {
+  const destructedZonefile = destructZonefile(operation.zonefile);
+  const txt = [
+    operation.subdomainName,
+    `owner=${operation.owner}`,
+    `seqn=${operation.sequenceNumber}`,
+    `parts=${destructedZonefile.length}`,
+  ];
+  destructedZonefile.forEach((zfPart, ix) => txt.push(`zf${ix}=${zfPart}`));
+
+  if (operation.signature) {
+    txt.push(`sig=${operation.signature}`);
+  }
+
+  return {
+    name: operation.subdomainName,
+    txt,
+  };
 }
