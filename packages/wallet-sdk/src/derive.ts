@@ -1,5 +1,5 @@
 import { Buffer, ChainID, TransactionVersion } from '@stacks/common';
-import { createSha2Hash, ecPrivateKeyToHexString } from '@stacks/encryption';
+import { compressPrivateKey, createSha2Hash, ecPrivateKeyToHexString } from '@stacks/encryption';
 import { StacksMainnet, StacksNetwork } from '@stacks/network';
 import { getAddressFromPrivateKey } from '@stacks/transactions';
 import { BIP32Interface } from 'bip32';
@@ -251,7 +251,7 @@ export const deriveStxPrivateKey = ({
 }) => {
   const childKey = rootNode.derivePath(STX_DERIVATION_PATH).derive(index);
   assertIsTruthy(childKey.privateKey);
-  return ecPrivateKeyToHexString(childKey.privateKey);
+  return ecPrivateKeyToHexString(compressPrivateKey(childKey.privateKey));
 };
 
 export const deriveDataPrivateKey = ({
@@ -263,7 +263,7 @@ export const deriveDataPrivateKey = ({
 }) => {
   const childKey = rootNode.derivePath(DATA_DERIVATION_PATH).deriveHardened(index);
   assertIsTruthy(childKey.privateKey);
-  return ecPrivateKeyToHexString(childKey.privateKey);
+  return ecPrivateKeyToHexString(compressPrivateKey(childKey.privateKey));
 };
 
 export const deriveAccount = ({

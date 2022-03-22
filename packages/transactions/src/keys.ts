@@ -1,19 +1,36 @@
+import { hmac } from '@noble/hashes/hmac';
+import { sha256 } from '@noble/hashes/sha256';
+import {
+  getPublicKey as nobleGetPublicKey,
+  Point,
+  Signature,
+  signSync,
+  utils,
+} from '@noble/secp256k1';
 import {
   Buffer,
   hexToBigInt,
   privateKeyToBuffer,
   PRIVATE_KEY_COMPRESSED_LENGTH,
 } from '@stacks/common';
+import { c32address } from 'c32check';
+import { BufferReader } from './bufferReader';
+import {
+  addressFromVersionHash,
+  addressHashModeToVersion,
+  addressToString,
+  createMessageSignature,
+  MessageSignature,
+} from './common';
 import {
   AddressHashMode,
   AddressVersion,
   COMPRESSED_PUBKEY_LENGTH_BYTES,
-  UNCOMPRESSED_PUBKEY_LENGTH_BYTES,
+  PubKeyEncoding,
   StacksMessageType,
   TransactionVersion,
-  PubKeyEncoding,
+  UNCOMPRESSED_PUBKEY_LENGTH_BYTES,
 } from './constants';
-
 import {
   BufferArray,
   hash160,
@@ -22,25 +39,6 @@ import {
   intToHexString,
   leftPadHexToLength,
 } from './utils';
-import {
-  getPublicKey as nobleGetPublicKey,
-  utils,
-  Point,
-  Signature,
-  signSync,
-} from '@noble/secp256k1';
-import { sha256 } from '@noble/hashes/sha256';
-import { hmac } from '@noble/hashes/hmac';
-
-import {
-  MessageSignature,
-  createMessageSignature,
-  addressHashModeToVersion,
-  addressFromVersionHash,
-  addressToString,
-} from './common';
-import { BufferReader } from './bufferReader';
-import { c32address } from 'c32check';
 
 /**
  * To use secp256k1.signSync set utils.hmacSha256Sync to a function using noble-hashes

@@ -87,12 +87,13 @@ describe(makeAuthResponse, () => {
     const appPrivateKey = await decryptPrivateKey(transitPrivateKey, payload.private_key);
     expect(appPrivateKey).not.toBeNull();
 
-    const address = publicKeyToAddress(getPublicKeyFromPrivate(appPrivateKey!));
+    const publicKey = getPublicKeyFromPrivate(appPrivateKey!);
+    const address = publicKeyToAddress(publicKey);
     const expectedDomain = `https://gaia.blockstack.org/hub/${address}/`;
     expect(apps[appDomain]).toEqual(expectedDomain);
     expect(appsMeta[appDomain]).not.toBeFalsy();
     expect(appsMeta[appDomain].storage).toEqual(expectedDomain);
-    expect(appsMeta[appDomain].publicKey).toEqual(getPublicKeyFromPrivate(appPrivateKey!));
+    expect(appsMeta[appDomain].publicKey).toEqual(publicKey);
   });
 
   test('generates an auth response with appPrivateKeyFromWalletSalt', async () => {

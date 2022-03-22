@@ -1,12 +1,11 @@
-import { Buffer } from '@stacks/common';
-import { ec as EllipticCurve } from 'elliptic';
+import { Buffer, FailedDecryptionError } from '@stacks/common';
 import * as BN from 'bn.js';
+import { ec as EllipticCurve } from 'elliptic';
+import { createCipher } from './aesCipher';
 import { randomBytes } from './cryptoRandom';
-import { FailedDecryptionError } from '@stacks/common';
+import { createHmacSha256 } from './hmacSha256';
 import { getPublicKeyFromPrivate } from './keys';
 import { hashSha256Sync, hashSha512Sync } from './sha2Hash';
-import { createHmacSha256 } from './hmacSha256';
-import { createCipher } from './aesCipher';
 import { getAesCbcOutputLength, getBase64OutputLength } from './utils';
 
 const ecurve = new EllipticCurve('secp256k1');

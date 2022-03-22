@@ -25,8 +25,9 @@ test('makeECPrivateKey', () => {
 
 test('getPublicKeyFromPrivate matches jsontokens', () => {
   const privateKey = makeECPrivateKey();
+  // getPublicKeyFromPrivate always returns compressed public key
   const publicKey = getPublicKeyFromPrivate(privateKey);
-  const secpClientPublicKey = SECP256K1Client.derivePublicKey(privateKey, false);
+  const secpClientPublicKey = SECP256K1Client.derivePublicKey(privateKey, true);
 
   expect(publicKeyToAddress(publicKey)).toEqual(publicKeyToAddress(secpClientPublicKey));
 });
@@ -35,23 +36,20 @@ test('getPublicKeyFromPrivate matches bitcoinjs', () => {
   const privateKey = makeECPrivateKey();
   const privateKeyCompressed = `${privateKey}01`;
 
-  const keyPairUncompressed = ECPair.fromPrivateKey(Buffer.from(privateKey, 'hex'), {
-    compressed: false,
-  });
-  const bitcoinJsPublicKeyUncompressed = keyPairUncompressed.publicKey.toString('hex');
-  expect(getPublicKeyFromPrivate(privateKey)).toEqual(bitcoinJsPublicKeyUncompressed);
-
   const keyPairCompressed = ECPair.fromPrivateKey(Buffer.from(privateKey, 'hex'), {
     compressed: true,
   });
   const bitcoinJsPublicKeyCompressed = keyPairCompressed.publicKey.toString('hex');
   expect(getPublicKeyFromPrivate(privateKeyCompressed)).toEqual(bitcoinJsPublicKeyCompressed);
+
+  // getPublicKeyFromPrivate always returns compressed public key
+  expect(getPublicKeyFromPrivate(privateKey)).toEqual(bitcoinJsPublicKeyCompressed);
 });
 
 test('getPublicKeyFromPrivate with bitcoinjs private key matches bitcoinjs', () => {
   const privateKey = ECPair.makeRandom().privateKey!.toString('hex');
   const bitcoinJsKeyPair = ECPair.fromPrivateKey(Buffer.from(privateKey, 'hex'), {
-    compressed: false,
+    compressed: true,
   });
   const bitcoinJsPublicKey = bitcoinJsKeyPair.publicKey.toString('hex');
   expect(getPublicKeyFromPrivate(privateKey)).toEqual(bitcoinJsPublicKey);
@@ -73,9 +71,9 @@ test('publicKeyToAddress', () => {
   expect(publicKeyToAddress(getPublicKeyFromPrivate(privateKey))).toEqual(expectedAddress);
 
   const privateKeyUncompressed = '00cdce6b5f87d38f2a830cae0da82162e1b487f07c5affa8130f01fe1a2a25fb';
-  const expectedAddressUncompressed = '1irPRMBJmuTd9FZQ5Cfdm4rcPvvez19uV';
+  // getPublicKeyFromPrivate always returns compressed public key
   expect(publicKeyToAddress(getPublicKeyFromPrivate(privateKeyUncompressed))).toEqual(
-    expectedAddressUncompressed
+    expectedAddress
   );
 });
 
@@ -105,7 +103,9 @@ describe(compressPrivateKey, () => {
     const privateKeyCompressed =
       '00cdce6b5f87d38f2a830cae0da82162e1b487f07c5affa8130f01fe1a2a25fb01';
 
-    expect(compressPrivateKey(privateKeyCompressed)).toEqual(privateKeyCompressed);
+    expect(compressPrivateKey(privateKeyCompressed)).toEqual(
+      Buffer.from(privateKeyCompressed, 'hex')
+    );
   });
 
   it('compresses uncompressed key', () => {
@@ -113,6 +113,6 @@ describe(compressPrivateKey, () => {
     const privateKeyCompressed =
       '00cdce6b5f87d38f2a830cae0da82162e1b487f07c5affa8130f01fe1a2a25fb01';
 
-    expect(compressPrivateKey(privateKey)).toEqual(privateKeyCompressed);
+    expect(compressPrivateKey(privateKey)).toEqual(Buffer.from(privateKeyCompressed, 'hex'));
   });
 });
