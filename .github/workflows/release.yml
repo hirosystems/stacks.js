@@ -1,5 +1,4 @@
-# based on: https://github.com/hirosystems/gh-actions-example/blob/main/.github/workflows/ci.yml
-name: release
+name: release beta
 
 on:
   push:
@@ -13,7 +12,7 @@ on:
 
 jobs:
   release:
-    name: Release
+    name: Release Beta
     runs-on: macos-latest
     if: github.event_name == 'push'
     steps:
