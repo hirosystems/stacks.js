@@ -1,4 +1,5 @@
 // @ts-ignore
+import { Buffer } from '@stacks/common';
 import { lookupProfile, NAME_LOOKUP_PATH, UserSession } from '@stacks/auth';
 import {
   BLOCKSTACK_DEFAULT_GAIA_HUB_URL,
