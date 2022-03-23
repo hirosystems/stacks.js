@@ -17,7 +17,7 @@ export default {
   },
   external: [/\@stacks\/.*\/dist\/polyfill/],
   plugins: [
-    // IMPORT PLUGIN ORDER:
+    // IMPORTANT PLUGIN ORDER:
     // - alias > resolve
     // - commonjs > replace
     // - commonjs > typescript
@@ -64,7 +64,7 @@ export default {
     }),
     typescript({
       tsconfig: './tsconfig.build.json',
-      // todo: disable delcation dist building
+      // todo: disable declaration dist building
     }),
     json({
       compact: true,
