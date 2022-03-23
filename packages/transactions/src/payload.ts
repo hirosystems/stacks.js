@@ -196,7 +196,7 @@ export function deserializePayload(bufferReader: BufferReader): Payload {
       const contractAddress = deserializeAddress(bufferReader);
       const contractCallName = deserializeLPString(bufferReader);
       const functionName = deserializeLPString(bufferReader);
-      const functionArgs = [];
+      const functionArgs: ClarityValue[] = [];
       const numberOfArgs = bufferReader.readUInt32BE();
       for (let i = 0; i < numberOfArgs; i++) {
         const clarityValue = deserializeCV(bufferReader);
