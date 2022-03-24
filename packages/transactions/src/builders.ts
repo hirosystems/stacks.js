@@ -2,10 +2,12 @@ import { Buffer, fetchPrivate, IntegerType, intToBigInt } from '@stacks/common';
 import { StacksNetwork, StacksMainnet, StacksNetworkName, StacksTestnet } from '@stacks/network';
 import { c32address } from 'c32check';
 import {
+  Authorization,
   createMultiSigSpendingCondition,
   createSingleSigSpendingCondition,
   createSponsoredAuth,
   createStandardAuth,
+  SpendingCondition,
 } from './authorization';
 import { ClarityValue, PrincipalCV } from './clarity';
 import {
@@ -564,8 +566,8 @@ export async function makeUnsignedSTXTokenTransfer(
 
   const payload = createTokenTransferPayload(options.recipient, options.amount, options.memo);
 
-  let authorization = null;
-  let spendingCondition = null;
+  let authorization: Authorization | null = null;
+  let spendingCondition: SpendingCondition | null = null;
 
   if ('publicKey' in options) {
     // single-sig
@@ -803,7 +805,7 @@ export async function makeUnsignedContractDeploy(
   const addressHashMode = AddressHashMode.SerializeP2PKH;
   const pubKey = createStacksPublicKey(options.publicKey);
 
-  let authorization = null;
+  let authorization: Authorization | null = null;
 
   const spendingCondition = createSingleSigSpendingCondition(
     addressHashMode,
@@ -998,8 +1000,8 @@ export async function makeUnsignedContractCall(
     validateContractCall(payload, abi);
   }
 
-  let spendingCondition = null;
-  let authorization = null;
+  let spendingCondition: SpendingCondition | null = null;
+  let authorization: Authorization | null = null;
 
   if ('publicKey' in options) {
     // single-sig
