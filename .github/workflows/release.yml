@@ -8,7 +8,6 @@ on:
       - "**"
     paths-ignore:
       - "**/CHANGELOG.md"
-      - "**/package.json"
 
 jobs:
   release:
@@ -41,13 +40,15 @@ jobs:
       - name: Build
         run: NODE_ENV=production npm run build
 
-      - name: "Release: Version"
-        run: npx lerna version --conventional-commits --conventional-prerelease --preid beta --no-push --yes
-
-      - name: "Release: Publish"
-        run: npx lerna publish --pre-dist-tag beta --yes
+      - name: "Release"
+        run: |
+          npx lerna-from-npm
+          npx lerna version --conventional-commits --conventional-prerelease --preid beta --no-push --no-git-tag-version  --yes
+          git commit -a -m 'DONT PUSH'
+          npx lerna publish from-package --pre-dist-tag beta --yes
+          export RELEASE=$(cat lerna.json | jq -r '.version')
+          git reset HEAD~ --hard
+          git tag v$RELEASE
+          git push origin v$RELEASE
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-      - name: "Release: Push Tag"
-        run: git push origin $(git describe --abbrev=0 --tags)
