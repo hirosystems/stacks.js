@@ -1,6 +1,5 @@
 {
-  "name": "stacks.js",
-  "version": "1.4.1",
+  "name": "root",
   "private": true,
   "prettier": "@stacks/prettier-config",
   "repository": {
@@ -47,6 +46,7 @@
     "@rollup/plugin-typescript": "^8.3.0",
     "@stacks/eslint-config": "^1.2.0",
     "@stacks/prettier-config": "^0.0.10",
+    "@types/bs58check": "^2.1.0",
     "@typescript-eslint/eslint-plugin": "^5.11.0",
     "@typescript-eslint/parser": "^5.11.0",
     "assert": "^2.0.0",
