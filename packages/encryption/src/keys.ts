@@ -1,28 +1,35 @@
+import { utils, getPublicKey, signSync } from '@noble/secp256k1';
 import { Buffer } from '@stacks/common';
-import { ECPair, address, networks, Network } from 'bitcoinjs-lib';
-import { randomBytes } from './cryptoRandom';
-import { hashSha256Sync } from './sha2Hash';
 import { hashRipemd160 } from './hashRipemd160';
+import { hashSha256Sync } from './sha2Hash';
+import { encode as base58Encode } from 'bs58check';
+import { sha256 } from '@noble/hashes/sha256';
+import { hmac } from '@noble/hashes/hmac';
+
+const BITCOIN_PUBKEYHASH = 0x00;
 
 /**
- *
- * @param numberOfBytes
- *
- * @ignore
+ * To use secp256k1.signSync set utils.hmacSha256Sync to a function using noble-hashes
+ * secp256k1.signSync is the counter part of secp256k1.sign (async version)
+ * secp256k1.signSync is used within signWithKey in this file
+ * secp256k1.signSync is used to maintain the semantics of signWithKey while migrating from elliptic lib
+ * utils.hmacSha256Sync docs: https://github.com/paulmillr/noble-secp256k1 readme file
  */
-export function getEntropy(arg: number): Buffer {
-  if (!arg) {
-    arg = 32;
-  }
-  return randomBytes(arg);
-}
+utils.hmacSha256Sync = (key: Uint8Array, ...msgs: Uint8Array[]) => {
+  const h = hmac.create(sha256, key);
+  msgs.forEach(msg => h.update(msg));
+  return h.digest();
+};
 
 /**
  * @ignore
  */
 export function makeECPrivateKey() {
-  const keyPair = ECPair.makeRandom({ rng: getEntropy });
-  return keyPair.privateKey!.toString('hex');
+  return Buffer.from(utils.randomPrivateKey()).toString('hex');
+}
+
+function toBase58Check(hash: Buffer) {
+  return base58Encode(Buffer.from([BITCOIN_PUBKEYHASH, ...hash].slice(0, 21)));
 }
 
 /**
@@ -31,19 +38,14 @@ export function makeECPrivateKey() {
 export function publicKeyToAddress(publicKey: string | Buffer) {
   const publicKeyBuffer = Buffer.isBuffer(publicKey) ? publicKey : Buffer.from(publicKey, 'hex');
   const publicKeyHash160 = hashRipemd160(hashSha256Sync(publicKeyBuffer));
-  const result = address.toBase58Check(publicKeyHash160, networks.bitcoin.pubKeyHash);
-  return result;
+  return toBase58Check(publicKeyHash160);
 }
 
 /**
  * @ignore
  */
 export function getPublicKeyFromPrivate(privateKey: string | Buffer) {
-  const privateKeyBuffer = Buffer.isBuffer(privateKey)
-    ? privateKey
-    : Buffer.from(privateKey, 'hex');
-  const keyPair = ECPair.fromPrivateKey(privateKeyBuffer);
-  return keyPair.publicKey.toString('hex');
+  return Buffer.from(getPublicKey(privateKeyToBuffer(privateKey), true)).toString('hex');
 }
 
 /**
@@ -51,25 +53,25 @@ export function getPublicKeyFromPrivate(privateKey: string | Buffer) {
  * @private
  * @ignore
  */
-export function hexStringToECPair(skHex: string, network?: Network): ECPair.ECPairInterface {
-  const ecPairOptions = {
-    network: network || networks.bitcoin,
-    compressed: true,
-  };
+function privateKeyToBuffer(privateKey: string | Buffer): Buffer {
+  const privateKeyBuffer = Buffer.isBuffer(privateKey)
+    ? privateKey
+    : Buffer.from(privateKey, 'hex');
 
-  if (skHex.length === 66) {
-    if (skHex.slice(64) !== '01') {
+  switch (privateKeyBuffer.length) {
+    case 32:
+      return privateKeyBuffer;
+    case 33:
+      if (privateKeyBuffer[32] !== 1) {
+        throw new Error(
+          'Improperly formatted compressed private-key. 66-length hex indicates compressed key, but the last byte must be == 1'
+        );
+      }
+      return privateKeyBuffer.slice(0, 32);
+    default:
       throw new Error(
-        'Improperly formatted private-key hex string. 66-length hex usually ' +
-          'indicates compressed key, but last byte must be == 1'
+        'Improperly formatted compressed private-key. Private-key hex length should be 64 or 66.'
       );
-    }
-    return ECPair.fromPrivateKey(Buffer.from(skHex.slice(0, 64), 'hex'), ecPairOptions);
-  } else if (skHex.length === 64) {
-    ecPairOptions.compressed = false;
-    return ECPair.fromPrivateKey(Buffer.from(skHex, 'hex'), ecPairOptions);
-  } else {
-    throw new Error('Improperly formatted private-key hex string: length should be 64 or 66.');
   }
 }
 
@@ -77,22 +79,18 @@ export function hexStringToECPair(skHex: string, network?: Network): ECPair.ECPa
  *
  * @ignore
  */
-export function ecPairToHexString(secretKey: ECPair.ECPairInterface) {
-  const ecPointHex = secretKey.privateKey!.toString('hex');
-  if (secretKey.compressed) {
-    return `${ecPointHex}01`;
-  } else {
-    return ecPointHex;
-  }
+export function ecSign(messageHash: Buffer, hexPrivateKey: string | Buffer) {
+  return Buffer.from(
+    signSync(messageHash, privateKeyToBuffer(hexPrivateKey), {
+      der: false,
+    })
+  );
 }
 
 /**
- * Creates a bitcoin address string from an ECPair
- * @private
+ *
  * @ignore
  */
-export function ecPairToAddress(keyPair: ECPair.ECPairInterface) {
-  const sha256 = hashSha256Sync(keyPair.publicKey);
-  const hash160 = hashRipemd160(sha256);
-  return address.toBase58Check(hash160, keyPair.network.pubKeyHash);
+export function ecPrivateKeyToHexString(privateKey: Buffer) {
+  return privateKey.toString('hex');
 }

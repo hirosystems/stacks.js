@@ -1,7 +1,12 @@
 // @ts-ignore
 import { Buffer } from '@stacks/common';
 import { TokenSigner, Json } from 'jsontokens';
-import { getPublicKeyFromPrivate, ecPairToAddress, hexStringToECPair } from '@stacks/encryption';
+import {
+  getPublicKeyFromPrivate,
+  ecPairToAddress,
+  hexStringToECPair,
+  publicKeyToAddress,
+} from '@stacks/encryption';
 import randomBytes from 'randombytes';
 import { GaiaHubConfig } from '@stacks/storage';
 
@@ -52,9 +57,7 @@ export const connectToGaiaHubWithConfig = ({
 }: ConnectToGaiaOptions): GaiaHubConfig => {
   const readURL = hubInfo.read_url_prefix;
   const token = makeGaiaAuthToken({ hubInfo, privateKey, gaiaHubUrl });
-  const address = ecPairToAddress(
-    hexStringToECPair(privateKey + (privateKey.length === 64 ? '01' : ''))
-  );
+  const address = publicKeyToAddress(getPublicKeyFromPrivate(privateKey));
   return {
     url_prefix: readURL,
     max_file_upload_size_megabytes: 100,
