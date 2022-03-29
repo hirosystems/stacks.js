@@ -5,11 +5,17 @@
     "module": "ES6"
   },
   "typedocOptions": {
-    "readme": "overview.md",
+    "name": "Stacks.js",
+    "json": "docs/docs.json",
+    "out": "docs",
+    "readme": "./readme.md",
+    "theme": "stacks",
     "excludePrivate": true,
     "excludeProtected": true,
-    "external-modulemap": ".*\/packages\/([\\w\\-_]+)\/",
     "gitRevision": "master",
-    "listInvalidSymbolLinks": true
+    "listInvalidSymbolLinks": true,
+    // theme and plugin options
+    "external-modulemap": ".*\/packages\/([\\w\\-_]+)\/",
+    "package-prefix": "@stacks",
   }
 }
