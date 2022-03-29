@@ -67,7 +67,7 @@
     "clean": "rimraf dist && tsc -b tsconfig.build.json --clean",
     "test": "jest",
     "test:watch": "jest --watch --coverage=false",
-    "prepublishOnly": "npm run test && npm run build"
+    "prepublishOnly": "npm run test && NODE_ENV=production npm run build"
   },
   "bugs": {
     "url": "https://github.com/blockstack/blockstack.js/issues"
