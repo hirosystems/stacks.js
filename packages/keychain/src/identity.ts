@@ -1,19 +1,16 @@
-import { Buffer } from '@stacks/common';
-import { bip32, ECPair } from 'bitcoinjs-lib';
-import { getPublicKeyFromPrivate } from '@stacks/encryption';
 import { makeAuthResponse } from '@stacks/auth';
-import { getProfileURLFromZoneFile } from './utils';
-import { Profile, Identity as IdentifyInterface } from './common';
-import { IdentityKeyPair } from './utils';
+import { getPublicKeyFromPrivate, publicKeyToAddress } from '@stacks/encryption';
+import { bip32 } from 'bitcoinjs-lib';
+import { Identity as IdentifyInterface, Profile } from './common';
+import IdentityAddressOwnerNode from './nodes/identity-address-owner-node';
+import { DEFAULT_PROFILE, fetchProfile, signAndUploadProfile } from './profiles';
+import { getProfileURLFromZoneFile, IdentityKeyPair } from './utils';
 import {
-  makeGaiaAssociationToken,
+  connectToGaiaHubWithConfig,
   DEFAULT_GAIA_HUB,
   getHubInfo,
-  connectToGaiaHubWithConfig,
+  makeGaiaAssociationToken,
 } from './utils/gaia';
-import IdentityAddressOwnerNode from './nodes/identity-address-owner-node';
-import { fetchProfile, DEFAULT_PROFILE, signAndUploadProfile } from './profiles';
-import { ecPairToAddress } from '@stacks/encryption';
 
 interface IdentityConstructorOptions {
   keyPair: IdentityKeyPair;
@@ -70,15 +67,15 @@ export class Identity implements IdentifyInterface {
       if (!profile.apps) {
         profile.apps = {};
       }
-      const challengeSigner = ECPair.fromPrivateKey(Buffer.from(appPrivateKey, 'hex'));
-      const storageUrl = `${hubInfo.read_url_prefix}${ecPairToAddress(challengeSigner)}/`;
+      const address = publicKeyToAddress(getPublicKeyFromPrivate(appPrivateKey));
+      const storageUrl = `${hubInfo.read_url_prefix}${address}/`;
       profile.apps[appDomain] = storageUrl;
       if (!profile.appsMeta) {
         profile.appsMeta = {};
       }
       profile.appsMeta[appDomain] = {
         storage: storageUrl,
-        publicKey: challengeSigner.publicKey.toString('hex'),
+        publicKey: getPublicKeyFromPrivate(appPrivateKey),
       };
       const gaiaHubConfig = connectToGaiaHubWithConfig({
         hubInfo,

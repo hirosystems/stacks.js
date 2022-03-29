@@ -1,10 +1,10 @@
-import { utils, getPublicKey, signSync } from '@noble/secp256k1';
+import { hmac } from '@noble/hashes/hmac';
+import { sha256 } from '@noble/hashes/sha256';
+import { getPublicKey, signSync, utils } from '@noble/secp256k1';
 import { Buffer } from '@stacks/common';
+import base58 from 'bs58';
 import { hashRipemd160 } from './hashRipemd160';
 import { hashSha256Sync } from './sha2Hash';
-import { encode as base58Encode } from 'bs58check';
-import { sha256 } from '@noble/hashes/sha256';
-import { hmac } from '@noble/hashes/hmac';
 
 const BITCOIN_PUBKEYHASH = 0x00;
 
@@ -28,7 +28,18 @@ export function makeECPrivateKey() {
   return Buffer.from(utils.randomPrivateKey()).toString('hex');
 }
 
-function toBase58Check(hash: Buffer) {
+/**
+ * @ignore
+ */
+export function base58Encode(hash: Buffer) {
+  const checksum = sha256(sha256(hash));
+  return base58.encode(Buffer.concat([hash, checksum], hash.length + 4));
+}
+
+/**
+ * @ignore
+ */
+export function hashToBase58Check(hash: Buffer) {
   return base58Encode(Buffer.from([BITCOIN_PUBKEYHASH, ...hash].slice(0, 21)));
 }
 
@@ -38,7 +49,7 @@ function toBase58Check(hash: Buffer) {
 export function publicKeyToAddress(publicKey: string | Buffer) {
   const publicKeyBuffer = Buffer.isBuffer(publicKey) ? publicKey : Buffer.from(publicKey, 'hex');
   const publicKeyHash160 = hashRipemd160(hashSha256Sync(publicKeyBuffer));
-  return toBase58Check(publicKeyHash160);
+  return hashToBase58Check(publicKeyHash160);
 }
 
 /**
@@ -93,4 +104,12 @@ export function ecSign(messageHash: Buffer, hexPrivateKey: string | Buffer) {
  */
 export function ecPrivateKeyToHexString(privateKey: Buffer) {
   return privateKey.toString('hex');
+}
+
+/**
+ *
+ * @ignore
+ */
+export function isValidPrivateKey(privateKey: string | Buffer) {
+  return utils.isValidPrivateKey(privateKeyToBuffer(privateKey));
 }
