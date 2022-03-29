@@ -67,7 +67,8 @@ export class Identity implements IdentifyInterface {
       if (!profile.apps) {
         profile.apps = {};
       }
-      const address = publicKeyToAddress(getPublicKeyFromPrivate(appPrivateKey));
+      const publicKey = getPublicKeyFromPrivate(appPrivateKey);
+      const address = publicKeyToAddress(publicKey);
       const storageUrl = `${hubInfo.read_url_prefix}${address}/`;
       profile.apps[appDomain] = storageUrl;
       if (!profile.appsMeta) {
@@ -75,7 +76,7 @@ export class Identity implements IdentifyInterface {
       }
       profile.appsMeta[appDomain] = {
         storage: storageUrl,
-        publicKey: getPublicKeyFromPrivate(appPrivateKey),
+        publicKey,
       };
       const gaiaHubConfig = connectToGaiaHubWithConfig({
         hubInfo,

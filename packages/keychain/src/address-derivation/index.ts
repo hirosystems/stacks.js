@@ -1,4 +1,4 @@
-import { ecPrivateKeyToHexString } from '@stacks/encryption';
+import { compressPrivateKey, ecPrivateKeyToHexString } from '@stacks/encryption';
 import { ChainID, getAddressFromPrivateKey, TransactionVersion } from '@stacks/transactions';
 import { BIP32Interface } from 'bitcoinjs-lib';
 
@@ -19,7 +19,7 @@ export function deriveStxAddressChain(chain: ChainID) {
     if (!childKey.privateKey) {
       throw new Error('Unable to derive private key from `rootNode`, bip32 master keychain');
     }
-    const privateKey = ecPrivateKeyToHexString(childKey.privateKey);
+    const privateKey = ecPrivateKeyToHexString(compressPrivateKey(childKey.privateKey));
     const txVersion =
       chain === ChainID.Mainnet ? TransactionVersion.Mainnet : TransactionVersion.Testnet;
     return {

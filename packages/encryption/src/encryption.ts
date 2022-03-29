@@ -1,12 +1,11 @@
 import { Buffer } from '@stacks/common';
 import {
   CipherTextEncoding,
-  SignedCipherObject,
-  encryptECIES,
   decryptECIES,
+  encryptECIES,
   signECDSA,
+  SignedCipherObject,
 } from './ec';
-
 import { getPublicKeyFromPrivate } from './keys';
 
 export interface EncryptionOptions {

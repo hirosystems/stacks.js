@@ -1,24 +1,5 @@
 // @ts-ignore
-import { Buffer } from '@stacks/common';
-import {
-  connectToGaiaHub,
-  deleteFromGaiaHub,
-  GaiaHubConfig,
-  getBlockstackErrorFromResponse,
-  getBucketUrl,
-  getFullReadUrl,
-  uploadToGaiaHub,
-} from './hub';
-
-import {
-  eciesGetJsonStringLength,
-  EncryptionOptions,
-  getPublicKeyFromPrivate,
-  publicKeyToAddress,
-  signECDSA,
-  verifyECDSA,
-} from '@stacks/encryption';
-
+import { lookupProfile, NAME_LOOKUP_PATH, UserSession } from '@stacks/auth';
 import {
   BLOCKSTACK_DEFAULT_GAIA_HUB_URL,
   DoesNotExist,
@@ -30,10 +11,24 @@ import {
   PayloadTooLargeError,
   SignatureVerificationError,
 } from '@stacks/common';
-
+import {
+  eciesGetJsonStringLength,
+  EncryptionOptions,
+  getPublicKeyFromPrivate,
+  publicKeyToAddress,
+  signECDSA,
+  verifyECDSA,
+} from '@stacks/encryption';
 import { FileContentLoader } from './fileContentLoader';
-
-import { lookupProfile, NAME_LOOKUP_PATH, UserSession } from '@stacks/auth';
+import {
+  connectToGaiaHub,
+  deleteFromGaiaHub,
+  GaiaHubConfig,
+  getBlockstackErrorFromResponse,
+  getBucketUrl,
+  getFullReadUrl,
+  uploadToGaiaHub,
+} from './hub';
 
 /**
  * Specify a valid MIME type, encryption options, and whether to sign the [[UserSession.putFile]].
@@ -331,7 +326,7 @@ export class Storage {
       }
       if (!gaiaAddress) {
         throw new SignatureVerificationError(
-          'Failed to get gaia address for verification of: ' + `${path}`
+          `Failed to get gaia address for verification of: ${path}`
         );
       }
       if (!signatureContents || typeof signatureContents !== 'string') {
@@ -411,7 +406,7 @@ export class Storage {
     }
     if (!address) {
       throw new SignatureVerificationError(
-        'Failed to get gaia address for verification of: ' + `${path}`
+        `Failed to get gaia address for verification of: ${path}`
       );
     }
     let sigObject;
