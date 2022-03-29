@@ -17,7 +17,7 @@ export function privateKeyToBuffer(privateKey: string | Buffer): Buffer {
 
   if (privateKeyBuffer.length == 33 && privateKeyBuffer[32] !== 1) {
     throw new Error(
-      'Improperly formatted private-key. 33 bytes indicates compressed key, but the last byte must be == 01'
+      'Improperly formatted private-key. 33 bytes indicate compressed key, but the last byte must be == 01'
     );
   }
 
