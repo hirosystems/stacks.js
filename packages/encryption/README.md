@@ -80,6 +80,7 @@ import { makeECPrivateKey, publicKeyToAddress } from '@stacks/encryption';
 import { SECP256K1Client } from 'jsontokens';
 
 const privateKey = makeECPrivateKey();
+// Private key is also usable with the jsontokens package
 const publicKey = SECP256K1Client.derivePublicKey(privateKey);
 const address = publicKeyToAddress(publicKey);
 console.log(address);
