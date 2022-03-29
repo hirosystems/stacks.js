@@ -1,35 +1,32 @@
-import * as crypto from 'crypto';
-import { TokenSigner, TokenVerifier, decodeToken } from 'jsontokens';
+import { AppConfig, LOCALSTORAGE_SESSION_KEY, UserData, UserSession } from '@stacks/auth';
 import {
-  uploadToGaiaHub,
-  getFullReadUrl,
-  connectToGaiaHub,
-  getBucketUrl,
-  deleteFromGaiaHub,
-  GaiaHubConfig,
-  getUserAppFileUrl,
-} from '../src';
-
-import { Storage } from '../src';
-
-import { UserSession, AppConfig, UserData, LOCALSTORAGE_SESSION_KEY } from '@stacks/auth';
-import {
+  Buffer,
   DoesNotExist,
+  fetchPrivate,
   getAesCbcOutputLength,
   getBase64OutputLength,
-  fetchPrivate,
-  Buffer,
 } from '@stacks/common';
-import { StacksMainnet } from '@stacks/network';
-import * as util from 'util';
-import * as jsdom from 'jsdom';
 import {
-  eciesGetJsonStringLength as eciesGetJsonStringLength,
   aes256CbcEncrypt,
+  eciesGetJsonStringLength,
   getPublicKeyFromPrivate,
 } from '@stacks/encryption';
-
+import { StacksMainnet } from '@stacks/network';
+import * as crypto from 'crypto';
 import fetchMock from 'jest-fetch-mock';
+import * as jsdom from 'jsdom';
+import { decodeToken, TokenSigner, TokenVerifier } from 'jsontokens';
+import * as util from 'util';
+import {
+  connectToGaiaHub,
+  deleteFromGaiaHub,
+  GaiaHubConfig,
+  getBucketUrl,
+  getFullReadUrl,
+  getUserAppFileUrl,
+  Storage,
+  uploadToGaiaHub,
+} from '../src';
 
 beforeEach(() => {
   fetchMock.resetMocks();
@@ -365,71 +362,74 @@ test('getFile without user session', async () => {
   /* eslint-disable */
   const profileContent = [
     {
-      'token': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NksifQ.eyJqdGkiOiJjNDhmOTQ0OC1hMGZlLTRiOWUtOWQ2YS1mYzA5MzhjOGUyNzAiLCJpYXQiOiIyMDE4LTAxLTA4VDE4OjIyOjI0Ljc5NloiLCJleHAiOiIyMDE5LTAxLTA4VDE4OjIyOjI0Ljc5NloiLCJzdWJqZWN0Ijp7InB1YmxpY0tleSI6IjAyNDg3YTkxY2Q5NjZmYWVjZWUyYWVmM2ZkZTM3MjgwOWI0NmEzNmVlMTkyNDhjMDFmNzJiNjQ1ZjQ0Y2VmMmUyYyJ9LCJpc3N1ZXIiOnsicHVibGljS2V5IjoiMDI0ODdhOTFjZDk2NmZhZWNlZTJhZWYzZmRlMzcyODA5YjQ2YTM2ZWUxOTI0OGMwMWY3MmI2NDVmNDRjZWYyZTJjIn0sImNsYWltIjp7IkB0eXBlIjoiUGVyc29uIiwiQGNvbnRleHQiOiJodHRwOi8vc2NoZW1hLm9yZyIsImltYWdlIjpbeyJAdHlwZSI6IkltYWdlT2JqZWN0IiwibmFtZSI6ImF2YXRhciIsImNvbnRlbnRVcmwiOiJodHRwczovL3d3dy5kcm9wYm94LmNvbS9zL2oxaDBrdHMwbTdhYWRpcC9hdmF0YXItMD9kbD0xIn1dLCJnaXZlbk5hbWUiOiIiLCJmYW1pbHlOYW1lIjoiIiwiZGVzY3JpcHRpb24iOiIiLCJhY2NvdW50IjpbeyJAdHlwZSI6IkFjY291bnQiLCJwbGFjZWhvbGRlciI6ZmFsc2UsInNlcnZpY2UiOiJoYWNrZXJOZXdzIiwiaWRlbnRpZmllciI6Inl1a2FubCIsInByb29mVHlwZSI6Imh0dHAiLCJwcm9vZlVybCI6Imh0dHBzOi8vbmV3cy55Y29tYmluYXRvci5jb20vdXNlcj9pZD15dWthbmwifSx7IkB0eXBlIjoiQWNjb3VudCIsInBsYWNlaG9sZGVyIjpmYWxzZSwic2VydmljZSI6ImdpdGh1YiIsImlkZW50aWZpZXIiOiJ5a25sIiwicHJvb2ZUeXBlIjoiaHR0cCIsInByb29mVXJsIjoiaHR0cHM6Ly9naXN0LmdpdGh1Yi5jb20veWtubC8xZjcwMThiOThmNzE2ZjAxNWE2Y2Y0NGZkYTA4MDZkNyJ9LHsiQHR5cGUiOiJBY2NvdW50IiwicGxhY2Vob2xkZXIiOmZhbHNlLCJzZXJ2aWNlIjoidHdpdHRlciIsImlkZW50aWZpZXIiOiJ5dWthbmwiLCJwcm9vZlR5cGUiOiJodHRwIiwicHJvb2ZVcmwiOiJodHRwczovL3R3aXR0ZXIuY29tL3l1a2FuTC9zdGF0dXMvOTE2NzQwNzQ5MjM2MTAxMTIwIn1dLCJuYW1lIjoiS2VuIExpYW8iLCJhcHBzIjp7Imh0dHA6Ly9sb2NhbGhvc3Q6ODA4MCI6Imh0dHBzOi8vZ2FpYS5ibG9ja3N0YWNrLm9yZy9odWIvMUREVXFmS3RRZ1lOdDcyMnd1QjRaMmZQQzdhaU5HUWE1Ui8ifX19.UyQNZ02kBFHEovbwiGaS-VQd57w9kcwn1Nt3QbW3afEMArg1OndmeplB7lzjMuRCLAi-88lkpQLkFw7LwKZ31Q',
-      'decodedToken': {
-        'header': {
-          'typ': 'JWT',
-          'alg': 'ES256K'
+      token:
+        'eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NksifQ.eyJqdGkiOiJjNDhmOTQ0OC1hMGZlLTRiOWUtOWQ2YS1mYzA5MzhjOGUyNzAiLCJpYXQiOiIyMDE4LTAxLTA4VDE4OjIyOjI0Ljc5NloiLCJleHAiOiIyMDE5LTAxLTA4VDE4OjIyOjI0Ljc5NloiLCJzdWJqZWN0Ijp7InB1YmxpY0tleSI6IjAyNDg3YTkxY2Q5NjZmYWVjZWUyYWVmM2ZkZTM3MjgwOWI0NmEzNmVlMTkyNDhjMDFmNzJiNjQ1ZjQ0Y2VmMmUyYyJ9LCJpc3N1ZXIiOnsicHVibGljS2V5IjoiMDI0ODdhOTFjZDk2NmZhZWNlZTJhZWYzZmRlMzcyODA5YjQ2YTM2ZWUxOTI0OGMwMWY3MmI2NDVmNDRjZWYyZTJjIn0sImNsYWltIjp7IkB0eXBlIjoiUGVyc29uIiwiQGNvbnRleHQiOiJodHRwOi8vc2NoZW1hLm9yZyIsImltYWdlIjpbeyJAdHlwZSI6IkltYWdlT2JqZWN0IiwibmFtZSI6ImF2YXRhciIsImNvbnRlbnRVcmwiOiJodHRwczovL3d3dy5kcm9wYm94LmNvbS9zL2oxaDBrdHMwbTdhYWRpcC9hdmF0YXItMD9kbD0xIn1dLCJnaXZlbk5hbWUiOiIiLCJmYW1pbHlOYW1lIjoiIiwiZGVzY3JpcHRpb24iOiIiLCJhY2NvdW50IjpbeyJAdHlwZSI6IkFjY291bnQiLCJwbGFjZWhvbGRlciI6ZmFsc2UsInNlcnZpY2UiOiJoYWNrZXJOZXdzIiwiaWRlbnRpZmllciI6Inl1a2FubCIsInByb29mVHlwZSI6Imh0dHAiLCJwcm9vZlVybCI6Imh0dHBzOi8vbmV3cy55Y29tYmluYXRvci5jb20vdXNlcj9pZD15dWthbmwifSx7IkB0eXBlIjoiQWNjb3VudCIsInBsYWNlaG9sZGVyIjpmYWxzZSwic2VydmljZSI6ImdpdGh1YiIsImlkZW50aWZpZXIiOiJ5a25sIiwicHJvb2ZUeXBlIjoiaHR0cCIsInByb29mVXJsIjoiaHR0cHM6Ly9naXN0LmdpdGh1Yi5jb20veWtubC8xZjcwMThiOThmNzE2ZjAxNWE2Y2Y0NGZkYTA4MDZkNyJ9LHsiQHR5cGUiOiJBY2NvdW50IiwicGxhY2Vob2xkZXIiOmZhbHNlLCJzZXJ2aWNlIjoidHdpdHRlciIsImlkZW50aWZpZXIiOiJ5dWthbmwiLCJwcm9vZlR5cGUiOiJodHRwIiwicHJvb2ZVcmwiOiJodHRwczovL3R3aXR0ZXIuY29tL3l1a2FuTC9zdGF0dXMvOTE2NzQwNzQ5MjM2MTAxMTIwIn1dLCJuYW1lIjoiS2VuIExpYW8iLCJhcHBzIjp7Imh0dHA6Ly9sb2NhbGhvc3Q6ODA4MCI6Imh0dHBzOi8vZ2FpYS5ibG9ja3N0YWNrLm9yZy9odWIvMUREVXFmS3RRZ1lOdDcyMnd1QjRaMmZQQzdhaU5HUWE1Ui8ifX19.UyQNZ02kBFHEovbwiGaS-VQd57w9kcwn1Nt3QbW3afEMArg1OndmeplB7lzjMuRCLAi-88lkpQLkFw7LwKZ31Q',
+      decodedToken: {
+        header: {
+          typ: 'JWT',
+          alg: 'ES256K',
         },
-        'payload': {
-          'jti': 'c48f9448-a0fe-4b9e-9d6a-fc0938c8e270',
-          'iat': '2018-01-08T18:22:24.796Z',
-          'exp': '2019-01-08T18:22:24.796Z',
-          'subject': {
-            'publicKey': '02487a91cd966faecee2aef3fde372809b46a36ee19248c01f72b645f44cef2e2c'
+        payload: {
+          jti: 'c48f9448-a0fe-4b9e-9d6a-fc0938c8e270',
+          iat: '2018-01-08T18:22:24.796Z',
+          exp: '2019-01-08T18:22:24.796Z',
+          subject: {
+            publicKey: '02487a91cd966faecee2aef3fde372809b46a36ee19248c01f72b645f44cef2e2c',
           },
-          'issuer': {
-            'publicKey': '02487a91cd966faecee2aef3fde372809b46a36ee19248c01f72b645f44cef2e2c'
+          issuer: {
+            publicKey: '02487a91cd966faecee2aef3fde372809b46a36ee19248c01f72b645f44cef2e2c',
           },
-          'claim': {
+          claim: {
             '@type': 'Person',
             '@context': 'http://schema.org',
-            'image': [
+            image: [
               {
                 '@type': 'ImageObject',
-                'name': 'avatar',
-                'contentUrl': 'https://www.dropbox.com/s/j1h0kts0m7aadip/avatar-0?dl=1'
-              }
+                name: 'avatar',
+                contentUrl: 'https://www.dropbox.com/s/j1h0kts0m7aadip/avatar-0?dl=1',
+              },
             ],
-            'givenName': '',
-            'familyName': '',
-            'description': '',
-            'account': [
+            givenName: '',
+            familyName: '',
+            description: '',
+            account: [
               {
                 '@type': 'Account',
-                'placeholder': false,
-                'service': 'hackerNews',
-                'identifier': 'yukanl',
-                'proofType': 'http',
-                'proofUrl': 'https://news.ycombinator.com/user?id=yukanl'
+                placeholder: false,
+                service: 'hackerNews',
+                identifier: 'yukanl',
+                proofType: 'http',
+                proofUrl: 'https://news.ycombinator.com/user?id=yukanl',
               },
               {
                 '@type': 'Account',
-                'placeholder': false,
-                'service': 'github',
-                'identifier': 'yknl',
-                'proofType': 'http',
-                'proofUrl': 'https://gist.github.com/yknl/1f7018b98f716f015a6cf44fda0806d7'
+                placeholder: false,
+                service: 'github',
+                identifier: 'yknl',
+                proofType: 'http',
+                proofUrl: 'https://gist.github.com/yknl/1f7018b98f716f015a6cf44fda0806d7',
               },
               {
                 '@type': 'Account',
-                'placeholder': false,
-                'service': 'twitter',
-                'identifier': 'yukanl',
-                'proofType': 'http',
-                'proofUrl': 'https://twitter.com/yukanL/status/916740749236101120'
-              }
+                placeholder: false,
+                service: 'twitter',
+                identifier: 'yukanl',
+                proofType: 'http',
+                proofUrl: 'https://twitter.com/yukanL/status/916740749236101120',
+              },
             ],
-            'name': 'Ken Liao',
-            'apps': {
-              'http://localhost:8080': 'https://gaia.blockstack.org/hub/1DDUqfKtQgYNt722wuB4Z2fPC7aiNGQa5R/'
-            }
-          }
+            name: 'Ken Liao',
+            apps: {
+              'http://localhost:8080':
+                'https://gaia.blockstack.org/hub/1DDUqfKtQgYNt722wuB4Z2fPC7aiNGQa5R/',
+            },
+          },
         },
-        'signature': 'UyQNZ02kBFHEovbwiGaS-VQd57w9kcwn1Nt3QbW3afEMArg1OndmeplB7lzjMuRCLAi-88lkpQLkFw7LwKZ31Q'
-      }
-    }
-  ]
+        signature:
+          'UyQNZ02kBFHEovbwiGaS-VQd57w9kcwn1Nt3QbW3afEMArg1OndmeplB7lzjMuRCLAi-88lkpQLkFw7LwKZ31Q',
+      },
+    },
+  ];
   /* eslint-enable */
 
   // const fileUrl = 'https://gaia.blockstack.org/hub/1DDUqfKtQgYNt722wuB4Z2fPC7aiNGQa5R/file.json'
@@ -542,71 +542,74 @@ test('getFile unencrypted, unsigned - multi-reader', async () => {
   /* eslint-disable */
   const profileContent = [
     {
-      'token': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NksifQ.eyJqdGkiOiJjNDhmOTQ0OC1hMGZlLTRiOWUtOWQ2YS1mYzA5MzhjOGUyNzAiLCJpYXQiOiIyMDE4LTAxLTA4VDE4OjIyOjI0Ljc5NloiLCJleHAiOiIyMDE5LTAxLTA4VDE4OjIyOjI0Ljc5NloiLCJzdWJqZWN0Ijp7InB1YmxpY0tleSI6IjAyNDg3YTkxY2Q5NjZmYWVjZWUyYWVmM2ZkZTM3MjgwOWI0NmEzNmVlMTkyNDhjMDFmNzJiNjQ1ZjQ0Y2VmMmUyYyJ9LCJpc3N1ZXIiOnsicHVibGljS2V5IjoiMDI0ODdhOTFjZDk2NmZhZWNlZTJhZWYzZmRlMzcyODA5YjQ2YTM2ZWUxOTI0OGMwMWY3MmI2NDVmNDRjZWYyZTJjIn0sImNsYWltIjp7IkB0eXBlIjoiUGVyc29uIiwiQGNvbnRleHQiOiJodHRwOi8vc2NoZW1hLm9yZyIsImltYWdlIjpbeyJAdHlwZSI6IkltYWdlT2JqZWN0IiwibmFtZSI6ImF2YXRhciIsImNvbnRlbnRVcmwiOiJodHRwczovL3d3dy5kcm9wYm94LmNvbS9zL2oxaDBrdHMwbTdhYWRpcC9hdmF0YXItMD9kbD0xIn1dLCJnaXZlbk5hbWUiOiIiLCJmYW1pbHlOYW1lIjoiIiwiZGVzY3JpcHRpb24iOiIiLCJhY2NvdW50IjpbeyJAdHlwZSI6IkFjY291bnQiLCJwbGFjZWhvbGRlciI6ZmFsc2UsInNlcnZpY2UiOiJoYWNrZXJOZXdzIiwiaWRlbnRpZmllciI6Inl1a2FubCIsInByb29mVHlwZSI6Imh0dHAiLCJwcm9vZlVybCI6Imh0dHBzOi8vbmV3cy55Y29tYmluYXRvci5jb20vdXNlcj9pZD15dWthbmwifSx7IkB0eXBlIjoiQWNjb3VudCIsInBsYWNlaG9sZGVyIjpmYWxzZSwic2VydmljZSI6ImdpdGh1YiIsImlkZW50aWZpZXIiOiJ5a25sIiwicHJvb2ZUeXBlIjoiaHR0cCIsInByb29mVXJsIjoiaHR0cHM6Ly9naXN0LmdpdGh1Yi5jb20veWtubC8xZjcwMThiOThmNzE2ZjAxNWE2Y2Y0NGZkYTA4MDZkNyJ9LHsiQHR5cGUiOiJBY2NvdW50IiwicGxhY2Vob2xkZXIiOmZhbHNlLCJzZXJ2aWNlIjoidHdpdHRlciIsImlkZW50aWZpZXIiOiJ5dWthbmwiLCJwcm9vZlR5cGUiOiJodHRwIiwicHJvb2ZVcmwiOiJodHRwczovL3R3aXR0ZXIuY29tL3l1a2FuTC9zdGF0dXMvOTE2NzQwNzQ5MjM2MTAxMTIwIn1dLCJuYW1lIjoiS2VuIExpYW8iLCJhcHBzIjp7Imh0dHA6Ly9sb2NhbGhvc3Q6ODA4MCI6Imh0dHBzOi8vZ2FpYS5ibG9ja3N0YWNrLm9yZy9odWIvMUREVXFmS3RRZ1lOdDcyMnd1QjRaMmZQQzdhaU5HUWE1Ui8ifX19.UyQNZ02kBFHEovbwiGaS-VQd57w9kcwn1Nt3QbW3afEMArg1OndmeplB7lzjMuRCLAi-88lkpQLkFw7LwKZ31Q',
-      'decodedToken': {
-        'header': {
-          'typ': 'JWT',
-          'alg': 'ES256K'
+      token:
+        'eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NksifQ.eyJqdGkiOiJjNDhmOTQ0OC1hMGZlLTRiOWUtOWQ2YS1mYzA5MzhjOGUyNzAiLCJpYXQiOiIyMDE4LTAxLTA4VDE4OjIyOjI0Ljc5NloiLCJleHAiOiIyMDE5LTAxLTA4VDE4OjIyOjI0Ljc5NloiLCJzdWJqZWN0Ijp7InB1YmxpY0tleSI6IjAyNDg3YTkxY2Q5NjZmYWVjZWUyYWVmM2ZkZTM3MjgwOWI0NmEzNmVlMTkyNDhjMDFmNzJiNjQ1ZjQ0Y2VmMmUyYyJ9LCJpc3N1ZXIiOnsicHVibGljS2V5IjoiMDI0ODdhOTFjZDk2NmZhZWNlZTJhZWYzZmRlMzcyODA5YjQ2YTM2ZWUxOTI0OGMwMWY3MmI2NDVmNDRjZWYyZTJjIn0sImNsYWltIjp7IkB0eXBlIjoiUGVyc29uIiwiQGNvbnRleHQiOiJodHRwOi8vc2NoZW1hLm9yZyIsImltYWdlIjpbeyJAdHlwZSI6IkltYWdlT2JqZWN0IiwibmFtZSI6ImF2YXRhciIsImNvbnRlbnRVcmwiOiJodHRwczovL3d3dy5kcm9wYm94LmNvbS9zL2oxaDBrdHMwbTdhYWRpcC9hdmF0YXItMD9kbD0xIn1dLCJnaXZlbk5hbWUiOiIiLCJmYW1pbHlOYW1lIjoiIiwiZGVzY3JpcHRpb24iOiIiLCJhY2NvdW50IjpbeyJAdHlwZSI6IkFjY291bnQiLCJwbGFjZWhvbGRlciI6ZmFsc2UsInNlcnZpY2UiOiJoYWNrZXJOZXdzIiwiaWRlbnRpZmllciI6Inl1a2FubCIsInByb29mVHlwZSI6Imh0dHAiLCJwcm9vZlVybCI6Imh0dHBzOi8vbmV3cy55Y29tYmluYXRvci5jb20vdXNlcj9pZD15dWthbmwifSx7IkB0eXBlIjoiQWNjb3VudCIsInBsYWNlaG9sZGVyIjpmYWxzZSwic2VydmljZSI6ImdpdGh1YiIsImlkZW50aWZpZXIiOiJ5a25sIiwicHJvb2ZUeXBlIjoiaHR0cCIsInByb29mVXJsIjoiaHR0cHM6Ly9naXN0LmdpdGh1Yi5jb20veWtubC8xZjcwMThiOThmNzE2ZjAxNWE2Y2Y0NGZkYTA4MDZkNyJ9LHsiQHR5cGUiOiJBY2NvdW50IiwicGxhY2Vob2xkZXIiOmZhbHNlLCJzZXJ2aWNlIjoidHdpdHRlciIsImlkZW50aWZpZXIiOiJ5dWthbmwiLCJwcm9vZlR5cGUiOiJodHRwIiwicHJvb2ZVcmwiOiJodHRwczovL3R3aXR0ZXIuY29tL3l1a2FuTC9zdGF0dXMvOTE2NzQwNzQ5MjM2MTAxMTIwIn1dLCJuYW1lIjoiS2VuIExpYW8iLCJhcHBzIjp7Imh0dHA6Ly9sb2NhbGhvc3Q6ODA4MCI6Imh0dHBzOi8vZ2FpYS5ibG9ja3N0YWNrLm9yZy9odWIvMUREVXFmS3RRZ1lOdDcyMnd1QjRaMmZQQzdhaU5HUWE1Ui8ifX19.UyQNZ02kBFHEovbwiGaS-VQd57w9kcwn1Nt3QbW3afEMArg1OndmeplB7lzjMuRCLAi-88lkpQLkFw7LwKZ31Q',
+      decodedToken: {
+        header: {
+          typ: 'JWT',
+          alg: 'ES256K',
         },
-        'payload': {
-          'jti': 'c48f9448-a0fe-4b9e-9d6a-fc0938c8e270',
-          'iat': '2018-01-08T18:22:24.796Z',
-          'exp': '2019-01-08T18:22:24.796Z',
-          'subject': {
-            'publicKey': '02487a91cd966faecee2aef3fde372809b46a36ee19248c01f72b645f44cef2e2c'
+        payload: {
+          jti: 'c48f9448-a0fe-4b9e-9d6a-fc0938c8e270',
+          iat: '2018-01-08T18:22:24.796Z',
+          exp: '2019-01-08T18:22:24.796Z',
+          subject: {
+            publicKey: '02487a91cd966faecee2aef3fde372809b46a36ee19248c01f72b645f44cef2e2c',
           },
-          'issuer': {
-            'publicKey': '02487a91cd966faecee2aef3fde372809b46a36ee19248c01f72b645f44cef2e2c'
+          issuer: {
+            publicKey: '02487a91cd966faecee2aef3fde372809b46a36ee19248c01f72b645f44cef2e2c',
           },
-          'claim': {
+          claim: {
             '@type': 'Person',
             '@context': 'http://schema.org',
-            'image': [
+            image: [
               {
                 '@type': 'ImageObject',
-                'name': 'avatar',
-                'contentUrl': 'https://www.dropbox.com/s/j1h0kts0m7aadip/avatar-0?dl=1'
-              }
+                name: 'avatar',
+                contentUrl: 'https://www.dropbox.com/s/j1h0kts0m7aadip/avatar-0?dl=1',
+              },
             ],
-            'givenName': '',
-            'familyName': '',
-            'description': '',
-            'account': [
+            givenName: '',
+            familyName: '',
+            description: '',
+            account: [
               {
                 '@type': 'Account',
-                'placeholder': false,
-                'service': 'hackerNews',
-                'identifier': 'yukanl',
-                'proofType': 'http',
-                'proofUrl': 'https://news.ycombinator.com/user?id=yukanl'
+                placeholder: false,
+                service: 'hackerNews',
+                identifier: 'yukanl',
+                proofType: 'http',
+                proofUrl: 'https://news.ycombinator.com/user?id=yukanl',
               },
               {
                 '@type': 'Account',
-                'placeholder': false,
-                'service': 'github',
-                'identifier': 'yknl',
-                'proofType': 'http',
-                'proofUrl': 'https://gist.github.com/yknl/1f7018b98f716f015a6cf44fda0806d7'
+                placeholder: false,
+                service: 'github',
+                identifier: 'yknl',
+                proofType: 'http',
+                proofUrl: 'https://gist.github.com/yknl/1f7018b98f716f015a6cf44fda0806d7',
               },
               {
                 '@type': 'Account',
-                'placeholder': false,
-                'service': 'twitter',
-                'identifier': 'yukanl',
-                'proofType': 'http',
-                'proofUrl': 'https://twitter.com/yukanL/status/916740749236101120'
-              }
+                placeholder: false,
+                service: 'twitter',
+                identifier: 'yukanl',
+                proofType: 'http',
+                proofUrl: 'https://twitter.com/yukanL/status/916740749236101120',
+              },
             ],
-            'name': 'Ken Liao',
-            'apps': {
-              'http://localhost:8080': 'https://gaia.blockstack.org/hub/1DDUqfKtQgYNt722wuB4Z2fPC7aiNGQa5R/'
-            }
-          }
+            name: 'Ken Liao',
+            apps: {
+              'http://localhost:8080':
+                'https://gaia.blockstack.org/hub/1DDUqfKtQgYNt722wuB4Z2fPC7aiNGQa5R/',
+            },
+          },
         },
-        'signature': 'UyQNZ02kBFHEovbwiGaS-VQd57w9kcwn1Nt3QbW3afEMArg1OndmeplB7lzjMuRCLAi-88lkpQLkFw7LwKZ31Q'
-      }
-    }
-  ]
+        signature:
+          'UyQNZ02kBFHEovbwiGaS-VQd57w9kcwn1Nt3QbW3afEMArg1OndmeplB7lzjMuRCLAi-88lkpQLkFw7LwKZ31Q',
+      },
+    },
+  ];
   /* eslint-enable */
 
   // const fileUrl = 'https://gaia.blockstack.org/hub/1DDUqfKtQgYNt722wuB4Z2fPC7aiNGQa5R/file.json'
@@ -1757,7 +1760,7 @@ test('base64 output size calculation', () => {
   }
 });
 
-test('playload size detection', async () => {
+test('payload size detection', async () => {
   const privateKey = 'a5c61c6ca7b3e7e55edee68566aeab22e4da26baa285c7bd10e8d2218aa3b229';
   const appConfig = new AppConfig(['store_write'], 'http://localhost:3000');
 
@@ -2221,87 +2224,93 @@ test('getUserAppFileUrl without user session', async () => {
   /* eslint-disable */
   const profileContent = [
     {
-      'token': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NksifQ.eyJqdGkiOiJjNDhmOTQ0OC1hMGZlLTRiOWUtOWQ2YS1mYzA5MzhjOGUyNzAiLCJpYXQiOiIyMDE4LTAxLTA4VDE4OjIyOjI0Ljc5NloiLCJleHAiOiIyMDE5LTAxLTA4VDE4OjIyOjI0Ljc5NloiLCJzdWJqZWN0Ijp7InB1YmxpY0tleSI6IjAyNDg3YTkxY2Q5NjZmYWVjZWUyYWVmM2ZkZTM3MjgwOWI0NmEzNmVlMTkyNDhjMDFmNzJiNjQ1ZjQ0Y2VmMmUyYyJ9LCJpc3N1ZXIiOnsicHVibGljS2V5IjoiMDI0ODdhOTFjZDk2NmZhZWNlZTJhZWYzZmRlMzcyODA5YjQ2YTM2ZWUxOTI0OGMwMWY3MmI2NDVmNDRjZWYyZTJjIn0sImNsYWltIjp7IkB0eXBlIjoiUGVyc29uIiwiQGNvbnRleHQiOiJodHRwOi8vc2NoZW1hLm9yZyIsImltYWdlIjpbeyJAdHlwZSI6IkltYWdlT2JqZWN0IiwibmFtZSI6ImF2YXRhciIsImNvbnRlbnRVcmwiOiJodHRwczovL3d3dy5kcm9wYm94LmNvbS9zL2oxaDBrdHMwbTdhYWRpcC9hdmF0YXItMD9kbD0xIn1dLCJnaXZlbk5hbWUiOiIiLCJmYW1pbHlOYW1lIjoiIiwiZGVzY3JpcHRpb24iOiIiLCJhY2NvdW50IjpbeyJAdHlwZSI6IkFjY291bnQiLCJwbGFjZWhvbGRlciI6ZmFsc2UsInNlcnZpY2UiOiJoYWNrZXJOZXdzIiwiaWRlbnRpZmllciI6Inl1a2FubCIsInByb29mVHlwZSI6Imh0dHAiLCJwcm9vZlVybCI6Imh0dHBzOi8vbmV3cy55Y29tYmluYXRvci5jb20vdXNlcj9pZD15dWthbmwifSx7IkB0eXBlIjoiQWNjb3VudCIsInBsYWNlaG9sZGVyIjpmYWxzZSwic2VydmljZSI6ImdpdGh1YiIsImlkZW50aWZpZXIiOiJ5a25sIiwicHJvb2ZUeXBlIjoiaHR0cCIsInByb29mVXJsIjoiaHR0cHM6Ly9naXN0LmdpdGh1Yi5jb20veWtubC8xZjcwMThiOThmNzE2ZjAxNWE2Y2Y0NGZkYTA4MDZkNyJ9LHsiQHR5cGUiOiJBY2NvdW50IiwicGxhY2Vob2xkZXIiOmZhbHNlLCJzZXJ2aWNlIjoidHdpdHRlciIsImlkZW50aWZpZXIiOiJ5dWthbmwiLCJwcm9vZlR5cGUiOiJodHRwIiwicHJvb2ZVcmwiOiJodHRwczovL3R3aXR0ZXIuY29tL3l1a2FuTC9zdGF0dXMvOTE2NzQwNzQ5MjM2MTAxMTIwIn1dLCJuYW1lIjoiS2VuIExpYW8iLCJhcHBzIjp7Imh0dHA6Ly9sb2NhbGhvc3Q6ODA4MCI6Imh0dHBzOi8vZ2FpYS5ibG9ja3N0YWNrLm9yZy9odWIvMUREVXFmS3RRZ1lOdDcyMnd1QjRaMmZQQzdhaU5HUWE1Ui8ifX19.UyQNZ02kBFHEovbwiGaS-VQd57w9kcwn1Nt3QbW3afEMArg1OndmeplB7lzjMuRCLAi-88lkpQLkFw7LwKZ31Q',
-      'decodedToken': {
-        'header': {
-          'typ': 'JWT',
-          'alg': 'ES256K'
+      token:
+        'eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NksifQ.eyJqdGkiOiJjNDhmOTQ0OC1hMGZlLTRiOWUtOWQ2YS1mYzA5MzhjOGUyNzAiLCJpYXQiOiIyMDE4LTAxLTA4VDE4OjIyOjI0Ljc5NloiLCJleHAiOiIyMDE5LTAxLTA4VDE4OjIyOjI0Ljc5NloiLCJzdWJqZWN0Ijp7InB1YmxpY0tleSI6IjAyNDg3YTkxY2Q5NjZmYWVjZWUyYWVmM2ZkZTM3MjgwOWI0NmEzNmVlMTkyNDhjMDFmNzJiNjQ1ZjQ0Y2VmMmUyYyJ9LCJpc3N1ZXIiOnsicHVibGljS2V5IjoiMDI0ODdhOTFjZDk2NmZhZWNlZTJhZWYzZmRlMzcyODA5YjQ2YTM2ZWUxOTI0OGMwMWY3MmI2NDVmNDRjZWYyZTJjIn0sImNsYWltIjp7IkB0eXBlIjoiUGVyc29uIiwiQGNvbnRleHQiOiJodHRwOi8vc2NoZW1hLm9yZyIsImltYWdlIjpbeyJAdHlwZSI6IkltYWdlT2JqZWN0IiwibmFtZSI6ImF2YXRhciIsImNvbnRlbnRVcmwiOiJodHRwczovL3d3dy5kcm9wYm94LmNvbS9zL2oxaDBrdHMwbTdhYWRpcC9hdmF0YXItMD9kbD0xIn1dLCJnaXZlbk5hbWUiOiIiLCJmYW1pbHlOYW1lIjoiIiwiZGVzY3JpcHRpb24iOiIiLCJhY2NvdW50IjpbeyJAdHlwZSI6IkFjY291bnQiLCJwbGFjZWhvbGRlciI6ZmFsc2UsInNlcnZpY2UiOiJoYWNrZXJOZXdzIiwiaWRlbnRpZmllciI6Inl1a2FubCIsInByb29mVHlwZSI6Imh0dHAiLCJwcm9vZlVybCI6Imh0dHBzOi8vbmV3cy55Y29tYmluYXRvci5jb20vdXNlcj9pZD15dWthbmwifSx7IkB0eXBlIjoiQWNjb3VudCIsInBsYWNlaG9sZGVyIjpmYWxzZSwic2VydmljZSI6ImdpdGh1YiIsImlkZW50aWZpZXIiOiJ5a25sIiwicHJvb2ZUeXBlIjoiaHR0cCIsInByb29mVXJsIjoiaHR0cHM6Ly9naXN0LmdpdGh1Yi5jb20veWtubC8xZjcwMThiOThmNzE2ZjAxNWE2Y2Y0NGZkYTA4MDZkNyJ9LHsiQHR5cGUiOiJBY2NvdW50IiwicGxhY2Vob2xkZXIiOmZhbHNlLCJzZXJ2aWNlIjoidHdpdHRlciIsImlkZW50aWZpZXIiOiJ5dWthbmwiLCJwcm9vZlR5cGUiOiJodHRwIiwicHJvb2ZVcmwiOiJodHRwczovL3R3aXR0ZXIuY29tL3l1a2FuTC9zdGF0dXMvOTE2NzQwNzQ5MjM2MTAxMTIwIn1dLCJuYW1lIjoiS2VuIExpYW8iLCJhcHBzIjp7Imh0dHA6Ly9sb2NhbGhvc3Q6ODA4MCI6Imh0dHBzOi8vZ2FpYS5ibG9ja3N0YWNrLm9yZy9odWIvMUREVXFmS3RRZ1lOdDcyMnd1QjRaMmZQQzdhaU5HUWE1Ui8ifX19.UyQNZ02kBFHEovbwiGaS-VQd57w9kcwn1Nt3QbW3afEMArg1OndmeplB7lzjMuRCLAi-88lkpQLkFw7LwKZ31Q',
+      decodedToken: {
+        header: {
+          typ: 'JWT',
+          alg: 'ES256K',
         },
-        'payload': {
-          'jti': 'c48f9448-a0fe-4b9e-9d6a-fc0938c8e270',
-          'iat': '2018-01-08T18:22:24.796Z',
-          'exp': '2019-01-08T18:22:24.796Z',
-          'subject': {
-            'publicKey': '02487a91cd966faecee2aef3fde372809b46a36ee19248c01f72b645f44cef2e2c'
+        payload: {
+          jti: 'c48f9448-a0fe-4b9e-9d6a-fc0938c8e270',
+          iat: '2018-01-08T18:22:24.796Z',
+          exp: '2019-01-08T18:22:24.796Z',
+          subject: {
+            publicKey: '02487a91cd966faecee2aef3fde372809b46a36ee19248c01f72b645f44cef2e2c',
           },
-          'issuer': {
-            'publicKey': '02487a91cd966faecee2aef3fde372809b46a36ee19248c01f72b645f44cef2e2c'
+          issuer: {
+            publicKey: '02487a91cd966faecee2aef3fde372809b46a36ee19248c01f72b645f44cef2e2c',
           },
-          'claim': {
+          claim: {
             '@type': 'Person',
             '@context': 'http://schema.org',
-            'image': [
+            image: [
               {
                 '@type': 'ImageObject',
-                'name': 'avatar',
-                'contentUrl': 'https://www.dropbox.com/s/j1h0kts0m7aadip/avatar-0?dl=1'
-              }
+                name: 'avatar',
+                contentUrl: 'https://www.dropbox.com/s/j1h0kts0m7aadip/avatar-0?dl=1',
+              },
             ],
-            'givenName': '',
-            'familyName': '',
-            'description': '',
-            'account': [
+            givenName: '',
+            familyName: '',
+            description: '',
+            account: [
               {
                 '@type': 'Account',
-                'placeholder': false,
-                'service': 'hackerNews',
-                'identifier': 'yukanl',
-                'proofType': 'http',
-                'proofUrl': 'https://news.ycombinator.com/user?id=yukanl'
+                placeholder: false,
+                service: 'hackerNews',
+                identifier: 'yukanl',
+                proofType: 'http',
+                proofUrl: 'https://news.ycombinator.com/user?id=yukanl',
               },
               {
                 '@type': 'Account',
-                'placeholder': false,
-                'service': 'github',
-                'identifier': 'yknl',
-                'proofType': 'http',
-                'proofUrl': 'https://gist.github.com/yknl/1f7018b98f716f015a6cf44fda0806d7'
+                placeholder: false,
+                service: 'github',
+                identifier: 'yknl',
+                proofType: 'http',
+                proofUrl: 'https://gist.github.com/yknl/1f7018b98f716f015a6cf44fda0806d7',
               },
               {
                 '@type': 'Account',
-                'placeholder': false,
-                'service': 'twitter',
-                'identifier': 'yukanl',
-                'proofType': 'http',
-                'proofUrl': 'https://twitter.com/yukanL/status/916740749236101120'
-              }
+                placeholder: false,
+                service: 'twitter',
+                identifier: 'yukanl',
+                proofType: 'http',
+                proofUrl: 'https://twitter.com/yukanL/status/916740749236101120',
+              },
             ],
-            'name': 'Ken Liao',
-            'apps': {
-              'http://localhost:8080': 'https://gaia.blockstack.org/hub/1DDUqfKtQgYNt722wuB4Z2fPC7aiNGQa5R/'
-            }
-          }
+            name: 'Ken Liao',
+            apps: {
+              'http://localhost:8080':
+                'https://gaia.blockstack.org/hub/1DDUqfKtQgYNt722wuB4Z2fPC7aiNGQa5R/',
+            },
+          },
         },
-        'signature': 'UyQNZ02kBFHEovbwiGaS-VQd57w9kcwn1Nt3QbW3afEMArg1OndmeplB7lzjMuRCLAi-88lkpQLkFw7LwKZ31Q'
-      }
-    }
-  ]
+        signature:
+          'UyQNZ02kBFHEovbwiGaS-VQd57w9kcwn1Nt3QbW3afEMArg1OndmeplB7lzjMuRCLAi-88lkpQLkFw7LwKZ31Q',
+      },
+    },
+  ];
   /* eslint-enable */
   const fileContents = JSON.stringify({ key: 'value' });
 
-  fetchMock.once(JSON.stringify(nameRecord)).once(JSON.stringify(profileContent)).once(fileContents);
+  fetchMock
+    .once(JSON.stringify(nameRecord))
+    .once(JSON.stringify(profileContent))
+    .once(fileContents);
 
   const url = await getUserAppFileUrl({
     path,
     username,
     appOrigin,
-    zoneFileLookupURL
+    zoneFileLookupURL,
   });
 
   expect(url).toBeTruthy();
   expect(url).toEqual(fileUrl);
 
-  const contents = await fetchPrivate( url as string ).then(res => res.json());
+  const contents = await fetchPrivate(url as string).then(res => res.json());
   expect(JSON.stringify(contents)).toEqual(fileContents);
 });
 

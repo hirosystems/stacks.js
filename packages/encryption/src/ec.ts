@@ -1,15 +1,14 @@
-import { Buffer } from '@stacks/common';
-import { getPublicKey, getSharedSecret, utils, signSync, verify, Point } from '@noble/secp256k1';
-import * as BN from 'bn.js';
-import { FailedDecryptionError } from '@stacks/common';
-import { getPublicKeyFromPrivate } from './keys';
-import { hashSha256Sync, hashSha512Sync } from './sha2Hash';
-import { createHmacSha256 } from './hmacSha256';
-import { createCipher } from './aesCipher';
-import { getAesCbcOutputLength, getBase64OutputLength } from './utils';
 import { hmac } from '@noble/hashes/hmac';
 import { sha256 } from '@noble/hashes/sha256';
-import { hexToBytes, concatBytes } from '@noble/hashes/utils';
+import { concatBytes, hexToBytes } from '@noble/hashes/utils';
+import { getPublicKey, getSharedSecret, Point, signSync, utils, verify } from '@noble/secp256k1';
+import { Buffer, FailedDecryptionError } from '@stacks/common';
+import * as BN from 'bn.js';
+import { createCipher } from './aesCipher';
+import { createHmacSha256 } from './hmacSha256';
+import { getPublicKeyFromPrivate } from './keys';
+import { hashSha256Sync, hashSha512Sync } from './sha2Hash';
+import { getAesCbcOutputLength, getBase64OutputLength } from './utils';
 
 /**
  * To use secp256k1.signSync set utils.hmacSha256Sync to a function using noble-hashes

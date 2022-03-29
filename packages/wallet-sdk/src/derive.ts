@@ -2,7 +2,7 @@
 // Secure, audited & minimal implementation of BIP32 hierarchical deterministic (HD) wallets.
 import { HDKey } from '@scure/bip32';
 import { Buffer, ChainID, TransactionVersion } from '@stacks/common';
-import { createSha2Hash, ecPrivateKeyToHexString } from '@stacks/encryption';
+import { compressPrivateKey, createSha2Hash, ecPrivateKeyToHexString } from '@stacks/encryption';
 import { StacksMainnet, StacksNetwork } from '@stacks/network';
 import { bytesToHex, getAddressFromPrivateKey } from '@stacks/transactions';
 import { Account, BIP32Interface, HARDENED_OFFSET, WalletKeys } from './models/common';
@@ -294,7 +294,7 @@ export const deriveStxPrivateKey = ({
     childKey.privateKey instanceof Uint8Array
       ? Buffer.from(childKey.privateKey)
       : childKey.privateKey;
-  return ecPrivateKeyToHexString(privateKey);
+  return ecPrivateKeyToHexString(compressPrivateKey(privateKey));
 };
 
 export const deriveDataPrivateKey = ({
@@ -316,7 +316,7 @@ export const deriveDataPrivateKey = ({
     childKey.privateKey instanceof Uint8Array
       ? Buffer.from(childKey.privateKey)
       : childKey.privateKey;
-  return ecPrivateKeyToHexString(privateKey);
+  return ecPrivateKeyToHexString(compressPrivateKey(privateKey));
 };
 
 export const deriveAccount = ({

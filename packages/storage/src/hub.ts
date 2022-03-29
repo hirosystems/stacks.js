@@ -243,7 +243,7 @@ export async function getBucketUrl(gaiaHubUrl: string, appPrivateKey: string): P
   const responseText = await response.text();
   const responseJSON = JSON.parse(responseText);
   const readURL = responseJSON.read_url_prefix;
-  const address = publicKeyToAddress(getPublicKeyFromPrivate(compressPrivateKey(appPrivateKey)));
+  const address = publicKeyToAddress(getPublicKeyFromPrivate(appPrivateKey));
   const bucketUrl = `${readURL}${address}/`;
   return bucketUrl;
 }

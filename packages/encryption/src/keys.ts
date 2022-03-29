@@ -1,6 +1,6 @@
 import { hmac } from '@noble/hashes/hmac';
 import { sha256 } from '@noble/hashes/sha256';
-import { getPublicKey, signSync, utils } from '@noble/secp256k1';
+import { getPublicKey as nobleGetPublicKey, signSync, utils } from '@noble/secp256k1';
 import { Buffer, privateKeyToBuffer, PRIVATE_KEY_COMPRESSED_LENGTH } from '@stacks/common';
 import base58 from 'bs58';
 import { hashRipemd160 } from './hashRipemd160';
@@ -54,13 +54,12 @@ export function publicKeyToAddress(publicKey: string | Buffer) {
 
 /**
  * @ignore
+ * @returns a compressed public key
  */
 export function getPublicKeyFromPrivate(privateKey: string | Buffer) {
   const privateKeyBuffer = privateKeyToBuffer(privateKey);
-  const shouldCompressPublicKey = privateKeyBuffer.length == PRIVATE_KEY_COMPRESSED_LENGTH;
-  return Buffer.from(getPublicKey(privateKeyBuffer.slice(0, 32), shouldCompressPublicKey)).toString(
-    'hex'
-  );
+  // for backwards compatibility we always return a compressed public key, regardless of private key mode
+  return Buffer.from(nobleGetPublicKey(privateKeyBuffer.slice(0, 32), true)).toString('hex');
 }
 
 /**
@@ -91,13 +90,10 @@ export function isValidPrivateKey(privateKey: string | Buffer): boolean {
 /**
  * @ignore
  */
-export function compressPrivateKey(privateKey: string | Buffer): string {
+export function compressPrivateKey(privateKey: string | Buffer): Buffer {
   const privateKeyBuffer = privateKeyToBuffer(privateKey);
 
-  const compressedPrivateKeyBuffer =
-    privateKeyBuffer.length == PRIVATE_KEY_COMPRESSED_LENGTH
-      ? privateKeyBuffer
-      : Buffer.concat([privateKeyBuffer, Buffer.from([1])]);
-
-  return ecPrivateKeyToHexString(compressedPrivateKeyBuffer);
+  return privateKeyBuffer.length == PRIVATE_KEY_COMPRESSED_LENGTH
+    ? privateKeyBuffer // leave compressed
+    : Buffer.concat([privateKeyBuffer, Buffer.from([1])]); // compress
 }
