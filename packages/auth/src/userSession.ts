@@ -10,7 +10,7 @@ import {
   decryptContent,
   encryptContent,
   EncryptContentOptions,
-  hexStringToECPair,
+  isValidPrivateKey,
 } from '@stacks/encryption';
 import { getAddressFromDID } from './dids';
 import {
@@ -275,9 +275,7 @@ export class UserSession {
             )) as string;
           } catch (e) {
             Logger.warn('Failed decryption of appPrivateKey, will try to use as given');
-            try {
-              hexStringToECPair(tokenPayload.private_key as string);
-            } catch (ecPairError) {
+            if (!isValidPrivateKey(tokenPayload.private_key as string)) {
               throw new LoginFailedError(
                 'Failed decrypting appPrivateKey. Usually means' +
                   ' that the transit key has changed during login.'

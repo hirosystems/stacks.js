@@ -2,15 +2,12 @@
 // Secure, audited & minimal implementation of BIP32 hierarchical deterministic (HD) wallets.
 import { HDKey } from '@scure/bip32';
 import { Buffer, ChainID, TransactionVersion } from '@stacks/common';
-import { HARDENED_OFFSET } from './models/common';
-import { ECPair } from 'bitcoinjs-lib';
-import { createSha2Hash, ecPairToHexString } from '@stacks/encryption';
-
-import { assertIsTruthy, whenChainId } from './utils';
-import { Account, WalletKeys, BIP32Interface } from './models/common';
+import { createSha2Hash, ecPrivateKeyToHexString } from '@stacks/encryption';
 import { StacksMainnet, StacksNetwork } from '@stacks/network';
-import { getAddressFromPrivateKey, bytesToHex } from '@stacks/transactions';
+import { bytesToHex, getAddressFromPrivateKey } from '@stacks/transactions';
+import { Account, BIP32Interface, HARDENED_OFFSET, WalletKeys } from './models/common';
 import { fetchFirstName } from './usernames';
+import { assertIsTruthy, whenChainId } from './utils';
 
 const DATA_DERIVATION_PATH = `m/888'/0'`;
 const WALLET_CONFIG_PATH = `m/44/5757'/0'/1`;
@@ -297,8 +294,7 @@ export const deriveStxPrivateKey = ({
     childKey.privateKey instanceof Uint8Array
       ? Buffer.from(childKey.privateKey)
       : childKey.privateKey;
-  const ecPair = ECPair.fromPrivateKey(privateKey);
-  return ecPairToHexString(ecPair);
+  return ecPrivateKeyToHexString(privateKey);
 };
 
 export const deriveDataPrivateKey = ({
@@ -320,8 +316,7 @@ export const deriveDataPrivateKey = ({
     childKey.privateKey instanceof Uint8Array
       ? Buffer.from(childKey.privateKey)
       : childKey.privateKey;
-  const ecPair = ECPair.fromPrivateKey(privateKey);
-  return ecPairToHexString(ecPair);
+  return ecPrivateKeyToHexString(privateKey);
 };
 
 export const deriveAccount = ({

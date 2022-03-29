@@ -1,12 +1,7 @@
 // @ts-ignore
 import { Buffer } from '@stacks/common';
 import { TokenSigner, Json } from 'jsontokens';
-import {
-  getPublicKeyFromPrivate,
-  ecPairToAddress,
-  hexStringToECPair,
-  publicKeyToAddress,
-} from '@stacks/encryption';
+import { getPublicKeyFromPrivate, publicKeyToAddress } from '@stacks/encryption';
 import randomBytes from 'randombytes';
 import { GaiaHubConfig } from '@stacks/storage';
 
@@ -79,9 +74,7 @@ export const makeReadOnlyGaiaConfig = ({
   readURL,
   privateKey,
 }: ReadOnlyGaiaConfigOptions): GaiaHubConfig => {
-  const address = ecPairToAddress(
-    hexStringToECPair(privateKey + (privateKey.length === 64 ? '01' : ''))
-  );
+  const address = publicKeyToAddress(getPublicKeyFromPrivate(privateKey));
   return {
     url_prefix: readURL,
     max_file_upload_size_megabytes: 100,
