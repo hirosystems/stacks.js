@@ -35,6 +35,8 @@
     ]
   },
   "devDependencies": {
+    "@janniks/typedoc-plugin-monorepo": "^0.4.2-1",
+    "@janniks/typedoc-theme-stacks": "^1.0.0",
     "@rollup/plugin-alias": "^3.1.9",
     "@rollup/plugin-babel": "^5.3.0",
     "@rollup/plugin-commonjs": "^21.0.1",
@@ -45,7 +47,6 @@
     "@rollup/plugin-typescript": "^8.3.0",
     "@stacks/eslint-config": "^1.2.0",
     "@stacks/prettier-config": "^0.0.10",
-    "@strictsoftware/typedoc-plugin-monorepo": "^0.4.2",
     "@typescript-eslint/eslint-plugin": "^5.11.0",
     "@typescript-eslint/parser": "^5.11.0",
     "assert": "^2.0.0",
@@ -58,6 +59,7 @@
     "lerna": "^4.0.0",
     "lerna-from-npm": "^1.0.0",
     "madge": "^5.0.1",
+    "node-jq": "^2.3.2",
     "path-browserify": "^1.0.1",
     "prettier": "^2.5.1",
     "rimraf": "^3.0.2",
@@ -65,14 +67,14 @@
     "rollup-plugin-node-globals": "^1.4.0",
     "rollup-plugin-terser": "^7.0.2",
     "stream-http": "^3.2.0",
-    "typedoc": "^0.20.35",
+    "typedoc": "^0.22.13",
     "typescript": "^4.2.4",
     "vite-compatible-readable-stream": "^3.6.0"
   },
   "scripts": {
     "bootstrap": "lerna bootstrap",
     "build": "lerna run build",
-    "build:docs": "rimraf docs && typedoc --name \"Stacks.js $npm_package_version Library Reference\" --readme ./readme.md --tsconfig tsconfig.typedoc.json --out docs --json docs/docs.json packages/**/src/index.ts",
+    "build:docs": "rimraf docs && typedoc --tsconfig tsconfig.typedoc.json packages/**/src/index.ts --release-version $(cat lerna.json | jq -r '.version')",
     "clean": "lerna clean",
     "lerna": "lerna",
     "lint": "npm run lint:eslint && npm run lint:prettier",
