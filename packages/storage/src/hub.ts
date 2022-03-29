@@ -219,9 +219,7 @@ export async function connectToGaiaHub(
   const hubInfo = await response.json();
   const readURL = hubInfo.read_url_prefix;
   const token = makeV1GaiaAuthToken(hubInfo, challengeSignerHex, gaiaHubUrl, associationToken);
-  const address = publicKeyToAddress(
-    getPublicKeyFromPrivate(compressPrivateKey(challengeSignerHex))
-  );
+  const address = publicKeyToAddress(getPublicKeyFromPrivate(challengeSignerHex));
   return {
     url_prefix: readURL,
     max_file_upload_size_megabytes: hubInfo.max_file_upload_size_megabytes,
