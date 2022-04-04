@@ -31,7 +31,7 @@ module.exports = {
       process: require.resolve('process/browser'), // unclear which @stacks package dependencies introduce this (not common, not network)
     }),
     isDedupe && new DuplicatesPlugin(),
-    isAnalyze && new BundleAnalyzerPlugin(),
+    isAnalyze && new BundleAnalyzerPlugin({ analyzerMode: 'static' }),
   ].filter(Boolean),
   optimization: {
     minimize: isProduction,
