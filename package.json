@@ -60,7 +60,6 @@
     "lerna": "^4.0.0",
     "lerna-from-npm": "^1.0.0",
     "madge": "^5.0.1",
-    "node-jq": "^2.3.2",
     "path-browserify": "^1.0.1",
     "prettier": "^2.5.1",
     "rimraf": "^3.0.2",
@@ -75,7 +74,7 @@
   "scripts": {
     "bootstrap": "lerna bootstrap",
     "build": "lerna run build",
-    "build:docs": "rimraf docs && typedoc --tsconfig tsconfig.typedoc.json packages/**/src/index.ts --release-version $(cat lerna.json | jq -r '.version')",
+    "build:docs": "rimraf docs && typedoc --tsconfig tsconfig.typedoc.json packages/**/src/index.ts --release-version $(node -p \"require('./lerna.json').version\")",
     "clean": "lerna clean",
     "lerna": "lerna",
     "lint": "npm run lint:eslint && npm run lint:prettier",
