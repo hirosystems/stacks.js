@@ -10,7 +10,6 @@ const NODE_ENV_PRODUCTION = 'production';
 const NODE_ENV_DEVELOPMENT = 'development';
 
 const isAnalyze = !!process.env.ANALYZE;
-const isDedupe = !!process.env.DEDUPE;
 const isProduction = process.env.NODE_ENV === NODE_ENV_PRODUCTION;
 
 module.exports = {
@@ -30,7 +29,7 @@ module.exports = {
       Buffer: ['buffer', 'Buffer'],
       process: require.resolve('process/browser'), // unclear which @stacks package dependencies introduce this (not common, not network)
     }),
-    isDedupe && new DuplicatesPlugin(),
+    isAnalyze && new DuplicatesPlugin(),
     isAnalyze && new BundleAnalyzerPlugin({ analyzerMode: 'static' }),
   ].filter(Boolean),
   optimization: {
