@@ -242,6 +242,7 @@ transaction must be appended to the signature.
 ```typescript
 // deserialize and sign transaction
 const bufferReader = new BufferReader(serializedTx);
+// Partially signed or unsigned multi-sig tx can be deserialized to add the required signatures
 const deserializedTx = deserializeTransaction(bufferReader);
 
 const signer = new TransactionSigner(deserializedTx);
