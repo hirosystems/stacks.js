@@ -526,13 +526,17 @@ test('Invalid spending conditions', () => {
 
   const badPublicKeyCountBuffer = Buffer.from(badPublicKeyCountBytes);
 
+  // Partially signed multi-sig tx can be serialized and deserialized without exception (Incorrect number of signatures)
+  // Should be able to deserialize as number of signatures are less than signatures required
   expect(() => deserializeSpendingCondition(new BufferReader(badPublicKeyCountBuffer)))
-    .toThrow('Incorrect number of signatures');
+    .not.toThrowError();
 
   const badPublicKeyCount2Buffer = Buffer.from(badPublicKeyCountBytes2);
 
+  // Partially signed multi-sig tx can be serialized and deserialized without exception (Incorrect number of signatures)
+  // Should be able to deserialize as number of signatures are less than signatures required
   expect(() => deserializeSpendingCondition(new BufferReader(badPublicKeyCount2Buffer)))
-    .toThrow('Incorrect number of signatures');
+    .not.toThrowError();
 
   // hashing mode doesn't allow uncompressed keys
   const signatureFF = createMessageSignature('ff'.repeat(65));

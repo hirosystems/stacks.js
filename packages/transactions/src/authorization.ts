@@ -235,7 +235,8 @@ export function deserializeMultiSigSpendingCondition(
   }
   const signaturesRequired = bufferReader.readUInt16BE();
 
-  if (numSigs !== signaturesRequired) throw new VerificationError(`Incorrect number of signatures`);
+  // Partially signed multi-sig tx can be serialized and deserialized without exception (Incorrect number of signatures)
+  // No need to check numSigs !== signaturesRequired to throw Incorrect number of signatures error
 
   if (haveUncompressed && hashMode === AddressHashMode.SerializeP2SH)
     throw new VerificationError('Uncompressed keys are not allowed in this hash mode');
