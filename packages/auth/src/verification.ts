@@ -1,9 +1,8 @@
+import { isSameOriginAbsoluteUrl } from '@stacks/common';
+import { publicKeyToAddress } from '@stacks/encryption';
 import { decodeToken, TokenVerifier } from 'jsontokens';
 import { getAddressFromDID } from './dids';
-import { publicKeyToAddress } from '@stacks/encryption';
-import { fetchPrivate, isSameOriginAbsoluteUrl } from '@stacks/common';
 import { fetchAppManifest } from './provider';
-import { c32ToB58 } from 'c32check';
 
 /**
  * Checks if the ES256k signature on passed `token` match the claimed public key
@@ -63,70 +62,6 @@ export function doPublicKeysMatchIssuer(token: string): boolean {
   }
 
   return false;
-}
-
-/**
- * Looks up the identity address that owns the claimed username
- * in `token` using the lookup endpoint provided in `nameLookupURL`
- * to determine if the username is owned by the identity address
- * that matches the claimed public key
- *
- * @param  {String} token  encoded and signed authentication token
- * @param  {String} nameLookupURL a URL to the name lookup endpoint of the Blockstack Core API
- * @return {Promise<Boolean>} returns a `Promise` that resolves to
- * `true` if the username is owned by the public key, otherwise the
- * `Promise` resolves to `false`
- * @private
- * @ignore
- */
-export async function doPublicKeysMatchUsername(
-  token: string,
-  nameLookupURL: string
-): Promise<boolean> {
-  try {
-    const payload = decodeToken(token).payload;
-    if (typeof payload === 'string') {
-      throw new Error('Unexpected token payload type of string');
-    }
-    if (!payload.username) {
-      return true;
-    }
-
-    if (payload.username === null) {
-      return true;
-    }
-
-    if (nameLookupURL === null) {
-      return false;
-    }
-
-    const username = payload.username;
-    const url = `${nameLookupURL.replace(/\/$/, '')}/${username}`;
-    const response = await fetchPrivate(url);
-    const responseText = await response.text();
-    const responseJSON = JSON.parse(responseText);
-    if (responseJSON.hasOwnProperty('address')) {
-      const nameOwningAddress = responseJSON.address;
-      let nameOwningAddressBtc = nameOwningAddress;
-      try {
-        // try converting STX to BTC
-        // if this throws, it's already a BTC address
-        nameOwningAddressBtc = c32ToB58(nameOwningAddress, 0);
-      } catch {}
-      const addressFromIssuer = getAddressFromDID(payload.iss);
-      if (nameOwningAddressBtc === addressFromIssuer) {
-        return true;
-      } else {
-        return false;
-      }
-    } else {
-      return false;
-    }
-  } catch (error) {
-    console.log(error);
-    console.log('Error checking `doPublicKeysMatchUsername`');
-    return false;
-  }
 }
 
 /**
