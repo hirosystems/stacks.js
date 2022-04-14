@@ -6,7 +6,6 @@ export {
   verifyAuthResponse,
   isExpirationDateValid,
   isIssuanceDateValid,
-  doPublicKeysMatchUsername,
   doPublicKeysMatchIssuer,
   doSignaturesMatchPublicKeys,
   isManifestUriValid,

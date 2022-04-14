@@ -8,7 +8,6 @@ import {
   isIssuanceDateValid,
   doSignaturesMatchPublicKeys,
   doPublicKeysMatchIssuer,
-  doPublicKeysMatchUsername,
   isManifestUriValid,
   isRedirectUriValid,
   verifyAuthRequestAndLoadManifest,
@@ -30,7 +29,6 @@ beforeEach(() => {
 
 const privateKey = 'a5c61c6ca7b3e7e55edee68566aeab22e4da26baa285c7bd10e8d2218aa3b229';
 const publicKey = '027d28f9951ce46538951e3697c62588a87f1f1f295de4a14fdd4c780fc52cfe69';
-const nameLookupURL = 'https://stacks-node-api.mainnet.stacks.co/v1/names/';
 
 test('makeAuthRequest && verifyAuthRequest', async () => {
   const appConfig = new AppConfig(['store_write'], 'http://localhost:3000');
@@ -191,10 +189,6 @@ test('makeAuthResponse && verifyAuthResponse', async () => {
   expect(isIssuanceDateValid(authResponse)).toBe(true);
   expect(doSignaturesMatchPublicKeys(authResponse)).toBe(true);
   expect(doPublicKeysMatchIssuer(authResponse)).toBe(true);
-
-  await doPublicKeysMatchUsername(authResponse, nameLookupURL).then(verifiedResult => {
-    expect(verifiedResult).toBe(true);
-  });
 });
 
 test('auth response with invalid or empty appPrivateKeyFromWalletSalt', async () => {
@@ -253,15 +247,11 @@ test('auth response with username', async () => {
 
   const authResponse = await makeAuthResponse(privateKey, sampleProfiles.ryan, 'ryan.id', null);
 
-  await doPublicKeysMatchUsername(authResponse, nameLookupURL).then(verified => {
-    expect(verified).toBe(true);
-  });
-
   await verifyAuthResponse(authResponse).then(verifiedResult => {
     expect(verifiedResult).toBe(true);
   });
 
-  expect(fetchMock.mock.calls.length).toEqual(1);
+  expect(fetchMock.mock.calls.length).toEqual(0);
 });
 
 test('auth response with invalid private key', async () => {

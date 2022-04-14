@@ -44,7 +44,6 @@
     "@stacks/encryption": "^3.3.0",
     "@stacks/network": "^3.3.0",
     "@stacks/profile": "^3.3.0",
-    "c32check": "^1.1.3",
     "cross-fetch": "^3.1.4",
     "jsontokens": "^3.0.0",
     "query-string": "^6.13.1"
