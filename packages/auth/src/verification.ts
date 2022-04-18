@@ -203,8 +203,6 @@ export async function verifyAuthRequestAndLoadManifest(token: string): Promise<a
 /**
  * Verify the authentication response is valid.
  * @param {String} token the authentication response token
- * @param {String} nameLookupURL the url use to verify owner of a username
- * @param fallbackLookupURLs an optional array of name lookup URLs to check usernames for
  * @return {Promise} that resolves to true if auth response
  * is valid and false if it does not
  * @private
