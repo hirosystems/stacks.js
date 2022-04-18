@@ -297,7 +297,6 @@ export class UserSession {
     }
 
     const userData: UserData = {
-      username: tokenPayload.username as string,
       profile: tokenPayload.profile,
       email: tokenPayload.email as string,
       decentralizedID: tokenPayload.iss,

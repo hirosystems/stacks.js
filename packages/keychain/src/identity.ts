@@ -96,7 +96,6 @@ export class Identity implements IdentifyInterface {
         ...(this.profile || {}),
         stxAddress,
       },
-      this.defaultUsername || '',
       {
         profileUrl,
       },

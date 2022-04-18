@@ -165,7 +165,7 @@ test('invalid auth request - invalid manifest uri', async () => {
 });
 
 test('makeAuthResponse && verifyAuthResponse', async () => {
-  const authResponse = await makeAuthResponse(privateKey, sampleProfiles.ryan, null, null);
+  const authResponse = await makeAuthResponse(privateKey, sampleProfiles.ryan, null);
   expect(authResponse).toBeTruthy();
 
   const decodedToken = decodeToken(authResponse);
@@ -179,7 +179,9 @@ test('makeAuthResponse && verifyAuthResponse', async () => {
   expect(JSON.stringify((decodedToken.payload as any).profile)).toEqual(
     JSON.stringify(sampleProfiles.ryan)
   );
-  expect((decodedToken.payload as any).username).toBe(null);
+
+  // username was removed from payload
+  expect('username' in (decodedToken.payload as any)).toBeFalsy();
 
   await verifyAuthResponse(authResponse).then(verifiedResult => {
     expect(verifiedResult).toBe(true);
@@ -196,7 +198,6 @@ test('auth response with invalid or empty appPrivateKeyFromWalletSalt', async ()
   const authResponse = await makeAuthResponse(
     privateKey,
     sampleProfiles.ryan,
-    null,
     null,
     null,
     null,
@@ -223,7 +224,6 @@ test('auth response with valid appPrivateKeyFromWalletSalt', async () => {
     null,
     null,
     null,
-    null,
     undefined,
     null,
     null,
@@ -245,7 +245,7 @@ test('auth response with valid appPrivateKeyFromWalletSalt', async () => {
 test('auth response with username', async () => {
   fetchMock.mockResponse(JSON.stringify(sampleNameRecords.ryan));
 
-  const authResponse = await makeAuthResponse(privateKey, sampleProfiles.ryan, 'ryan.id', null);
+  const authResponse = await makeAuthResponse(privateKey, sampleProfiles.ryan, null);
 
   await verifyAuthResponse(authResponse).then(verifiedResult => {
     expect(verifiedResult).toBe(true);
@@ -270,7 +270,6 @@ test('auth response with invalid private key', async () => {
   const authResponse = await makeAuthResponse(
     privateKey,
     sampleProfiles.ryan,
-    'ryan.id',
     metadata,
     undefined,
     appPrivateKey,
@@ -312,7 +311,6 @@ test('handlePendingSignIn with authResponseToken', async () => {
   const authResponse = await makeAuthResponse(
     privateKey,
     sampleProfiles.ryan,
-    'ryan.id',
     metadata,
     undefined,
     appPrivateKey,
@@ -340,7 +338,6 @@ test('handlePendingSignIn 2', async () => {
   const authResponse = await makeAuthResponse(
     privateKey,
     sampleProfiles.ryan,
-    'ryan.id',
     metadata,
     undefined,
     appPrivateKey,
@@ -387,7 +384,6 @@ test('handlePendingSignIn with existing user session', async () => {
   const authResponse = await makeAuthResponse(
     privateKey,
     sampleProfiles.ryan,
-    'ryan.id',
     metadata,
     undefined,
     appPrivateKey,
@@ -453,7 +449,6 @@ test('handlePendingSignIn with authResponseToken, transit key and custom Blockst
   const authResponse = await makeAuthResponse(
     privateKey,
     sampleProfiles.ryan,
-    'ryan.id',
     metadata,
     undefined,
     appPrivateKey,
@@ -503,7 +498,6 @@ test(
     const authResponse = await makeAuthResponse(
       privateKey,
       sampleProfiles.ryan,
-      'ryan.id',
       metadata,
       undefined,
       appPrivateKey,

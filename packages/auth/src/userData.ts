@@ -2,8 +2,6 @@
  *  Returned from the [[UserSession.loadUserData]] function.
  */
 export interface UserData {
-  // public: the blockstack ID (for example: stackerson.id or alice.blockstack.id)
-  username: string;
   // public: the email address for the user. only available if the `email`
   // scope is requested, and if the user has entered a valid email into
   // their profile.

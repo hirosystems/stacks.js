@@ -118,7 +118,6 @@ export const makeAuthResponse = async ({
         mainnet: getStxAddress({ account, transactionVersion: TransactionVersion.Mainnet }),
       },
     },
-    account.username || '',
     {
       profileUrl,
     },
