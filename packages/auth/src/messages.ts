@@ -159,7 +159,6 @@ export async function decryptPrivateKey(
  * @param  {String} privateKey the identity key of the Blockstack ID generating
  * the authentication response
  * @param  {Object} profile the profile object for the Blockstack ID
- * @param  {String} username the username of the Blockstack ID if any, otherwise `null`
  * @param  {AuthMetadata} metadata an object containing metadata sent as part of the authentication
  * response including `email` if requested and available and a URL to the profile
  * @param  {String} coreToken core session token when responding to a legacy auth request
@@ -181,7 +180,6 @@ export async function makeAuthResponse(
   privateKey: string,
   // eslint-disable-next-line @typescript-eslint/ban-types
   profile: {} = {},
-  username: string | null = null,
   metadata: AuthMetadata | null,
   coreToken: string | null = null,
   appPrivateKey: string | null = null,
@@ -232,7 +230,6 @@ export async function makeAuthResponse(
       public_keys: [publicKey],
       appPrivateKeyFromWalletSalt,
       profile,
-      username,
       core_token: coreTokenPayload,
     },
     additionalProperties
