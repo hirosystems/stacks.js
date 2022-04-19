@@ -11,3 +11,5 @@ export * from './sha2Hash';
 export * from './encryption';
 
 export * from './utils';
+
+export * from './messageSignature';
