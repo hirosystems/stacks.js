@@ -16,6 +16,12 @@ jobs:
     if: github.event_name == 'push'
     steps:
       - uses: actions/checkout@v2
+        with:
+          # pulls all commits (needed for lerna / semantic release to correctly version)
+          fetch-depth: "0"
+
+      # pulls all tags (needed for lerna / semantic release to correctly version)
+      - run: git fetch --depth=1 origin +refs/tags/*:refs/tags/*
 
       - name: Set Node Version
         uses: actions/setup-node@v2
