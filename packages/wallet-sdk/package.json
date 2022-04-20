@@ -53,7 +53,7 @@
     "@stacks/profile": "^4.0.0",
     "@stacks/storage": "^4.0.0",
     "@stacks/transactions": "^4.0.0",
-    "bip39": "^3.0.2",
+    "@scure/bip39": "^1.0.0",
     "bitcoinjs-lib": "^5.2.0",
     "bn.js": "^5.2.0",
     "c32check": "^1.1.3",

@@ -1,8 +1,16 @@
-import { generateMnemonic, mnemonicToSeed } from 'bip39';
+// https://github.com/paulmillr/scure-bip39
+// Secure, audited & minimal implementation of BIP39 mnemonic phrases.
+import { generateMnemonic, mnemonicToSeed } from '@scure/bip39';
+// Word lists not imported by default as that would increase bundle sizes too much as in case of bitcoinjs/bip39
+// Use default english world list similiar to bitcoinjs/bip39
+// Backward compatible with bitcoinjs/bip39 dependency
+// Very small in size as compared to bitcoinjs/bip39 wordlist
+// Reference: https://github.com/paulmillr/scure-bip39
+import { wordlist } from '@scure/bip39/wordlists/english';
+
 // https://github.com/paulmillr/scure-bip32
 // Secure, audited & minimal implementation of BIP32 hierarchical deterministic (HD) wallets.
 import { HDKey } from '@scure/bip32';
-import { randomBytes } from '@stacks/encryption';
 import { Wallet, getRootNode } from './models/common';
 import { encrypt } from './encryption';
 import { deriveAccount, deriveWalletKeys } from './derive';
@@ -11,7 +19,7 @@ import { DerivationType } from '.';
 export type AllowedKeyEntropyBits = 128 | 256;
 
 export const generateSecretKey = (entropy: AllowedKeyEntropyBits = 256) => {
-  const secretKey = generateMnemonic(entropy, randomBytes);
+  const secretKey = generateMnemonic(wordlist, entropy);
   return secretKey;
 };
 

@@ -7,7 +7,9 @@ import {
   selectStxDerivation,
   fetchUsernameForAccountByDerivationType,
 } from '../src';
-import { mnemonicToSeed } from 'bip39';
+// https://github.com/paulmillr/scure-bip39
+// Secure, audited & minimal implementation of BIP39 mnemonic phrases.
+import { mnemonicToSeed } from '@scure/bip39';
 import { BIP32Interface, fromBase58 } from 'bip32';
 import { HDKey } from '@scure/bip32';
 import { TransactionVersion, bytesToHex } from '@stacks/transactions';
