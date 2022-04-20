@@ -1,6 +1,6 @@
 {
   "name": "@stacks/encryption",
-  "version": "4.0.0-beta.0",
+  "version": "4.0.0",
   "description": "Encryption utilities for Stacks",
   "author": "yknl <yukanliao@gmail.com>",
   "homepage": "https://blockstack.org",
@@ -35,7 +35,7 @@
     "@noble/hashes": "^1.0.0",
     "@noble/secp256k1": "^1.5.5",
     "@scure/bip39": "^1.0.0",
-    "@stacks/common": "^4.0.0-beta.0",
+    "@stacks/common": "^4.0.0",
     "@types/bn.js": "^4.11.6",
     "@types/node": "^14.14.43",
     "bn.js": "^5.2.0",

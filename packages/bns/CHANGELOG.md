@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.0.0](https://github.com/blockstack/stacks.js/compare/v4.0.0-beta.2...v4.0.0) (2022-04-20)
+
+**Note:** Version bump only for package @stacks/bns
+
+
+
+
+
 # [3.5.0](https://github.com/blockstack/stacks.js/compare/v3.5.0-beta.3...v3.5.0) (2022-03-30)
 
 **Note:** Version bump only for package @stacks/bns
