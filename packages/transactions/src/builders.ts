@@ -1281,7 +1281,8 @@ export interface ReadOnlyFunctionOptions {
 }
 
 /**
- * Calls a read only function from a contract interface
+ * Calls a function as read-only from a contract interface
+ * It is not necessary that the function is defined as read-only in the contract
  *
  * @param  {ReadOnlyFunctionOptions} readOnlyFunctionOptions - the options object
  *
