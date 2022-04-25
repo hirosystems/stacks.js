@@ -17,7 +17,8 @@ import {
   makeStandardFungiblePostCondition, makeStandardNonFungiblePostCondition, makeStandardSTXPostCondition, makeSTXTokenTransfer,
   makeUnsignedContractCall, makeUnsignedContractDeploy, makeUnsignedSTXTokenTransfer, SignedTokenTransferOptions, sponsorTransaction, TxBroadcastResult,
   TxBroadcastResultOk,
-  TxBroadcastResultRejected
+  TxBroadcastResultRejected,
+  estimateTransactionByteLength
 } from '../src/builders';
 import { bufferCV, bufferCVFromString, serializeCV, standardPrincipalCV } from '../src/clarity';
 import { createMessageSignature } from '../src/common';
@@ -1059,6 +1060,118 @@ test('Estimate transaction transfer fee', async () => {
   }));
   expect(resultEstimateFee.map(f => f.fee)).toEqual([140, 17, 125]);
   expect(resultEstimateFee2.map(f => f.fee)).toEqual([140, 17, 125]);
+});
+
+test('Single-sig transaction byte length must include signature', async () => {
+  /*
+   * *** Context ***
+   * 1) Single-sig transaction byte length remain same due to empty message signature which allocates the space for signature
+   * 2) estimateTransactionByteLength should correctly estimate the byte length of single-sig transaction
+   */
+
+  const recipient = standardPrincipalCV('SP3FGQ8Z7JY9BWYZ5WM53E0M9NK7WHJF0691NZ159');
+  const amount = 2500000;
+  const fee = 100;
+  const nonce = 10;
+  const memo = 'test memo...';
+
+  const privateKey = 'a5c61c6ca7b3e7e55edee68566aeab22e4da26baa285c7bd10e8d2218aa3b229';
+  const publicKey = '027d28f9951ce46538951e3697c62588a87f1f1f295de4a14fdd4c780fc52cfe69';
+
+  // Create a unsigned single-sig transaction
+  const unsignedTransaction = await makeUnsignedSTXTokenTransfer({
+    recipient,
+    amount,
+    fee,
+    nonce,
+    memo: memo,
+    publicKey: publicKey,
+    anchorMode: AnchorMode.Any
+  });
+
+  // Due to empty message signature space will be allocated for signature
+  expect(unsignedTransaction.serialize().byteLength).toEqual(estimateTransactionByteLength(unsignedTransaction));
+
+  const signer = new TransactionSigner(unsignedTransaction);
+  // Now sign the transaction and verify the byteLength after adding signature
+  signer.signOrigin(createStacksPrivateKey(privateKey));
+
+  const finalSerializedTx = signer.transaction.serialize();
+
+  // Byte length will remains the same after signing due to pre allocated space by empty message signature
+  expect(finalSerializedTx.byteLength).toEqual(estimateTransactionByteLength(signer.transaction));
+});
+
+test('Multi-sig transaction byte length must include the required signatures', async () => {
+  /*
+   * *** Context ***
+   * 1) Multi-sig transaction byte length increases by adding signatures
+   *    which causes the incorrect fee estimation because the fee value is set while creating unsigned transaction
+   * 2) estimateTransactionByteLength should correctly estimate the byte length of multi-sig transaction
+   */
+
+  const recipient = standardPrincipalCV('SP3FGQ8Z7JY9BWYZ5WM53E0M9NK7WHJF0691NZ159');
+  const amount = 2500000;
+  const fee = 100;
+  const nonce = 10;
+  const memo = 'test memo...';
+
+  const privKeyStrings = [
+    '6d430bb91222408e7706c9001cfaeb91b08c2be6d5ac95779ab52c6b431950e001',
+    '2a584d899fed1d24e26b524f202763c8ab30260167429f157f1c119f550fa6af01',
+    'd5200dee706ee53ae98a03fba6cf4fdcc5084c30cfa9e1b3462dcdeaa3e0f1d201',
+  ];
+  const privKeys = privKeyStrings.map(createStacksPrivateKey);
+
+  const pubKeys = privKeyStrings.map(pubKeyfromPrivKey);
+  const pubKeyStrings = pubKeys.map(publicKeyToString);
+
+  // Create a unsigned multi-sig transaction
+  const transaction = await makeUnsignedSTXTokenTransfer({
+    recipient,
+    amount,
+    fee,
+    nonce,
+    memo: memo,
+    numSignatures: 3,
+    publicKeys: pubKeyStrings,
+    anchorMode: AnchorMode.Any
+  });
+
+  // Total length without signatures
+  const unsignedByteLength = 120;
+
+  const serializedTx = transaction.serialize();
+  // Unsigned transaction byte length without signatures
+  expect(serializedTx.byteLength).toEqual(unsignedByteLength);
+
+  // Expected final byte length after adding the required signatures
+  const expectedFinalLength = 318;
+
+  // estimatedLen includes the space required for signatures in case of multi-sig transaction
+  expect(estimateTransactionByteLength(transaction)).toEqual(expectedFinalLength);
+
+  // Now add the required signatures one by one and test it against the value returned by estimateTransactionByteLength
+  const signer = new TransactionSigner(transaction);
+
+  signer.signOrigin(privKeys[0]);
+  // Should calculate correct length if transaction is partially signed
+  expect(estimateTransactionByteLength(signer.transaction)).toEqual(expectedFinalLength);
+
+  signer.signOrigin(privKeys[1]);
+  // Should calculate correct length if transaction is partially signed
+  expect(estimateTransactionByteLength(signer.transaction)).toEqual(expectedFinalLength);
+
+  signer.signOrigin(privKeys[2]);
+  // Should calculate correct length if transaction is completely signed
+  expect(estimateTransactionByteLength(signer.transaction)).toEqual(expectedFinalLength);
+
+  const finalSerializedTx = signer.transaction.serialize();
+  // Validate expectedFinalLength is correct
+  expect(finalSerializedTx.byteLength).toEqual(expectedFinalLength);
+
+  // Final byte length should match as estimated by estimateTransactionByteLength
+  expect(finalSerializedTx.byteLength).toEqual(estimateTransactionByteLength(signer.transaction));
 });
 
 test('Make STX token transfer with fetch account nonce', async () => {
