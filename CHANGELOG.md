@@ -3,17 +3,47 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-# [4.0.0](https://github.com/hirosystems/stacks.js/compare/v4.0.0-beta.2...v4.0.0) (2022-04-20)
-
-**Note:** Version bump only for package root
+# [4.0.0](https://github.com/hirosystems/stacks.js/compare/v3.5.0...v4.0.0) (2022-04-20)
 
 
+### BREAKING CHANGES
+
+* This change REMOVES the `username` attribute from auth token payloads and therefore also from userData in @stacks/connect. Hence, there is NO MORE username verification done by @stacks/connect automatically.
+
+### Bug Fixes
+
+* remove doPublicKeysMatchUsername ([e2f3cf9](https://github.com/hirosystems/stacks.js/commit/e2f3cf93f1ae5148f78620e37786104cd482d7e1))
+* remove username checking ([e32781b](https://github.com/hirosystems/stacks.js/commit/e32781ba2a8af5afbe83b4a02419e0cc4a6f5bb0))
+* deserialize partially signed multisig transaction ([52d4045](https://github.com/hirosystems/stacks.js/commit/52d4045abb5b91fe48756f743cfda5eff135f7dc))
+* offload bip32 dependency from wallet-sdk ([c729006](https://github.com/hirosystems/stacks.js/commit/c729006b8d37a18005adff146aea5f0f9aaf6d5d))
+* offload bip39 dependency from encryption ([7973100](https://github.com/hirosystems/stacks.js/commit/797310003c981b8eb5e081f0f89e082986cd76d2))
+* private key compression ([cf0a3ab](https://github.com/hirosystems/stacks.js/commit/cf0a3ab9b04876c942d241e554e96db17e512b5b))
+
+
+### Features
+
+* Add encode / decode messages to support ([ad300fb](https://github.com/hirosystems/stacks.js/commit/ad300fb1564331aebe70e710dfd8039312d4a17d)), closes [#1231](https://github.com/hirosystems/stacks.js/issues/1231)
+* remove username from payload and userdata ([926c549](https://github.com/hirosystems/stacks.js/commit/926c549d15ea5488820f5a4a144ca74e6d30211d))
 
 
 
-# [3.5.0](https://github.com/hirosystems/stacks.js/compare/v3.5.0-beta.3...v3.5.0) (2022-03-30)
 
-**Note:** Version bump only for package stacks.js
+
+# [3.5.0](https://github.com/hirosystems/stacks.js/compare/v3.4.0...v3.5.0) (2022-03-30)
+
+
+### Bug Fixes
+
+* offload ramdombytes library from encryption ([fe3f30e](https://github.com/hirosystems/stacks.js/commit/fe3f30ee4ea110ef150a1b407bde0af2feba6783))
+* use noble-secp256k1 in encryption to replace elliptic dependency ([8cc1774](https://github.com/hirosystems/stacks.js/commit/8cc1774d06cbe63ba4188800b57cc8cc159712a6))
+* use noble-secp256k1 in encryption to replace elliptic dependency ([ca778e4](https://github.com/hirosystems/stacks.js/commit/ca778e493e4b8651b0db896a469617be65139b30))
+* offload ramdombytes library from transactions ([c06e5b8](https://github.com/hirosystems/stacks.js/commit/c06e5b838fe42c376b9347f486393ea31bc54ddb))
+* remove unused dependency ramdombytes from wallet-sdk ([61eeb57](https://github.com/hirosystems/stacks.js/commit/61eeb57ab0b4e41838e154701165ac0fe98b760c))
+
+
+### Features
+
+* add appPrivateKeyFromWalletSalt ([#1212](https://github.com/hirosystems/stacks.js/issues/1212)) ([ac3858c](https://github.com/hirosystems/stacks.js/commit/ac3858cc0c5bd6aba0ff2c71704161bb4926e387))
 
 
 
@@ -30,15 +60,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 
 
-# [3.3.0](https://github.com/hirosystems/stacks.js/compare/v3.2.1-beta.0...v3.3.0) (2022-02-23)
-
-**Note:** Version bump only for package stacks.js
-
-
-
-
-
-## [3.2.1-beta.0](https://github.com/hirosystems/stacks.js/compare/v3.2.0...v3.2.1-beta.0) (2022-02-23)
+# [3.3.0](https://github.com/hirosystems/stacks.js/compare/v3.2.0...v3.3.0) (2022-02-23)
 
 
 ### Bug Fixes
