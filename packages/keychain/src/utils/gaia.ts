@@ -1,5 +1,5 @@
 // @ts-ignore
-import { Buffer } from '@stacks/common';
+import { Buffer, FetchFn, getDefaultFetchFn } from '@stacks/common';
 import { TokenSigner, Json } from 'jsontokens';
 import { getPublicKeyFromPrivate, publicKeyToAddress } from '@stacks/encryption';
 import randomBytes from 'randombytes';
@@ -12,8 +12,8 @@ interface HubInfo {
   read_url_prefix: string;
 }
 
-export const getHubInfo = async (hubUrl: string) => {
-  const response = await fetch(`${hubUrl}/hub_info`);
+export const getHubInfo = async (hubUrl: string, fetchFn: FetchFn = getDefaultFetchFn()) => {
+  const response = await fetchFn(`${hubUrl}/hub_info`);
   const data: HubInfo = await response.json();
   return data;
 };
@@ -111,11 +111,12 @@ const makeGaiaAuthToken = ({ hubInfo, privateKey, gaiaHubUrl }: ConnectToGaiaOpt
 export const uploadToGaiaHub = async (
   filename: string,
   contents: Blob | Buffer | ArrayBufferView | string,
-  hubConfig: GaiaHubConfig
+  hubConfig: GaiaHubConfig,
+  fetchFn: FetchFn = getDefaultFetchFn()
 ): Promise<string> => {
   const contentType = 'application/json';
 
-  const response = await fetch(`${hubConfig.server}/store/${hubConfig.address}/${filename}`, {
+  const response = await fetchFn(`${hubConfig.server}/store/${hubConfig.address}/${filename}`, {
     method: 'POST',
     headers: {
       'Content-Type': contentType,

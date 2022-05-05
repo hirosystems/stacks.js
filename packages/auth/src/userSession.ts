@@ -1,5 +1,5 @@
 // @ts-ignore
-import { Buffer } from '@stacks/common';
+import { Buffer, FetchFn, getDefaultFetchFn } from '@stacks/common';
 import { AppConfig } from './appConfig';
 import { SessionOptions } from './sessionData';
 import { InstanceDataStore, LocalStorageStore, SessionDataStore } from './sessionStore';
@@ -15,7 +15,6 @@ import {
 import { getAddressFromDID } from './dids';
 import {
   BLOCKSTACK_DEFAULT_GAIA_HUB_URL,
-  fetchPrivate,
   getGlobalObject,
   InvalidStateError,
   isLaterVersion,
@@ -214,7 +213,8 @@ export class UserSession {
    * if handling the sign in request fails or there was no pending sign in request.
    */
   async handlePendingSignIn(
-    authResponseToken: string = this.getAuthResponseToken()
+    authResponseToken: string = this.getAuthResponseToken(),
+    fetchFn: FetchFn = getDefaultFetchFn()
   ): Promise<UserData> {
     const sessionData = this.store.getSessionData();
 
@@ -312,7 +312,7 @@ export class UserSession {
     };
     const profileURL = tokenPayload.profile_url as string;
     if (!userData.profile && profileURL) {
-      const response = await fetchPrivate(profileURL);
+      const response = await fetchFn(profileURL);
       if (!response.ok) {
         // return blank profile if we fail to fetch
         userData.profile = Object.assign({}, DEFAULT_PROFILE);

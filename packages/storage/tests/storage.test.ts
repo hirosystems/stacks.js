@@ -2,9 +2,9 @@ import { AppConfig, LOCALSTORAGE_SESSION_KEY, UserData, UserSession } from '@sta
 import {
   Buffer,
   DoesNotExist,
-  fetchPrivate,
   getAesCbcOutputLength,
   getBase64OutputLength,
+  getDefaultFetchFn,
 } from '@stacks/common';
 import {
   aes256CbcEncrypt,
@@ -2310,7 +2310,7 @@ test('getUserAppFileUrl without user session', async () => {
   expect(url).toBeTruthy();
   expect(url).toEqual(fileUrl);
 
-  const contents = await fetchPrivate(url as string).then(res => res.json());
+  const contents = await getDefaultFetchFn()(url as string).then(res => res.json());
   expect(JSON.stringify(contents)).toEqual(fileContents);
 });
 

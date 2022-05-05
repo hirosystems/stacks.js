@@ -2,7 +2,7 @@ import { getProfileURLFromZoneFile } from '../utils';
 import { signProfileToken, wrapProfileToken } from '@stacks/profile';
 import { connectToGaiaHub, GaiaHubConfig, uploadToGaiaHub } from '@stacks/storage';
 import { getPublicKeyFromPrivate } from '@stacks/encryption';
-import { fetchPrivate } from '@stacks/common';
+import { FetchFn, getDefaultFetchFn } from '@stacks/common';
 import { Account, Profile, getGaiaAddress } from './common';
 
 export const DEFAULT_PROFILE: Profile = {
@@ -12,9 +12,12 @@ export const DEFAULT_PROFILE: Profile = {
 
 export const DEFAULT_PROFILE_FILE_NAME = 'profile.json';
 
-export const fetchProfileFromUrl = async (profileUrl: string) => {
+export const fetchProfileFromUrl = async (
+  profileUrl: string,
+  fetchFn: FetchFn = getDefaultFetchFn()
+) => {
   try {
-    const res = await fetchPrivate(profileUrl);
+    const res = await fetchFn(profileUrl);
     if (res.ok) {
       const json = await res.json();
       const { decodedToken } = json[0];

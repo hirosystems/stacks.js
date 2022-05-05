@@ -3,7 +3,7 @@ import { parseZoneFile } from 'zone-file';
 
 import { getTokenFileUrl, Person } from '../profile';
 import { extractProfile } from '../profileTokens';
-import { fetchPrivate } from '@stacks/common';
+import { FetchFn, getDefaultFetchFn } from '@stacks/common';
 
 /**
  *
@@ -16,7 +16,8 @@ import { fetchPrivate } from '@stacks/common';
 export function resolveZoneFileToPerson(
   zoneFile: any,
   publicKeyOrAddress: string,
-  callback: (profile: any) => void
+  callback: (profile: any) => void,
+  fetchFn: FetchFn = getDefaultFetchFn()
 ) {
   let zoneFileJson = null;
   try {
@@ -46,7 +47,7 @@ export function resolveZoneFileToPerson(
   }
 
   if (tokenFileUrl) {
-    fetchPrivate(tokenFileUrl)
+    fetchFn(tokenFileUrl)
       .then(response => response.text())
       .then(responseText => JSON.parse(responseText))
       .then(responseJson => {
