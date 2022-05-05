@@ -1,13 +1,13 @@
 // https://github.com/paulmillr/scure-bip32
 // Secure, audited & minimal implementation of BIP32 hierarchical deterministic (HD) wallets.
 import { HDKey } from '@scure/bip32';
-import { Buffer, ChainID, TransactionVersion } from '@stacks/common';
+import { Buffer, ChainID, TransactionVersion, whenChainId } from '@stacks/common';
 import { compressPrivateKey, createSha2Hash, ecPrivateKeyToHexString } from '@stacks/encryption';
-import { StacksMainnet, StacksNetwork } from '@stacks/network';
+import { getNameInfo, StacksMainnet, StacksNetwork } from '@stacks/network';
 import { bytesToHex, getAddressFromPrivateKey } from '@stacks/transactions';
 import { Account, BIP32Interface, HARDENED_OFFSET, WalletKeys } from './models/common';
 import { fetchFirstName } from './usernames';
-import { assertIsTruthy, whenChainId } from './utils';
+import { assertIsTruthy } from './utils';
 
 const DATA_DERIVATION_PATH = `m/888'/0'`;
 const WALLET_CONFIG_PATH = `m/44/5757'/0'/1`;
@@ -177,7 +177,7 @@ const selectDerivationTypeForUsername = async ({
   network?: StacksNetwork;
 }): Promise<DerivationType> => {
   if (network) {
-    const nameInfo = await network.getNameInfo(username);
+    const nameInfo = await getNameInfo(network, username);
     let stxPrivateKey = deriveStxPrivateKey({ rootNode, index });
     let derivedAddress = getAddressFromPrivateKey(stxPrivateKey);
     if (derivedAddress !== nameInfo.address) {
@@ -250,13 +250,9 @@ export const fetchUsernameForAccountByDerivationType = async ({
   username: string | undefined;
 }> => {
   // try to find existing usernames owned by given derivation path
-  const selectedNetwork = network ?? new StacksMainnet();
-  const txVersion = whenChainId(selectedNetwork.chainId)({
-    [ChainID.Mainnet]: TransactionVersion.Mainnet,
-    [ChainID.Testnet]: TransactionVersion.Testnet,
-  });
+  const selectedNetwork = network ?? StacksMainnet;
   const privateKey = derivePrivateKeyByType({ rootNode, index, derivationType });
-  const address = getAddressFromPrivateKey(privateKey, txVersion);
+  const address = getAddressFromPrivateKey(privateKey, selectedNetwork.transactionVersion);
   const username = await fetchFirstName(address, selectedNetwork);
   return { username };
 };

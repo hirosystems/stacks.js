@@ -10,6 +10,7 @@ import { Buffer as BufferPolyfill } from 'buffer/';
 import type { Buffer as NodeJSBuffer } from 'buffer';
 
 import BN from 'bn.js';
+import { ChainID, TransactionVersion } from './constants';
 
 const AvailableBufferModule: typeof NodeJSBuffer =
   // eslint-disable-next-line node/prefer-global/buffer
@@ -412,4 +413,23 @@ export function hexToBigInt(hex: string): bigint {
 
 export function utf8ToBytes(content: string) {
   return new TextEncoder().encode(content);
+}
+
+/* WHENs */
+
+interface WhenChainIdMap<T> {
+  [ChainID.Mainnet]: T;
+  [ChainID.Testnet]: T;
+}
+export function whenChainId(chainId: ChainID) {
+  return <T>(chainIdMap: WhenChainIdMap<T>): T => chainIdMap[chainId];
+}
+
+interface WhenTransactionVersionMap<T> {
+  [TransactionVersion.Mainnet]: T;
+  [TransactionVersion.Testnet]: T;
+}
+export function whenTransactionVersion(transactionVersion: TransactionVersion) {
+  return <T>(transactionVersionMap: WhenTransactionVersionMap<T>): T =>
+    transactionVersionMap[transactionVersion];
 }

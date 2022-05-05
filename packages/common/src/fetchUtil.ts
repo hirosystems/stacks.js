@@ -8,6 +8,7 @@ export interface RequestContext {
   init: RequestInit;
 }
 
+// todo: extends RequestContext?
 export interface ResponseContext {
   fetch: FetchFn;
   url: string;
@@ -141,9 +142,9 @@ function getDefaultMiddleware(): FetchMiddleware[] {
   return [setOriginMiddleware];
 }
 
-export function getDefaultFetchFn(fetchLib: FetchFn, ...middleware: FetchMiddleware[]): FetchFn;
-export function getDefaultFetchFn(...middleware: FetchMiddleware[]): FetchFn;
-export function getDefaultFetchFn(...args: any[]): FetchFn {
+export function makeFetchFn(fetchLib: FetchFn, ...middleware: FetchMiddleware[]): FetchFn;
+export function makeFetchFn(...middleware: FetchMiddleware[]): FetchFn;
+export function makeFetchFn(...args: any[]): FetchFn {
   let fetchLib: FetchFn = fetch;
   let middlewareOpt: FetchMiddleware[] = [];
   if (args.length > 0) {

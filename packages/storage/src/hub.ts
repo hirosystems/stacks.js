@@ -5,7 +5,7 @@ import {
   DoesNotExist,
   FetchFn,
   GaiaHubErrorResponse,
-  getDefaultFetchFn,
+  makeFetchFn,
   Logger,
   megabytesToBytes,
   NotEnoughProofError,
@@ -64,7 +64,7 @@ export async function uploadToGaiaHub(
   newFile = true,
   etag?: string,
   dangerouslyIgnoreEtag?: boolean,
-  fetchFn: FetchFn = getDefaultFetchFn()
+  fetchFn: FetchFn = makeFetchFn()
 ): Promise<UploadResponse> {
   Logger.debug(`uploadToGaiaHub: uploading ${filename} to ${hubConfig.server}`);
 
@@ -104,7 +104,7 @@ export async function uploadToGaiaHub(
 export async function deleteFromGaiaHub(
   filename: string,
   hubConfig: GaiaHubConfig,
-  fetchFn: FetchFn = getDefaultFetchFn()
+  fetchFn: FetchFn = makeFetchFn()
 ): Promise<void> {
   Logger.debug(`deleteFromGaiaHub: deleting ${filename} from ${hubConfig.server}`);
   const response = await fetchFn(`${hubConfig.server}/delete/${hubConfig.address}/${filename}`, {
@@ -212,7 +212,7 @@ export async function connectToGaiaHub(
   gaiaHubUrl: string,
   challengeSignerHex: string,
   associationToken?: string,
-  fetchFn: FetchFn = getDefaultFetchFn()
+  fetchFn: FetchFn = makeFetchFn()
 ): Promise<GaiaHubConfig> {
   Logger.debug(`connectToGaiaHub: ${gaiaHubUrl}/hub_info`);
 
@@ -240,7 +240,7 @@ export async function connectToGaiaHub(
 export async function getBucketUrl(
   gaiaHubUrl: string,
   appPrivateKey: string,
-  fetchFn: FetchFn = getDefaultFetchFn()
+  fetchFn: FetchFn = makeFetchFn()
 ): Promise<string> {
   const response = await fetchFn(`${gaiaHubUrl}/hub_info`);
   const responseText = await response.text();

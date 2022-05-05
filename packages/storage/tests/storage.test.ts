@@ -4,7 +4,7 @@ import {
   DoesNotExist,
   getAesCbcOutputLength,
   getBase64OutputLength,
-  getDefaultFetchFn,
+  makeFetchFn,
 } from '@stacks/common';
 import {
   aes256CbcEncrypt,
@@ -359,7 +359,6 @@ test('getFile without user session', async () => {
 
   // const profileUrl = 'https://gaia.blockstack.org/hub/16zVUoP7f15nfTiHw2UNiX8NT5SWYqwNv3/0/profile.json'
 
-  /* eslint-disable */
   const profileContent = [
     {
       token:
@@ -465,7 +464,7 @@ test('core node preferences respected for name lookups', async () => {
     gaiaHubConfig,
   };
 
-  const defaultCoreNode = new StacksMainnet().bnsLookupUrl;
+  const defaultCoreNode = StacksMainnet.apiUrl;
   const appSpecifiedCoreNode = 'https://app-specified-core-node.local';
   const userSpecifiedCoreNode = 'https://user-specified-core-node.local';
 
@@ -539,7 +538,6 @@ test('getFile unencrypted, unsigned - multi-reader', async () => {
 
   // const profileUrl = 'https://gaia.blockstack.org/hub/16zVUoP7f15nfTiHw2UNiX8NT5SWYqwNv3/0/profile.json'
 
-  /* eslint-disable */
   const profileContent = [
     {
       token:
@@ -2221,7 +2219,7 @@ test('getUserAppFileUrl without user session', async () => {
     address: 'SP10VG75GE4PE0VBA3KD3NVKSYEMM3YV9V17HJ32N',
     zonefile_hash: '98f42e11026d42d394b3424d4d7f0cccd6f376e2',
   };
-  /* eslint-disable */
+
   const profileContent = [
     {
       token:
@@ -2310,7 +2308,7 @@ test('getUserAppFileUrl without user session', async () => {
   expect(url).toBeTruthy();
   expect(url).toEqual(fileUrl);
 
-  const contents = await getDefaultFetchFn()(url as string).then(res => res.json());
+  const contents = await makeFetchFn()(url as string).then(res => res.json());
   expect(JSON.stringify(contents)).toEqual(fileContents);
 });
 

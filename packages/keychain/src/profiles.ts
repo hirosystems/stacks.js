@@ -4,7 +4,7 @@ import { Identity, Profile } from './common';
 import { IdentityKeyPair } from './utils';
 import { uploadToGaiaHub } from './utils/gaia';
 import { GaiaHubConfig } from '@stacks/storage';
-import { FetchFn, getDefaultFetchFn } from '@stacks/common';
+import { FetchFn, makeFetchFn } from '@stacks/common';
 
 export const DEFAULT_PROFILE: Profile = {
   '@type': 'Person',
@@ -69,7 +69,7 @@ const sendUsernameToRegistrar = async ({
   subdomain,
   zoneFile,
   identity,
-  fetchFn = getDefaultFetchFn(),
+  fetchFn = makeFetchFn(),
 }: SendToRegistrarParams) => {
   const { registerUrl } = registrars[subdomain];
 
@@ -153,7 +153,7 @@ export const signAndUploadProfile = async ({
 export const fetchProfile = async ({
   identity,
   gaiaUrl,
-  fetchFn = getDefaultFetchFn(),
+  fetchFn = makeFetchFn(),
 }: {
   identity: Identity;
   gaiaUrl: string;

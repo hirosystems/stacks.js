@@ -64,7 +64,7 @@ test('backwards compatible legacy config private key derivation', async () => {
 test('derive derivation path without username', async () => {
   const rootPrivateKey = await mnemonicToSeed(SECRET_KEY);
   const rootNode = fromSeed(Buffer.from(rootPrivateKey));
-  const network = new StacksMainnet();
+  const network = StacksMainnet;
   const { username, stxDerivationType } = await selectStxDerivation({
     username: undefined,
     rootNode,
@@ -78,7 +78,7 @@ test('derive derivation path without username', async () => {
 test('derive derivation path with username owned by address of stx derivation path', async () => {
   const rootPrivateKey = await mnemonicToSeed(SECRET_KEY);
   const rootNode = fromSeed(Buffer.from(rootPrivateKey));
-  const network = new StacksMainnet();
+  const network = StacksMainnet;
 
   fetchMock.once(JSON.stringify({ address: DATA_ADDRESS }));
 
@@ -95,7 +95,7 @@ test('derive derivation path with username owned by address of stx derivation pa
 test('derive derivation path with username owned by address of unknown derivation path', async () => {
   const rootPrivateKey = await mnemonicToSeed(SECRET_KEY);
   const rootNode = fromSeed(Buffer.from(rootPrivateKey));
-  const network = new StacksMainnet();
+  const network = StacksMainnet;
 
   fetchMock.once(JSON.stringify({ address: 'SP000000000000000000002Q6VF78' }));
 
@@ -112,7 +112,7 @@ test('derive derivation path with username owned by address of unknown derivatio
 test('derive derivation path with username owned by address of data derivation path', async () => {
   const rootPrivateKey = await mnemonicToSeed(SECRET_KEY);
   const rootNode = fromSeed(Buffer.from(rootPrivateKey));
-  const network = new StacksMainnet();
+  const network = StacksMainnet;
 
   fetchMock.once(JSON.stringify({ address: 'SP30RZ44NTH2D95M1HSWVMM8VVHSAFY71VF3XQZ0K' }));
 
@@ -129,7 +129,7 @@ test('derive derivation path with username owned by address of data derivation p
 test('derive derivation path with new username owned by address of stx derivation path', async () => {
   const rootPrivateKey = await mnemonicToSeed(SECRET_KEY);
   const rootNode = fromSeed(Buffer.from(rootPrivateKey));
-  const network = new StacksMainnet();
+  const network = StacksMainnet;
 
   fetchMock.once(JSON.stringify({ names: ['public_profile_for_testing.id.blockstack'] }));
 
@@ -149,7 +149,7 @@ test('derive derivation path with new username owned by address of stx derivatio
 test('derive derivation path with new username owned by address of data derivation path', async () => {
   const rootPrivateKey = await mnemonicToSeed(SECRET_KEY);
   const rootNode = fromSeed(Buffer.from(rootPrivateKey));
-  const network = new StacksMainnet();
+  const network = StacksMainnet;
 
   fetchMock
     .once(JSON.stringify({ names: [] })) // no names on stx derivation path
@@ -207,7 +207,7 @@ test('fetch username owned by derivation type', async () => {
     rootNode,
     index: 0,
     derivationType: DerivationType.Wallet,
-    network: new StacksMainnet(),
+    network: StacksMainnet,
   });
   expect(username).toEqual('public_profile_for_testing.id.blockstack');
 });
@@ -222,7 +222,7 @@ test('fetch username owned by different derivation type', async () => {
     rootNode,
     index: 0,
     derivationType: DerivationType.Wallet,
-    network: new StacksMainnet(),
+    network: StacksMainnet,
   });
   expect(username).toEqual(undefined);
 });

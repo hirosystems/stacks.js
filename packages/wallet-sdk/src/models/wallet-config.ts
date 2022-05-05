@@ -1,7 +1,7 @@
 import { Account, Wallet } from './common';
 import { GaiaHubConfig, connectToGaiaHub, uploadToGaiaHub } from '@stacks/storage';
 import { decryptContent, encryptContent, getPublicKeyFromPrivate } from '@stacks/encryption';
-import { FetchFn, getDefaultFetchFn } from '@stacks/common';
+import { FetchFn, makeFetchFn } from '@stacks/common';
 
 export interface ConfigApp {
   origin: string;
@@ -39,7 +39,7 @@ export const getOrCreateWalletConfig = async ({
   wallet,
   gaiaHubConfig,
   skipUpload,
-  fetchFn = getDefaultFetchFn(),
+  fetchFn = makeFetchFn(),
 }: {
   wallet: Wallet;
   gaiaHubConfig: GaiaHubConfig;
@@ -58,7 +58,7 @@ export const getOrCreateWalletConfig = async ({
 export const fetchWalletConfig = async ({
   wallet,
   gaiaHubConfig,
-  fetchFn = getDefaultFetchFn(),
+  fetchFn = makeFetchFn(),
 }: {
   wallet: Wallet;
   gaiaHubConfig: GaiaHubConfig;

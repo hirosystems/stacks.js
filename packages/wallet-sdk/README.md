@@ -173,7 +173,7 @@ const restoredWallet = await restoreWalletAccounts({
   // `baseWallet` is returned from `generateWallet`
   wallet: baseWallet,
   gaiaHubUrl: 'https://hub.blockstack.org',
-  network: new StacksMainnet(),
+  network: StacksMainnet,
 });
 ```
 
@@ -219,7 +219,7 @@ You can generate signed transactions by following the documentation from `@stack
 ```ts
 import { makeSTXTokenTransfer, StacksMainnet } from '@stacks/transactions';
 
-const network = new StacksMainnet();
+const network = StacksMainnet;
 
 // get an account from the user's wallet
 const account = wallet.accounts[0];

@@ -1,4 +1,4 @@
-import { ChainID, FetchFn, getDefaultFetchFn } from '@stacks/common';
+import { FetchFn, makeFetchFn } from '@stacks/common';
 import { getPublicKeyFromPrivate, publicKeyToAddress, randomBytes } from '@stacks/encryption';
 import { GaiaHubConfig } from '@stacks/storage';
 import { AssertionError } from 'assert';
@@ -6,7 +6,7 @@ import { Json, TokenSigner } from 'jsontokens';
 import { parseZoneFile } from 'zone-file';
 
 export function assertIsTruthy<T>(val: T): asserts val is NonNullable<T> {
-  if (val === undefined || val === null) {
+  if (!val) {
     throw new AssertionError({ expected: true, actual: val });
   }
 }
@@ -16,10 +16,7 @@ interface NameInfoResponse {
   zonefile: string;
 }
 
-export const getProfileURLFromZoneFile = async (
-  name: string,
-  fetchFn: FetchFn = getDefaultFetchFn()
-) => {
+export const getProfileURLFromZoneFile = async (name: string, fetchFn: FetchFn = makeFetchFn()) => {
   const url = `https://stacks-node-api.stacks.co/v1/names/${name}`;
   const res = await fetchFn(url);
   if (res.ok) {
@@ -39,7 +36,7 @@ interface HubInfo {
   read_url_prefix: string;
 }
 
-export const getHubInfo = async (gaiaHubUrl: string, fetchFn: FetchFn = getDefaultFetchFn()) => {
+export const getHubInfo = async (gaiaHubUrl: string, fetchFn: FetchFn = makeFetchFn()) => {
   const response = await fetchFn(`${gaiaHubUrl}/hub_info`);
   const data: HubInfo = await response.json();
   return data;
@@ -123,11 +120,3 @@ export const makeGaiaAssociationToken = ({
   const token = tokenSigner.sign(payload);
   return token;
 };
-
-interface WhenChainIdMap<T> {
-  [ChainID.Mainnet]: T;
-  [ChainID.Testnet]: T;
-}
-export function whenChainId(chainId: ChainID) {
-  return <T>(chainIdMap: WhenChainIdMap<T>): T => chainIdMap[chainId];
-}

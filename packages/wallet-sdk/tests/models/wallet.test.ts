@@ -27,7 +27,7 @@ test('restore wallet with username not owned by stx private key', async () => {
   const wallet = await restoreWalletAccounts({
     wallet: baseWallet,
     gaiaHubUrl: 'https://hub.gaia.com',
-    network: new StacksMainnet(),
+    network: StacksMainnet,
   });
 
   expect(wallet?.accounts[0]?.username).toEqual(undefined);
@@ -42,14 +42,14 @@ test('restore wallet with username owned by stx private key', async () => {
 
   fetchMock
     .once(mockGaiaHubInfo)
-    .once(JSON.stringify('no found'), { status: 404 }) // TODO mock fetch legacy wallet config
+    .once(JSON.stringify('not found'), { status: 404 }) // TODO mock fetch legacy wallet config
     .once(JSON.stringify({ names: ['public_profile_for_testing.id.blockstack'] }))
     .once(JSON.stringify('ok')); // updateWalletConfig
 
   const wallet = await restoreWalletAccounts({
     wallet: baseWallet,
     gaiaHubUrl: 'https://hub.gaia.com',
-    network: new StacksMainnet(),
+    network: StacksMainnet,
   });
 
   expect(wallet?.accounts[0]?.username).toEqual('public_profile_for_testing.id.blockstack');

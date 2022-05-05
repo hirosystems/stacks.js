@@ -1,6 +1,5 @@
 import { Buffer } from '@stacks/common';
-import { bufferCV, uintCV, hash160 } from '@stacks/transactions';
-
+import { bufferCV, hash160, uintCV } from '@stacks/transactions';
 import BN from 'bn.js';
 
 export function decodeFQN(fqdn: string): {

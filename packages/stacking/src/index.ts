@@ -29,7 +29,17 @@ import {
   BurnchainRewardsTotal,
   BurnchainRewardSlotHolderListResponse,
 } from '@stacks/stacks-blockchain-api-types';
-import { StacksNetwork } from '@stacks/network';
+import {
+  getAccountApiUrl,
+  getBlockTimeInfoUrl,
+  getInfoUrl,
+  getPoxInfoUrl,
+  getRewardHoldersUrl,
+  getRewardsTotalUrl,
+  getRewardsUrl,
+  isMainnet,
+  StacksNetwork,
+} from '@stacks/network';
 import BN from 'bn.js';
 import { StackingErrors } from './constants';
 import { decodeBtcAddress } from './utils';
@@ -174,7 +184,7 @@ export class StackingClient {
    * @returns {Promise<CoreInfo>} that resolves to a CoreInfo response if the operation succeeds
    */
   async getCoreInfo(): Promise<CoreInfo> {
-    const url = this.network.getInfoUrl();
+    const url = getInfoUrl(this.network);
     return this.network.fetchFn(url).then(res => res.json());
   }
 
@@ -184,7 +194,7 @@ export class StackingClient {
    * @returns {Promise<PoxInfo>} that resolves to a PoxInfo response if the operation succeeds
    */
   async getPoxInfo(): Promise<PoxInfo> {
-    const url = this.network.getPoxInfoUrl();
+    const url = getPoxInfoUrl(this.network);
     return this.network.fetchFn(url).then(res => res.json());
   }
 
@@ -194,10 +204,10 @@ export class StackingClient {
    * @returns {Promise<number>} that resolves to a number if the operation succeeds
    */
   async getTargetBlockTime(): Promise<number> {
-    const url = this.network.getBlockTimeInfoUrl();
+    const url = getBlockTimeInfoUrl(this.network);
     const res = await this.network.fetchFn(url).then(res => res.json());
 
-    if (this.network.isMainnet()) {
+    if (isMainnet(this.network)) {
       return res.mainnet.target_block_time;
     } else {
       return res.testnet.target_block_time;
@@ -205,7 +215,7 @@ export class StackingClient {
   }
 
   async getAccountStatus(): Promise<any> {
-    const url = this.network.getAccountApiUrl(this.address);
+    const url = getAccountApiUrl(this.network, this.address);
     return this.network.fetchFn(url).then(res => res.json());
   }
 
@@ -242,7 +252,7 @@ export class StackingClient {
    * @returns {Promise<TotalRewardsResponse | RewardsError>} that resolves to TotalRewardsResponse or RewardsError
    */
   async getRewardsTotalForBtcAddress(): Promise<BurnchainRewardsTotal | RewardsError> {
-    const url = this.network.getRewardsTotalUrl(this.address);
+    const url = getRewardsTotalUrl(this.network, this.address);
     return this.network.fetchFn(url).then(res => res.json());
   }
 
@@ -254,7 +264,7 @@ export class StackingClient {
   async getRewardsForBtcAddress(
     options?: RewardOptions
   ): Promise<BurnchainRewardListResponse | RewardsError> {
-    const url = `${this.network.getRewardsUrl(this.address, options)}`;
+    const url = `${getRewardsUrl(this.network, this.address, options)}`;
     return this.network.fetchFn(url).then(res => res.json());
   }
 
@@ -266,7 +276,7 @@ export class StackingClient {
   async getRewardHoldersForBtcAddress(
     options?: RewardOptions
   ): Promise<BurnchainRewardSlotHolderListResponse | RewardsError> {
-    const url = `${this.network.getRewardHoldersUrl(this.address, options)}`;
+    const url = `${getRewardHoldersUrl(this.network, this.address, options)}`;
     return this.network.fetchFn(url).then(res => res.json());
   }
 

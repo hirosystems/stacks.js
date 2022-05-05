@@ -15,17 +15,17 @@ Creating a Stacks mainnet, testnet or mocknet network
 ```typescript
 import { StacksMainnet, StacksTestnet, StacksMocknet } from '@stacks/network';
 
-const network = new StacksMainnet();
+const network = StacksMainnet;
 
-const testnet = new StacksTestnet();
+const testnet = StacksTestnet;
 
-const mocknet = new StacksMocknet();
+const mocknet = StacksMocknet;
 ```
 
 Setting a custom node URL
 
 ```typescript
-const network = new StacksMainnet({ url: 'https://www.mystacksnode.com/' });
+const network = StacksMainnet({ url: 'https://www.mystacksnode.com/' });
 ```
 
 Check if network is mainnet

@@ -65,7 +65,7 @@ test('backwards compatible legacy config private key derivation', async () => {
 test('derive derivation path without username', async () => {
   const rootPrivateKey = await mnemonicToSeed(SECRET_KEY);
   const rootNode = HDKey.fromMasterSeed(rootPrivateKey);
-  const network = new StacksMainnet();
+  const network = StacksMainnet;
   const { username, stxDerivationType } = await selectStxDerivation({
     username: undefined,
     rootNode,
@@ -79,7 +79,7 @@ test('derive derivation path without username', async () => {
 test('derive derivation path with username owned by address of stx derivation path', async () => {
   const rootPrivateKey = await mnemonicToSeed(SECRET_KEY);
   const rootNode = HDKey.fromMasterSeed(rootPrivateKey);
-  const network = new StacksMainnet();
+  const network = StacksMainnet;
 
   fetchMock.once(JSON.stringify({ address: DATA_ADDRESS }));
 
@@ -96,7 +96,7 @@ test('derive derivation path with username owned by address of stx derivation pa
 test('derive derivation path with username owned by address of unknown derivation path', async () => {
   const rootPrivateKey = await mnemonicToSeed(SECRET_KEY);
   const rootNode = HDKey.fromMasterSeed(rootPrivateKey);
-  const network = new StacksMainnet();
+  const network = StacksMainnet;
 
   fetchMock.once(JSON.stringify({ address: 'SP000000000000000000002Q6VF78' }));
 
@@ -113,7 +113,7 @@ test('derive derivation path with username owned by address of unknown derivatio
 test('derive derivation path with username owned by address of data derivation path', async () => {
   const rootPrivateKey = await mnemonicToSeed(SECRET_KEY);
   const rootNode = HDKey.fromMasterSeed(rootPrivateKey);
-  const network = new StacksMainnet();
+  const network = StacksMainnet;
 
   fetchMock.once(JSON.stringify({ address: 'SP30RZ44NTH2D95M1HSWVMM8VVHSAFY71VF3XQZ0K' }));
 
@@ -130,7 +130,7 @@ test('derive derivation path with username owned by address of data derivation p
 test('derive derivation path with new username owned by address of stx derivation path', async () => {
   const rootPrivateKey = await mnemonicToSeed(SECRET_KEY);
   const rootNode = HDKey.fromMasterSeed(rootPrivateKey);
-  const network = new StacksMainnet();
+  const network = StacksMainnet;
 
   fetchMock.once(JSON.stringify({ names: ['public_profile_for_testing.id.blockstack'] }));
 
@@ -150,7 +150,7 @@ test('derive derivation path with new username owned by address of stx derivatio
 test('derive derivation path with new username owned by address of data derivation path', async () => {
   const rootPrivateKey = await mnemonicToSeed(SECRET_KEY);
   const rootNode = HDKey.fromMasterSeed(rootPrivateKey);
-  const network = new StacksMainnet();
+  const network = StacksMainnet;
 
   fetchMock
     .once(JSON.stringify({ names: [] })) // no names on stx derivation path
@@ -208,7 +208,7 @@ test('fetch username owned by derivation type', async () => {
     rootNode,
     index: 0,
     derivationType: DerivationType.Wallet,
-    network: new StacksMainnet(),
+    network: StacksMainnet,
   });
   expect(username).toEqual('public_profile_for_testing.id.blockstack');
 });
@@ -223,7 +223,7 @@ test('fetch username owned by different derivation type', async () => {
     rootNode,
     index: 0,
     derivationType: DerivationType.Wallet,
-    network: new StacksMainnet(),
+    network: StacksMainnet,
   });
   expect(username).toEqual(undefined);
 });
@@ -242,19 +242,22 @@ test('fetch username defaults to mainnet', async () => {
   expect(fetchMock.mock.calls[0][0]).toContain('stacks-node-api.mainnet');
 });
 
-test('Verify compatibility between @scure/bip32 and bip32 dependency',() => {
+test('Verify compatibility between @scure/bip32 and bip32 dependency', () => {
   // Consider a root key in base58 format
-  const root = 'xprv9s21ZrQH143K3QTDL4LXw2F7HEK3wJUD2nW2nRk4stbPy6cq3jPPqjiChkVvvNKmPGJxWUtg6LnF5kejMRNNU3TGtRBeJgk33yuGBxrMPHi';
+  const root =
+    'xprv9s21ZrQH143K3QTDL4LXw2F7HEK3wJUD2nW2nRk4stbPy6cq3jPPqjiChkVvvNKmPGJxWUtg6LnF5kejMRNNU3TGtRBeJgk33yuGBxrMPHi';
   const bip32Node: BIP32Interface = fromBase58(root);
 
   // Use same root key to create node using @scure/bip32
   const keychainNode = HDKey.fromExtendedKey(root);
 
   if (bip32Node.privateKey && keychainNode.privateKey) {
-      expect(bip32Node.privateKey.toString('hex')).toEqual(bytesToHex(keychainNode.privateKey))
+    expect(bip32Node.privateKey.toString('hex')).toEqual(bytesToHex(keychainNode.privateKey));
   } else {
     // Reject test case
-    fail('No private keys: failed to verify compatibility between @scure/bip32 and bip32 dependency');
+    fail(
+      'No private keys: failed to verify compatibility between @scure/bip32 and bip32 dependency'
+    );
   }
 
   const derivationPath = 'm/0/0';
@@ -266,9 +269,13 @@ test('Verify compatibility between @scure/bip32 and bip32 dependency',() => {
   const childKeychainNode = keychainNode.derive(derivationPath);
 
   if (childBip32Node.privateKey && childKeychainNode.privateKey) {
-    expect(childBip32Node.privateKey.toString('hex')).toEqual(bytesToHex(childKeychainNode.privateKey))
+    expect(childBip32Node.privateKey.toString('hex')).toEqual(
+      bytesToHex(childKeychainNode.privateKey)
+    );
   } else {
     // Reject test case
-    fail('No private keys: failed to verify compatibility between @scure/bip32 and bip32 dependency');
+    fail(
+      'No private keys: failed to verify compatibility between @scure/bip32 and bip32 dependency'
+    );
   }
 });

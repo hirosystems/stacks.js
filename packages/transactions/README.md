@@ -64,8 +64,8 @@ import { makeContractDeploy, broadcastTransaction, AnchorMode } from '@stacks/tr
 import { StacksTestnet, StacksMainnet } from '@stacks/network';
 import { readFileSync } from 'fs';
 
-// for mainnet, use `StacksMainnet()`
-const network = new StacksTestnet();
+// for mainnet, use `StacksMainnet`
+const network = StacksTestnet;
 
 const txOptions = {
   contractName: 'contract_name',
@@ -94,8 +94,8 @@ import {
 } from '@stacks/transactions';
 import { StacksTestnet, StacksMainnet } from '@stacks/network';
 
-// for mainnet, use `StacksMainnet()`
-const network = new StacksTestnet();
+// for mainnet, use `StacksMainnet`
+const network = StacksTestnet;
 
 // Add an optional post condition
 // See below for details on constructing post conditions
@@ -180,8 +180,8 @@ const sponsorOptions = {
 
 const sponsoredTx = await sponsorTransaction(sponsorOptions);
 
-// for mainnet, use `StacksMainnet()`
-const network = new StacksTestnet();
+// for mainnet, use `StacksMainnet`
+const network = StacksTestnet;
 
 const broadcastResponse = await broadcastTransaction(sponsoredTx, network);
 const txId = broadcastResponse.txid;
@@ -273,7 +273,7 @@ const contractAddress = 'ST3KC0MTNW34S1ZXD36JYKFD3JJMWA01M55DSJ4JE';
 const contractName = 'kv-store';
 const functionName = 'get-value';
 const buffer = bufferCVFromString('foo');
-const network = new StacksTestnet();
+const network = StacksTestnet;
 const senderAddress = 'ST2F4BK4GZH6YFBNHYDDGN4T1RKBA7DA1BJZPJEJJ';
 
 const options = {

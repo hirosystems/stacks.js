@@ -16,22 +16,21 @@ import {
   publicKeyToAddress,
   createStacksPublicKey,
   FungibleConditionCode,
-  AddressVersion, createNonFungiblePostCondition, NonFungibleConditionCode, parseAssetInfoString, tupleCV,
+  AddressVersion,
+  createNonFungiblePostCondition,
+  NonFungibleConditionCode,
+  parseAssetInfoString,
+  tupleCV,
 } from '@stacks/transactions';
 
-import {
-  StacksNetwork,
-  StacksTestnet
-} from '@stacks/network';
+import { StacksNetwork, StacksTestnet } from '@stacks/network';
 
-import {
-  BNS_CONTRACT_NAME, BnsContractAddress, PriceFunction
-} from '../src'
+import { BNS_CONTRACT_NAME, BnsContractAddress, PriceFunction } from '../src';
 
-import {bufferCVFromString, decodeFQN, getZonefileHash, uintCVFromBN} from "../src/utils";
+import { bufferCVFromString, decodeFQN, getZonefileHash, uintCVFromBN } from '../src/utils';
 
-import BN from "bn.js";
-import { ChainID } from "@stacks/common";
+import BN from 'bn.js';
+import { ChainID } from '@stacks/common';
 
 beforeEach(() => {
   fetchMock.resetMocks();
@@ -59,7 +58,7 @@ test('canRegisterName true', async () => {
   const callReadOnlyFunction = jest.fn().mockResolvedValue(trueFunctionCallResponse);
   const getAddressFromPrivateKey = jest.fn().mockReturnValue(notRandomAddress);
 
-  const network = new StacksTestnet();
+  const network = StacksTestnet;
 
   jest.mock('@stacks/transactions', () => ({
     callReadOnlyFunction,
@@ -68,14 +67,14 @@ test('canRegisterName true', async () => {
     makeRandomPrivKey: jest.requireActual('@stacks/transactions').makeRandomPrivKey,
     ClarityType: jest.requireActual('@stacks/transactions').ClarityType,
     ClarityValue: jest.requireActual('@stacks/transactions').ClarityValue,
-    bufferCV: jest.requireActual('@stacks/transactions').bufferCV
+    bufferCV: jest.requireActual('@stacks/transactions').bufferCV,
   }));
 
   const { canRegisterName } = require('../src');
   const result = await canRegisterName({ fullyQualifiedName, network });
 
   const bnsFunctionName = 'can-name-be-registered';
-  
+
   const expectedReadOnlyFunctionCallOptions = {
     contractAddress: BnsContractAddress.testnet,
     contractName: BNS_CONTRACT_NAME,
@@ -85,10 +84,10 @@ test('canRegisterName true', async () => {
       bufferCV(Buffer.from(fullyQualifiedName.split('.')[0])),
     ],
     senderAddress: notRandomAddress,
-    network
+    network,
   };
 
-  expect(result).toEqual(true);  
+  expect(result).toEqual(true);
   expect(callReadOnlyFunction).toHaveBeenCalledTimes(1);
   expect(callReadOnlyFunction).toHaveBeenCalledWith(expectedReadOnlyFunctionCallOptions);
 });
@@ -102,7 +101,7 @@ test('canRegisterName false', async () => {
   const callReadOnlyFunction = jest.fn().mockResolvedValue(falseFunctionCallResponse);
   const getAddressFromPrivateKey = jest.fn().mockReturnValue(notRandomAddress);
 
-  const network = new StacksTestnet();
+  const network = StacksTestnet;
 
   jest.mock('@stacks/transactions', () => ({
     callReadOnlyFunction,
@@ -111,14 +110,14 @@ test('canRegisterName false', async () => {
     makeRandomPrivKey: jest.requireActual('@stacks/transactions').makeRandomPrivKey,
     ClarityType: jest.requireActual('@stacks/transactions').ClarityType,
     ClarityValue: jest.requireActual('@stacks/transactions').ClarityValue,
-    bufferCV: jest.requireActual('@stacks/transactions').bufferCV
+    bufferCV: jest.requireActual('@stacks/transactions').bufferCV,
   }));
 
   const { canRegisterName } = require('../src');
-  const result = await canRegisterName({ fullyQualifiedName, network} );
+  const result = await canRegisterName({ fullyQualifiedName, network });
 
   const bnsFunctionName = 'can-name-be-registered';
-  
+
   const expectedReadOnlyFunctionCallOptions = {
     contractAddress: BnsContractAddress.testnet,
     contractName: BNS_CONTRACT_NAME,
@@ -128,10 +127,10 @@ test('canRegisterName false', async () => {
       bufferCV(Buffer.from(fullyQualifiedName.split('.')[0])),
     ],
     senderAddress: notRandomAddress,
-    network
+    network,
   };
 
-  expect(result).toEqual(false);  
+  expect(result).toEqual(false);
   expect(callReadOnlyFunction).toHaveBeenCalledTimes(1);
   expect(callReadOnlyFunction).toHaveBeenCalledWith(expectedReadOnlyFunctionCallOptions);
 });
@@ -145,7 +144,7 @@ test('canRegisterName error', async () => {
   const callReadOnlyFunction = jest.fn().mockResolvedValue(errorFunctionCallResponse);
   const getAddressFromPrivateKey = jest.fn().mockReturnValue(notRandomAddress);
 
-  const network = new StacksTestnet();
+  const network = StacksTestnet;
 
   jest.mock('@stacks/transactions', () => ({
     callReadOnlyFunction,
@@ -154,14 +153,14 @@ test('canRegisterName error', async () => {
     makeRandomPrivKey: jest.requireActual('@stacks/transactions').makeRandomPrivKey,
     ClarityType: jest.requireActual('@stacks/transactions').ClarityType,
     ClarityValue: jest.requireActual('@stacks/transactions').ClarityValue,
-    bufferCV: jest.requireActual('@stacks/transactions').bufferCV
+    bufferCV: jest.requireActual('@stacks/transactions').bufferCV,
   }));
 
   const { canRegisterName } = require('../src');
   const result = await canRegisterName({ fullyQualifiedName, network });
 
   const bnsFunctionName = 'can-name-be-registered';
-  
+
   const expectedReadOnlyFunctionCallOptions = {
     contractAddress: BnsContractAddress.testnet,
     contractName: BNS_CONTRACT_NAME,
@@ -171,10 +170,10 @@ test('canRegisterName error', async () => {
       bufferCV(Buffer.from(fullyQualifiedName.split('.')[0])),
     ],
     senderAddress: notRandomAddress,
-    network
+    network,
   };
 
-  expect(result).toEqual(false);  
+  expect(result).toEqual(false);
   expect(callReadOnlyFunction).toHaveBeenCalledTimes(1);
   expect(callReadOnlyFunction).toHaveBeenCalledWith(expectedReadOnlyFunctionCallOptions);
 });
@@ -188,7 +187,7 @@ test('getNamespacePrice', async () => {
   const callReadOnlyFunction = jest.fn().mockResolvedValue(namespacePriceResponse);
   const getAddressFromPrivateKey = jest.fn().mockReturnValue(address);
 
-  const network = new StacksTestnet();
+  const network = StacksTestnet;
 
   jest.mock('@stacks/transactions', () => ({
     callReadOnlyFunction,
@@ -197,7 +196,7 @@ test('getNamespacePrice', async () => {
     makeRandomPrivKey: jest.requireActual('@stacks/transactions').makeRandomPrivKey,
     ClarityType: jest.requireActual('@stacks/transactions').ClarityType,
     ClarityValue: jest.requireActual('@stacks/transactions').ClarityValue,
-    bufferCV: jest.requireActual('@stacks/transactions').bufferCV
+    bufferCV: jest.requireActual('@stacks/transactions').bufferCV,
   }));
 
   const { getNamespacePrice } = require('../src');
@@ -209,11 +208,9 @@ test('getNamespacePrice', async () => {
     contractAddress: BnsContractAddress.testnet,
     contractName: BNS_CONTRACT_NAME,
     functionName: bnsFunctionName,
-      senderAddress: address,
-      functionArgs: [
-      bufferCVFromString(namespace)
-    ],
-      network
+    senderAddress: address,
+    functionArgs: [bufferCVFromString(namespace)],
+    network,
   };
 
   expect(result.toString()).toEqual('10');
@@ -230,7 +227,7 @@ test('getNamespacePrice error', async () => {
   const callReadOnlyFunction = jest.fn().mockResolvedValue(errorResponse);
   const getAddressFromPrivateKey = jest.fn().mockReturnValue(address);
 
-  const network = new StacksTestnet();
+  const network = StacksTestnet;
 
   jest.mock('@stacks/transactions', () => ({
     callReadOnlyFunction,
@@ -240,7 +237,7 @@ test('getNamespacePrice error', async () => {
     ClarityType: jest.requireActual('@stacks/transactions').ClarityType,
     ClarityValue: jest.requireActual('@stacks/transactions').ClarityValue,
     bufferCV: jest.requireActual('@stacks/transactions').bufferCV,
-    cvToString: jest.requireActual('@stacks/transactions').cvToString
+    cvToString: jest.requireActual('@stacks/transactions').cvToString,
   }));
 
   const { getNamespacePrice } = require('../src');
@@ -252,10 +249,8 @@ test('getNamespacePrice error', async () => {
     contractName: BNS_CONTRACT_NAME,
     functionName: bnsFunctionName,
     senderAddress: address,
-    functionArgs: [
-      bufferCVFromString(namespace)
-    ],
-    network
+    functionArgs: [bufferCVFromString(namespace)],
+    network,
   };
 
   await expect(getNamespacePrice({ namespace, network })).rejects.toEqual(new Error('u1001'));
@@ -274,7 +269,7 @@ test('getNamePrice', async () => {
   const callReadOnlyFunction = jest.fn().mockResolvedValue(namePriceResponse);
   const getAddressFromPrivateKey = jest.fn().mockReturnValue(address);
 
-  const network = new StacksTestnet();
+  const network = StacksTestnet;
 
   jest.mock('@stacks/transactions', () => ({
     callReadOnlyFunction,
@@ -283,7 +278,7 @@ test('getNamePrice', async () => {
     makeRandomPrivKey: jest.requireActual('@stacks/transactions').makeRandomPrivKey,
     ClarityType: jest.requireActual('@stacks/transactions').ClarityType,
     ClarityValue: jest.requireActual('@stacks/transactions').ClarityValue,
-    bufferCV: jest.requireActual('@stacks/transactions').bufferCV
+    bufferCV: jest.requireActual('@stacks/transactions').bufferCV,
   }));
 
   const { getNamePrice } = require('../src');
@@ -296,11 +291,8 @@ test('getNamePrice', async () => {
     contractName: BNS_CONTRACT_NAME,
     functionName: bnsFunctionName,
     senderAddress: address,
-    functionArgs: [
-      bufferCVFromString(namespace),
-      bufferCVFromString(name)
-    ],
-    network
+    functionArgs: [bufferCVFromString(namespace), bufferCVFromString(name)],
+    network,
   };
 
   expect(result.toString()).toEqual('10');
@@ -319,7 +311,7 @@ test('getNamePrice error', async () => {
   const callReadOnlyFunction = jest.fn().mockResolvedValue(namePriceResponse);
   const getAddressFromPrivateKey = jest.fn().mockReturnValue(address);
 
-  const network = new StacksTestnet();
+  const network = StacksTestnet;
 
   jest.mock('@stacks/transactions', () => ({
     callReadOnlyFunction,
@@ -341,11 +333,8 @@ test('getNamePrice error', async () => {
     contractName: BNS_CONTRACT_NAME,
     functionName: bnsFunctionName,
     senderAddress: address,
-    functionArgs: [
-      bufferCVFromString(namespace),
-      bufferCVFromString(name)
-    ],
-    network
+    functionArgs: [bufferCVFromString(namespace), bufferCVFromString(name)],
+    network,
   };
 
   await expect(getNamePrice({ fullyQualifiedName, network })).rejects.toEqual(new Error('u2001'));
@@ -359,7 +348,7 @@ test('preorderNamespace', async () => {
   const stxToBurn = new BN(10);
 
   const publicKey = '03ef788b3830c00abe8f64f62dc32fc863bc0b2cafeb073b6c8e1c7657d9c2c3ab';
-  const network = new StacksTestnet();
+  const network = StacksTestnet;
 
   const makeUnsignedContractCall = jest.fn().mockResolvedValue({});
 
@@ -382,7 +371,7 @@ test('preorderNamespace', async () => {
     salt,
     stxToBurn,
     publicKey,
-    network
+    network,
   });
 
   const bnsFunctionName = 'namespace-preorder';
@@ -395,15 +384,12 @@ test('preorderNamespace', async () => {
     contractAddress: BnsContractAddress.testnet,
     contractName: BNS_CONTRACT_NAME,
     functionName: bnsFunctionName,
-    functionArgs: [
-      bufferCV(hash160(Buffer.from(`${namespace}${salt}`))),
-      uintCVFromBN(stxToBurn)
-    ],
+    functionArgs: [bufferCV(hash160(Buffer.from(`${namespace}${salt}`))), uintCVFromBN(stxToBurn)],
     validateWithAbi: false,
     publicKey,
     network,
     anchorMode: AnchorMode.Any,
-    postConditions: [burnSTXPostCondition]
+    postConditions: [burnSTXPostCondition],
   };
 
   expect(makeUnsignedContractCall).toHaveBeenCalledTimes(1);
@@ -436,14 +422,14 @@ test('revealNamespace', async () => {
     b16: new BN(16),
     nonAlphaDiscount: new BN(0),
     noVowelDiscount: new BN(0),
-  }
+  };
 
   const lifetime = new BN(10000);
   const namespaceImportAddress = 'SPF0324DSC4K505TP6A8C7GAK4R95E38TGNZP7RE';
 
   const makeUnsignedContractCall = jest.fn().mockResolvedValue({});
 
-  const network = new StacksTestnet();
+  const network = StacksTestnet;
 
   jest.mock('@stacks/transactions', () => ({
     makeUnsignedContractCall,
@@ -462,7 +448,7 @@ test('revealNamespace', async () => {
     lifetime,
     namespaceImportAddress,
     publicKey,
-    network
+    network,
   });
 
   const bnsFunctionName = 'namespace-reveal';
@@ -516,7 +502,7 @@ test('importName', async () => {
 
   const makeUnsignedContractCall = jest.fn().mockResolvedValue({});
 
-  const network = new StacksTestnet();
+  const network = StacksTestnet;
 
   jest.mock('@stacks/transactions', () => ({
     makeUnsignedContractCall,
@@ -534,7 +520,7 @@ test('importName', async () => {
     beneficiary,
     zonefile,
     publicKey,
-    network
+    network,
   });
 
   const bnsFunctionName = 'name-import';
@@ -547,7 +533,7 @@ test('importName', async () => {
       bufferCVFromString(namespace),
       bufferCVFromString(name),
       standardPrincipalCV(beneficiary),
-      bufferCV(getZonefileHash(zonefile))
+      bufferCV(getZonefileHash(zonefile)),
     ],
     publicKey,
     network,
@@ -565,7 +551,7 @@ test('readyNamespace', async () => {
 
   const makeUnsignedContractCall = jest.fn().mockResolvedValue({});
 
-  const network = new StacksTestnet();
+  const network = StacksTestnet;
 
   jest.mock('@stacks/transactions', () => ({
     makeUnsignedContractCall,
@@ -577,7 +563,7 @@ test('readyNamespace', async () => {
   await buildReadyNamespaceTx({
     namespace,
     publicKey,
-    network
+    network,
   });
 
   const bnsFunctionName = 'namespace-ready';
@@ -586,9 +572,7 @@ test('readyNamespace', async () => {
     contractAddress: BnsContractAddress.testnet,
     contractName: BNS_CONTRACT_NAME,
     functionName: bnsFunctionName,
-    functionArgs: [
-      bufferCVFromString(namespace),
-    ],
+    functionArgs: [bufferCVFromString(namespace)],
     publicKey,
     network,
     validateWithAbi: false,
@@ -607,7 +591,7 @@ test('preorderName', async () => {
 
   const makeUnsignedContractCall = jest.fn().mockResolvedValue({});
 
-  const network = new StacksTestnet();
+  const network = StacksTestnet;
 
   jest.mock('@stacks/transactions', () => ({
     makeUnsignedContractCall,
@@ -628,7 +612,7 @@ test('preorderName', async () => {
     salt,
     stxToBurn,
     publicKey,
-    network
+    network,
   });
 
   const bnsFunctionName = 'name-preorder';
@@ -649,7 +633,7 @@ test('preorderName', async () => {
     network,
     validateWithAbi: false,
     anchorMode: AnchorMode.Any,
-    postConditions: [burnSTXPostCondition]
+    postConditions: [burnSTXPostCondition],
   };
 
   expect(makeUnsignedContractCall).toHaveBeenCalledTimes(1);
@@ -664,7 +648,7 @@ test('registerName', async () => {
 
   const makeUnsignedContractCall = jest.fn().mockResolvedValue({});
 
-  const network = new StacksTestnet();
+  const network = StacksTestnet;
 
   jest.mock('@stacks/transactions', () => ({
     makeUnsignedContractCall,
@@ -679,7 +663,7 @@ test('registerName', async () => {
     salt,
     zonefile,
     publicKey,
-    network
+    network,
   });
 
   const bnsFunctionName = 'name-register';
@@ -694,7 +678,7 @@ test('registerName', async () => {
       bufferCVFromString(namespace),
       bufferCVFromString(name),
       bufferCVFromString(salt),
-      bufferCV(getZonefileHash(zonefile))
+      bufferCV(getZonefileHash(zonefile)),
     ],
     publicKey,
     network,
@@ -713,7 +697,7 @@ test('updateName', async () => {
 
   const makeUnsignedContractCall = jest.fn().mockResolvedValue({});
 
-  const network = new StacksTestnet();
+  const network = StacksTestnet;
 
   jest.mock('@stacks/transactions', () => ({
     makeUnsignedContractCall,
@@ -727,7 +711,7 @@ test('updateName', async () => {
     fullyQualifiedName,
     zonefile,
     publicKey,
-    network
+    network,
   });
 
   const bnsFunctionName = 'name-update';
@@ -741,7 +725,7 @@ test('updateName', async () => {
     functionArgs: [
       bufferCVFromString(namespace),
       bufferCVFromString(name),
-      bufferCV(getZonefileHash(zonefile))
+      bufferCV(getZonefileHash(zonefile)),
     ],
     publicKey,
     network,
@@ -761,7 +745,7 @@ test('transferName', async () => {
 
   const makeUnsignedContractCall = jest.fn().mockResolvedValue({});
 
-  const network = new StacksTestnet();
+  const network = StacksTestnet;
 
   jest.mock('@stacks/transactions', () => ({
     makeUnsignedContractCall,
@@ -778,7 +762,8 @@ test('transferName', async () => {
     NonFungibleConditionCode: jest.requireActual('@stacks/transactions').NonFungibleConditionCode,
     parseAssetInfoString: jest.requireActual('@stacks/transactions').parseAssetInfoString,
     tupleCV: jest.requireActual('@stacks/transactions').tupleCV,
-    createNonFungiblePostCondition: jest.requireActual('@stacks/transactions').createNonFungiblePostCondition,
+    createNonFungiblePostCondition:
+      jest.requireActual('@stacks/transactions').createNonFungiblePostCondition,
   }));
 
   const { buildTransferNameTx } = require('../src');
@@ -787,7 +772,7 @@ test('transferName', async () => {
     newOwnerAddress,
     publicKey,
     zonefile,
-    network
+    network,
   });
 
   const bnsFunctionName = 'name-transfer';
@@ -799,7 +784,7 @@ test('transferName', async () => {
     parseAssetInfoString(`${getBnsContractAddress(network)}.bns::names`),
     tupleCV({
       name: bufferCVFromString(name),
-      namespace: bufferCVFromString(namespace)
+      namespace: bufferCVFromString(namespace),
     })
   );
   const nameTransferPostConditionTwo = createNonFungiblePostCondition(
@@ -808,7 +793,7 @@ test('transferName', async () => {
     parseAssetInfoString(`${getBnsContractAddress(network)}.bns::names`),
     tupleCV({
       name: bufferCVFromString(name),
-      namespace: bufferCVFromString(namespace)
+      namespace: bufferCVFromString(namespace),
     })
   );
   const expectedBNSContractCallOptions = {
@@ -825,7 +810,7 @@ test('transferName', async () => {
     network,
     validateWithAbi: false,
     anchorMode: AnchorMode.Any,
-    postConditions: [nameTransferPostConditionOne, nameTransferPostConditionTwo]
+    postConditions: [nameTransferPostConditionOne, nameTransferPostConditionTwo],
   };
 
   expect(makeUnsignedContractCall).toHaveBeenCalledTimes(1);
@@ -840,7 +825,7 @@ test('transferName optionalArguments', async () => {
 
   const makeUnsignedContractCall = jest.fn().mockResolvedValue({});
 
-  const network = new StacksTestnet();
+  const network = StacksTestnet;
 
   jest.mock('@stacks/transactions', () => ({
     makeUnsignedContractCall,
@@ -857,7 +842,8 @@ test('transferName optionalArguments', async () => {
     NonFungibleConditionCode: jest.requireActual('@stacks/transactions').NonFungibleConditionCode,
     parseAssetInfoString: jest.requireActual('@stacks/transactions').parseAssetInfoString,
     tupleCV: jest.requireActual('@stacks/transactions').tupleCV,
-    createNonFungiblePostCondition: jest.requireActual('@stacks/transactions').createNonFungiblePostCondition,
+    createNonFungiblePostCondition:
+      jest.requireActual('@stacks/transactions').createNonFungiblePostCondition,
   }));
 
   const { buildTransferNameTx } = require('../src');
@@ -866,7 +852,7 @@ test('transferName optionalArguments', async () => {
     newOwnerAddress,
     publicKey,
     zonefile,
-    network
+    network,
   });
 
   const bnsFunctionName = 'name-transfer';
@@ -878,7 +864,7 @@ test('transferName optionalArguments', async () => {
     parseAssetInfoString(`${getBnsContractAddress(network)}.bns::names`),
     tupleCV({
       name: bufferCVFromString(name),
-      namespace: bufferCVFromString(namespace)
+      namespace: bufferCVFromString(namespace),
     })
   );
   const nameTransferPostConditionTwo = createNonFungiblePostCondition(
@@ -887,7 +873,7 @@ test('transferName optionalArguments', async () => {
     parseAssetInfoString(`${getBnsContractAddress(network)}.bns::names`),
     tupleCV({
       name: bufferCVFromString(name),
-      namespace: bufferCVFromString(namespace)
+      namespace: bufferCVFromString(namespace),
     })
   );
   const expectedBNSContractCallOptions = {
@@ -904,7 +890,7 @@ test('transferName optionalArguments', async () => {
     network,
     validateWithAbi: false,
     anchorMode: AnchorMode.Any,
-    postConditions: [nameTransferPostConditionOne, nameTransferPostConditionTwo]
+    postConditions: [nameTransferPostConditionOne, nameTransferPostConditionTwo],
   };
 
   expect(makeUnsignedContractCall).toHaveBeenCalledTimes(1);
@@ -917,7 +903,7 @@ test('revokeName', async () => {
 
   const makeUnsignedContractCall = jest.fn().mockResolvedValue({});
 
-  const network = new StacksTestnet();
+  const network = StacksTestnet;
 
   jest.mock('@stacks/transactions', () => ({
     makeUnsignedContractCall,
@@ -930,7 +916,7 @@ test('revokeName', async () => {
   await buildRevokeNameTx({
     fullyQualifiedName,
     publicKey,
-    network
+    network,
   });
 
   const bnsFunctionName = 'name-revoke';
@@ -941,10 +927,7 @@ test('revokeName', async () => {
     contractAddress: BnsContractAddress.testnet,
     contractName: BNS_CONTRACT_NAME,
     functionName: bnsFunctionName,
-    functionArgs: [
-      bufferCVFromString(namespace),
-      bufferCVFromString(name),
-    ],
+    functionArgs: [bufferCVFromString(namespace), bufferCVFromString(name)],
     publicKey,
     network,
     validateWithAbi: false,
@@ -964,7 +947,7 @@ test('renewName', async () => {
 
   const makeUnsignedContractCall = jest.fn().mockResolvedValue({});
 
-  const network = new StacksTestnet();
+  const network = StacksTestnet;
 
   jest.mock('@stacks/transactions', () => ({
     makeUnsignedContractCall,
@@ -988,7 +971,7 @@ test('renewName', async () => {
     newOwnerAddress,
     zonefile,
     publicKey,
-    network
+    network,
   });
 
   const bnsFunctionName = 'name-renewal';
@@ -1008,13 +991,13 @@ test('renewName', async () => {
       bufferCVFromString(name),
       uintCVFromBN(stxToBurn),
       someCV(standardPrincipalCV(newOwnerAddress)),
-      someCV(bufferCV(getZonefileHash(zonefile)))
+      someCV(bufferCV(getZonefileHash(zonefile))),
     ],
     publicKey,
     network,
     validateWithAbi: false,
     anchorMode: AnchorMode.Any,
-    postConditions: [burnSTXPostCondition]
+    postConditions: [burnSTXPostCondition],
   };
 
   expect(makeUnsignedContractCall).toHaveBeenCalledTimes(1);
@@ -1030,7 +1013,7 @@ test('renewName optionalArguments', async () => {
 
   const makeUnsignedContractCall = jest.fn().mockResolvedValue({});
 
-  const network = new StacksTestnet();
+  const network = StacksTestnet;
 
   jest.mock('@stacks/transactions', () => ({
     makeUnsignedContractCall,
@@ -1053,7 +1036,7 @@ test('renewName optionalArguments', async () => {
     newOwnerAddress,
     zonefile,
     publicKey,
-    network
+    network,
   });
 
   const bnsFunctionName = 'name-renewal';
@@ -1073,13 +1056,13 @@ test('renewName optionalArguments', async () => {
       bufferCVFromString(name),
       uintCVFromBN(stxToBurn),
       noneCV(),
-      noneCV()
+      noneCV(),
     ],
     publicKey,
     network,
     validateWithAbi: false,
     anchorMode: AnchorMode.Any,
-    postConditions: [burnSTXPostCondition]
+    postConditions: [burnSTXPostCondition],
   };
 
   expect(makeUnsignedContractCall).toHaveBeenCalledTimes(1);

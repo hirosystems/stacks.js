@@ -1,34 +1,34 @@
 // @ts-ignore
-import { Buffer, FetchFn, getDefaultFetchFn } from '@stacks/common';
-import { AppConfig } from './appConfig';
-import { SessionOptions } from './sessionData';
-import { InstanceDataStore, LocalStorageStore, SessionDataStore } from './sessionStore';
-import { decodeToken } from 'jsontokens';
-import { verifyAuthResponse } from './verification';
-import * as authMessages from './messages';
+import {
+  BLOCKSTACK_DEFAULT_GAIA_HUB_URL,
+  FetchFn,
+  getGlobalObject,
+  InvalidStateError,
+  isLaterVersion,
+  Logger,
+  LoginFailedError,
+  makeFetchFn,
+  MissingParameterError,
+  nextHour,
+} from '@stacks/common';
 import {
   decryptContent,
   encryptContent,
   EncryptContentOptions,
   isValidPrivateKey,
 } from '@stacks/encryption';
-import { getAddressFromDID } from './dids';
-import {
-  BLOCKSTACK_DEFAULT_GAIA_HUB_URL,
-  getGlobalObject,
-  InvalidStateError,
-  isLaterVersion,
-  Logger,
-  LoginFailedError,
-  MissingParameterError,
-  nextHour,
-} from '@stacks/common';
 import { extractProfile } from '@stacks/profile';
-import { AuthScope, DEFAULT_PROFILE } from './constants';
+import { decodeToken } from 'jsontokens';
 import * as queryString from 'query-string';
-import { UserData } from './userData';
-import { StacksMainnet } from '@stacks/network';
+import { AppConfig } from './appConfig';
+import { AuthScope, DEFAULT_PROFILE } from './constants';
+import { getAddressFromDID } from './dids';
+import * as authMessages from './messages';
 import { protocolEchoReplyDetection } from './protocolEchoDetection';
+import { SessionOptions } from './sessionData';
+import { InstanceDataStore, LocalStorageStore, SessionDataStore } from './sessionStore';
+import { UserData } from './userData';
+import { verifyAuthResponse } from './verification';
 
 /**
  *
@@ -214,7 +214,7 @@ export class UserSession {
    */
   async handlePendingSignIn(
     authResponseToken: string = this.getAuthResponseToken(),
-    fetchFn: FetchFn = getDefaultFetchFn()
+    fetchFn: FetchFn = makeFetchFn()
   ): Promise<UserData> {
     const sessionData = this.store.getSessionData();
 
@@ -224,15 +224,7 @@ export class UserSession {
 
     const transitKey = this.store.getSessionData().transitKey;
 
-    // let nameLookupURL;
-    let coreNode = this.appConfig && this.appConfig.coreNode;
-    if (!coreNode) {
-      const network = new StacksMainnet();
-      coreNode = network.bnsLookupUrl;
-    }
-
     const tokenPayload = decodeToken(authResponseToken).payload;
-
     if (typeof tokenPayload === 'string') {
       throw new Error('Unexpected token payload type of string');
     }
@@ -346,7 +338,7 @@ export class UserSession {
 
   /**
    * Encrypts the data provided with the app public key.
-   * @param {String|Buffer} content  the data to encrypt
+   * @param {String | Buffer} content  the data to encrypt
    * @param options
    * @param {String} options.publicKey the hex string of the ECDSA public
    * key to use for encryption. If not provided, will use user's appPrivateKey.
@@ -364,11 +356,11 @@ export class UserSession {
   /**
    * Decrypts data encrypted with `encryptContent` with the
    * transit private key.
-   * @param {String|Buffer} content - encrypted content.
+   * @param {String | Buffer} content - encrypted content.
    * @param options
    * @param {String} options.privateKey - The hex string of the ECDSA private
    * key to use for decryption. If not provided, will use user's appPrivateKey.
-   * @returns {String|Buffer} decrypted content.
+   * @returns {String | Buffer} decrypted content.
    */
   decryptContent(content: string, options?: { privateKey?: string }): Promise<Buffer | string> {
     const opts = Object.assign({}, options);

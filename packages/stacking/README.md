@@ -12,14 +12,14 @@ npm install @stacks/stacking
 
 Initialize a `StackingClient` to interact with the Stacking contract.
 
-*Note: the `StackingClient` sets its transactions `AnchorMode` to `Any`.*
+_Note: the `StackingClient` sets its transactions `AnchorMode` to `Any`._
 
 ```typescript
 import { StacksTestnet, StacksMainnet } from '@stacks/network';
 import { StackingClient } from '@stacks/stacking';
 
-// for mainnet: const network = new StacksMainnet();
-const network = new StacksTestnet();
+// for mainnet: const network = StacksMainnet;
+const network = StacksTestnet;
 // the stacks STX address
 const address = 'ST3XKKN4RPV69NN1PHFDNX3TYKXT7XPC4N8KC1ARH';
 const client = new StackingClient(address, network);
@@ -190,7 +190,7 @@ const amountMicroStx = 100000000000n;
 // private key for transaction signing
 const privateKey = 'd48f215481c16cbe6426f8e557df9b78895661971d71735126545abddcd5377001';
 
-const delegetateResponse = await client.delegateStx({ 
+const delegetateResponse = await client.delegateStx({
   amountMicroStx,
   delegateTo,
   untilBurnBlockHeight, // optional
@@ -226,8 +226,8 @@ import { getNonce } from '@stacks/transactions';
 import { StacksTestnet, StacksMainnet } from '@stacks/network';
 import { StackingClient } from '@stacks/stacking';
 
-// for mainnet: const network = new StacksMainnet();
-const network = new StacksTestnet();
+// for mainnet: const network = StacksMainnet;
+const network = StacksTestnet;
 // the stacks STX address
 const address = 'ST3XKKN4RPV69NN1PHFDNX3TYKXT7XPC4N8KC1ARH';
 // delegators would initiate a different client
@@ -291,8 +291,8 @@ import { StacksTestnet, StacksMainnet } from '@stacks/network';
 import { StackingClient } from '@stacks/stacking';
 
 const address = 'myfTfju9XSMRusaY2qTitSEMSchsWRA441';
-// for mainnet: const network = new StacksMainnet();
-const network = new StacksTestnet();
+// for mainnet: const network = StacksMainnet;
+const network = StacksTestnet;
 const client = new StackingClient(address, network);
 const options = { limit: 2, offset: 0 };
 
@@ -330,8 +330,8 @@ import { StacksTestnet, StacksMainnet } from '@stacks/network';
 import { StackingClient } from '@stacks/stacking';
 
 const address = 'myfTfju9XSMRusaY2qTitSEMSchsWRA441';
-// for mainnet: const network = new StacksMainnet();
-const network = new StacksTestnet();
+// for mainnet: const network = StacksMainnet;
+const network = StacksTestnet;
 const client = new StackingClient(address, network);
 
 const total = await client.getRewardsTotalForBtcAddress();
@@ -348,8 +348,8 @@ import { StacksTestnet, StacksMainnet } from '@stacks/network';
 import { StackingClient } from '@stacks/stacking';
 
 const address = 'myfTfju9XSMRusaY2qTitSEMSchsWRA441';
-// for mainnet: const network = new StacksMainnet();
-const network = new StacksTestnet();
+// for mainnet: const network = StacksMainnet;
+const network = StacksTestnet;
 const client = new StackingClient(address, network);
 const options = { limit: 2, offset: 0 };
 

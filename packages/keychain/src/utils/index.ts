@@ -1,4 +1,4 @@
-import { Buffer, FetchFn, getDefaultFetchFn } from '@stacks/common';
+import { Buffer, FetchFn, makeFetchFn } from '@stacks/common';
 import { BIP32Interface } from 'bitcoinjs-lib';
 import IdentityAddressOwnerNode from '../nodes/identity-address-owner-node';
 import { createSha2Hash, publicKeyToAddress } from '@stacks/encryption';
@@ -183,7 +183,7 @@ export const validateSubdomainFormat = (identityName: string): IdentityNameValid
 export const validateSubdomainAvailability = async (
   name: string,
   subdomain: Subdomains = Subdomains.BLOCKSTACK,
-  fetchFn: FetchFn = getDefaultFetchFn()
+  fetchFn: FetchFn = makeFetchFn()
 ) => {
   const url = `${registrars[subdomain].apiUrl}/${name.toLowerCase()}.${subdomain}`;
   const resp = await fetchFn(url);
@@ -248,10 +248,7 @@ interface NameInfoResponse {
   zonefile: string;
 }
 
-export const getProfileURLFromZoneFile = async (
-  name: string,
-  fetchFn: FetchFn = getDefaultFetchFn()
-) => {
+export const getProfileURLFromZoneFile = async (name: string, fetchFn: FetchFn = makeFetchFn()) => {
   const url = `https://stacks-node-api.stacks.co/v1/names/${name}`;
   const res = await fetchFn(url);
   if (res.ok) {

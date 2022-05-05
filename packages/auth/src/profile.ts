@@ -1,10 +1,10 @@
 import { resolveZoneFileToProfile } from '@stacks/profile';
-import { StacksMainnet, StacksNetwork, StacksNetworkName } from '@stacks/network';
+import { getNameInfo, StacksMainnet, StacksNetwork } from '@stacks/network';
 
 export interface ProfileLookupOptions {
   username: string;
   zoneFileLookupURL?: string;
-  network?: StacksNetworkName | StacksNetwork;
+  network?: StacksNetwork;
 }
 
 /**
@@ -22,21 +22,24 @@ export function lookupProfile(lookupOptions: ProfileLookupOptions): Promise<Reco
   }
 
   const defaultOptions = {
-    network: new StacksMainnet(),
+    network: StacksMainnet,
   };
   const options = Object.assign(defaultOptions, lookupOptions);
 
-  const network = StacksNetwork.fromNameOrNetwork(options.network);
   let lookupPromise;
   if (options.zoneFileLookupURL) {
     const url = `${options.zoneFileLookupURL.replace(/\/$/, '')}/${options.username}`;
-    lookupPromise = network.fetchFn(url).then(response => response.json());
+    lookupPromise = options.network.fetchFn(url).then((response: Response) => response.json());
   } else {
-    lookupPromise = network.getNameInfo(options.username);
+    lookupPromise = getNameInfo(options.network, options.username);
   }
   return lookupPromise.then((responseJSON: any) => {
     if (responseJSON.hasOwnProperty('zonefile') && responseJSON.hasOwnProperty('address')) {
-      return resolveZoneFileToProfile(responseJSON.zonefile, responseJSON.address, network.fetchFn);
+      return resolveZoneFileToProfile(
+        responseJSON.zonefile,
+        responseJSON.address,
+        options.network.fetchFn
+      );
     } else {
       throw new Error(
         'Invalid zonefile lookup response: did not contain `address`' + ' or `zonefile` field'
