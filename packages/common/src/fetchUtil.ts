@@ -10,3 +10,17 @@ export async function fetchPrivate(input: RequestInfo, init?: RequestInit): Prom
   const fetchResult = await fetch(input, fetchOpts);
   return fetchResult;
 }
+
+export async function soFetch(
+  fetchLib: typeof fetch,
+  input: RequestInfo,
+  init?: RequestInit
+): Promise<Response> {
+  const defaultFetchOpts: RequestInit = {
+    referrer: 'no-referrer',
+    referrerPolicy: 'no-referrer',
+  };
+  const fetchOpts = Object.assign(defaultFetchOpts, init);
+  const fetchResult = await fetchLib(input, fetchOpts);
+  return fetchResult;
+}

@@ -6,6 +6,7 @@ export const HIRO_MOCKNET_DEFAULT = 'http://localhost:3999';
 
 export interface NetworkConfig {
   url: string;
+  fetchLib: typeof fetch;
 }
 
 export const StacksNetworks = ['mainnet', 'testnet'] as const;
