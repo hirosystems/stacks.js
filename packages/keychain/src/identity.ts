@@ -5,6 +5,7 @@ import { Identity as IdentifyInterface, Profile } from './common';
 import IdentityAddressOwnerNode from './nodes/identity-address-owner-node';
 import { DEFAULT_PROFILE, fetchProfile, signAndUploadProfile } from './profiles';
 import { getProfileURLFromZoneFile, IdentityKeyPair } from './utils';
+import { fetchPrivate } from '@stacks/common';
 import {
   connectToGaiaHubWithConfig,
   DEFAULT_GAIA_HUB,
@@ -131,7 +132,7 @@ export class Identity implements IdentifyInterface {
 
   async fetchNames() {
     const getNamesUrl = `https://stacks-node-api.stacks.co/v1/addresses/bitcoin/${this.address}`;
-    const res = await fetch(getNamesUrl);
+    const res = await fetchPrivate(getNamesUrl);
     const data = await res.json();
     const { names }: { names: string[] } = data;
     return names;

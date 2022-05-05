@@ -1,4 +1,4 @@
-import { Buffer } from '@stacks/common';
+import { Buffer, fetchPrivate } from '@stacks/common';
 import { mnemonicToSeed } from 'bip39';
 import { bip32, BIP32Interface } from 'bitcoinjs-lib';
 import { ChainID } from '@stacks/transactions';
@@ -227,7 +227,7 @@ export class Wallet {
 
   async fetchConfig(gaiaConfig: GaiaHubConfig): Promise<WalletConfig | null> {
     try {
-      const response = await fetch(
+      const response = await fetchPrivate(
         `${gaiaConfig.url_prefix}${gaiaConfig.address}/wallet-config.json`
       );
       const encrypted = await response.text();
