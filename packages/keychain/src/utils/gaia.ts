@@ -1,5 +1,5 @@
 // @ts-ignore
-import { Buffer } from '@stacks/common';
+import { Buffer, fetchPrivate } from '@stacks/common';
 import { TokenSigner, Json } from 'jsontokens';
 import { getPublicKeyFromPrivate, publicKeyToAddress } from '@stacks/encryption';
 import randomBytes from 'randombytes';
@@ -13,7 +13,7 @@ interface HubInfo {
 }
 
 export const getHubInfo = async (hubUrl: string) => {
-  const response = await fetch(`${hubUrl}/hub_info`);
+  const response = await fetchPrivate(`${hubUrl}/hub_info`);
   const data: HubInfo = await response.json();
   return data;
 };
@@ -115,16 +115,19 @@ export const uploadToGaiaHub = async (
 ): Promise<string> => {
   const contentType = 'application/json';
 
-  const response = await fetch(`${hubConfig.server}/store/${hubConfig.address}/${filename}`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': contentType,
-      Authorization: `bearer ${hubConfig.token}`,
-    },
-    body: contents,
-    referrer: 'no-referrer',
-    referrerPolicy: 'no-referrer',
-  });
+  const response = await fetchPrivate(
+    `${hubConfig.server}/store/${hubConfig.address}/${filename}`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': contentType,
+        Authorization: `bearer ${hubConfig.token}`,
+      },
+      body: contents,
+      referrer: 'no-referrer',
+      referrerPolicy: 'no-referrer',
+    }
+  );
   const { publicURL } = await response.json();
   return publicURL;
 };
