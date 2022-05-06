@@ -1,23 +1,23 @@
+export const MAX_STRING_LENGTH_BYTES = 128;
+export const CLARITY_INT_SIZE = 128;
+export const CLARITY_INT_BYTE_SIZE = 16;
+export const COINBASE_BUFFER_LENGTH_BYTES = 32;
+export const RECOVERABLE_ECDSA_SIG_LENGTH_BYTES = 65;
+export const COMPRESSED_PUBKEY_LENGTH_BYTES = 32;
+export const UNCOMPRESSED_PUBKEY_LENGTH_BYTES = 64;
+export const MEMO_MAX_LENGTH_BYTES = 34;
+export const DEFAULT_CORE_NODE_API_URL = 'https://stacks-node-api.mainnet.stacks.co';
+
 /**
  * Unsigned 32-bit integer
  */
-enum ChainID {
+export enum ChainID {
   Testnet = 0x80000000,
   Mainnet = 0x00000001,
 }
+export const DEFAULT_CHAIN_ID = ChainID.Mainnet;
 
-const DEFAULT_CHAIN_ID = ChainID.Mainnet;
-const MAX_STRING_LENGTH_BYTES = 128;
-const CLARITY_INT_SIZE = 128;
-const CLARITY_INT_BYTE_SIZE = 16;
-const COINBASE_BUFFER_LENGTH_BYTES = 32;
-const RECOVERABLE_ECDSA_SIG_LENGTH_BYTES = 65;
-const COMPRESSED_PUBKEY_LENGTH_BYTES = 32;
-const UNCOMPRESSED_PUBKEY_LENGTH_BYTES = 64;
-const MEMO_MAX_LENGTH_BYTES = 34;
-const DEFAULT_CORE_NODE_API_URL = 'https://stacks-node-api.mainnet.stacks.co';
-
-enum StacksMessageType {
+export enum StacksMessageType {
   Address,
   Principal,
   LengthPrefixedString,
@@ -31,7 +31,7 @@ enum StacksMessageType {
   TransactionAuthField,
 }
 
-enum PayloadType {
+export enum PayloadType {
   TokenTransfer = 0x00,
   SmartContract = 0x01,
   ContractCall = 0x02,
@@ -50,7 +50,7 @@ enum PayloadType {
  * AnchorModes, check out {@link https://github.com/stacksgov/sips/blob/main/sips/sip-001/sip-001-burn-election.md SIP 001} and
  * {@link https://github.com/stacksgov/sips/blob/main/sips/sip-005/sip-005-blocks-and-transactions.md SIP 005}
  */
-enum AnchorMode {
+export enum AnchorMode {
   /** The transaction MUST be included in an anchored block */
   OnChainOnly = 0x01,
   /** The transaction MUST be included in a microblock */
@@ -59,30 +59,35 @@ enum AnchorMode {
   Any = 0x03,
 }
 
-enum TransactionVersion {
+export enum TransactionVersion {
   Mainnet = 0x00,
   Testnet = 0x80,
 }
+export const DEFAULT_TRANSACTION_VERSION = TransactionVersion.Mainnet;
 
-const DEFAULT_TRANSACTION_VERSION = TransactionVersion.Mainnet;
-
-enum PostConditionMode {
+export enum PostConditionMode {
   Allow = 0x01,
   Deny = 0x02,
 }
 
-enum PostConditionType {
+export enum PostConditionType {
   STX = 0x00,
   Fungible = 0x01,
   NonFungible = 0x02,
 }
 
-enum AuthType {
+export enum PostConditionPrincipalID {
+  Origin = 0x01,
+  Standard = 0x02,
+  Contract = 0x03,
+}
+
+export enum AuthType {
   Standard = 0x04,
   Sponsored = 0x05,
 }
 
-enum AddressHashMode {
+export enum AddressHashMode {
   // serialization modes for public keys to addresses.
   // We support four different modes due to legacy compatibility with Stacks v1 addresses:
   /** SingleSigHashMode - hash160(public-key), same as bitcoin's p2pkh */
@@ -95,22 +100,28 @@ enum AddressHashMode {
   SerializeP2WSH = 0x03,
 }
 
-type SingleSigHashMode = AddressHashMode.SerializeP2PKH | AddressHashMode.SerializeP2WPKH;
-type MultiSigHashMode = AddressHashMode.SerializeP2SH | AddressHashMode.SerializeP2WSH;
+export type SingleSigHashMode = AddressHashMode.SerializeP2PKH | AddressHashMode.SerializeP2WPKH;
+export type MultiSigHashMode = AddressHashMode.SerializeP2SH | AddressHashMode.SerializeP2WSH;
 
-enum AddressVersion {
-  MainnetSingleSig = 22,
-  MainnetMultiSig = 20,
-  TestnetSingleSig = 26,
-  TestnetMultiSig = 21,
+/**
+ * Address version for c32check to identify address type. Responds to the
+ * letters in Crockford's Base32 alphabet
+ * - https://github.com/stacks-network/c32check
+ * - https://en.wikipedia.org/wiki/Base32#Crockford's_Base32
+ */
+export enum AddressVersion {
+  MainnetSingleSig = 22, // P
+  MainnetMultiSig = 20, // M
+  TestnetSingleSig = 26, // T
+  TestnetMultiSig = 21, // N
 }
 
-enum PubKeyEncoding {
+export enum PubKeyEncoding {
   Compressed = 0x00,
   Uncompressed = 0x01,
 }
 
-enum FungibleConditionCode {
+export enum FungibleConditionCode {
   Equal = 0x01,
   Greater = 0x02,
   GreaterEqual = 0x03,
@@ -118,24 +129,18 @@ enum FungibleConditionCode {
   LessEqual = 0x05,
 }
 
-enum NonFungibleConditionCode {
+export enum NonFungibleConditionCode {
   DoesNotOwn = 0x10,
   Owns = 0x11,
 }
 
-enum PostConditionPrincipalID {
-  Origin = 0x01,
-  Standard = 0x02,
-  Contract = 0x03,
-}
-
-enum AssetType {
+export enum AssetType {
   STX = 0x00,
   Fungible = 0x01,
   NonFungible = 0x02,
 }
 
-enum TxRejectedReason {
+export enum TxRejectedReason {
   Serialization = 'Serialization',
   Deserialization = 'Deserialization',
   SignatureValidation = 'SignatureValidation',
@@ -155,35 +160,3 @@ enum TxRejectedReason {
   ServerFailureDatabase = 'ServerFailureDatabase',
   ServerFailureOther = 'ServerFailureOther',
 }
-
-export {
-  MAX_STRING_LENGTH_BYTES,
-  CLARITY_INT_SIZE,
-  CLARITY_INT_BYTE_SIZE,
-  COINBASE_BUFFER_LENGTH_BYTES,
-  DEFAULT_CHAIN_ID,
-  DEFAULT_TRANSACTION_VERSION,
-  RECOVERABLE_ECDSA_SIG_LENGTH_BYTES,
-  COMPRESSED_PUBKEY_LENGTH_BYTES,
-  UNCOMPRESSED_PUBKEY_LENGTH_BYTES,
-  MEMO_MAX_LENGTH_BYTES,
-  DEFAULT_CORE_NODE_API_URL,
-  ChainID,
-  StacksMessageType,
-  PayloadType,
-  AnchorMode,
-  TransactionVersion,
-  PostConditionMode,
-  PostConditionType,
-  PostConditionPrincipalID,
-  AuthType,
-  AddressHashMode,
-  SingleSigHashMode,
-  MultiSigHashMode,
-  AddressVersion,
-  PubKeyEncoding,
-  FungibleConditionCode,
-  NonFungibleConditionCode,
-  AssetType,
-  TxRejectedReason,
-};

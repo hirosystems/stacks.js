@@ -9,6 +9,7 @@ import { c32addressDecode } from 'c32check';
 import lodashCloneDeep from 'lodash.clonedeep';
 import { with0x } from '@stacks/common';
 import { bytesToHex } from '@noble/hashes/utils';
+import { AddressHashMode, MultiSigHashMode, SingleSigHashMode } from './constants';
 
 /**
  * Use utils.randomBytes to replace randombytes dependency
@@ -271,4 +272,29 @@ export const validateTxId = (txid: string): boolean => {
   const value = with0x(txid).toLowerCase();
   if (value.length !== 66) return false;
   return with0x(BigInt(value).toString(16).padStart(64, '0')) === value;
+};
+
+export const isSingleSigHashMode = (
+  addressHashMode: AddressHashMode
+): addressHashMode is SingleSigHashMode => {
+  return (
+    addressHashMode == AddressHashMode.SerializeP2PKH ||
+    addressHashMode == AddressHashMode.SerializeP2WPKH
+  );
+};
+
+export const isMultiSigHashMode = (
+  addressHashMode: AddressHashMode
+): addressHashMode is MultiSigHashMode => {
+  return (
+    addressHashMode == AddressHashMode.SerializeP2SH ||
+    addressHashMode == AddressHashMode.SerializeP2WSH
+  );
+};
+
+export const isSegWitHashMode = (addressHashMode: AddressHashMode) => {
+  return (
+    addressHashMode == AddressHashMode.SerializeP2WPKH ||
+    addressHashMode == AddressHashMode.SerializeP2WSH
+  );
 };

@@ -1,56 +1,56 @@
 import { Buffer, intToBytes } from '@stacks/common';
+import { BufferReader } from './bufferReader';
+import { deserializeCV, serializeCV } from './clarity';
 import {
-  MEMO_MAX_LENGTH_BYTES,
+  Address,
+  addressFromVersionHash,
+  addressHashModeToVersion,
+  MessageSignature,
+} from './common';
+import {
   AddressHashMode,
   AddressVersion,
-  TransactionVersion,
-  StacksMessageType,
+  FungibleConditionCode,
+  MEMO_MAX_LENGTH_BYTES,
+  NonFungibleConditionCode,
   PostConditionPrincipalID,
   PostConditionType,
-  FungibleConditionCode,
-  NonFungibleConditionCode,
+  StacksMessageType,
+  TransactionVersion,
 } from './constants';
-
-import { StacksPublicKey, serializePublicKey, deserializePublicKey, isCompressed } from './keys';
-
-import {
-  BufferArray,
-  intToHexString,
-  hexStringToInt,
-  exceedsMaxLengthBytes,
-  hashP2PKH,
-  rightPadHexToLength,
-  hashP2SH,
-  hashP2WSH,
-  hashP2WPKH,
-} from './utils';
-
-import { BufferReader } from './bufferReader';
-import {
-  PostCondition,
-  StandardPrincipal,
-  ContractPrincipal,
-  PostConditionPrincipal,
-  LengthPrefixedString,
-  AssetInfo,
-  createLPString,
-} from './postcondition-types';
-import { Payload, deserializePayload, serializePayload } from './payload';
 import { DeserializationError } from './errors';
+import { deserializePublicKey, isCompressed, serializePublicKey, StacksPublicKey } from './keys';
+import { deserializePayload, Payload, serializePayload } from './payload';
 import {
-  deserializeTransactionAuthField,
+  AssetInfo,
+  ContractPrincipal,
+  createLPString,
+  LengthPrefixedString,
+  PostCondition,
+  PostConditionPrincipal,
+  StandardPrincipal,
+} from './postcondition-types';
+import {
   deserializeMessageSignature,
+  deserializeTransactionAuthField,
   serializeMessageSignature,
   serializeTransactionAuthField,
   TransactionAuthField,
 } from './signature';
 import {
-  MessageSignature,
-  Address,
-  addressHashModeToVersion,
-  addressFromVersionHash,
-} from './common';
-import { deserializeCV, serializeCV } from './clarity';
+  BufferArray,
+  exceedsMaxLengthBytes,
+  hashP2PKH,
+  hashP2SH,
+  hashP2WPKH,
+  hashP2WSH,
+  hexStringToInt,
+  intToHexString,
+  isSegWitHashMode,
+  isSingleSigHashMode,
+  rightPadHexToLength,
+} from './utils';
+
 export type StacksMessage =
   | Address
   | PostConditionPrincipal
@@ -152,18 +152,12 @@ export function addressFromPublicKeys(
     throw Error('Invalid number of public keys');
   }
 
-  if (hashMode === AddressHashMode.SerializeP2PKH || hashMode === AddressHashMode.SerializeP2WPKH) {
-    if (publicKeys.length !== 1 || numSigs !== 1) {
-      throw Error('Invalid number of public keys or signatures');
-    }
+  if (isSingleSigHashMode(hashMode) && (publicKeys.length !== 1 || numSigs !== 1)) {
+    throw Error('Invalid number of public keys or signatures');
   }
 
-  if (hashMode === AddressHashMode.SerializeP2WPKH || hashMode === AddressHashMode.SerializeP2WSH) {
-    for (let i = 0; i < publicKeys.length; i++) {
-      if (!isCompressed(publicKeys[i])) {
-        throw Error('Public keys must be compressed for segwit');
-      }
-    }
+  if (isSegWitHashMode(hashMode) && publicKeys.some(p => !isCompressed(p))) {
+    throw Error('Public keys must be compressed for segwit');
   }
 
   switch (hashMode) {

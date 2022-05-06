@@ -7,7 +7,7 @@ import {
   MultiSigSpendingCondition,
   SponsoredAuthorization,
   createStandardAuth,
-  createSponsoredAuth
+  createSponsoredAuth,
 } from '../src/authorization';
 
 import { TokenTransferPayload, createTokenTransferPayload } from '../src/payload';
@@ -27,11 +27,7 @@ import {
   AddressHashMode,
 } from '../src/constants';
 
-import {
-  createStacksPrivateKey,
-  pubKeyfromPrivKey,
-  publicKeyToString
-} from '../src/keys';
+import { createStacksPrivateKey, pubKeyfromPrivKey, publicKeyToString } from '../src/keys';
 
 import { TransactionSigner } from '../src/signer';
 
@@ -67,11 +63,7 @@ test('STX token transfer transaction serialization and deserialization', () => {
   const authType = AuthType.Standard;
   const authorization = createStandardAuth(spendingCondition);
 
-  const postCondition = createSTXPostCondition(
-    recipient,
-    FungibleConditionCode.GreaterEqual,
-    0
-  );
+  const postCondition = createSTXPostCondition(recipient, FungibleConditionCode.GreaterEqual, 0);
 
   const postConditions = createLPList([postCondition]);
   const transaction = new StacksTransaction(
@@ -91,12 +83,16 @@ test('STX token transfer transaction serialization and deserialization', () => {
 
   const serialized = transaction.serialize();
   const deserialized = deserializeTransaction(new BufferReader(serialized));
-  
+
   const serializedHexString = serialized.toString('hex');
-  expect(deserializeTransaction(serializedHexString).serialize().toString('hex')).toEqual(serialized.toString('hex'));
+  expect(deserializeTransaction(serializedHexString).serialize().toString('hex')).toEqual(
+    serialized.toString('hex')
+  );
 
   const serializedHexStringPrefixed = '0x' + serializedHexString;
-  expect(deserializeTransaction(serializedHexStringPrefixed).serialize().toString('hex')).toEqual(serialized.toString('hex'));
+  expect(deserializeTransaction(serializedHexStringPrefixed).serialize().toString('hex')).toEqual(
+    serialized.toString('hex')
+  );
 
   expect(deserialized.version).toBe(transactionVersion);
   expect(deserialized.chainId).toBe(chainId);
@@ -144,11 +140,7 @@ test('STX token transfer transaction fee setting', () => {
   const authType = AuthType.Standard;
   const authorization = createStandardAuth(spendingCondition);
 
-  const postCondition = createSTXPostCondition(
-    recipient,
-    FungibleConditionCode.GreaterEqual,
-    0
-  );
+  const postCondition = createSTXPostCondition(recipient, FungibleConditionCode.GreaterEqual, 0);
 
   const postConditions = createLPList([postCondition]);
 
@@ -269,7 +261,60 @@ test('STX token transfer transaction multi-sig serialization and deserialization
   expect(deserializedPayload.amount.toString()).toBe(amount.toString());
 });
 
-test('STX token transfer transaction multi-sig uncompressed keys serialization and deserialization', () => {
+test('multi-sig STX transfer with uncompressed keys and P2WSH', () => {
+  const nonce = 0;
+  const fee = 0;
+  const privKeyStrings = [
+    '6d430bb91222408e7706c9001cfaeb91b08c2be6d5ac95779ab52c6b431950e0',
+    '2a584d899fed1d24e26b524f202763c8ab30260167429f157f1c119f550fa6af',
+    'd5200dee706ee53ae98a03fba6cf4fdcc5084c30cfa9e1b3462dcdeaa3e0f1d2',
+  ];
+  const privKeys = privKeyStrings.map(createStacksPrivateKey);
+  const pubKeys = privKeyStrings.map(pubKeyfromPrivKey);
+  const pubKeyStrings = pubKeys.map(publicKeyToString);
+
+  expect(() =>
+    createMultiSigSpendingCondition(AddressHashMode.SerializeP2WSH, 2, pubKeyStrings, nonce, fee)
+  ).toThrow('Public keys must be compressed for segwit');
+
+  // Incorrectly/manually create a tx without segwit and later change auth to segwit
+  const temporaryAddressHashMode = AddressHashMode.SerializeP2SH;
+  const spendingCondition = createMultiSigSpendingCondition(
+    temporaryAddressHashMode,
+    2,
+    pubKeyStrings,
+    nonce,
+    fee
+  );
+  const originAuth = createStandardAuth(spendingCondition);
+  const originAddress = originAuth.spendingCondition?.signer;
+  expect(originAddress).toEqual('73a8b4a751a678fe83e9d35ce301371bb3d397f7');
+
+  const transactionVersion = TransactionVersion.Mainnet;
+  const address = 'SP3FGQ8Z7JY9BWYZ5WM53E0M9NK7WHJF0691NZ159';
+  const recipientCV = standardPrincipalCV(address);
+  const payload = createTokenTransferPayload(recipientCV, 2500000, 'memo');
+
+  const transaction = new StacksTransaction(transactionVersion, originAuth, payload);
+  // override with incorrect segwit hash mode
+  transaction.auth.spendingCondition.hashMode = AddressHashMode.SerializeP2WSH;
+
+  const signer = new TransactionSigner(transaction);
+  signer.signOrigin(privKeys[0]);
+  signer.signOrigin(privKeys[1]);
+  signer.appendOrigin(pubKeys[2]);
+
+  expect(() => transaction.verifyOrigin()).toThrow(
+    'Uncompressed keys are not allowed in this hash mode'
+  );
+
+  const serialized = transaction.serialize();
+  expect(() => deserializeTransaction(new BufferReader(serialized))).toThrow(
+    'Uncompressed keys are not allowed in this hash mode'
+  );
+});
+
+test('multi-sig STX transfer with uncompressed keys and P2SH', () => {
   const addressHashMode = AddressHashMode.SerializeP2SH;
   const nonce = 0;
   const fee = 0;
@@ -313,18 +358,17 @@ test('STX token transfer transaction multi-sig uncompressed keys serialization a
   signer.signOrigin(privKeys[1]);
   signer.appendOrigin(pubKeys[2]);
 
-  const expectedError = 'Uncompressed keys are not allowed in this hash mode';
-
-  expect(() => transaction.verifyOrigin()).toThrow(expectedError);
+  expect(() => transaction.verifyOrigin()).not.toThrow();
 
   const serialized = transaction.serialize();
-  
+
   // serialized tx that has been successfully deserialized and had
   // its auth verified via the stacks-blockchain implementation
-  const verifiedTx = "0000000001040173a8b4a751a678fe83e9d35ce301371bb3d397f7000000000000000000000000000000000000000303010359b18fbcb6d5e26efc1eae70aefdae54995e6fd4f3ec40d2ff43b2227c4def1ee6416bf3dd5c92c8150fa51717f1f2db778c02ba47b8c70c1a8ff640b4edee03017b7d76c3d1f7d449604df864e4013da5094be7276aa02cb73ec9fc8108a0bed46c7cde4d702830c1db34ef7c19e2776f59107afef39084776fc88bc78dbb96560103661ec7479330bf1ef7a4c9d1816f089666a112e72d671048e5424fc528ca51530002030200000000000516df0ba3e79792be7be5e50a370289accfc8c9e03200000000002625a06d656d6f000000000000000000000000000000000000000000000000000000000000"
+  const verifiedTx =
+    '0000000001040173a8b4a751a678fe83e9d35ce301371bb3d397f7000000000000000000000000000000000000000303010359b18fbcb6d5e26efc1eae70aefdae54995e6fd4f3ec40d2ff43b2227c4def1ee6416bf3dd5c92c8150fa51717f1f2db778c02ba47b8c70c1a8ff640b4edee03017b7d76c3d1f7d449604df864e4013da5094be7276aa02cb73ec9fc8108a0bed46c7cde4d702830c1db34ef7c19e2776f59107afef39084776fc88bc78dbb96560103661ec7479330bf1ef7a4c9d1816f089666a112e72d671048e5424fc528ca51530002030200000000000516df0ba3e79792be7be5e50a370289accfc8c9e03200000000002625a06d656d6f000000000000000000000000000000000000000000000000000000000000';
   expect(serialized.toString('hex')).toBe(verifiedTx);
 
-  expect(() => deserializeTransaction(new BufferReader(serialized))).toThrow(expectedError);
+  expect(() => deserializeTransaction(new BufferReader(serialized))).not.toThrow();
 });
 
 test('Sponsored STX token transfer transaction serialization and deserialization', () => {
@@ -377,11 +421,15 @@ test('Sponsored STX token transfer transaction serialization and deserialization
   expect(deserialized.auth.spendingCondition!.hashMode).toBe(addressHashMode);
   expect(deserialized.auth.spendingCondition!.nonce!.toString()).toBe(nonce.toString());
   expect(deserialized.auth.spendingCondition!.fee!.toString()).toBe(fee.toString());
-  expect((deserialized.auth as SponsoredAuthorization).sponsorSpendingCondition!.hashMode).toBe(addressHashMode);
-  expect((deserialized.auth as SponsoredAuthorization).sponsorSpendingCondition!.nonce!.toString()).toBe(
-    sponsorNonce.toString()
+  expect((deserialized.auth as SponsoredAuthorization).sponsorSpendingCondition!.hashMode).toBe(
+    addressHashMode
   );
-  expect((deserialized.auth as SponsoredAuthorization).sponsorSpendingCondition!.fee!.toString()).toBe(fee.toString());
+  expect(
+    (deserialized.auth as SponsoredAuthorization).sponsorSpendingCondition!.nonce!.toString()
+  ).toBe(sponsorNonce.toString());
+  expect(
+    (deserialized.auth as SponsoredAuthorization).sponsorSpendingCondition!.fee!.toString()
+  ).toBe(fee.toString());
   expect(deserialized.anchorMode).toBe(anchorMode);
   expect(deserialized.postConditionMode).toBe(postConditionMode);
 

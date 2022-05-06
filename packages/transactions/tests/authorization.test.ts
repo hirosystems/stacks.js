@@ -13,10 +13,11 @@ import { createTransactionAuthField } from '../src/signature';
 import { createMessageSignature } from '../src/common';
 import { BufferArray } from '../src/utils';
 
-import {AddressHashMode, AuthType, PubKeyEncoding} from '../src/constants';
+import { AddressHashMode, AuthType, PubKeyEncoding } from '../src/constants';
 
-import {BufferReader} from '../src/bufferReader';
-import {createStacksPrivateKey, createStacksPublicKey, signWithKey,} from '../src/keys';
+import { BufferReader } from '../src/bufferReader';
+import { createStacksPrivateKey, createStacksPublicKey, signWithKey } from '../src/keys';
+import { Buffer } from '@stacks/common';
 
 test('ECDSA recoverable signature', () => {
   const privKeyString = 'edf9aee84d9b7abc145504dde6726c64f369d37ee34ded868fabd876c26570bc';
@@ -84,7 +85,9 @@ test('Single sig spending condition uncompressed', () => {
   ]
   const spendingConditionBytes = Buffer.from(spendingConditionBytesHex);
 
-  expect(serializedSpendingCondition.toString('hex')).toEqual(spendingConditionBytes.toString('hex'));
+  expect(serializedSpendingCondition.toString('hex')).toEqual(
+    spendingConditionBytes.toString('hex')
+  );
 });
 
 test('Multi sig spending condition uncompressed', () => {
@@ -105,7 +108,9 @@ test('Multi sig spending condition uncompressed', () => {
 
   const signature = createMessageSignature('ff'.repeat(65));
   const fields = [signature, signature, createStacksPublicKey(pubKeys[2])];
-  spendingCondition.fields = fields.map(sig => createTransactionAuthField(PubKeyEncoding.Compressed, sig));
+  spendingCondition.fields = fields.map(sig =>
+    createTransactionAuthField(PubKeyEncoding.Compressed, sig)
+  );
 
   const serializedSpendingCondition = serializeSpendingCondition(spendingCondition);
 
@@ -139,7 +144,9 @@ test('Multi sig spending condition uncompressed', () => {
 
   const spendingConditionBytes = Buffer.from(spendingConditionBytesHex);
 
-  expect(serializedSpendingCondition.toString('hex')).toEqual(spendingConditionBytes.toString('hex'));
+  expect(serializedSpendingCondition.toString('hex')).toEqual(
+    spendingConditionBytes.toString('hex')
+  );
 });
 
 // auth.rs: tx_stacks_spending_condition_p2sh() (compressed multisig)
@@ -162,7 +169,9 @@ test('Multi sig P2SH spending condition compressed', () => {
   const signature1 = createMessageSignature('ff'.repeat(65));
   const signature2 = createMessageSignature('fe'.repeat(65));
   const fields = [signature1, signature2, createStacksPublicKey(pubKeys[0])];
-  spendingCondition.fields = fields.map(sig => createTransactionAuthField(PubKeyEncoding.Compressed, sig));
+  spendingCondition.fields = fields.map(sig =>
+    createTransactionAuthField(PubKeyEncoding.Compressed, sig)
+  );
 
   const serializedSpendingCondition = serializeSpendingCondition(spendingCondition);
 
@@ -207,7 +216,6 @@ test('Multi sig P2SH spending condition compressed', () => {
   expect(serializedSpendingCondition).toEqual(spendingConditionBytes);
 });
 
-
 // auth.rs: tx_stacks_spending_condition_p2wsh()
 test('Multi sig P2WSH spending condition compressed', () => {
   const addressHashMode = AddressHashMode.SerializeP2WSH;
@@ -228,7 +236,9 @@ test('Multi sig P2WSH spending condition compressed', () => {
   const signature1 = createMessageSignature('ff'.repeat(65));
   const signature2 = createMessageSignature('fe'.repeat(65));
   const fields = [signature1, signature2, createStacksPublicKey(pubKeys[0])];
-  spendingCondition.fields = fields.map(sig => createTransactionAuthField(PubKeyEncoding.Compressed, sig));
+  spendingCondition.fields = fields.map(sig =>
+    createTransactionAuthField(PubKeyEncoding.Compressed, sig)
+  );
 
   const serializedSpendingCondition = serializeSpendingCondition(spendingCondition);
 
@@ -282,7 +292,8 @@ test('Spending conditions', () => {
   const signer = '11'.repeat(20);
   const signatureFF = createMessageSignature('ff'.repeat(65));
   const signatureFE = createMessageSignature('fe'.repeat(65));
-  const pubKeyUncompressed = '04ef2340518b5867b23598a9cf74611f8b98064f7d55cdb8c107c67b5efcbc5c771f112f919b00a6c6c5f51f7c63e1762fe9fac9b66ec75a053db7f51f4a52712b';
+  const pubKeyUncompressed =
+    '04ef2340518b5867b23598a9cf74611f8b98064f7d55cdb8c107c67b5efcbc5c771f112f919b00a6c6c5f51f7c63e1762fe9fac9b66ec75a053db7f51f4a52712b';
   const pubKeyCompressed = '03ef2340518b5867b23598a9cf74611f8b98064f7d55cdb8c107c67b5efcbc5c77';
 
   const sp1 = createSingleSigSpendingCondition(AddressHashMode.SerializeP2PKH, '', bn123, bn567);
@@ -295,44 +306,58 @@ test('Spending conditions', () => {
   sp2.keyEncoding = PubKeyEncoding.Compressed;
   sp2.signature = signatureFF;
 
-  const sp3 = createMultiSigSpendingCondition(AddressHashMode.SerializeP2SH,
+  const sp3 = createMultiSigSpendingCondition(
+    AddressHashMode.SerializeP2SH,
     2,
     [pubKeyUncompressed, pubKeyUncompressed, pubKeyUncompressed],
     bn123,
-    bn567);
+    bn567
+  );
   sp3.signer = signer;
-  sp3.fields = [signatureFF, signatureFE, createStacksPublicKey(pubKeyUncompressed)].map(sig => createTransactionAuthField(PubKeyEncoding.Uncompressed, sig));
+  sp3.fields = [signatureFF, signatureFE, createStacksPublicKey(pubKeyUncompressed)].map(sig =>
+    createTransactionAuthField(PubKeyEncoding.Uncompressed, sig)
+  );
 
-  const sp4 = createMultiSigSpendingCondition(AddressHashMode.SerializeP2SH,
+  const sp4 = createMultiSigSpendingCondition(
+    AddressHashMode.SerializeP2SH,
     2,
     [pubKeyCompressed, pubKeyCompressed, pubKeyCompressed],
     bn123,
-    bn567);
+    bn567
+  );
   sp4.signer = signer;
-  sp4.fields = [signatureFF, signatureFE, createStacksPublicKey(pubKeyCompressed)].map(sig => createTransactionAuthField(PubKeyEncoding.Compressed, sig));
+  sp4.fields = [signatureFF, signatureFE, createStacksPublicKey(pubKeyCompressed)].map(sig =>
+    createTransactionAuthField(PubKeyEncoding.Compressed, sig)
+  );
 
   const sp5 = createSingleSigSpendingCondition(AddressHashMode.SerializeP2WPKH, '', bn345, bn567);
   sp5.signer = signer;
   sp5.keyEncoding = PubKeyEncoding.Compressed;
   sp5.signature = signatureFE;
 
-  const sp6 = createMultiSigSpendingCondition(AddressHashMode.SerializeP2WSH,
+  const sp6 = createMultiSigSpendingCondition(
+    AddressHashMode.SerializeP2WSH,
     2,
     [pubKeyCompressed, pubKeyCompressed, pubKeyCompressed],
     bn456,
-    bn567);
+    bn567
+  );
   sp6.signer = signer;
-  sp6.fields = [signatureFF, signatureFE, createStacksPublicKey(pubKeyCompressed)].map(sig => createTransactionAuthField(PubKeyEncoding.Compressed, sig));
+  sp6.fields = [signatureFF, signatureFE, createStacksPublicKey(pubKeyCompressed)].map(sig =>
+    createTransactionAuthField(PubKeyEncoding.Compressed, sig)
+  );
 
   const spendingConditions = [sp1, sp2, sp3, sp4, sp5, sp6];
 
   for (let i = 0; i < spendingConditions.length; i++) {
     const serialized1 = serializeSpendingCondition(spendingConditions[i]);
-    const serialized2 = serializeSpendingCondition(spendingConditions[(i + 1) % spendingConditions.length]);
+    const serialized2 = serializeSpendingCondition(
+      spendingConditions[(i + 1) % spendingConditions.length]
+    );
 
     const standard: StandardAuthorization = {
       authType: AuthType.Standard,
-      spendingCondition: spendingConditions[i]
+      spendingCondition: spendingConditions[i],
     };
     const standardArray = new BufferArray();
     standardArray.appendByte(AuthType.Standard);
@@ -342,7 +367,7 @@ test('Spending conditions', () => {
     const sponsored: SponsoredAuthorization = {
       authType: AuthType.Sponsored,
       spendingCondition: spendingConditions[i],
-      sponsorSpendingCondition: spendingConditions[(i + 1) % spendingConditions.length]
+      sponsorSpendingCondition: spendingConditions[(i + 1) % spendingConditions.length],
     };
     const sponsoredArray = new BufferArray();
     sponsoredArray.appendByte(AuthType.Sponsored);
@@ -353,7 +378,6 @@ test('Spending conditions', () => {
     expect(serializeAuthorization(standard)).toEqual(standardBytes);
     expect(serializeAuthorization(sponsored)).toEqual(sponsoredBytes);
   }
-
 });
 
 // auth.rs: tx_stacks_invalid_spending_conditions()
@@ -381,8 +405,9 @@ test('Invalid spending conditions', () => {
 
   const badHashModeSpendingConditionBytes = Buffer.from(badHashModeBytesHex);
 
-  expect(() => deserializeSpendingCondition(new BufferReader(badHashModeSpendingConditionBytes)))
-    .toThrow('Could not parse 255 as AddressHashMode');
+  expect(() =>
+    deserializeSpendingCondition(new BufferReader(badHashModeSpendingConditionBytes))
+  ).toThrow('Could not parse 255 as AddressHashMode');
 
   // prettier-ignore
   const badHashModeMultiSigBytesHex = [
@@ -406,8 +431,9 @@ test('Invalid spending conditions', () => {
 
   const badHashModeMultiSigSependingCondBytes = Buffer.from(badHashModeMultiSigBytesHex);
 
-  expect(() => deserializeSpendingCondition(new BufferReader(badHashModeMultiSigSependingCondBytes)))
-    .toThrow('Could not read 253 as AuthFieldType');
+  expect(() =>
+    deserializeSpendingCondition(new BufferReader(badHashModeMultiSigSependingCondBytes))
+  ).toThrow('Could not read 253 as AuthFieldType');
 
   // this will parse into a singlesig spending condition, but data will still remain.
   // the reason it parses is because the public keys length field encodes a valid 2-byte
@@ -528,15 +554,17 @@ test('Invalid spending conditions', () => {
 
   // Partially signed multi-sig tx can be serialized and deserialized without exception (Incorrect number of signatures)
   // Should be able to deserialize as number of signatures are less than signatures required
-  expect(() => deserializeSpendingCondition(new BufferReader(badPublicKeyCountBuffer)))
-    .not.toThrowError();
+  expect(() =>
+    deserializeSpendingCondition(new BufferReader(badPublicKeyCountBuffer))
+  ).not.toThrowError();
 
   const badPublicKeyCount2Buffer = Buffer.from(badPublicKeyCountBytes2);
 
   // Partially signed multi-sig tx can be serialized and deserialized without exception (Incorrect number of signatures)
   // Should be able to deserialize as number of signatures are less than signatures required
-  expect(() => deserializeSpendingCondition(new BufferReader(badPublicKeyCount2Buffer)))
-    .not.toThrowError();
+  expect(() =>
+    deserializeSpendingCondition(new BufferReader(badPublicKeyCount2Buffer))
+  ).not.toThrowError();
 
   // hashing mode doesn't allow uncompressed keys
   const signatureFF = createMessageSignature('ff'.repeat(65));
@@ -575,9 +603,10 @@ test('Invalid spending conditions', () => {
 
   expect(Buffer.from(badP2WpkhUncompressedBytes)).toEqual(serializedSPUncompressedKeys);
   expect(() =>
-    deserializeSpendingCondition(new BufferReader(Buffer.from(badP2WpkhUncompressedBytes))))
-      .toThrow('Failed to parse singlesig spending condition: incomaptible hash mode and key encoding');
-
+    deserializeSpendingCondition(new BufferReader(Buffer.from(badP2WpkhUncompressedBytes)))
+  ).toThrow(
+    'Failed to parse singlesig spending condition: incomaptible hash mode and key encoding'
+  );
 });
 
 // auth.rs: tx_stacks_spending_condition_p2pkh()
@@ -648,10 +677,7 @@ test('Single sig P2PKH spending condition', () => {
     0xfe, 0xfe, 0xfe, 0xfe, 0xfe, 0xfe, 0xfe, 0xfe, 0xfe, 0xfe, 0xfe,
   ];
 
-  const spendingConditions = [
-    spP2PkhCompressed,
-    spP2PkhUncompressed
-  ];
+  const spendingConditions = [spP2PkhCompressed, spP2PkhUncompressed];
   const spendingConditionsBytes = [
     spendingConditionP2PkhCompressedBytes,
     spendingConditionP2PkhUncompressedBytes,
@@ -659,8 +685,12 @@ test('Single sig P2PKH spending condition', () => {
 
   for (let i = 0; i < spendingConditions.length; i++) {
     const serializedSpendingCondition = serializeSpendingCondition(spendingConditions[i]);
-    expect(serializedSpendingCondition.toString('hex')).toEqual(Buffer.from(spendingConditionsBytes[i]).toString('hex'));
-    const spendingCondition = deserializeSpendingCondition(new BufferReader(serializedSpendingCondition));
+    expect(serializedSpendingCondition.toString('hex')).toEqual(
+      Buffer.from(spendingConditionsBytes[i]).toString('hex')
+    );
+    const spendingCondition = deserializeSpendingCondition(
+      new BufferReader(serializedSpendingCondition)
+    );
     expect(spendingCondition).toEqual(spendingConditions[i]);
   }
 });
@@ -681,7 +711,7 @@ test('Single sig P2WPKH spending condition', () => {
   spP2WPKHCompressed.signer = '11'.repeat(20);
 
   // prettier-ignore
-  let spendingConditionP2WpkhCompressedBytes = [
+  const spendingConditionP2WpkhCompressedBytes = [
     // hash mode
     AddressHashMode.SerializeP2WPKH,
     // signer
@@ -700,17 +730,17 @@ test('Single sig P2WPKH spending condition', () => {
     0xfe, 0xfe, 0xfe, 0xfe, 0xfe, 0xfe, 0xfe, 0xfe, 0xfe, 0xfe, 0xfe,
   ];
 
-  const spendingConditions = [
-    spP2WPKHCompressed,
-  ];
-  const spendingConditionsBytes = [
-    spendingConditionP2WpkhCompressedBytes,
-  ];
+  const spendingConditions = [spP2WPKHCompressed];
+  const spendingConditionsBytes = [spendingConditionP2WpkhCompressedBytes];
 
   for (let i = 0; i < spendingConditions.length; i++) {
     const serializedSpendingCondition = serializeSpendingCondition(spendingConditions[i]);
-    expect(serializedSpendingCondition.toString('hex')).toEqual(Buffer.from(spendingConditionsBytes[i]).toString('hex'));
-    const spendingCondition = deserializeSpendingCondition(new BufferReader(serializedSpendingCondition));
+    expect(serializedSpendingCondition.toString('hex')).toEqual(
+      Buffer.from(spendingConditionsBytes[i]).toString('hex')
+    );
+    const spendingCondition = deserializeSpendingCondition(
+      new BufferReader(serializedSpendingCondition)
+    );
     expect(spendingCondition).toEqual(spendingConditions[i]);
   }
 });
