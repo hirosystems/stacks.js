@@ -1,3 +1,4 @@
+import { createApiKeyMiddleware, getDefaultFetchFn } from '@stacks/common';
 import { StacksMainnet, StacksTestnet } from '@stacks/network';
 import * as fs from 'fs';
 import fetchMock from 'jest-fetch-mock';
@@ -55,6 +56,26 @@ function setSignature(unsignedTransaction: StacksTransaction, signature: string 
 beforeEach(() => {
   fetchMock.resetMocks();
   jest.resetModules();
+});
+
+test('API key middleware - get nonce', async () => {
+  const senderAddress = 'STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6';
+
+  const apiKey = '1234-my-api-key-example';
+  const fetchFn = getDefaultFetchFn(createApiKeyMiddleware({ apiKey }));
+  const network = new StacksMainnet({ fetchFn });
+
+  fetchMock.mockOnce(`{"balance": "0", "nonce": "123"}`);
+
+  const fetchNonce = await getNonce(senderAddress, network);
+  expect(fetchNonce).toBe(123n);
+  expect(fetchMock.mock.calls.length).toEqual(1);
+  expect(fetchMock.mock.calls[0][0]).toEqual(
+    'https://stacks-node-api.mainnet.stacks.co/v2/accounts/STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6?proof=0'
+  );
+  const callHeaders = new Headers(fetchMock.mock.calls[0][1]?.headers);
+  expect(callHeaders.has('x-api-key')).toBeTruthy();
+  expect(callHeaders.get('x-api-key')).toBe(apiKey);
 });
 
 test('Make STX token transfer with set tx fee', async () => {

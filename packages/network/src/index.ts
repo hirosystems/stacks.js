@@ -126,7 +126,7 @@ export class StacksMainnet extends StacksNetwork {
   version = TransactionVersion.Mainnet;
   chainId = ChainID.Mainnet;
 
-  constructor(opts?: NetworkConfig) {
+  constructor(opts?: Partial<NetworkConfig>) {
     super({
       url: opts?.url ?? HIRO_MAINNET_DEFAULT,
       fetchFn: opts?.fetchFn,
@@ -138,7 +138,7 @@ export class StacksTestnet extends StacksNetwork {
   version = TransactionVersion.Testnet;
   chainId = ChainID.Testnet;
 
-  constructor(opts?: NetworkConfig) {
+  constructor(opts?: Partial<NetworkConfig>) {
     super({
       url: opts?.url ?? HIRO_TESTNET_DEFAULT,
       fetchFn: opts?.fetchFn,
@@ -150,7 +150,7 @@ export class StacksMocknet extends StacksNetwork {
   version = TransactionVersion.Testnet;
   chainId = ChainID.Testnet;
 
-  constructor(opts?: NetworkConfig) {
+  constructor(opts?: Partial<NetworkConfig>) {
     super({
       url: opts?.url ?? HIRO_MOCKNET_DEFAULT,
       fetchFn: opts?.fetchFn,

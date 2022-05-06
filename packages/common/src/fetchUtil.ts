@@ -24,80 +24,6 @@ export interface FetchMiddleware {
   pre?: (context: RequestContext) => PromiseLike<FetchParams | void> | FetchParams | void;
   post?: (context: ResponseContext) => Promise<Response | void> | Response | void;
 }
-
-// TODO: make the value a promise so that multiple re-auth requests are not running in parallel
-// TODO: make the storage interface configurable
-// in-memory session auth data, keyed by the endpoint host
-const sessionAuthData = new Map<string, { authKey: string }>();
-
-export interface ApiSessionAuthMiddlewareOpts {
-  /** The middleware / API key header will only be added to requests matching this host. */
-  host?: RegExp | string;
-  /** The http header name used for specifying the API key value. */
-  httpHeader?: string;
-  authPath: string;
-  authRequestMetadata: Record<string, string>;
-}
-
-export function getApiSessionAuthMiddleware({
-  host = /(.*)api(.*)\.stacks\.co$/i,
-  httpHeader = 'x-api-key',
-  authPath = '/request_key',
-  authRequestMetadata = {},
-}: ApiSessionAuthMiddlewareOpts): FetchMiddleware {
-  const authMiddleware: FetchMiddleware = {
-    pre: context => {
-      const reqUrl = new URL(context.url);
-      let hostMatches = false;
-      if (typeof host === 'string') {
-        hostMatches = host === reqUrl.host;
-      } else {
-        hostMatches = !!host.exec(reqUrl.host);
-      }
-      const authData = sessionAuthData.get(reqUrl.host);
-      if (hostMatches && authData) {
-        const headers = new Headers(context.init.headers);
-        headers.set(httpHeader, authData.authKey);
-        context.init.headers = headers;
-      }
-    },
-    post: async context => {
-      const reqUrl = new URL(context.url);
-      let hostMatches = false;
-      if (typeof host === 'string') {
-        hostMatches = host === reqUrl.host;
-      } else {
-        hostMatches = !!host.exec(reqUrl.host);
-      }
-      // if request is for configured host, and response was `401 Unauthorized`,
-      // then request auth key and retry request.
-      if (hostMatches && context.response.status === 401) {
-        const authEndpoint = new URL(reqUrl.origin);
-        authEndpoint.pathname = authPath;
-        const authReq = await context.fetch(authEndpoint.toString(), {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Accept: 'application/json',
-          },
-          body: JSON.stringify(authRequestMetadata),
-        });
-        const authResponseBody = await authReq.text();
-        if (authReq.ok) {
-          const authResp: { api_key: string } = JSON.parse(authResponseBody);
-          sessionAuthData.set(reqUrl.host, { authKey: authResp.api_key });
-          return context.fetch(context.url, context.init);
-        } else {
-          throw new Error(`Error fetching API auth key: ${authReq.status}: ${authResponseBody}`);
-        }
-      } else {
-        return context.response;
-      }
-    },
-  };
-  return authMiddleware;
-}
-
 export interface ApiKeyMiddlewareOpts {
   /** The middleware / API key header will only be added to requests matching this host. */
   host?: RegExp | string;
@@ -156,7 +82,7 @@ export function getDefaultFetchFn(...args: any[]): FetchFn {
   }
   const middlewares = [...getDefaultMiddleware(), ...middlewareOpt];
   const fetchFn = async (url: string, init?: RequestInit | undefined): Promise<Response> => {
-    let fetchParams = { url, init: init || {} };
+    let fetchParams = { url, init: init ?? {} };
     for (const middleware of middlewares) {
       if (middleware.pre) {
         const result = await Promise.resolve(
