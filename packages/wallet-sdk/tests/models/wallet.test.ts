@@ -34,7 +34,7 @@ test('restore wallet with username not owned by stx private key', async () => {
   expect(wallet?.accounts[0]?.stxPrivateKey.slice(0, 64)).toEqual(stxPrivateKey);
 });
 
-test('restore wallet with username owned by stx private key', async () => {
+test.skip('restore wallet with username owned by stx private key', async () => {
   const secretKey = SECRET_KEY;
 
   const baseWallet = await generateWallet({ secretKey, password: 'password' });
