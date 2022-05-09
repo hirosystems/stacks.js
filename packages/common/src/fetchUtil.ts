@@ -56,7 +56,7 @@ export function createApiKeyMiddleware({
   };
 }
 
-function getDefaultMiddleware(): FetchMiddleware[] {
+function createDefaultMiddleware(): FetchMiddleware[] {
   const setOriginMiddleware: FetchMiddleware = {
     pre: context => {
       // Send only the origin in the Referer header. For example, a document
@@ -67,9 +67,9 @@ function getDefaultMiddleware(): FetchMiddleware[] {
   return [setOriginMiddleware];
 }
 
-export function getDefaultFetchFn(fetchLib: FetchFn, ...middleware: FetchMiddleware[]): FetchFn;
-export function getDefaultFetchFn(...middleware: FetchMiddleware[]): FetchFn;
-export function getDefaultFetchFn(...args: any[]): FetchFn {
+export function createFetchFn(fetchLib: FetchFn, ...middleware: FetchMiddleware[]): FetchFn;
+export function createFetchFn(...middleware: FetchMiddleware[]): FetchFn;
+export function createFetchFn(...args: any[]): FetchFn {
   let fetchLib: FetchFn = fetch;
   let middlewareOpt: FetchMiddleware[] = [];
   if (args.length > 0) {
@@ -80,7 +80,7 @@ export function getDefaultFetchFn(...args: any[]): FetchFn {
   if (args.length > 0) {
     middlewareOpt = args;
   }
-  const middlewares = [...getDefaultMiddleware(), ...middlewareOpt];
+  const middlewares = [...createDefaultMiddleware(), ...middlewareOpt];
   const fetchFn = async (url: string, init?: RequestInit | undefined): Promise<Response> => {
     let fetchParams = { url, init: init ?? {} };
     for (const middleware of middlewares) {

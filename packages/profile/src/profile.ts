@@ -22,7 +22,7 @@ import { makeZoneFile, parseZoneFile } from 'zone-file';
 // @ts-ignore
 import * as inspector from 'schema-inspector';
 
-import { Logger, getDefaultFetchFn, FetchFn } from '@stacks/common';
+import { Logger, createFetchFn, FetchFn } from '@stacks/common';
 
 const schemaDefinition: { [key: string]: any } = {
   type: 'object',
@@ -339,7 +339,7 @@ export function getTokenFileUrl(zoneFileJson: any): string | null {
 export function resolveZoneFileToProfile(
   zoneFile: any,
   publicKeyOrAddress: string,
-  fetchFn: FetchFn = getDefaultFetchFn()
+  fetchFn: FetchFn = createFetchFn()
 ): Promise<Record<string, any>> {
   return new Promise((resolve, reject) => {
     let zoneFileJson = null;

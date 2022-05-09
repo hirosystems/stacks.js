@@ -1,4 +1,4 @@
-import { TransactionVersion, ChainID, getDefaultFetchFn, FetchFn } from '@stacks/common';
+import { TransactionVersion, ChainID, createFetchFn, FetchFn } from '@stacks/common';
 
 export const HIRO_MAINNET_DEFAULT = 'https://stacks-node-api.mainnet.stacks.co';
 export const HIRO_TESTNET_DEFAULT = 'https://stacks-node-api.testnet.stacks.co';
@@ -29,7 +29,7 @@ export class StacksNetwork {
 
   constructor(networkConfig: NetworkConfig) {
     this.coreApiUrl = networkConfig.url;
-    this.fetchFn = networkConfig.fetchFn ?? getDefaultFetchFn();
+    this.fetchFn = networkConfig.fetchFn ?? createFetchFn();
   }
 
   static fromName = (networkName: StacksNetworkName): StacksNetwork => {

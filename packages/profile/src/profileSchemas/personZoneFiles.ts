@@ -3,7 +3,7 @@ import { parseZoneFile } from 'zone-file';
 
 import { getTokenFileUrl, Person } from '../profile';
 import { extractProfile } from '../profileTokens';
-import { FetchFn, getDefaultFetchFn } from '@stacks/common';
+import { FetchFn, createFetchFn } from '@stacks/common';
 
 /**
  *
@@ -17,7 +17,7 @@ export function resolveZoneFileToPerson(
   zoneFile: any,
   publicKeyOrAddress: string,
   callback: (profile: any) => void,
-  fetchFn: FetchFn = getDefaultFetchFn()
+  fetchFn: FetchFn = createFetchFn()
 ) {
   let zoneFileJson = null;
   try {

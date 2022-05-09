@@ -1,5 +1,5 @@
 // @ts-ignore
-import { Buffer, FetchFn, getDefaultFetchFn } from '@stacks/common';
+import { Buffer, FetchFn, createFetchFn } from '@stacks/common';
 import { AppConfig } from './appConfig';
 import { SessionOptions } from './sessionData';
 import { InstanceDataStore, LocalStorageStore, SessionDataStore } from './sessionStore';
@@ -214,7 +214,7 @@ export class UserSession {
    */
   async handlePendingSignIn(
     authResponseToken: string = this.getAuthResponseToken(),
-    fetchFn: FetchFn = getDefaultFetchFn()
+    fetchFn: FetchFn = createFetchFn()
   ): Promise<UserData> {
     const sessionData = this.store.getSessionData();
 

@@ -1,4 +1,4 @@
-import { ChainID, FetchFn, getDefaultFetchFn } from '@stacks/common';
+import { ChainID, FetchFn, createFetchFn } from '@stacks/common';
 import { getPublicKeyFromPrivate, publicKeyToAddress, randomBytes } from '@stacks/encryption';
 import { GaiaHubConfig } from '@stacks/storage';
 import { AssertionError } from 'assert';
@@ -18,7 +18,7 @@ interface NameInfoResponse {
 
 export const getProfileURLFromZoneFile = async (
   name: string,
-  fetchFn: FetchFn = getDefaultFetchFn()
+  fetchFn: FetchFn = createFetchFn()
 ) => {
   const url = `https://stacks-node-api.stacks.co/v1/names/${name}`;
   const res = await fetchFn(url);
@@ -39,7 +39,7 @@ interface HubInfo {
   read_url_prefix: string;
 }
 
-export const getHubInfo = async (gaiaHubUrl: string, fetchFn: FetchFn = getDefaultFetchFn()) => {
+export const getHubInfo = async (gaiaHubUrl: string, fetchFn: FetchFn = createFetchFn()) => {
   const response = await fetchFn(`${gaiaHubUrl}/hub_info`);
   const data: HubInfo = await response.json();
   return data;

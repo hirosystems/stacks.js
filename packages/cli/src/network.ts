@@ -5,7 +5,7 @@ import BN from 'bn.js';
 import { CLI_CONFIG_TYPE } from './argparse';
 
 import { BlockstackNetwork } from 'blockstack/lib/network';
-import { FetchFn, getDefaultFetchFn } from '@stacks/common';
+import { FetchFn, createFetchFn } from '@stacks/common';
 
 export interface CLI_NETWORK_OPTS {
   consensusHash: string | null;
@@ -188,7 +188,7 @@ export class CLINetworkAdapter {
     namespace: string,
     useCLI: boolean = true,
     receiveFeesPeriod: number = -1,
-    fetchFn: FetchFn = getDefaultFetchFn()
+    fetchFn: FetchFn = createFetchFn()
   ): Promise<string> {
     // override with CLI option
     if (this.namespaceBurnAddress && useCLI) {
@@ -246,7 +246,7 @@ export class CLINetworkAdapter {
     });
   }
 
-  getBlockchainNameRecord(name: string, fetchFn: FetchFn = getDefaultFetchFn()): Promise<any> {
+  getBlockchainNameRecord(name: string, fetchFn: FetchFn = createFetchFn()): Promise<any> {
     // TODO: send to blockstack.js
     const url = `${this.legacyNetwork.blockstackAPIUrl}/v1/blockchains/bitcoin/names/${name}`;
     return fetchFn(url)
@@ -272,7 +272,7 @@ export class CLINetworkAdapter {
   getNameHistory(
     name: string,
     page: number,
-    fetchFn: FetchFn = getDefaultFetchFn()
+    fetchFn: FetchFn = createFetchFn()
   ): Promise<Record<string, any[]>> {
     // TODO: send to blockstack.js
     const url = `${this.legacyNetwork.blockstackAPIUrl}/v1/names/${name}/history?page=${page}`;

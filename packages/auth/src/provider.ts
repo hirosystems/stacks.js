@@ -1,6 +1,6 @@
 import * as queryString from 'query-string';
 import { decodeToken } from 'jsontokens';
-import { BLOCKSTACK_HANDLER, getGlobalObject, getDefaultFetchFn, FetchFn } from '@stacks/common';
+import { BLOCKSTACK_HANDLER, getGlobalObject, createFetchFn, FetchFn } from '@stacks/common';
 
 /**
  * Retrieves the authentication request from the query string
@@ -38,7 +38,7 @@ export function getAuthRequestFromURL() {
  */
 export async function fetchAppManifest(
   authRequest: string,
-  fetchFn: FetchFn = getDefaultFetchFn()
+  fetchFn: FetchFn = createFetchFn()
 ): Promise<any> {
   if (!authRequest) {
     throw new Error('Invalid auth request');

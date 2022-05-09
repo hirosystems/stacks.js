@@ -1,4 +1,4 @@
-import { Buffer, FetchFn, getDefaultFetchFn } from '@stacks/common';
+import { Buffer, FetchFn, createFetchFn } from '@stacks/common';
 import { mnemonicToSeed } from 'bip39';
 import { bip32, BIP32Interface } from 'bitcoinjs-lib';
 import { ChainID } from '@stacks/transactions';
@@ -227,7 +227,7 @@ export class Wallet {
 
   async fetchConfig(
     gaiaConfig: GaiaHubConfig,
-    fetchFn: FetchFn = getDefaultFetchFn()
+    fetchFn: FetchFn = createFetchFn()
   ): Promise<WalletConfig | null> {
     try {
       const response = await fetchFn(

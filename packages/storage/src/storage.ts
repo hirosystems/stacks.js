@@ -1,5 +1,5 @@
 // @ts-ignore
-import { Buffer, FetchFn, getDefaultFetchFn } from '@stacks/common';
+import { Buffer, FetchFn, createFetchFn } from '@stacks/common';
 import { lookupProfile, NAME_LOOKUP_PATH, UserSession } from '@stacks/auth';
 import {
   BLOCKSTACK_DEFAULT_GAIA_HUB_URL,
@@ -272,7 +272,7 @@ export class Storage {
     username: string | undefined,
     zoneFileLookupURL: string | undefined,
     forceText: boolean,
-    fetchFn: FetchFn = getDefaultFetchFn()
+    fetchFn: FetchFn = createFetchFn()
   ): Promise<string | ArrayBuffer | null> {
     const opts = { app, username, zoneFileLookupURL };
     const readUrl = await this.getFileUrl(path, opts);
@@ -694,7 +694,7 @@ export class Storage {
     callCount: number,
     fileCount: number,
     callback: (name: string) => boolean,
-    fetchFn: FetchFn = getDefaultFetchFn()
+    fetchFn: FetchFn = createFetchFn()
   ): Promise<number> {
     if (callCount > 65536) {
       // this is ridiculously huge, and probably indicates

@@ -1,4 +1,4 @@
-import { FetchFn, getDefaultFetchFn } from '@stacks/common';
+import { FetchFn, createFetchFn } from '@stacks/common';
 import { decryptContent } from '@stacks/encryption';
 import { GaiaHubConfig } from '@stacks/storage';
 import { deriveLegacyConfigPrivateKey } from '../derive';
@@ -28,7 +28,7 @@ export interface LegacyWalletConfig {
 export async function fetchLegacyWalletConfig({
   wallet,
   gaiaHubConfig,
-  fetchFn = getDefaultFetchFn(),
+  fetchFn = createFetchFn(),
 }: {
   wallet: Wallet;
   gaiaHubConfig: GaiaHubConfig;

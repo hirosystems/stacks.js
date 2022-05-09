@@ -1,4 +1,4 @@
-import { Buffer, FetchFn, getDefaultFetchFn, IntegerType, intToBigInt } from '@stacks/common';
+import { Buffer, FetchFn, createFetchFn, IntegerType, intToBigInt } from '@stacks/common';
 import { StacksNetwork, StacksMainnet, StacksNetworkName, StacksTestnet } from '@stacks/network';
 import { c32address } from 'c32check';
 import {
@@ -414,7 +414,7 @@ export async function broadcastRawTransaction(
   rawTx: Buffer,
   url: string,
   attachment?: Buffer,
-  fetchFn: FetchFn = getDefaultFetchFn()
+  fetchFn: FetchFn = createFetchFn()
 ): Promise<TxBroadcastResult> {
   const options = {
     method: 'POST',
