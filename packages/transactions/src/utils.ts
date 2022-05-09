@@ -1,10 +1,9 @@
-import { Buffer } from '@stacks/common';
+import { Buffer, fetchPrivate } from '@stacks/common';
 import { sha256, sha512 } from 'sha.js';
 import { ClarityValue, serializeCV } from './clarity';
 import RIPEMD160 from 'ripemd160-min';
 import randombytes from 'randombytes';
 import { deserializeCV } from './clarity';
-import fetch from 'cross-fetch';
 import { c32addressDecode } from 'c32check';
 import lodashCloneDeep from 'lodash/cloneDeep';
 import { with0x } from '@stacks/common';
@@ -141,15 +140,8 @@ export function isClarityName(name: string) {
 }
 
 /** @ignore */
-export async function fetchPrivate(input: RequestInfo, init?: RequestInit): Promise<Response> {
-  const defaultFetchOpts: RequestInit = {
-    referrer: 'no-referrer',
-    referrerPolicy: 'no-referrer',
-  };
-  const fetchOpts = Object.assign(defaultFetchOpts, init);
-  const fetchResult = await fetch(input, fetchOpts);
-  return fetchResult;
-}
+export { fetchPrivate };
+
 /**
  * Converts a clarity value to a hex encoded string with `0x` prefix
  * @param {ClarityValue} cv  - the clarity value to convert

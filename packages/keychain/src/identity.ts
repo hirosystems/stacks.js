@@ -1,19 +1,17 @@
-import { Buffer } from '@stacks/common';
-import { bip32, ECPair } from 'bitcoinjs-lib';
-import { getPublicKeyFromPrivate } from '@stacks/encryption';
 import { makeAuthResponse } from '@stacks/auth';
+import { Buffer, fetchPrivate } from '@stacks/common';
+import { ecPairToAddress, getPublicKeyFromPrivate } from '@stacks/encryption';
+import { bip32, ECPair } from 'bitcoinjs-lib';
+import IdentityAddressOwnerNode from './nodes/identity-address-owner-node';
+import { DEFAULT_PROFILE, fetchProfile, Profile, signAndUploadProfile } from './profiles';
 import { getProfileURLFromZoneFile } from './utils';
-
-import { IdentityKeyPair } from './utils/index';
 import {
-  makeGaiaAssociationToken,
+  connectToGaiaHubWithConfig,
   DEFAULT_GAIA_HUB,
   getHubInfo,
-  connectToGaiaHubWithConfig,
+  makeGaiaAssociationToken,
 } from './utils/gaia';
-import IdentityAddressOwnerNode from './nodes/identity-address-owner-node';
-import { Profile, fetchProfile, DEFAULT_PROFILE, signAndUploadProfile } from './profiles';
-import { ecPairToAddress } from '@stacks/encryption';
+import { IdentityKeyPair } from './utils/index';
 
 interface IdentityConstructorOptions {
   keyPair: IdentityKeyPair;
@@ -134,7 +132,7 @@ export class Identity {
 
   async fetchNames() {
     const getNamesUrl = `https://core.blockstack.org/v1/addresses/bitcoin/${this.address}`;
-    const res = await fetch(getNamesUrl);
+    const res = await fetchPrivate(getNamesUrl);
     const data = await res.json();
     const { names }: { names: string[] } = data;
     return names;

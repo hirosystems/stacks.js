@@ -4,6 +4,7 @@ import { IdentityKeyPair } from './utils';
 import { uploadToGaiaHub } from './utils/gaia';
 import Identity from './identity';
 import { GaiaHubConfig } from '@stacks/storage';
+import { fetchPrivate } from '@stacks/common';
 
 const PERSON_TYPE = 'Person';
 const CONTEXT = 'http://schema.org';
@@ -108,7 +109,7 @@ const sendUsernameToRegistrar = async ({
     'Content-Type': 'application/json',
   };
 
-  const response = await fetch(registerUrl, {
+  const response = await fetchPrivate(registerUrl, {
     method: 'POST',
     headers: requestHeaders,
     body: registrationRequestBody,
@@ -183,7 +184,7 @@ export const fetchProfile = async ({
 }) => {
   try {
     const url = await identity.profileUrl(gaiaUrl);
-    const res = await fetch(url);
+    const res = await fetchPrivate(url);
     if (res.ok) {
       const json = await res.json();
       const { decodedToken } = json[0];
