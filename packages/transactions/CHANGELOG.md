@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.0.1](https://github.com/hirosystems/stacks.js/compare/v4.0.1-beta.1...v4.0.1) (2022-05-09)
+
+
+### Bug Fixes
+
+* allow referrer header in request options ([70ea915](https://github.com/hirosystems/stacks.js/commit/70ea9156f6916f32e40adf7464322476a9acd8ab))
+
+
+
+
+
 # [4.0.0](https://github.com/hirosystems/stacks.js/compare/v4.0.0-beta.2...v4.0.0) (2022-04-20)
 
 **Note:** Version bump only for package @stacks/transactions

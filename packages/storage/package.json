@@ -1,6 +1,6 @@
 {
   "name": "@stacks/storage",
-  "version": "4.0.0",
+  "version": "4.0.1",
   "description": "Stacks storage library",
   "author": "yknl <yukanliao@gmail.com>",
   "homepage": "https://blockstack.org",
@@ -33,8 +33,8 @@
   },
   "dependencies": {
     "@stacks/auth": "^4.0.0",
-    "@stacks/common": "^4.0.0",
-    "@stacks/encryption": "^4.0.0",
+    "@stacks/common": "^4.0.1",
+    "@stacks/encryption": "^4.0.1",
     "bitcoinjs-lib": "^5.2.0",
     "jsontokens": "^3.0.0"
   },

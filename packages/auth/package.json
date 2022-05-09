@@ -1,6 +1,6 @@
 {
   "name": "@stacks/auth",
-  "version": "4.0.0",
+  "version": "4.0.1",
   "description": "Authentication for Stacks apps.",
   "keywords": [
     "Stacks",
@@ -40,9 +40,9 @@
     "url": "https://github.com/blockstack/blockstack.js/issues"
   },
   "dependencies": {
-    "@stacks/common": "^4.0.0",
-    "@stacks/encryption": "^4.0.0",
-    "@stacks/network": "^4.0.0",
+    "@stacks/common": "^4.0.1",
+    "@stacks/encryption": "^4.0.1",
+    "@stacks/network": "^4.0.1",
     "@stacks/profile": "^4.0.0",
     "cross-fetch": "^3.1.4",
     "jsontokens": "^3.0.0",
