@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.5.1](https://github.com/hirosystems/stacks.js/compare/v3.5.0...v3.5.1) (2022-05-09)
+
+
+### Bug Fixes
+
+* allow referrer header in request options ([9949df6](https://github.com/hirosystems/stacks.js/commit/9949df69589b8b78c8480c4b019961b6a132a666))
+
+
+
+
+
 # [3.5.0](https://github.com/hirosystems/stacks.js/compare/v3.5.0-beta.3...v3.5.0) (2022-03-30)
 
 **Note:** Version bump only for package stacks.js

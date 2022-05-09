@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.5.1](https://github.com/blockstack/blockstack.js/compare/v3.5.0...v3.5.1) (2022-05-09)
+
+**Note:** Version bump only for package @stacks/encryption
+
+
+
+
+
 # [3.5.0](https://github.com/blockstack/blockstack.js/compare/v3.5.0-beta.3...v3.5.0) (2022-03-30)
 
 **Note:** Version bump only for package @stacks/encryption
