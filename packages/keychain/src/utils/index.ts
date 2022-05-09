@@ -1,4 +1,4 @@
-import { Buffer } from '@stacks/common';
+import { Buffer, fetchPrivate } from '@stacks/common';
 import { BIP32Interface } from 'bitcoinjs-lib';
 import IdentityAddressOwnerNode from '../nodes/identity-address-owner-node';
 import { createSha2Hash, publicKeyToAddress } from '@stacks/encryption';
@@ -185,7 +185,7 @@ export const validateSubdomainAvailability = async (
   subdomain: Subdomains = Subdomains.BLOCKSTACK
 ) => {
   const url = `${registrars[subdomain].apiUrl}/${name.toLowerCase()}.${subdomain}`;
-  const resp = await fetch(url);
+  const resp = await fetchPrivate(url);
   const data = await resp.json();
   return data;
 };
@@ -249,7 +249,7 @@ interface NameInfoResponse {
 
 export const getProfileURLFromZoneFile = async (name: string) => {
   const url = `https://stacks-node-api.stacks.co/v1/names/${name}`;
-  const res = await fetch(url);
+  const res = await fetchPrivate(url);
   if (res.ok) {
     const nameInfo: NameInfoResponse = await res.json();
     const zone = parseZoneFile(nameInfo.zonefile);
