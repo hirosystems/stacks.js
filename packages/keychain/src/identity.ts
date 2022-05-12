@@ -1,4 +1,5 @@
 import { makeAuthResponse } from '@stacks/auth';
+import { FetchFn, createFetchFn } from '@stacks/common';
 import { getPublicKeyFromPrivate, publicKeyToAddress } from '@stacks/encryption';
 import { bip32 } from 'bitcoinjs-lib';
 import { Identity as IdentifyInterface, Profile } from './common';
@@ -130,9 +131,9 @@ export class Identity implements IdentifyInterface {
     return `${gaiaUrl}${this.address}/profile.json`;
   }
 
-  async fetchNames() {
+  async fetchNames(fetchFn: FetchFn = createFetchFn()) {
     const getNamesUrl = `https://stacks-node-api.stacks.co/v1/addresses/bitcoin/${this.address}`;
-    const res = await fetchPrivate(getNamesUrl);
+    const res = await fetchFn(getNamesUrl);
     const data = await res.json();
     const { names }: { names: string[] } = data;
     return names;

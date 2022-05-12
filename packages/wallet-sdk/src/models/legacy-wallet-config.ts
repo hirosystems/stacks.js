@@ -1,6 +1,6 @@
+import { FetchFn, createFetchFn } from '@stacks/common';
 import { decryptContent } from '@stacks/encryption';
 import { GaiaHubConfig } from '@stacks/storage';
-import { fetchPrivate } from '@stacks/transactions';
 import { deriveLegacyConfigPrivateKey } from '../derive';
 import { Wallet, getRootNode } from './common';
 
@@ -28,14 +28,16 @@ export interface LegacyWalletConfig {
 export async function fetchLegacyWalletConfig({
   wallet,
   gaiaHubConfig,
+  fetchFn = createFetchFn(),
 }: {
   wallet: Wallet;
   gaiaHubConfig: GaiaHubConfig;
+  fetchFn?: FetchFn;
 }) {
   const rootNode = getRootNode(wallet);
   const legacyConfigKey = deriveLegacyConfigPrivateKey(rootNode);
   try {
-    const response = await fetchPrivate(
+    const response = await fetchFn(
       `${gaiaHubConfig.url_prefix}${gaiaHubConfig.address}/wallet-config.json`
     );
     if (!response.ok) return null;

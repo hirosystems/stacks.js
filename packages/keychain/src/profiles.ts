@@ -1,10 +1,9 @@
-import { connectToGaiaHub } from '@stacks/storage';
-import { signProfileToken, wrapProfileToken, makeProfileZoneFile } from '@stacks/profile';
+import { createFetchFn, FetchFn } from '@stacks/common';
+import { makeProfileZoneFile, signProfileToken, wrapProfileToken } from '@stacks/profile';
+import { connectToGaiaHub, GaiaHubConfig } from '@stacks/storage';
 import { Identity, Profile } from './common';
 import { IdentityKeyPair } from './utils';
 import { uploadToGaiaHub } from './utils/gaia';
-import { GaiaHubConfig } from '@stacks/storage';
-import { fetchPrivate } from '@stacks/common';
 
 export const DEFAULT_PROFILE: Profile = {
   '@type': 'Person',
@@ -61,6 +60,7 @@ interface SendToRegistrarParams {
   subdomain: Subdomains;
   zoneFile: string;
   identity: Identity;
+  fetchFn?: FetchFn;
 }
 
 const sendUsernameToRegistrar = async ({
@@ -68,6 +68,7 @@ const sendUsernameToRegistrar = async ({
   subdomain,
   zoneFile,
   identity,
+  fetchFn = createFetchFn(),
 }: SendToRegistrarParams) => {
   const { registerUrl } = registrars[subdomain];
 
@@ -82,7 +83,7 @@ const sendUsernameToRegistrar = async ({
     'Content-Type': 'application/json',
   };
 
-  const response = await fetchPrivate(registerUrl, {
+  const response = await fetchFn(registerUrl, {
     method: 'POST',
     headers: requestHeaders,
     body: registrationRequestBody,
@@ -151,13 +152,15 @@ export const signAndUploadProfile = async ({
 export const fetchProfile = async ({
   identity,
   gaiaUrl,
+  fetchFn = createFetchFn(),
 }: {
   identity: Identity;
   gaiaUrl: string;
+  fetchFn?: FetchFn;
 }) => {
   try {
     const url = await identity.profileUrl(gaiaUrl);
-    const res = await fetchPrivate(url);
+    const res = await fetchFn(url);
     if (res.ok) {
       const json = await res.json();
       const { decodedToken } = json[0];

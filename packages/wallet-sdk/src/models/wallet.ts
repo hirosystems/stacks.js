@@ -26,7 +26,7 @@ export async function restoreWalletAccounts({
   gaiaHubUrl: string;
   network: StacksNetwork;
 }): Promise<Wallet> {
-  const hubInfo = await getHubInfo(gaiaHubUrl);
+  const hubInfo = await getHubInfo(gaiaHubUrl, network.fetchFn);
   const rootNode = getRootNode(wallet);
   const legacyGaiaConfig = connectToGaiaHubWithConfig({
     hubInfo,
@@ -40,8 +40,8 @@ export async function restoreWalletAccounts({
   });
 
   const [walletConfig, legacyWalletConfig] = await Promise.all([
-    fetchWalletConfig({ wallet, gaiaHubConfig: currentGaiaConfig }),
-    fetchLegacyWalletConfig({ wallet, gaiaHubConfig: legacyGaiaConfig }),
+    fetchWalletConfig({ wallet, gaiaHubConfig: currentGaiaConfig, fetchFn: network.fetchFn }),
+    fetchLegacyWalletConfig({ wallet, gaiaHubConfig: legacyGaiaConfig, fetchFn: network.fetchFn }),
   ]);
   // Restore from existing config
   if (

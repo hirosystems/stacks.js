@@ -2,7 +2,7 @@
 // Secure, audited & minimal implementation of BIP32 hierarchical deterministic (HD) wallets.
 import { HDKey } from '@scure/bip32';
 import { makeAuthResponse as _makeAuthResponse } from '@stacks/auth';
-import { Buffer } from '@stacks/common';
+import { Buffer, FetchFn, createFetchFn } from '@stacks/common';
 import {
   getPublicKeyFromPrivate,
   hashCode,
@@ -68,6 +68,7 @@ export const makeAuthResponse = async ({
   scopes = [],
   gaiaHubUrl,
   appPrivateKeyFromWalletSalt = null,
+  fetchFn = createFetchFn(),
 }: {
   account: Account;
   appDomain: string;
@@ -75,11 +76,12 @@ export const makeAuthResponse = async ({
   scopes?: string[];
   gaiaHubUrl: string;
   appPrivateKeyFromWalletSalt?: string | null;
+  fetchFn?: FetchFn;
 }) => {
   const appPrivateKey = getAppPrivateKey({ account, appDomain });
-  const hubInfo = await getHubInfo(gaiaHubUrl);
+  const hubInfo = await getHubInfo(gaiaHubUrl, fetchFn);
   const profileUrl = await fetchAccountProfileUrl({ account, gaiaHubUrl: hubInfo.read_url_prefix });
-  const profile = (await fetchProfileFromUrl(profileUrl)) || DEFAULT_PROFILE;
+  const profile = (await fetchProfileFromUrl(profileUrl, fetchFn)) || DEFAULT_PROFILE;
   if (scopes.includes('publish_data')) {
     if (!profile.apps) {
       profile.apps = {};

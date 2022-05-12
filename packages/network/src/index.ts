@@ -1,4 +1,4 @@
-import { TransactionVersion, ChainID, fetchPrivate } from '@stacks/common';
+import { TransactionVersion, ChainID, createFetchFn, FetchFn } from '@stacks/common';
 
 export const HIRO_MAINNET_DEFAULT = 'https://stacks-node-api.mainnet.stacks.co';
 export const HIRO_TESTNET_DEFAULT = 'https://stacks-node-api.testnet.stacks.co';
@@ -6,6 +6,7 @@ export const HIRO_MOCKNET_DEFAULT = 'http://localhost:3999';
 
 export interface NetworkConfig {
   url: string;
+  fetchFn?: FetchFn;
 }
 
 export const StacksNetworks = ['mainnet', 'testnet'] as const;
@@ -24,8 +25,11 @@ export class StacksNetwork {
 
   readonly coreApiUrl: string;
 
+  fetchFn: FetchFn;
+
   constructor(networkConfig: NetworkConfig) {
     this.coreApiUrl = networkConfig.url;
+    this.fetchFn = networkConfig.fetchFn ?? createFetchFn();
   }
 
   static fromName = (networkName: StacksNetworkName): StacksNetwork => {
@@ -95,7 +99,7 @@ export class StacksNetwork {
       TODO: Update to v2 API URL for name lookups
     */
     const nameLookupURL = `${this.bnsLookupUrl}/v1/names/${fullyQualifiedName}`;
-    return fetchPrivate(nameLookupURL)
+    return this.fetchFn(nameLookupURL)
       .then(resp => {
         if (resp.status === 404) {
           throw new Error('Name not found');
@@ -122,8 +126,11 @@ export class StacksMainnet extends StacksNetwork {
   version = TransactionVersion.Mainnet;
   chainId = ChainID.Mainnet;
 
-  constructor(networkUrl: NetworkConfig = { url: HIRO_MAINNET_DEFAULT }) {
-    super(networkUrl);
+  constructor(opts?: Partial<NetworkConfig>) {
+    super({
+      url: opts?.url ?? HIRO_MAINNET_DEFAULT,
+      fetchFn: opts?.fetchFn,
+    });
   }
 }
 
@@ -131,8 +138,11 @@ export class StacksTestnet extends StacksNetwork {
   version = TransactionVersion.Testnet;
   chainId = ChainID.Testnet;
 
-  constructor(networkUrl: NetworkConfig = { url: HIRO_TESTNET_DEFAULT }) {
-    super(networkUrl);
+  constructor(opts?: Partial<NetworkConfig>) {
+    super({
+      url: opts?.url ?? HIRO_TESTNET_DEFAULT,
+      fetchFn: opts?.fetchFn,
+    });
   }
 }
 
@@ -140,7 +150,10 @@ export class StacksMocknet extends StacksNetwork {
   version = TransactionVersion.Testnet;
   chainId = ChainID.Testnet;
 
-  constructor(networkUrl: NetworkConfig = { url: HIRO_MOCKNET_DEFAULT }) {
-    super(networkUrl);
+  constructor(opts?: Partial<NetworkConfig>) {
+    super({
+      url: opts?.url ?? HIRO_MOCKNET_DEFAULT,
+      fetchFn: opts?.fetchFn,
+    });
   }
 }
