@@ -9,6 +9,7 @@ import {
   hashSha256Sync,
   publicKeyToAddress,
 } from '@stacks/encryption';
+import { createFetchFn, FetchFn } from '@stacks/network';
 import { bytesToHex, getAddressFromPrivateKey, TransactionVersion } from '@stacks/transactions';
 import { connectToGaiaHubWithConfig, getHubInfo, makeGaiaAssociationToken } from '../utils';
 import { Account, HARDENED_OFFSET } from './common';
@@ -68,6 +69,7 @@ export const makeAuthResponse = async ({
   scopes = [],
   gaiaHubUrl,
   appPrivateKeyFromWalletSalt = null,
+  fetchFn = createFetchFn(),
 }: {
   account: Account;
   appDomain: string;
@@ -75,11 +77,12 @@ export const makeAuthResponse = async ({
   scopes?: string[];
   gaiaHubUrl: string;
   appPrivateKeyFromWalletSalt?: string | null;
+  fetchFn?: FetchFn;
 }) => {
   const appPrivateKey = getAppPrivateKey({ account, appDomain });
-  const hubInfo = await getHubInfo(gaiaHubUrl);
+  const hubInfo = await getHubInfo(gaiaHubUrl, fetchFn);
   const profileUrl = await fetchAccountProfileUrl({ account, gaiaHubUrl: hubInfo.read_url_prefix });
-  const profile = (await fetchProfileFromUrl(profileUrl)) || DEFAULT_PROFILE;
+  const profile = (await fetchProfileFromUrl(profileUrl, fetchFn)) || DEFAULT_PROFILE;
   if (scopes.includes('publish_data')) {
     if (!profile.apps) {
       profile.apps = {};

@@ -1,11 +1,5 @@
 import { AppConfig, LOCALSTORAGE_SESSION_KEY, UserData, UserSession } from '@stacks/auth';
-import {
-  Buffer,
-  DoesNotExist,
-  fetchPrivate,
-  getAesCbcOutputLength,
-  getBase64OutputLength,
-} from '@stacks/common';
+import { Buffer, DoesNotExist, getAesCbcOutputLength, getBase64OutputLength } from '@stacks/common';
 import {
   aes256CbcEncrypt,
   eciesGetJsonStringLength,
@@ -13,7 +7,7 @@ import {
   hashSha256Sync,
   verifySignature
 } from '@stacks/encryption';
-import { StacksMainnet } from '@stacks/network';
+import { createFetchFn, StacksMainnet } from '@stacks/network';
 import * as crypto from 'crypto';
 import fetchMock from 'jest-fetch-mock';
 import * as jsdom from 'jsdom';
@@ -2371,7 +2365,7 @@ test('getUserAppFileUrl without user session', async () => {
   expect(url).toBeTruthy();
   expect(url).toEqual(fileUrl);
 
-  const contents = await fetchPrivate(url as string).then(res => res.json());
+  const contents = await createFetchFn()(url as string).then(res => res.json());
   expect(JSON.stringify(contents)).toEqual(fileContents);
 });
 

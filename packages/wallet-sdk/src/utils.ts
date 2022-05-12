@@ -1,5 +1,6 @@
-import { ChainID, fetchPrivate } from '@stacks/common';
+import { ChainID } from '@stacks/common';
 import { getPublicKeyFromPrivate, publicKeyToAddress, randomBytes } from '@stacks/encryption';
+import { createFetchFn, FetchFn } from '@stacks/network';
 import { GaiaHubConfig } from '@stacks/storage';
 import { AssertionError } from 'assert';
 import { Json, TokenSigner } from 'jsontokens';
@@ -16,9 +17,12 @@ interface NameInfoResponse {
   zonefile: string;
 }
 
-export const getProfileURLFromZoneFile = async (name: string) => {
+export const getProfileURLFromZoneFile = async (
+  name: string,
+  fetchFn: FetchFn = createFetchFn()
+) => {
   const url = `https://stacks-node-api.stacks.co/v1/names/${name}`;
-  const res = await fetchPrivate(url);
+  const res = await fetchFn(url);
   if (res.ok) {
     const nameInfo: NameInfoResponse = await res.json();
     const zone = parseZoneFile(nameInfo.zonefile);
@@ -36,8 +40,8 @@ interface HubInfo {
   read_url_prefix: string;
 }
 
-export const getHubInfo = async (gaiaHubUrl: string) => {
-  const response = await fetchPrivate(`${gaiaHubUrl}/hub_info`);
+export const getHubInfo = async (gaiaHubUrl: string, fetchFn: FetchFn = createFetchFn()) => {
+  const response = await fetchFn(`${gaiaHubUrl}/hub_info`);
   const data: HubInfo = await response.json();
   return data;
 };

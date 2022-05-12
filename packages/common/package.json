@@ -37,8 +37,7 @@
   "dependencies": {
     "@types/bn.js": "^5.1.0",
     "@types/node": "^14.14.43",
-    "buffer": "^6.0.3",
-    "cross-fetch": "^3.1.4"
+    "buffer": "^6.0.3"
   },
   "devDependencies": {
     "@rollup/plugin-typescript": "^8.3.0",

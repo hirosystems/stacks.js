@@ -12,8 +12,11 @@
     "theme": "stacks",
     "excludePrivate": true,
     "excludeProtected": true,
-    "gitRevision": "master",
     "listInvalidSymbolLinks": true,
+    "categoryOrder": [
+      "*",
+      "Other"
+    ],
     // theme and plugin options
     "external-modulemap": ".*\/packages\/([\\w\\-_]+)\/",
     "package-prefix": "@stacks",

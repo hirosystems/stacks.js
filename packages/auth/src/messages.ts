@@ -1,16 +1,13 @@
-import { Buffer } from '@stacks/common';
-import 'cross-fetch/polyfill';
-
-import { TokenSigner, SECP256K1Client } from 'jsontokens';
-import { makeUUID4, nextMonth, getGlobalObject } from '@stacks/common';
-import { makeDIDFromAddress } from './dids';
+import { Buffer, getGlobalObject, makeUUID4, nextMonth } from '@stacks/common';
 import {
-  encryptECIES,
   decryptECIES,
+  encryptECIES,
   makeECPrivateKey,
   publicKeyToAddress,
 } from '@stacks/encryption';
-import { DEFAULT_SCOPE, AuthScope } from './constants';
+import { SECP256K1Client, TokenSigner } from 'jsontokens';
+import { AuthScope, DEFAULT_SCOPE } from './constants';
+import { makeDIDFromAddress } from './dids';
 
 const VERSION = '1.4.0';
 
