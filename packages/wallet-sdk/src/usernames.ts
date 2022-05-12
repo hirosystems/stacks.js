@@ -1,4 +1,3 @@
-import { fetchPrivate } from '@stacks/common';
 import { StacksNetwork } from '@stacks/network';
 
 export const fetchFirstName = async (
@@ -6,7 +5,7 @@ export const fetchFirstName = async (
   network: StacksNetwork
 ): Promise<string | undefined> => {
   try {
-    const namesResponse = await fetchPrivate(
+    const namesResponse = await network.fetchFn(
       `${network.bnsLookupUrl}/v1/addresses/stacks/${address}`
     );
     const namesJson = await namesResponse.json();

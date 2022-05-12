@@ -1,6 +1,7 @@
 import * as queryString from 'query-string';
 import { decodeToken } from 'jsontokens';
-import { BLOCKSTACK_HANDLER, getGlobalObject, fetchPrivate } from '@stacks/common';
+import { BLOCKSTACK_HANDLER, getGlobalObject } from '@stacks/common';
+import { createFetchFn, FetchFn } from '@stacks/network';
 
 /**
  * Retrieves the authentication request from the query string
@@ -36,7 +37,10 @@ export function getAuthRequestFromURL() {
  * @private
  * @ignore
  */
-export async function fetchAppManifest(authRequest: string): Promise<any> {
+export async function fetchAppManifest(
+  authRequest: string,
+  fetchFn: FetchFn = createFetchFn()
+): Promise<any> {
   if (!authRequest) {
     throw new Error('Invalid auth request');
   }
@@ -47,7 +51,7 @@ export async function fetchAppManifest(authRequest: string): Promise<any> {
   const manifestURI = payload.manifest_uri as string;
   try {
     // Logger.debug(`Fetching manifest from ${manifestURI}`)
-    const response = await fetchPrivate(manifestURI);
+    const response = await fetchFn(manifestURI);
     const responseText = await response.text();
     const responseJSON = JSON.parse(responseText);
     return { ...responseJSON, manifestURI };

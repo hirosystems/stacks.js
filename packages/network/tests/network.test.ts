@@ -5,7 +5,7 @@ import {
   StacksMainnet,
   StacksMocknet,
   StacksTestnet,
-} from '@stacks/network';
+} from '../src/network';
 
 describe('Setting coreApiUrl', () => {
   test('it sets mainnet default url', () => {

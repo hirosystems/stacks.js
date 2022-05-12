@@ -1,9 +1,8 @@
-// @ts-ignore
-import { Buffer, fetchPrivate } from '@stacks/common';
-import { TokenSigner, Json } from 'jsontokens';
 import { getPublicKeyFromPrivate, publicKeyToAddress } from '@stacks/encryption';
-import randomBytes from 'randombytes';
+import { createFetchFn, FetchFn } from '@stacks/network';
 import { GaiaHubConfig } from '@stacks/storage';
+import { Json, TokenSigner } from 'jsontokens';
+import randomBytes from 'randombytes';
 
 export const DEFAULT_GAIA_HUB = 'https://gaia.blockstack.org/hub/';
 
@@ -12,8 +11,8 @@ interface HubInfo {
   read_url_prefix: string;
 }
 
-export const getHubInfo = async (hubUrl: string) => {
-  const response = await fetchPrivate(`${hubUrl}/hub_info`);
+export const getHubInfo = async (hubUrl: string, fetchFn: FetchFn = createFetchFn()) => {
+  const response = await fetchFn(`${hubUrl}/hub_info`);
   const data: HubInfo = await response.json();
   return data;
 };
@@ -110,24 +109,23 @@ const makeGaiaAuthToken = ({ hubInfo, privateKey, gaiaHubUrl }: ConnectToGaiaOpt
 
 export const uploadToGaiaHub = async (
   filename: string,
+  // eslint-disable-next-line node/prefer-global/buffer
   contents: Blob | Buffer | ArrayBufferView | string,
-  hubConfig: GaiaHubConfig
+  hubConfig: GaiaHubConfig,
+  fetchFn: FetchFn = createFetchFn()
 ): Promise<string> => {
   const contentType = 'application/json';
 
-  const response = await fetchPrivate(
-    `${hubConfig.server}/store/${hubConfig.address}/${filename}`,
-    {
-      method: 'POST',
-      headers: {
-        'Content-Type': contentType,
-        Authorization: `bearer ${hubConfig.token}`,
-      },
-      body: contents,
-      referrer: 'no-referrer',
-      referrerPolicy: 'no-referrer',
-    }
-  );
+  const response = await fetchFn(`${hubConfig.server}/store/${hubConfig.address}/${filename}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': contentType,
+      Authorization: `bearer ${hubConfig.token}`,
+    },
+    body: contents,
+    referrer: 'no-referrer',
+    referrerPolicy: 'no-referrer',
+  });
   const { publicURL } = await response.json();
   return publicURL;
 };

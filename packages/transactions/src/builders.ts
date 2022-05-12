@@ -1,5 +1,12 @@
-import { Buffer, fetchPrivate, IntegerType, intToBigInt } from '@stacks/common';
-import { StacksNetwork, StacksMainnet, StacksNetworkName, StacksTestnet } from '@stacks/network';
+import { Buffer, IntegerType, intToBigInt } from '@stacks/common';
+import {
+  StacksNetwork,
+  StacksMainnet,
+  StacksNetworkName,
+  StacksTestnet,
+  FetchFn,
+  createFetchFn,
+} from '@stacks/network';
 import { c32address } from 'c32check';
 import {
   Authorization,
@@ -73,12 +80,10 @@ export async function getNonce(
   address: string,
   network?: StacksNetworkName | StacksNetwork
 ): Promise<bigint> {
-  const defaultNetwork = new StacksMainnet();
-  const url = network
-    ? StacksNetwork.fromNameOrNetwork(network).getAccountApiUrl(address)
-    : defaultNetwork.getAccountApiUrl(address);
+  const derivedNetwork = StacksNetwork.fromNameOrNetwork(network ?? new StacksMainnet());
+  const url = derivedNetwork.getAccountApiUrl(address);
 
-  const response = await fetchPrivate(url);
+  const response = await derivedNetwork.fetchFn(url);
   if (!response.ok) {
     let msg = '';
     try {
@@ -124,10 +129,10 @@ export async function estimateTransfer(
     headers: requestHeaders,
   };
 
-  const derivedNetwork = network ?? deriveNetwork(transaction);
-  const url = StacksNetwork.fromNameOrNetwork(derivedNetwork).getTransferFeeEstimateApiUrl();
+  const derivedNetwork = StacksNetwork.fromNameOrNetwork(network ?? deriveNetwork(transaction));
+  const url = derivedNetwork.getTransferFeeEstimateApiUrl();
 
-  const response = await fetchPrivate(url, fetchOptions);
+  const response = await derivedNetwork.fetchFn(url, fetchOptions);
   if (!response.ok) {
     let msg = '';
     try {
@@ -185,12 +190,10 @@ export async function estimateTransaction(
     }),
   };
 
-  const defaultNetwork = new StacksMainnet();
-  const url = network
-    ? StacksNetwork.fromNameOrNetwork(network).getTransactionFeeEstimateApiUrl()
-    : defaultNetwork.getTransactionFeeEstimateApiUrl();
+  const derivedNetwork = StacksNetwork.fromNameOrNetwork(network ?? new StacksMainnet());
+  const url = derivedNetwork.getTransactionFeeEstimateApiUrl();
 
-  const response = await fetchPrivate(url, options);
+  const response = await derivedNetwork.fetchFn(url, options);
 
   if (!response.ok) {
     let msg = '';
@@ -400,10 +403,10 @@ export async function broadcastTransaction(
   attachment?: Buffer
 ): Promise<TxBroadcastResult> {
   const rawTx = transaction.serialize();
-  const derivedNetwork = network ?? deriveNetwork(transaction);
-  const url = StacksNetwork.fromNameOrNetwork(derivedNetwork).getBroadcastApiUrl();
+  const derivedNetwork = StacksNetwork.fromNameOrNetwork(network ?? deriveNetwork(transaction));
+  const url = derivedNetwork.getBroadcastApiUrl();
 
-  return broadcastRawTransaction(rawTx, url, attachment);
+  return broadcastRawTransaction(rawTx, url, attachment, derivedNetwork.fetchFn);
 }
 
 /**
@@ -417,7 +420,8 @@ export async function broadcastTransaction(
 export async function broadcastRawTransaction(
   rawTx: Buffer,
   url: string,
-  attachment?: Buffer
+  attachment?: Buffer,
+  fetchFn: FetchFn = createFetchFn()
 ): Promise<TxBroadcastResult> {
   const options = {
     method: 'POST',
@@ -430,7 +434,7 @@ export async function broadcastRawTransaction(
       : rawTx,
   };
 
-  const response = await fetchPrivate(url, options);
+  const response = await fetchFn(url, options);
   if (!response.ok) {
     try {
       return (await response.json()) as TxBroadcastResult;
@@ -469,9 +473,10 @@ export async function getAbi(
     method: 'GET',
   };
 
-  const url = StacksNetwork.fromNameOrNetwork(network).getAbiApiUrl(address, contractName);
+  const derivedNetwork = StacksNetwork.fromNameOrNetwork(network);
+  const url = derivedNetwork.getAbiApiUrl(address, contractName);
 
-  const response = await fetchPrivate(url, options);
+  const response = await derivedNetwork.fetchFn(url, options);
   if (!response.ok) {
     const msg = await response.text().catch(() => '');
     throw new Error(
@@ -748,10 +753,10 @@ export async function estimateContractDeploy(
 
   // Place holder estimate until contract deploy fee estimation is fully implemented on Stacks
   // blockchain core
-  const derivedNetwork = network ?? deriveNetwork(transaction);
-  const url = StacksNetwork.fromNameOrNetwork(derivedNetwork).getTransferFeeEstimateApiUrl();
+  const derivedNetwork = StacksNetwork.fromNameOrNetwork(network ?? deriveNetwork(transaction));
+  const url = derivedNetwork.getTransferFeeEstimateApiUrl();
 
-  const response = await fetchPrivate(url, fetchOptions);
+  const response = await derivedNetwork.fetchFn(url, fetchOptions);
   if (!response.ok) {
     const msg = await response.text().catch(() => '');
     throw new Error(
@@ -945,10 +950,10 @@ export async function estimateContractFunctionCall(
 
   // Place holder estimate until contract call fee estimation is fully implemented on Stacks
   // blockchain core
-  const derivedNetwork = network ?? deriveNetwork(transaction);
-  const url = StacksNetwork.fromNameOrNetwork(derivedNetwork).getTransferFeeEstimateApiUrl();
+  const derivedNetwork = StacksNetwork.fromNameOrNetwork(network ?? deriveNetwork(transaction));
+  const url = derivedNetwork.getTransferFeeEstimateApiUrl();
 
-  const response = await fetchPrivate(url, fetchOptions);
+  const response = await derivedNetwork.fetchFn(url, fetchOptions);
   if (!response.ok) {
     const msg = await response.text().catch(() => '');
     throw new Error(
@@ -1311,7 +1316,7 @@ export async function callReadOnlyFunction(
     arguments: args,
   });
 
-  const response = await fetchPrivate(url, {
+  const response = await network.fetchFn(url, {
     method: 'POST',
     body,
     headers: {

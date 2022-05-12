@@ -67,14 +67,14 @@
     "rollup-plugin-node-globals": "^1.4.0",
     "rollup-plugin-terser": "^7.0.2",
     "stream-http": "^3.2.0",
-    "typedoc": "^0.22.13",
+    "typedoc": "^0.22.15",
     "typescript": "^4.2.4",
     "vite-compatible-readable-stream": "^3.6.0"
   },
   "scripts": {
     "bootstrap": "lerna bootstrap",
     "build": "lerna run build",
-    "build:docs": "rimraf docs && typedoc --tsconfig tsconfig.typedoc.json packages/**/src/index.ts --release-version $(node -p \"require('./lerna.json').version\")",
+    "build:docs": "rimraf docs && RELEASE_VERSION=$(node -p \"require('./lerna.json').version\") && typedoc --tsconfig tsconfig.typedoc.json packages/**/src/index.ts --release-version $RELEASE_VERSION",
     "clean": "lerna clean",
     "lerna": "lerna",
     "lint": "npm run lint:eslint && npm run lint:prettier",

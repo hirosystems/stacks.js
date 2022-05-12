@@ -1,10 +1,7 @@
-// @ts-ignore
-import { Buffer } from '@stacks/common';
 import { lookupProfile, NAME_LOOKUP_PATH, UserSession } from '@stacks/auth';
 import {
   BLOCKSTACK_DEFAULT_GAIA_HUB_URL,
   DoesNotExist,
-  fetchPrivate,
   GaiaHubError,
   getGlobalObject,
   InvalidStateError,
@@ -20,6 +17,7 @@ import {
   signECDSA,
   verifyECDSA,
 } from '@stacks/encryption';
+import { createFetchFn, FetchFn } from '@stacks/network';
 import { FileContentLoader } from './fileContentLoader';
 import {
   connectToGaiaHub,
@@ -272,11 +270,12 @@ export class Storage {
     app: string,
     username: string | undefined,
     zoneFileLookupURL: string | undefined,
-    forceText: boolean
+    forceText: boolean,
+    fetchFn: FetchFn = createFetchFn()
   ): Promise<string | ArrayBuffer | null> {
     const opts = { app, username, zoneFileLookupURL };
     const readUrl = await this.getFileUrl(path, opts);
-    const response = await fetchPrivate(readUrl);
+    const response = await fetchFn(readUrl);
     if (!response.ok) {
       throw await getBlockstackErrorFromResponse(response, `getFile ${path} failed.`, null);
     }
@@ -394,6 +393,7 @@ export class Storage {
     privateKey?: string,
     username?: string,
     zoneFileLookupURL?: string
+    // eslint-disable-next-line node/prefer-global/buffer
   ): Promise<string | Buffer> {
     const appPrivateKey = privateKey || this.userSession.loadUserData().appPrivateKey;
 
@@ -460,6 +460,7 @@ export class Storage {
    */
   async putFile(
     path: string,
+    // eslint-disable-next-line node/prefer-global/buffer
     content: string | Buffer | ArrayBufferView | Blob,
     options?: PutFileOptions
   ): Promise<string> {
@@ -556,6 +557,7 @@ export class Storage {
       };
     } else {
       // In all other cases, we only need one upload.
+      // eslint-disable-next-line node/prefer-global/buffer
       let contentForUpload: string | Buffer | Blob;
       if (!opt.encrypt && !opt.sign) {
         // If content does not need encrypted or signed, it can be passed directly
@@ -693,7 +695,8 @@ export class Storage {
     page: string | null,
     callCount: number,
     fileCount: number,
-    callback: (name: string) => boolean
+    callback: (name: string) => boolean,
+    fetchFn: FetchFn = createFetchFn()
   ): Promise<number> {
     if (callCount > 65536) {
       // this is ridiculously huge, and probably indicates
@@ -714,10 +717,7 @@ export class Storage {
         },
         body: pageRequest,
       };
-      response = await fetchPrivate(
-        `${hubConfig.server}/list-files/${hubConfig.address}`,
-        fetchOptions
-      );
+      response = await fetchFn(`${hubConfig.server}/list-files/${hubConfig.address}`, fetchOptions);
       if (!response.ok) {
         throw await getBlockstackErrorFromResponse(response, 'ListFiles failed.', hubConfig);
       }

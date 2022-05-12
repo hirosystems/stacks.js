@@ -3,7 +3,6 @@ import {
   Buffer,
   ConflictError,
   DoesNotExist,
-  fetchPrivate,
   GaiaHubErrorResponse,
   Logger,
   megabytesToBytes,
@@ -21,6 +20,7 @@ import {
   randomBytes,
   Signature,
 } from '@stacks/encryption';
+import { createFetchFn, FetchFn } from '@stacks/network';
 import { TokenSigner } from 'jsontokens';
 
 /**
@@ -62,7 +62,8 @@ export async function uploadToGaiaHub(
   contentType = 'application/octet-stream',
   newFile = true,
   etag?: string,
-  dangerouslyIgnoreEtag?: boolean
+  dangerouslyIgnoreEtag?: boolean,
+  fetchFn: FetchFn = createFetchFn()
 ): Promise<UploadResponse> {
   Logger.debug(`uploadToGaiaHub: uploading ${filename} to ${hubConfig.server}`);
 
@@ -79,14 +80,11 @@ export async function uploadToGaiaHub(
     }
   }
 
-  const response = await fetchPrivate(
-    `${hubConfig.server}/store/${hubConfig.address}/${filename}`,
-    {
-      method: 'POST',
-      headers,
-      body: contents,
-    }
-  );
+  const response = await fetchFn(`${hubConfig.server}/store/${hubConfig.address}/${filename}`, {
+    method: 'POST',
+    headers,
+    body: contents,
+  });
   if (!response.ok) {
     throw await getBlockstackErrorFromResponse(
       response,
@@ -102,17 +100,18 @@ export async function uploadToGaiaHub(
  * @param filename
  * @param hubConfig
  */
-export async function deleteFromGaiaHub(filename: string, hubConfig: GaiaHubConfig): Promise<void> {
+export async function deleteFromGaiaHub(
+  filename: string,
+  hubConfig: GaiaHubConfig,
+  fetchFn: FetchFn = createFetchFn()
+): Promise<void> {
   Logger.debug(`deleteFromGaiaHub: deleting ${filename} from ${hubConfig.server}`);
-  const response = await fetchPrivate(
-    `${hubConfig.server}/delete/${hubConfig.address}/${filename}`,
-    {
-      method: 'DELETE',
-      headers: {
-        Authorization: `bearer ${hubConfig.token}`,
-      },
-    }
-  );
+  const response = await fetchFn(`${hubConfig.server}/delete/${hubConfig.address}/${filename}`, {
+    method: 'DELETE',
+    headers: {
+      Authorization: `bearer ${hubConfig.token}`,
+    },
+  });
   if (!response.ok) {
     throw await getBlockstackErrorFromResponse(
       response,
@@ -208,11 +207,12 @@ function makeV1GaiaAuthToken(
 export async function connectToGaiaHub(
   gaiaHubUrl: string,
   challengeSignerHex: string,
-  associationToken?: string
+  associationToken?: string,
+  fetchFn: FetchFn = createFetchFn()
 ): Promise<GaiaHubConfig> {
   Logger.debug(`connectToGaiaHub: ${gaiaHubUrl}/hub_info`);
 
-  const response = await fetchPrivate(`${gaiaHubUrl}/hub_info`);
+  const response = await fetchFn(`${gaiaHubUrl}/hub_info`);
   const hubInfo = await response.json();
   const readURL = hubInfo.read_url_prefix;
   const token = makeV1GaiaAuthToken(hubInfo, challengeSignerHex, gaiaHubUrl, associationToken);
@@ -233,8 +233,12 @@ export async function connectToGaiaHub(
  *
  * @ignore
  */
-export async function getBucketUrl(gaiaHubUrl: string, appPrivateKey: string): Promise<string> {
-  const response = await fetchPrivate(`${gaiaHubUrl}/hub_info`);
+export async function getBucketUrl(
+  gaiaHubUrl: string,
+  appPrivateKey: string,
+  fetchFn: FetchFn = createFetchFn()
+): Promise<string> {
+  const response = await fetchFn(`${gaiaHubUrl}/hub_info`);
   const responseText = await response.text();
   const responseJSON = JSON.parse(responseText);
   const readURL = responseJSON.read_url_prefix;
