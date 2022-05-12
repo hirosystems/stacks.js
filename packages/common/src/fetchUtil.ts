@@ -7,28 +7,36 @@ const defaultFetchOpts: RequestInit = {
   referrerPolicy: 'origin', // Use origin value for referrer policy
   // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Referrer-Policy
 };
-/*
+
+/**
  * Get fetch options
- * @return fetchOptions
+ * @category Network
  */
 export const getFetchOptions = () => {
   return defaultFetchOpts;
 };
-/*
- * Set fetch options
- * Users can change default referrer as well as other options when fetch is used internally by stacks.js libraries or from server side
+
+/**
+ * Sets global fetch options for stacks.js network calls.
+ *
  * @example
- *  Reference: https://developer.mozilla.org/en-US/docs/Web/API/Request/Request
- *  setFetchOptions({  referrer: 'no-referrer', referrerPolicy: 'no-referrer', ... other options as per above reference  });
- * Now all the subsequent fetchPrivate will use above options
- * @return fetchOptions
+ * Users can change the default referrer as well as other options when fetch is used internally by stacks.js:
+ * ```
+ * setFetchOptions({ referrer: 'no-referrer', referrerPolicy: 'no-referrer', ...otherRequestOptions });
+ * ```
+ * After calling {@link setFetchOptions} all subsequent network calls will use the specified options above.
+ *
+ * @see MDN Request: https://developer.mozilla.org/en-US/docs/Web/API/Request/Request
+ * @returns global fetch options after merging with previous options (or defaults)
+ * @category Network
+ * @related {@link getFetchOptions}
  */
-export const setFetchOptions = (ops: RequestInit) => {
+export const setFetchOptions = (ops: RequestInit): RequestInit => {
   return Object.assign(defaultFetchOpts, ops);
 };
 
-/** @ignore */
-export async function fetchPrivate(input: RequestInfo, init?: RequestInit): Promise<Response> {
+/** @internal */
+export async function fetchWrapper(input: RequestInfo, init?: RequestInit): Promise<Response> {
   const fetchOpts = {};
   // Use the provided options in request options along with default or user provided values
   Object.assign(fetchOpts, init, defaultFetchOpts);
@@ -76,6 +84,14 @@ export function hostMatches(host: string, pattern: string | RegExp) {
   return (pattern as RegExp).exec(host);
 }
 
+/**
+ * Creates a new middleware from an API key.
+ * @example
+ * ```
+ * const apiMiddleware = createApiKeyMiddleware("example_e8e044a3_41d8b0fe_3dd3988ef302");
+ * ```
+ * @category Network
+ */
 export function createApiKeyMiddleware({
   apiKey,
   host = /(.*)api(.*)\.stacks\.co$/i,
@@ -104,9 +120,8 @@ function createDefaultMiddleware(): FetchMiddleware[] {
   return [setOriginMiddleware];
 }
 
-// Argument helper function for {createFetchFn}
 function argsForCreateFetchFn(args: any[]): { middlewares: FetchMiddleware[]; fetchLib: FetchFn } {
-  let fetchLib: FetchFn = fetch;
+  let fetchLib: FetchFn = fetchWrapper;
   let middlewares: FetchMiddleware[] = [];
   if (args.length > 0 && typeof args[0] === 'function') {
     fetchLib = args.shift();
@@ -117,6 +132,16 @@ function argsForCreateFetchFn(args: any[]): { middlewares: FetchMiddleware[]; fe
   return { middlewares, fetchLib };
 }
 
+/**
+ * Creates a new network fetching function, which combines an optional fetch-compatible library with optional middlware.
+ * @example
+ * ```
+ * const customFetch = createFetchFn(someMiddleware)
+ * const customFetch = createFetchFn(fetch, someMiddleware)
+ * const customFetch = createFetchFn(fetch, middlewareA, middlewareB)
+ * ```
+ * @category Network
+ */
 export function createFetchFn(fetchLib: FetchFn, ...middleware: FetchMiddleware[]): FetchFn;
 export function createFetchFn(...middleware: FetchMiddleware[]): FetchFn;
 export function createFetchFn(...args: any[]): FetchFn {
@@ -125,6 +150,7 @@ export function createFetchFn(...args: any[]): FetchFn {
 
   const fetchFn = async (url: string, init?: RequestInit | undefined): Promise<Response> => {
     let fetchParams = { url, init: init ?? {} };
+
     for (const middleware of middlewares) {
       if (typeof middleware.pre !== 'function') continue;
       const result = await Promise.resolve(

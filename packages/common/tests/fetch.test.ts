@@ -1,14 +1,17 @@
-import { fetchPrivate, getFetchOptions, setFetchOptions } from '../src'
-import fetchMock from "jest-fetch-mock";
+import { fetchWrapper, getFetchOptions, setFetchOptions } from '../src';
+import fetchMock from 'jest-fetch-mock';
 
 test('Verify fetch private options', async () => {
-  const defaultOptioins  = getFetchOptions();
+  const defaultOptioins = getFetchOptions();
 
   expect(defaultOptioins).toEqual({ referrerPolicy: 'origin' });
 
   // Override default options when fetchPrivate is called internally by other stacks.js libraries like transactions or from server side
   // This is for developers as they cannot directly pass options directly in fetchPrivate
-  const modifiedOptions: RequestInit= { referrer: 'http://test.com', referrerPolicy: 'same-origin' };
+  const modifiedOptions: RequestInit = {
+    referrer: 'http://test.com',
+    referrerPolicy: 'same-origin',
+  };
 
   // Developers can set fetch options globally one time specifically when fetchPrivate is used internally by stacks.js libraries
   setFetchOptions(modifiedOptions);
@@ -18,11 +21,10 @@ test('Verify fetch private options', async () => {
   // Browser will replace about:client with actual url but it will not be visible in test case
   fetchMock.mockOnce(`{ status: 'success'}`, { headers: modifiedOptions as any });
 
-  const result = await fetchPrivate('https://example.com');
+  const result = await fetchWrapper('https://example.com');
 
   // Verify the request options
   expect(result.status).toEqual(200);
   expect(result.headers.get('referrer')).toEqual(modifiedOptions.referrer);
   expect(result.headers.get('referrerPolicy')).toEqual(modifiedOptions.referrerPolicy);
-})
-
+});

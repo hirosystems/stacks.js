@@ -1,12 +1,11 @@
 import { makeAuthResponse } from '@stacks/auth';
-import { FetchFn, createFetchFn } from '@stacks/common';
+import { createFetchFn, FetchFn } from '@stacks/common';
 import { getPublicKeyFromPrivate, publicKeyToAddress } from '@stacks/encryption';
 import { bip32 } from 'bitcoinjs-lib';
 import { Identity as IdentifyInterface, Profile } from './common';
 import IdentityAddressOwnerNode from './nodes/identity-address-owner-node';
 import { DEFAULT_PROFILE, fetchProfile, signAndUploadProfile } from './profiles';
 import { getProfileURLFromZoneFile, IdentityKeyPair } from './utils';
-import { fetchPrivate } from '@stacks/common';
 import {
   connectToGaiaHubWithConfig,
   DEFAULT_GAIA_HUB,

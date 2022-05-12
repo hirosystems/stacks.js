@@ -1,13 +1,11 @@
-import { Buffer, fetchPrivate } from '@stacks/common';
-import { sha256, sha512 } from 'sha.js';
-import { ClarityValue, serializeCV } from './clarity';
-import RIPEMD160 from 'ripemd160-min';
+import { bytesToHex } from '@noble/hashes/utils';
 import { utils } from '@noble/secp256k1';
-import { deserializeCV } from './clarity';
+import { Buffer, with0x } from '@stacks/common';
 import { c32addressDecode } from 'c32check';
 import lodashCloneDeep from 'lodash.clonedeep';
-import { with0x } from '@stacks/common';
-import { bytesToHex } from '@noble/hashes/utils';
+import RIPEMD160 from 'ripemd160-min';
+import { sha256, sha512 } from 'sha.js';
+import { ClarityValue, deserializeCV, serializeCV } from './clarity';
 
 /**
  * Use utils.randomBytes to replace randombytes dependency
@@ -196,9 +194,6 @@ export function isClarityName(name: string) {
   const regex = /^[a-zA-Z]([a-zA-Z0-9]|[-_!?+<>=/*])*$|^[-+=/*]$|^[<>]=?$/;
   return regex.test(name) && name.length < 128;
 }
-
-/** @ignore */
-export { fetchPrivate };
 
 /**
  * Converts a clarity value to a hex encoded string with `0x` prefix
