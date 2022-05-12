@@ -19,8 +19,8 @@ import {
   hashSha256Sync,
   publicKeyToAddress,
   randomBytes,
+  Signature,
 } from '@stacks/encryption';
-import { script, Transaction } from 'bitcoinjs-lib';
 import { TokenSigner } from 'jsontokens';
 
 /**
@@ -151,11 +151,8 @@ function makeLegacyAuthToken(challengeText: string, signerKeyHex: string): strin
   if (parsedChallenge[0] === 'gaiahub' && parsedChallenge[3] === 'blockstack_storage_please_sign') {
     const digest = hashSha256Sync(Buffer.from(challengeText));
     const signatureBuffer = ecSign(digest, compressPrivateKey(signerKeyHex));
-    const signatureWithHash = script.signature.encode(signatureBuffer, Transaction.SIGHASH_NONE);
-
-    // We only want the DER encoding so remove the sighash version byte at the end.
-    // See: https://github.com/bitcoinjs/bitcoinjs-lib/issues/1241#issuecomment-428062912
-    const signature = signatureWithHash.toString('hex').slice(0, -2);
+    // We only want the DER encoding so use toDERHex provided by @noble/secp256k1
+    const signature = Signature.fromCompact(signatureBuffer.toString('hex')).toDERHex();
 
     const publickey = getPublicKeyFromPrivate(signerKeyHex);
     const token = Buffer.from(JSON.stringify({ publickey, signature })).toString('base64');
