@@ -7,7 +7,7 @@ This repo is home to most of the stacks.js libraries, which provide everything y
 
 #### Stacks Primitives
 - [`@stacks/transactions`](https://github.com/hirosystems/stacks.js/tree/master/packages/transactions) Construct, decode transactions and work with Clarity smart contracts on the Stacks blockchain.
-- [`@stacks/wallet-sdk`](https://github.com/hirosystems/stacks.js/tree/master/packages/wallet-sdk) Library for building wallets for the Stacks blockchain.
+- [`@stacks/wallet-sdk`](https://github.com/hirosystems/stacks.js/tree/master/packages/wallet-sdk) Library for building wallets, managing accounts, and handling keys for the Stacks blockchain.
 - [`@stacks/storage`](https://github.com/hirosystems/stacks.js/tree/master/packages/storage) Store and fetch files with Gaia, the decentralized storage system.
 - [`@stacks/encryption`](https://github.com/hirosystems/stacks.js/tree/master/packages/encryption) Encryption functions used by stacks.js packages.
 - [`@stacks/auth`](https://github.com/hirosystems/stacks.js/tree/master/packages/auth) Construct and decode authentication requests for Stacks apps.
@@ -19,15 +19,9 @@ This repo is home to most of the stacks.js libraries, which provide everything y
 - [`@stacks/bns`](https://github.com/hirosystems/stacks.js/tree/master/packages/bns) Library for interacting with the BNS contract.
 - [`@stacks/stacking`](https://github.com/hirosystems/stacks.js/tree/master/packages/stacking) Library for PoX stacking.
 
-
-
 #### Others
 - [`@stacks/cli`](https://github.com/hirosystems/stacks.js/tree/master/packages/cli) Command line interface to interact with auth, storage and Stacks transactions.
-- [`@stacks/keychain`](https://github.com/hirosystems/stacks.js/tree/master/packages/keychain) Create and manage keys/wallets for the Stacks blockchain. _**OUTDATED:** replaced by `@stacks/wallet-sdk`_
-
-
-
-
+- [`@stacks/keychain`](https://github.com/hirosystems/stacks.js/tree/master/packages/keychain) _**DEPRECATED:** replaced by `@stacks/wallet-sdk`_
 
 See `README` in each package directory for installation instructions and usage.
 
