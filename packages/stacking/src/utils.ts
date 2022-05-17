@@ -138,9 +138,9 @@ export function poxAddressToBtcAddress(...args: PoxAddressArgs): string {
   return btcAddress;
 }
 
-export function getBTCAddress(version: Buffer, checksum: Buffer) {
-  const btcAddress = address.toBase58Check(checksum, Number(version.toString()));
-  return btcAddress;
+export function getBTCAddress(version: number | Buffer, checksum: Buffer) {
+  const versionNumber: number = typeof version === 'number' ? version : version[0];
+  return address.toBase58Check(checksum, versionNumber);
 }
 
 export function getErrorString(error: StackingErrors): string {
