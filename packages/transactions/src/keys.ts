@@ -15,6 +15,7 @@ import {
   intToHex,
   privateKeyToBuffer,
   PRIVATE_KEY_COMPRESSED_LENGTH,
+  parseRecoverableSignature as parseRecoverableSignatureFromCommon,
 } from '@stacks/common';
 import { c32address } from 'c32check';
 import { BufferReader } from './bufferReader';
@@ -179,20 +180,11 @@ export function getSignatureRecoveryParam(signature: string) {
   return hexToInt(recoveryParamHex);
 }
 
-export function parseRecoverableSignature(signature: string) {
-  const coordinateValueBytes = 32;
-  if (signature.length < coordinateValueBytes * 2 * 2 + 1) {
-    throw new Error('Invalid signature');
-  }
-  const recoveryParamHex = signature.substr(0, 2);
-  const r = signature.substr(2, coordinateValueBytes * 2);
-  const s = signature.substr(2 + coordinateValueBytes * 2, coordinateValueBytes * 2);
-  return {
-    recoveryParam: hexToInt(recoveryParamHex),
-    r,
-    s,
-  };
-}
+/**
+ * @deprecated
+ * This method is now exported from `@stacks/common` {@link parseRecoverableSignature}
+ */
+export const parseRecoverableSignature = parseRecoverableSignatureFromCommon;
 
 export function getPublicKey(privateKey: StacksPrivateKey): StacksPublicKey {
   return pubKeyfromPrivKey(privateKey.data);

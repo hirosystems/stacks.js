@@ -1,6 +1,14 @@
 import { hmac } from '@noble/hashes/hmac';
 import { sha256 } from '@noble/hashes/sha256';
-import { getPublicKey, getSharedSecret, Point, signSync, utils, verify } from '@noble/secp256k1';
+import {
+  Signature,
+  getPublicKey,
+  getSharedSecret,
+  Point,
+  signSync,
+  utils,
+  verify,
+} from '@noble/secp256k1';
 import {
   Buffer,
   toBuffer,
@@ -8,10 +16,13 @@ import {
   concatBytes,
   hexToBytes,
   bytesToHex,
+  hexToBigInt,
+  parseRecoverableSignature,
 } from '@stacks/common';
 import { createCipher } from './aesCipher';
 import { createHmacSha256 } from './hmacSha256';
 import { getPublicKeyFromPrivate } from './keys';
+import { hashMessage } from './messageSignature';
 import { hashSha256Sync, hashSha512Sync } from './sha2Hash';
 import { getAesCbcOutputLength, getBase64OutputLength } from './utils';
 
@@ -501,4 +512,24 @@ export function verifyECDSA(
   const contentBuffer = getBuffer(content);
   const contentHash = hashSha256Sync(contentBuffer);
   return verify(signature, contentHash, publicKey);
+}
+
+interface VerifyMessageSignatureArgs {
+  signature: string;
+  message: string | Buffer;
+  publicKey: string;
+}
+
+/**
+ * Verify message signature with recoverable public key
+ */
+export function verifyMessageSignature({
+  signature,
+  message,
+  publicKey,
+}: VerifyMessageSignatureArgs) {
+  const { r, s } = parseRecoverableSignature(signature);
+  const sig = new Signature(hexToBigInt(r), hexToBigInt(s));
+  const hashedMsg = typeof message === 'string' ? hashMessage(message) : message;
+  return verify(sig, hashedMsg, publicKey);
 }
