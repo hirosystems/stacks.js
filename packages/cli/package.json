@@ -2,91 +2,20 @@
   "name": "@stacks/cli",
   "version": "4.1.1",
   "description": "Stacks command line tool",
-  "keywords": [
-    "stacks",
-    "command",
-    "blockchain",
-    "id",
-    "auth",
-    "authentication",
-    "bitcoin",
-    "blockchain auth",
-    "blockchain authentication",
-    "blockchainid",
-    "blockchain id",
-    "bitcoin auth",
-    "bitcoin authentication",
-    "bitcoin login",
-    "blockchain login",
-    "authorization",
-    "login",
-    "signin",
-    "sso",
-    "crypto",
-    "cryptography",
-    "token",
-    "blockstack",
-    "blockstack auth",
-    "profile",
-    "identity",
-    "ethereum"
-  ],
-  "author": {
-    "name": "Jude Nelson",
-    "email": "jude@blockstack.com",
-    "url": "https://blockstack.com"
-  },
-  "homepage": "https://blockstack.org",
+  "license": "MIT",
+  "author": "Hiro Systems PBC (https://hiro.so)",
   "contributors": [
-    {
-      "name": "Ken Liao",
-      "email": "yukanliao@gmail.com"
-    }
+    "Ken Liao <yukanliao@gmail.com>"
   ],
-  "license": "GPL-3.0-or-later",
-  "bin": {
-    "stacks": "./bin.js",
-    "stx": "./bin.js"
-  },
-  "main": "dist/index.js",
-  "files": [
-    "dist",
-    "src"
-  ],
-  "publishConfig": {
-    "access": "public"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/blockstack/blockstack.js.git"
-  },
+  "homepage": "https://www.hiro.so/stacks-js",
   "scripts": {
-    "start": "tsc -b tsconfig.build.json --watch --verbose",
     "build": "npm run clean && npm run build:cjs",
     "build:cjs": "tsc -b tsconfig.build.json",
     "clean": "rimraf dist && tsc -b tsconfig.build.json --clean",
+    "prepublishOnly": "npm run test && NODE_ENV=production npm run build",
+    "start": "tsc -b tsconfig.build.json --watch --verbose",
     "test": "jest",
-    "test:watch": "jest --watch --coverage=false",
-    "prepublishOnly": "npm run test && NODE_ENV=production npm run build"
-  },
-  "bugs": {
-    "url": "https://github.com/blockstack/blockstack.js/issues"
-  },
-  "devDependencies": {
-    "@types/cors": "^2.8.5",
-    "@types/express": "^4.16.1",
-    "@types/express-winston": "^3.0.1",
-    "@types/inquirer": "^6.5.0",
-    "@types/jest": "^26.0.22",
-    "@types/node-fetch": "^2.5.0",
-    "@types/ripemd160": "^2.0.0",
-    "jest": "^26.6.3",
-    "jest-fetch-mock": "^3.0.3",
-    "jest-module-name-mapper": "^0.1.5",
-    "rimraf": "^3.0.2",
-    "ts-jest": "^26.5.5",
-    "typescript": "^4.2.4",
-    "webpack-bundle-analyzer": "^4.5.0"
+    "test:watch": "jest --watch --coverage=false"
   },
   "dependencies": {
     "@stacks/auth": "^4.1.0",
@@ -114,6 +43,70 @@
     "ripemd160": "^2.0.1",
     "winston": "^3.2.1",
     "zone-file": "^2.0.0-beta.3"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.5",
+    "@types/express": "^4.16.1",
+    "@types/express-winston": "^3.0.1",
+    "@types/inquirer": "^6.5.0",
+    "@types/jest": "^26.0.22",
+    "@types/node-fetch": "^2.5.0",
+    "@types/ripemd160": "^2.0.0",
+    "jest": "^26.6.3",
+    "jest-fetch-mock": "^3.0.3",
+    "jest-module-name-mapper": "^0.1.5",
+    "rimraf": "^3.0.2",
+    "ts-jest": "^26.5.5",
+    "typescript": "^4.2.4",
+    "webpack-bundle-analyzer": "^4.5.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "main": "dist/index.js",
+  "files": [
+    "dist",
+    "src"
+  ],
+  "keywords": [
+    "auth",
+    "authentication",
+    "authorization",
+    "bitcoin",
+    "bitcoin auth",
+    "bitcoin authentication",
+    "bitcoin login",
+    "blockchain",
+    "blockchain auth",
+    "blockchain authentication",
+    "blockchain id",
+    "blockchain login",
+    "blockchainid",
+    "blockstack",
+    "blockstack auth",
+    "command",
+    "crypto",
+    "cryptography",
+    "ethereum",
+    "id",
+    "identity",
+    "login",
+    "profile",
+    "signin",
+    "sso",
+    "stacks",
+    "token"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hirosystems/stacks.js.git"
+  },
+  "bugs": {
+    "url": "https://github.com/blockstack/blockstack.js/issues"
+  },
+  "bin": {
+    "stacks": "./bin.js",
+    "stx": "./bin.js"
   },
   "gitHead": "77b4d6d531b74996e4b7a0cbd1cf5b8358a690ce"
 }
