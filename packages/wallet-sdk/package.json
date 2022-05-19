@@ -2,47 +2,31 @@
   "name": "@stacks/wallet-sdk",
   "version": "4.1.2",
   "description": "A library for generating Stacks blockchain wallets",
-  "author": "Hank Stoever",
+  "license": "MIT",
+  "author": "Hiro Systems PBC (https://hiro.so)",
   "scripts": {
-    "start": "tsc -b tsconfig.build.json --watch --verbose",
     "build": "npm run clean && npm run build:cjs && npm run build:esm && npm run build:umd && npm run build:polyfill",
     "build:cjs": "tsc -b tsconfig.build.json",
-    "build:esm": "tsc -p tsconfig.build.json --module ES6 --outDir ./dist/esm",
-    "build:umd": "NODE_OPTIONS=--max-old-space-size=8192 webpack --config webpack.config.js",
-    "build:polyfill": "NODE_OPTIONS=--max-old-space-size=8192 rollup -c ../../configs/rollup.config.js && rimraf dist/polyfill/dist",
-    "clean": "rimraf dist && tsc -b tsconfig.build.json --clean",
-    "typecheck": "tsc --noEmit",
-    "typecheck:watch": "npm run typecheck -- --watch",
-    "test": "jest --coverage",
-    "dev": "cross-env NODE_ENV=development tsdx watch",
     "build:cjs:watch": "tsc --outDir ./lib -m commonjs -t es2017 --watch",
+    "build:esm": "tsc -p tsconfig.build.json --module ES6 --outDir ./dist/esm",
     "build:esm:watch": "tsc --outDir ./lib-esm -m es6 -t es2017 --watch",
-    "test:watch": "jest --watch --coverage=false",
+    "build:polyfill": "NODE_OPTIONS=--max-old-space-size=8192 rollup -c ../../configs/rollup.config.js && rimraf dist/polyfill/dist",
+    "build:umd": "NODE_OPTIONS=--max-old-space-size=8192 webpack --config webpack.config.js",
+    "clean": "rimraf dist && tsc -b tsconfig.build.json --clean",
+    "depcheck": "depcheck --ignores='@types/*,eslint*,safe-buffer,codecov,@typescript-eslint/*,@blockstack/*'",
+    "dev": "cross-env NODE_ENV=development tsdx watch",
     "lint": "yarn lint:eslint && yarn lint:prettier",
     "lint:eslint": "eslint \"src/**/*.{ts,tsx}\"",
     "lint:fix": "eslint \"src/**/*.{ts,tsx}\" --fix",
     "lint:prettier": "prettier --check \"src/**/*.{ts,tsx}\" *.js",
     "lint:prettier:fix": "prettier --write \"src/**/*.{ts,tsx}\" *.js",
-    "depcheck": "depcheck --ignores='@types/*,eslint*,safe-buffer,codecov,@typescript-eslint/*,@blockstack/*'",
     "pack": "npm pack",
-    "prepublishOnly": "npm run test && NODE_ENV=production npm run build"
-  },
-  "license": "MIT",
-  "files": [
-    "dist",
-    "src"
-  ],
-  "devDependencies": {
-    "@types/jest": "^26.0.22",
-    "@types/node": "^14.14.43",
-    "assert": "^2.0.0",
-    "bip32": "^2.0.6",
-    "crypto-browserify": "^3.12.0",
-    "jest": "^26.6.3",
-    "jest-fetch-mock": "^3.0.3",
-    "process": "^0.11.10",
-    "webpack-bundle-analyzer": "^4.5.0",
-    "yalc": "1.0.0-pre.49"
+    "prepublishOnly": "npm run test && NODE_ENV=production npm run build",
+    "start": "tsc -b tsconfig.build.json --watch --verbose",
+    "test": "jest --coverage",
+    "test:watch": "jest --watch --coverage=false",
+    "typecheck": "tsc --noEmit",
+    "typecheck:watch": "npm run typecheck -- --watch"
   },
   "dependencies": {
     "@scure/bip32": "^1.0.1",
@@ -60,14 +44,30 @@
     "triplesec": "^4.0.3",
     "zone-file": "^2.0.0-beta.3"
   },
+  "devDependencies": {
+    "@types/jest": "^26.0.22",
+    "@types/node": "^14.14.43",
+    "assert": "^2.0.0",
+    "bip32": "^2.0.6",
+    "crypto-browserify": "^3.12.0",
+    "jest": "^26.6.3",
+    "jest-fetch-mock": "^3.0.3",
+    "process": "^0.11.10",
+    "webpack-bundle-analyzer": "^4.5.0",
+    "yalc": "1.0.0-pre.49"
+  },
+  "sideEffects": false,
   "publishConfig": {
     "access": "public"
   },
-  "sideEffects": false,
   "typings": "dist/index.d.ts",
   "main": "dist/index.js",
   "module": "dist/esm/index.js",
   "browser": "dist/polyfill/index.js",
   "umd:main": "dist/umd/index.js",
-  "unpkg": "dist/umd/index.js"
+  "unpkg": "dist/umd/index.js",
+  "files": [
+    "dist",
+    "src"
+  ]
 }

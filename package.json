@@ -1,37 +1,26 @@
 {
-  "name": "root",
   "private": true,
-  "prettier": "@stacks/prettier-config",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/hirosystems/stacks.js.git"
-  },
+  "name": "root",
   "workspaces": [
     "packages/**"
   ],
-  "release": {
-    "branches": [
-      "master"
-    ],
-    "plugins": [
-      "@semantic-release/commit-analyzer",
-      "@semantic-release/release-notes-generator",
-      [
-        "@semantic-release/npm",
-        {
-          "npmPublish": false
-        }
-      ],
-      "@semantic-release/changelog",
-      [
-        "@semantic-release/git",
-        {
-          "assets": [
-            "docs"
-          ]
-        }
-      ]
-    ]
+  "prettier": "@stacks/prettier-config",
+  "scripts": {
+    "bootstrap": "lerna bootstrap",
+    "build": "lerna run build",
+    "build:docs": "rimraf docs && RELEASE_VERSION=$(node -p \"require('./lerna.json').version\") && typedoc --tsconfig tsconfig.typedoc.json packages/**/src/index.ts --release-version $RELEASE_VERSION",
+    "clean": "lerna clean",
+    "lerna": "lerna",
+    "lint": "npm run lint:eslint && npm run lint:prettier",
+    "lint:eslint": "eslint \"packages/**/src/**/*.{ts,tsx|!(d.ts)}\" -f unix",
+    "lint:eslint:fix": "eslint \"packages/**/src/**/*.{ts,tsx}\" -f unix --fix",
+    "lint:fix": "eslint \"packages/**/src/**/*.{ts,tsx}\" -f unix --fix",
+    "lint:prettier": "prettier --check \"packages/**/src/**/*.{ts,tsx|!(d.ts)}\" *.js --ignore-path .gitignore",
+    "lint:prettier:fix": "prettier --write \"packages/**/src/**/*.{ts,tsx|!(d.ts)}\" *.js --ignore-path .gitignore",
+    "madge": "madge --circular --extensions ts --exclude 'd.ts' packages/",
+    "pack": "lerna run pack",
+    "test": "lerna run test",
+    "typecheck": "lerna run typecheck --parallel --no-bail --stream"
   },
   "devDependencies": {
     "@janniks/typedoc-plugin-monorepo": "^0.4.2-1",
@@ -71,21 +60,8 @@
     "typescript": "^4.2.4",
     "vite-compatible-readable-stream": "^3.6.0"
   },
-  "scripts": {
-    "bootstrap": "lerna bootstrap",
-    "build": "lerna run build",
-    "build:docs": "rimraf docs && RELEASE_VERSION=$(node -p \"require('./lerna.json').version\") && typedoc --tsconfig tsconfig.typedoc.json packages/**/src/index.ts --release-version $RELEASE_VERSION",
-    "clean": "lerna clean",
-    "lerna": "lerna",
-    "lint": "npm run lint:eslint && npm run lint:prettier",
-    "lint:eslint": "eslint \"packages/**/src/**/*.{ts,tsx|!(d.ts)}\" -f unix",
-    "lint:fix": "eslint \"packages/**/src/**/*.{ts,tsx}\" -f unix --fix",
-    "pack": "lerna run pack",
-    "lint:eslint:fix": "eslint \"packages/**/src/**/*.{ts,tsx}\" -f unix --fix",
-    "lint:prettier": "prettier --check \"packages/**/src/**/*.{ts,tsx|!(d.ts)}\" *.js --ignore-path .gitignore",
-    "lint:prettier:fix": "prettier --write \"packages/**/src/**/*.{ts,tsx|!(d.ts)}\" *.js --ignore-path .gitignore",
-    "test": "lerna run test",
-    "typecheck": "lerna run typecheck --parallel --no-bail --stream",
-    "madge": "madge --circular --extensions ts --exclude 'd.ts' packages/"
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hirosystems/stacks.js.git"
   }
 }
