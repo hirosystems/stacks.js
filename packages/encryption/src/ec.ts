@@ -1,23 +1,24 @@
 import { hmac } from '@noble/hashes/hmac';
 import { sha256 } from '@noble/hashes/sha256';
 import {
-  Signature,
   getPublicKey,
   getSharedSecret,
   Point,
+  Signature,
   signSync,
   utils,
   verify,
 } from '@noble/secp256k1';
 import {
   Buffer,
-  toBuffer,
-  FailedDecryptionError,
-  concatBytes,
-  hexToBytes,
   bytesToHex,
+  concatBytes,
+  FailedDecryptionError,
   hexToBigInt,
-  parseRecoverableSignature,
+  hexToBytes,
+  parseRecoverableSignatureVrs,
+  signatureRsvToVrs,
+  toBuffer,
 } from '@stacks/common';
 import { createCipher } from './aesCipher';
 import { createHmacSha256 } from './hmacSha256';
@@ -522,14 +523,32 @@ interface VerifyMessageSignatureArgs {
 
 /**
  * Verify message signature with recoverable public key
+ * @deprecated The Clarity compatible {@link verifyMessageSignatureRsv} is preferred
  */
 export function verifyMessageSignature({
   signature,
   message,
   publicKey,
-}: VerifyMessageSignatureArgs) {
-  const { r, s } = parseRecoverableSignature(signature);
+}: VerifyMessageSignatureArgs): boolean {
+  // todo: remove method and pull body to `verifyMessageSignatureRsv`
+  const { r, s } = parseRecoverableSignatureVrs(signature);
   const sig = new Signature(hexToBigInt(r), hexToBigInt(s));
   const hashedMsg = typeof message === 'string' ? hashMessage(message) : message;
   return verify(sig, hashedMsg, publicKey);
+}
+
+/**
+ * Verifies a Clarity compatible signed message using a public key. The
+ * `signature` option needs to be in RSV format.
+ */
+export function verifyMessageSignatureRsv({
+  signature,
+  message,
+  publicKey,
+}: VerifyMessageSignatureArgs): boolean {
+  return verifyMessageSignature({
+    signature: signatureRsvToVrs(signature),
+    message,
+    publicKey,
+  });
 }

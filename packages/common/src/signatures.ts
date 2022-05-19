@@ -1,16 +1,28 @@
 import { hexToInt } from './utils';
 
-export function parseRecoverableSignature(signature: string) {
-  const coordinateValueBytes = 32;
-  if (signature.length < coordinateValueBytes * 2 * 2 + 1) {
+const COORDINATE_BYTES = 32;
+
+/** @ignore */
+export function parseRecoverableSignatureVrs(signature: string) {
+  if (signature.length < COORDINATE_BYTES * 2 * 2 + 1) {
     throw new Error('Invalid signature');
   }
-  const recoveryParamHex = signature.substr(0, 2);
-  const r = signature.substr(2, coordinateValueBytes * 2);
-  const s = signature.substr(2 + coordinateValueBytes * 2, coordinateValueBytes * 2);
+  const recoveryIdHex = signature.slice(0, 2);
+  const r = signature.slice(2, 2 + COORDINATE_BYTES * 2);
+  const s = signature.slice(2 + COORDINATE_BYTES * 2);
   return {
-    recoveryParam: hexToInt(recoveryParamHex),
+    recoveryId: hexToInt(recoveryIdHex),
     r,
     s,
   };
+}
+
+/** @ignore */
+export function signatureVrsToRsv(signature: string) {
+  return signature.slice(2) + signature.slice(0, 2);
+}
+
+/** @ignore */
+export function signatureRsvToVrs(signature: string) {
+  return signature.slice(-2) + signature.slice(0, -2);
 }

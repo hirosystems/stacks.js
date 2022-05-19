@@ -11,11 +11,12 @@ import {
   Buffer,
   bytesToHex,
   hexToBigInt,
-  hexToInt,
   intToHex,
+  parseRecoverableSignatureVrs,
   privateKeyToBuffer,
   PRIVATE_KEY_COMPRESSED_LENGTH,
-  parseRecoverableSignature as parseRecoverableSignatureFromCommon,
+  signatureRsvToVrs,
+  signatureVrsToRsv,
 } from '@stacks/common';
 import { c32address } from 'c32check';
 import { BufferReader } from './bufferReader';
@@ -35,7 +36,7 @@ import {
   TransactionVersion,
   UNCOMPRESSED_PUBKEY_LENGTH_BYTES,
 } from './constants';
-import { BufferArray, hash160, hashP2PKH, leftPadHexToLength } from './utils';
+import { BufferArray, hash160, hashP2PKH } from './utils';
 
 /**
  * To use secp256k1.signSync set utils.hmacSha256Sync to a function using noble-hashes
@@ -85,17 +86,34 @@ export function createStacksPublicKey(key: string): StacksPublicKey {
   };
 }
 
-export function publicKeyFromSignature(
+export function publicKeyFromSignatureVrs(
   message: string,
   messageSignature: MessageSignature,
   pubKeyEncoding = PubKeyEncoding.Compressed
 ): string {
-  const parsedSignature = parseRecoverableSignature(messageSignature.data);
+  const parsedSignature = parseRecoverableSignatureVrs(messageSignature.data);
   const signature = new Signature(hexToBigInt(parsedSignature.r), hexToBigInt(parsedSignature.s));
-  const point = Point.fromSignature(message, signature, parsedSignature.recoveryParam);
+  const point = Point.fromSignature(message, signature, parsedSignature.recoveryId);
   const compressed = pubKeyEncoding === PubKeyEncoding.Compressed;
   return point.toHex(compressed);
 }
+
+export function publicKeyFromSignatureRsv(
+  message: string,
+  messageSignature: MessageSignature,
+  pubKeyEncoding = PubKeyEncoding.Compressed
+): string {
+  return publicKeyFromSignatureVrs(
+    message,
+    { ...messageSignature, data: signatureRsvToVrs(messageSignature.data) },
+    pubKeyEncoding
+  );
+}
+
+/**
+ * @deprecated use {@link publicKeyFromSignatureRsv} (recommended) or {@link publicKeyFromSignatureVrs} instead
+ */
+export const publicKeyFromSignature = publicKeyFromSignatureVrs;
 
 export function publicKeyFromBuffer(data: Buffer): StacksPublicKey {
   return { type: StacksMessageType.PublicKey, data };
@@ -153,38 +171,44 @@ export function makeRandomPrivKey(): StacksPrivateKey {
   return createStacksPrivateKey(bytesToHex(utils.randomPrivateKey()));
 }
 
-export function signWithKey(privateKey: StacksPrivateKey, input: string): MessageSignature {
-  const [rawSignature, recoveryParam] = signSync(input, privateKey.data.slice(0, 32), {
+/**
+ * @deprecated The Clarity compatible {@link signMessageHashRsv} is preferred, but differs in signature format
+ * @returns A recoverable signature (in VRS order)
+ */
+export function signWithKey(privateKey: StacksPrivateKey, messageHash: string): MessageSignature {
+  const [rawSignature, recoveryId] = signSync(messageHash, privateKey.data.slice(0, 32), {
     canonical: true,
     recovered: true,
   });
-  const signature = Signature.fromHex(rawSignature);
-  const coordinateValueBytes = 32;
-  const r = leftPadHexToLength(signature.r.toString(16), coordinateValueBytes * 2);
-  const s = leftPadHexToLength(signature.s.toString(16), coordinateValueBytes * 2);
-
-  if (recoveryParam === undefined || recoveryParam === null) {
-    throw new Error('"signature.recoveryParam" is not set');
+  if (recoveryId == null) {
+    throw new Error('No signature recoveryId received');
   }
-  const recoveryParamHex = intToHex(recoveryParam, 1);
-  const recoverableSignatureString = recoveryParamHex + r + s;
+  const recoveryIdHex = intToHex(recoveryId, 1);
+  const recoverableSignatureString = recoveryIdHex + Signature.fromHex(rawSignature).toCompactHex(); // V + RS
   return createMessageSignature(recoverableSignatureString);
 }
 
-export function getSignatureRecoveryParam(signature: string) {
-  const coordinateValueBytes = 32;
-  if (signature.length < coordinateValueBytes * 2 * 2 + 1) {
-    throw new Error('Invalid signature');
-  }
-  const recoveryParamHex = signature.substr(0, 2);
-  return hexToInt(recoveryParamHex);
+/**
+ * Signs a message using a private key. The resulting signature along with the
+ * original message can be verified using {@link verifyMessageSignature}
+ * @returns A recoverable signature (in RSV order)
+ */
+export function signMessageHashRsv({
+  messageHash,
+  privateKey,
+}: {
+  messageHash: string;
+  privateKey: StacksPrivateKey;
+}): MessageSignature {
+  const messageSignature = signWithKey(privateKey, messageHash);
+  return { ...messageSignature, data: signatureVrsToRsv(messageSignature.data) };
 }
 
 /**
  * @deprecated
- * This method is now exported from `@stacks/common` {@link parseRecoverableSignature}
+ * This method is now exported from `@stacks/common` {@link parseRecoverableSignatureVrs}
  */
-export const parseRecoverableSignature = parseRecoverableSignatureFromCommon;
+export const parseRecoverableSignature = parseRecoverableSignatureVrs;
 
 export function getPublicKey(privateKey: StacksPrivateKey): StacksPublicKey {
   return pubKeyfromPrivKey(privateKey.data);
