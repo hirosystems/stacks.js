@@ -167,7 +167,7 @@ export function signWithKey(privateKey: StacksPrivateKey, input: string): Messag
     throw new Error('"signature.recoveryParam" is not set');
   }
   const recoveryParamHex = intToHex(recoveryParam, 1);
-  const recoverableSignatureString = recoveryParamHex + r + s;
+  const recoverableSignatureString = r + s + recoveryParamHex;
   return createMessageSignature(recoverableSignatureString);
 }
 
