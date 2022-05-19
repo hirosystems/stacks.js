@@ -1,6 +1,6 @@
 {
   "name": "@stacks/bns",
-  "version": "4.0.1",
+  "version": "4.0.2",
   "description": "Library for working with the Stacks Blockchain Naming System BNS.",
   "keywords": [
     "Stacks",
@@ -40,9 +40,9 @@
     "url": "https://github.com/blockstack/stacks.js/issues"
   },
   "dependencies": {
-    "@stacks/common": "^4.0.1",
-    "@stacks/network": "^4.0.1",
-    "@stacks/transactions": "^4.0.0"
+    "@stacks/common": "^4.0.2",
+    "@stacks/network": "^4.0.2",
+    "@stacks/transactions": "^4.0.2"
   },
   "devDependencies": {
     "@types/jest": "^26.0.22",
