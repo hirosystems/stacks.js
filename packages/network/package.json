@@ -1,6 +1,6 @@
 {
   "name": "@stacks/network",
-  "version": "4.0.2",
+  "version": "4.1.0",
   "description": "Library for Stacks network operations",
   "keywords": [
     "stacks",
@@ -40,7 +40,7 @@
     "url": "https://github.com/blockstack/blockstack.js/issues"
   },
   "dependencies": {
-    "@stacks/common": "^4.0.2",
+    "@stacks/common": "^4.1.0",
     "cross-fetch": "^3.1.5"
   },
   "devDependencies": {
