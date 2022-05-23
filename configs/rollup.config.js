@@ -14,8 +14,9 @@ export default {
     file: 'dist/polyfill/index.js',
     format: 'esm',
     intro: 'window.global = window',
+    sourcemap: true,
   },
-  external: [/\@stacks\/.*\/dist\/polyfill/],
+  external: [/\@stacks\/.*/],
   plugins: [
     // IMPORTANT PLUGIN ORDER:
     // - alias > resolve
@@ -24,24 +25,10 @@ export default {
     // - inject Buffer > typescript
     alias({
       entries: [
-        // polyfills
         { find: 'stream', replacement: 'vite-compatible-readable-stream' },
         { find: 'crypto', replacement: 'crypto-browserify' },
         { find: 'readable-stream', replacement: 'vite-compatible-readable-stream' },
-        { find: 'brorand', replacement: require.resolve('./polyfills/brorand.js') },
-
-        // replace @stacks with their polyfill versions
-        { find: '@stacks/auth', replacement: '@stacks/auth/dist/polyfill' },
-        { find: '@stacks/bns', replacement: '@stacks/bns/dist/polyfill' },
-        { find: '@stacks/common', replacement: '@stacks/common/dist/polyfill' },
-        { find: '@stacks/encryption', replacement: '@stacks/encryption/dist/polyfill' },
-        { find: '@stacks/keychain', replacement: '@stacks/keychain/dist/polyfill' },
-        { find: '@stacks/network', replacement: '@stacks/network/dist/polyfill' },
-        { find: '@stacks/profile', replacement: '@stacks/profile/dist/polyfill' },
-        { find: '@stacks/stacking', replacement: '@stacks/stacking/dist/polyfill' },
-        { find: '@stacks/storage', replacement: '@stacks/storage/dist/polyfill' },
-        { find: '@stacks/transactions', replacement: '@stacks/transactions/dist/polyfill' },
-        { find: '@stacks/wallet-sdk', replacement: '@stacks/wallet-sdk/dist/polyfill' },
+        { find: 'util', replacement: require.resolve('util/') },
       ],
     }),
     resolve({
@@ -68,8 +55,6 @@ export default {
     }),
     json({
       compact: true,
-      // todo: ignore non-english wordlists (currently causes commonjs to ignore needed deps)
-      // proposed regex: include: /^(?!.*wordlist(?!.*english)).*/,
     }),
     terser(),
   ],

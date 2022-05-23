@@ -5,7 +5,9 @@ module.exports = {
   testEnvironment: 'node',
   coverageDirectory: './coverage/',
   collectCoverage: true,
-  moduleNameMapper: require('jest-module-name-mapper').default(path.resolve(__dirname, 'tsconfig.json')),
+  moduleNameMapper: require('jest-module-name-mapper').default(
+    path.resolve(__dirname, 'tsconfig.json')
+  ),
   globals: {
     'ts-jest': {
       tsconfig: path.resolve(__dirname, 'tsconfig.json'),
