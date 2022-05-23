@@ -22,10 +22,11 @@
   },
   "dependencies": {
     "@stacks/common": "^4.1.0",
+    "@stacks/encryption": "^4.1.0",
     "@stacks/network": "^4.1.0",
     "@stacks/stacks-blockchain-api-types": "^0.61.0",
     "@stacks/transactions": "^4.1.0",
-    "bitcoinjs-lib": "^5.2.0"
+    "bs58": "^5.0.0"
   },
   "devDependencies": {
     "@types/jest": "^26.0.22",

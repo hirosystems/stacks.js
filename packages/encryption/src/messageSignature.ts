@@ -1,13 +1,13 @@
-import { sha256 } from 'sha.js';
-import { encode, decode, encodingLength } from 'varuint-bitcoin';
+import { sha256 } from '@noble/hashes/sha256';
 import { Buffer } from '@stacks/common';
+import { decode, encode, encodingLength } from 'varuint-bitcoin';
 
 // 'Stacks Message Signing:\n'.length //  = 24
 // 'Stacks Message Signing:\n'.length.toString(16) //  = 18
 const chainPrefix = '\x18Stacks Message Signing:\n';
 
-export function hashMessage(message: string) {
-  return new sha256().update(encodeMessage(message)).digest();
+export function hashMessage(message: string): Buffer {
+  return Buffer.from(sha256(encodeMessage(message)));
 }
 
 export function encodeMessage(message: string | Buffer): Buffer {

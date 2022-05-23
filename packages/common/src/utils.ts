@@ -500,8 +500,8 @@ export function bytesToHex(uint8a: Uint8Array): string {
   // pre-caching improves the speed 6x
   if (!(uint8a instanceof Uint8Array)) throw new Error('Uint8Array expected');
   let hex = '';
-  for (let i = 0; i < uint8a.length; i++) {
-    hex += hexes[uint8a[i]];
+  for (const u of uint8a) {
+    hex += hexes[u];
   }
   return hex;
 }
