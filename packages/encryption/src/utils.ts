@@ -1,3 +1,7 @@
+import { Signature, verify } from '@noble/secp256k1';
+
+export { Signature, verify as verifySignature };
+
 /**
  * Calculate the AES-CBC ciphertext output byte length a given input length.
  * AES has a fixed block size of 16-bytes regardless key size.

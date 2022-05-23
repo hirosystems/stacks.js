@@ -1,28 +1,27 @@
-import { Buffer, fetchPrivate } from '@stacks/common';
+import { Buffer } from '@stacks/common';
+import { decryptContent, encryptContent, getPublicKeyFromPrivate } from '@stacks/encryption';
+import { createFetchFn, FetchFn } from '@stacks/network';
+import { connectToGaiaHub, GaiaHubConfig } from '@stacks/storage';
+import { ChainID } from '@stacks/transactions';
 import { mnemonicToSeed } from 'bip39';
 import { bip32, BIP32Interface } from 'bitcoinjs-lib';
-import { ChainID } from '@stacks/transactions';
-
+import { deriveStxAddressChain } from '../address-derivation';
+import { decrypt } from '../encryption/decrypt';
+import Identity from '../identity';
 import {
+  AllowedKeyEntropyBits,
+  deriveRootKeychainFromMnemonic,
+  encryptMnemonicFormatted,
+  generateEncryptedMnemonicRootKeychain,
+} from '../mnemonic';
+import {
+  assertIsTruthy,
   getBlockchainIdentities,
   IdentityKeyPair,
   makeIdentity,
-  assertIsTruthy,
   recursiveRestoreIdentities,
 } from '../utils';
-import Identity from '../identity';
-import { decrypt } from '../encryption/decrypt';
-import { GaiaHubConfig, connectToGaiaHub } from '@stacks/storage';
-import { encryptContent, decryptContent, getPublicKeyFromPrivate } from '@stacks/encryption';
-
-import {
-  AllowedKeyEntropyBits,
-  generateEncryptedMnemonicRootKeychain,
-  deriveRootKeychainFromMnemonic,
-  encryptMnemonicFormatted,
-} from '../mnemonic';
-import { deriveStxAddressChain } from '../address-derivation';
-import { makeReadOnlyGaiaConfig, DEFAULT_GAIA_HUB, uploadToGaiaHub } from '../utils/gaia';
+import { DEFAULT_GAIA_HUB, makeReadOnlyGaiaConfig, uploadToGaiaHub } from '../utils/gaia';
 import { WalletSigner } from './signer';
 
 const CONFIG_INDEX = 45;
@@ -225,9 +224,12 @@ export class Wallet {
     return connectToGaiaHub(gaiaHubUrl, this.configPrivateKey);
   }
 
-  async fetchConfig(gaiaConfig: GaiaHubConfig): Promise<WalletConfig | null> {
+  async fetchConfig(
+    gaiaConfig: GaiaHubConfig,
+    fetchFn: FetchFn = createFetchFn()
+  ): Promise<WalletConfig | null> {
     try {
-      const response = await fetchPrivate(
+      const response = await fetchFn(
         `${gaiaConfig.url_prefix}${gaiaConfig.address}/wallet-config.json`
       );
       const encrypted = await response.text();

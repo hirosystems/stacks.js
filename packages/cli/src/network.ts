@@ -1,11 +1,8 @@
-import blockstack from 'blockstack';
+import { createFetchFn, FetchFn } from '@stacks/network';
 import * as bitcoin from 'bitcoinjs-lib';
-import BN from 'bn.js';
-import fetch from 'node-fetch';
-
-import { CLI_CONFIG_TYPE } from './argparse';
-
+import blockstack from 'blockstack';
 import { BlockstackNetwork } from 'blockstack/lib/network';
+import { CLI_CONFIG_TYPE } from './argparse';
 
 export interface CLI_NETWORK_OPTS {
   consensusHash: string | null;
@@ -22,7 +19,7 @@ export interface CLI_NETWORK_OPTS {
 
 export interface PriceType {
   units: 'BTC' | 'STACKS';
-  amount: import('bn.js');
+  amount: bigint;
 }
 
 export type NameInfoType = {
@@ -144,7 +141,7 @@ export class CLINetworkAdapter {
       return new Promise((resolve: any) =>
         resolve({
           units: String(this.priceUnits),
-          amount: new BN(this.priceToPay as string),
+          amount: BigInt(this.priceToPay || 0),
         } as PriceType)
       );
     }
@@ -154,7 +151,7 @@ export class CLINetworkAdapter {
       if (!priceInfo.units) {
         priceInfo = {
           units: 'BTC',
-          amount: new BN(String(priceInfo)),
+          amount: BigInt(priceInfo.amount),
         };
       }
       return priceInfo;
@@ -167,7 +164,7 @@ export class CLINetworkAdapter {
       return new Promise((resolve: any) =>
         resolve({
           units: String(this.priceUnits),
-          amount: new BN(String(this.priceToPay)),
+          amount: BigInt(this.priceToPay || 0),
         } as PriceType)
       );
     }
@@ -177,7 +174,7 @@ export class CLINetworkAdapter {
       if (!priceInfo.units) {
         priceInfo = {
           units: 'BTC',
-          amount: new BN(String(priceInfo)),
+          amount: BigInt(priceInfo.amount),
         } as PriceType;
       }
       return priceInfo;
@@ -187,7 +184,8 @@ export class CLINetworkAdapter {
   getNamespaceBurnAddress(
     namespace: string,
     useCLI: boolean = true,
-    receiveFeesPeriod: number = -1
+    receiveFeesPeriod: number = -1,
+    fetchFn: FetchFn = createFetchFn()
   ): Promise<string> {
     // override with CLI option
     if (this.namespaceBurnAddress && useCLI) {
@@ -195,7 +193,7 @@ export class CLINetworkAdapter {
     }
 
     return Promise.all([
-      fetch(`${this.legacyNetwork.blockstackAPIUrl}/v1/namespaces/${namespace}`),
+      fetchFn(`${this.legacyNetwork.blockstackAPIUrl}/v1/namespaces/${namespace}`),
       this.legacyNetwork.getBlockHeight(),
     ])
       .then(([resp, blockHeight]: [any, number]) => {
@@ -245,10 +243,10 @@ export class CLINetworkAdapter {
     });
   }
 
-  getBlockchainNameRecord(name: string): Promise<any> {
+  getBlockchainNameRecord(name: string, fetchFn: FetchFn = createFetchFn()): Promise<any> {
     // TODO: send to blockstack.js
     const url = `${this.legacyNetwork.blockstackAPIUrl}/v1/blockchains/bitcoin/names/${name}`;
-    return fetch(url)
+    return fetchFn(url)
       .then(resp => {
         if (resp.status !== 200) {
           throw new Error(`Bad response status: ${resp.status}`);
@@ -268,10 +266,14 @@ export class CLINetworkAdapter {
       });
   }
 
-  getNameHistory(name: string, page: number): Promise<Record<string, any[]>> {
+  getNameHistory(
+    name: string,
+    page: number,
+    fetchFn: FetchFn = createFetchFn()
+  ): Promise<Record<string, any[]>> {
     // TODO: send to blockstack.js
     const url = `${this.legacyNetwork.blockstackAPIUrl}/v1/names/${name}/history?page=${page}`;
-    return fetch(url)
+    return fetchFn(url)
       .then(resp => {
         if (resp.status !== 200) {
           throw new Error(`Bad response status: ${resp.status}`);

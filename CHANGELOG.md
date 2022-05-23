@@ -3,6 +3,47 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.1.1](https://github.com/hirosystems/stacks.js/compare/v4.2.0-beta.1...v4.1.1) (2022-05-19)
+
+**Note:** Version bump only for package root
+
+
+
+
+
+# [4.1.0](https://github.com/hirosystems/stacks.js/compare/v4.0.2...v4.1.0) (2022-05-19)
+
+
+### Features
+
+* add fetch middleware for api keys and request init ([ef45632](https://github.com/hirosystems/stacks.js/commit/ef456327a3e1dcdc2aa364cbe55e47225029c5d2))
+
+
+
+
+
+## [4.0.2](https://github.com/hirosystems/stacks.js/compare/v4.0.2-beta.1...v4.0.2) (2022-05-19)
+
+
+### Bug Fixes
+
+* **message-signing:** add working utility fn ([20b721c](https://github.com/hirosystems/stacks.js/commit/20b721cdccc2fb73f98aad80eb6d5e8e9cb987d0))
+
+
+
+
+
+## [4.0.1](https://github.com/hirosystems/stacks.js/compare/v4.0.1-beta.1...v4.0.1) (2022-05-09)
+
+
+### Bug Fixes
+
+* allow referrer header in request options ([70ea915](https://github.com/hirosystems/stacks.js/commit/70ea9156f6916f32e40adf7464322476a9acd8ab))
+
+
+
+
+
 # [4.0.0](https://github.com/hirosystems/stacks.js/compare/v3.5.0...v4.0.0) (2022-04-20)
 
 

@@ -1,12 +1,28 @@
 import { hmac } from '@noble/hashes/hmac';
 import { sha256 } from '@noble/hashes/sha256';
-import { concatBytes, hexToBytes } from '@noble/hashes/utils';
-import { getPublicKey, getSharedSecret, Point, signSync, utils, verify } from '@noble/secp256k1';
-import { Buffer, FailedDecryptionError } from '@stacks/common';
-import * as BN from 'bn.js';
+import {
+  Signature,
+  getPublicKey,
+  getSharedSecret,
+  Point,
+  signSync,
+  utils,
+  verify,
+} from '@noble/secp256k1';
+import {
+  Buffer,
+  toBuffer,
+  FailedDecryptionError,
+  concatBytes,
+  hexToBytes,
+  bytesToHex,
+  hexToBigInt,
+  parseRecoverableSignature,
+} from '@stacks/common';
 import { createCipher } from './aesCipher';
 import { createHmacSha256 } from './hmacSha256';
 import { getPublicKeyFromPrivate } from './keys';
+import { hashMessage } from './messageSignature';
 import { hashSha256Sync, hashSha512Sync } from './sha2Hash';
 import { getAesCbcOutputLength, getBase64OutputLength } from './utils';
 
@@ -179,12 +195,12 @@ function isValidPublicKey(pub: string): {
 }
 
 /**
- * Hex encodes a 32-byte BN.js instance.
+ * Hex encodes a 32-byte bigint instance.
  * The result string is zero padded and always 64 characters in length.
  * @ignore
  */
-export function getHexFromBN(bnInput: BN): string {
-  const hexOut = bnInput.toString('hex', 64);
+export function getHexFromBN(bnInput: bigint): string {
+  const hexOut = bnInput.toString(16);
   if (hexOut.length === 64) {
     return hexOut;
   } else if (hexOut.length < 64) {
@@ -198,14 +214,14 @@ export function getHexFromBN(bnInput: BN): string {
 }
 
 /**
- * Returns a big-endian encoded 32-byte BN.js instance.
+ * Returns a big-endian encoded 32-byte buffer instance.
  * The result Buffer is zero padded and always 32 bytes in length.
  * @ignore
  */
-export function getBufferFromBN(bnInput: BN): Buffer {
-  const result = bnInput.toArrayLike(Buffer, 'be', 32);
+export function getBufferFromBN(bnInput: bigint): Buffer {
+  const result = toBuffer(bnInput, 32);
   if (result.byteLength !== 32) {
-    throw new Error('Failed to generate a 32-byte BN');
+    throw new Error('Failed to generate a 32-byte buffer instance');
   }
   return result;
 }
@@ -362,7 +378,7 @@ export async function encryptECIES(
   let cipherTextString: string;
 
   if (!cipherTextEncoding || cipherTextEncoding === 'hex') {
-    cipherTextString = utils.bytesToHex(cipherText);
+    cipherTextString = bytesToHex(cipherText);
   } else if (cipherTextEncoding === 'base64') {
     cipherTextString = cipherText.toString('base64');
   } else {
@@ -370,10 +386,10 @@ export async function encryptECIES(
   }
 
   const result: CipherObject = {
-    iv: utils.bytesToHex(initializationVector),
-    ephemeralPK: utils.bytesToHex(ephemeralPublicKey),
+    iv: bytesToHex(initializationVector),
+    ephemeralPK: bytesToHex(ephemeralPublicKey),
     cipherText: cipherTextString,
-    mac: utils.bytesToHex(mac),
+    mac: bytesToHex(mac),
     wasString,
   };
   if (cipherTextEncoding && cipherTextEncoding !== 'hex') {
@@ -465,7 +481,7 @@ export function signECDSA(
   const signature = signSync(contentHash, privateKey);
 
   return {
-    signature: utils.bytesToHex(signature),
+    signature: bytesToHex(signature),
     publicKey,
   };
 }
@@ -496,4 +512,24 @@ export function verifyECDSA(
   const contentBuffer = getBuffer(content);
   const contentHash = hashSha256Sync(contentBuffer);
   return verify(signature, contentHash, publicKey);
+}
+
+interface VerifyMessageSignatureArgs {
+  signature: string;
+  message: string | Buffer;
+  publicKey: string;
+}
+
+/**
+ * Verify message signature with recoverable public key
+ */
+export function verifyMessageSignature({
+  signature,
+  message,
+  publicKey,
+}: VerifyMessageSignatureArgs) {
+  const { r, s } = parseRecoverableSignature(signature);
+  const sig = new Signature(hexToBigInt(r), hexToBigInt(s));
+  const hashedMsg = typeof message === 'string' ? hashMessage(message) : message;
+  return verify(sig, hashedMsg, publicKey);
 }

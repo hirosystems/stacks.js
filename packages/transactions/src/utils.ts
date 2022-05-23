@@ -1,13 +1,10 @@
-import { Buffer, fetchPrivate } from '@stacks/common';
-import { sha256, sha512 } from 'sha.js';
-import { ClarityValue, serializeCV } from './clarity';
-import RIPEMD160 from 'ripemd160-min';
 import { utils } from '@noble/secp256k1';
-import { deserializeCV } from './clarity';
+import { Buffer, bytesToHex, with0x } from '@stacks/common';
 import { c32addressDecode } from 'c32check';
 import lodashCloneDeep from 'lodash.clonedeep';
-import { with0x } from '@stacks/common';
-import { bytesToHex } from '@noble/hashes/utils';
+import RIPEMD160 from 'ripemd160-min';
+import { sha256, sha512 } from 'sha.js';
+import { ClarityValue, deserializeCV, serializeCV } from './clarity';
 
 /**
  * Use utils.randomBytes to replace randombytes dependency
@@ -17,6 +14,9 @@ import { bytesToHex } from '@noble/hashes/utils';
  */
 export const randomBytes = (bytesLength?: number) => Buffer.from(utils.randomBytes(bytesLength));
 
+/**
+ * @deprecated Import from `@stacks/common` instead
+ */
 export { bytesToHex };
 
 export class BufferArray {
@@ -51,11 +51,6 @@ export const leftPadHexToLength = (hexString: string, length: number): string =>
 
 export const rightPadHexToLength = (hexString: string, length: number): string =>
   hexString.padEnd(length, '0');
-
-export const intToHexString = (integer: number, lengthBytes = 8): string =>
-  integer.toString(16).padStart(lengthBytes * 2, '0');
-
-export const hexStringToInt = (hexString: string): number => parseInt(hexString, 16);
 
 export const exceedsMaxLengthBytes = (string: string, maxLengthBytes: number): boolean =>
   string ? Buffer.from(string).length > maxLengthBytes : false;
@@ -196,9 +191,6 @@ export function isClarityName(name: string) {
   const regex = /^[a-zA-Z]([a-zA-Z0-9]|[-_!?+<>=/*])*$|^[-+=/*]$|^[<>]=?$/;
   return regex.test(name) && name.length < 128;
 }
-
-/** @ignore */
-export { fetchPrivate };
 
 /**
  * Converts a clarity value to a hex encoded string with `0x` prefix

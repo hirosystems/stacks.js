@@ -3,6 +3,33 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.1.0](https://github.com/blockstack/blockstack.js/compare/v4.0.2...v4.1.0) (2022-05-19)
+
+**Note:** Version bump only for package @stacks/encryption
+
+
+
+
+
+## [4.0.2](https://github.com/blockstack/blockstack.js/compare/v4.0.2-beta.1...v4.0.2) (2022-05-19)
+
+
+### Bug Fixes
+
+* **message-signing:** add working utility fn ([20b721c](https://github.com/blockstack/blockstack.js/commit/20b721cdccc2fb73f98aad80eb6d5e8e9cb987d0))
+
+
+
+
+
+## [4.0.1](https://github.com/blockstack/blockstack.js/compare/v4.0.1-beta.1...v4.0.1) (2022-05-09)
+
+**Note:** Version bump only for package @stacks/encryption
+
+
+
+
+
 # [4.0.0](https://github.com/blockstack/blockstack.js/compare/v4.0.0-beta.2...v4.0.0) (2022-04-20)
 
 **Note:** Version bump only for package @stacks/encryption

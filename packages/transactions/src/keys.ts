@@ -9,9 +9,13 @@ import {
 } from '@noble/secp256k1';
 import {
   Buffer,
+  bytesToHex,
   hexToBigInt,
+  hexToInt,
+  intToHex,
   privateKeyToBuffer,
   PRIVATE_KEY_COMPRESSED_LENGTH,
+  parseRecoverableSignature as parseRecoverableSignatureFromCommon,
 } from '@stacks/common';
 import { c32address } from 'c32check';
 import { BufferReader } from './bufferReader';
@@ -31,14 +35,7 @@ import {
   TransactionVersion,
   UNCOMPRESSED_PUBKEY_LENGTH_BYTES,
 } from './constants';
-import {
-  BufferArray,
-  hash160,
-  hashP2PKH,
-  hexStringToInt,
-  intToHexString,
-  leftPadHexToLength,
-} from './utils';
+import { BufferArray, hash160, hashP2PKH, leftPadHexToLength } from './utils';
 
 /**
  * To use secp256k1.signSync set utils.hmacSha256Sync to a function using noble-hashes
@@ -121,11 +118,11 @@ export function serializePublicKey(key: StacksPublicKey): Buffer {
 export function pubKeyfromPrivKey(privateKey: string | Buffer): StacksPublicKey {
   const privKey = createStacksPrivateKey(privateKey);
   const publicKey = nobleGetPublicKey(privKey.data.slice(0, 32), privKey.compressed);
-  return createStacksPublicKey(utils.bytesToHex(publicKey));
+  return createStacksPublicKey(bytesToHex(publicKey));
 }
 
 export function compressPublicKey(publicKey: string | Buffer): StacksPublicKey {
-  const hex = typeof publicKey === 'string' ? publicKey : utils.bytesToHex(publicKey);
+  const hex = typeof publicKey === 'string' ? publicKey : bytesToHex(publicKey);
   const compressed = Point.fromHex(hex).toHex(true);
   return createStacksPublicKey(compressed);
 }
@@ -153,7 +150,7 @@ export function createStacksPrivateKey(key: string | Buffer): StacksPrivateKey {
 }
 
 export function makeRandomPrivKey(): StacksPrivateKey {
-  return createStacksPrivateKey(utils.bytesToHex(utils.randomPrivateKey()));
+  return createStacksPrivateKey(bytesToHex(utils.randomPrivateKey()));
 }
 
 export function signWithKey(privateKey: StacksPrivateKey, input: string): MessageSignature {
@@ -169,7 +166,7 @@ export function signWithKey(privateKey: StacksPrivateKey, input: string): Messag
   if (recoveryParam === undefined || recoveryParam === null) {
     throw new Error('"signature.recoveryParam" is not set');
   }
-  const recoveryParamHex = intToHexString(recoveryParam, 1);
+  const recoveryParamHex = intToHex(recoveryParam, 1);
   const recoverableSignatureString = recoveryParamHex + r + s;
   return createMessageSignature(recoverableSignatureString);
 }
@@ -180,23 +177,14 @@ export function getSignatureRecoveryParam(signature: string) {
     throw new Error('Invalid signature');
   }
   const recoveryParamHex = signature.substr(0, 2);
-  return hexStringToInt(recoveryParamHex);
+  return hexToInt(recoveryParamHex);
 }
 
-export function parseRecoverableSignature(signature: string) {
-  const coordinateValueBytes = 32;
-  if (signature.length < coordinateValueBytes * 2 * 2 + 1) {
-    throw new Error('Invalid signature');
-  }
-  const recoveryParamHex = signature.substr(0, 2);
-  const r = signature.substr(2, coordinateValueBytes * 2);
-  const s = signature.substr(2 + coordinateValueBytes * 2, coordinateValueBytes * 2);
-  return {
-    recoveryParam: hexStringToInt(recoveryParamHex),
-    r,
-    s,
-  };
-}
+/**
+ * @deprecated
+ * This method is now exported from `@stacks/common` {@link parseRecoverableSignature}
+ */
+export const parseRecoverableSignature = parseRecoverableSignatureFromCommon;
 
 export function getPublicKey(privateKey: StacksPrivateKey): StacksPublicKey {
   return pubKeyfromPrivKey(privateKey.data);

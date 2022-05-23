@@ -1366,7 +1366,7 @@ export const CLI_ARGS = {
         '\n' +
         'Example\n' +
         '\n' +
-        '    $ stx get_stacks_payment_key "toast canal educate tissue express melody produce later gospel victory meadow outdoor hollow catch liberty annual gasp hat hello april equip thank neck cruise"\n' +
+        '    $ stx get_stacks_wallet_key "toast canal educate tissue express melody produce later gospel victory meadow outdoor hollow catch liberty annual gasp hat hello april equip thank neck cruise"\n' +
         '    [\n' +
         '      {\n' +
         '        "privateKey": "a25cea8d310ce656c6d427068c77bad58327334f73e39c296508b06589bc4fa201",\n' +
