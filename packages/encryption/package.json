@@ -27,7 +27,6 @@
     "@types/node": "^14.14.43",
     "bs58": "^5.0.0",
     "ripemd160-min": "^0.0.6",
-    "sha.js": "^2.4.11",
     "varuint-bitcoin": "^1.1.2"
   },
   "devDependencies": {
