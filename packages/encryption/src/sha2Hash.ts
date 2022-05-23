@@ -1,5 +1,6 @@
+import { sha256 } from '@noble/hashes/sha256';
+import { sha512 } from '@noble/hashes/sha512';
 import { Buffer } from '@stacks/common';
-import { sha256, sha512 } from 'sha.js';
 import { getCryptoLib } from './cryptoUtils';
 
 type NodeCryptoCreateHash = typeof import('crypto').createHash;
@@ -68,13 +69,9 @@ export async function createSha2Hash(): Promise<Sha2Hash> {
 }
 
 export function hashSha256Sync(data: Buffer) {
-  const hash = new sha256();
-  hash.update(data);
-  return hash.digest();
+  return Buffer.from(sha256(data));
 }
 
 export function hashSha512Sync(data: Buffer) {
-  const hash = new sha512();
-  hash.update(data);
-  return hash.digest();
+  return Buffer.from(sha512(data));
 }

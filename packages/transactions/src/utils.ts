@@ -1,9 +1,10 @@
+import { ripemd160 } from '@noble/hashes/ripemd160';
+import { sha256 } from '@noble/hashes/sha256';
+import { sha512_256 } from '@noble/hashes/sha512';
 import { utils } from '@noble/secp256k1';
 import { Buffer, bytesToHex, with0x } from '@stacks/common';
 import { c32addressDecode } from 'c32check';
 import lodashCloneDeep from 'lodash.clonedeep';
-import RIPEMD160 from 'ripemd160-min';
-import { sha256, sha512 } from 'sha.js';
 import { ClarityValue, deserializeCV, serializeCV } from './clarity';
 
 /**
@@ -66,44 +67,12 @@ export function omit<T, K extends keyof any>(obj: T, prop: K): Omit<T, K> {
   return clone;
 }
 
-export class sha512_256 extends sha512 {
-  constructor() {
-    super();
-    // set the "SHA-512/256" initialization vector
-    // see https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.180-4.pdf
-    Object.assign(this, {
-      _ah: 0x22312194,
-      _al: 0xfc2bf72c,
-      _bh: 0x9f555fa3,
-      _bl: 0xc84c64c2,
-      _ch: 0x2393b86b,
-      _cl: 0x6f53b151,
-      _dh: 0x96387719,
-      _dl: 0x5940eabd,
-      _eh: 0x96283ee2,
-      _el: 0xa88effe3,
-      _fh: 0xbe5e1e25,
-      _fl: 0x53863992,
-      _gh: 0x2b0199fc,
-      _gl: 0x2c85b8aa,
-      _hh: 0x0eb72ddc,
-      _hl: 0x81c52ca2,
-    });
-  }
-  digest(): Buffer;
-  digest(encoding: BufferEncoding): string;
-  digest(encoding?: BufferEncoding): string | Buffer {
-    // "SHA-512/256" truncates the digest to 32 bytes
-    const buff = super.digest().slice(0, 32);
-    return encoding ? buff.toString(encoding) : buff;
-  }
-}
-
-export const txidFromData = (data: Buffer): string => new sha512_256().update(data).digest('hex');
+export const txidFromData = (data: Buffer): string => {
+  return Buffer.from(sha512_256(data)).toString('hex');
+};
 
 export const hash160 = (input: Buffer): Buffer => {
-  const sha256Result = new sha256().update(input).digest();
-  return Buffer.from(new RIPEMD160().update(sha256Result).digest());
+  return Buffer.from(ripemd160(sha256(input)));
 };
 
 // Internally, the Stacks blockchain encodes address the same as Bitcoin
@@ -175,7 +144,7 @@ export const hashP2WSH = (numSigs: number, pubKeys: Buffer[]): string => {
   scriptArray.appendByte(174);
 
   const script = scriptArray.concatBuffer();
-  const digest = new sha256().update(script).digest();
+  const digest = Buffer.from(sha256(script));
 
   const bufferArray = new BufferArray();
   bufferArray.appendByte(0);

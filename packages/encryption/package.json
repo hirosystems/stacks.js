@@ -61,7 +61,9 @@
   "typings": "dist/index.d.ts",
   "main": "dist/index.js",
   "module": "dist/esm/index.js",
-  "browser": "dist/polyfill/index.js",
+  "browser": {
+    "crypto": false
+  },
   "umd:main": "dist/umd/index.js",
   "unpkg": "dist/umd/index.js",
   "files": [

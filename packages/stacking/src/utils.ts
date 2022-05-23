@@ -1,5 +1,5 @@
-// @ts-ignore
-import { Buffer } from '@stacks/common';
+/* eslint-disable node/prefer-global/buffer */
+import { base58CheckDecode, base58CheckEncode } from '@stacks/encryption';
 import {
   AddressHashMode,
   BufferCV,
@@ -7,7 +7,6 @@ import {
   ClarityValue,
   TupleCV,
 } from '@stacks/transactions';
-import { address } from 'bitcoinjs-lib';
 import { StackingErrors } from './constants';
 
 export class InvalidAddressError extends Error {
@@ -69,7 +68,7 @@ export function hashModeToBtcAddressVersion(
 
 export function getAddressHashMode(btcAddress: string) {
   try {
-    const { version } = address.fromBase58Check(btcAddress);
+    const { version } = base58CheckDecode(btcAddress);
     return btcAddressVersionToHashMode(version);
   } catch (error: any) {
     throw new InvalidAddressError(btcAddress, error);
@@ -77,17 +76,16 @@ export function getAddressHashMode(btcAddress: string) {
 }
 
 export function decodeBtcAddress(btcAddress: string) {
-  let b58Result: address.Base58CheckResult;
   try {
-    b58Result = address.fromBase58Check(btcAddress);
+    const b58Result = base58CheckDecode(btcAddress);
+    const hashMode = btcAddressVersionToHashMode(b58Result.version);
+    return {
+      hashMode,
+      data: b58Result.hash,
+    };
   } catch (error: any) {
     throw new InvalidAddressError(btcAddress, error);
   }
-  const hashMode = btcAddressVersionToHashMode(b58Result.version);
-  return {
-    hashMode,
-    data: b58Result.hash,
-  };
 }
 
 export function extractPoxAddressFromClarityValue(poxAddrClarityValue: ClarityValue) {
@@ -134,13 +132,13 @@ export function poxAddressToBtcAddress(...args: PoxAddressArgs): string {
     throw new Error(`Invalid byte length for hashBytes: ${hashBytes.toString('hex')}`);
   }
   const btcNetworkVersion = hashModeToBtcAddressVersion(version[0], network);
-  const btcAddress = address.toBase58Check(hashBytes, btcNetworkVersion);
+  const btcAddress = base58CheckEncode(btcNetworkVersion, hashBytes);
   return btcAddress;
 }
 
 export function getBTCAddress(version: number | Buffer, checksum: Buffer) {
   const versionNumber: number = typeof version === 'number' ? version : version[0];
-  return address.toBase58Check(checksum, versionNumber);
+  return base58CheckEncode(versionNumber, checksum);
 }
 
 export function getErrorString(error: StackingErrors): string {

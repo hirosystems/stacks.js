@@ -29,6 +29,36 @@ export function makeECPrivateKey() {
 }
 
 /**
+ * Based on bitcoinjs-lib MIT https://github.com/bitcoinjs/bs58check/blob/12b3e700f355c5c49d0be3f8fc29be6c66e753e9/base.js
+ * @ignore
+ */
+export function base58CheckDecode(btcAddress: string): {
+  version: number;
+  hash: Buffer;
+} {
+  const buffer = Buffer.from(base58.decode(btcAddress));
+  const payload = buffer.slice(0, -4);
+  const checksum = buffer.slice(-4);
+  const newChecksum = sha256(sha256(payload));
+
+  if (
+    (checksum[0] ^ newChecksum[0]) |
+    (checksum[1] ^ newChecksum[1]) |
+    (checksum[2] ^ newChecksum[2]) |
+    (checksum[3] ^ newChecksum[3])
+  ) {
+    throw new Error('Invalid checksum');
+  }
+
+  if (payload.length !== 21) throw new TypeError('Invalid address length');
+
+  const version = payload.readUInt8(0);
+  const hash = payload.slice(1);
+
+  return { version, hash };
+}
+
+/**
  * @ignore
  */
 export function base58Encode(hash: Buffer) {
@@ -39,8 +69,8 @@ export function base58Encode(hash: Buffer) {
 /**
  * @ignore
  */
-export function hashToBase58Check(hash: Buffer) {
-  return base58Encode(Buffer.from([BITCOIN_PUBKEYHASH, ...hash].slice(0, 21)));
+export function base58CheckEncode(version: number, hash: Buffer) {
+  return base58Encode(Buffer.from([version, ...hash].slice(0, 21)));
 }
 
 /**
@@ -49,7 +79,7 @@ export function hashToBase58Check(hash: Buffer) {
 export function publicKeyToAddress(publicKey: string | Buffer) {
   const publicKeyBuffer = Buffer.isBuffer(publicKey) ? publicKey : Buffer.from(publicKey, 'hex');
   const publicKeyHash160 = hashRipemd160(hashSha256Sync(publicKeyBuffer));
-  return hashToBase58Check(publicKeyHash160);
+  return base58CheckEncode(BITCOIN_PUBKEYHASH, publicKeyHash160);
 }
 
 /**
