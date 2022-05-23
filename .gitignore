@@ -54,3 +54,5 @@ docs
 
 # from previous .npmignore
 unused
+
+*.tgz

@@ -2,13 +2,12 @@ import { ChainID } from '@stacks/common';
 import { getPublicKeyFromPrivate, publicKeyToAddress, randomBytes } from '@stacks/encryption';
 import { createFetchFn, FetchFn } from '@stacks/network';
 import { GaiaHubConfig } from '@stacks/storage';
-import { AssertionError } from 'assert';
 import { Json, TokenSigner } from 'jsontokens';
 import { parseZoneFile } from 'zone-file';
 
 export function assertIsTruthy<T>(val: T): asserts val is NonNullable<T> {
-  if (val === undefined || val === null) {
-    throw new AssertionError({ expected: true, actual: val });
+  if (!val) {
+    throw new Error(`expected: true, actual: ${val}`);
   }
 }
 
