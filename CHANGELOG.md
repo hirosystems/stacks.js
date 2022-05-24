@@ -5,7 +5,9 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 ## [4.1.2](https://github.com/hirosystems/stacks.js/compare/v4.2.0-beta.3...v4.1.2) (2022-05-23)
 
-**Note:** Version bump only for package root
+### Bug Fixes
+
+* add blockstack dependency ([79152d3](https://github.com/hirosystems/stacks.js/commit/79152d30918401fcc3b9799aaab38da6d7be056d))
 
 
 
@@ -13,7 +15,9 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 ## [4.1.1](https://github.com/hirosystems/stacks.js/compare/v4.2.0-beta.1...v4.1.1) (2022-05-19)
 
-**Note:** Version bump only for package root
+### Bug Fixes
+
+* update api client ([f8cd319](https://github.com/hirosystems/stacks.js/commit/f8cd319212360cb87f537436278415f4f8d4cacc))
 
 
 
