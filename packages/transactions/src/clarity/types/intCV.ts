@@ -12,6 +12,24 @@ interface IntCV {
   readonly value: bigint;
 }
 
+/**
+ * Converts IntegerType in to IntCV clarity type
+ *
+ * @param {value} integer value to be converted to IntCV clarity type
+ *
+ * @returns {IntCV} returns instance of type IntCV
+ *
+ * @example
+ * ```typescript
+ *  import { intCV } from '@stacks/transactions';
+ *
+ *  const value = intCV('100'); // parameter any of type: number | string | bigint | Uint8Array | BN
+ *  // { type: 0, value: 100n }
+ * ```
+ *
+ * @visit
+ * {@link https://github.com/hirosystems/stacks.js/blob/master/packages/transactions/tests/clarity.test.ts clarity test cases for more examples}
+ */
 const intCV = (value: IntegerType): IntCV => {
   const bigInt = intToBigInt(value, true);
   if (bigInt > MAX_I128) {
@@ -31,6 +49,24 @@ interface UIntCV {
   readonly value: bigint;
 }
 
+/**
+ * Converts IntegerType in to IntCV clarity type
+ *
+ * @param {value} integer value to be converted to UIntCV clarity type (Only unsigned integer is allowed otherwise throws exception)
+ *
+ * @returns {UIntCV} returns instance of type UIntCV
+ *
+ * @example
+ * ```typescript
+ *  import { uintCV } from '@stacks/transactions';
+ *
+ *  const value = uintCV('100'); // parameter any of type: number | string | bigint | Uint8Array | BN
+ *  // { type: 1, value: 100n }
+ * ```
+ *
+ * @visit
+ * {@link https://github.com/hirosystems/stacks.js/blob/master/packages/transactions/tests/clarity.test.ts clarity test cases for more examples}
+ */
 const uintCV = (value: IntegerType): UIntCV => {
   const bigInt = intToBigInt(value, false);
   if (bigInt < MIN_U128) {

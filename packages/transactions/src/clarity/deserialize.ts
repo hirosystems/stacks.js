@@ -21,6 +21,28 @@ import { deserializeAddress, deserializeLPString } from '../types';
 import { DeserializationError } from '../errors';
 import { stringAsciiCV, stringUtf8CV } from './types/stringCV';
 
+/**
+ * Deserializes clarity value to clarity type
+ *
+ * @param {value} Buffer | string value to be converted to clarity type
+ **
+ * @returns {ClarityType} returns the clarity type instance
+ *
+ * @example
+ * ```typescript
+ *  import { intCV, serializeCV, deserializeCV } from '@stacks/transactions';
+ *
+ *  const serialized = serializeCV(intCV(100)); // Similarly works for other clarity types as well like listCV, booleanCV ...
+ *
+ *  // <Buffer 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 64>
+ *
+ *  const deserialized = deserializeCV(serialized);
+ *  // { type: 0, value: 100n }
+ * ```
+ *
+ * @visit
+ * {@link https://github.com/hirosystems/stacks.js/blob/master/packages/transactions/tests/clarity.test.ts clarity test cases for more examples}
+ */
 export default function deserializeCV<T extends ClarityValue = ClarityValue>(
   serializedClarityValue: BufferReader | Buffer | string
 ): T {

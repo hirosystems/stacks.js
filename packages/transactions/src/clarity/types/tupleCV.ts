@@ -9,6 +9,28 @@ interface TupleCV<T extends TupleData = TupleData> {
   data: T;
 }
 
+/**
+ * Create tuple of clarity values
+ *
+ * @param {tupleData} tuple value to be converted to tuple of clarity types
+ *
+ * @returns {TupleCV} returns instance of type clarity tuple
+ *
+ * @example
+ * ```typescript
+ *  import { tupleCV, trueCV, falseCV } from '@stacks/transactions';
+ *
+ *  const tuple = tupleCV({
+ *    c: trueCV(),
+ *    b: falseCV(),
+ *    a: trueCV(),
+ *  });
+ *  // { type: 12, data: { c: { type: 3 }, b: { type: 4 }, a: { type: 3 } } }
+ * ```
+ *
+ * @visit
+ * {@link https://github.com/hirosystems/stacks.js/blob/master/packages/transactions/tests/clarity.test.ts clarity test cases for more examples}
+ */
 function tupleCV<T extends ClarityValue = ClarityValue>(data: TupleData<T>): TupleCV<TupleData<T>> {
   for (const key in data) {
     if (!isClarityName(key)) {

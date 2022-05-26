@@ -128,6 +128,25 @@ function serializeStringUtf8CV(cv: StringUtf8CV) {
   return serializeStringCV(cv, 'utf8');
 }
 
+/**
+ * Serializes clarity value to buffer
+ *
+ * @param {value} clarity value to be converted to buffer
+ **
+ * @returns {Buffer} returns the buffer instance
+ *
+ * @example
+ * ```typescript
+ *  import { intCV, serializeCV } from '@stacks/transactions';
+ *
+ *  const serialized = serializeCV(intCV(100)); // Similarly works for other clarity types as well like listCV, booleanCV ...
+ *
+ *  // <Buffer 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 64>
+ * ```
+ *
+ * @visit
+ * {@link https://github.com/hirosystems/stacks.js/blob/master/packages/transactions/tests/clarity.test.ts clarity test cases for more examples}
+ */
 export function serializeCV(value: ClarityValue): Buffer {
   switch (value.type) {
     case ClarityType.BoolTrue:
