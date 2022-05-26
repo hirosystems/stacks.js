@@ -36,21 +36,104 @@ function principalCV(principal: string): PrincipalCV {
   }
 }
 
+/**
+ * Converts stx address in to StandardPrincipalCV clarity type
+ *
+ * @param {addressString} string value to be converted to StandardPrincipalCV clarity type
+ *
+ * @returns {StandardPrincipalCV} returns instance of type StandardPrincipalCV
+ *
+ * @example
+ * ```typescript
+ *  import { standardPrincipalCV } from '@stacks/transactions';
+ *
+ *  const addr = standardPrincipalCV('SP2JXKMSH007NPYAQHKJPQMAQYAD90NQGTVJVQ02B');
+ *  // { type: 5, address: { type: 0, version: 22, hash160: 'a5d9d331000f5b79578ce56bd157f29a9056f0d6' } }
+ * ```
+ *
+ * @visit
+ * {@link https://github.com/hirosystems/stacks.js/blob/master/packages/transactions/tests/clarity.test.ts clarity test cases for more examples}
+ */
 function standardPrincipalCV(addressString: string): StandardPrincipalCV {
   const addr = createAddress(addressString);
   return { type: ClarityType.PrincipalStandard, address: addr };
 }
 
+/**
+ * Converts stx address in to StandardPrincipalCV clarity type
+ *
+ * @param {addressString} string value to be converted to StandardPrincipalCV clarity type
+ *
+ * @returns {StandardPrincipalCV} returns instance of type StandardPrincipalCV
+ *
+ * @example
+ * ```typescript
+ *  import { standardPrincipalCVFromAddress, Address  } from '@stacks/transactions';
+ *
+ *  const address: Address = {
+ *    type: 0,
+ *    version: 22,
+ *    hash160: 'a5d9d331000f5b79578ce56bd157f29a9056f0d6'
+ *  };
+ *
+ *  const principalCV = standardPrincipalCVFromAddress(address);
+ *  // { type: 5, address: { type: 0, version: 22, hash160: 'a5d9d331000f5b79578ce56bd157f29a9056f0d6' } }
+ * ```
+ *
+ * @visit
+ * {@link https://github.com/hirosystems/stacks.js/blob/master/packages/transactions/tests/clarity.test.ts clarity test cases for more examples}
+ */
 function standardPrincipalCVFromAddress(address: Address): StandardPrincipalCV {
   return { type: ClarityType.PrincipalStandard, address };
 }
 
+/**
+ * Converts stx address in to ContractPrincipalCV clarity type
+ *
+ * @param {addressString} string value to be converted to ContractPrincipalCV clarity type
+
+ * @param {contractName} string containing contract name
+ *
+ * @returns {ContractPrincipalCV} returns instance of type ContractPrincipalCV
+ *
+ * @example
+ * ```typescript
+ *  import { contractPrincipalCV } from '@stacks/transactions';
+ *
+ *  const contractAddress = contractPrincipalCV('SP2JXKMSH007NPYAQHKJPQMAQYAD90NQGTVJVQ02B', 'test');
+ *  // { type: 6, address: { type: 0, version: 22, hash160: 'a5d9d331000f5b79578ce56bd157f29a9056f0d6' }, contractName: { type: 2, content: 'test', lengthPrefixBytes: 1, maxLengthBytes: 128 } }
+ * ```
+ *
+ * @visit
+ * {@link https://github.com/hirosystems/stacks.js/blob/master/packages/transactions/tests/clarity.test.ts clarity test cases for more examples}
+ */
 function contractPrincipalCV(addressString: string, contractName: string): ContractPrincipalCV {
   const addr = createAddress(addressString);
   const lengthPrefixedContractName = createLPString(contractName);
   return contractPrincipalCVFromAddress(addr, lengthPrefixedContractName);
 }
 
+/**
+ * Create ContractPrincipalCV from Address type
+ *
+ * @param {address} address value to be converted to ContractPrincipalCV clarity type
+ *
+ * @param {contractName} contract name of type LengthPrefixedString
+ *
+ * @returns {ContractPrincipalCV} returns instance of type ContractPrincipalCV
+ *
+ * @example
+ * ```typescript
+ *  import { contractPrincipalCVFromAddress, createLPString, createAddress } from '@stacks/transactions';
+ *
+ *  const contractAddressCV = contractPrincipalCVFromAddress(createAddress('SP2JXKMSH007NPYAQHKJPQMAQYAD90NQGTVJVQ02B'), createLPString('test'));
+ *
+ *  // { type: 6, address: { type: 0, version: 22, hash160: 'a5d9d331000f5b79578ce56bd157f29a9056f0d6' }, contractName: { type: 2, content: 'test', lengthPrefixBytes: 1, maxLengthBytes: 128 } }
+ * ```
+ *
+ * @visit
+ * {@link https://github.com/hirosystems/stacks.js/blob/master/packages/transactions/tests/clarity.test.ts clarity test cases for more examples}
+ */
 function contractPrincipalCVFromAddress(
   address: Address,
   contractName: LengthPrefixedString

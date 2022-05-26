@@ -10,14 +10,55 @@ interface StringUtf8CV {
   readonly data: string;
 }
 
+/**
+ * Converts ClarityValue to stringAsciiCV
+ *
+ * @param {data} ClarityValue value to be converted to stringAsciiCV clarity type
+ *
+ * @returns {StringAsciiCV} returns instance of type StringAsciiCV
+ *
+ * @example
+ * ```typescript
+ *  import { stringAsciiCV } from '@stacks/transactions';
+ *
+ *  const stringAscii = stringAsciiCV('test');
+ *
+ *  // { type: 13, data: 'hello' }
+ * ```
+ *
+ * @visit
+ * {@link https://github.com/hirosystems/stacks.js/blob/master/packages/transactions/tests/clarity.test.ts clarity test cases for more examples}
+ */
 const stringAsciiCV = (data: string): StringAsciiCV => {
   return { type: ClarityType.StringASCII, data };
 };
 
+/**
+ * Converts ClarityValue to stringUtf8CV
+ *
+ * @param {data} ClarityValue value to be converted to stringUtf8CV clarity type
+ *
+ * @returns {stringUtf8CV} returns instance of type stringUtf8CV
+ *
+ * @example
+ * ```typescript
+ *  import { stringUtf8CV } from '@stacks/transactions';
+ *
+ *  const stringUTF8 = stringUtf8CV('test');
+ *
+ *  // { type: 13, data: 'hello' }
+ * ```
+ *
+ * @visit
+ * {@link https://github.com/hirosystems/stacks.js/blob/master/packages/transactions/tests/clarity.test.ts clarity test cases for more examples}
+ */
 const stringUtf8CV = (data: string): StringUtf8CV => {
   return { type: ClarityType.StringUTF8, data };
 };
 
+/**
+ *  @ignore
+ */
 const stringCV = (data: string, encoding: 'ascii' | 'utf8'): StringAsciiCV | StringUtf8CV => {
   switch (encoding) {
     case 'ascii':
