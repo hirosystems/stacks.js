@@ -28,6 +28,7 @@ export default {
         { find: 'stream', replacement: 'vite-compatible-readable-stream' },
         { find: 'crypto', replacement: 'crypto-browserify' },
         { find: 'readable-stream', replacement: 'vite-compatible-readable-stream' },
+        { find: 'brorand', replacement: require.resolve('./polyfills/brorand.js') },
         { find: 'util', replacement: require.resolve('util/') },
       ],
     }),
