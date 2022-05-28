@@ -1,6 +1,6 @@
 {
   "name": "@stacks/profile",
-  "version": "4.2.0",
+  "version": "4.2.1",
   "description": "Library for Stacks profiles",
   "license": "MIT",
   "author": "Hiro Systems PBC (https://hiro.so)",
@@ -21,9 +21,9 @@
     "typecheck:watch": "npm run typecheck -- --watch"
   },
   "dependencies": {
-    "@stacks/common": "^4.2.0",
-    "@stacks/network": "^4.2.0",
-    "@stacks/transactions": "^4.2.0",
+    "@stacks/common": "^4.2.1",
+    "@stacks/network": "^4.2.1",
+    "@stacks/transactions": "^4.2.1",
     "jsontokens": "^3.0.0",
     "schema-inspector": "^2.0.1",
     "zone-file": "^2.0.0-beta.3"
