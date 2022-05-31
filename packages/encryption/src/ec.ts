@@ -512,7 +512,10 @@ export function verifyECDSA(
 ): boolean {
   const contentBuffer = getBuffer(content);
   const contentHash = hashSha256Sync(contentBuffer);
-  return verify(signature, contentHash, publicKey);
+  // verify() is strict: true by default. High-s signatures are rejected, which mirrors libsecp behavior
+  // Set verify options to strict: false, to support the legacy stacks implementations
+  // Reference: https://github.com/paulmillr/noble-secp256k1/releases/tag/1.4.0
+  return verify(signature, contentHash, publicKey, { strict: false });
 }
 
 interface VerifyMessageSignatureArgs {
@@ -534,7 +537,10 @@ export function verifyMessageSignature({
   const { r, s } = parseRecoverableSignatureVrs(signature);
   const sig = new Signature(hexToBigInt(r), hexToBigInt(s));
   const hashedMsg = typeof message === 'string' ? hashMessage(message) : message;
-  return verify(sig, hashedMsg, publicKey);
+  // verify() is strict: true by default. High-s signatures are rejected, which mirrors libsecp behavior
+  // Set verify options to strict: false, to support the legacy stacks implementations
+  // Reference: https://github.com/paulmillr/noble-secp256k1/releases/tag/1.4.0
+  return verify(sig, hashedMsg, publicKey, { strict: false });
 }
 
 /**
