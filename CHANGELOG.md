@@ -5,9 +5,19 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 ## [4.2.2](https://github.com/hirosystems/stacks.js/compare/v4.2.2-beta.0...v4.2.2) (2022-06-01)
 
-**Note:** Version bump only for package root
+
+### Bug Fixes
+
+* update jsontokens lib ([462f5e2](https://github.com/hirosystems/stacks.js/commit/462f5e2fe5809e8c0f471054b9ed31d8b311076b))
 
 
+
+## [4.2.1](https://github.com/hirosystems/stacks.js/compare/v4.2.0...v4.2.1) (2022-05-28)
+
+
+### Bug Fixes
+
+* revert polyfill removal ([695ceb9](https://github.com/hirosystems/stacks.js/commit/695ceb9a93f60af79419d92ece70cb7075abdad9))
 
 
 
