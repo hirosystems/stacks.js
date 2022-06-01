@@ -39,7 +39,7 @@
     "bip39": "^3.0.2",
     "bitcoinjs-lib": "^5.2.0",
     "c32check": "^1.1.3",
-    "jsontokens": "^3.0.0",
+    "jsontokens": "^3.1.1",
     "randombytes": "^2.1.0",
     "triplesec": "^4.0.3",
     "zone-file": "^2.0.0-beta.3"

@@ -38,7 +38,7 @@
     "express": "^4.17.1",
     "express-winston": "^3.1.0",
     "inquirer": "^7.1.0",
-    "jsontokens": "^3.0.0",
+    "jsontokens": "^3.1.1",
     "node-fetch": "^2.6.0",
     "ripemd160": "^2.0.1",
     "winston": "^3.2.1",
