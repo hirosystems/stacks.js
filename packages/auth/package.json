@@ -26,7 +26,7 @@
     "@stacks/network": "^4.2.1",
     "@stacks/profile": "^4.2.1",
     "cross-fetch": "^3.1.5",
-    "jsontokens": "^3.0.0",
+    "jsontokens": "^3.1.1",
     "query-string": "^6.13.1"
   },
   "devDependencies": {
@@ -44,7 +44,9 @@
   "typings": "dist/index.d.ts",
   "main": "dist/index.js",
   "module": "dist/esm/index.js",
-  "browser": "dist/polyfill/index.js",
+  "browser": {
+    "crypto": false
+  },
   "umd:main": "dist/umd/index.js",
   "unpkg": "dist/umd/index.js",
   "files": [
