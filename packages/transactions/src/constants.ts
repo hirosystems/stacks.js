@@ -28,6 +28,7 @@ enum StacksMessageType {
   LengthPrefixedList,
   Payload,
   MessageSignature,
+  StructuredDataSignature,
   TransactionAuthField,
 }
 
