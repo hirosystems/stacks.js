@@ -39,6 +39,7 @@
     "smart-buffer": "^4.1.0"
   },
   "devDependencies": {
+    "@stacks/encryption": "^4.2.2",
     "@types/common-tags": "^1.8.0",
     "@types/elliptic": "^6.4.12",
     "@types/jest": "^26.0.22",
