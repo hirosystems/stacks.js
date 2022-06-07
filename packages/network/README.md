@@ -58,7 +58,7 @@ import { createApiKeyMiddleware, createFetchFn, StacksMainnet } from '@stacks/ne
 import { broadcastResponse, getNonce, makeSTXTokenTransfer } from '@stacks/transactions';
 
 const myApiMiddleware = createApiKeyMiddleware('example_e8e044a3_41d8b0fe_3dd3988ef302');
-const myFetchFn = createFetchFn(apiMiddleware); // middlewares can be used to create a new fetch function
+const myFetchFn = createFetchFn(myApiMiddleware); // middlewares can be used to create a new fetch function
 const myMainnet = new StacksMainnet({ fetchFn: myFetchFn }); // the fetchFn options can be passed to a StacksNetwork to override the default fetch function
 
 const txOptions = {
