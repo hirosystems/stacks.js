@@ -4,8 +4,17 @@ import { decrypt } from '../src/encryption/decrypt';
 import { ECPair, bip32 } from 'bitcoinjs-lib';
 import { decryptContent, encryptContent, getPublicKeyFromPrivate } from '@stacks/encryption';
 import { DEFAULT_GAIA_HUB } from '../src/utils/gaia';
-import { mnemonicToSeed } from 'bip39';
 import { ChainID } from '@stacks/transactions';
+import { Buffer } from '@stacks/common';
+// https://github.com/paulmillr/scure-bip39
+// Secure, audited & minimal implementation of BIP39 mnemonic phrases.
+import { validateMnemonic, mnemonicToEntropy, entropyToMnemonic, mnemonicToSeed } from '@scure/bip39';
+// Word lists not imported by default as that would increase bundle sizes too much as in case of bitcoinjs/bip39
+// Use default english world list similiar to bitcoinjs/bip39
+// Backward compatible with bitcoinjs/bip39 dependency
+// Very small in size as compared to bitcoinjs/bip39 wordlist
+// Reference: https://github.com/paulmillr/scure-bip39
+import { wordlist } from '@scure/bip39/wordlists/english';
 
 describe('Restoring a wallet', () => {
   test('restores an existing wallet and keychain', async () => {
@@ -266,10 +275,59 @@ test('restoreIdentities', async () => {
     'password'
   );
   const seed = await mnemonicToSeed(plainTextBuffer);
-  const rootNode = bip32.fromSeed(seed);
+  const rootNode = bip32.fromSeed(Buffer.from(seed));
   await wallet.restoreIdentities({ gaiaReadURL: DEFAULT_GAIA_HUB, rootNode });
   expect(wallet.identities.length).toEqual(3);
   expect(wallet.identities[0].defaultUsername).toEqual('hankstoever.id');
   expect(wallet.identities[1].defaultUsername).toEqual('hankstoever2.id');
   expect(wallet.identities[2].defaultUsername).toEqual('hankstoever3.id');
+});
+
+test('Verify compatibility @scure/bip39 <=> bitcoinjs/bip39', () => {
+  // Consider an entropy
+  const entropy = '00000000000000000000000000000000';
+  // Consider same entropy in array format
+  const entropyUint8Array = new Uint8Array(entropy.split('').map(Number));
+
+  // Based on Aaron comment do not import bitcoinjs/bip39 for these tests
+  const bitcoinjsBip39 = {
+    // Consider it equivalent to bitcoinjs/bip39 (offloaded now)
+    // Using this map of required functions from bitcoinjs/bip39 and mocking the output for considered entropy
+    entropyToMnemonicBip39: (_: string) =>
+      'abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about',
+    validateMnemonicBip39: (_: string) => true,
+    mnemonicToEntropyBip39: (_: string) => '00000000000000000000000000000000',
+  };
+
+  // entropyToMnemonicBip39 imported from bitcoinjs/bip39
+  const bip39Mnemonic = bitcoinjsBip39.entropyToMnemonicBip39(entropy);
+  // entropyToMnemonic imported from @scure/bip39
+  const mnemonic = entropyToMnemonic(entropyUint8Array, wordlist);
+
+  //Phase 1: Cross verify mnemonic validity: @scure/bip39 <=> bitcoinjs/bip39
+
+  // validateMnemonic imported from @scure/bip39
+  expect(validateMnemonic(bip39Mnemonic, wordlist)).toEqual(true);
+  // validateMnemonicBip39 imported from bitcoinjs/bip39
+  expect(bitcoinjsBip39.validateMnemonicBip39(mnemonic)).toEqual(true);
+
+  // validateMnemonic imported from @scure/bip39
+  expect(validateMnemonic(mnemonic, wordlist)).toEqual(true);
+  // validateMnemonicBip39 imported from bitcoinjs/bip39
+  expect(bitcoinjsBip39.validateMnemonicBip39(bip39Mnemonic)).toEqual(true);
+
+  //Phase 2: Get back entropy from mnemonic and verify @scure/bip39 <=> bitcoinjs/bip39
+
+  // mnemonicToEntropy imported from @scure/bip39
+  expect(mnemonicToEntropy(mnemonic, wordlist)).toEqual(entropyUint8Array);
+  // mnemonicToEntropyBip39 imported from bitcoinjs/bip39
+  expect(bitcoinjsBip39.mnemonicToEntropyBip39(bip39Mnemonic)).toEqual(entropy);
+  // mnemonicToEntropy imported from @scure/bip39
+  expect(Buffer.from(mnemonicToEntropy(bip39Mnemonic, wordlist)).toString('hex')).toEqual(entropy);
+  // mnemonicToEntropyBip39 imported from bitcoinjs/bip39
+  const entropyString = bitcoinjsBip39.mnemonicToEntropyBip39(mnemonic);
+  // Convert entropy to bytes
+  const entropyInBytes = new Uint8Array(entropyString.split('').map(Number));
+  // entropy should match with entropyUint8Array
+  expect(entropyInBytes).toEqual(entropyUint8Array);
 });

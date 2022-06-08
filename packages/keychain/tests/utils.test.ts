@@ -7,7 +7,7 @@ import {
   recursiveRestoreIdentities,
 } from '../src/utils';
 import { Subdomains, registrars, Wallet, decrypt } from '../src';
-import { mnemonicToSeed } from 'bip39';
+import { mnemonicToSeed } from '@scure/bip39';
 import { bip32 } from 'bitcoinjs-lib';
 import { profileResponse, nameInfoResponse } from './helpers';
 import { ChainID } from '@stacks/transactions';
@@ -98,7 +98,7 @@ test('recursively makes identities', async () => {
     'password'
   );
   const seed = await mnemonicToSeed(plainTextBuffer);
-  const rootNode = bip32.fromSeed(seed);
+  const rootNode = bip32.fromSeed(Buffer.from(seed));
 
   fetchMock
     .once(JSON.stringify({ names: ['myname.id'] }))
