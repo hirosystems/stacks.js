@@ -3,7 +3,9 @@ import { decryptContent, encryptContent, getPublicKeyFromPrivate } from '@stacks
 import { createFetchFn, FetchFn } from '@stacks/network';
 import { connectToGaiaHub, GaiaHubConfig } from '@stacks/storage';
 import { ChainID } from '@stacks/transactions';
-import { mnemonicToSeed } from 'bip39';
+// https://github.com/paulmillr/scure-bip39
+// Secure, audited & minimal implementation of BIP39 mnemonic phrases.
+import { mnemonicToSeed } from '@scure/bip39';
 import { bip32, BIP32Interface } from 'bitcoinjs-lib';
 import { deriveStxAddressChain } from '../address-derivation';
 import { decrypt } from '../encryption/decrypt';
@@ -211,7 +213,7 @@ export class Wallet {
   async createNewIdentity(password: string) {
     const plainTextBuffer = await decrypt(Buffer.from(this.encryptedBackupPhrase, 'hex'), password);
     const seed = await mnemonicToSeed(plainTextBuffer);
-    const rootNode = bip32.fromSeed(seed);
+    const rootNode = bip32.fromSeed(Buffer.from(seed));
     const index = this.identities.length;
     const identity = await makeIdentity(rootNode, index);
     this.identities.push(identity);
