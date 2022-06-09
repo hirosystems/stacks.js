@@ -1,5 +1,5 @@
 {
-  "name": "@stacks/transactions",
+  "name": "something",
   "version": "4.2.1",
   "description": "Javascript library for constructing transactions on the Stacks blockchain.",
   "license": "MIT",
