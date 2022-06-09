@@ -4,17 +4,21 @@ A package for interacting with the [BNS contract](https://explorer.stacks.co/txi
 on the Stacks blockchain.
 
 ## What is BNS?
+
 The [Blockchain Naming System](https://docs.blockstack.org/build-apps/references/bns)
 (BNS) is a network system that binds Stacks usernames to off-chain
 state without relying on any central points of control.
 
 ## Installation
+
 ```
 npm install --save @stacks/bns
 ```
+
 ## Example Usages
 
-### Check availability 
+### Check availability
+
 Check if name can be registered
 
 ```typescript
@@ -29,7 +33,8 @@ const result = await canRegisterName({ fullyQualifiedName, network });
 // true / false
 ```
 
-### Get name price 
+### Get name price
+
 Get price of name registration in microstacks
 
 ```typescript
@@ -45,11 +50,12 @@ const price = await getNamePrice({ fullyQualifiedName, network });
 ```
 
 ### Steps to register name
+
 Send two transaction to secure a name, preorder and then register.
 
 1. Preorder: Generates a name preorder transaction. First step in registering a name. This transaction does not reveal the name that is about to be registered. And it sets the amount of STX to be burned for the registration.
 2. Register: Generates a name transfer transaction. This changes the owner of the registered name.
-             
+
 ### Preorder
 
 ```typescript
@@ -72,7 +78,7 @@ const stxToBurn = 200n;
 // warning: Do not expose your private key by hard coding in code. Use env variables to load private keys.
 const privateKey = '<insert private key here>'; // process.env.privateKey
 const publicKey = publicKeyToString(pubKeyfromPrivKey(privateKey));
-    
+
 // construct an unsigned bns priorder-name transaction
 // note: builder functions build transactions with AnchorMode set to Any
 const unsignedTX = await buildPreorderNameTx({
@@ -82,11 +88,11 @@ const unsignedTX = await buildPreorderNameTx({
   publicKey,
   network,
 });
-  
+
 // Sign the transaction with private key and broadcast to the network
 const signer = new TransactionSigner(unsignedTX);
 signer.signOrigin(createStacksPrivateKey(privateKey));
-  
+
 const reply: TxBroadcastResult = await broadcastTransaction(signer.transaction, network);
 // reply.txid
 // Wait for the transaction to be confirmed before sending register transaction
@@ -128,11 +134,16 @@ const unsignedTX = await buildRegisterNameTx({
 const signer = new TransactionSigner(unsignedTX);
 signer.signOrigin(createStacksPrivateKey(privateKey));
 
-const reply: TxBroadcastResult = await broadcastTransaction(signer.transaction, network, Buffer.from(zonefile));
+const reply: TxBroadcastResult = await broadcastTransaction(
+  signer.transaction,
+  network,
+  Buffer.from(zonefile)
+);
 // reply.txid
 ```
 
 ### Transfer name
+
 Transfer the ownership to other address
 
 ```typescript
@@ -163,18 +174,23 @@ const unsignedTX = await buildTransferNameTx({
   newOwnerAddress,
   publicKey,
   zonefile,
-  network
+  network,
 });
 
 // Sign the transaction with private key and broadcast to the network
 const signer = new TransactionSigner(unsignedTX);
 signer.signOrigin(createStacksPrivateKey(privateKey));
 
-const reply: TxBroadcastResult = await broadcastTransaction(signer.transaction, network, Buffer.from(zonefile));
+const reply: TxBroadcastResult = await broadcastTransaction(
+  signer.transaction,
+  network,
+  Buffer.from(zonefile)
+);
 // reply.txid
 ```
 
 ### Update name
+
 Generates a name update transaction. This changes the zonefile for the registered name.
 
 ```typescript
@@ -209,11 +225,16 @@ const unsignedTX = await buildUpdateNameTx({
 const signer = new TransactionSigner(unsignedTX);
 signer.signOrigin(createStacksPrivateKey(privateKey));
 
-const reply: TxBroadcastResult = await broadcastTransaction(signer.transaction, network, Buffer.from(zonefile));
+const reply: TxBroadcastResult = await broadcastTransaction(
+  signer.transaction,
+  network,
+  Buffer.from(zonefile)
+);
 // reply.txid
 ```
 
 ### Renew name
+
 Generates a name renew transaction. This renews a name registration.
 
 ```typescript
@@ -253,11 +274,16 @@ const unsignedTX = await buildRenewNameTx({
 const signer = new TransactionSigner(unsignedTX);
 signer.signOrigin(createStacksPrivateKey(privateKey));
 
-const reply: TxBroadcastResult = await broadcastTransaction(signer.transaction, network, Buffer.from(zonefile));
+const reply: TxBroadcastResult = await broadcastTransaction(
+  signer.transaction,
+  network,
+  Buffer.from(zonefile)
+);
 // reply.txid
 ```
 
 ### Revoke name
+
 Generates a name revoke transaction. This revokes a name registration.
 
 ```typescript

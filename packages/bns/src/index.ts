@@ -452,7 +452,6 @@ export async function buildImportNameTx({
     ],
     publicKey,
     network,
-    attachment: Buffer.from(zonefile),
   });
 }
 
@@ -605,7 +604,6 @@ export async function buildRegisterNameTx({
     ],
     network,
     publicKey,
-    attachment: Buffer.from(zonefile),
   });
 }
 
@@ -653,7 +651,6 @@ export async function buildUpdateNameTx({
     functionArgs: [bufferCVFromString(namespace), bufferCVFromString(name), bufferCV(zonefileHash)],
     publicKey,
     network,
-    attachment: Buffer.from(zonefile),
   });
 }
 
@@ -732,7 +729,6 @@ export async function buildTransferNameTx({
     functionArgs,
     publicKey,
     network,
-    attachment: zonefile ? Buffer.from(zonefile) : undefined,
     postConditions: [postConditionSender, postConditionReceiver],
   });
 }
@@ -840,7 +836,6 @@ export async function buildRenewNameTx({
     functionArgs,
     publicKey,
     network,
-    attachment: zonefile ? Buffer.from(zonefile) : undefined,
     postConditions: [burnSTXPostCondition],
   });
 }
