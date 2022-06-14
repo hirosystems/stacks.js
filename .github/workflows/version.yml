@@ -1,0 +1,45 @@
+name: version
+
+on:
+  push:
+    branches:
+      - master
+    tags-ignore:
+      - "**"
+
+  workflow_dispatch:
+
+jobs:
+  pre_run:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Cancel Previous Runs
+        uses: styfle/cancel-workflow-action@ad6cb1b847ffb509a69b745b6ee2f1d14dfe14b8
+        with:
+          access_token: ${{ github.token }}
+
+  publish_beta:
+    runs-on: ubuntu-latest
+    needs: pre_run
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      # pulls all tags (needed for lerna to correctly version)
+      - run: git fetch --depth=1 origin +refs/tags/*:refs/tags/*
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          cache: npm
+
+      - run: npm ci
+      - run: npm run bootstrap
+
+      - name: Create Release Pull Request
+        uses: changesets/action@v1
+        with:
+          version: git tag -d `git tag | grep -E 'beta'` && npx lerna version --conventional-commits --no-push --no-git-tag-version --yes
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

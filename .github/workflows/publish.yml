@@ -1,0 +1,46 @@
+name: publish
+
+on:
+  push:
+    branches:
+      - master
+    tags-ignore:
+      - "**"
+
+  workflow_dispatch:
+
+jobs:
+  pre_run:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Cancel Previous Runs
+        uses: styfle/cancel-workflow-action@ad6cb1b847ffb509a69b745b6ee2f1d14dfe14b8
+        with:
+          access_token: ${{ github.token }}
+
+  publish_beta:
+    runs-on: ubuntu-latest
+    needs: pre_run
+    if: "contains(github.event.head_commit.message, 'chore: version packages')"
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          cache: npm
+
+      - run: npm ci
+      - run: npm run bootstrap
+
+      - run: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > .npmrc
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Publish
+        run: |
+          NODE_ENV=production npx lerna publish from-package --no-verify-access --yes
+          export RELEASE=$(cat lerna.json | jq -r '.version')
+          git tag -a v$RELEASE -m v$RELEASE
+          git push origin v$RELEASE
