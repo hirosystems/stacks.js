@@ -1,0 +1,77 @@
+name: pull-request
+on: [pull_request, workflow_dispatch]
+
+jobs:
+  pre_run:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Cancel Previous Runs
+        uses: styfle/cancel-workflow-action@ad6cb1b847ffb509a69b745b6ee2f1d14dfe14b8
+        with:
+          access_token: ${{ github.token }}
+
+  code_checks:
+    runs-on: ubuntu-latest
+    needs: pre_run
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          cache: npm
+      - run: npm ci
+      - name: Bootstrap lerna
+        run: npm run bootstrap
+      - name: Check bootstrap
+        run: |
+          if [[ -n $(git status -s) ]]; then
+            git status
+            echo "Error: file tree is not clean; Likely needs bootstraping"
+            echo "Run `npm run bootstrap` and commit to resolve"
+            exit 1
+          fi
+      - run: npm run lint
+      - run: npm run typecheck
+      - name: Check for circular dependencies
+        run: npm run madge
+      - run: npm run lerna run test --stream --parallel -- -- --coverage
+      - uses: codecov/codecov-action@v1
+
+  check_fork:
+    runs-on: ubuntu-latest
+    outputs:
+      is_not_fork: ${{ steps.check.outputs.is_not_fork }}
+    steps:
+      - id: check
+        run: echo "::set-output name=is_not_fork::${{ env.NPM_TOKEN != '' }}"
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  publish_npm_pr:
+    runs-on: ubuntu-latest
+    needs: [pre_run, check_fork]
+    if: needs.check_fork.outputs.is_not_fork == 'true'
+    steps:
+      - uses: actions/checkout@v3
+        if: github.event_name == 'pull_request'
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+      - uses: actions/checkout@v3
+        if: github.event_name == 'workflow_dispatch'
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          cache: npm
+      - run: npm ci
+      - run: npm run bootstrap
+      - id: git-commit
+        run: echo "::set-output name=sha::$(git rev-parse --short HEAD)"
+      - run: echo $SHA
+        env:
+          SHA: ${{ steps.git-commit.outputs.sha }}
+      - run: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > .npmrc
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - run: npx lerna publish prepatch --preid pr.$SHA --dist-tag pr --no-verify-access --no-push --no-git-tag-version --yes
+        env:
+          SHA: ${{ steps.git-commit.outputs.sha }}
