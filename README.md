@@ -1,4 +1,4 @@
-# stacks.js [![Test Action](https://github.com/hirosystems/stacks.js/actions/workflows/tests.yml/badge.svg?branch=master)](https://github.com/hirosystems/stacks.js/actions/workflows/tests.yml?query=branch%3Amaster)
+# Stacks.js [![Test Action](https://img.shields.io/github/lerna-json/v/hirosystems/stacks.js?label=monorepo)](https://github.com/hirosystems/stacks.js/tree/master/packages)
 
 This repo is home to most of the stacks.js libraries, which provide everything you need to work with the [Stacks blockchain](https://www.stacks.co/what-is-stacks) from JavaScript/TypeScript.
 
@@ -29,7 +29,7 @@ See `README` in each package directory for installation instructions and usage.
 
 ## Importing & Polyfills
 
-Most of the stacks.js packages are released in multiple different forms.
+Most of the Stacks.js packages are released in multiple different forms.
 These typically include:
 
 - `commonjs` under `/dist`
@@ -62,7 +62,7 @@ Otherwise, [open a new issue](https://github.com/hirosystems/stacks.js/issues/ne
 
 ## Migrating from blockstack.js
 
-To migrate your app from blockstack.js to stacks.js follow the steps in the [migration guide](https://github.com/hirosystems/stacks.js/tree/master/.github/MIGRATION_GUIDE.md).
+To migrate your app from blockstack.js to Stacks.js follow the steps in the [migration guide](https://github.com/hirosystems/stacks.js/tree/master/.github/MIGRATION_GUIDE.md).
 
 ## Development: environment setup
 
