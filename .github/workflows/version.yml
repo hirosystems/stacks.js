@@ -40,7 +40,7 @@ jobs:
         # hack changesets/action to allow not using changesets
       - run: |
           mkdir .changeset
-          touch .changeset/fake-changeset.md
+          echo '---\n---\n' > .changeset/fake-changeset.md
           echo '.changeset/fake-changeset.md' >> .git/info/exclude
 
       - name: Create Release Pull Request
