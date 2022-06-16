@@ -7,6 +7,8 @@ on:
     tags-ignore:
       - "**"
 
+  pull_request:
+
   workflow_dispatch:
 
 jobs:
@@ -26,18 +28,19 @@ jobs:
         with:
           fetch-depth: 0
 
-      # pulls all tags (needed for lerna to correctly version)
-      - run: git fetch --depth=1 origin +refs/tags/*:refs/tags/*
-
       - uses: actions/setup-node@v3
         with:
           node-version: 16
           cache: npm
 
+      - run: |
+          git rev-parse --short HEAD
+          git tag
+
       - run: npm ci
       - run: npm run bootstrap
 
-        # hack changesets/action to allow not using changesets
+      # hack changesets/action to allow not using changesets
       - run: |
           npx changeset init
           npx changeset --empty
