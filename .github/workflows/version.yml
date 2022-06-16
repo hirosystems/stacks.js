@@ -46,7 +46,7 @@ jobs:
       - run: git tag -d $(git tag | grep 'beta')
 
       - name: Create Release Pull Request
-        uses: changesets/action@v1
+        uses: janniks/changesets-action@main
         with:
           title: "chore: version packages"
           commit: "chore: version packages"
