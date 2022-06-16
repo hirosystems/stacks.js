@@ -23,6 +23,7 @@
     "typecheck": "lerna run typecheck --parallel --no-bail --stream"
   },
   "devDependencies": {
+    "@changesets/cli": "^2.23.0",
     "@janniks/typedoc-plugin-monorepo": "^0.4.2-1",
     "@janniks/typedoc-theme-stacks": "^1.0.1",
     "@rollup/plugin-alias": "^3.1.9",

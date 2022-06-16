@@ -39,9 +39,9 @@ jobs:
 
         # hack changesets/action to allow not using changesets
       - run: |
-          mkdir .changeset
-          echo '---\n---\n' > .changeset/fake-changeset.md
-          echo '.changeset/fake-changeset.md' >> .git/info/exclude
+          npx changeset init
+          npx changeset --empty
+          echo '.changeset/' >> .git/info/exclude
 
       - name: Create Release Pull Request
         uses: changesets/action@v1
