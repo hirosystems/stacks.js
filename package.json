@@ -47,7 +47,6 @@
     "eslint-plugin-node": "^11.1.0",
     "inspectpack": "^4.7.1",
     "lerna": "^4.0.0",
-    "lerna-from-npm": "^1.0.0",
     "madge": "^5.0.1",
     "path-browserify": "^1.0.1",
     "prettier": "^2.5.1",

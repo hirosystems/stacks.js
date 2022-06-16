@@ -47,12 +47,13 @@ jobs:
 
       - name: Version & Publish
         run: |
-          npx lerna-from-npm
-          git tag -d `git tag | grep -E 'beta'`
-          npx lerna version --conventional-commits --conventional-prerelease --force-publish --preid beta --no-push --no-git-tag-version --yes
-          git commit -a -m 'DONT PUSH'
+          LATEST=$(git describe --tags --abbrev=0)
+          npx lerna version $LATEST --force-publish --no-changelog --no-push --no-git-tag-version --yes
+          git commit -a -m 'DONT PUSH: fast-forward to latest npm release' --allow-empty
+          npx lerna version --conventional-commits --conventional-prerelease --force-publish --preid beta --no-changelog --no-push --no-git-tag-version --yes
+          git commit -a -m 'DONT PUSH: version beta release' --allow-empty
+          RELEASE=$(cat lerna.json | jq -r '.version')
           npx lerna publish from-package --no-verify-access --pre-dist-tag beta --yes
-          export RELEASE=$(cat lerna.json | jq -r '.version')
-          git reset HEAD~ --hard
+          git reset HEAD~2 --hard
           git tag v$RELEASE
           git push origin v$RELEASE

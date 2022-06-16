@@ -40,7 +40,7 @@ jobs:
 
       - name: Publish
         run: |
-          NODE_ENV=production npx lerna publish from-package --no-verify-access --yes
-          export RELEASE=$(cat lerna.json | jq -r '.version')
+          npx lerna publish from-package --no-verify-access --yes
+          RELEASE=$(cat lerna.json | jq -r '.version')
           git tag -a v$RELEASE -m v$RELEASE
           git push origin v$RELEASE
