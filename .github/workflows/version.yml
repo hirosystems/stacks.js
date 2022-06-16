@@ -45,6 +45,8 @@ jobs:
       - name: Create Release Pull Request
         uses: changesets/action@v1
         with:
+          title: "chore: version packages"
+          commit: "chore: version packages"
           version: git tag -d `git tag | grep -E 'beta'` && npx lerna version --conventional-commits --no-push --no-git-tag-version --yes
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
