@@ -48,6 +48,6 @@ jobs:
         with:
           title: "chore: version packages"
           commit: "chore: version packages"
-          version: git tag -d `git tag | grep -E 'beta'` && npx lerna version --conventional-commits --no-push --no-git-tag-version --yes
+          version: git tag -d `git tag | grep 'beta'` && npx lerna version --conventional-commits --no-push --no-git-tag-version --yes
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
