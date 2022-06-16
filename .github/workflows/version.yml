@@ -41,7 +41,7 @@ jobs:
       - run: |
           mkdir .changesets
           touch .changesets/fake-changeset.md
-          git update-index --assume-unchanged .changesets/fake-changeset.md
+          echo '.changesets/fake-changeset.md' >> .git/info/exclude
 
       - name: Create Release Pull Request
         uses: changesets/action@v1
