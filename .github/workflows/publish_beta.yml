@@ -41,7 +41,7 @@ jobs:
       - run: git config --local user.email 'action@github.com'
       - run: git config --local user.name 'GitHub Action'
 
-      - run: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > .npmrc
+      - run: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > ~/.npmrc
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
@@ -49,7 +49,7 @@ jobs:
         run: |
           npx lerna-from-npm
           git tag -d `git tag | grep -E 'beta'`
-          npx lerna version --conventional-commits --conventional-prerelease --preid beta --no-push --no-git-tag-version  --yes
+          npx lerna version --conventional-commits --conventional-prerelease --force-publish --preid beta --no-push --no-git-tag-version --yes
           git commit -a -m 'DONT PUSH'
           npx lerna publish from-package --no-verify-access --pre-dist-tag beta --yes
           export RELEASE=$(cat lerna.json | jq -r '.version')
