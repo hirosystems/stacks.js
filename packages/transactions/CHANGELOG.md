@@ -3,6 +3,23 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.3.0](https://github.com/hirosystems/stacks.js/compare/v4.2.2...v4.3.0) (2022-06-16)
+
+
+### Bug Fixes
+
+* add clarity typedoc annotations ([b95783d](https://github.com/hirosystems/stacks.js/commit/b95783db54d8a5294c7f10e67ccb0f2c529aef75))
+* export structuredDataSignature ([5e8736b](https://github.com/hirosystems/stacks.js/commit/5e8736bcf572d7334947c040b218a82598bfb2e0))
+
+
+### Features
+
+* add SIP-018 support ([a4c0577](https://github.com/hirosystems/stacks.js/commit/a4c0577c7e6fb5010eb886c3b04c2636282e442a)), closes [#1283](https://github.com/hirosystems/stacks.js/issues/1283) [#1281](https://github.com/hirosystems/stacks.js/issues/1281)
+
+
+
+
+
 # [4.2.0](https://github.com/hirosystems/stacks.js/compare/v4.1.2...v4.2.0) (2022-05-25)
 
 
