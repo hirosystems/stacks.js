@@ -21,7 +21,7 @@ interface ResponseOkCV<T extends ClarityValue = ClarityValue> {
  * @returns {responseErrorCV} returns instance of type responseErrorCV
  *
  * @example
- * ```typescript
+ * ```
  *  import { responseErrorCV, intCV } from '@stacks/transactions';
  *
  *  const respErrorCV = responseErrorCV(intCV(1));
@@ -44,7 +44,7 @@ function responseErrorCV<T extends ClarityValue = ClarityValue>(value: T): Respo
  * @returns {ResponseOkCV} returns instance of type ResponseOkCV
  *
  * @example
- * ```typescript
+ * ```
  *  import { responseOkCV, intCV } from '@stacks/transactions';
  *
  *  const respOKCV = responseOkCV(intCV(1));

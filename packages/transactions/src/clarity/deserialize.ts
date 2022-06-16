@@ -29,7 +29,7 @@ import { stringAsciiCV, stringUtf8CV } from './types/stringCV';
  * @returns {ClarityType} returns the clarity type instance
  *
  * @example
- * ```typescript
+ * ```
  *  import { intCV, serializeCV, deserializeCV } from '@stacks/transactions';
  *
  *  const serialized = serializeCV(intCV(100)); // Similarly works for other clarity types as well like listCV, booleanCV ...

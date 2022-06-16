@@ -136,7 +136,7 @@ function serializeStringUtf8CV(cv: StringUtf8CV) {
  * @returns {Buffer} returns the buffer instance
  *
  * @example
- * ```typescript
+ * ```
  *  import { intCV, serializeCV } from '@stacks/transactions';
  *
  *  const serialized = serializeCV(intCV(100)); // Similarly works for other clarity types as well like listCV, booleanCV ...

@@ -20,7 +20,7 @@ interface IntCV {
  * @returns {IntCV} returns instance of type IntCV
  *
  * @example
- * ```typescript
+ * ```
  *  import { intCV } from '@stacks/transactions';
  *
  *  const value = intCV('100'); // parameter any of type: number | string | bigint | Uint8Array | BN
@@ -57,7 +57,7 @@ interface UIntCV {
  * @returns {UIntCV} returns instance of type UIntCV
  *
  * @example
- * ```typescript
+ * ```
  *  import { uintCV } from '@stacks/transactions';
  *
  *  const value = uintCV('100'); // parameter any of type: number | string | bigint | Uint8Array | BN
