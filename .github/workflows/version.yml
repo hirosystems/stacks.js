@@ -43,11 +43,13 @@ jobs:
           npx changeset --empty
           echo '.changeset/' >> .git/info/exclude
 
+      - run: git tag -d $(git tag | grep 'beta')
+
       - name: Create Release Pull Request
         uses: changesets/action@v1
         with:
           title: "chore: version packages"
           commit: "chore: version packages"
-          version: git tag -d `git tag | grep 'beta'` && npx lerna version --conventional-commits --no-push --no-git-tag-version --yes
+          version: npx lerna version --conventional-commits --no-push --no-git-tag-version --yes
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
