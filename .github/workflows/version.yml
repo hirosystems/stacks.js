@@ -39,6 +39,7 @@ jobs:
 
         # hack changesets/action to allow not using changesets
       - run: |
+          mkdir .changesets
           touch .changesets/fake-changeset.md
           git update-index --assume-unchanged .changesets/fake-changeset.md
 
