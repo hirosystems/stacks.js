@@ -44,7 +44,7 @@ function principalCV(principal: string): PrincipalCV {
  * @returns {StandardPrincipalCV} returns instance of type StandardPrincipalCV
  *
  * @example
- * ```typescript
+ * ```
  *  import { standardPrincipalCV } from '@stacks/transactions';
  *
  *  const addr = standardPrincipalCV('SP2JXKMSH007NPYAQHKJPQMAQYAD90NQGTVJVQ02B');
@@ -67,7 +67,7 @@ function standardPrincipalCV(addressString: string): StandardPrincipalCV {
  * @returns {StandardPrincipalCV} returns instance of type StandardPrincipalCV
  *
  * @example
- * ```typescript
+ * ```
  *  import { standardPrincipalCVFromAddress, Address  } from '@stacks/transactions';
  *
  *  const address: Address = {
@@ -97,7 +97,7 @@ function standardPrincipalCVFromAddress(address: Address): StandardPrincipalCV {
  * @returns {ContractPrincipalCV} returns instance of type ContractPrincipalCV
  *
  * @example
- * ```typescript
+ * ```
  *  import { contractPrincipalCV } from '@stacks/transactions';
  *
  *  const contractAddress = contractPrincipalCV('SP2JXKMSH007NPYAQHKJPQMAQYAD90NQGTVJVQ02B', 'test');
@@ -123,7 +123,7 @@ function contractPrincipalCV(addressString: string, contractName: string): Contr
  * @returns {ContractPrincipalCV} returns instance of type ContractPrincipalCV
  *
  * @example
- * ```typescript
+ * ```
  *  import { contractPrincipalCVFromAddress, createLPString, createAddress } from '@stacks/transactions';
  *
  *  const contractAddressCV = contractPrincipalCVFromAddress(createAddress('SP2JXKMSH007NPYAQHKJPQMAQYAD90NQGTVJVQ02B'), createLPString('test'));

@@ -14,7 +14,7 @@ interface BufferCV {
  * @returns {BufferCV} returns instance of type BufferCV
  *
  * @example
- * ```typescript
+ * ```
  *  import { bufferCV } from '@stacks/transactions';
  *
  *  const buffer = Buffer.from('this is a test');
@@ -43,7 +43,7 @@ const bufferCV = (buffer: Buffer): BufferCV => {
  * @returns {BufferCV} returns instance of type BufferCV
  *
  * @example
- * ```typescript
+ * ```
  *  import { bufferCVFromString } from '@stacks/transactions';
  *
  *  const str = 'this is a test';

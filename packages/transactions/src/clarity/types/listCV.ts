@@ -14,7 +14,7 @@ interface ListCV<T extends ClarityValue = ClarityValue> {
  * @returns {ListCV<T>} returns instance of type ListCV<T>
  *
  * @example
- * ```typescript
+ * ```
  *  import { listCV, intCV } from '@stacks/transactions';
  *
  *  const list = listCV([intCV(1), intCV(2), intCV(3), intCV(-4)]);

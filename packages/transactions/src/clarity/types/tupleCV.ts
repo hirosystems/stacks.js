@@ -17,7 +17,7 @@ interface TupleCV<T extends TupleData = TupleData> {
  * @returns {TupleCV} returns instance of type clarity tuple
  *
  * @example
- * ```typescript
+ * ```
  *  import { tupleCV, trueCV, falseCV } from '@stacks/transactions';
  *
  *  const tuple = tupleCV({

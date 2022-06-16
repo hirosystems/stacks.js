@@ -17,7 +17,7 @@ interface SomeCV<T extends ClarityValue = ClarityValue> {
  * @returns {NoneCV} returns instance of type NoneCV
  *
  * @example
- * ```typescript
+ * ```
  *  import { noneCV } from '@stacks/transactions';
  *
  *  const value = noneCV();
@@ -39,7 +39,7 @@ function noneCV(): NoneCV {
  * @returns {OptionalCV} returns instance of type OptionalCV
  *
  * @example
- * ```typescript
+ * ```
  *  import { someCV, trueCV } from '@stacks/transactions';
  *
  *  const value = someCV(trueCV());

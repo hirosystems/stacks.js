@@ -16,7 +16,7 @@ interface FalseCV {
  * @returns {BooleanCV} returns instance of type BooleanCV
  *
  * @example
- * ```typescript
+ * ```
  *  import { trueCV } from '@stacks/transactions';
  *
  *  const trueCV = trueCV();
@@ -34,7 +34,7 @@ const trueCV = (): BooleanCV => ({ type: ClarityType.BoolTrue });
  * @returns {BooleanCV} returns instance of type BooleanCV
  *
  * @example
- * ```typescript
+ * ```
  *  import { falseCV } from '@stacks/transactions';
  *
  *  const falseCV = falseCV();

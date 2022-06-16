@@ -18,7 +18,7 @@ interface StringUtf8CV {
  * @returns {StringAsciiCV} returns instance of type StringAsciiCV
  *
  * @example
- * ```typescript
+ * ```
  *  import { stringAsciiCV } from '@stacks/transactions';
  *
  *  const stringAscii = stringAsciiCV('test');
@@ -41,7 +41,7 @@ const stringAsciiCV = (data: string): StringAsciiCV => {
  * @returns {stringUtf8CV} returns instance of type stringUtf8CV
  *
  * @example
- * ```typescript
+ * ```
  *  import { stringUtf8CV } from '@stacks/transactions';
  *
  *  const stringUTF8 = stringUtf8CV('test');
