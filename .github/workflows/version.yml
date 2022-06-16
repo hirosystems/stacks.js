@@ -37,6 +37,11 @@ jobs:
       - run: npm ci
       - run: npm run bootstrap
 
+        # hack changesets/action to allow not using changesets
+      - run: |
+          touch .changesets/fake-changeset.md
+          git update-index --assume-unchanged .changesets/fake-changeset.md
+
       - name: Create Release Pull Request
         uses: changesets/action@v1
         with:
