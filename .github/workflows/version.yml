@@ -25,9 +25,7 @@ jobs:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
-
-      # pulls all tags (needed for lerna to correctly version)
-      - run: git fetch --depth=1 origin +refs/tags/*:refs/tags/*
+          ref: master
 
       - uses: actions/setup-node@v3
         with:
@@ -37,7 +35,7 @@ jobs:
       - run: npm ci
       - run: npm run bootstrap
 
-        # hack changesets/action to allow not using changesets
+      # hack changesets/action to allow not using changesets
       - run: |
           npx changeset init
           npx changeset --empty
