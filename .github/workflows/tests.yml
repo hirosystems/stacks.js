@@ -1,5 +1,13 @@
 name: tests
-on: [workflow_call, workflow_dispatch]
+on:
+  push:
+    branches:
+      - master
+    tags-ignore:
+      - "**"
+
+  workflow_call:
+  workflow_dispatch:
 
 jobs:
   tests:

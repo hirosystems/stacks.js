@@ -9,6 +9,10 @@ on:
 
   workflow_dispatch:
 
+env:
+  COMMIT_USER: Hiro DevOps
+  COMMIT_EMAIL: 45208873+blockstack-devops@users.noreply.github.com
+
 jobs:
   pre-run:
     uses: ./.github/workflows/pre-run.yml
