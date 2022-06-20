@@ -9,6 +9,7 @@
     "bootstrap": "lerna bootstrap",
     "build": "lerna run build",
     "build:docs": "rimraf docs && RELEASE_VERSION=$(node -p \"require('./lerna.json').version\") && typedoc --tsconfig tsconfig.typedoc.json packages/**/src/index.ts --release-version $RELEASE_VERSION",
+    "ci:version": "npx lerna version --conventional-commits --no-push --no-git-tag-version --yes && npx lerna bootstrap",
     "clean": "lerna clean",
     "lerna": "lerna",
     "lint": "npm run lint:eslint && npm run lint:prettier",
@@ -20,8 +21,7 @@
     "madge": "madge --circular --extensions ts --exclude 'd.ts' packages/",
     "pack": "lerna run pack",
     "test": "lerna run test",
-    "typecheck": "lerna run typecheck --parallel --no-bail --stream",
-    "version": "npx lerna version --conventional-commits --no-push --no-git-tag-version --yes && npx lerna bootstrap"
+    "typecheck": "lerna run typecheck --parallel --no-bail --stream"
   },
   "devDependencies": {
     "@changesets/cli": "^2.23.0",
