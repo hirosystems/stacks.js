@@ -1,0 +1,37 @@
+name: tests
+on: [workflow_call, workflow_dispatch]
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          cache: npm
+      - run: npm ci
+
+      - name: Bootstrap lerna
+        run: npm run bootstrap
+      - name: Check bootstrap
+        run: |
+          if [[ -n $(git status -s) ]]; then
+            git status
+            echo "Error: file tree is not clean; Likely needs bootstraping"
+            echo "Run `npm run bootstrap` and commit to resolve"
+            exit 1
+          fi
+
+      - name: Run lint
+        run: npm run lint
+      - name: Run typecheck
+        run: npm run typecheck
+      - name: Check for circular dependencies
+        run: npm run madge
+
+      - name: Run tests
+        run: npm run lerna run test --stream --parallel -- -- --coverage
+
+      - name: Upload test coverage
+        uses: codecov/codecov-action@v1

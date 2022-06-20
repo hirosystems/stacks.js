@@ -1,0 +1,40 @@
+name: pull-request
+on: [pull_request, workflow_dispatch]
+
+jobs:
+  pre-run:
+    uses: ./.github/workflows/pre-run.yml
+    secrets: inherit
+
+  tests:
+    needs: pre-run
+    uses: ./.github/workflows/tests.yml
+
+  publish-pr:
+    runs-on: ubuntu-latest
+    needs: [pre-run, tests]
+    if: needs.pre-run.outputs.is-not-fork == 'true'
+    steps:
+      - uses: actions/checkout@v3
+        if: github.event_name == 'pull_request'
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+      - uses: actions/checkout@v3
+        if: github.event_name == 'workflow_dispatch'
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          cache: npm
+      - run: npm ci
+      - run: npm run bootstrap
+      - id: git-commit
+        run: echo "::set-output name=sha::$(git rev-parse --short HEAD)"
+      - run: echo $SHA
+        env:
+          SHA: ${{ steps.git-commit.outputs.sha }}
+      - run: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > ~/.npmrc
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - run: npx lerna publish prepatch --preid pr.$SHA --dist-tag pr --no-verify-access --no-push --no-git-tag-version --yes
+        env:
+          SHA: ${{ steps.git-commit.outputs.sha }}
