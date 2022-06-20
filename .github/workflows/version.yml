@@ -48,6 +48,6 @@ jobs:
         with:
           title: "chore: version packages"
           commit: "chore: version packages"
-          version: npx lerna version --conventional-commits --no-push --no-git-tag-version --yes
+          version: npm run version
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN || secrets.GITHUB_TOKEN }}
