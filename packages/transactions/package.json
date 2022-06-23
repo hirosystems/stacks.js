@@ -1,6 +1,6 @@
 {
   "name": "@stacks/transactions",
-  "version": "4.3.0",
+  "version": "4.3.1",
   "description": "Javascript library for constructing transactions on the Stacks blockchain.",
   "license": "MIT",
   "author": "Hiro Systems PBC (https://hiro.so)",
@@ -39,7 +39,7 @@
     "smart-buffer": "^4.1.0"
   },
   "devDependencies": {
-    "@stacks/encryption": "^4.3.0",
+    "@stacks/encryption": "^4.3.1",
     "@types/common-tags": "^1.8.0",
     "@types/elliptic": "^6.4.12",
     "@types/jest": "^26.0.22",
