@@ -325,7 +325,7 @@ export class StackingClient {
     return Promise.all([balancePromise, poxInfoPromise])
       .then(([balance, poxInfo]) => {
         const { hashMode, data } = decodeBtcAddress(poxAddress);
-        const hashModeBuffer = bufferCV(toBuffer(BigInt(hashMode)));
+        const hashModeBuffer = bufferCV(toBuffer(BigInt(hashMode), 1));
         const hashbytes = bufferCV(data);
         const poxAddressCV = tupleCV({
           hashbytes,
