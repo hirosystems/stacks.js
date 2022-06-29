@@ -2001,5 +2001,6 @@ export const testables =
         getStacksWalletKey,
         register,
         preorder,
+        canStack,
       }
     : undefined;

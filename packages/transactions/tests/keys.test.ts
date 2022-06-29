@@ -40,6 +40,17 @@ import { serializeDeserialize } from './macros';
 // Better do it once and reuse it
 const ec = new EC('secp256k1');
 
+test('pubKeyfromPrivKey', () => {
+  expect(
+    pubKeyfromPrivKey('edf9aee84d9b7abc145504dde6726c64f369d37ee34ded868fabd876c26570bc01').data
+      .byteLength
+  ).toBe(33);
+  expect(
+    pubKeyfromPrivKey('edf9aee84d9b7abc145504dde6726c64f369d37ee34ded868fabd876c26570bc').data
+      .byteLength
+  ).toBe(65);
+});
+
 test('Stacks public key and private keys', () => {
   const privKeyString = 'edf9aee84d9b7abc145504dde6726c64f369d37ee34ded868fabd876c26570bc';
   const pubKeyString =

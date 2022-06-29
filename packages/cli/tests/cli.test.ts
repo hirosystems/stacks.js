@@ -4,17 +4,34 @@ import { CLI_CONFIG_TYPE } from '../src/argparse';
 
 import * as fixtures from './fixtures/cli.fixture';
 import inquirer from 'inquirer';
-import {ClarityAbi} from '@stacks/transactions';
-import {readFileSync} from 'fs';
+import { ClarityAbi } from '@stacks/transactions';
+import { readFileSync } from 'fs';
 import path from 'path';
 import fetchMock from 'jest-fetch-mock';
-import { makekeychainTests, keyInfoTests, MakeKeychainResult, WalletKeyInfoResult } from './derivation-path/keychain';
+import {
+  makekeychainTests,
+  keyInfoTests,
+  MakeKeychainResult,
+  WalletKeyInfoResult,
+} from './derivation-path/keychain';
 
-const TEST_ABI: ClarityAbi = JSON.parse(readFileSync(path.join(__dirname, './abi/test-abi.json')).toString());
-const TEST_FEE_ESTIMATE = JSON.parse(readFileSync(path.join(__dirname, './fee-estimate/test-fee-estimate.json')).toString());
+const TEST_ABI: ClarityAbi = JSON.parse(
+  readFileSync(path.join(__dirname, './abi/test-abi.json')).toString()
+);
+const TEST_FEE_ESTIMATE = JSON.parse(
+  readFileSync(path.join(__dirname, './fee-estimate/test-fee-estimate.json')).toString()
+);
 jest.mock('inquirer');
 
-const { addressConvert, contractFunctionCall, makeKeychain, getStacksWalletKey, preorder, register } = testables as any;
+const {
+  addressConvert,
+  contractFunctionCall,
+  makeKeychain,
+  getStacksWalletKey,
+  preorder,
+  register,
+  canStack,
+} = testables as any;
 
 const mainnetNetwork = new CLINetworkAdapter(
   getNetwork({} as CLI_CONFIG_TYPE, false),
@@ -42,14 +59,7 @@ describe('Contract function call', () => {
     const fee = 200;
     const nonce = 0;
     const privateKey = 'cb3df38053d132895220b9ce471f6b676db5b9bf0b4adefb55f2118ece2478df01';
-    const args = [
-      contractAddress,
-      contractName,
-      functionName,
-      fee,
-      nonce,
-      privateKey
-    ];
+    const args = [contractAddress, contractName, functionName, fee, nonce, privateKey];
     const contractInputArg = { currency: 'USD' };
 
     // @ts-ignore
@@ -70,14 +80,7 @@ describe('Contract function call', () => {
     const fee = 210;
     const nonce = 1;
     const privateKey = 'cb3df38053d132895220b9ce471f6b676db5b9bf0b4adefb55f2118ece2478df01';
-    const args = [
-      contractAddress,
-      contractName,
-      functionName,
-      fee,
-      nonce,
-      privateKey
-    ];
+    const args = [contractAddress, contractName, functionName, fee, nonce, privateKey];
     const contractInputArg = { msg: 'plain text' };
 
     // @ts-ignore
@@ -98,14 +101,7 @@ describe('Contract function call', () => {
     const fee = 220;
     const nonce = 2;
     const privateKey = 'cb3df38053d132895220b9ce471f6b676db5b9bf0b4adefb55f2118ece2478df01';
-    const args = [
-      contractAddress,
-      contractName,
-      functionName,
-      fee,
-      nonce,
-      privateKey
-    ];
+    const args = [contractAddress, contractName, functionName, fee, nonce, privateKey];
     const contractInputArg = { optional: 'optional string-utf8 string' };
 
     // @ts-ignore
@@ -126,14 +122,7 @@ describe('Contract function call', () => {
     const fee = 230;
     const nonce = 3;
     const privateKey = 'cb3df38053d132895220b9ce471f6b676db5b9bf0b4adefb55f2118ece2478df01';
-    const args = [
-      contractAddress,
-      contractName,
-      functionName,
-      fee,
-      nonce,
-      privateKey
-    ];
+    const args = [contractAddress, contractName, functionName, fee, nonce, privateKey];
     const contractInputArg = {
       amount: 1000,
       address: 'STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6',
@@ -158,16 +147,9 @@ describe('Contract function call', () => {
     const fee = 240;
     const nonce = 4;
     const privateKey = 'cb3df38053d132895220b9ce471f6b676db5b9bf0b4adefb55f2118ece2478df01';
-    const args = [
-      contractAddress,
-      contractName,
-      functionName,
-      fee,
-      nonce,
-      privateKey
-    ];
+    const args = [contractAddress, contractName, functionName, fee, nonce, privateKey];
     const contractInputArg = {
-      bufferArg: 'string buffer'
+      bufferArg: 'string buffer',
     };
 
     // @ts-ignore
@@ -183,54 +165,55 @@ describe('Contract function call', () => {
 });
 
 describe('Keychain custom derivation path', () => {
-  test.each(makekeychainTests)('Make keychain using custom derivation path %#', async (derivationPath: string, keyChainResult: MakeKeychainResult) => {
-    const encrypted = 'vim+XrRNSm+SqSn0MyWNEi/e+UK5kX8WGCLE/sevT6srZG+quzpp911sWP0CcvsExCH1M4DgOfOldMitLdkq1b6rApDwtAcOWdAqiaBk37M=';
-    const args = [encrypted, derivationPath];
+  test.each(makekeychainTests)(
+    'Make keychain using custom derivation path %#',
+    async (derivationPath: string, keyChainResult: MakeKeychainResult) => {
+      const encrypted =
+        'vim+XrRNSm+SqSn0MyWNEi/e+UK5kX8WGCLE/sevT6srZG+quzpp911sWP0CcvsExCH1M4DgOfOldMitLdkq1b6rApDwtAcOWdAqiaBk37M=';
+      const args = [encrypted, derivationPath];
 
-    // Mock TTY
-    process.stdin.isTTY = true;
-    process.env.password = 'supersecret';
+      // Mock TTY
+      process.stdin.isTTY = true;
+      process.env.password = 'supersecret';
 
-    const keyChain = await makeKeychain(testnetNetwork, args);
-    const result = JSON.parse(keyChain);
-    expect(result).toEqual(keyChainResult);
-    // Unmock TTY
-    process.stdin.isTTY = false;
-    process.env.password = undefined;
-  });
+      const keyChain = await makeKeychain(testnetNetwork, args);
+      const result = JSON.parse(keyChain);
+      expect(result).toEqual(keyChainResult);
+      // Unmock TTY
+      process.stdin.isTTY = false;
+      process.env.password = undefined;
+    }
+  );
 
-  test.each(keyInfoTests)('Make keychain using custom derivation path %#', async (derivationPath: string, walletInfoResult: WalletKeyInfoResult ) => {
-    const encrypted = 'vim+XrRNSm+SqSn0MyWNEi/e+UK5kX8WGCLE/sevT6srZG+quzpp911sWP0CcvsExCH1M4DgOfOldMitLdkq1b6rApDwtAcOWdAqiaBk37M=';
-    const args = [encrypted, derivationPath];
+  test.each(keyInfoTests)(
+    'Make keychain using custom derivation path %#',
+    async (derivationPath: string, walletInfoResult: WalletKeyInfoResult) => {
+      const encrypted =
+        'vim+XrRNSm+SqSn0MyWNEi/e+UK5kX8WGCLE/sevT6srZG+quzpp911sWP0CcvsExCH1M4DgOfOldMitLdkq1b6rApDwtAcOWdAqiaBk37M=';
+      const args = [encrypted, derivationPath];
 
-    // Mock TTY
-    process.stdin.isTTY = true;
-    process.env.password = 'supersecret';
+      // Mock TTY
+      process.stdin.isTTY = true;
+      process.env.password = 'supersecret';
 
-    const walletKey = await getStacksWalletKey(testnetNetwork, args);
-    const result = JSON.parse(walletKey);
-    expect(result).toEqual([
-      walletInfoResult
-    ]);
-    // Unmock TTY
-    process.stdin.isTTY = false;
-    process.env.password = undefined;
-  });
+      const walletKey = await getStacksWalletKey(testnetNetwork, args);
+      const result = JSON.parse(walletKey);
+      expect(result).toEqual([walletInfoResult]);
+      // Unmock TTY
+      process.stdin.isTTY = false;
+      process.env.password = undefined;
+    }
+  );
 });
 
 describe('BNS', () => {
   test('buildRegisterNameTx', async () => {
     const fullyQualifiedName = 'test.id';
     const ownerKey = '0d146cf7289dd0b6f41385b0dbc733167c5dffc6534c59cafd63a615f59095d8';
-    const salt =  'salt';
+    const salt = 'salt';
     const zonefile = 'zonefile';
 
-    const args = [
-      fullyQualifiedName,
-      ownerKey,
-      salt,
-      zonefile,
-    ];
+    const args = [fullyQualifiedName, ownerKey, salt, zonefile];
 
     const mockedResponse = JSON.stringify(TEST_FEE_ESTIMATE);
 
@@ -246,15 +229,10 @@ describe('BNS', () => {
   test('buildPreorderNameTx', async () => {
     const fullyQualifiedName = 'test.id';
     const privateKey = '0d146cf7289dd0b6f41385b0dbc733167c5dffc6534c59cafd63a615f59095d8';
-    const salt =  'salt';
+    const salt = 'salt';
     const stxToBurn = '1000';
 
-    const args = [
-      fullyQualifiedName,
-      privateKey,
-      salt,
-      stxToBurn,
-    ];
+    const args = [fullyQualifiedName, privateKey, salt, stxToBurn];
 
     const mockedResponse = JSON.stringify(TEST_FEE_ESTIMATE);
 
@@ -266,4 +244,22 @@ describe('BNS', () => {
 
     expect(txResult.txid).toEqual('0xsuccess');
   });
+});
+
+test('can_stack', async () => {
+  fetchMock.mockOnce(
+    '{"stx":{"balance":"6216000000000","total_sent":"0","total_received":"6216000000000","total_fees_sent":"0","total_miner_rewards_received":"0","lock_tx_id":"","locked":"0","lock_height":0,"burnchain_lock_height":0,"burnchain_unlock_height":0},"fungible_tokens":{},"non_fungible_tokens":{}}'
+  );
+  fetchMock.mockOnce(
+    '{"stx":{"balance":"6216000000000","total_sent":"0","total_received":"6216000000000","total_fees_sent":"0","total_miner_rewards_received":"0","lock_tx_id":"","locked":"0","lock_height":0,"burnchain_lock_height":0,"burnchain_unlock_height":0},"fungible_tokens":{},"non_fungible_tokens":{}}'
+  );
+  fetchMock.mockOnce(
+    '{"contract_id":"ST000000000000000000002AMW42H.pox","pox_activation_threshold_ustx":827381433155441,"first_burnchain_block_height":2000000,"prepare_phase_block_length":50,"reward_phase_block_length":1000,"reward_slots":2000,"rejection_fraction":12,"total_liquid_supply_ustx":41369071657772050,"current_cycle":{"id":269,"min_threshold_ustx":5180000000000,"stacked_ustx":0,"is_pox_active":false},"next_cycle":{"id":270,"min_threshold_ustx":5180000000000,"min_increment_ustx":5171133957221,"stacked_ustx":5600000000000,"prepare_phase_start_block_height":2283450,"blocks_until_prepare_phase":172,"reward_phase_start_block_height":2283500,"blocks_until_reward_phase":222,"ustx_until_pox_rejection":4964288598932640},"min_amount_ustx":5180000000000,"prepare_cycle_length":50,"reward_cycle_id":269,"reward_cycle_length":1050,"rejection_votes_left_required":4964288598932640,"next_reward_cycle_in":222}'
+  );
+  fetchMock.mockOnce('{"eligible":true}');
+
+  const params =
+    '6216000000000 10 mqkccNX5h7Xy1YUku3X2fCFCC54x6HEiHk ST3VJVZ265JZMG1N61YE3EQ7GNTQHF6PXP0E7YACV';
+  const response = await canStack(testnetNetwork, params.split(' '));
+  expect(response.eligible).toBe(true);
 });
