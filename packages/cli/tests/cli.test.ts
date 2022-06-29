@@ -247,19 +247,27 @@ describe('BNS', () => {
 });
 
 test('can_stack', async () => {
+  fetchMock.resetMocks();
   fetchMock.mockOnce(
-    '{"stx":{"balance":"6216000000000","total_sent":"0","total_received":"6216000000000","total_fees_sent":"0","total_miner_rewards_received":"0","lock_tx_id":"","locked":"0","lock_height":0,"burnchain_lock_height":0,"burnchain_unlock_height":0},"fungible_tokens":{},"non_fungible_tokens":{}}'
+    '{"contract_id":"ST000000000000000000002AMW42H.pox","pox_activation_threshold_ustx":827381723155441,"first_burnchain_block_height":2000000,"prepare_phase_block_length":50,"reward_phase_block_length":1000,"reward_slots":2000,"rejection_fraction":12,"total_liquid_supply_ustx":41369086157772050,"current_cycle":{"id":269,"min_threshold_ustx":5180000000000,"stacked_ustx":0,"is_pox_active":false},"next_cycle":{"id":270,"min_threshold_ustx":5180000000000,"min_increment_ustx":5171135769721,"stacked_ustx":5600000000000,"prepare_phase_start_block_height":2283450,"blocks_until_prepare_phase":146,"reward_phase_start_block_height":2283500,"blocks_until_reward_phase":196,"ustx_until_pox_rejection":4964290338932640},"min_amount_ustx":5180000000000,"prepare_cycle_length":50,"reward_cycle_id":269,"reward_cycle_length":1050,"rejection_votes_left_required":4964290338932640,"next_reward_cycle_in":196}'
   );
   fetchMock.mockOnce(
-    '{"stx":{"balance":"6216000000000","total_sent":"0","total_received":"6216000000000","total_fees_sent":"0","total_miner_rewards_received":"0","lock_tx_id":"","locked":"0","lock_height":0,"burnchain_lock_height":0,"burnchain_unlock_height":0},"fungible_tokens":{},"non_fungible_tokens":{}}'
+    '{ "balance": "0x0000000000000000000005a74678d000", "locked": "0x00000000000000000000000000000000", "unlock_height": 0, "nonce": 0 }'
   );
   fetchMock.mockOnce(
-    '{"contract_id":"ST000000000000000000002AMW42H.pox","pox_activation_threshold_ustx":827381433155441,"first_burnchain_block_height":2000000,"prepare_phase_block_length":50,"reward_phase_block_length":1000,"reward_slots":2000,"rejection_fraction":12,"total_liquid_supply_ustx":41369071657772050,"current_cycle":{"id":269,"min_threshold_ustx":5180000000000,"stacked_ustx":0,"is_pox_active":false},"next_cycle":{"id":270,"min_threshold_ustx":5180000000000,"min_increment_ustx":5171133957221,"stacked_ustx":5600000000000,"prepare_phase_start_block_height":2283450,"blocks_until_prepare_phase":172,"reward_phase_start_block_height":2283500,"blocks_until_reward_phase":222,"ustx_until_pox_rejection":4964288598932640},"min_amount_ustx":5180000000000,"prepare_cycle_length":50,"reward_cycle_id":269,"reward_cycle_length":1050,"rejection_votes_left_required":4964288598932640,"next_reward_cycle_in":222}'
+    '{"contract_id":"ST000000000000000000002AMW42H.pox","pox_activation_threshold_ustx":827381723155441,"first_burnchain_block_height":2000000,"prepare_phase_block_length":50,"reward_phase_block_length":1000,"reward_slots":2000,"rejection_fraction":12,"total_liquid_supply_ustx":41369086157772050,"current_cycle":{"id":269,"min_threshold_ustx":5180000000000,"stacked_ustx":0,"is_pox_active":false},"next_cycle":{"id":270,"min_threshold_ustx":5180000000000,"min_increment_ustx":5171135769721,"stacked_ustx":5600000000000,"prepare_phase_start_block_height":2283450,"blocks_until_prepare_phase":146,"reward_phase_start_block_height":2283500,"blocks_until_reward_phase":196,"ustx_until_pox_rejection":4964290338932640},"min_amount_ustx":5180000000000,"prepare_cycle_length":50,"reward_cycle_id":269,"reward_cycle_length":1050,"rejection_votes_left_required":4964290338932640,"next_reward_cycle_in":196}'
   );
+  fetchMock.mockOnce('{"okay":true,"result":"0x0703"}');
   fetchMock.mockOnce('{"eligible":true}');
 
   const params =
     '6216000000000 10 mqkccNX5h7Xy1YUku3X2fCFCC54x6HEiHk ST3VJVZ265JZMG1N61YE3EQ7GNTQHF6PXP0E7YACV';
   const response = await canStack(testnetNetwork, params.split(' '));
   expect(response.eligible).toBe(true);
+
+  expect(fetchMock.mock.calls).toHaveLength(4);
+  expect(fetchMock.mock.calls[3][0]).toContain('/pox/can-stack-stx');
+  expect(fetchMock.mock.calls[3][1]?.body).toBe(
+    '{"sender":"ST3VJVZ265JZMG1N61YE3EQ7GNTQHF6PXP0E7YACV","arguments":["0x0c000000020968617368627974657302000000147046a658021260485e1ba9eb6c3e4c26b60953290776657273696f6e020000000100","0x010000000000000000000005a74678d000","0x010000000000000000000000000000010d","0x010000000000000000000000000000000a"]}'
+  );
 });
