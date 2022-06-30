@@ -527,7 +527,7 @@ export class StackingClient {
     burnBlockHeight: number;
   }) {
     const { hashMode, data } = decodeBtcAddress(poxAddress);
-    const hashModeBuffer = bufferCV(toBuffer(BigInt(hashMode)));
+    const hashModeBuffer = bufferCV(toBuffer(BigInt(hashMode), 1));
     const hashbytes = bufferCV(data);
     const address = tupleCV({
       hashbytes,
@@ -565,7 +565,7 @@ export class StackingClient {
 
     if (poxAddress) {
       const { hashMode, data } = decodeBtcAddress(poxAddress);
-      const hashModeBuffer = bufferCV(toBuffer(BigInt(hashMode)));
+      const hashModeBuffer = bufferCV(toBuffer(BigInt(hashMode), 1));
       const hashbytes = bufferCV(data);
       address = someCV(
         tupleCV({
@@ -612,7 +612,7 @@ export class StackingClient {
     nonce?: IntegerType;
   }) {
     const { hashMode, data } = decodeBtcAddress(poxAddress);
-    const hashModeBuffer = bufferCV(toBuffer(BigInt(hashMode)));
+    const hashModeBuffer = bufferCV(toBuffer(BigInt(hashMode), 1));
     const hashbytes = bufferCV(data);
     const address = tupleCV({
       hashbytes,
@@ -654,7 +654,7 @@ export class StackingClient {
     rewardCycle: number;
   }) {
     const { hashMode, data } = decodeBtcAddress(poxAddress);
-    const hashModeBuffer = bufferCV(toBuffer(BigInt(hashMode)));
+    const hashModeBuffer = bufferCV(toBuffer(BigInt(hashMode), 1));
     const hashbytes = bufferCV(data);
     const address = tupleCV({
       hashbytes,
