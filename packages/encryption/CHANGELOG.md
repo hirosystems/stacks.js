@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.3.1](https://github.com/hirosystems/stacks.js/compare/v4.3.0...v4.3.1) (2022-07-01)
+
+
+### Bug Fixes
+
+* support legacy signature verification ([8446724](https://github.com/hirosystems/stacks.js/commit/844672480c6540b65df8d793b4bac0ec7ddd9205))
+
+
+
+
+
 # [4.3.0](https://github.com/hirosystems/stacks.js/compare/v4.2.2...v4.3.0) (2022-06-16)
 
 **Note:** Version bump only for package @stacks/encryption

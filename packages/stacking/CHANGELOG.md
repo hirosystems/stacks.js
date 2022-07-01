@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.3.1](https://github.com/hirosystems/stacks.js/compare/v4.3.0...v4.3.1) (2022-07-01)
+
+
+### Bug Fixes
+
+* use correct buffer size for hashmode in stacking ([ca51914](https://github.com/hirosystems/stacks.js/commit/ca51914276da9434ac8df9cb9e7fb1e648ad2173))
+
+
+
+
+
 # [4.3.0](https://github.com/hirosystems/stacks.js/compare/v4.2.2...v4.3.0) (2022-06-16)
 
 **Note:** Version bump only for package @stacks/stacking
