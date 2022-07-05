@@ -31,6 +31,9 @@ jobs:
       - run: npm run bootstrap
       - run: npm run build
 
+      - run: git config --local user.email 'action@github.com'
+      - run: git config --local user.name 'GitHub Action'
+
       - run: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > ~/.npmrc
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
