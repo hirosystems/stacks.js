@@ -46,7 +46,7 @@
   },
   "devDependencies": {
     "@types/jest": "^26.0.22",
-    "@types/node": "^14.14.43",
+    "@types/node": "^18.0.4",
     "assert": "^2.0.0",
     "bip32": "^2.0.6",
     "crypto-browserify": "^3.12.0",

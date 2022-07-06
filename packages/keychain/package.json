@@ -33,7 +33,7 @@
     "@stacks/profile": "^4.3.3",
     "@stacks/storage": "^4.3.3",
     "@stacks/transactions": "^4.3.3",
-    "@types/node": "^14.14.43",
+    "@types/node": "^18.0.4",
     "@types/triplesec": "^3.0.0",
     "bip32": "^2.0.6",
     "bip39": "^3.0.2",
