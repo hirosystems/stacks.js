@@ -279,7 +279,7 @@ describe('Subdomain Migration', () => {
       'sound idle panel often situate develop unit text design antenna vendor screen opinion balcony share trigger accuse scatter visa uniform brass update opinion media',
       'test2.id.stx', // Subdomain to be migrated
       'ST3Q2T3380WE1K5PW72R6R76Q8HRPEK8HR02W6V1M', // Owner mismatch
-      'No subdomains selected. Canceling...', // expected output, not migrated due to owner mismatch
+      'No subdomains found or selected. Canceling...', // expected output, not migrated due to owner mismatch
       false,
     ],
   ];
