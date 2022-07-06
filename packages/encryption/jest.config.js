@@ -1,4 +1,8 @@
 const path = require('path');
+if (process.env.SKIP_TESTS) {
+  console.log('Skipping tests...');
+  process.exit(0);
+}
 module.exports = {
   rootDir: __dirname,
   preset: 'ts-jest',
