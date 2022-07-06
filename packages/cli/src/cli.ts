@@ -1,50 +1,51 @@
 import { Buffer } from '@stacks/common';
-import * as blockstack from 'blockstack';
 import * as bitcoin from 'bitcoinjs-lib';
-import * as process from 'process';
-import * as fs from 'fs';
-import * as winston from 'winston';
+import * as blockstack from 'blockstack';
 import cors from 'cors';
+import * as crypto from 'crypto';
+import * as fs from 'fs';
+import * as process from 'process';
+import * as winston from 'winston';
 
 import * as scureBip39 from '@scure/bip39';
 import { wordlist } from '@scure/bip39/wordlists/english';
-import express from 'express';
-import * as path from 'path';
-import { prompt } from 'inquirer';
-import fetch from 'node-fetch';
-import {
-  makeSTXTokenTransfer,
-  makeContractDeploy,
-  makeContractCall,
-  callReadOnlyFunction,
-  broadcastTransaction,
-  estimateTransfer,
-  estimateContractDeploy,
-  estimateContractFunctionCall,
-  SignedTokenTransferOptions,
-  ContractDeployOptions,
-  SignedContractCallOptions,
-  ReadOnlyFunctionOptions,
-  ContractCallPayload,
-  ClarityValue,
-  ClarityAbi,
-  getAbi,
-  validateContractCall,
-  PostConditionMode,
-  cvToString,
-  StacksTransaction,
-  TxBroadcastResult,
-  getAddressFromPrivateKey,
-  TransactionVersion,
-  TransactionSigner,
-  publicKeyToString,
-  pubKeyfromPrivKey,
-  createStacksPrivateKey,
-  AnchorMode,
-  signWithKey,
-} from '@stacks/transactions';
 import { buildPreorderNameTx, buildRegisterNameTx } from '@stacks/bns';
 import { StacksMainnet, StacksTestnet } from '@stacks/network';
+import {
+  AnchorMode,
+  broadcastTransaction,
+  callReadOnlyFunction,
+  ClarityAbi,
+  ClarityValue,
+  ContractCallPayload,
+  ContractDeployOptions,
+  createStacksPrivateKey,
+  cvToString,
+  estimateContractDeploy,
+  estimateContractFunctionCall,
+  estimateTransfer,
+  getAbi,
+  getAddressFromPrivateKey,
+  makeContractCall,
+  makeContractDeploy,
+  makeSTXTokenTransfer,
+  PostConditionMode,
+  pubKeyfromPrivKey,
+  publicKeyToString,
+  ReadOnlyFunctionOptions,
+  SignedContractCallOptions,
+  SignedTokenTransferOptions,
+  signWithKey,
+  StacksTransaction,
+  TransactionSigner,
+  TransactionVersion,
+  TxBroadcastResult,
+  validateContractCall,
+} from '@stacks/transactions';
+import express from 'express';
+import { prompt } from 'inquirer';
+import fetch from 'node-fetch';
+import * as path from 'path';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const c32check = require('c32check');
@@ -52,75 +53,75 @@ const c32check = require('c32check');
 import { UserData } from '@stacks/auth';
 import crossfetch from 'cross-fetch';
 
-import { StackingClient, StackerInfo } from '@stacks/stacking';
+import { StackerInfo, StackingClient } from '@stacks/stacking';
 
-import { FaucetsApi, AccountsApi, Configuration } from '@stacks/blockchain-api-client';
+import { AccountsApi, Configuration, FaucetsApi } from '@stacks/blockchain-api-client';
 
 import { GaiaHubConfig } from '@stacks/storage';
 
 import {
+  extractAppKey,
+  getApplicationKeyInfo,
   getOwnerKeyInfo,
   getPaymentKeyInfo,
   getStacksWalletKeyInfo,
-  getApplicationKeyInfo,
-  extractAppKey,
-  STX_WALLET_COMPATIBLE_SEED_STRENGTH,
-  PaymentKeyInfoType,
   OwnerKeyInfoType,
+  PaymentKeyInfoType,
   StacksKeyInfoType,
+  STX_WALLET_COMPATIBLE_SEED_STRENGTH,
 } from './keys';
 
 import {
-  CLI_ARGS,
-  getCLIOpts,
+  checkArgs,
+  CLIOptAsBool,
   CLIOptAsString,
   CLIOptAsStringArray,
-  CLIOptAsBool,
-  checkArgs,
-  loadConfig,
-  makeCommandUsageString,
-  makeAllCommandsList,
-  USAGE,
+  CLI_ARGS,
   DEFAULT_CONFIG_PATH,
   DEFAULT_CONFIG_TESTNET_PATH,
+  getCLIOpts,
   ID_ADDRESS_PATTERN,
+  loadConfig,
+  makeAllCommandsList,
+  makeCommandUsageString,
   STACKS_ADDRESS_PATTERN,
+  USAGE,
 } from './argparse';
 
-import { encryptBackupPhrase, decryptBackupPhrase } from './encrypt';
+import { decryptBackupPhrase, encryptBackupPhrase } from './encrypt';
 
 import { CLINetworkAdapter, CLI_NETWORK_OPTS, getNetwork, NameInfoType } from './network';
 
 import { gaiaAuth, gaiaConnect, gaiaUploadProfileAll, getGaiaAddressFromProfile } from './data';
 
 import {
-  JSONStringify,
   canonicalPrivateKey,
+  ClarityFunctionArg,
   decodePrivateKey,
-  makeProfileJWT,
+  generateExplorerTxPageUrl,
+  getBackupPhrase,
+  getIDAppKeys,
   getNameInfoEasy,
   getpass,
-  getBackupPhrase,
-  mkdirs,
   IDAppKeys,
-  getIDAppKeys,
-  makePromptsFromArgList,
-  parseClarityFunctionArgAnswers,
-  ClarityFunctionArg,
-  generateExplorerTxPageUrl,
   isTestnetAddress,
-  subdomainOpToZFPieces,
+  JSONStringify,
+  makeProfileJWT,
+  makePromptsFromArgList,
+  mkdirs,
+  parseClarityFunctionArgAnswers,
   SubdomainOp,
+  subdomainOpToZFPieces,
 } from './utils';
 
-import { handleAuth, handleSignIn } from './auth';
 import {
   generateNewAccount,
   generateWallet,
   getAppPrivateKey,
   restoreWalletAccounts,
 } from '@stacks/wallet-sdk';
-import { getMaxIDSearchIndex, setMaxIDSearchIndex, getPrivateKeyAddress } from './common';
+import { handleAuth, handleSignIn } from './auth';
+import { getMaxIDSearchIndex, getPrivateKeyAddress, setMaxIDSearchIndex } from './common';
 // global CLI options
 let txOnly = false;
 let estimateOnly = false;

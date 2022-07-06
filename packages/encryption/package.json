@@ -24,7 +24,7 @@
     "@noble/secp256k1": "^1.5.5",
     "@scure/bip39": "^1.1.0",
     "@stacks/common": "^4.3.2",
-    "@types/node": "^14.14.43",
+    "@types/node": "^18.0.4",
     "bs58": "^5.0.0",
     "ripemd160-min": "^0.0.6",
     "varuint-bitcoin": "^1.1.2"
