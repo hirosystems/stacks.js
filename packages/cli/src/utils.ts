@@ -811,7 +811,6 @@ function destructZonefile(zonefile: string) {
 export function subdomainOpToZFPieces(operation: SubdomainOp) {
   const destructedZonefile = destructZonefile(operation.zonefile);
   const txt = [
-    operation.subdomainName,
     `owner=${operation.owner}`,
     `seqn=${operation.sequenceNumber}`,
     `parts=${destructedZonefile.length}`,
