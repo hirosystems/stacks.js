@@ -62,7 +62,7 @@ export function base58CheckDecode(btcAddress: string): {
  * @ignore
  */
 export function base58Encode(hash: Buffer) {
-  const checksum = sha256(sha256(hash));
+  const checksum = Buffer.from(sha256(sha256(hash)));
   return base58.encode(Buffer.concat([hash, checksum], hash.length + 4));
 }
 

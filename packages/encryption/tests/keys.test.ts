@@ -4,13 +4,13 @@ import { address, ECPair, networks } from 'bitcoinjs-lib';
 import bs58check from 'bs58check';
 import { SECP256K1Client } from 'jsontokens';
 import {
+  base58Encode,
+  compressPrivateKey,
+  ecSign,
   getPublicKeyFromPrivate,
   hashSha256Sync,
   makeECPrivateKey,
   publicKeyToAddress,
-  ecSign,
-  base58Encode,
-  compressPrivateKey,
 } from '../src';
 import { hashRipemd160 } from '../src/hashRipemd160';
 
