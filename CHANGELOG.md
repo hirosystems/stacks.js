@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.3.2](https://github.com/hirosystems/stacks.js/compare/v4.3.1...v4.3.2) (2022-07-11)
+
+
+### Bug Fixes
+
+* convert checksum to buffer ([963b028](https://github.com/hirosystems/stacks.js/commit/963b028d0db7b1fb57fef0a68f540ec35c80743a))
+
+
+
+
+
 ## [4.3.1](https://github.com/hirosystems/stacks.js/compare/v4.3.0...v4.3.1) (2022-07-01)
 
 
