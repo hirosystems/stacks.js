@@ -8,17 +8,21 @@
     "name": "Stacks.js",
     "json": "docs/docs.json",
     "out": "docs",
-    "readme": "./readme.md",
+    // "readme": "./readme.md",
     "theme": "stacks",
     "excludePrivate": true,
     "excludeProtected": true,
-    "listInvalidSymbolLinks": true,
+    // "listInvalidSymbolLinks": true,
     "categoryOrder": [
       "*",
       "Other"
     ],
     // theme and plugin options
-    "external-modulemap": ".*\/packages\/([\\w\\-_]+)\/",
-    "package-prefix": "@stacks",
+    // "external-modulemap": ".*\/packages\/([\\w\\-_]+)\/",
+    "breadcrumb-root": "@stacks",
+    // "entryPoints": [
+    //   "packages/bns/src",
+    //   "packages/auth/src"
+    // ]
   }
 }

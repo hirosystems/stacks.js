@@ -62,5 +62,9 @@
   },
   "bugs": {
     "url": "https://github.com/blockstack/stacks.js/issues"
+  },
+  "typedoc": {
+    "displayName": "bns",
+    "readmeFile": "./README.md"
   }
 }

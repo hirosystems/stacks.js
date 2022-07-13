@@ -57,6 +57,10 @@
     "url": "git+https://github.com/hirosystems/stacks.js.git"
   },
   "bugs": {
-    "url": "https://github.com/blockstack/blockstack.js/issues"
+    "url": "https://github.com/hirosystems/stacks.js/issues"
+  },
+  "typedoc": {
+    "displayName": "common",
+    "readmeFile": "./README.md"
   }
 }

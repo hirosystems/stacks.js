@@ -68,6 +68,10 @@
     "dist",
     "src"
   ],
+  "bin": {
+    "stacks": "./bin.js",
+    "stx": "./bin.js"
+  },
   "keywords": [
     "auth",
     "authentication",
@@ -102,11 +106,10 @@
     "url": "git+https://github.com/hirosystems/stacks.js.git"
   },
   "bugs": {
-    "url": "https://github.com/blockstack/blockstack.js/issues"
+    "url": "https://github.com/hirosystems/stacks.js/issues"
   },
-  "bin": {
-    "stacks": "./bin.js",
-    "stx": "./bin.js"
-  },
-  "gitHead": "77b4d6d531b74996e4b7a0cbd1cf5b8358a690ce"
+  "typedoc": {
+    "displayName": "cli",
+    "readmeFile": "./README.md"
+  }
 }

@@ -69,5 +69,9 @@
   "files": [
     "dist",
     "src"
-  ]
+  ],
+  "typedoc": {
+    "displayName": "wallet-sdk",
+    "readmeFile": "./README.md"
+  }
 }

@@ -77,5 +77,9 @@
   },
   "bugs": {
     "url": "https://github.com/hirosystems/stacks.js/issues"
+  },
+  "typedoc": {
+    "displayName": "transactions",
+    "readmeFile": "./README.md"
   }
 }
