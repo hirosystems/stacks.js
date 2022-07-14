@@ -24,12 +24,12 @@ export const getOwnerKeyInfo: Array<[string, number, string, OwnerKeyInfoType]> 
     },
   ],
   [
-    'oppose spider rich leader proud foil dish finger fee pipe ethics bundle', // mnemonic
+    'oppose spider rich leader proud foil dish finger fee pipe ethics cable', // mnemonic
     0, // index
     'v0.10-current', // version
     {
-      privateKey: '7e96519d1202ad990a4d1d14c9e8891d9c53b52ce1fd4aa1b4549e5fbc8bfcda01',
-      idAddress: 'ID-1FwnbMXxFMxiAFxXV7fKcZn5dB4y6hSkxY',
+      privateKey: 'd98c5f09b826f7f7b543055bdd25197ca08a6cbedbb80f8f5060645274a0704201',
+      idAddress: 'ID-1D6kMXjiSDmNt6hwFPUkeHnFtdUgSoPE1e',
       version: 'v0.10-current',
       index: 0,
     },
@@ -48,8 +48,8 @@ export const findIdentityIndex: Array<[string, string, number]> = [
     1, // index
   ],
   [
-    'oppose spider rich leader proud foil dish finger fee pipe ethics bundle', // mnemonic
-    'ID-1FwnbMXxFMxiAFxXV7fKcZn5dB4y6hSkxY',
+    'oppose spider rich leader proud foil dish finger fee pipe ethics cable', // mnemonic
+    'ID-1D6kMXjiSDmNt6hwFPUkeHnFtdUgSoPE1e',
     0, // index
   ],
 ];

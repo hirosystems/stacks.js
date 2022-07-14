@@ -47,29 +47,30 @@ test('ripemd160 digest tests', async () => {
     ['message digest', '5d0689ef49d2fae572b881b123a85ffa21595f36'],
     ['', '9c1185a5c5e9fc54612808977ee8f548b2258d31'],
   ];
-  const nodeCryptoHasher = await ripemd160.createHashRipemd160();
-  expect(nodeCryptoHasher instanceof ripemd160.NodeCryptoRipemd160Digest).toEqual(true);
+  const nodeCryptoHasher = ripemd160.createHashRipemd160();
+  expect(nodeCryptoHasher instanceof ripemd160.NodeCryptoRipemd160Digest).toEqual(false); // node crpyto hashRipemd160 disabled
 
   for (const [input, expected] of vectors) {
-    const result = await nodeCryptoHasher.digest(Buffer.from(input));
+    const result = nodeCryptoHasher.digest(Buffer.from(input));
     const resultHex = result.toString('hex');
     expect(resultHex).toEqual(expected);
   }
 
   const polyfillHasher = new ripemd160.Ripemd160PolyfillDigest();
   for (const [input, expected] of vectors) {
-    const result = await polyfillHasher.digest(Buffer.from(input));
+    const result = polyfillHasher.digest(Buffer.from(input));
     const resultHex = result.toString('hex');
     expect(resultHex).toEqual(expected);
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
   const nodeCrypto = require('crypto');
   const createHashOrig = nodeCrypto.createHash;
   nodeCrypto.createHash = () => {
     throw new Error('Artificial broken hash');
   };
   try {
-    await ripemd160.hashRipemd160(Buffer.from('acb'));
+    ripemd160.hashRipemd160(Buffer.from('acb'));
   } finally {
     nodeCrypto.createHash = createHashOrig;
   }

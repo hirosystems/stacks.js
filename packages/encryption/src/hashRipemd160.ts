@@ -1,6 +1,5 @@
 import { Buffer } from '@stacks/common';
 import Ripemd160Polyfill from 'ripemd160-min';
-import { isNodeCryptoAvailable } from './cryptoUtils';
 
 type NodeCryptoCreateHash = typeof import('crypto').createHash;
 
@@ -47,17 +46,17 @@ export class NodeCryptoRipemd160Digest implements Ripemd160Digest {
 }
 
 export function createHashRipemd160() {
-  const nodeCryptoCreateHash = isNodeCryptoAvailable(nodeCrypto => {
-    if (typeof nodeCrypto.createHash === 'function') {
-      return nodeCrypto.createHash;
-    }
-    return false;
-  });
-  if (nodeCryptoCreateHash) {
-    return new NodeCryptoRipemd160Digest(nodeCryptoCreateHash);
-  } else {
-    return new Ripemd160PolyfillDigest();
-  }
+  // // disable node hashRipemd160, because it doesn't work with node 17,18 openSSL
+  // const nodeCryptoCreateHash = isNodeCryptoAvailable(nodeCrypto => {
+  //   if (typeof nodeCrypto.createHash === 'function') {
+  //     return nodeCrypto.createHash;
+  //   }
+  //   return false;
+  // });
+  // if (nodeCryptoCreateHash) {
+  //   return new NodeCryptoRipemd160Digest(nodeCryptoCreateHash);
+  // } else {
+  return new Ripemd160PolyfillDigest();
 }
 
 export function hashRipemd160(data: Buffer) {

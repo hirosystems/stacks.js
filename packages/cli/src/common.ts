@@ -1,8 +1,9 @@
+import { publicKeyToAddress } from '@stacks/encryption';
+import { pubKeyfromPrivKey } from '@stacks/transactions';
+import * as bitcoinjs from 'bitcoinjs-lib';
+import { TransactionSigner } from 'blockstack';
 import { DEFAULT_MAX_ID_SEARCH_INDEX } from './argparse';
 import { CLINetworkAdapter } from './network';
-import * as blockstack from 'blockstack';
-import { TransactionSigner } from 'blockstack';
-import * as bitcoinjs from 'bitcoinjs-lib';
 
 let maxIDSearchIndex = DEFAULT_MAX_ID_SEARCH_INDEX;
 
@@ -46,13 +47,12 @@ export function getPrivateKeyAddress(
   privateKey: string | CLITransactionSigner
 ): string {
   if (isCLITransactionSigner(privateKey)) {
-    const pkts = privateKey;
-    return pkts.address;
-  } else {
-    const pk = privateKey;
-    const ecKeyPair = blockstack.hexStringToECPair(pk);
-    return network.coerceAddress(blockstack.ecPairToAddress(ecKeyPair));
+    return privateKey.address;
   }
+
+  const pubKey = pubKeyfromPrivKey(privateKey);
+  const btcAddress = publicKeyToAddress(pubKey.data);
+  return network.coerceAddress(btcAddress);
 }
 
 export function isCLITransactionSigner(

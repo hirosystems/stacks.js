@@ -6,8 +6,8 @@ import * as fs from 'fs';
 import * as winston from 'winston';
 import cors from 'cors';
 
-import * as crypto from 'crypto';
-import * as bip39 from 'bip39';
+import * as scureBip39 from '@scure/bip39';
+import { wordlist } from '@scure/bip39/wordlists/english';
 import express from 'express';
 import * as path from 'path';
 import { prompt } from 'inquirer';
@@ -322,21 +322,15 @@ async function getStacksWalletKey(network: CLINetworkAdapter, args: string[]): P
  * @mnemonic (string) OPTIONAL; the 12-word phrase
  */
 async function makeKeychain(network: CLINetworkAdapter, args: string[]): Promise<string> {
-  let mnemonic: string;
-  if (args[0]) {
-    mnemonic = await getBackupPhrase(args[0]);
-  } else {
-    // eslint-disable-next-line @typescript-eslint/await-thenable
-    mnemonic = await bip39.generateMnemonic(
-      STX_WALLET_COMPATIBLE_SEED_STRENGTH,
-      crypto.randomBytes
-    );
-  }
+  const mnemonic: string = args[0]
+    ? await getBackupPhrase(args[0])
+    : scureBip39.generateMnemonic(wordlist, STX_WALLET_COMPATIBLE_SEED_STRENGTH);
 
   const derivationPath: string | undefined = args[1] || undefined;
   const stacksKeyInfo = await getStacksWalletKeyInfo(network, mnemonic, derivationPath);
+
   return JSONStringify({
-    mnemonic: mnemonic,
+    mnemonic,
     keyInfo: stacksKeyInfo,
   });
 }
