@@ -25,12 +25,15 @@ test('getStacksWalletKeyInfo', async () => {
 });
 
 describe('getStacksWalletKeyInfo custom derivation path', () => {
-  test.each(keyInfoTests)('%#', async (derivationPath: string, keyInfoResult: WalletKeyInfoResult)  => {
-    const mnemonic = 'apart spin rich leader siren foil dish sausage fee pipe ethics bundle';
-    const info = await getStacksWalletKeyInfo(mainnetNetwork, mnemonic, derivationPath);
+  test.each(keyInfoTests)(
+    '%#',
+    async (derivationPath: string, keyInfoResult: WalletKeyInfoResult) => {
+      const mnemonic = 'apart spin rich leader siren foil dish sausage fee pipe ethics bundle';
+      const info = await getStacksWalletKeyInfo(mainnetNetwork, mnemonic, derivationPath);
 
-    expect(info).toEqual(keyInfoResult);
-  });
+      expect(info).toEqual(keyInfoResult);
+    }
+  );
 });
 
 describe('getOwnerKeyInfo', () => {

@@ -75,11 +75,24 @@ export function base58CheckEncode(version: number, hash: Buffer) {
 
 /**
  * @ignore
+ * @deprecated Use {@link publicKeyToBtcAddress} instead
  */
 export function publicKeyToAddress(publicKey: string | Buffer) {
   const publicKeyBuffer = Buffer.isBuffer(publicKey) ? publicKey : Buffer.from(publicKey, 'hex');
   const publicKeyHash160 = hashRipemd160(hashSha256Sync(publicKeyBuffer));
   return base58CheckEncode(BITCOIN_PUBKEYHASH, publicKeyHash160);
+}
+
+/**
+ * @ignore
+ */
+export function publicKeyToBtcAddress(
+  publicKey: string | Buffer,
+  version: number = BITCOIN_PUBKEYHASH
+) {
+  const publicKeyBuffer = Buffer.isBuffer(publicKey) ? publicKey : Buffer.from(publicKey, 'hex');
+  const publicKeyHash160 = hashRipemd160(hashSha256Sync(publicKeyBuffer));
+  return base58CheckEncode(version, publicKeyHash160);
 }
 
 /**

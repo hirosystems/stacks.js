@@ -18,10 +18,13 @@
     "test:watch": "jest --watch --coverage=false"
   },
   "dependencies": {
+    "@scure/bip32": "^1.1.0",
+    "@scure/bip39": "^1.1.0",
     "@stacks/auth": "^4.3.2",
     "@stacks/blockchain-api-client": "^4.0.1",
     "@stacks/bns": "^4.3.2",
     "@stacks/common": "^4.3.2",
+    "@stacks/encryption": "^4.3.2",
     "@stacks/network": "^4.3.2",
     "@stacks/stacking": "^4.3.2",
     "@stacks/storage": "^4.3.2",
@@ -41,6 +44,7 @@
     "jsontokens": "^3.1.1",
     "node-fetch": "^2.6.0",
     "ripemd160": "^2.0.1",
+    "wif": "^2.0.6",
     "winston": "^3.2.1",
     "zone-file": "^2.0.0-beta.3"
   },
@@ -52,6 +56,7 @@
     "@types/jest": "^26.0.22",
     "@types/node-fetch": "^2.5.0",
     "@types/ripemd160": "^2.0.0",
+    "@types/wif": "^2.0.2",
     "jest": "^26.6.3",
     "jest-fetch-mock": "^3.0.3",
     "jest-module-name-mapper": "^0.1.5",

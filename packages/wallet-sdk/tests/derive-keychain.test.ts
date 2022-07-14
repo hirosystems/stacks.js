@@ -244,6 +244,9 @@ test('fetch username defaults to mainnet', async () => {
 });
 
 test('Verify compatibility between @scure/bip32 and bip32 dependency', () => {
+  // !!! Test currently fails for node v18 !!!
+  // todo: remove test and BIP32Interface backwards compatibility in next major release
+
   // Consider a root key in base58 format
   const root =
     'xprv9s21ZrQH143K3QTDL4LXw2F7HEK3wJUD2nW2nRk4stbPy6cq3jPPqjiChkVvvNKmPGJxWUtg6LnF5kejMRNNU3TGtRBeJgk33yuGBxrMPHi';
