@@ -7,14 +7,17 @@ import {
   ClarityType,
   intCV,
   noneCV,
+  ReadOnlyFunctionOptions,
   responseErrorCV,
   responseOkCV,
+  SignedContractCallOptions,
   someCV,
   standardPrincipalCV,
   trueCV,
   tupleCV,
   TupleCV,
   uintCV,
+  validateContractCall,
 } from '@stacks/transactions';
 import { address as btcAddress } from 'bitcoinjs-lib';
 import fetchMock from 'jest-fetch-mock';
@@ -25,11 +28,6 @@ import {
   InvalidAddressError,
   poxAddressToBtcAddress,
 } from '../src/utils';
-
-beforeEach(() => {
-  fetchMock.resetMocks();
-  jest.resetModules();
-});
 
 const poxInfo = {
   contract_id: 'ST000000000000000000002AMW42H.pox',
@@ -127,6 +125,29 @@ const blocktimeInfo = {
     target_block_time: 600,
   },
 };
+
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const poxAbi = require('./poxAbi.json');
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const { createContractCallPayload } = require('../../transactions/src/payload.ts'); // not exported currently
+
+// testing helper method
+function isPoxAbiValid(opts: SignedContractCallOptions | ReadOnlyFunctionOptions): boolean {
+  return validateContractCall(
+    createContractCallPayload(
+      opts.contractAddress,
+      opts.contractName,
+      opts.functionName,
+      opts.functionArgs
+    ),
+    poxAbi
+  );
+}
+
+beforeEach(() => {
+  fetchMock.resetMocks();
+  jest.resetModules();
+});
 
 test('check stacking eligibility true', async () => {
   const address = 'ST3XKKN4RPV69NN1PHFDNX3TYKXT7XPC4N8KC1ARH';
@@ -287,6 +308,7 @@ test('stack stx', async () => {
   expect(broadcastTransaction).toHaveBeenCalledTimes(1);
   expect(broadcastTransaction).toHaveBeenCalledWith(transaction, network);
   expect(stackingResults).toEqual(broadcastResponse);
+  expect(isPoxAbiValid(expectedContractCallOptions)).toBe(true);
 });
 
 test('delegate stx', async () => {
@@ -358,6 +380,7 @@ test('delegate stx', async () => {
   expect(broadcastTransaction).toHaveBeenCalledTimes(1);
   expect(broadcastTransaction).toHaveBeenCalledWith(transaction, network);
   expect(delegateResults).toEqual(broadcastResponse);
+  expect(isPoxAbiValid(expectedContractCallOptions)).toBe(true);
 });
 
 test('delegate stx with empty optional parameters', async () => {
@@ -421,6 +444,7 @@ test('delegate stx with empty optional parameters', async () => {
   expect(broadcastTransaction).toHaveBeenCalledTimes(1);
   expect(broadcastTransaction).toHaveBeenCalledWith(transaction, network);
   expect(delegateResults).toEqual(broadcastResponse);
+  expect(isPoxAbiValid(expectedContractCallOptions)).toBe(true);
 });
 
 test('delegate stack stx with one delegator', async () => {
@@ -504,6 +528,7 @@ test('delegate stack stx with one delegator', async () => {
   expect(broadcastTransaction).toHaveBeenCalledTimes(1);
   expect(broadcastTransaction).toHaveBeenCalledWith(transaction, network);
   expect(delegateResults).toEqual(broadcastResponse);
+  expect(isPoxAbiValid(expectedContractCallOptions)).toBe(true);
 });
 
 test('delegate stack stx with set nonce', async () => {
@@ -589,6 +614,7 @@ test('delegate stack stx with set nonce', async () => {
   expect(broadcastTransaction).toHaveBeenCalledTimes(1);
   expect(broadcastTransaction).toHaveBeenCalledWith(transaction, network);
   expect(delegateResults).toEqual(broadcastResponse);
+  expect(isPoxAbiValid(expectedContractCallOptions)).toBe(true);
 });
 
 test('delegator commit', async () => {
@@ -651,6 +677,7 @@ test('delegator commit', async () => {
   expect(broadcastTransaction).toHaveBeenCalledTimes(1);
   expect(broadcastTransaction).toHaveBeenCalledWith(transaction, network);
   expect(delegateResults).toEqual(broadcastResponse);
+  expect(isPoxAbiValid(expectedContractCallOptions)).toBe(true);
 });
 
 test('revoke delegate stx', async () => {
@@ -699,6 +726,7 @@ test('revoke delegate stx', async () => {
   expect(broadcastTransaction).toHaveBeenCalledTimes(1);
   expect(broadcastTransaction).toHaveBeenCalledWith(transaction, network);
   expect(revokeDelegateResults).toEqual(broadcastResponse);
+  expect(isPoxAbiValid(expectedContractCallOptions)).toBe(true);
 });
 
 test('get stacking status', async () => {
@@ -768,6 +796,7 @@ test('get stacking status', async () => {
   expect(stackingStatus.details.lock_period).toEqual(lockPeriod);
   expect(stackingStatus.details.pox_address.version.toString()).toEqual(version);
   expect(stackingStatus.details.pox_address.hashbytes.toString()).toEqual(hashbytes);
+  expect(isPoxAbiValid(expectedReadOnlyFunctionCallOptions)).toBe(true);
 });
 
 test('get core info', async () => {
