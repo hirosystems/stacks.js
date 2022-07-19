@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.3.3](https://github.com/hirosystems/stacks.js/compare/v4.3.2...v4.3.3) (2022-07-19)
+
+
+### Bug Fixes
+
+* update make_keychain command ([62355bc](https://github.com/hirosystems/stacks.js/commit/62355bc69dbeddd90773ed093e634c06460e86ce))
+
+
+
+
+
 ## [4.3.2](https://github.com/hirosystems/stacks.js/compare/v4.3.1...v4.3.2) (2022-07-11)
 
 **Note:** Version bump only for package @stacks/wallet-sdk
