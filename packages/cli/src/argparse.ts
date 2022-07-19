@@ -1397,14 +1397,26 @@ export const CLI_ARGS = {
       minItems: 1,
       maxItems: 2,
       help:
-        'Enable users to transfer subdomains to wallet-key addresses that correspond to all data-key addresses \n' +
+        'Enable users to transfer subdomains currently owned by any data-key \n' +
+        'addresses, to the wallet-key address of the account. Data-key addresses \n' +
+        'owning addresses is a remnant of the Blockstack Connect interface. \n' +
+        'Currently, the web wallet extension shows usernames owned by the \n' +
+        'wallet-key address of an account.\n' +
+        '\n' +
         'This command performs these steps in sequence: \n' +
-        "1. Detects whether there are any subdomains registered with the user's key and owned by data-key-derived addresses\n" +
-        '2. Prompts the user to confirm whether they want to migrate these subdomains to the corresponding wallet-key-derived addresses for their key by position\n' +
-        "3. Alerts the user to any subdomains that can't be migrated to these wallet-key-derived addresses given collision with existing usernames owned by them\n" +
-        '4. Initiates request to subdomain registrar using new transfer endpoint upon confirmation\n' +
-        '5. Displays message indicating how long the user will have to wait until request is likely fulfilled\n' +
-        '6. Displays confirmation that no subdomains are pending migration if user tries to execute command again\n' +
+        '1. Detects whether there are any subdomains owned by data-key addresses\n' +
+        '2. Prompts the user to confirm whether they want to migrate the each \n' +
+        '   owned subdomain to the corresponding wallet-key addresses for the \n' +
+        '   resepective wallet account\n' +
+        "3. Alerts the user to any subdomains that can't be migrated to these \n" +
+        '   wallet-key addresses given collision with existing usernames owned \n' +
+        '   by them\n' +
+        '4. Initiates a request to the subdomain registrar using the /transfer\n' +
+        '   endpoint\n' +
+        '5. Displays a message indicating how long the user will have to wait \n' +
+        '   until request is likely fulfilled\n' +
+        '6. Informs user that no subdomains are pending migration if the command \n' +
+        '   is executed again\n' +
         '\n' +
         'Example\n' +
         '\n' +
