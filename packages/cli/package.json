@@ -42,7 +42,7 @@
     "express-winston": "^3.1.0",
     "inquirer": "^7.1.0",
     "jsontokens": "^3.1.1",
-    "node-fetch": "^2.6.0",
+    "node-fetch": "^3.2.10",
     "ripemd160": "^2.0.1",
     "wif": "^2.0.6",
     "winston": "^3.2.1",
