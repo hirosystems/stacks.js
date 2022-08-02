@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.3.4](https://github.com/hirosystems/stacks.js/compare/v4.3.3...v4.3.4) (2022-08-02)
+
+
+### Bug Fixes
+
+* migrate subdomains to wallet key address ([b32cb41](https://github.com/hirosystems/stacks.js/commit/b32cb417f593200b1de13a704eceda7c3ab7f5a8))
+* update subdomainOpToZFPieces ([159157d](https://github.com/hirosystems/stacks.js/commit/159157d778476c8392a3c5bc274b57596b47f6f9))
+
+
+
+
+
 ## [4.3.3](https://github.com/hirosystems/stacks.js/compare/v4.3.2...v4.3.3) (2022-07-19)
 
 
