@@ -35,9 +35,15 @@ enum StacksMessageType {
 enum PayloadType {
   TokenTransfer = 0x00,
   SmartContract = 0x01,
+  VersionedSmartContract = 0x06,
   ContractCall = 0x02,
   PoisonMicroblock = 0x03,
   Coinbase = 0x04,
+}
+
+enum ClarityVersion {
+  Clarity1 = 1,
+  Clarity2 = 2,
 }
 
 /**
@@ -172,6 +178,7 @@ export {
   ChainID,
   StacksMessageType,
   PayloadType,
+  ClarityVersion,
   AnchorMode,
   TransactionVersion,
   PostConditionMode,

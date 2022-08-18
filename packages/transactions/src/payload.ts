@@ -1,5 +1,10 @@
 import { Buffer, IntegerType, intToBigInt, intToBytes } from '@stacks/common';
-import { COINBASE_BUFFER_LENGTH_BYTES, PayloadType, StacksMessageType } from './constants';
+import {
+  ClarityVersion,
+  COINBASE_BUFFER_LENGTH_BYTES,
+  PayloadType,
+  StacksMessageType,
+} from './constants';
 
 import { BufferArray } from './utils';
 
@@ -23,6 +28,7 @@ export type Payload =
   | TokenTransferPayload
   | ContractCallPayload
   | SmartContractPayload
+  | VersionedSmartContractPayload
   | PoisonPayload
   | CoinbasePayload;
 
@@ -38,6 +44,7 @@ export type PayloadInput =
   | (TokenTransferPayload | (Omit<TokenTransferPayload, 'amount'> & { amount: IntegerType }))
   | ContractCallPayload
   | SmartContractPayload
+  | VersionedSmartContractPayload
   | PoisonPayload
   | CoinbasePayload;
 
@@ -104,10 +111,19 @@ export interface SmartContractPayload {
   readonly codeBody: LengthPrefixedString;
 }
 
+export interface VersionedSmartContractPayload {
+  readonly type: StacksMessageType.Payload;
+  readonly payloadType: PayloadType.VersionedSmartContract;
+  readonly clarityVersion: ClarityVersion;
+  readonly contractName: LengthPrefixedString;
+  readonly codeBody: LengthPrefixedString;
+}
+
 export function createSmartContractPayload(
   contractName: string | LengthPrefixedString,
-  codeBody: string | LengthPrefixedString
-): SmartContractPayload {
+  codeBody: string | LengthPrefixedString,
+  clarityVersion?: ClarityVersion
+): SmartContractPayload | VersionedSmartContractPayload {
   if (typeof contractName === 'string') {
     contractName = createLPString(contractName);
   }
@@ -115,12 +131,22 @@ export function createSmartContractPayload(
     codeBody = codeBodyString(codeBody);
   }
 
-  return {
-    type: StacksMessageType.Payload,
-    payloadType: PayloadType.SmartContract,
-    contractName,
-    codeBody,
-  };
+  if (typeof clarityVersion === 'number') {
+    return {
+      type: StacksMessageType.Payload,
+      payloadType: PayloadType.VersionedSmartContract,
+      clarityVersion: clarityVersion,
+      contractName,
+      codeBody,
+    };
+  } else {
+    return {
+      type: StacksMessageType.Payload,
+      payloadType: PayloadType.SmartContract,
+      contractName,
+      codeBody,
+    };
+  }
 }
 
 export interface PoisonPayload {
@@ -170,6 +196,11 @@ export function serializePayload(payload: PayloadInput): Buffer {
       bufferArray.push(serializeStacksMessage(payload.contractName));
       bufferArray.push(serializeStacksMessage(payload.codeBody));
       break;
+    case PayloadType.VersionedSmartContract:
+      bufferArray.appendByte(payload.clarityVersion);
+      bufferArray.push(serializeStacksMessage(payload.contractName));
+      bufferArray.push(serializeStacksMessage(payload.codeBody));
+      break;
     case PayloadType.PoisonMicroblock:
       // TODO: implement
       break;
@@ -208,10 +239,19 @@ export function deserializePayload(bufferReader: BufferReader): Payload {
         functionName,
         functionArgs
       );
-    case PayloadType.SmartContract:
+    case PayloadType.SmartContract: {
       const smartContractName = deserializeLPString(bufferReader);
       const codeBody = deserializeLPString(bufferReader, 4, 100000);
       return createSmartContractPayload(smartContractName, codeBody);
+    }
+    case PayloadType.VersionedSmartContract: {
+      const clarityVersion = bufferReader.readUInt8Enum(ClarityVersion, n => {
+        throw new Error(`Cannot recognize ClarityVersion: ${n}`);
+      });
+      const smartContractName = deserializeLPString(bufferReader);
+      const codeBody = deserializeLPString(bufferReader, 4, 100000);
+      return createSmartContractPayload(smartContractName, codeBody, clarityVersion);
+    }
     case PayloadType.PoisonMicroblock:
       // TODO: implement
       return createPoisonPayload();
