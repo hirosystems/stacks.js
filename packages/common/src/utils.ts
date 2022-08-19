@@ -1,20 +1,5 @@
 import { Logger } from './logger';
 
-// Buffer module from NodeJS that also works in the browser https://www.npmjs.com/package/buffer
-// > The trailing slash is important, tells module lookup algorithm to use the npm module
-// > named buffer instead of the node.js core module named buffer!
-import { Buffer as BufferPolyfill } from 'buffer/';
-
-// There can be small type definition differences between the NodeJS Buffer and polyfill Buffer,
-// so export using the type definition from NodeJS (@types/node).
-import type { Buffer as NodeJSBuffer } from 'buffer';
-
-const AvailableBufferModule: typeof NodeJSBuffer =
-  // eslint-disable-next-line node/prefer-global/buffer
-  typeof Buffer !== 'undefined' ? Buffer : (BufferPolyfill as any);
-
-export { AvailableBufferModule as Buffer };
-
 /**
  *  @ignore
  */
@@ -332,9 +317,8 @@ export function getGlobalObjects<K extends Extract<keyof Window, string>>(
 type BN = import('bn.js'); // Type only import from @types/bn.js
 export type IntegerType = number | string | bigint | Uint8Array | BN;
 
-// eslint-disable-next-line node/prefer-global/buffer
-export function intToBytes(value: IntegerType, signed: boolean, byteLength: number): Buffer {
-  return toBuffer(intToBigInt(value, signed), byteLength);
+export function intToBytes(value: IntegerType, signed: boolean, byteLength: number): Uint8Array {
+  return bigIntToBytes(intToBigInt(value, signed), byteLength);
 }
 
 export function intToBigInt(value: IntegerType, signed: boolean): bigint {
@@ -347,7 +331,7 @@ export function intToBigInt(value: IntegerType, signed: boolean): bigint {
     return BigInt(parsedValue);
   }
   if (typeof parsedValue === 'string') {
-    // If hex string then convert to buffer then fall through to the buffer condition
+    // If hex string then convert to bytes then fall through to the bytes condition
     if (parsedValue.toLowerCase().startsWith('0x')) {
       // Trim '0x' hex-prefix
       let hex = parsedValue.slice(2);
@@ -355,7 +339,7 @@ export function intToBigInt(value: IntegerType, signed: boolean): bigint {
       // Allow odd-length strings like `0xf` -- some libs output these, or even just `0x${num.toString(16)}`
       hex = hex.padStart(hex.length + (hex.length % 2), '0');
 
-      parsedValue = AvailableBufferModule.from(hex, 'hex');
+      parsedValue = hexToBytes(hex);
     } else {
       try {
         return BigInt(parsedValue);
@@ -369,7 +353,7 @@ export function intToBigInt(value: IntegerType, signed: boolean): bigint {
   if (typeof parsedValue === 'bigint') {
     return parsedValue;
   }
-  if (parsedValue instanceof Uint8Array || AvailableBufferModule.isBuffer(parsedValue)) {
+  if (parsedValue instanceof Uint8Array) {
     if (signed) {
       // Allow byte arrays smaller than 128-bits to be passed.
       // This allows positive signed ints like `0x08` (8) or negative signed
@@ -393,7 +377,7 @@ export function intToBigInt(value: IntegerType, signed: boolean): bigint {
     return BigInt(parsedValue.toString());
   }
   throw new TypeError(
-    `Invalid value type. Must be a number, bigint, integer-string, hex-string, or Buffer.`
+    `Invalid value type. Must be a number, bigint, integer-string, hex-string, or Uint8Array.`
   );
 }
 
@@ -432,15 +416,14 @@ export function hexToInt(hex: string): number {
 }
 
 /**
- * Converts bigint to buffer type
- * @param {value} bigint value to be converted into buffer
- * @param {length} buffer optional length
- * @return {Buffer} buffer instance in big endian format
+ * Converts bigint to byte array
+ * @param value bigint value to be converted
+ * @param length byte array optional length
+ * @return {Uint8Array} byte array
  */
-export function toBuffer(value: bigint, length: number = 16) {
+export function bigIntToBytes(value: bigint, length: number = 16): Uint8Array {
   const hex = intToHex(value, length);
-  // buffer instance in big endian format
-  return AvailableBufferModule.from(hexToBytes(hex));
+  return hexToBytes(hex);
 }
 
 /**
@@ -527,13 +510,16 @@ export function hexToBytes(hex: string): Uint8Array {
 }
 
 declare const TextEncoder: any;
+declare const TextDecoder: any;
 
 /** @ignore */
 export function utf8ToBytes(str: string): Uint8Array {
-  if (typeof str !== 'string') {
-    throw new TypeError(`utf8ToBytes expected string, got ${typeof str}`);
-  }
   return new TextEncoder().encode(str);
+}
+
+/** @ignore */
+export function bytesToUtf8(arr: Uint8Array): string {
+  return new TextDecoder().decode(arr);
 }
 
 /** @ignore */
@@ -560,4 +546,15 @@ export function concatBytes(...arrays: Uint8Array[]): Uint8Array {
     pad += arr.length;
   }
   return result;
+}
+
+/**
+ * Better `instanceof` check for ArrayBuffer types in different environments
+ * @ignore
+ */
+export function isInstance(object: any, type: any) {
+  return (
+    object instanceof type ||
+    (object?.constructor?.name != null && object.constructor.name === type.name)
+  );
 }
