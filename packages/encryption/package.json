@@ -25,6 +25,7 @@
     "@scure/bip39": "^1.1.0",
     "@stacks/common": "^4.3.5",
     "@types/node": "^18.0.4",
+    "base64-js": "^1.5.1",
     "bs58": "^5.0.0",
     "ripemd160-min": "^0.0.6",
     "varuint-bitcoin": "^1.1.2"

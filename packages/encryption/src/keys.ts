@@ -1,7 +1,14 @@
 import { hmac } from '@noble/hashes/hmac';
 import { sha256 } from '@noble/hashes/sha256';
 import { getPublicKey as nobleGetPublicKey, signSync, utils } from '@noble/secp256k1';
-import { Buffer, privateKeyToBuffer, PRIVATE_KEY_COMPRESSED_LENGTH } from '@stacks/common';
+import {
+  bytesToHex,
+  concatBytes,
+  hexToBytes,
+  privateKeyToBytes,
+  PRIVATE_KEY_COMPRESSED_LENGTH,
+  readUInt8,
+} from '@stacks/common';
 import base58 from 'bs58';
 import { hashRipemd160 } from './hashRipemd160';
 import { hashSha256Sync } from './sha2Hash';
@@ -25,7 +32,7 @@ utils.hmacSha256Sync = (key: Uint8Array, ...msgs: Uint8Array[]) => {
  * @ignore
  */
 export function makeECPrivateKey() {
-  return Buffer.from(utils.randomPrivateKey()).toString('hex');
+  return bytesToHex(utils.randomPrivateKey());
 }
 
 /**
@@ -34,11 +41,11 @@ export function makeECPrivateKey() {
  */
 export function base58CheckDecode(btcAddress: string): {
   version: number;
-  hash: Buffer;
+  hash: Uint8Array;
 } {
-  const buffer = Buffer.from(base58.decode(btcAddress));
-  const payload = buffer.slice(0, -4);
-  const checksum = buffer.slice(-4);
+  const bytes = base58.decode(btcAddress);
+  const payload = bytes.slice(0, -4);
+  const checksum = bytes.slice(-4);
   const newChecksum = sha256(sha256(payload));
 
   if (
@@ -52,7 +59,7 @@ export function base58CheckDecode(btcAddress: string): {
 
   if (payload.length !== 21) throw new TypeError('Invalid address length');
 
-  const version = payload.readUInt8(0);
+  const version = readUInt8(payload, 0);
   const hash = payload.slice(1);
 
   return { version, hash };
@@ -61,25 +68,26 @@ export function base58CheckDecode(btcAddress: string): {
 /**
  * @ignore
  */
-export function base58Encode(hash: Buffer) {
-  const checksum = Buffer.from(sha256(sha256(hash)));
-  return base58.encode(Buffer.concat([hash, checksum], hash.length + 4));
+export function base58Encode(hash: Uint8Array) {
+  const checksum = sha256(sha256(hash));
+  return base58.encode(concatBytes(hash, checksum).slice(0, hash.length + 4));
 }
 
 /**
  * @ignore
  */
-export function base58CheckEncode(version: number, hash: Buffer) {
-  return base58Encode(Buffer.from([version, ...hash].slice(0, 21)));
+export function base58CheckEncode(version: number, hash: Uint8Array) {
+  return base58Encode(concatBytes(new Uint8Array([version]), hash.slice(0, 20)));
 }
 
+// todo: remove @deprecated methods
 /**
  * @ignore
  * @deprecated Use {@link publicKeyToBtcAddress} instead
  */
-export function publicKeyToAddress(publicKey: string | Buffer) {
-  const publicKeyBuffer = Buffer.isBuffer(publicKey) ? publicKey : Buffer.from(publicKey, 'hex');
-  const publicKeyHash160 = hashRipemd160(hashSha256Sync(publicKeyBuffer));
+export function publicKeyToAddress(publicKey: string | Uint8Array) {
+  const publicKeyBytes = typeof publicKey === 'string' ? hexToBytes(publicKey) : publicKey;
+  const publicKeyHash160 = hashRipemd160(hashSha256Sync(publicKeyBytes));
   return base58CheckEncode(BITCOIN_PUBKEYHASH, publicKeyHash160);
 }
 
@@ -87,11 +95,11 @@ export function publicKeyToAddress(publicKey: string | Buffer) {
  * @ignore
  */
 export function publicKeyToBtcAddress(
-  publicKey: string | Buffer,
+  publicKey: string | Uint8Array,
   version: number = BITCOIN_PUBKEYHASH
 ) {
-  const publicKeyBuffer = Buffer.isBuffer(publicKey) ? publicKey : Buffer.from(publicKey, 'hex');
-  const publicKeyHash160 = hashRipemd160(hashSha256Sync(publicKeyBuffer));
+  const publicKeyBytes = typeof publicKey === 'string' ? hexToBytes(publicKey) : publicKey;
+  const publicKeyHash160 = hashRipemd160(hashSha256Sync(publicKeyBytes));
   return base58CheckEncode(version, publicKeyHash160);
 }
 
@@ -99,44 +107,43 @@ export function publicKeyToBtcAddress(
  * @ignore
  * @returns a compressed public key
  */
-export function getPublicKeyFromPrivate(privateKey: string | Buffer) {
-  const privateKeyBuffer = privateKeyToBuffer(privateKey);
+export function getPublicKeyFromPrivate(privateKey: string | Uint8Array): string {
+  const privateKeyBytes = privateKeyToBytes(privateKey);
   // for backwards compatibility we always return a compressed public key, regardless of private key mode
-  return Buffer.from(nobleGetPublicKey(privateKeyBuffer.slice(0, 32), true)).toString('hex');
+  return bytesToHex(nobleGetPublicKey(privateKeyBytes.slice(0, 32), true));
 }
 
 /**
  * @ignore
  */
-export function ecSign(messageHash: Buffer, hexPrivateKey: string | Buffer) {
-  return Buffer.from(
-    signSync(messageHash, privateKeyToBuffer(hexPrivateKey).slice(0, 32), {
-      der: false,
-    })
-  );
+export function ecSign(messageHash: Uint8Array, hexPrivateKey: string | Uint8Array) {
+  return signSync(messageHash, privateKeyToBytes(hexPrivateKey).slice(0, 32), {
+    der: false,
+  });
+}
+
+// todo: remove duplicate methods
+/**
+ * @ignore
+ */
+export function ecPrivateKeyToHexString(privateKey: Uint8Array): string {
+  return bytesToHex(privateKey);
 }
 
 /**
  * @ignore
  */
-export function ecPrivateKeyToHexString(privateKey: Buffer): string {
-  return privateKey.toString('hex');
+export function isValidPrivateKey(privateKey: string | Uint8Array): boolean {
+  return utils.isValidPrivateKey(privateKeyToBytes(privateKey));
 }
 
 /**
  * @ignore
  */
-export function isValidPrivateKey(privateKey: string | Buffer): boolean {
-  return utils.isValidPrivateKey(privateKeyToBuffer(privateKey));
-}
+export function compressPrivateKey(privateKey: string | Uint8Array): Uint8Array {
+  const privateKeyBytes = privateKeyToBytes(privateKey);
 
-/**
- * @ignore
- */
-export function compressPrivateKey(privateKey: string | Buffer): Buffer {
-  const privateKeyBuffer = privateKeyToBuffer(privateKey);
-
-  return privateKeyBuffer.length == PRIVATE_KEY_COMPRESSED_LENGTH
-    ? privateKeyBuffer // leave compressed
-    : Buffer.concat([privateKeyBuffer, Buffer.from([1])]); // compress
+  return privateKeyBytes.length == PRIVATE_KEY_COMPRESSED_LENGTH
+    ? privateKeyBytes // leave compressed
+    : concatBytes(privateKeyBytes, new Uint8Array([1])); // compress
 }

@@ -1,4 +1,4 @@
-import { Buffer, getGlobalObject, makeUUID4, nextMonth } from '@stacks/common';
+import { getGlobalObject, makeUUID4, nextMonth } from '@stacks/common';
 import {
   decryptECIES,
   encryptECIES,
