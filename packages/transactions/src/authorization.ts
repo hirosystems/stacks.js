@@ -1,4 +1,12 @@
-import { Buffer, IntegerType, intToBigInt, intToBytes } from '@stacks/common';
+import {
+  bytesToHex,
+  concatArray,
+  hexToBytes,
+  IntegerType,
+  intToBigInt,
+  intToBytes,
+  writeUInt16BE,
+} from '@stacks/common';
 import {
   AddressHashMode,
   AuthType,
@@ -9,7 +17,7 @@ import {
   StacksMessageType,
 } from './constants';
 
-import { BufferArray, cloneDeep, leftPadHex, txidFromData } from './utils';
+import { cloneDeep, leftPadHex, txidFromData } from './utils';
 import {
   TransactionAuthField,
   serializeMessageSignature,
@@ -33,14 +41,14 @@ import {
   StacksPublicKey,
 } from './keys';
 
-import { BufferReader } from './bufferReader';
 import { MessageSignature } from './common';
 import { DeserializationError, SigningError, VerificationError } from './errors';
+import { ByteReader } from './bytesReader';
 
 export function emptyMessageSignature(): MessageSignature {
   return {
     type: StacksMessageType.MessageSignature,
-    data: Buffer.alloc(RECOVERABLE_ECDSA_SIG_LENGTH_BYTES, 0x00).toString('hex'),
+    data: bytesToHex(new Uint8Array(RECOVERABLE_ECDSA_SIG_LENGTH_BYTES)),
   };
 }
 
@@ -148,44 +156,47 @@ function clearCondition(condition: SpendingConditionOpts): SpendingCondition {
 
 export function serializeSingleSigSpendingCondition(
   condition: SingleSigSpendingConditionOpts
-): Buffer {
-  const bufferArray: BufferArray = new BufferArray();
-  bufferArray.appendByte(condition.hashMode);
-  bufferArray.appendHexString(condition.signer);
-  bufferArray.push(intToBytes(condition.nonce, false, 8));
-  bufferArray.push(intToBytes(condition.fee, false, 8));
-  bufferArray.appendByte(condition.keyEncoding);
-  bufferArray.push(serializeMessageSignature(condition.signature));
-  return bufferArray.concatBuffer();
+): Uint8Array {
+  const bytesArray = [
+    condition.hashMode,
+    hexToBytes(condition.signer),
+    intToBytes(condition.nonce, false, 8),
+    intToBytes(condition.fee, false, 8),
+    condition.keyEncoding as number,
+    serializeMessageSignature(condition.signature),
+  ];
+  return concatArray(bytesArray);
 }
 
 export function serializeMultiSigSpendingCondition(
   condition: MultiSigSpendingConditionOpts
-): Buffer {
-  const bufferArray: BufferArray = new BufferArray();
-  bufferArray.appendByte(condition.hashMode);
-  bufferArray.appendHexString(condition.signer);
-  bufferArray.push(intToBytes(condition.nonce, false, 8));
-  bufferArray.push(intToBytes(condition.fee, false, 8));
+): Uint8Array {
+  const bytesArray = [
+    condition.hashMode,
+    hexToBytes(condition.signer),
+    intToBytes(condition.nonce, false, 8),
+    intToBytes(condition.fee, false, 8),
+  ];
 
   const fields = createLPList(condition.fields);
-  bufferArray.push(serializeLPList(fields));
+  bytesArray.push(serializeLPList(fields));
 
-  const numSigs = Buffer.alloc(2);
-  numSigs.writeUInt16BE(condition.signaturesRequired, 0);
-  bufferArray.push(numSigs);
-  return bufferArray.concatBuffer();
+  const numSigs = new Uint8Array(2);
+  writeUInt16BE(numSigs, condition.signaturesRequired, 0);
+  bytesArray.push(numSigs);
+
+  return concatArray(bytesArray);
 }
 
 export function deserializeSingleSigSpendingCondition(
   hashMode: SingleSigHashMode,
-  bufferReader: BufferReader
+  bytesReader: ByteReader
 ): SingleSigSpendingCondition {
-  const signer = bufferReader.readBuffer(20).toString('hex');
-  const nonce = BigInt('0x' + bufferReader.readBuffer(8).toString('hex'));
-  const fee = BigInt('0x' + bufferReader.readBuffer(8).toString('hex'));
+  const signer = bytesToHex(bytesReader.readBytes(20));
+  const nonce = BigInt(`0x${bytesToHex(bytesReader.readBytes(8))}`);
+  const fee = BigInt(`0x${bytesToHex(bytesReader.readBytes(8))}`);
 
-  const keyEncoding = bufferReader.readUInt8Enum(PubKeyEncoding, n => {
+  const keyEncoding = bytesReader.readUInt8Enum(PubKeyEncoding, n => {
     throw new DeserializationError(`Could not parse ${n} as PubKeyEncoding`);
   });
   if (hashMode === AddressHashMode.SerializeP2WPKH && keyEncoding != PubKeyEncoding.Compressed) {
@@ -193,7 +204,7 @@ export function deserializeSingleSigSpendingCondition(
       'Failed to parse singlesig spending condition: incomaptible hash mode and key encoding'
     );
   }
-  const signature = deserializeMessageSignature(bufferReader);
+  const signature = deserializeMessageSignature(bytesReader);
   return {
     hashMode,
     signer,
@@ -206,13 +217,13 @@ export function deserializeSingleSigSpendingCondition(
 
 export function deserializeMultiSigSpendingCondition(
   hashMode: MultiSigHashMode,
-  bufferReader: BufferReader
+  bytesReader: ByteReader
 ): MultiSigSpendingCondition {
-  const signer = bufferReader.readBuffer(20).toString('hex');
-  const nonce = BigInt('0x' + bufferReader.readBuffer(8).toString('hex'));
-  const fee = BigInt('0x' + bufferReader.readBuffer(8).toString('hex'));
+  const signer = bytesToHex(bytesReader.readBytes(20));
+  const nonce = BigInt('0x' + bytesToHex(bytesReader.readBytes(8)));
+  const fee = BigInt('0x' + bytesToHex(bytesReader.readBytes(8)));
 
-  const fields = deserializeLPList(bufferReader, StacksMessageType.TransactionAuthField)
+  const fields = deserializeLPList(bytesReader, StacksMessageType.TransactionAuthField)
     .values as TransactionAuthField[];
 
   let haveUncompressed = false;
@@ -233,7 +244,7 @@ export function deserializeMultiSigSpendingCondition(
         break;
     }
   }
-  const signaturesRequired = bufferReader.readUInt16BE();
+  const signaturesRequired = bytesReader.readUInt16BE();
 
   // Partially signed multi-sig tx can be serialized and deserialized without exception (Incorrect number of signatures)
   // No need to check numSigs !== signaturesRequired to throw Incorrect number of signatures error
@@ -251,23 +262,22 @@ export function deserializeMultiSigSpendingCondition(
   };
 }
 
-export function serializeSpendingCondition(condition: SpendingConditionOpts): Buffer {
+export function serializeSpendingCondition(condition: SpendingConditionOpts): Uint8Array {
   if (isSingleSig(condition)) {
     return serializeSingleSigSpendingCondition(condition);
-  } else {
-    return serializeMultiSigSpendingCondition(condition);
   }
+  return serializeMultiSigSpendingCondition(condition);
 }
 
-export function deserializeSpendingCondition(bufferReader: BufferReader): SpendingCondition {
-  const hashMode = bufferReader.readUInt8Enum(AddressHashMode, n => {
+export function deserializeSpendingCondition(bytesReader: ByteReader): SpendingCondition {
+  const hashMode = bytesReader.readUInt8Enum(AddressHashMode, n => {
     throw new DeserializationError(`Could not parse ${n} as AddressHashMode`);
   });
 
   if (hashMode === AddressHashMode.SerializeP2PKH || hashMode === AddressHashMode.SerializeP2WPKH) {
-    return deserializeSingleSigSpendingCondition(hashMode, bufferReader);
+    return deserializeSingleSigSpendingCondition(hashMode, bytesReader);
   } else {
-    return deserializeMultiSigSpendingCondition(hashMode, bufferReader);
+    return deserializeMultiSigSpendingCondition(hashMode, bytesReader);
   }
 }
 
@@ -287,15 +297,15 @@ export function makeSigHashPreSign(
 
   const sigHash =
     curSigHash +
-    Buffer.from([authType]).toString('hex') +
-    intToBytes(fee, false, 8).toString('hex') +
-    intToBytes(nonce, false, 8).toString('hex');
+    bytesToHex(new Uint8Array([authType])) +
+    bytesToHex(intToBytes(fee, false, 8)) +
+    bytesToHex(intToBytes(nonce, false, 8));
 
-  if (Buffer.from(sigHash, 'hex').byteLength !== hashLength) {
+  if (hexToBytes(sigHash).byteLength !== hashLength) {
     throw Error('Invalid signature hash length');
   }
 
-  return txidFromData(Buffer.from(sigHash, 'hex'));
+  return txidFromData(hexToBytes(sigHash));
 }
 
 function makeSigHashPostSign(
@@ -315,12 +325,12 @@ function makeSigHashPostSign(
 
   const sigHash = curSigHash + leftPadHex(pubKeyEncoding.toString(16)) + signature.data;
 
-  const sigHashBuffer = Buffer.from(sigHash, 'hex');
-  if (sigHashBuffer.byteLength > hashLength) {
+  const sigHashBytes = hexToBytes(sigHash);
+  if (sigHashBytes.byteLength > hashLength) {
     throw Error('Invalid signature hash length');
   }
 
-  return txidFromData(sigHashBuffer);
+  return txidFromData(sigHashBytes);
 }
 
 export function nextSignature(
@@ -601,36 +611,36 @@ export function setSponsor(
   };
 }
 
-export function serializeAuthorization(auth: Authorization): Buffer {
-  const bufferArray: BufferArray = new BufferArray();
-  bufferArray.appendByte(auth.authType);
+export function serializeAuthorization(auth: Authorization): Uint8Array {
+  const bytesArray = [];
+  bytesArray.push(auth.authType);
 
   switch (auth.authType) {
     case AuthType.Standard:
-      bufferArray.push(serializeSpendingCondition(auth.spendingCondition));
+      bytesArray.push(serializeSpendingCondition(auth.spendingCondition));
       break;
     case AuthType.Sponsored:
-      bufferArray.push(serializeSpendingCondition(auth.spendingCondition));
-      bufferArray.push(serializeSpendingCondition(auth.sponsorSpendingCondition));
+      bytesArray.push(serializeSpendingCondition(auth.spendingCondition));
+      bytesArray.push(serializeSpendingCondition(auth.sponsorSpendingCondition));
       break;
   }
 
-  return bufferArray.concatBuffer();
+  return concatArray(bytesArray);
 }
 
-export function deserializeAuthorization(bufferReader: BufferReader) {
-  const authType = bufferReader.readUInt8Enum(AuthType, n => {
+export function deserializeAuthorization(bytesReader: ByteReader) {
+  const authType = bytesReader.readUInt8Enum(AuthType, n => {
     throw new DeserializationError(`Could not parse ${n} as AuthType`);
   });
 
   let spendingCondition;
   switch (authType) {
     case AuthType.Standard:
-      spendingCondition = deserializeSpendingCondition(bufferReader);
+      spendingCondition = deserializeSpendingCondition(bytesReader);
       return createStandardAuth(spendingCondition);
     case AuthType.Sponsored:
-      spendingCondition = deserializeSpendingCondition(bufferReader);
-      const sponsorSpendingCondition = deserializeSpendingCondition(bufferReader);
+      spendingCondition = deserializeSpendingCondition(bytesReader);
+      const sponsorSpendingCondition = deserializeSpendingCondition(bytesReader);
       return createSponsoredAuth(spendingCondition, sponsorSpendingCondition);
   }
 }

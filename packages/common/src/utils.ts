@@ -530,6 +530,20 @@ export function toBytes(data: Uint8Array | string): Uint8Array {
   return data;
 }
 
+/** @ignore */
+export function asciiToBytes(str: string) {
+  const byteArray = [];
+  for (let i = 0; i < str.length; i++) {
+    byteArray.push(str.charCodeAt(i) & 0xff); // ignore second bytes of UTF-16 character
+  }
+  return new Uint8Array(byteArray);
+}
+
+/** @ignore */
+export function bytesToAscii(arr: Uint8Array) {
+  return String.fromCharCode.apply(null, arr as any as number[]);
+}
+
 /**
  * Concats Uint8Array-s into one; like `Buffer.concat([buf1, buf2])`
  * @example concatBytes(buf1, buf2)
@@ -546,6 +560,16 @@ export function concatBytes(...arrays: Uint8Array[]): Uint8Array {
     pad += arr.length;
   }
   return result;
+}
+
+export function concatArray(elements: (Uint8Array | number[] | number)[]) {
+  return concatBytes(
+    ...elements.map(e => {
+      if (typeof e === 'number') return new Uint8Array([e]);
+      if (e instanceof Array) return new Uint8Array(e);
+      return e;
+    })
+  );
 }
 
 /**

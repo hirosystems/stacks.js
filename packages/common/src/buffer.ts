@@ -1,3 +1,5 @@
+import { isEnum } from './enum';
+
 /** @ignore */
 export function equals(a: Uint8Array, b: Uint8Array) {
   if (a.byteLength !== b.byteLength) return false;
@@ -7,6 +9,16 @@ export function equals(a: Uint8Array, b: Uint8Array) {
   return true;
 }
 
+// /** @ignore */
+// todo: do we need compare for Uint8Array?
+// export function compare(a: Uint8Array, b: Uint8Array) {
+//   if (a.byteLength !== b.byteLength) return false;
+//   for (let i = 0; i < a.byteLength; i++) {
+//     if (a[i] !== b[i]) return false;
+//   }
+//   return true;
+// }
+
 /** @ignore */
 // todo: maybe remove and use string repeat
 export function alloc(length: number, value: number) {
@@ -15,6 +27,31 @@ export function alloc(length: number, value: number) {
     a[i] = value;
   }
   return a;
+}
+
+/** @ignore */
+export function readUInt8Enum<T extends string, TEnumValue extends number>(
+  source: Uint8Array,
+  offset: number,
+  enumVariable: { [key in T]: TEnumValue },
+  invalidEnumErrorFormatter: (val: number) => Error
+): TEnumValue {
+  const num = readUInt8(source, offset);
+  if (isEnum(enumVariable, num)) {
+    return num;
+  }
+  throw invalidEnumErrorFormatter(num);
+}
+
+/** @ignore */
+export function readUInt16BE(source: Uint8Array, offset: number): number {
+  return ((source[offset + 0] << 8) | source[offset + 1]) >>> 0;
+}
+
+/** @ignore */
+export function writeUInt16BE(source: Uint8Array, value: number, offset: number): void {
+  source[offset + 0] = value >>> 8;
+  source[offset + 1] = value >>> 0;
 }
 
 // The following methods are based on `microsoft/vscode` implementation
