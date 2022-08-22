@@ -71,13 +71,7 @@ The private key for each account's STX address is derived from `m/44'/5757'/0'/0
 With NPM:
 
 ```bash
-npm install @stacks/wallet-sdk --save
-```
-
-With Yarn:
-
-```bash
-yarn add @stacks/wallet-sdk
+npm install @stacks/wallet-sdk
 ```
 
 ### Generate a Secret Key
