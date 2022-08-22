@@ -7,7 +7,7 @@
   "contributors": [
     "Ken Liao <yukanliao@gmail.com>"
   ],
-  "homepage": "https://www.hiro.so/stacks-js",
+  "homepage": "https://hiro.so/stacks-js",
   "scripts": {
     "build": "npm run clean && npm run build:cjs",
     "build:cjs": "tsc -b tsconfig.build.json",
