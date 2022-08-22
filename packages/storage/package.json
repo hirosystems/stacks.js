@@ -25,6 +25,7 @@
     "@stacks/common": "^4.3.5",
     "@stacks/encryption": "^4.3.5",
     "@stacks/network": "^4.3.5",
+    "base64-js": "^1.5.1",
     "jsontokens": "^3.1.1"
   },
   "devDependencies": {

@@ -8,12 +8,14 @@ import {
   megabytesToBytes,
   PayloadTooLargeError,
   SignatureVerificationError,
+  utf8ToBytes,
 } from '@stacks/common';
 import {
   eciesGetJsonStringLength,
   EncryptionOptions,
   getPublicKeyFromPrivate,
   publicKeyToAddress,
+  publicKeyToBtcAddress,
   signECDSA,
   verifyECDSA,
 } from '@stacks/encryption';
@@ -321,20 +323,19 @@ export class Storage {
         this.getGaiaAddress(opt.app!, opt.username, opt.zoneFileLookupURL),
       ]);
 
-      if (!fileContents) {
-        return fileContents;
-      }
-      if (!gaiaAddress) {
+      if (!fileContents) return fileContents;
+
+      if (!gaiaAddress)
         throw new SignatureVerificationError(
           `Failed to get gaia address for verification of: ${path}`
         );
-      }
-      if (!signatureContents || typeof signatureContents !== 'string') {
+
+      if (!signatureContents || typeof signatureContents !== 'string')
         throw new SignatureVerificationError(
           'Failed to obtain signature for file: ' +
             `${path} -- looked in ${path}${SIGNATURE_FILE_SUFFIX}`
         );
-      }
+
       let signature;
       let publicKey;
       try {
@@ -342,40 +343,39 @@ export class Storage {
         signature = sigObject.signature;
         publicKey = sigObject.publicKey;
       } catch (err) {
-        if (err instanceof SyntaxError) {
+        if (err instanceof SyntaxError)
           throw new Error(
-            'Failed to parse signature content JSON ' +
-              `(path: ${path}${SIGNATURE_FILE_SUFFIX})` +
-              ' The content may be corrupted.'
+            `Failed to parse signature content JSON (path: ${path}${SIGNATURE_FILE_SUFFIX}) The content may be corrupted.`
           );
-        } else {
-          throw err;
-        }
-      }
-      const signerAddress = publicKeyToAddress(publicKey);
-      if (gaiaAddress !== signerAddress) {
-        throw new SignatureVerificationError(
-          `Signer pubkey address (${signerAddress}) doesn't` +
-            ` match gaia address (${gaiaAddress})`
-        );
-      } else if (!verifyECDSA(fileContents, publicKey, signature)) {
-        throw new SignatureVerificationError(
-          'Contents do not match ECDSA signature: ' +
-            `path: ${path}, signature: ${path}${SIGNATURE_FILE_SUFFIX}`
-        );
-      } else {
-        return fileContents;
-      }
-    } catch (err) {
-      // For missing .sig files, throw `SignatureVerificationError` instead of `DoesNotExist` error.
-      if (err instanceof DoesNotExist && err.message.indexOf(sigPath) >= 0) {
-        throw new SignatureVerificationError(
-          'Failed to obtain signature for file: ' +
-            `${path} -- looked in ${path}${SIGNATURE_FILE_SUFFIX}`
-        );
-      } else {
         throw err;
       }
+      const signerAddress = publicKeyToAddress(publicKey);
+      if (gaiaAddress !== signerAddress)
+        throw new SignatureVerificationError(
+          `Signer pubkey address (${signerAddress}) doesn't match gaia address (${gaiaAddress})`
+        );
+
+      if (
+        !verifyECDSA(
+          typeof fileContents === 'string'
+            ? utf8ToBytes(fileContents)
+            : new Uint8Array(fileContents),
+          publicKey,
+          signature
+        )
+      ) {
+        throw new SignatureVerificationError(
+          `Contents do not match ECDSA signature: path: ${path}, signature: ${path}${SIGNATURE_FILE_SUFFIX}`
+        );
+      }
+      return fileContents;
+    } catch (err) {
+      // For missing .sig files, throw `SignatureVerificationError` instead of `DoesNotExist` error.
+      if (err instanceof DoesNotExist && err.message.indexOf(sigPath) >= 0)
+        throw new SignatureVerificationError(
+          `Failed to obtain signature for file: ${path} -- looked in ${path}${SIGNATURE_FILE_SUFFIX}`
+        );
+      throw err;
     }
   }
 
@@ -394,17 +394,14 @@ export class Storage {
     username?: string,
     zoneFileLookupURL?: string
     // eslint-disable-next-line node/prefer-global/buffer
-  ): Promise<string | Buffer> {
+  ): Promise<string | Uint8Array> {
     const appPrivateKey = privateKey || this.userSession.loadUserData().appPrivateKey;
 
     const appPublicKey = getPublicKeyFromPrivate(appPrivateKey);
 
-    let address: string;
-    if (username) {
-      address = await this.getGaiaAddress(app, username, zoneFileLookupURL);
-    } else {
-      address = publicKeyToAddress(appPublicKey);
-    }
+    const address: string = username
+      ? await this.getGaiaAddress(app, username, zoneFileLookupURL)
+      : publicKeyToBtcAddress(appPublicKey);
     if (!address) {
       throw new SignatureVerificationError(
         `Failed to get gaia address for verification of: ${path}`
@@ -416,9 +413,7 @@ export class Storage {
     } catch (err) {
       if (err instanceof SyntaxError) {
         throw new Error(
-          'Failed to parse encrypted, signed content JSON. The content may not ' +
-            'be encrypted. If using getFile, try passing' +
-            ' { verify: false, decrypt: false }.'
+          'Failed to parse encrypted, signed content JSON. The content may not be encrypted. If using getFile, try passing { verify: false, decrypt: false }.'
         );
       } else {
         throw err;
@@ -431,15 +426,15 @@ export class Storage {
 
     if (!signerPublicKey || !cipherText || !signature) {
       throw new SignatureVerificationError(
-        'Failed to get signature verification data from file:' + ` ${path}`
+        `Failed to get signature verification data from file: ${path}`
       );
     } else if (signerAddress !== address) {
       throw new SignatureVerificationError(
-        `Signer pubkey address (${signerAddress}) doesn't` + ` match gaia address (${address})`
+        `Signer pubkey address (${signerAddress}) doesn't match gaia address (${address})`
       );
     } else if (!verifyECDSA(cipherText, signerPublicKey, signature)) {
       throw new SignatureVerificationError(
-        'Contents do not match ECDSA signature in file:' + ` ${path}`
+        `Contents do not match ECDSA signature in file: ${path}`
       );
     } else if (typeof privateKey === 'string') {
       const decryptOpt = { privateKey };
@@ -452,7 +447,7 @@ export class Storage {
   /**
    * Stores the data provided in the app's data store to to the file specified.
    * @param {String} path - the path to store the data in
-   * @param {String|Buffer} content - the data to store in the file
+   * @param {String|Uint8Array} content - the data to store in the file
    * @param options a [[PutFileOptions]] object
    *
    * @returns {Promise} that resolves if the operation succeed and rejects
@@ -460,8 +455,7 @@ export class Storage {
    */
   async putFile(
     path: string,
-    // eslint-disable-next-line node/prefer-global/buffer
-    content: string | Buffer | ArrayBufferView | Blob,
+    content: string | Uint8Array | ArrayBufferView | Blob,
     options?: PutFileOptions
   ): Promise<string> {
     const defaults: PutFileOptions = {
@@ -558,7 +552,7 @@ export class Storage {
     } else {
       // In all other cases, we only need one upload.
       // eslint-disable-next-line node/prefer-global/buffer
-      let contentForUpload: string | Buffer | Blob;
+      let contentForUpload: string | Uint8Array | Blob;
       if (!opt.encrypt && !opt.sign) {
         // If content does not need encrypted or signed, it can be passed directly
         // to the fetch request without loading into memory.

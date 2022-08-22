@@ -1,4 +1,5 @@
-import { Buffer } from '@stacks/common';
+import { utf8ToBytes } from '@stacks/common';
+
 /**
  * Retrieves the specified file from the app's data store.
  * @param {String} path - the path to the file to read
@@ -6,11 +7,11 @@ import { Buffer } from '@stacks/common';
  * or rejects with an error
  */
 export /** @ignore */
-type PutFileContent = string | Buffer | ArrayBufferView | ArrayBufferLike | Blob;
+type PutFileContent = string | Uint8Array | ArrayBufferView | ArrayBufferLike | Blob;
 
 /** @ignore */
 export class FileContentLoader {
-  readonly content: Buffer | Blob;
+  readonly content: Uint8Array | Blob;
 
   readonly wasString: boolean;
 
@@ -18,11 +19,11 @@ export class FileContentLoader {
 
   readonly contentByteLength: number;
 
-  private loadedData?: Promise<Buffer>;
+  private loadedData?: Promise<Uint8Array>;
 
   static readonly supportedTypesMsg =
     'Supported types are: `string` (to be UTF8 encoded), ' +
-    '`Buffer`, `Blob`, `File`, `ArrayBuffer`, `UInt8Array` or any other typed array buffer. ';
+    '`Uint8Array`, `Blob`, `File`, `ArrayBuffer`, `UInt8Array` or any other typed array buffer. ';
 
   constructor(content: PutFileContent, contentType: string) {
     this.wasString = typeof content === 'string';
@@ -34,7 +35,7 @@ export class FileContentLoader {
   private static normalizeContentDataType(
     content: PutFileContent,
     contentType: string
-  ): Buffer | Blob {
+  ): Uint8Array | Blob {
     try {
       if (typeof content === 'string') {
         // If a charset is specified it must be either utf8 or ascii, otherwise the encoded content
@@ -49,17 +50,19 @@ export class FileContentLoader {
         }
         if (typeof TextEncoder !== 'undefined') {
           const encodedString = new TextEncoder().encode(content);
-          return Buffer.from(encodedString.buffer);
+          return new Uint8Array(encodedString.buffer);
         }
-        return Buffer.from(content);
-      } else if (Buffer.isBuffer(content)) {
+        return utf8ToBytes(content);
+      } else if (content instanceof Uint8Array) {
         return content;
       } else if (ArrayBuffer.isView(content)) {
-        return Buffer.from(content.buffer, content.byteOffset, content.byteLength);
+        return new Uint8Array(
+          content.buffer.slice(content.byteOffset, content.byteOffset + content.byteLength)
+        );
       } else if (typeof Blob !== 'undefined' && content instanceof Blob) {
         return content;
       } else if (typeof ArrayBuffer !== 'undefined' && content instanceof ArrayBuffer) {
-        return Buffer.from(content);
+        return new Uint8Array(content);
       } else if (Array.isArray(content)) {
         // Provided with a regular number `Array` -- this is either an (old) method
         // of representing an octet array, or a dev error. Perform basic check for octet array.
@@ -71,7 +74,7 @@ export class FileContentLoader {
             `Unexpected array values provided as file data: value "${content[0]}" at index 0 is not an octet number. ${this.supportedTypesMsg}`
           );
         }
-        return Buffer.from(content);
+        return new Uint8Array(content);
       } else {
         const typeName = Object.prototype.toString.call(content);
         throw new Error(
@@ -95,7 +98,7 @@ export class FileContentLoader {
   }
 
   private detectContentLength(): number {
-    if (ArrayBuffer.isView(this.content) || Buffer.isBuffer(this.content)) {
+    if (ArrayBuffer.isView(this.content) || this.content instanceof Uint8Array) {
       return this.content.byteLength;
     } else if (typeof Blob !== 'undefined' && this.content instanceof Blob) {
       return this.content.size;
@@ -106,26 +109,30 @@ export class FileContentLoader {
     throw error;
   }
 
-  private async loadContent(): Promise<Buffer> {
+  private async loadContent(): Promise<Uint8Array> {
     try {
-      if (Buffer.isBuffer(this.content)) {
+      if (this.content instanceof Uint8Array) {
         return this.content;
       } else if (ArrayBuffer.isView(this.content)) {
-        return Buffer.from(this.content.buffer, this.content.byteOffset, this.content.byteLength);
+        return new Uint8Array(
+          this.content.buffer.slice(
+            this.content.byteOffset,
+            this.content.byteOffset + this.content.byteLength
+          )
+        );
       } else if (typeof Blob !== 'undefined' && this.content instanceof Blob) {
         const reader = new FileReader();
-        const readPromise = new Promise<Buffer>((resolve, reject) => {
+        const readPromise = new Promise<Uint8Array>((resolve, reject) => {
           reader.onerror = err => {
             reject(err);
           };
           reader.onload = () => {
             const arrayBuffer = reader.result as ArrayBuffer;
-            resolve(Buffer.from(arrayBuffer));
+            resolve(new Uint8Array(arrayBuffer));
           };
           reader.readAsArrayBuffer(this.content as Blob);
         });
-        const result = await readPromise;
-        return result;
+        return await readPromise;
       } else {
         const typeName = Object.prototype.toString.call(this.content);
         throw new Error(`Unexpected type ${typeName}`);
@@ -138,7 +145,7 @@ export class FileContentLoader {
     }
   }
 
-  load(): Promise<Buffer | string> {
+  load(): Promise<Uint8Array | string> {
     if (this.loadedData === undefined) {
       this.loadedData = this.loadContent();
     }
