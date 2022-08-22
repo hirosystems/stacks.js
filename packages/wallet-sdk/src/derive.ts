@@ -1,7 +1,7 @@
 // https://github.com/paulmillr/scure-bip32
 // Secure, audited & minimal implementation of BIP32 hierarchical deterministic (HD) wallets.
 import { HDKey } from '@scure/bip32';
-import { Buffer, ChainID, TransactionVersion } from '@stacks/common';
+import { ChainID, TransactionVersion, utf8ToBytes } from '@stacks/common';
 import { compressPrivateKey, createSha2Hash, ecPrivateKeyToHexString } from '@stacks/encryption';
 import { StacksMainnet, StacksNetwork } from '@stacks/network';
 import { bytesToHex, getAddressFromPrivateKey } from '@stacks/transactions';
@@ -19,7 +19,7 @@ export const deriveWalletKeys = async (rootNode: HDKey | BIP32Interface): Promis
   const derived: WalletKeys = {
     salt: await deriveSalt(rootNode),
     rootKey: rootNode instanceof HDKey ? rootNode.privateExtendedKey : rootNode.toBase58(), // Backward compatibility with bip32
-    configPrivateKey: deriveConfigPrivateKey(rootNode).toString('hex'),
+    configPrivateKey: bytesToHex(deriveConfigPrivateKey(rootNode)),
   };
   return derived;
 };
@@ -35,23 +35,21 @@ export const deriveWalletKeys = async (rootNode: HDKey | BIP32Interface): Promis
  *
  * @param rootNode A keychain that was created using the wallet's seed phrase
  */
-export const deriveConfigPrivateKey = (rootNode: HDKey | BIP32Interface): Buffer => {
+export const deriveConfigPrivateKey = (rootNode: HDKey | BIP32Interface): Uint8Array => {
   // Keep BIP32Interface for backward compatibility with bip32
-  let derivedConfigKey;
-  if (rootNode instanceof HDKey) {
-    derivedConfigKey = rootNode.derive(WALLET_CONFIG_PATH).privateKey;
-  } else {
-    // Backward compatibility with bip32
-    derivedConfigKey = rootNode.derivePath(WALLET_CONFIG_PATH).privateKey;
-  }
-  if (!derivedConfigKey) {
-    throw new TypeError('Unable to derive config key for wallet identities');
-  }
-  if (derivedConfigKey instanceof Uint8Array) {
-    derivedConfigKey = Buffer.from(derivedConfigKey);
-  }
-  return derivedConfigKey;
+  const derivedConfigKey =
+    rootNode instanceof HDKey
+      ? rootNode.derive(WALLET_CONFIG_PATH).privateKey
+      : rootNode.derivePath(WALLET_CONFIG_PATH).privateKey;
+
+  if (!derivedConfigKey) throw new TypeError('Unable to derive config key for wallet identities');
+
+  return derivedConfigKey instanceof Uint8Array
+    ? derivedConfigKey
+    : new Uint8Array(derivedConfigKey);
 };
+
+// todo: remove old BIP32Interface
 
 /**
  * Before the Stacks Wallet, the authenticator used with Connect used a different format
@@ -72,11 +70,10 @@ export const deriveLegacyConfigPrivateKey = (rootNode: HDKey | BIP32Interface): 
   if (!derivedLegacyKey) {
     throw new TypeError('Unable to derive config key for wallet identities');
   }
-  if (derivedLegacyKey instanceof Buffer) {
-    return derivedLegacyKey.toString('hex');
-  } else {
-    return bytesToHex(derivedLegacyKey);
-  }
+  // eslint-disable-next-line node/prefer-global/buffer
+  return derivedLegacyKey instanceof Buffer
+    ? derivedLegacyKey.toString('hex')
+    : bytesToHex(derivedLegacyKey);
 };
 
 /**
@@ -90,16 +87,16 @@ export const deriveSalt = async (rootNode: HDKey | BIP32Interface) => {
 
   if (rootNode instanceof HDKey) {
     identitiesKeychain = rootNode.derive(DATA_DERIVATION_PATH);
-    publicKeyHex = Buffer.from(bytesToHex(identitiesKeychain.publicKey as Uint8Array));
+    publicKeyHex = utf8ToBytes(bytesToHex(identitiesKeychain.publicKey as Uint8Array));
   } else {
     // Backward compatibility with bip32
     identitiesKeychain = rootNode.derivePath(DATA_DERIVATION_PATH);
-    publicKeyHex = Buffer.from(identitiesKeychain.publicKey.toString('hex'));
+    publicKeyHex = utf8ToBytes(identitiesKeychain.publicKey.toString('hex'));
   }
 
   const sha2Hash = await createSha2Hash();
   const saltData = await sha2Hash.digest(publicKeyHex, 'sha256');
-  const salt = saltData.toString('hex');
+  const salt = bytesToHex(saltData);
 
   return salt;
 };
@@ -292,8 +289,8 @@ export const deriveStxPrivateKey = ({
   assertIsTruthy(childKey.privateKey);
   const privateKey =
     childKey.privateKey instanceof Uint8Array
-      ? Buffer.from(childKey.privateKey)
-      : childKey.privateKey;
+      ? childKey.privateKey
+      : new Uint8Array(childKey.privateKey);
   return ecPrivateKeyToHexString(compressPrivateKey(privateKey));
 };
 
@@ -314,8 +311,8 @@ export const deriveDataPrivateKey = ({
   assertIsTruthy(childKey.privateKey);
   const privateKey =
     childKey.privateKey instanceof Uint8Array
-      ? Buffer.from(childKey.privateKey)
-      : childKey.privateKey;
+      ? childKey.privateKey
+      : new Uint8Array(childKey.privateKey);
   return ecPrivateKeyToHexString(compressPrivateKey(privateKey));
 };
 

@@ -1,5 +1,4 @@
-// @ts-ignore
-import { Buffer } from '@stacks/common';
+/* eslint-disable node/prefer-global/buffer */
 import { getPublicKeyFromPrivate, publicKeyToAddress } from '@stacks/encryption';
 // https://github.com/paulmillr/scure-bip32
 // Secure, audited & minimal implementation of BIP32 hierarchical deterministic (HD) wallets.
@@ -42,6 +41,7 @@ interface Network {
 
 // Reference: https://github.com/bitcoinjs/bip32/blob/79c6dedb3edfdc8505fe74d9f34c115c33e8a2da/ts-src/bip32.ts#L19-L41
 // Using BIP32Interface for backward compatibility with offloaded bip32 dependency
+// todo: remove legacy
 export interface BIP32Interface {
   chainCode: Buffer;
   network: Network;

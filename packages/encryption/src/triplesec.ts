@@ -5,6 +5,8 @@ export function triplesecDecrypt(
   arg: { data: Uint8Array; key: Uint8Array },
   cb: (err: Error | null, buff: Uint8Array | null) => void
 ) {
+  if (!global.Buffer) throw Error('Using triplesec currently requires polyfilling `Buffer`');
+
   const argBuffer = {
     data: Buffer.from(arg.data),
     key: Buffer.from(arg.key),
