@@ -1,4 +1,5 @@
-import { encryptMnemonic, decryptMnemonic, triplesecDecrypt } from '@stacks/encryption';
+import { encryptMnemonic, decryptMnemonic } from '@stacks/encryption';
+import { triplesecDecrypt } from './triplesec';
 
 /**
  * Decrypt an encrypted mnemonic phrase with a password.

@@ -38,7 +38,6 @@ import {
   utils,
   verify as nobleSecp256k1Verify,
 } from '@noble/secp256k1';
-import { triplesecDecrypt } from '../src/triplesec';
 
 const privateKey = 'a5c61c6ca7b3e7e55edee68566aeab22e4da26baa285c7bd10e8d2218aa3b229';
 const publicKey = '027d28f9951ce46538951e3697c62588a87f1f1f295de4a14fdd4c780fc52cfe69';
@@ -514,6 +513,9 @@ test('encryptMnemonic & decryptMnemonic', async () => {
     'dacd8a676f1f873c5f9c708cc6070642d44d2505aa9cdba26c50ad6f8d3e547fb0cba710' +
     'a7f7be54ff7ea7e98a809ddee5ef85f6f259b3a17a8d8dbaac618b80fe266a1e63ec19e4' +
     '76bee9177b51894e';
+
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const { triplesecDecrypt } = require('../../wallet-sdk/src/triplesec');
 
   // Test encryption -> decryption. Can't be done with hard-coded values
   // due to random salt.
