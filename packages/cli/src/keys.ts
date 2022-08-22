@@ -1,3 +1,4 @@
+/* eslint-disable node/prefer-global/buffer */
 // TODO: most of this code should be in blockstack.js
 // Will remove most of this code once the wallet functionality is there instead.
 
