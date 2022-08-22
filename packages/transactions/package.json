@@ -9,7 +9,7 @@
     "Matthew Little",
     "Reed Rosenbluth"
   ],
-  "homepage": "https://www.hiro.so/stacks-js",
+  "homepage": "https://hiro.so/stacks-js",
   "scripts": {
     "build": "npm run clean && npm run build:cjs && npm run build:esm && npm run build:umd && npm run build:polyfill",
     "build:cjs": "tsc -b tsconfig.build.json",
