@@ -160,14 +160,6 @@ test('check stacking eligibility true', async () => {
   jest.mock('@stacks/transactions', () => ({
     ...jest.requireActual('@stacks/transactions'),
     callReadOnlyFunction,
-    bufferCV: jest.requireActual('@stacks/transactions').bufferCV,
-    tupleCV: jest.requireActual('@stacks/transactions').tupleCV,
-    uintCV: jest.requireActual('@stacks/transactions').uintCV,
-    trueCV: jest.requireActual('@stacks/transactions').trueCV,
-    responseOkCV: jest.requireActual('@stacks/transactions').responseOkCV,
-    ClarityType: jest.requireActual('@stacks/transactions').ClarityType,
-    AddressHashMode: jest.requireActual('@stacks/transactions').AddressHashMode,
-    validateStacksAddress: jest.requireActual('@stacks/transactions').validateStacksAddress,
   }));
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const { StackingClient } = require('../src'); // needed for jest.mock module

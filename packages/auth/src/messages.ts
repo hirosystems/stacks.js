@@ -1,4 +1,12 @@
-import { getGlobalObject, makeUUID4, nextMonth } from '@stacks/common';
+import {
+  bytesToHex,
+  bytesToUtf8,
+  getGlobalObject,
+  hexToBytes,
+  makeUUID4,
+  nextMonth,
+  utf8ToBytes,
+} from '@stacks/common';
 import {
   decryptECIES,
   encryptECIES,
@@ -118,9 +126,9 @@ export function makeAuthRequest(
  * @ignore
  */
 export async function encryptPrivateKey(publicKey: string, privateKey: string): Promise<string> {
-  const encryptedObj = await encryptECIES(publicKey, Buffer.from(privateKey), true);
+  const encryptedObj = await encryptECIES(publicKey, utf8ToBytes(privateKey), true);
   const encryptedJSON = JSON.stringify(encryptedObj);
-  return Buffer.from(encryptedJSON).toString('hex');
+  return bytesToHex(utf8ToBytes(encryptedJSON));
 }
 
 /**
@@ -138,7 +146,7 @@ export async function decryptPrivateKey(
   privateKey: string,
   hexedEncrypted: string
 ): Promise<string | null> {
-  const unhexedString = Buffer.from(hexedEncrypted, 'hex').toString();
+  const unhexedString = bytesToUtf8(hexToBytes(hexedEncrypted));
   const encryptedObj = JSON.parse(unhexedString);
   const decrypted = await decryptECIES(privateKey, encryptedObj);
   if (typeof decrypted !== 'string') {
