@@ -393,7 +393,6 @@ export class Storage {
     privateKey?: string,
     username?: string,
     zoneFileLookupURL?: string
-    // eslint-disable-next-line node/prefer-global/buffer
   ): Promise<string | Uint8Array> {
     const appPrivateKey = privateKey || this.userSession.loadUserData().appPrivateKey;
 
@@ -551,7 +550,6 @@ export class Storage {
       };
     } else {
       // In all other cases, we only need one upload.
-      // eslint-disable-next-line node/prefer-global/buffer
       let contentForUpload: string | Uint8Array | Blob;
       if (!opt.encrypt && !opt.sign) {
         // If content does not need encrypted or signed, it can be passed directly

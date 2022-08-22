@@ -7,7 +7,6 @@ import { encryptMnemonic, decryptMnemonic, triplesecDecrypt } from '@stacks/encr
  * @param password - Password for data
  * @return the raw mnemonic phrase
  */
-// eslint-disable-next-line node/prefer-global/buffer
 export function decrypt(dataBytes: Uint8Array | string, password: string): Promise<string> {
   return decryptMnemonic(dataBytes, password, triplesecDecrypt);
 }
@@ -18,7 +17,6 @@ export function decrypt(dataBytes: Uint8Array | string, password: string): Promi
  * @param password - Password to encrypt mnemonic with
  * @return The encrypted phrase
  * */
-// eslint-disable-next-line node/prefer-global/buffer
 export function encrypt(phrase: string, password: string): Promise<Uint8Array> {
   return encryptMnemonic(phrase, password);
 }

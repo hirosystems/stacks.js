@@ -1,4 +1,3 @@
-/* eslint-disable node/prefer-global/buffer */
 import { base58CheckDecode, base58CheckEncode } from '@stacks/encryption';
 import {
   AddressHashMode,

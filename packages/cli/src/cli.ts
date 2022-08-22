@@ -1,3 +1,4 @@
+/* eslint-disable node/prefer-global/buffer */
 import { bytesToHex } from '@stacks/common';
 import * as bitcoin from 'bitcoinjs-lib';
 import * as blockstack from 'blockstack';
