@@ -165,7 +165,7 @@ export function createStacksPrivateKey(key: string | Uint8Array): StacksPrivateK
 }
 
 export function makeRandomPrivKey(): StacksPrivateKey {
-  return createStacksPrivateKey(bytesToHex(utils.randomPrivateKey()));
+  return createStacksPrivateKey(utils.randomPrivateKey());
 }
 
 /**
