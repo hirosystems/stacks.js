@@ -1,4 +1,3 @@
-import { Buffer } from '@stacks/common';
 import * as logger from 'winston';
 import * as bitcoinjs from 'bitcoinjs-lib';
 import * as readline from 'readline';

@@ -21,8 +21,7 @@
   },
   "dependencies": {
     "@types/bn.js": "^5.1.0",
-    "@types/node": "^18.0.4",
-    "buffer": "^6.0.3"
+    "@types/node": "^18.0.4"
   },
   "devDependencies": {
     "@types/jest": "^26.0.22",
