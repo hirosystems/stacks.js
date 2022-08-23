@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.3.5](https://github.com/hirosystems/stacks.js/compare/v4.3.4...v4.3.5) (2022-08-23)
+
+
+### Bug Fixes
+
+* offload bip39 from keychain ([132e0c5](https://github.com/hirosystems/stacks.js/commit/132e0c5beae1fcc5623256ee89988d7ac99725ac))
+
+
+
+
+
 ## [4.3.4](https://github.com/hirosystems/stacks.js/compare/v4.3.3...v4.3.4) (2022-08-02)
 
 **Note:** Version bump only for package @stacks/keychain
