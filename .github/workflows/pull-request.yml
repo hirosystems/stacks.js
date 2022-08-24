@@ -49,7 +49,7 @@ jobs:
       - run: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > ~/.npmrc
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-      - run: npx lerna publish prepatch --preid pr.$SHA --dist-tag pr --no-verify-access --no-push --no-git-tag-version --yes
+      - run: npx lerna publish prepatch --preid pr.$SHA --dist-tag pr --no-verify-access --no-push --no-git-tag-version --force-publish --yes
         env:
           SHA: ${{ steps.git-commit.outputs.sha }}
           SKIP_TESTS: true
