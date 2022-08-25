@@ -32,7 +32,7 @@ import { createStacksPrivateKey, pubKeyfromPrivKey, publicKeyToString } from '..
 import { TransactionSigner } from '../src/signer';
 
 import fetchMock from 'jest-fetch-mock';
-import { ByteReader } from '../src/bytesReader';
+import { BytesReader } from '../src/bytesReader';
 import { standardPrincipalCV } from '../src/clarity';
 import { bytesToHex } from '@stacks/common';
 
@@ -83,7 +83,7 @@ test('STX token transfer transaction serialization and deserialization', () => {
   transaction.verifyOrigin();
 
   const serialized = transaction.serialize();
-  const deserialized = deserializeTransaction(new ByteReader(serialized));
+  const deserialized = deserializeTransaction(new BytesReader(serialized));
 
   const serializedHexString = bytesToHex(serialized);
   expect(bytesToHex(deserializeTransaction(serializedHexString).serialize())).toEqual(
@@ -161,14 +161,14 @@ test('STX token transfer transaction fee setting', () => {
   transaction.verifyOrigin();
 
   const serialized = transaction.serialize();
-  const deserialized = deserializeTransaction(new ByteReader(serialized));
+  const deserialized = deserializeTransaction(new BytesReader(serialized));
   expect(deserialized.auth.spendingCondition!.fee!.toString()).toBe(fee.toString());
 
   const setFee = 123;
   transaction.setFee(setFee);
 
   const postSetFeeSerialized = transaction.serialize();
-  const postSetFeeDeserialized = deserializeTransaction(new ByteReader(postSetFeeSerialized));
+  const postSetFeeDeserialized = deserializeTransaction(new BytesReader(postSetFeeSerialized));
   expect(postSetFeeDeserialized.version).toBe(transactionVersion);
   expect(postSetFeeDeserialized.chainId).toBe(chainId);
   expect(postSetFeeDeserialized.auth.authType).toBe(authType);
@@ -244,7 +244,7 @@ test('STX token transfer transaction multi-sig serialization and deserialization
   transaction.verifyOrigin();
 
   const serialized = transaction.serialize();
-  const deserialized = deserializeTransaction(new ByteReader(serialized));
+  const deserialized = deserializeTransaction(new BytesReader(serialized));
   expect(deserialized.version).toBe(transactionVersion);
   expect(deserialized.chainId).toBe(chainId);
   expect(deserialized.auth.authType).toBe(authType);
@@ -318,7 +318,7 @@ test('STX token transfer transaction multi-sig uncompressed keys serialization a
     '0000000001040173a8b4a751a678fe83e9d35ce301371bb3d397f7000000000000000000000000000000000000000303010359b18fbcb6d5e26efc1eae70aefdae54995e6fd4f3ec40d2ff43b2227c4def1ee6416bf3dd5c92c8150fa51717f1f2db778c02ba47b8c70c1a8ff640b4edee03017b7d76c3d1f7d449604df864e4013da5094be7276aa02cb73ec9fc8108a0bed46c7cde4d702830c1db34ef7c19e2776f59107afef39084776fc88bc78dbb96560103661ec7479330bf1ef7a4c9d1816f089666a112e72d671048e5424fc528ca51530002030200000000000516df0ba3e79792be7be5e50a370289accfc8c9e03200000000002625a06d656d6f000000000000000000000000000000000000000000000000000000000000';
   expect(bytesToHex(serialized)).toBe(verifiedTx);
 
-  expect(() => deserializeTransaction(new ByteReader(serialized))).toThrow(expectedError);
+  expect(() => deserializeTransaction(new BytesReader(serialized))).toThrow(expectedError);
 });
 
 test('Sponsored STX token transfer transaction serialization and deserialization', () => {
@@ -364,7 +364,7 @@ test('Sponsored STX token transfer transaction serialization and deserialization
   transaction.verifyOrigin();
 
   const serialized = transaction.serialize();
-  const deserialized = deserializeTransaction(new ByteReader(serialized));
+  const deserialized = deserializeTransaction(new BytesReader(serialized));
   expect(deserialized.version).toBe(transactionVersion);
   expect(deserialized.chainId).toBe(chainId);
   expect(deserialized.auth.authType).toBe(authType);

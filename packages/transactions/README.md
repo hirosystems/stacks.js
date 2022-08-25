@@ -161,14 +161,14 @@ The serialized transaction can now be passed to the sponsoring party which will 
 ```typescript
 import {
   sponsorTransaction,
-  BufferReader,
+  BytesReader,
   deserializeTransaction,
   broadcastTransaction,
 } from '@stacks/transactions';
 import { StacksTestnet, StacksMainnet } from '@stacks/network';
 
-const bufferReader = new BufferReader(Buffer.from(serializedTx, 'hex'));
-const deserializedTx = deserializeTransaction(bufferReader);
+const bytesReader = new BytesReader(Buffer.from(serializedTx, 'hex'));
+const deserializedTx = deserializeTransaction(bytesReader);
 const sponsorKey = '770287b9471081c8acd37d57190c7a70f0da2633311cc120853537362d32e67c01';
 const fee = 1000n;
 
@@ -201,7 +201,7 @@ import {
   publicKeyToString,
   TransactionSigner,
   standardPrincipalCV,
-  BufferReader,
+  BytesReader,
   AnchorMode,
 } from '@stacks/transactions';
 
@@ -241,9 +241,9 @@ transaction must be appended to the signature.
 
 ```typescript
 // deserialize and sign transaction
-const bufferReader = new BufferReader(serializedTx);
+const bytesReader = new BytesReader(serializedTx);
 // Partially signed or unsigned multi-sig tx can be deserialized to add the required signatures
-const deserializedTx = deserializeTransaction(bufferReader);
+const deserializedTx = deserializeTransaction(bytesReader);
 
 const signer = new TransactionSigner(deserializedTx);
 

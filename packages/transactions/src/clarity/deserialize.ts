@@ -15,7 +15,7 @@ import {
   listCV,
   tupleCV,
 } from '.';
-import { ByteReader as ByteReader } from '../bytesReader';
+import { BytesReader as BytesReader } from '../bytesReader';
 import { deserializeAddress, deserializeLPString } from '../types';
 import { DeserializationError } from '../errors';
 import { stringAsciiCV, stringUtf8CV } from './types/stringCV';
@@ -44,16 +44,16 @@ import { bytesToAscii, bytesToUtf8, hexToBytes } from '@stacks/common';
  * {@link https://github.com/hirosystems/stacks.js/blob/master/packages/transactions/tests/clarity.test.ts clarity test cases for more examples}
  */
 export default function deserializeCV<T extends ClarityValue = ClarityValue>(
-  serializedClarityValue: ByteReader | Uint8Array | string
+  serializedClarityValue: BytesReader | Uint8Array | string
 ): T {
-  let bytesReader: ByteReader;
+  let bytesReader: BytesReader;
   if (typeof serializedClarityValue === 'string') {
     const hasHexPrefix = serializedClarityValue.slice(0, 2).toLowerCase() === '0x';
-    bytesReader = new ByteReader(
+    bytesReader = new BytesReader(
       hexToBytes(hasHexPrefix ? serializedClarityValue.slice(2) : serializedClarityValue)
     );
   } else if (serializedClarityValue instanceof Uint8Array) {
-    bytesReader = new ByteReader(serializedClarityValue);
+    bytesReader = new BytesReader(serializedClarityValue);
   } else {
     bytesReader = serializedClarityValue;
   }

@@ -1,4 +1,4 @@
-import { ByteReader } from './bytesReader';
+import { BytesReader } from './bytesReader';
 import { DeserializationError } from './errors';
 import { PubKeyEncoding, RECOVERABLE_ECDSA_SIG_LENGTH_BYTES, StacksMessageType } from './constants';
 import {
@@ -28,7 +28,7 @@ export interface TransactionAuthField {
 
 export type TransactionAuthFieldContents = StacksPublicKey | MessageSignature;
 
-export function deserializeMessageSignature(bytesReader: ByteReader): MessageSignature {
+export function deserializeMessageSignature(bytesReader: BytesReader): MessageSignature {
   return createMessageSignature(
     bytesToHex(bytesReader.readBytes(RECOVERABLE_ECDSA_SIG_LENGTH_BYTES))
   );
@@ -51,7 +51,7 @@ export function createTransactionAuthField(
   };
 }
 
-export function deserializeTransactionAuthField(bytesReader: ByteReader): TransactionAuthField {
+export function deserializeTransactionAuthField(bytesReader: BytesReader): TransactionAuthField {
   const authFieldType = bytesReader.readUInt8Enum(AuthFieldType, n => {
     throw new DeserializationError(`Could not read ${n} as AuthFieldType`);
   });

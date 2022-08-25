@@ -14,7 +14,7 @@ import { createAddress, LengthPrefixedString, createLPString } from './postcondi
 import { Address } from './common';
 import { ClarityValue, serializeCV, deserializeCV } from './clarity/';
 
-import { ByteReader } from './bytesReader';
+import { BytesReader } from './bytesReader';
 import { PrincipalCV, principalCV } from './clarity/types/principalCV';
 
 export type Payload =
@@ -183,7 +183,7 @@ export function serializePayload(payload: PayloadInput): Uint8Array {
   return concatArray(bytesArray);
 }
 
-export function deserializePayload(bytesReader: ByteReader): Payload {
+export function deserializePayload(bytesReader: BytesReader): Payload {
   const payloadType = bytesReader.readUInt8Enum(PayloadType, n => {
     throw new Error(`Cannot recognize PayloadType: ${n}`);
   });

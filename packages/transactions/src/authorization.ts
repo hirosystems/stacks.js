@@ -43,7 +43,7 @@ import {
 
 import { MessageSignature } from './common';
 import { DeserializationError, SigningError, VerificationError } from './errors';
-import { ByteReader } from './bytesReader';
+import { BytesReader } from './bytesReader';
 
 export function emptyMessageSignature(): MessageSignature {
   return {
@@ -190,7 +190,7 @@ export function serializeMultiSigSpendingCondition(
 
 export function deserializeSingleSigSpendingCondition(
   hashMode: SingleSigHashMode,
-  bytesReader: ByteReader
+  bytesReader: BytesReader
 ): SingleSigSpendingCondition {
   const signer = bytesToHex(bytesReader.readBytes(20));
   const nonce = BigInt(`0x${bytesToHex(bytesReader.readBytes(8))}`);
@@ -217,7 +217,7 @@ export function deserializeSingleSigSpendingCondition(
 
 export function deserializeMultiSigSpendingCondition(
   hashMode: MultiSigHashMode,
-  bytesReader: ByteReader
+  bytesReader: BytesReader
 ): MultiSigSpendingCondition {
   const signer = bytesToHex(bytesReader.readBytes(20));
   const nonce = BigInt('0x' + bytesToHex(bytesReader.readBytes(8)));
@@ -269,7 +269,7 @@ export function serializeSpendingCondition(condition: SpendingConditionOpts): Ui
   return serializeMultiSigSpendingCondition(condition);
 }
 
-export function deserializeSpendingCondition(bytesReader: ByteReader): SpendingCondition {
+export function deserializeSpendingCondition(bytesReader: BytesReader): SpendingCondition {
   const hashMode = bytesReader.readUInt8Enum(AddressHashMode, n => {
     throw new DeserializationError(`Could not parse ${n} as AddressHashMode`);
   });
@@ -628,7 +628,7 @@ export function serializeAuthorization(auth: Authorization): Uint8Array {
   return concatArray(bytesArray);
 }
 
-export function deserializeAuthorization(bytesReader: ByteReader) {
+export function deserializeAuthorization(bytesReader: BytesReader) {
   const authType = bytesReader.readUInt8Enum(AuthType, n => {
     throw new DeserializationError(`Could not parse ${n} as AuthType`);
   });
