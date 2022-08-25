@@ -17,7 +17,7 @@ import { Address, addressToString } from '../src/common';
 import { TransactionVersion, AddressHashMode, StacksMessageType } from '../src/constants';
 
 import { serializeDeserialize } from './macros';
-import { ByteReader } from '../src/bytesReader';
+import { BytesReader } from '../src/bytesReader';
 import { createStacksPublicKey } from '../src/keys';
 
 test('Length prefixed strings serialization and deserialization', () => {
@@ -49,8 +49,8 @@ test('Length prefixed list serialization and deserialization', () => {
   const lpList: LengthPrefixedList = createLPList(l);
   const serialized = serializeStacksMessage(lpList);
 
-  const bufferReader = new ByteReader(serialized);
-  const deserialized = deserializeLPList(bufferReader, StacksMessageType.Address);
+  const bytesReader = new BytesReader(serialized);
+  const deserialized = deserializeLPList(bytesReader, StacksMessageType.Address);
 
   expect(deserialized.values.length).toBe(addressList.length);
 

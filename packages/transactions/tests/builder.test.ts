@@ -17,7 +17,7 @@ import {
   SponsoredAuthorization,
   StandardAuthorization,
 } from '../src/authorization';
-import { ByteReader } from '../src/bytesReader';
+import { BytesReader } from '../src/bytesReader';
 import {
   broadcastTransaction,
   callReadOnlyFunction,
@@ -358,8 +358,8 @@ test('Make Multi-Sig STX token transfer', async () => {
 
   expect(bytesToHex(serializedTx)).toBe(tx);
 
-  const bufferReader = new ByteReader(serializedTx);
-  const deserializedTx = deserializeTransaction(bufferReader);
+  const bytesReader = new BytesReader(serializedTx);
+  const deserializedTx = deserializeTransaction(bytesReader);
 
   expect(deserializedTx.auth.authType).toBe(authType);
 
@@ -426,11 +426,11 @@ test('Should deserialize partially signed multi-Sig STX token transfer', async (
 
   expect(bytesToHex(serializedTx)).toBe(tx);
 
-  const bufferReader = new ByteReader(serializedTx);
+  const bytesReader = new BytesReader(serializedTx);
 
   // Partially signed or unsigned multi-sig tx can be serialized and deserialized without exception (Incorrect number of signatures)
   // Should be able to deserializeTransaction with missing signatures.
-  expect(() => deserializeTransaction(bufferReader)).not.toThrowError();
+  expect(() => deserializeTransaction(bytesReader)).not.toThrowError();
 
   // Now add the required signatures in the original transactions
   const signer = new TransactionSigner(transaction);
@@ -439,10 +439,10 @@ test('Should deserialize partially signed multi-Sig STX token transfer', async (
   signer.appendOrigin(pubKeys[2]);
 
   const fullySignedTransaction = transaction.serialize();
-  const bufferReaderSignedTx = new ByteReader(fullySignedTransaction);
+  const bytesReaderSignedTx = new BytesReader(fullySignedTransaction);
 
   // Should deserialize fully signed multi sig transaction
-  const deserializedTx = deserializeTransaction(bufferReaderSignedTx);
+  const deserializedTx = deserializeTransaction(bytesReaderSignedTx);
 
   expect(deserializedTx.auth.authType).toBe(authType);
 
@@ -565,10 +565,10 @@ test('Make Multi-Sig STX token transfer with two transaction signers', async () 
   const partiallySignedSerialized = transaction.serialize();
 
   // deserialize
-  const bufferReader2 = new ByteReader(partiallySignedSerialized);
+  const bytesReader2 = new BytesReader(partiallySignedSerialized);
   // Partially signed multi-sig tx can be serialized and deserialized without exception (Incorrect number of signatures)
   // Should be able to deserialize as number of signatures are less than signatures required
-  expect(() => deserializeTransaction(bufferReader2)).not.toThrowError();
+  expect(() => deserializeTransaction(bytesReader2)).not.toThrowError();
 
   // finish signing with new TransactionSigner
   const signer2 = new TransactionSigner(transaction);
@@ -592,8 +592,8 @@ test('Make Multi-Sig STX token transfer with two transaction signers', async () 
 
   const serializedTx = transaction.serialize();
 
-  const bufferReader = new ByteReader(serializedTx);
-  const deserializedTx = deserializeTransaction(bufferReader);
+  const bytesReader = new BytesReader(serializedTx);
+  const deserializedTx = deserializeTransaction(bytesReader);
 
   expect(deserializedTx.auth.authType).toBe(authType);
 
@@ -741,8 +741,8 @@ test('Make smart contract deploy unsigned', async () => {
 
   const serializedTx = transaction.serialize();
 
-  const bufferReader = new ByteReader(serializedTx);
-  const deserializedTx = deserializeTransaction(bufferReader);
+  const bytesReader = new BytesReader(serializedTx);
+  const deserializedTx = deserializeTransaction(bytesReader);
 
   expect(deserializedTx.auth.authType).toBe(authType);
 
@@ -772,8 +772,8 @@ test('Make smart contract deploy signed', async () => {
 
   const serializedTx = transaction.serialize();
 
-  const bufferReader = new ByteReader(serializedTx);
-  const deserializedTx = deserializeTransaction(bufferReader);
+  const bytesReader = new BytesReader(serializedTx);
+  const deserializedTx = deserializeTransaction(bytesReader);
   expect(deserializedTx.auth.authType).toBe(authType);
 
   expect(deserializedTx.auth.spendingCondition!.hashMode).toBe(addressHashMode);
@@ -1302,8 +1302,8 @@ test('Make sponsored STX token transfer', async () => {
   const sponsorSignedTx = await sponsorTransaction(sponsorOptions);
   const sponsorSignedTxSerialized = sponsorSignedTx.serialize();
 
-  const bufferReader = new ByteReader(sponsorSignedTxSerialized);
-  const deserializedSponsorTx = deserializeTransaction(bufferReader);
+  const bytesReader = new BytesReader(sponsorSignedTxSerialized);
+  const deserializedSponsorTx = deserializeTransaction(bytesReader);
 
   // Create same sponsored transaction in steps to verify the signature contents with sponsorTransaction call
   const payload = createTokenTransferPayload(recipient, amount, memo);
@@ -1447,8 +1447,8 @@ test('Make sponsored STX token transfer with sponsor fee estimate', async () => 
 
   const sponsorSignedTxSerialized = sponsorSignedTx.serialize();
 
-  const bufferReader = new ByteReader(sponsorSignedTxSerialized);
-  const deserializedSponsorTx = deserializeTransaction(bufferReader);
+  const bytesReader = new BytesReader(sponsorSignedTxSerialized);
+  const deserializedSponsorTx = deserializeTransaction(bytesReader);
 
   expect(deserializedSponsorTx.auth.authType).toBe(authType);
 
@@ -1503,8 +1503,8 @@ test('Make sponsored STX token transfer with set tx fee', async () => {
 
   const sponsorSignedTxSerialized = sponsorSignedTx.serialize();
 
-  const bufferReader = new ByteReader(sponsorSignedTxSerialized);
-  const deserializedSponsorTx = deserializeTransaction(bufferReader);
+  const bytesReader = new BytesReader(sponsorSignedTxSerialized);
+  const deserializedSponsorTx = deserializeTransaction(bytesReader);
 
   expect(fetchMock.mock.calls.length).toEqual(0);
   expect(deserializedSponsorTx.auth.spendingCondition!.nonce!.toString()).toBe(nonce.toString());
@@ -1560,8 +1560,8 @@ test('Make sponsored contract deploy with sponsor fee estimate', async () => {
 
   const sponsorSignedTxSerialized = sponsorSignedTx.serialize();
 
-  const bufferReader = new ByteReader(sponsorSignedTxSerialized);
-  const deserializedSponsorTx = deserializeTransaction(bufferReader);
+  const bytesReader = new BytesReader(sponsorSignedTxSerialized);
+  const deserializedSponsorTx = deserializeTransaction(bytesReader);
 
   expect(deserializedSponsorTx.auth.authType).toBe(authType);
 
@@ -1623,8 +1623,8 @@ test('Make sponsored contract call with sponsor nonce fetch', async () => {
 
   const sponsorSignedTxSerialized = sponsorSignedTx.serialize();
 
-  const bufferReader = new ByteReader(sponsorSignedTxSerialized);
-  const deserializedSponsorTx = deserializeTransaction(bufferReader);
+  const bytesReader = new BytesReader(sponsorSignedTxSerialized);
+  const deserializedSponsorTx = deserializeTransaction(bytesReader);
 
   expect(deserializedSponsorTx.auth.authType).toBe(authType);
 

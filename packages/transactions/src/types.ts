@@ -31,7 +31,7 @@ import {
   hashP2WPKH,
 } from './utils';
 
-import { ByteReader } from './bytesReader';
+import { BytesReader } from './bytesReader';
 import {
   PostCondition,
   StandardPrincipal,
@@ -98,7 +98,7 @@ export function serializeStacksMessage(message: StacksMessage): Uint8Array {
 }
 
 export function deserializeStacksMessage(
-  bytesReader: ByteReader,
+  bytesReader: BytesReader,
   type: StacksMessageType,
   listType?: StacksMessageType
 ): StacksMessage {
@@ -194,7 +194,7 @@ export function serializeAddress(address: Address): Uint8Array {
   return concatArray(bytesArray);
 }
 
-export function deserializeAddress(bytesReader: ByteReader): Address {
+export function deserializeAddress(bytesReader: BytesReader): Address {
   const version = hexToInt(bytesToHex(bytesReader.readBytes(1)));
   const data = bytesToHex(bytesReader.readBytes(20));
 
@@ -211,7 +211,7 @@ export function serializePrincipal(principal: PostConditionPrincipal): Uint8Arra
   return concatArray(bytesArray);
 }
 
-export function deserializePrincipal(bytesReader: ByteReader): PostConditionPrincipal {
+export function deserializePrincipal(bytesReader: BytesReader): PostConditionPrincipal {
   const prefix = bytesReader.readUInt8Enum(PostConditionPrincipalID, n => {
     throw new DeserializationError(`Unexpected Principal payload type: ${n}`);
   });
@@ -238,7 +238,7 @@ export function serializeLPString(lps: LengthPrefixedString) {
 }
 
 export function deserializeLPString(
-  bytesReader: ByteReader,
+  bytesReader: BytesReader,
   prefixBytes?: number,
   maxLength?: number
 ): LengthPrefixedString {
@@ -272,7 +272,7 @@ export function serializeMemoString(memoString: MemoString): Uint8Array {
   return concatArray(bytesArray);
 }
 
-export function deserializeMemoString(bytesReader: ByteReader): MemoString {
+export function deserializeMemoString(bytesReader: BytesReader): MemoString {
   const content = bytesToUtf8(bytesReader.readBytes(MEMO_MAX_LENGTH_BYTES));
   return { type: StacksMessageType.MemoString, content };
 }
@@ -285,7 +285,7 @@ export function serializeAssetInfo(info: AssetInfo): Uint8Array {
   return concatArray(bytesArray);
 }
 
-export function deserializeAssetInfo(bytesReader: ByteReader): AssetInfo {
+export function deserializeAssetInfo(bytesReader: BytesReader): AssetInfo {
   return {
     type: StacksMessageType.AssetInfo,
     address: deserializeAddress(bytesReader),
@@ -322,7 +322,7 @@ export function serializeLPList(lpList: LengthPrefixedList): Uint8Array {
 }
 
 export function deserializeLPList(
-  bytesReader: ByteReader,
+  bytesReader: BytesReader,
   type: StacksMessageType,
   lengthPrefixBytes?: number
 ): LengthPrefixedList {
@@ -385,7 +385,7 @@ export function serializePostCondition(postCondition: PostCondition): Uint8Array
   return concatArray(bytesArray);
 }
 
-export function deserializePostCondition(bytesReader: ByteReader): PostCondition {
+export function deserializePostCondition(bytesReader: BytesReader): PostCondition {
   const postConditionType = bytesReader.readUInt8Enum(PostConditionType, n => {
     throw new DeserializationError(`Could not read ${n} as PostConditionType`);
   });

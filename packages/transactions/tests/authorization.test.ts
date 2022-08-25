@@ -16,7 +16,7 @@ import { bytesToHex } from '../src/utils';
 import { AddressHashMode, AuthType, PubKeyEncoding } from '../src/constants';
 
 import { concatArray } from '@stacks/common';
-import { ByteReader } from '../src/bytesReader';
+import { BytesReader } from '../src/bytesReader';
 import { createStacksPrivateKey, createStacksPublicKey, signWithKey } from '../src/keys';
 
 test('ECDSA recoverable signature', () => {
@@ -41,7 +41,7 @@ test('Single spending condition serialization and deserialization', () => {
 
   const serialized = serializeSpendingCondition(spendingCondition);
   const deserialized = deserializeSpendingCondition(
-    new ByteReader(serialized)
+    new BytesReader(serialized)
   ) as SingleSigSpendingCondition;
   expect(deserialized.hashMode).toBe(addressHashMode);
   expect(deserialized.nonce!.toString()).toBe(nonce.toString());
@@ -402,7 +402,7 @@ test('Invalid spending conditions', () => {
   const badHashModeSpendingConditionBytes = new Uint8Array(badHashModeBytesHex);
 
   expect(() =>
-    deserializeSpendingCondition(new ByteReader(badHashModeSpendingConditionBytes))
+    deserializeSpendingCondition(new BytesReader(badHashModeSpendingConditionBytes))
   ).toThrow('Could not parse 255 as AddressHashMode');
 
   // prettier-ignore
@@ -428,7 +428,7 @@ test('Invalid spending conditions', () => {
   const badHashModeMultiSigSependingCondBytes = new Uint8Array(badHashModeMultiSigBytesHex);
 
   expect(() =>
-    deserializeSpendingCondition(new ByteReader(badHashModeMultiSigSependingCondBytes))
+    deserializeSpendingCondition(new BytesReader(badHashModeMultiSigSependingCondBytes))
   ).toThrow('Could not read 253 as AuthFieldType');
 
   // this will parse into a singlesig spending condition, but data will still remain.
@@ -464,7 +464,7 @@ test('Invalid spending conditions', () => {
   );
 
   const deserializedBadHashModeSinglesigBytesParseable = deserializeSpendingCondition(
-    new ByteReader(badHashModeSinglesigBytesParseableBuffer)
+    new BytesReader(badHashModeSinglesigBytesParseableBuffer)
   );
 
   // corrupt but will parse with trailing bits
@@ -553,7 +553,7 @@ test('Invalid spending conditions', () => {
   // Partially signed multi-sig tx can be serialized and deserialized without exception (Incorrect number of signatures)
   // Should be able to deserialize as number of signatures are less than signatures required
   expect(() =>
-    deserializeSpendingCondition(new ByteReader(badPublicKeyCountBuffer))
+    deserializeSpendingCondition(new BytesReader(badPublicKeyCountBuffer))
   ).not.toThrowError();
 
   const badPublicKeyCount2Buffer = new Uint8Array(badPublicKeyCountBytes2);
@@ -561,7 +561,7 @@ test('Invalid spending conditions', () => {
   // Partially signed multi-sig tx can be serialized and deserialized without exception (Incorrect number of signatures)
   // Should be able to deserialize as number of signatures are less than signatures required
   expect(() =>
-    deserializeSpendingCondition(new ByteReader(badPublicKeyCount2Buffer))
+    deserializeSpendingCondition(new BytesReader(badPublicKeyCount2Buffer))
   ).not.toThrowError();
 
   // hashing mode doesn't allow uncompressed keys
@@ -601,7 +601,7 @@ test('Invalid spending conditions', () => {
 
   expect(new Uint8Array(badP2WpkhUncompressedBytes)).toEqual(serializedSPUncompressedKeys);
   expect(() =>
-    deserializeSpendingCondition(new ByteReader(new Uint8Array(badP2WpkhUncompressedBytes)))
+    deserializeSpendingCondition(new BytesReader(new Uint8Array(badP2WpkhUncompressedBytes)))
   ).toThrow(
     'Failed to parse singlesig spending condition: incomaptible hash mode and key encoding'
   );
@@ -687,7 +687,7 @@ test('Single sig P2PKH spending condition', () => {
       bytesToHex(new Uint8Array(spendingConditionsBytes[i]))
     );
     const spendingCondition = deserializeSpendingCondition(
-      new ByteReader(serializedSpendingCondition)
+      new BytesReader(serializedSpendingCondition)
     );
     expect(spendingCondition).toEqual(spendingConditions[i]);
   }
@@ -737,7 +737,7 @@ test('Single sig P2WPKH spending condition', () => {
       bytesToHex(new Uint8Array(spendingConditionsBytes[i]))
     );
     const spendingCondition = deserializeSpendingCondition(
-      new ByteReader(serializedSpendingCondition)
+      new BytesReader(serializedSpendingCondition)
     );
     expect(spendingCondition).toEqual(spendingConditions[i]);
   }

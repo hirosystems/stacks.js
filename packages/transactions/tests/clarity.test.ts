@@ -6,7 +6,7 @@ import {
   hexToBytes,
   utf8ToBytes,
 } from '@stacks/common';
-import { ByteReader } from '../src/bytesReader';
+import { BytesReader } from '../src/bytesReader';
 import {
   bufferCV,
   BufferCV,
@@ -46,8 +46,8 @@ const ADDRESS = 'SP2JXKMSH007NPYAQHKJPQMAQYAD90NQGTVJVQ02B';
 
 function serializeDeserialize<T extends ClarityValue>(value: T): ClarityValue {
   const serializedDeserialized: Uint8Array = serializeCV(value);
-  const bufferReader = new ByteReader(serializedDeserialized);
-  return deserializeCV(bufferReader);
+  const bytesReader = new BytesReader(serializedDeserialized);
+  return deserializeCV(bytesReader);
 }
 
 describe('Clarity Types', () => {
@@ -482,8 +482,8 @@ describe('Clarity Types', () => {
         0x11, 0xde, 0xad, 0xbe, 0xef, 0x11, 0xab, 0xab, 0xff, 0xff, 0x11, 0xde, 0xad, 0xbe, 0xef,
         0x11, 0xab, 0xab, 0xff, 0xff,
       ]);
-      const bufferReader = new ByteReader(concatBytes(new Uint8Array([0x00]), addressBuffer));
-      const standardPrincipal = standardPrincipalCVFromAddress(deserializeAddress(bufferReader));
+      const bytesReader = new BytesReader(concatBytes(new Uint8Array([0x00]), addressBuffer));
+      const standardPrincipal = standardPrincipalCVFromAddress(deserializeAddress(bytesReader));
       const serialized = bytesToHex(serializeCV(standardPrincipal));
       expect(serialized).toEqual('050011deadbeef11ababffff11deadbeef11ababffff');
     });
@@ -494,8 +494,8 @@ describe('Clarity Types', () => {
         0x11, 0xab, 0xab, 0xff, 0xff,
       ]);
       const contractName = 'abcd';
-      const bufferReader = new ByteReader(concatBytes(new Uint8Array([0x00]), addressBuffer));
-      const standardPrincipal = standardPrincipalCVFromAddress(deserializeAddress(bufferReader));
+      const bytesReader = new BytesReader(concatBytes(new Uint8Array([0x00]), addressBuffer));
+      const standardPrincipal = standardPrincipalCVFromAddress(deserializeAddress(bytesReader));
       const contractPrincipal = contractPrincipalCVFromStandard(standardPrincipal, contractName);
       const serialized = bytesToHex(serializeCV(contractPrincipal));
       expect(serialized).toEqual('060011deadbeef11ababffff11deadbeef11ababffff0461626364');
@@ -559,7 +559,7 @@ describe('Clarity Types', () => {
       ];
       const serialized = strings.map(serializeCV);
       serialized.forEach(ser => {
-        const reader = new ByteReader(ser);
+        const reader = new BytesReader(ser);
         const serializedStringLenByte = reader.readBytes(5)[4];
         expect(serializedStringLenByte).toEqual(1);
         expect(ser.length).toEqual(6);

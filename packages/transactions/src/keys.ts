@@ -20,7 +20,7 @@ import {
   signatureVrsToRsv,
 } from '@stacks/common';
 import { c32address } from 'c32check';
-import { ByteReader } from './bytesReader';
+import { BytesReader } from './bytesReader';
 import {
   addressFromVersionHash,
   addressHashModeToVersion,
@@ -144,7 +144,7 @@ export function compressPublicKey(publicKey: string | Uint8Array): StacksPublicK
   return createStacksPublicKey(compressed);
 }
 
-export function deserializePublicKey(bytesReader: ByteReader): StacksPublicKey {
+export function deserializePublicKey(bytesReader: BytesReader): StacksPublicKey {
   const fieldId = bytesReader.readUInt8();
   const keyLength =
     fieldId !== 4 ? COMPRESSED_PUBKEY_LENGTH_BYTES : UNCOMPRESSED_PUBKEY_LENGTH_BYTES;

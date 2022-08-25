@@ -42,7 +42,7 @@ import { createLPList, deserializeLPList, LengthPrefixedList, serializeLPList } 
 
 import { isCompressed, StacksPrivateKey, StacksPublicKey } from './keys';
 
-import { ByteReader } from './bytesReader';
+import { BytesReader } from './bytesReader';
 
 import { SerializationError, SigningError } from './errors';
 
@@ -259,16 +259,16 @@ export class StacksTransaction {
 /**
  * @param data Uint8Array or hex string
  */
-export function deserializeTransaction(data: ByteReader | Uint8Array | string) {
-  let bytesReader: ByteReader;
+export function deserializeTransaction(data: BytesReader | Uint8Array | string) {
+  let bytesReader: BytesReader;
   if (typeof data === 'string') {
     if (data.slice(0, 2).toLowerCase() === '0x') {
-      bytesReader = new ByteReader(hexToBytes(data.slice(2)));
+      bytesReader = new BytesReader(hexToBytes(data.slice(2)));
     } else {
-      bytesReader = new ByteReader(hexToBytes(data));
+      bytesReader = new BytesReader(hexToBytes(data));
     }
   } else if (data instanceof Uint8Array) {
-    bytesReader = new ByteReader(data);
+    bytesReader = new BytesReader(data);
   } else {
     bytesReader = data;
   }

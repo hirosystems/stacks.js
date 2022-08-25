@@ -41,7 +41,7 @@ export function isEnum<T extends string, TEnumValue extends number>(
   return isEnum(enumVariable, value);
 }
 
-export class ByteReader {
+export class BytesReader {
   source: Uint8Array;
   consumed: number = 0;
 
