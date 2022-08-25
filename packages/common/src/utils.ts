@@ -524,10 +524,9 @@ export function bytesToUtf8(arr: Uint8Array): string {
 
 /** @ignore */
 export function toBytes(data: Uint8Array | string): Uint8Array {
-  if (typeof data === 'string') data = utf8ToBytes(data);
-  if (!(data instanceof Uint8Array))
-    throw new TypeError(`Expected input type is Uint8Array (got ${typeof data})`);
-  return data;
+  if (typeof data === 'string') return utf8ToBytes(data);
+  if (data instanceof Uint8Array) return data;
+  throw new TypeError(`Expected input type is (Uint8Array | string) but got (${typeof data})`);
 }
 
 /** @ignore */
