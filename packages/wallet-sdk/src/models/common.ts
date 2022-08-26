@@ -1,4 +1,3 @@
-/* eslint-disable node/prefer-global/buffer */
 import { getPublicKeyFromPrivate, publicKeyToAddress } from '@stacks/encryption';
 // https://github.com/paulmillr/scure-bip32
 // Secure, audited & minimal implementation of BIP32 hierarchical deterministic (HD) wallets.
@@ -23,48 +22,7 @@ export interface Account {
 
 // Reference:  https://github.com/bitcoinjs/bip32/blob/79c6dedb3edfdc8505fe74d9f34c115c33e8a2da/ts-src/bip32.ts#L102
 // Used to replicate deriveHardened bip32 method using deriveChild of scure-bip32 to offload old bip32 library
-export const HARDENED_OFFSET = 0x80000000;
-
-// Reference: https://github.com/bitcoinjs/bip32/blob/79c6dedb3edfdc8505fe74d9f34c115c33e8a2da/ts-src/bip32.ts#L7-L17
-// Used inside BIP32Interface for backward compatibility with offloaded bip32 dependency
-interface Network {
-  wif: number;
-  bip32: {
-    public: number;
-    private: number;
-  };
-  messagePrefix?: string;
-  bech32?: string;
-  pubKeyHash?: number;
-  scriptHash?: number;
-}
-
-// Reference: https://github.com/bitcoinjs/bip32/blob/79c6dedb3edfdc8505fe74d9f34c115c33e8a2da/ts-src/bip32.ts#L19-L41
-// Using BIP32Interface for backward compatibility with offloaded bip32 dependency
-// todo: remove legacy
-export interface BIP32Interface {
-  chainCode: Buffer;
-  network: Network;
-  lowR: boolean;
-  depth: number;
-  index: number;
-  parentFingerprint: number;
-  publicKey: Buffer;
-  privateKey?: Buffer;
-  identifier: Buffer;
-  fingerprint: Buffer;
-  isNeutered(): boolean;
-  neutered(): BIP32Interface;
-  toBase58(): string;
-  toWIF(): string;
-  derive(index: number): BIP32Interface;
-  deriveHardened(index: number): BIP32Interface;
-  derivePath(path: string): BIP32Interface;
-  sign(hash: Buffer, lowR?: boolean): Buffer;
-  verify(hash: Buffer, signature: Buffer): boolean;
-  signSchnorr?(hash: Buffer): Buffer;
-  verifySchnorr?(hash: Buffer, signature: Buffer): boolean;
-}
+export const HARDENED_OFFSET = 0x80_00_00_00;
 
 const PERSON_TYPE = 'Person';
 const CONTEXT = 'http://schema.org';
