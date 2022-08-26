@@ -1,4 +1,3 @@
-import alias from '@rollup/plugin-alias';
 import commonjs from '@rollup/plugin-commonjs';
 import inject from '@rollup/plugin-inject';
 import json from '@rollup/plugin-json';
@@ -13,7 +12,6 @@ export default {
   output: {
     file: 'dist/polyfill/index.js',
     format: 'esm',
-    intro: 'window.global = window',
     sourcemap: true,
   },
   external: [/\@stacks\/.*/],
@@ -23,15 +21,6 @@ export default {
     // - commonjs > replace
     // - commonjs > typescript
     // - inject Buffer > typescript
-    alias({
-      entries: [
-        { find: 'stream', replacement: 'vite-compatible-readable-stream' },
-        { find: 'crypto', replacement: 'crypto-browserify' },
-        { find: 'readable-stream', replacement: 'vite-compatible-readable-stream' },
-        { find: 'brorand', replacement: require.resolve('./polyfills/brorand.js') },
-        { find: 'util', replacement: require.resolve('util/') },
-      ],
-    }),
     resolve({
       mainFields: ['browser', 'module', 'main', 'jsnext:main'],
       preferBuiltins: false,
