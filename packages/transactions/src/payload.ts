@@ -22,7 +22,8 @@ export type Payload =
   | SmartContractPayload
   | VersionedSmartContractPayload
   | PoisonPayload
-  | CoinbasePayload;
+  | CoinbasePayload
+  | CoinbasePayloadToAltRecipient;
 
 export function isTokenTransferPayload(p: Payload): p is TokenTransferPayload {
   return p.payloadType === PayloadType.TokenTransfer;
@@ -54,7 +55,8 @@ export type PayloadInput =
   | SmartContractPayload
   | VersionedSmartContractPayload
   | PoisonPayload
-  | CoinbasePayload;
+  | CoinbasePayload
+  | CoinbasePayloadToAltRecipient;
 
 export function createTokenTransferPayload(
   recipient: string | PrincipalCV,
@@ -143,18 +145,17 @@ export function createSmartContractPayload(
     return {
       type: StacksMessageType.Payload,
       payloadType: PayloadType.VersionedSmartContract,
-      clarityVersion: clarityVersion,
-      contractName,
-      codeBody,
-    };
-  } else {
-    return {
-      type: StacksMessageType.Payload,
-      payloadType: PayloadType.SmartContract,
+      clarityVersion,
       contractName,
       codeBody,
     };
   }
+  return {
+    type: StacksMessageType.Payload,
+    payloadType: PayloadType.SmartContract,
+    contractName,
+    codeBody,
+  };
 }
 
 export interface PoisonPayload {
@@ -172,14 +173,33 @@ export interface CoinbasePayload {
   readonly coinbaseBytes: Uint8Array;
 }
 
-export function createCoinbasePayload(coinbaseBytes: Uint8Array): CoinbasePayload {
+export interface CoinbasePayloadToAltRecipient {
+  readonly type: StacksMessageType.Payload;
+  readonly payloadType: PayloadType.CoinbaseToAltRecipient;
+  readonly coinbaseBytes: Uint8Array;
+  readonly recipient: PrincipalCV;
+}
+
+export function createCoinbasePayload(
+  coinbaseBytes: Uint8Array,
+  altRecipient?: PrincipalCV
+): CoinbasePayload | CoinbasePayloadToAltRecipient {
   if (coinbaseBytes.byteLength != COINBASE_BYTES_LENGTH) {
-    throw Error(`Coinbase length must be ${COINBASE_BYTES_LENGTH} bytes`);
+    throw Error(`Coinbase buffer size must be ${COINBASE_BYTES_LENGTH} bytes`);
+  }
+
+  if (altRecipient != undefined) {
+    return {
+      type: StacksMessageType.Payload,
+      payloadType: PayloadType.CoinbaseToAltRecipient,
+      coinbaseBytes,
+      recipient: altRecipient,
+    };
   }
   return {
     type: StacksMessageType.Payload,
     payloadType: PayloadType.Coinbase,
-    coinbaseBytes: coinbaseBytes,
+    coinbaseBytes,
   };
 }
 
@@ -218,6 +238,10 @@ export function serializePayload(payload: PayloadInput): Uint8Array {
       break;
     case PayloadType.Coinbase:
       bytesArray.push(payload.coinbaseBytes);
+      break;
+    case PayloadType.CoinbaseToAltRecipient:
+      bytesArray.push(payload.coinbaseBytes);
+      bytesArray.push(serializeCV(payload.recipient));
       break;
   }
 
@@ -270,5 +294,9 @@ export function deserializePayload(bytesReader: BytesReader): Payload {
     case PayloadType.Coinbase:
       const coinbaseBytes = bytesReader.readBytes(COINBASE_BYTES_LENGTH);
       return createCoinbasePayload(coinbaseBytes);
+    case PayloadType.CoinbaseToAltRecipient:
+      const coinbaseToAltRecipientBuffer = bytesReader.readBytes(COINBASE_BYTES_LENGTH);
+      const altRecipient = deserializeCV(bytesReader) as PrincipalCV;
+      return createCoinbasePayload(coinbaseToAltRecipientBuffer, altRecipient);
   }
 }

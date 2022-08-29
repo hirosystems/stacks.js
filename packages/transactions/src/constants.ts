@@ -45,6 +45,7 @@ enum PayloadType {
   ContractCall = 0x02,
   PoisonMicroblock = 0x03,
   Coinbase = 0x04,
+  CoinbaseToAltRecipient = 0x05,
 }
 
 enum ClarityVersion {
