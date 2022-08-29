@@ -1,21 +1,22 @@
 import {
-  TokenTransferPayload,
-  ContractCallPayload,
-  SmartContractPayload,
   CoinbasePayload,
-  createSmartContractPayload,
+  CoinbasePayloadToAltRecipient,
+  ContractCallPayload,
   createCoinbasePayload,
   createContractCallPayload,
+  createSmartContractPayload,
   createTokenTransferPayload,
+  SmartContractPayload,
+  TokenTransferPayload,
   VersionedSmartContractPayload,
 } from '../src/payload';
 
 import { serializeDeserialize } from './macros';
 
-import { trueCV, falseCV, standardPrincipalCV, contractPrincipalCV } from '../src/clarity';
+import { contractPrincipalCV, falseCV, standardPrincipalCV, trueCV } from '../src/clarity';
 
-import { ClarityVersion, COINBASE_BUFFER_LENGTH_BYTES, StacksMessageType } from '../src/constants';
 import { principalToString } from '../src/clarity/types/principalCV';
+import { ClarityVersion, COINBASE_BUFFER_LENGTH_BYTES, StacksMessageType } from '../src/constants';
 
 test('STX token transfer payload serialization and deserialization', () => {
   const recipient = standardPrincipalCV('SP3FGQ8Z7JY9BWYZ5WM53E0M9NK7WHJF0691NZ159');
@@ -150,4 +151,37 @@ test('Coinbase payload serialization and deserialization', () => {
 
   const deserialized = serializeDeserialize(payload, StacksMessageType.Payload) as CoinbasePayload;
   expect(deserialized.coinbaseBuffer.toString()).toBe(coinbaseBuffer.toString());
+});
+
+test('Coinbase to standard principal recipient payload serialization and deserialization', () => {
+  const coinbaseBuffer = Buffer.alloc(COINBASE_BUFFER_LENGTH_BYTES, 0);
+  coinbaseBuffer.write('coinbase buffer');
+  const standardRecipient = standardPrincipalCV('ST2X2FYCY01Y7YR2TGC2Y6661NFF3SMH0NGXPWTV5');
+
+  const payload = createCoinbasePayload(coinbaseBuffer, standardRecipient);
+
+  const deserialized = serializeDeserialize(
+    payload,
+    StacksMessageType.Payload
+  ) as CoinbasePayloadToAltRecipient;
+  expect(deserialized.coinbaseBuffer.toString()).toBe(coinbaseBuffer.toString());
+  expect(deserialized.recipient).toEqual(standardRecipient);
+});
+
+test('Coinbase to contract principal recipient payload serialization and deserialization', () => {
+  const coinbaseBuffer = Buffer.alloc(COINBASE_BUFFER_LENGTH_BYTES, 0);
+  coinbaseBuffer.write('coinbase buffer');
+  const contractRecipient = contractPrincipalCV(
+    'ST2X2FYCY01Y7YR2TGC2Y6661NFF3SMH0NGXPWTV5',
+    'hello_world'
+  );
+
+  const payload = createCoinbasePayload(coinbaseBuffer, contractRecipient);
+
+  const deserialized = serializeDeserialize(
+    payload,
+    StacksMessageType.Payload
+  ) as CoinbasePayloadToAltRecipient;
+  expect(deserialized.coinbaseBuffer.toString()).toBe(coinbaseBuffer.toString());
+  expect(deserialized.recipient).toEqual(contractRecipient);
 });

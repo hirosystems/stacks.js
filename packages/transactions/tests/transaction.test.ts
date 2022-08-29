@@ -1,43 +1,44 @@
-import { StacksTransaction, deserializeTransaction } from '../src/transaction';
+import { deserializeTransaction, StacksTransaction } from '../src/transaction';
 
 import {
-  createSingleSigSpendingCondition,
-  SingleSigSpendingCondition,
   createMultiSigSpendingCondition,
-  MultiSigSpendingCondition,
-  SponsoredAuthorization,
+  createSingleSigSpendingCondition,
+  createSponsoredAuth,
   createStandardAuth,
-  createSponsoredAuth
+  MultiSigSpendingCondition,
+  SingleSigSpendingCondition,
+  SponsoredAuthorization,
 } from '../src/authorization';
 
-import { TokenTransferPayload, createTokenTransferPayload } from '../src/payload';
+import {
+  CoinbasePayloadToAltRecipient,
+  createTokenTransferPayload,
+  TokenTransferPayload,
+} from '../src/payload';
 
 import { createSTXPostCondition } from '../src/postcondition';
 
-import { createLPList } from '../src/types';
 import { createStandardPrincipal, STXPostCondition } from '../src/postcondition-types';
+import { createLPList } from '../src/types';
 
 import {
-  DEFAULT_CHAIN_ID,
-  TransactionVersion,
-  AnchorMode,
-  PostConditionMode,
-  AuthType,
-  FungibleConditionCode,
   AddressHashMode,
+  AnchorMode,
+  AuthType,
+  DEFAULT_CHAIN_ID,
+  FungibleConditionCode,
+  PostConditionMode,
+  TransactionVersion,
 } from '../src/constants';
 
-import {
-  createStacksPrivateKey,
-  pubKeyfromPrivKey,
-  publicKeyToString
-} from '../src/keys';
+import { createStacksPrivateKey, pubKeyfromPrivKey, publicKeyToString } from '../src/keys';
 
 import { TransactionSigner } from '../src/signer';
 
+import { hexToBytes } from '@stacks/common';
 import fetchMock from 'jest-fetch-mock';
 import { BufferReader } from '../src/bufferReader';
-import { standardPrincipalCV } from '../src/clarity';
+import { contractPrincipalCV, standardPrincipalCV } from '../src/clarity';
 
 beforeEach(() => {
   fetchMock.resetMocks();
@@ -67,11 +68,7 @@ test('STX token transfer transaction serialization and deserialization', () => {
   const authType = AuthType.Standard;
   const authorization = createStandardAuth(spendingCondition);
 
-  const postCondition = createSTXPostCondition(
-    recipient,
-    FungibleConditionCode.GreaterEqual,
-    0
-  );
+  const postCondition = createSTXPostCondition(recipient, FungibleConditionCode.GreaterEqual, 0);
 
   const postConditions = createLPList([postCondition]);
   const transaction = new StacksTransaction(
@@ -91,12 +88,16 @@ test('STX token transfer transaction serialization and deserialization', () => {
 
   const serialized = transaction.serialize();
   const deserialized = deserializeTransaction(new BufferReader(serialized));
-  
+
   const serializedHexString = serialized.toString('hex');
-  expect(deserializeTransaction(serializedHexString).serialize().toString('hex')).toEqual(serialized.toString('hex'));
+  expect(deserializeTransaction(serializedHexString).serialize().toString('hex')).toEqual(
+    serialized.toString('hex')
+  );
 
   const serializedHexStringPrefixed = '0x' + serializedHexString;
-  expect(deserializeTransaction(serializedHexStringPrefixed).serialize().toString('hex')).toEqual(serialized.toString('hex'));
+  expect(deserializeTransaction(serializedHexStringPrefixed).serialize().toString('hex')).toEqual(
+    serialized.toString('hex')
+  );
 
   expect(deserialized.version).toBe(transactionVersion);
   expect(deserialized.chainId).toBe(chainId);
@@ -144,11 +145,7 @@ test('STX token transfer transaction fee setting', () => {
   const authType = AuthType.Standard;
   const authorization = createStandardAuth(spendingCondition);
 
-  const postCondition = createSTXPostCondition(
-    recipient,
-    FungibleConditionCode.GreaterEqual,
-    0
-  );
+  const postCondition = createSTXPostCondition(recipient, FungibleConditionCode.GreaterEqual, 0);
 
   const postConditions = createLPList([postCondition]);
 
@@ -318,10 +315,11 @@ test('STX token transfer transaction multi-sig uncompressed keys serialization a
   expect(() => transaction.verifyOrigin()).toThrow(expectedError);
 
   const serialized = transaction.serialize();
-  
+
   // serialized tx that has been successfully deserialized and had
   // its auth verified via the stacks-blockchain implementation
-  const verifiedTx = "0000000001040173a8b4a751a678fe83e9d35ce301371bb3d397f7000000000000000000000000000000000000000303010359b18fbcb6d5e26efc1eae70aefdae54995e6fd4f3ec40d2ff43b2227c4def1ee6416bf3dd5c92c8150fa51717f1f2db778c02ba47b8c70c1a8ff640b4edee03017b7d76c3d1f7d449604df864e4013da5094be7276aa02cb73ec9fc8108a0bed46c7cde4d702830c1db34ef7c19e2776f59107afef39084776fc88bc78dbb96560103661ec7479330bf1ef7a4c9d1816f089666a112e72d671048e5424fc528ca51530002030200000000000516df0ba3e79792be7be5e50a370289accfc8c9e03200000000002625a06d656d6f000000000000000000000000000000000000000000000000000000000000"
+  const verifiedTx =
+    '0000000001040173a8b4a751a678fe83e9d35ce301371bb3d397f7000000000000000000000000000000000000000303010359b18fbcb6d5e26efc1eae70aefdae54995e6fd4f3ec40d2ff43b2227c4def1ee6416bf3dd5c92c8150fa51717f1f2db778c02ba47b8c70c1a8ff640b4edee03017b7d76c3d1f7d449604df864e4013da5094be7276aa02cb73ec9fc8108a0bed46c7cde4d702830c1db34ef7c19e2776f59107afef39084776fc88bc78dbb96560103661ec7479330bf1ef7a4c9d1816f089666a112e72d671048e5424fc528ca51530002030200000000000516df0ba3e79792be7be5e50a370289accfc8c9e03200000000002625a06d656d6f000000000000000000000000000000000000000000000000000000000000';
   expect(serialized.toString('hex')).toBe(verifiedTx);
 
   expect(() => deserializeTransaction(new BufferReader(serialized))).toThrow(expectedError);
@@ -377,15 +375,63 @@ test('Sponsored STX token transfer transaction serialization and deserialization
   expect(deserialized.auth.spendingCondition!.hashMode).toBe(addressHashMode);
   expect(deserialized.auth.spendingCondition!.nonce!.toString()).toBe(nonce.toString());
   expect(deserialized.auth.spendingCondition!.fee!.toString()).toBe(fee.toString());
-  expect((deserialized.auth as SponsoredAuthorization).sponsorSpendingCondition!.hashMode).toBe(addressHashMode);
-  expect((deserialized.auth as SponsoredAuthorization).sponsorSpendingCondition!.nonce!.toString()).toBe(
-    sponsorNonce.toString()
+  expect((deserialized.auth as SponsoredAuthorization).sponsorSpendingCondition!.hashMode).toBe(
+    addressHashMode
   );
-  expect((deserialized.auth as SponsoredAuthorization).sponsorSpendingCondition!.fee!.toString()).toBe(fee.toString());
+  expect(
+    (deserialized.auth as SponsoredAuthorization).sponsorSpendingCondition!.nonce!.toString()
+  ).toBe(sponsorNonce.toString());
+  expect(
+    (deserialized.auth as SponsoredAuthorization).sponsorSpendingCondition!.fee!.toString()
+  ).toBe(fee.toString());
   expect(deserialized.anchorMode).toBe(anchorMode);
   expect(deserialized.postConditionMode).toBe(postConditionMode);
 
   const deserializedPayload = deserialized.payload as TokenTransferPayload;
   expect(deserializedPayload.recipient).toEqual(recipientCV);
   expect(deserializedPayload.amount.toString()).toBe(amount.toString());
+});
+
+test('Coinbase pay to alt standard principal recipient deserialization', () => {
+  // todo: serialization from real private key
+  const serializedTx =
+    '0x80800000000400fd3cd910d78fe7c4cd697d5228e51a912ff2ba740000000000000004000000000000000001008d36064b250dba5d3221ac235a9320adb072cfc23cd63511e6d814f97f0302e66c2ece80d7512df1b3e90ca6dce18179cb67b447973c739825ce6c6756bc247d010200000000050000000000000000000000000000000000000000000000000000000000000000051aba27f99e007c7f605a8305e318c1abde3cd220ac';
+  const deserializedTx = deserializeTransaction(serializedTx);
+
+  expect(deserializedTx.anchorMode).toBe(AnchorMode.OnChainOnly);
+  expect((deserializedTx.auth.spendingCondition as SingleSigSpendingCondition).signature.data).toBe(
+    '008d36064b250dba5d3221ac235a9320adb072cfc23cd63511e6d814f97f0302e66c2ece80d7512df1b3e90ca6dce18179cb67b447973c739825ce6c6756bc247d'
+  );
+  expect((deserializedTx.payload as CoinbasePayloadToAltRecipient).coinbaseBuffer).toEqual(
+    Buffer.from(hexToBytes('0'.repeat(64)))
+  );
+  expect((deserializedTx.payload as CoinbasePayloadToAltRecipient).recipient).toEqual(
+    standardPrincipalCV('ST2X2FYCY01Y7YR2TGC2Y6661NFF3SMH0NGXPWTV5')
+  );
+  expect(deserializedTx.txid()).toBe(
+    '449f5ea5c541bbbbbf7a1bff2434c449dca2ae3cdc52ba8d24b0bd0d3632d9bc'
+  );
+  expect(deserializedTx.version).toBe(TransactionVersion.Testnet);
+});
+
+test('Coinbase pay to alt contract principal recipient deserialization', () => {
+  // todo: serialization from real private key
+  const serializedTx =
+    '0x8080000000040055a0a92720d20398211cd4c7663d65d018efcc1f00000000000000030000000000000000010118da31f542913e8c56961b87ee4794924e655a28a2034e37ef4823eeddf074747285bd6efdfbd84eecdf62cffa7c1864e683c688f4c105f4db7429066735b4e2010200000000050000000000000000000000000000000000000000000000000000000000000000061aba27f99e007c7f605a8305e318c1abde3cd220ac0b68656c6c6f5f776f726c64';
+  const deserializedTx = deserializeTransaction(serializedTx);
+
+  expect(deserializedTx.anchorMode).toBe(AnchorMode.OnChainOnly);
+  expect((deserializedTx.auth.spendingCondition as SingleSigSpendingCondition).signature.data).toBe(
+    '0118da31f542913e8c56961b87ee4794924e655a28a2034e37ef4823eeddf074747285bd6efdfbd84eecdf62cffa7c1864e683c688f4c105f4db7429066735b4e2'
+  );
+  expect((deserializedTx.payload as CoinbasePayloadToAltRecipient).coinbaseBuffer).toEqual(
+    Buffer.from(hexToBytes('0'.repeat(64)))
+  );
+  expect((deserializedTx.payload as CoinbasePayloadToAltRecipient).recipient).toEqual(
+    contractPrincipalCV('ST2X2FYCY01Y7YR2TGC2Y6661NFF3SMH0NGXPWTV5', 'hello_world')
+  );
+  expect(deserializedTx.txid()).toBe(
+    'bd1a9e1d60ca29fc630633170f396f5b6b85c9620bd16d63384ebc5a01a1829b'
+  );
+  expect(deserializedTx.version).toBe(TransactionVersion.Testnet);
 });

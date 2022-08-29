@@ -76,6 +76,7 @@ export class StacksTransaction {
     } else {
       switch (payload.payloadType) {
         case PayloadType.Coinbase:
+        case PayloadType.CoinbaseToAltRecipient:
         case PayloadType.PoisonMicroblock: {
           this.anchorMode = AnchorMode.OnChainOnly;
           break;
