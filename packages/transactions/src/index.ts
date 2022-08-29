@@ -15,6 +15,7 @@ export {
   TokenTransferPayload,
   ContractCallPayload,
   SmartContractPayload,
+  VersionedSmartContractPayload,
   PoisonPayload,
   CoinbasePayload,
   serializePayload,
