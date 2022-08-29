@@ -1,5 +1,6 @@
 import {
   CoinbasePayload,
+  CoinbasePayloadToAltRecipient,
   ContractCallPayload,
   createCoinbasePayload,
   createContractCallPayload,
@@ -14,7 +15,7 @@ import { serializeDeserialize } from './macros';
 
 import { contractPrincipalCV, falseCV, standardPrincipalCV, trueCV } from '../src/clarity';
 
-import { bytesToUtf8, utf8ToBytes } from '@stacks/common';
+import { utf8ToBytes } from '@stacks/common';
 import { principalToString } from '../src/clarity/types/principalCV';
 import { ClarityVersion, StacksMessageType } from '../src/constants';
 
@@ -149,5 +150,36 @@ test('Coinbase payload serialization and deserialization', () => {
   const payload = createCoinbasePayload(coinbaseBuffer);
 
   const deserialized = serializeDeserialize(payload, StacksMessageType.Payload) as CoinbasePayload;
-  expect(bytesToUtf8(deserialized.coinbaseBytes)).toBe(coinbaseBuffer.toString());
+  expect(deserialized.coinbaseBytes).toEqual(coinbaseBuffer);
+});
+
+test('Coinbase to standard principal recipient payload serialization and deserialization', () => {
+  const coinbaseBuffer = utf8ToBytes('coinbase buffer                 ');
+  const standardRecipient = standardPrincipalCV('ST2X2FYCY01Y7YR2TGC2Y6661NFF3SMH0NGXPWTV5');
+
+  const payload = createCoinbasePayload(coinbaseBuffer, standardRecipient);
+
+  const deserialized = serializeDeserialize(
+    payload,
+    StacksMessageType.Payload
+  ) as CoinbasePayloadToAltRecipient;
+  expect(deserialized.coinbaseBytes).toEqual(coinbaseBuffer);
+  expect(deserialized.recipient).toEqual(standardRecipient);
+});
+
+test('Coinbase to contract principal recipient payload serialization and deserialization', () => {
+  const coinbaseBuffer = utf8ToBytes('coinbase buffer                 ');
+  const contractRecipient = contractPrincipalCV(
+    'ST2X2FYCY01Y7YR2TGC2Y6661NFF3SMH0NGXPWTV5',
+    'hello_world'
+  );
+
+  const payload = createCoinbasePayload(coinbaseBuffer, contractRecipient);
+
+  const deserialized = serializeDeserialize(
+    payload,
+    StacksMessageType.Payload
+  ) as CoinbasePayloadToAltRecipient;
+  expect(deserialized.coinbaseBytes).toEqual(coinbaseBuffer);
+  expect(deserialized.recipient).toEqual(contractRecipient);
 });

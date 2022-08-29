@@ -18,6 +18,7 @@ export {
   VersionedSmartContractPayload,
   PoisonPayload,
   CoinbasePayload,
+  CoinbasePayloadToAltRecipient,
   serializePayload,
 } from './payload';
 

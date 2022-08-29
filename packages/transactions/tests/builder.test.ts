@@ -657,6 +657,10 @@ test('addSignature to an unsigned transaction', async () => {
   expect(unsignedTx).not.toBe(signedTx);
 });
 
+test('Make coinbase pay to alt recipient transaction', () => {
+  // todo: add test vector to pay to alt
+});
+
 test('Make versioned smart contract deploy', async () => {
   const contractName = 'kv-store';
   const codeBody = fs.readFileSync('./tests/contracts/kv-store.clar').toString();
