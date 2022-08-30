@@ -2459,7 +2459,7 @@ test('connect to gaia hub with a user session and association token', async () =
 
   const gaiaConfig = await storage.setLocalGaiaHubConnection();
   const { token } = gaiaConfig;
-  const assocToken = (decodeToken(token.slice(2)).payload as any).associationToken;
+  const assocToken = (decodeToken(token.slice(3)).payload as any).associationToken;
   expect(assocToken).toEqual(gaiaAssociationToken);
 });
 
