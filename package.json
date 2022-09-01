@@ -48,7 +48,7 @@
     "eslint-plugin-import": "^2.25.4",
     "eslint-plugin-node": "^11.1.0",
     "inspectpack": "^4.7.1",
-    "lerna": "^5.1.8",
+    "lerna": "^5.4.3",
     "madge": "^5.0.1",
     "path-browserify": "^1.0.1",
     "prettier": "^2.5.1",
