@@ -1,4 +1,4 @@
-import { Buffer } from '@stacks/common';
+import { bytesToHex } from '@stacks/common';
 import * as bitcoin from 'bitcoinjs-lib';
 import * as blockstack from 'blockstack';
 import cors from 'cors';
@@ -725,7 +725,7 @@ async function sendTokens(network: CLINetworkAdapter, args: string[]): Promise<s
   }
 
   if (txOnly) {
-    return Promise.resolve(tx.serialize().toString('hex'));
+    return Promise.resolve(bytesToHex(tx.serialize()));
   }
 
   return broadcastTransaction(tx, txNetwork)
@@ -786,7 +786,7 @@ async function contractDeploy(network: CLINetworkAdapter, args: string[]): Promi
   }
 
   if (txOnly) {
-    return Promise.resolve(tx.serialize().toString('hex'));
+    return Promise.resolve(bytesToHex(tx.serialize()));
   }
 
   return broadcastTransaction(tx, txNetwork)
@@ -873,7 +873,7 @@ async function contractFunctionCall(network: CLINetworkAdapter, args: string[]):
       }
 
       if (txOnly) {
-        return Promise.resolve(tx.serialize().toString('hex'));
+        return Promise.resolve(bytesToHex(tx.serialize()));
       }
 
       return broadcastTransaction(tx, txNetwork)
@@ -1653,8 +1653,8 @@ async function stackingStatus(network: CLINetworkAdapter, args: string[]): Promi
           lock_period: status.details.lock_period,
           unlock_height: status.details.unlock_height,
           pox_address: {
-            version: status.details.pox_address.version.toString('hex'),
-            hashbytes: status.details.pox_address.hashbytes.toString('hex'),
+            version: bytesToHex(status.details.pox_address.version),
+            hashbytes: bytesToHex(status.details.pox_address.hashbytes),
           },
         };
       } else {

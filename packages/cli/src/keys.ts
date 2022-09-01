@@ -6,7 +6,7 @@ const c32check = require('c32check');
 
 import { HDKey } from '@scure/bip32';
 import * as scureBip39 from '@scure/bip39';
-import { Buffer } from '@stacks/common';
+
 import {
   compressPrivateKey,
   getPublicKeyFromPrivate,
