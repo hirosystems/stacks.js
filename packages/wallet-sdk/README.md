@@ -2,27 +2,22 @@
 
 `@stacks/wallet-sdk` is a library for building wallets for the Stacks blockchain.
 
-<!-- TOC depthFrom:2 -->
-
-- [@stacks/wallet-sdk](#stackswallet-sdk)
-  - [Features](#features)
-  - [Key Concepts](#key-concepts)
-    - [Secret Key](#secret-key)
-    - [Wallet](#wallet)
-    - [Account](#account)
-    - [Derivation paths](#derivation-paths)
-  - [Usage](#usage)
-    - [Installation](#installation)
-    - [Generate a Secret Key](#generate-a-secret-key)
-    - [Generate a wallet](#generate-a-wallet)
-    - [Generating new accounts](#generating-new-accounts)
-    - [Restoring accounts for an existing Wallet](#restoring-accounts-for-an-existing-wallet)
-    - [Making an authentication response](#making-an-authentication-response)
-    - [Usage with `@stacks/transactions`](#usage-with-stackstransactions)
-      - [Getting an account's STX address](#getting-an-accounts-stx-address)
-      - [Signing Stacks Transactions](#signing-stacks-transactions)
-
-<!-- /TOC -->
+- [Features](#features)
+- [Key Concepts](#key-concepts)
+  - [Secret Key](#secret-key)
+  - [Wallet](#wallet)
+  - [Account](#account)
+  - [Derivation paths](#derivation-paths)
+- [Usage](#usage)
+  - [Installation](#installation)
+  - [Generate a Secret Key](#generate-a-secret-key)
+  - [Generate a wallet](#generate-a-wallet)
+  - [Generating new accounts](#generating-new-accounts)
+  - [Restoring accounts for an existing Wallet](#restoring-accounts-for-an-existing-wallet)
+  - [Making an authentication response](#making-an-authentication-response)
+  - [Usage with `@stacks/transactions`](#usage-with-stackstransactions)
+    - [Getting an account's STX address](#getting-an-accounts-stx-address)
+    - [Signing Stacks Transactions](#signing-stacks-transactions)
 
 ## Features
 
