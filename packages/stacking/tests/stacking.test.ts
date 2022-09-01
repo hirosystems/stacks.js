@@ -1,4 +1,5 @@
-import { Buffer, toBuffer } from '@stacks/common';
+import { bigIntToBytes, bytesToHex, hexToBytes } from '@stacks/common';
+import { base58CheckDecode } from '@stacks/encryption';
 import { StacksTestnet } from '@stacks/network';
 import {
   AddressHashMode,
@@ -19,7 +20,6 @@ import {
   uintCV,
   validateContractCall,
 } from '@stacks/transactions';
-import { address as btcAddress } from 'bitcoinjs-lib';
 import fetchMock from 'jest-fetch-mock';
 import { StackingErrors } from '../src/constants';
 import {
@@ -160,14 +160,6 @@ test('check stacking eligibility true', async () => {
   jest.mock('@stacks/transactions', () => ({
     ...jest.requireActual('@stacks/transactions'),
     callReadOnlyFunction,
-    bufferCV: jest.requireActual('@stacks/transactions').bufferCV,
-    tupleCV: jest.requireActual('@stacks/transactions').tupleCV,
-    uintCV: jest.requireActual('@stacks/transactions').uintCV,
-    trueCV: jest.requireActual('@stacks/transactions').trueCV,
-    responseOkCV: jest.requireActual('@stacks/transactions').responseOkCV,
-    ClarityType: jest.requireActual('@stacks/transactions').ClarityType,
-    AddressHashMode: jest.requireActual('@stacks/transactions').AddressHashMode,
-    validateStacksAddress: jest.requireActual('@stacks/transactions').validateStacksAddress,
   }));
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const { StackingClient } = require('../src'); // needed for jest.mock module
@@ -278,8 +270,8 @@ test('stack stx', async () => {
     burnBlockHeight,
   });
 
-  const { version, hash } = btcAddress.fromBase58Check(poxAddress);
-  const versionBuffer = bufferCV(toBuffer(BigInt(version), 1));
+  const { version, hash } = base58CheckDecode(poxAddress);
+  const versionBuffer = bufferCV(bigIntToBytes(BigInt(version), 1));
   const hashbytes = bufferCV(hash);
   const poxAddressCV = tupleCV({
     hashbytes,
@@ -350,8 +342,8 @@ test('delegate stx', async () => {
     privateKey,
   });
 
-  const { version, hash } = btcAddress.fromBase58Check(poxAddress);
-  const versionBuffer = bufferCV(toBuffer(BigInt(version), 1));
+  const { version, hash } = base58CheckDecode(poxAddress);
+  const versionBuffer = bufferCV(bigIntToBytes(BigInt(version), 1));
   const hashbytes = bufferCV(hash);
   const poxAddressCV = tupleCV({
     hashbytes,
@@ -497,8 +489,8 @@ test('delegate stack stx with one delegator', async () => {
     privateKey,
   });
 
-  const { version, hash } = btcAddress.fromBase58Check(poxAddress);
-  const versionBuffer = bufferCV(toBuffer(BigInt(version), 1));
+  const { version, hash } = base58CheckDecode(poxAddress);
+  const versionBuffer = bufferCV(bigIntToBytes(BigInt(version), 1));
   const hashbytes = bufferCV(hash);
   const poxAddressCV = tupleCV({
     hashbytes,
@@ -582,8 +574,8 @@ test('delegate stack stx with set nonce', async () => {
     nonce,
   });
 
-  const { version, hash } = btcAddress.fromBase58Check(poxAddress);
-  const versionBuffer = bufferCV(toBuffer(BigInt(version), 1));
+  const { version, hash } = base58CheckDecode(poxAddress);
+  const versionBuffer = bufferCV(bigIntToBytes(BigInt(version), 1));
   const hashbytes = bufferCV(hash);
   const poxAddressCV = tupleCV({
     hashbytes,
@@ -652,8 +644,8 @@ test('delegator commit', async () => {
     privateKey,
   });
 
-  const { version, hash } = btcAddress.fromBase58Check(poxAddress);
-  const versionBuffer = bufferCV(toBuffer(BigInt(version), 1));
+  const { version, hash } = base58CheckDecode(poxAddress);
+  const versionBuffer = bufferCV(bigIntToBytes(BigInt(version), 1));
   const hashbytes = bufferCV(hash);
   const poxAddressCV = tupleCV({
     hashbytes,
@@ -732,7 +724,7 @@ test('revoke delegate stx', async () => {
 test('get stacking status', async () => {
   const address = 'ST3XKKN4RPV69NN1PHFDNX3TYKXT7XPC4N8KC1ARH';
   const network = new StacksTestnet();
-  const amountMicrostx = 10000;
+  const amountMicrostx = 10_000;
   const firstRewardCycle = 10;
   const lockPeriod = 20;
   const version = '00';
@@ -744,8 +736,8 @@ test('get stacking status', async () => {
       'first-reward-cycle': uintCV(firstRewardCycle),
       'lock-period': uintCV(lockPeriod),
       'pox-addr': tupleCV({
-        version: bufferCV(Buffer.from(version)),
-        hashbytes: bufferCV(Buffer.from(hashbytes)),
+        version: bufferCV(hexToBytes(version)),
+        hashbytes: bufferCV(hexToBytes(hashbytes)),
       }),
     })
   );
@@ -794,8 +786,8 @@ test('get stacking status', async () => {
   expect(stackingStatus.details.amount_microstx).toEqual(amountMicrostx.toString());
   expect(stackingStatus.details.first_reward_cycle).toEqual(firstRewardCycle);
   expect(stackingStatus.details.lock_period).toEqual(lockPeriod);
-  expect(stackingStatus.details.pox_address.version.toString()).toEqual(version);
-  expect(stackingStatus.details.pox_address.hashbytes.toString()).toEqual(hashbytes);
+  expect(bytesToHex(stackingStatus.details.pox_address.version)).toEqual(version);
+  expect(bytesToHex(stackingStatus.details.pox_address.hashbytes)).toEqual(hashbytes);
   expect(isPoxAbiValid(expectedReadOnlyFunctionCallOptions)).toBe(true);
 });
 
@@ -1016,38 +1008,38 @@ test('pox address hash mode', async () => {
 
 test('pox address to btc address', () => {
   const vectors: {
-    version: Buffer;
-    hashBytes: Buffer;
+    version: Uint8Array;
+    hashBytes: Uint8Array;
     network: 'mainnet' | 'testnet';
     expectedBtcAddr: string;
   }[] = [
     {
-      version: Buffer.from([0x01]),
-      hashBytes: Buffer.from('07366658d1e5f0f75c585a17b618b776f4f10a6b', 'hex'),
+      version: new Uint8Array([0x01]),
+      hashBytes: hexToBytes('07366658d1e5f0f75c585a17b618b776f4f10a6b'),
       network: 'mainnet',
       expectedBtcAddr: '32M9pegJxqXBoxXSKBN1s7HJUR2YMkMaFg',
     },
     {
-      version: Buffer.from([0x01]),
-      hashBytes: Buffer.from('9b24b88b1334b0a17a99c09470c4df06ffd3ea22', 'hex'),
+      version: new Uint8Array([0x01]),
+      hashBytes: hexToBytes('9b24b88b1334b0a17a99c09470c4df06ffd3ea22'),
       network: 'mainnet',
       expectedBtcAddr: '3FqLegt1Lo1JuhiBAQQiM5WwDdmefTo5zd',
     },
     {
-      version: Buffer.from([0x00]),
-      hashBytes: Buffer.from('fde9c82d7bc43f55e9054438470c3ca8d6e7237f', 'hex'),
+      version: new Uint8Array([0x00]),
+      hashBytes: hexToBytes('fde9c82d7bc43f55e9054438470c3ca8d6e7237f'),
       network: 'mainnet',
       expectedBtcAddr: '1Q9a1zGPfJ4oH5Xaz5wc7BdvWV21fSNkkr',
     },
     {
-      version: Buffer.from([0x00]),
-      hashBytes: Buffer.from('5dc795522f81dcb7eb774a0b8e84b612e3edc141', 'hex'),
+      version: new Uint8Array([0x00]),
+      hashBytes: hexToBytes('5dc795522f81dcb7eb774a0b8e84b612e3edc141'),
       network: 'testnet',
       expectedBtcAddr: 'mp4pEBdJiMh6aL5Uhs6nZX1XhyZ4V2xrzg',
     },
     {
-      version: Buffer.from([0x01]),
-      hashBytes: Buffer.from('3149c3eba2d21cfdeea56894866b8f4cd11b72ad', 'hex'),
+      version: new Uint8Array([0x01]),
+      hashBytes: hexToBytes('3149c3eba2d21cfdeea56894866b8f4cd11b72ad'),
       network: 'testnet',
       expectedBtcAddr: '2MwjqTzEJodSaoehcxRSqfWrvJMGZHq4tdC',
     },
@@ -1058,7 +1050,7 @@ test('pox address to btc address', () => {
     expect(btcAddress).toBe(item.expectedBtcAddr);
     const decodedAddress = decodeBtcAddress(btcAddress);
     expect(decodedAddress.hashMode).toBe(item.version[0]);
-    expect(decodedAddress.data.toString('hex')).toBe(item.hashBytes.toString('hex'));
+    expect(bytesToHex(decodedAddress.data)).toBe(bytesToHex(item.hashBytes));
   });
 
   vectors.forEach(item => {
@@ -1079,6 +1071,6 @@ test('pox address to btc address', () => {
     expect(btcAddress).toBe(item.expectedBtcAddr);
     const decodedAddress = decodeBtcAddress(btcAddress);
     expect(decodedAddress.hashMode).toBe(item.version[0]);
-    expect(decodedAddress.data.toString('hex')).toBe(item.hashBytes.toString('hex'));
+    expect(bytesToHex(decodedAddress.data)).toBe(bytesToHex(item.hashBytes));
   });
 });
