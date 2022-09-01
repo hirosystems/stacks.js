@@ -1,5 +1,5 @@
-import { Buffer } from '@stacks/common';
-import { bufferCV, uintCV, hash160 } from '@stacks/transactions';
+import { utf8ToBytes } from '@stacks/common';
+import { hash160 } from '@stacks/transactions';
 
 export function decodeFQN(fqdn: string): {
   name: string;
@@ -8,26 +8,16 @@ export function decodeFQN(fqdn: string): {
 } {
   const nameParts = fqdn.split('.');
   if (nameParts.length > 2) {
-    const subdomain = nameParts[0];
-    const name = nameParts[1];
-    const namespace = nameParts[2];
     return {
-      subdomain,
-      name,
-      namespace,
-    };
-  } else {
-    const name = nameParts[0];
-    const namespace = nameParts[1];
-    return {
-      name,
-      namespace,
+      subdomain: nameParts[0],
+      name: nameParts[1],
+      namespace: nameParts[2],
     };
   }
+  return {
+    name: nameParts[0],
+    namespace: nameParts[1],
+  };
 }
 
-export const bufferCVFromString = (string: string) => bufferCV(Buffer.from(string));
-
-export const uintCVFromBN = (int: bigint) => uintCV(int.toString(10));
-
-export const getZonefileHash = (zonefile: string) => hash160(Buffer.from(zonefile));
+export const getZonefileHash = (zonefile: string) => hash160(utf8ToBytes(zonefile));
