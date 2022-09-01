@@ -50,6 +50,7 @@ interface STXTransferOptions {
   anchorMode: AnchorMode;
 }
 
+/** @deprecated use `@stacks/wallet-sdk` and `@stacks/transactions` instead */
 export class WalletSigner {
   privateKey: Buffer;
 

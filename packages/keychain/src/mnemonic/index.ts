@@ -15,6 +15,7 @@ import { encryptMnemonic } from '@stacks/encryption';
 
 export type AllowedKeyEntropyBits = 128 | 256;
 
+/** @deprecated use `generateSecretKey` and `generateWallet` from `@stacks/wallet-sdk` instead */
 export async function generateMnemonicRootKeychain(entropy: AllowedKeyEntropyBits) {
   const plaintextMnemonic = generateBip39Mnemonic(wordlist, entropy);
   const seed = await mnemonicToSeed(plaintextMnemonic);
@@ -25,6 +26,7 @@ export async function generateMnemonicRootKeychain(entropy: AllowedKeyEntropyBit
   };
 }
 
+/** @deprecated use `generateWallet` from `@stacks/wallet-sdk` instead */
 export async function generateEncryptedMnemonicRootKeychain(
   password: string,
   entropy: AllowedKeyEntropyBits
@@ -40,12 +42,14 @@ export async function generateEncryptedMnemonicRootKeychain(
   };
 }
 
+/** @deprecated use `generateWallet` from `@stacks/wallet-sdk` instead */
 export async function deriveRootKeychainFromMnemonic(plaintextMnemonic: string) {
   const seed = await mnemonicToSeed(plaintextMnemonic);
   const rootNode = bip32.fromSeed(Buffer.from(seed));
   return rootNode;
 }
 
+/** @deprecated use `encrypt` from `@stacks/wallet-sdk` instead */
 export async function encryptMnemonicFormatted(plaintextMnemonic: string, password: string) {
   const encryptedMnemonic = await encryptMnemonic(plaintextMnemonic, password);
   const encryptedMnemonicHex = encryptedMnemonic.toString('hex');

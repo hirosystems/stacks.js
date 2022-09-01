@@ -10,6 +10,7 @@ import { registrars, Subdomains } from '../profiles';
 const IDENTITY_KEYCHAIN = 888;
 const BLOCKSTACK_ON_BITCOIN = 0;
 
+/** @deprecated */
 export function getIdentityPrivateKeychain(rootNode: BIP32Interface) {
   return rootNode.deriveHardened(IDENTITY_KEYCHAIN).deriveHardened(BLOCKSTACK_ON_BITCOIN);
 }
@@ -17,6 +18,7 @@ export function getIdentityPrivateKeychain(rootNode: BIP32Interface) {
 const EXTERNAL_ADDRESS = 'EXTERNAL_ADDRESS';
 const CHANGE_ADDRESS = 'CHANGE_ADDRESS';
 
+/** @deprecated */
 export function getBitcoinPrivateKeychain(rootNode: BIP32Interface) {
   const BIP_44_PURPOSE = 44;
   const BITCOIN_COIN_TYPE = 0;
@@ -28,6 +30,7 @@ export function getBitcoinPrivateKeychain(rootNode: BIP32Interface) {
     .deriveHardened(ACCOUNT_INDEX);
 }
 
+/** @deprecated */
 export function getBitcoinAddressNode(
   bitcoinKeychain: BIP32Interface,
   addressIndex = 0,
@@ -46,6 +49,7 @@ export function getBitcoinAddressNode(
   return bitcoinKeychain.derive(chain).derive(addressIndex);
 }
 
+/** @deprecated */
 export async function getIdentityOwnerAddressNode(
   identityPrivateKeychain: BIP32Interface,
   identityIndex = 0
@@ -76,6 +80,7 @@ export interface IdentityKeyPair {
   salt: string;
 }
 
+/** @deprecated */
 export function deriveIdentityKeyPair(
   identityOwnerAddressNode: IdentityAddressOwnerNode
 ): IdentityKeyPair {
@@ -95,6 +100,7 @@ export function deriveIdentityKeyPair(
   return keyPair;
 }
 
+/** @deprecated */
 export async function getBlockchainIdentities(
   rootNode: BIP32Interface,
   identitiesToGenerate: number
@@ -133,6 +139,7 @@ export async function getBlockchainIdentities(
   };
 }
 
+/** @deprecated */
 export const makeIdentity = async (rootNode: BIP32Interface, index: number) => {
   const identityPrivateKeychainNode = getIdentityPrivateKeychain(rootNode);
   const identityOwnerAddressNode = await getIdentityOwnerAddressNode(
@@ -163,6 +170,7 @@ export enum IdentityNameValidityError {
 
 const containsLegalCharacters = (name: string) => /^[a-z0-9_]+$/.test(name);
 
+/** @deprecated */
 export const validateSubdomainFormat = (identityName: string): IdentityNameValidityError | null => {
   const nameLength = identityName.length;
 
@@ -181,6 +189,7 @@ export const validateSubdomainFormat = (identityName: string): IdentityNameValid
   return null;
 };
 
+/** @deprecated */
 export const validateSubdomainAvailability = async (
   name: string,
   subdomain: Subdomains = Subdomains.BLOCKSTACK,
@@ -202,6 +211,7 @@ interface RecursiveMakeIdentitiesOptions {
  * Restore identities by recursively making a new identity, and checking if it has a username.
  *
  * As soon as a username is not found for an identity, the recursion stops.
+ *  @deprecated
  */
 export const recursiveRestoreIdentities = async ({
   rootNode,
