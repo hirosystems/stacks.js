@@ -87,7 +87,7 @@ export function createLPString(
   const prefixLength = lengthPrefixBytes || 1;
   const maxLength = maxLengthBytes || MAX_STRING_LENGTH_BYTES;
   if (exceedsMaxLengthBytes(content, maxLength)) {
-    throw new Error(`String length exceeds maximum bytes ${maxLength.toString()}`);
+    throw new Error(`String length exceeds maximum bytes ${maxLength}`);
   }
   return {
     type: StacksMessageType.LengthPrefixedString,

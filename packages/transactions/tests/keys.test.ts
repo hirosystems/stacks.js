@@ -6,9 +6,9 @@ import {
   verify as nobleSecp256k1Verify,
 } from '@noble/secp256k1';
 import {
-  Buffer,
   bytesToHex,
   hexToBigInt,
+  hexToBytes,
   parseRecoverableSignatureVrs,
   signatureRsvToVrs,
   utf8ToBytes,
@@ -69,30 +69,30 @@ test('Stacks public key and private keys', () => {
   expect(privateKeyToString(randomKey).length).toEqual(64);
 
   expect(getAddressFromPrivateKey(privKeyString)).toBe('SPZG6BAY4JVR9RNAB1HY92B7Q208ZYY4HZEA9PX5');
-  expect(getAddressFromPrivateKey(Buffer.from(privKeyString, 'hex'))).toBe(
+  expect(getAddressFromPrivateKey(hexToBytes(privKeyString))).toBe(
     'SPZG6BAY4JVR9RNAB1HY92B7Q208ZYY4HZEA9PX5'
   );
 
   expect(getAddressFromPrivateKey(privKeyString, TransactionVersion.Testnet)).toBe(
     'STZG6BAY4JVR9RNAB1HY92B7Q208ZYY4HZG8ZXFM'
   );
-  expect(
-    getAddressFromPrivateKey(Buffer.from(privKeyString, 'hex'), TransactionVersion.Testnet)
-  ).toBe('STZG6BAY4JVR9RNAB1HY92B7Q208ZYY4HZG8ZXFM');
+  expect(getAddressFromPrivateKey(hexToBytes(privKeyString), TransactionVersion.Testnet)).toBe(
+    'STZG6BAY4JVR9RNAB1HY92B7Q208ZYY4HZG8ZXFM'
+  );
 
   expect(getAddressFromPublicKey(pubKeyString)).toBe('SPZG6BAY4JVR9RNAB1HY92B7Q208ZYY4HZEA9PX5');
-  expect(getAddressFromPublicKey(Buffer.from(pubKeyString, 'hex'))).toBe(
+  expect(getAddressFromPublicKey(hexToBytes(pubKeyString))).toBe(
     'SPZG6BAY4JVR9RNAB1HY92B7Q208ZYY4HZEA9PX5'
   );
 
   expect(getAddressFromPublicKey(pubKeyString, TransactionVersion.Testnet)).toBe(
     'STZG6BAY4JVR9RNAB1HY92B7Q208ZYY4HZG8ZXFM'
   );
-  expect(
-    getAddressFromPublicKey(Buffer.from(pubKeyString, 'hex'), TransactionVersion.Testnet)
-  ).toBe('STZG6BAY4JVR9RNAB1HY92B7Q208ZYY4HZG8ZXFM');
+  expect(getAddressFromPublicKey(hexToBytes(pubKeyString), TransactionVersion.Testnet)).toBe(
+    'STZG6BAY4JVR9RNAB1HY92B7Q208ZYY4HZG8ZXFM'
+  );
 
-  const compressedPubKey = compressPublicKey(pubKey.data).data.toString('hex');
+  const compressedPubKey = bytesToHex(compressPublicKey(pubKey.data).data);
   expect(compressedPubKey).toBe(
     '03ef788b3830c00abe8f64f62dc32fc863bc0b2cafeb073b6c8e1c7657d9c2c3ab'
   );
@@ -114,7 +114,7 @@ test('signWithKey', () => {
   const expectedSignatureVrs =
     '00f540e429fc6e8a4c27f2782479e739cae99aa21e8cb25d4436f333577bc791cd1d9672055dd1604dd5194b88076e4f859dd93c834785ed589ec38291698d4142';
 
-  const messageHash = Buffer.from(sha256('Hello World')).toString('hex');
+  const messageHash = bytesToHex(sha256('Hello World'));
   expect(messageHash).toBe(expectedMessageHash);
 
   const signature = signWithKey(privateKey, messageHash);
@@ -137,7 +137,7 @@ test('signMessageHashRsv', () => {
   const expectedSignatureRsv =
     'f540e429fc6e8a4c27f2782479e739cae99aa21e8cb25d4436f333577bc791cd1d9672055dd1604dd5194b88076e4f859dd93c834785ed589ec38291698d414200';
 
-  const messageHash = Buffer.from(sha256('Hello World')).toString('hex');
+  const messageHash = bytesToHex(sha256('Hello World'));
   expect(messageHash).toBe(expectedMessageHash);
 
   const signature = signMessageHashRsv({ privateKey, messageHash });
@@ -153,7 +153,7 @@ test('noble sign message', () => {
   const expectedR = 114926983411733245831514739773229123958640458736536797227773647312126690926912n;
   const expectedS = 3148023981578716756961627923124903910422344826113324160219886779423594190576n;
 
-  const messageHash = Buffer.from(sha256('greetings from noble')).toString('hex');
+  const messageHash = bytesToHex(sha256('greetings from noble'));
   expect(messageHash).toBe(expectedMessageHash);
 
   const signatureRsv = signMessageHashRsv({ privateKey, messageHash }).data;

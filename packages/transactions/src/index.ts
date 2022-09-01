@@ -1,6 +1,6 @@
 export { StacksTransaction, deserializeTransaction } from './transaction';
 
-export { BufferReader } from './bufferReader';
+export { ByteReader as BytesReader } from './bytesReader';
 
 export {
   Authorization,

@@ -17,7 +17,7 @@ import { Address, addressToString } from '../src/common';
 import { TransactionVersion, AddressHashMode, StacksMessageType } from '../src/constants';
 
 import { serializeDeserialize } from './macros';
-import { BufferReader } from '../src/bufferReader';
+import { ByteReader } from '../src/bytesReader';
 import { createStacksPublicKey } from '../src/keys';
 
 test('Length prefixed strings serialization and deserialization', () => {
@@ -49,7 +49,7 @@ test('Length prefixed list serialization and deserialization', () => {
   const lpList: LengthPrefixedList = createLPList(l);
   const serialized = serializeStacksMessage(lpList);
 
-  const bufferReader = new BufferReader(serialized);
+  const bufferReader = new ByteReader(serialized);
   const deserialized = deserializeLPList(bufferReader, StacksMessageType.Address);
 
   expect(deserialized.values.length).toBe(addressList.length);
@@ -131,7 +131,6 @@ test('C32 address hash mode - testnet P2WSH', () => {
   expect(address).toBe(expected);
 });
 
-
 test('C32check addresses serialization and deserialization', () => {
   const c32AddressString = 'SP9YX31TK12T0EZKWP3GZXX8AM37JDQHAWM7VBTH';
   const addr = createAddress(c32AddressString);
@@ -150,38 +149,49 @@ test('Asset info serialization and deserialization', () => {
   expect(deserialized.assetName.content).toBe(assetName);
 });
 
-
 // address/mod.rs: test_public_keys_to_address_hash()
 test('Public keys to address hash', () => {
   const fixtures = [
     {
-      keys: [createStacksPublicKey('040fadbbcea0ff3b05f03195b41cd991d7a0af8bd38559943aec99cbdaf0b22cc806b9a4f07579934774cc0c155e781d45c989f94336765e88a66d91cfb9f060b0')],
+      keys: [
+        createStacksPublicKey(
+          '040fadbbcea0ff3b05f03195b41cd991d7a0af8bd38559943aec99cbdaf0b22cc806b9a4f07579934774cc0c155e781d45c989f94336765e88a66d91cfb9f060b0'
+        ),
+      ],
       numRequired: 1,
       segwit: false,
       result: '395f3643cea07ec4eec73b4d9a973dcce56b9bf1',
     },
     {
       keys: [
-        createStacksPublicKey('040fadbbcea0ff3b05f03195b41cd991d7a0af8bd38559943aec99cbdaf0b22cc806b9a4f07579934774cc0c155e781d45c989f94336765e88a66d91cfb9f060b0'),
-        createStacksPublicKey('04c77f262dda02580d65c9069a8a34c56bd77325bba4110b693b90216f5a3edc0bebc8ce28d61aa86b414aa91ecb29823b11aeed06098fcd97fee4bc73d54b1e96')
+        createStacksPublicKey(
+          '040fadbbcea0ff3b05f03195b41cd991d7a0af8bd38559943aec99cbdaf0b22cc806b9a4f07579934774cc0c155e781d45c989f94336765e88a66d91cfb9f060b0'
+        ),
+        createStacksPublicKey(
+          '04c77f262dda02580d65c9069a8a34c56bd77325bba4110b693b90216f5a3edc0bebc8ce28d61aa86b414aa91ecb29823b11aeed06098fcd97fee4bc73d54b1e96'
+        ),
       ],
       numRequired: 2,
       segwit: false,
       result: 'fd3a5e9f5ba311ce6122765f0af8da7488e25d3a',
     },
     {
-      keys: [createStacksPublicKey('020fadbbcea0ff3b05f03195b41cd991d7a0af8bd38559943aec99cbdaf0b22cc8')],
+      keys: [
+        createStacksPublicKey('020fadbbcea0ff3b05f03195b41cd991d7a0af8bd38559943aec99cbdaf0b22cc8'),
+      ],
       numRequired: 1,
       segwit: true,
       result: '0ac7ad046fe22c794dd923b3be14b2e668e50c42',
     },
     {
-      keys: [createStacksPublicKey('020fadbbcea0ff3b05f03195b41cd991d7a0af8bd38559943aec99cbdaf0b22cc8'),
-      createStacksPublicKey('02c77f262dda02580d65c9069a8a34c56bd77325bba4110b693b90216f5a3edc0b')],
+      keys: [
+        createStacksPublicKey('020fadbbcea0ff3b05f03195b41cd991d7a0af8bd38559943aec99cbdaf0b22cc8'),
+        createStacksPublicKey('02c77f262dda02580d65c9069a8a34c56bd77325bba4110b693b90216f5a3edc0b'),
+      ],
       numRequired: 2,
       segwit: true,
       result: '3e02fa83ac2fae11fd6703b91e7c94ad393052e2',
-     }
+    },
   ];
 
   for (const fixture of fixtures) {

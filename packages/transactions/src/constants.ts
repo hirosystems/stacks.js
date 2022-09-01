@@ -10,7 +10,7 @@ const DEFAULT_CHAIN_ID = ChainID.Mainnet;
 const MAX_STRING_LENGTH_BYTES = 128;
 const CLARITY_INT_SIZE = 128;
 const CLARITY_INT_BYTE_SIZE = 16;
-const COINBASE_BUFFER_LENGTH_BYTES = 32;
+const COINBASE_LENGTH_BYTES = 32;
 const RECOVERABLE_ECDSA_SIG_LENGTH_BYTES = 65;
 const COMPRESSED_PUBKEY_LENGTH_BYTES = 32;
 const UNCOMPRESSED_PUBKEY_LENGTH_BYTES = 64;
@@ -30,6 +30,12 @@ enum StacksMessageType {
   MessageSignature,
   StructuredDataSignature,
   TransactionAuthField,
+}
+
+type WhenMessageTypeMap<T> = Record<StacksMessageType, T>;
+
+export function whenMessageType(messageType: StacksMessageType) {
+  return <T>(messageTypeMap: WhenMessageTypeMap<T>): T => messageTypeMap[messageType];
 }
 
 enum PayloadType {
@@ -161,7 +167,7 @@ export {
   MAX_STRING_LENGTH_BYTES,
   CLARITY_INT_SIZE,
   CLARITY_INT_BYTE_SIZE,
-  COINBASE_BUFFER_LENGTH_BYTES,
+  COINBASE_LENGTH_BYTES as COINBASE_BYTES_LENGTH,
   DEFAULT_CHAIN_ID,
   DEFAULT_TRANSACTION_VERSION,
   RECOVERABLE_ECDSA_SIG_LENGTH_BYTES,

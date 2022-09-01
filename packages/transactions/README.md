@@ -329,7 +329,7 @@ import {
   tupleCV,
   bufferCV,
 } from '@stacks/transactions';
-import { Buffer } from '@stacks/common';
+import { utf8ToBytes } from '@stacks/common';
 
 // construct boolean clarity values
 const t = trueCV();
@@ -339,9 +339,9 @@ const f = falseCV();
 const nothing = noneCV();
 const something = someCV(t);
 
-// construct a buffer clarity value from an existing Buffer
-const buffer = Buffer.from('foo');
-const bufCV = bufferCV(buffer);
+// construct a buffer clarity value from an existing byte array
+const bytes = utf8ToBytes('foo'); // Uint8Array(3) [ 102, 111, 111 ]
+const bufCV = bufferCV(bytes);
 
 // construct signed and unsigned integer clarity values
 const i = intCV(-10);

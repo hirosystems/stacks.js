@@ -8,18 +8,19 @@ import {
   utils,
 } from '@noble/secp256k1';
 import {
-  Buffer,
   bytesToHex,
+  concatArray,
   hexToBigInt,
+  hexToBytes,
   intToHex,
   parseRecoverableSignatureVrs,
-  privateKeyToBuffer,
+  privateKeyToBytes,
   PRIVATE_KEY_COMPRESSED_LENGTH,
   signatureRsvToVrs,
   signatureVrsToRsv,
 } from '@stacks/common';
 import { c32address } from 'c32check';
-import { BufferReader } from './bufferReader';
+import { ByteReader } from './bytesReader';
 import {
   addressFromVersionHash,
   addressHashModeToVersion,
@@ -36,7 +37,7 @@ import {
   TransactionVersion,
   UNCOMPRESSED_PUBKEY_LENGTH_BYTES,
 } from './constants';
-import { BufferArray, hash160, hashP2PKH } from './utils';
+import { hash160, hashP2PKH } from './utils';
 
 /**
  * To use secp256k1.signSync set utils.hmacSha256Sync to a function using noble-hashes
@@ -53,13 +54,13 @@ utils.hmacSha256Sync = (key: Uint8Array, ...msgs: Uint8Array[]) => {
 
 export interface StacksPublicKey {
   readonly type: StacksMessageType.PublicKey;
-  readonly data: Buffer;
+  readonly data: Uint8Array;
 }
 
 /** Creates a P2PKH address string from the given private key and tx version. */
 export function getAddressFromPrivateKey(
-  /** Private key buffer or hex string */
-  privateKey: string | Buffer,
+  /** Private key bytes or hex string */
+  privateKey: string | Uint8Array,
   transactionVersion = TransactionVersion.Mainnet
 ): string {
   const pubKey = pubKeyfromPrivKey(privateKey);
@@ -68,13 +69,13 @@ export function getAddressFromPrivateKey(
 
 /** Creates a P2PKH address string from the given public key and tx version. */
 export function getAddressFromPublicKey(
-  /** Public key buffer or hex string */
-  publicKey: string | Buffer,
+  /** Public key bytes or hex string */
+  publicKey: string | Uint8Array,
   transactionVersion = TransactionVersion.Mainnet
 ): string {
-  publicKey = typeof publicKey === 'string' ? publicKey : publicKey.toString('hex');
+  publicKey = typeof publicKey === 'string' ? publicKey : bytesToHex(publicKey);
   const addrVer = addressHashModeToVersion(AddressHashMode.SerializeP2PKH, transactionVersion);
-  const addr = addressFromVersionHash(addrVer, hashP2PKH(Buffer.from(publicKey, 'hex')));
+  const addr = addressFromVersionHash(addrVer, hashP2PKH(hexToBytes(publicKey)));
   const addrString = addressToString(addr);
   return addrString;
 }
@@ -82,7 +83,7 @@ export function getAddressFromPublicKey(
 export function createStacksPublicKey(key: string): StacksPublicKey {
   return {
     type: StacksMessageType.PublicKey,
-    data: Buffer.from(key, 'hex'),
+    data: hexToBytes(key),
   };
 }
 
@@ -115,60 +116,56 @@ export function publicKeyFromSignatureRsv(
  */
 export const publicKeyFromSignature = publicKeyFromSignatureVrs;
 
-export function publicKeyFromBuffer(data: Buffer): StacksPublicKey {
+export function publicKeyFromBytes(data: Uint8Array): StacksPublicKey {
   return { type: StacksMessageType.PublicKey, data };
 }
 
 export function isCompressed(key: StacksPublicKey): boolean {
-  return !key.data.toString('hex').startsWith('04');
+  return !bytesToHex(key.data).startsWith('04');
 }
 
 export function publicKeyToString(key: StacksPublicKey): string {
-  return key.data.toString('hex');
+  return bytesToHex(key.data);
 }
 
-export function serializePublicKey(key: StacksPublicKey): Buffer {
-  const bufferArray: BufferArray = new BufferArray();
-  bufferArray.push(key.data);
-  return bufferArray.concatBuffer();
+export function serializePublicKey(key: StacksPublicKey): Uint8Array {
+  return key.data.slice();
 }
 
-export function pubKeyfromPrivKey(privateKey: string | Buffer): StacksPublicKey {
+export function pubKeyfromPrivKey(privateKey: string | Uint8Array): StacksPublicKey {
   const privKey = createStacksPrivateKey(privateKey);
   const publicKey = nobleGetPublicKey(privKey.data.slice(0, 32), privKey.compressed);
   return createStacksPublicKey(bytesToHex(publicKey));
 }
 
-export function compressPublicKey(publicKey: string | Buffer): StacksPublicKey {
+export function compressPublicKey(publicKey: string | Uint8Array): StacksPublicKey {
   const hex = typeof publicKey === 'string' ? publicKey : bytesToHex(publicKey);
   const compressed = Point.fromHex(hex).toHex(true);
   return createStacksPublicKey(compressed);
 }
 
-export function deserializePublicKey(bufferReader: BufferReader): StacksPublicKey {
-  const fieldId = bufferReader.readUInt8();
+export function deserializePublicKey(bytesReader: ByteReader): StacksPublicKey {
+  const fieldId = bytesReader.readUInt8();
   const keyLength =
     fieldId !== 4 ? COMPRESSED_PUBKEY_LENGTH_BYTES : UNCOMPRESSED_PUBKEY_LENGTH_BYTES;
-  return publicKeyFromBuffer(
-    Buffer.concat([Buffer.from([fieldId]), bufferReader.readBuffer(keyLength)])
-  );
+  return publicKeyFromBytes(concatArray([fieldId, bytesReader.readBytes(keyLength)]));
 }
 
 export interface StacksPrivateKey {
   // "compressed" private key is a misnomer: https://web.archive.org/web/20220131144208/https://www.oreilly.com/library/view/mastering-bitcoin/9781491902639/ch04.html#comp_priv
   // it actually means: should public keys be generated as "compressed" or "uncompressed" from this private key
   compressed: boolean;
-  data: Buffer;
+  data: Uint8Array;
 }
 
-export function createStacksPrivateKey(key: string | Buffer): StacksPrivateKey {
-  const data = privateKeyToBuffer(key);
+export function createStacksPrivateKey(key: string | Uint8Array): StacksPrivateKey {
+  const data = privateKeyToBytes(key);
   const compressed = data.length == PRIVATE_KEY_COMPRESSED_LENGTH;
   return { data, compressed };
 }
 
 export function makeRandomPrivKey(): StacksPrivateKey {
-  return createStacksPrivateKey(bytesToHex(utils.randomPrivateKey()));
+  return createStacksPrivateKey(utils.randomPrivateKey());
 }
 
 /**
@@ -215,9 +212,9 @@ export function getPublicKey(privateKey: StacksPrivateKey): StacksPublicKey {
 }
 
 export function privateKeyToString(privateKey: StacksPrivateKey): string {
-  return privateKey.data.toString('hex');
+  return bytesToHex(privateKey.data);
 }
 
 export function publicKeyToAddress(version: AddressVersion, publicKey: StacksPublicKey): string {
-  return c32address(version, hash160(publicKey.data).toString('hex'));
+  return c32address(version, bytesToHex(hash160(publicKey.data)));
 }

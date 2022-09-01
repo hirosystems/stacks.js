@@ -1,4 +1,4 @@
-import { BufferReader } from './bufferReader';
+import { ByteReader } from './bytesReader';
 import { DeserializationError } from './errors';
 import { PubKeyEncoding, RECOVERABLE_ECDSA_SIG_LENGTH_BYTES, StacksMessageType } from './constants';
 import {
@@ -11,8 +11,7 @@ import {
 import { createMessageSignature, MessageSignature } from './common';
 
 // @ts-ignore
-import { Buffer } from '@stacks/common';
-import { BufferArray } from './utils';
+import { bytesToHex, concatArray, hexToBytes } from '@stacks/common';
 
 export enum AuthFieldType {
   PublicKeyCompressed = 0x00,
@@ -29,9 +28,9 @@ export interface TransactionAuthField {
 
 export type TransactionAuthFieldContents = StacksPublicKey | MessageSignature;
 
-export function deserializeMessageSignature(bufferReader: BufferReader): MessageSignature {
+export function deserializeMessageSignature(bytesReader: ByteReader): MessageSignature {
   return createMessageSignature(
-    bufferReader.readBuffer(RECOVERABLE_ECDSA_SIG_LENGTH_BYTES).toString('hex')
+    bytesToHex(bytesReader.readBytes(RECOVERABLE_ECDSA_SIG_LENGTH_BYTES))
   );
 }
 
@@ -52,8 +51,8 @@ export function createTransactionAuthField(
   };
 }
 
-export function deserializeTransactionAuthField(bufferReader: BufferReader): TransactionAuthField {
-  const authFieldType = bufferReader.readUInt8Enum(AuthFieldType, n => {
+export function deserializeTransactionAuthField(bytesReader: ByteReader): TransactionAuthField {
+  const authFieldType = bytesReader.readUInt8Enum(AuthFieldType, n => {
     throw new DeserializationError(`Could not read ${n} as AuthFieldType`);
   });
 
@@ -61,56 +60,54 @@ export function deserializeTransactionAuthField(bufferReader: BufferReader): Tra
     case AuthFieldType.PublicKeyCompressed:
       return createTransactionAuthField(
         PubKeyEncoding.Compressed,
-        deserializePublicKey(bufferReader)
+        deserializePublicKey(bytesReader)
       );
     case AuthFieldType.PublicKeyUncompressed:
       return createTransactionAuthField(
         PubKeyEncoding.Uncompressed,
-        deserializePublicKey(bufferReader)
+        deserializePublicKey(bytesReader)
       );
     case AuthFieldType.SignatureCompressed:
       return createTransactionAuthField(
         PubKeyEncoding.Compressed,
-        deserializeMessageSignature(bufferReader)
+        deserializeMessageSignature(bytesReader)
       );
     case AuthFieldType.SignatureUncompressed:
       return createTransactionAuthField(
         PubKeyEncoding.Uncompressed,
-        deserializeMessageSignature(bufferReader)
+        deserializeMessageSignature(bytesReader)
       );
     default:
       throw new Error(`Unknown auth field type: ${JSON.stringify(authFieldType)}`);
   }
 }
 
-export function serializeMessageSignature(messageSignature: MessageSignature): Buffer {
-  const bufferArray: BufferArray = new BufferArray();
-  bufferArray.appendHexString(messageSignature.data);
-  return bufferArray.concatBuffer();
+export function serializeMessageSignature(messageSignature: MessageSignature): Uint8Array {
+  return hexToBytes(messageSignature.data);
 }
 
-export function serializeTransactionAuthField(field: TransactionAuthField): Buffer {
-  const bufferArray: BufferArray = new BufferArray();
+export function serializeTransactionAuthField(field: TransactionAuthField): Uint8Array {
+  const bytesArray = [];
 
   switch (field.contents.type) {
     case StacksMessageType.PublicKey:
       if (field.pubKeyEncoding == PubKeyEncoding.Compressed) {
-        bufferArray.appendByte(AuthFieldType.PublicKeyCompressed);
-        bufferArray.push(serializePublicKey(field.contents));
+        bytesArray.push(AuthFieldType.PublicKeyCompressed);
+        bytesArray.push(serializePublicKey(field.contents));
       } else {
-        bufferArray.appendByte(AuthFieldType.PublicKeyUncompressed);
-        bufferArray.push(serializePublicKey(compressPublicKey(field.contents.data)));
+        bytesArray.push(AuthFieldType.PublicKeyUncompressed);
+        bytesArray.push(serializePublicKey(compressPublicKey(field.contents.data)));
       }
       break;
     case StacksMessageType.MessageSignature:
       if (field.pubKeyEncoding == PubKeyEncoding.Compressed) {
-        bufferArray.appendByte(AuthFieldType.SignatureCompressed);
+        bytesArray.push(AuthFieldType.SignatureCompressed);
       } else {
-        bufferArray.appendByte(AuthFieldType.SignatureUncompressed);
+        bytesArray.push(AuthFieldType.SignatureUncompressed);
       }
-      bufferArray.push(serializeMessageSignature(field.contents));
+      bytesArray.push(serializeMessageSignature(field.contents));
       break;
   }
 
-  return bufferArray.concatBuffer();
+  return concatArray(bytesArray);
 }

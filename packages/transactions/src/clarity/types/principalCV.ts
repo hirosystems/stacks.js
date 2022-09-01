@@ -1,7 +1,7 @@
-import { Buffer } from '@stacks/common';
 import { LengthPrefixedString, createAddress, createLPString } from '../../postcondition-types';
 import { Address, addressToString } from '../../common';
 import { ClarityType } from '../constants';
+import { utf8ToBytes } from '@stacks/common';
 
 type PrincipalCV = StandardPrincipalCV | ContractPrincipalCV;
 
@@ -138,7 +138,7 @@ function contractPrincipalCVFromAddress(
   address: Address,
   contractName: LengthPrefixedString
 ): ContractPrincipalCV {
-  if (Buffer.byteLength(contractName.content) >= 128) {
+  if (utf8ToBytes(contractName.content).byteLength >= 128) {
     throw new Error('Contract name must be less than 128 bytes');
   }
   return { type: ClarityType.PrincipalContract, address, contractName };

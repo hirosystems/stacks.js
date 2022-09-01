@@ -1,4 +1,3 @@
-import { Buffer } from '@stacks/common';
 import {
   ClarityType,
   ClarityValue,
@@ -16,15 +15,16 @@ import {
   listCV,
   tupleCV,
 } from '.';
-import { BufferReader } from '../bufferReader';
+import { ByteReader as ByteReader } from '../bytesReader';
 import { deserializeAddress, deserializeLPString } from '../types';
 import { DeserializationError } from '../errors';
 import { stringAsciiCV, stringUtf8CV } from './types/stringCV';
+import { bytesToAscii, bytesToUtf8, hexToBytes } from '@stacks/common';
 
 /**
  * Deserializes clarity value to clarity type
  *
- * @param {value} Buffer | string value to be converted to clarity type
+ * @param {value} Uint8Array | string value to be converted to clarity type
  **
  * @returns {ClarityType} returns the clarity type instance
  *
@@ -34,7 +34,7 @@ import { stringAsciiCV, stringUtf8CV } from './types/stringCV';
  *
  *  const serialized = serializeCV(intCV(100)); // Similarly works for other clarity types as well like listCV, booleanCV ...
  *
- *  // <Buffer 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 64>
+ *  // <Uint8Array 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 64>
  *
  *  const deserialized = deserializeCV(serialized);
  *  // { type: 0, value: 100n }
@@ -44,33 +44,33 @@ import { stringAsciiCV, stringUtf8CV } from './types/stringCV';
  * {@link https://github.com/hirosystems/stacks.js/blob/master/packages/transactions/tests/clarity.test.ts clarity test cases for more examples}
  */
 export default function deserializeCV<T extends ClarityValue = ClarityValue>(
-  serializedClarityValue: BufferReader | Buffer | string
+  serializedClarityValue: ByteReader | Uint8Array | string
 ): T {
-  let bufferReader: BufferReader;
+  let bytesReader: ByteReader;
   if (typeof serializedClarityValue === 'string') {
     const hasHexPrefix = serializedClarityValue.slice(0, 2).toLowerCase() === '0x';
-    bufferReader = new BufferReader(
-      Buffer.from(hasHexPrefix ? serializedClarityValue.slice(2) : serializedClarityValue, 'hex')
+    bytesReader = new ByteReader(
+      hexToBytes(hasHexPrefix ? serializedClarityValue.slice(2) : serializedClarityValue)
     );
-  } else if (Buffer.isBuffer(serializedClarityValue)) {
-    bufferReader = new BufferReader(serializedClarityValue);
+  } else if (serializedClarityValue instanceof Uint8Array) {
+    bytesReader = new ByteReader(serializedClarityValue);
   } else {
-    bufferReader = serializedClarityValue;
+    bytesReader = serializedClarityValue;
   }
-  const type = bufferReader.readUInt8Enum(ClarityType, n => {
+  const type = bytesReader.readUInt8Enum(ClarityType, n => {
     throw new DeserializationError(`Cannot recognize Clarity Type: ${n}`);
   });
 
   switch (type) {
     case ClarityType.Int:
-      return intCV(bufferReader.readBuffer(16)) as T;
+      return intCV(bytesReader.readBytes(16)) as T;
 
     case ClarityType.UInt:
-      return uintCV(bufferReader.readBuffer(16)) as T;
+      return uintCV(bytesReader.readBytes(16)) as T;
 
     case ClarityType.Buffer:
-      const bufferLength = bufferReader.readUInt32BE();
-      return bufferCV(bufferReader.readBuffer(bufferLength)) as T;
+      const bufferLength = bytesReader.readUInt32BE();
+      return bufferCV(bytesReader.readBytes(bufferLength)) as T;
 
     case ClarityType.BoolTrue:
       return trueCV() as T;
@@ -79,59 +79,59 @@ export default function deserializeCV<T extends ClarityValue = ClarityValue>(
       return falseCV() as T;
 
     case ClarityType.PrincipalStandard:
-      const sAddress = deserializeAddress(bufferReader);
+      const sAddress = deserializeAddress(bytesReader);
       return standardPrincipalCVFromAddress(sAddress) as T;
 
     case ClarityType.PrincipalContract:
-      const cAddress = deserializeAddress(bufferReader);
-      const contractName = deserializeLPString(bufferReader);
+      const cAddress = deserializeAddress(bytesReader);
+      const contractName = deserializeLPString(bytesReader);
       return contractPrincipalCVFromAddress(cAddress, contractName) as T;
 
     case ClarityType.ResponseOk:
-      return responseOkCV(deserializeCV(bufferReader)) as T;
+      return responseOkCV(deserializeCV(bytesReader)) as T;
 
     case ClarityType.ResponseErr:
-      return responseErrorCV(deserializeCV(bufferReader)) as T;
+      return responseErrorCV(deserializeCV(bytesReader)) as T;
 
     case ClarityType.OptionalNone:
       return noneCV() as T;
 
     case ClarityType.OptionalSome:
-      return someCV(deserializeCV(bufferReader)) as T;
+      return someCV(deserializeCV(bytesReader)) as T;
 
     case ClarityType.List:
-      const listLength = bufferReader.readUInt32BE();
+      const listLength = bytesReader.readUInt32BE();
       const listContents: ClarityValue[] = [];
       for (let i = 0; i < listLength; i++) {
-        listContents.push(deserializeCV(bufferReader));
+        listContents.push(deserializeCV(bytesReader));
       }
       return listCV(listContents) as T;
 
     case ClarityType.Tuple:
-      const tupleLength = bufferReader.readUInt32BE();
+      const tupleLength = bytesReader.readUInt32BE();
       const tupleContents: { [key: string]: ClarityValue } = {};
       for (let i = 0; i < tupleLength; i++) {
-        const clarityName = deserializeLPString(bufferReader).content;
+        const clarityName = deserializeLPString(bytesReader).content;
         if (clarityName === undefined) {
           throw new DeserializationError('"content" is undefined');
         }
-        tupleContents[clarityName] = deserializeCV(bufferReader);
+        tupleContents[clarityName] = deserializeCV(bytesReader);
       }
       return tupleCV(tupleContents) as T;
 
     case ClarityType.StringASCII:
-      const asciiStrLen = bufferReader.readUInt32BE();
-      const asciiStr = bufferReader.readBuffer(asciiStrLen).toString('ascii');
+      const asciiStrLen = bytesReader.readUInt32BE();
+      const asciiStr = bytesToAscii(bytesReader.readBytes(asciiStrLen));
       return stringAsciiCV(asciiStr) as T;
 
     case ClarityType.StringUTF8:
-      const utf8StrLen = bufferReader.readUInt32BE();
-      const utf8Str = bufferReader.readBuffer(utf8StrLen).toString('utf8');
+      const utf8StrLen = bytesReader.readUInt32BE();
+      const utf8Str = bytesToUtf8(bytesReader.readBytes(utf8StrLen));
       return stringUtf8CV(utf8Str) as T;
 
     default:
       throw new DeserializationError(
-        'Unable to deserialize Clarity Value from buffer. Could not find valid Clarity Type.'
+        'Unable to deserialize Clarity Value from Uint8Array. Could not find valid Clarity Type.'
       );
   }
 }

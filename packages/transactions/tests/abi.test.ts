@@ -3,34 +3,36 @@ import path from 'path';
 import { createContractCallPayload } from '../src/payload';
 
 import {
-  trueCV,
-  intCV,
-  tupleCV,
-  uintCV,
-  standardPrincipalCV,
-  contractPrincipalCV,
   bufferCVFromString,
-  someCV,
+  contractPrincipalCV,
   falseCV,
+  intCV,
   listCV,
-  responseOkCV,
-  responseErrorCV,
   noneCV,
+  responseErrorCV,
+  responseOkCV,
+  someCV,
+  standardPrincipalCV,
   stringAsciiCV,
   stringUtf8CV,
+  trueCV,
+  tupleCV,
+  uintCV,
 } from '../src/clarity';
 
 import {
-  validateContractCall,
-  ClarityAbi,
   abiFunctionToString,
-  parseToCV,
+  ClarityAbi,
   ClarityAbiType,
+  parseToCV,
+  validateContractCall,
 } from '../src/contract-abi';
 
-import { oneLineTrim } from 'common-tags';
+import { utf8ToBytes } from '@stacks/common';
 
-const TEST_ABI: ClarityAbi = JSON.parse(readFileSync(path.join(__dirname, './abi/test-abi.json')).toString());
+const TEST_ABI: ClarityAbi = JSON.parse(
+  readFileSync(path.join(__dirname, './abi/test-abi.json')).toString()
+);
 
 test('ABI validation', () => {
   const contractAddress = 'ST3KC0MTNW34S1ZXD36JYKFD3JJMWA01M55DSJ4JE';
@@ -117,31 +119,7 @@ test('ABI validation should not accept list length more than specified in argume
   );
 
   expect(() => validateContractCall(payload, TEST_ABI)).toThrow(
-    // Don't forget to include spaces at the end of each line of this multiline string
-    oneLineTrim`
-    Clarity function \`tuple-test\` expects argument 1 to be of type 
-      (tuple 
-        (key1 bool) 
-        (key2 int) 
-        (key3 uint) 
-        (key4 principal) 
-        (key5 (buff 3)) 
-        (key6 (optional bool)) 
-        (key7 (response bool bool)) 
-        (key8 (list 2 bool)) 
-        (key9 (string-ascii 11)) 
-        (key10 (string-utf8 11))), not 
-      (tuple 
-        (key1 bool) 
-        (key2 int) 
-        (key3 uint) 
-        (key4 principal) 
-        (key5 (buff 3)) 
-        (key6 (optional bool)) 
-        (key7 (response bool UnknownType)) 
-        (key8 (list 3 bool)) 
-        (key9 (string-ascii 11)) 
-        (key10 (string-utf8 11)))`
+    `Clarity function \`tuple-test\` expects argument 1 to be of type (tuple (key1 bool) (key2 int) (key3 uint) (key4 principal) (key5 (buff 3)) (key6 (optional bool)) (key7 (response bool bool)) (key8 (list 2 bool)) (key9 (string-ascii 11)) (key10 (string-utf8 11))), not (tuple (key1 bool) (key2 int) (key3 uint) (key4 principal) (key5 (buff 3)) (key6 (optional bool)) (key7 (response bool UnknownType)) (key8 (list 3 bool)) (key9 (string-ascii 11)) (key10 (string-utf8 11)))`
   );
 });
 
@@ -221,31 +199,7 @@ test('ABI validation fail, tuple mistyped', () => {
   );
 
   expect(() => validateContractCall(payload, TEST_ABI)).toThrow(
-    // Don't forget to include spaces at the end of each line of this multiline string
-    oneLineTrim`
-    Clarity function \`tuple-test\` expects argument 1 to be of type 
-      (tuple 
-        (key1 bool) 
-        (key2 int) 
-        (key3 uint) 
-        (key4 principal) 
-        (key5 (buff 3)) 
-        (key6 (optional bool)) 
-        (key7 (response bool bool)) 
-        (key8 (list 2 bool)) 
-        (key9 (string-ascii 11)) 
-        (key10 (string-utf8 11))), not 
-      (tuple 
-        (key1 bool) 
-        (key2 int) 
-        (key3 uint) 
-        (key4 principal) 
-        (key5 (buff 3)) 
-        (key6 (optional none)) 
-        (key7 (response UnknownType bool)) 
-        (key8 bool) 
-        (key9 (string-ascii 11)) 
-        (key10 (string-utf8 11)))`
+    `Clarity function \`tuple-test\` expects argument 1 to be of type (tuple (key1 bool) (key2 int) (key3 uint) (key4 principal) (key5 (buff 3)) (key6 (optional bool)) (key7 (response bool bool)) (key8 (list 2 bool)) (key9 (string-ascii 11)) (key10 (string-utf8 11))), not (tuple (key1 bool) (key2 int) (key3 uint) (key4 principal) (key5 (buff 3)) (key6 (optional none)) (key7 (response UnknownType bool)) (key8 bool) (key9 (string-ascii 11)) (key10 (string-utf8 11)))`
   );
 });
 
@@ -274,30 +228,7 @@ test('ABI validation fail, tuple wrong key', () => {
   );
 
   expect(() => validateContractCall(payload, TEST_ABI)).toThrow(
-    // Don't forget to include spaces at the end of each line of this multiline string
-    oneLineTrim`
-    Clarity function \`tuple-test\` expects argument 1 to be of type 
-    (tuple 
-      (key1 bool) 
-      (key2 int) 
-      (key3 uint) 
-      (key4 principal) 
-      (key5 (buff 3)) 
-      (key6 (optional bool)) 
-      (key7 (response bool bool)) 
-      (key8 (list 2 bool)) 
-      (key9 (string-ascii 11)) 
-      (key10 (string-utf8 11))), not 
-    (tuple 
-      (wrong-key bool) 
-      (key2 int) 
-      (key3 uint) 
-      (key4 principal) 
-      (key5 (buff 3)) 
-      (key6 (optional bool)) 
-      (key7 (response bool UnknownType)) 
-      (key9 (list 2 bool)))
-    `
+    `Clarity function \`tuple-test\` expects argument 1 to be of type (tuple (key1 bool) (key2 int) (key3 uint) (key4 principal) (key5 (buff 3)) (key6 (optional bool)) (key7 (response bool bool)) (key8 (list 2 bool)) (key9 (string-ascii 11)) (key10 (string-utf8 11))), not (tuple (wrong-key bool) (key2 int) (key3 uint) (key4 principal) (key5 (buff 3)) (key6 (optional bool)) (key7 (response bool UnknownType)) (key9 (list 2 bool)))`
   );
 });
 
@@ -401,7 +332,7 @@ test('Parse string input using ABI arg type', () => {
   const principalFunctionArgType: ClarityAbiType = 'principal';
   const bufferFunctionArgType: ClarityAbiType = {
     buffer: {
-      length: Buffer.from(bufferString).byteLength,
+      length: utf8ToBytes(bufferString).byteLength,
     },
   };
 
