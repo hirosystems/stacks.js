@@ -9,6 +9,7 @@ import { decryptMnemonic } from '@stacks/encryption';
  * @param data - Buffer or hex-encoded string of the encrypted mnemonic
  * @param password - Password for data
  * @return the raw mnemonic phrase
+ * @deprecated use `decrypt` from `@stacks/wallet-sdk` instead
  */
 export async function decrypt(dataBuffer: Buffer | string, password: string): Promise<string> {
   const result = await decryptMnemonic(dataBuffer, password, triplesecDecrypt);

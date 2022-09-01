@@ -28,6 +28,7 @@ export const registrars = {
   },
 };
 
+/** @deprecated use `@stacks/profile` instead */
 export function signProfileForUpload(profile: Profile, keypair: IdentityKeyPair) {
   const privateKey = keypair.key;
   const publicKey = keypair.keyID;
@@ -38,6 +39,7 @@ export function signProfileForUpload(profile: Profile, keypair: IdentityKeyPair)
   return JSON.stringify(tokenRecords, null, 2);
 }
 
+/** @deprecated use `@stacks/profile` instead */
 export async function uploadProfile(
   gaiaHubUrl: string,
   identity: Identity,
@@ -111,6 +113,7 @@ interface RegisterParams {
 
 /**
  * Register a subdomain for a given identity
+ * @deprecated use `@stacks/profile` instead
  */
 export const registerSubdomain = async ({
   identity,
@@ -134,6 +137,7 @@ export const registerSubdomain = async ({
   return identity;
 };
 
+/** @deprecated use `@stacks/profile` instead */
 export const signAndUploadProfile = async ({
   profile,
   gaiaHubUrl,
@@ -149,6 +153,7 @@ export const signAndUploadProfile = async ({
   await uploadProfile(gaiaHubUrl, identity, signedProfileTokenData, gaiaHubConfig);
 };
 
+/** @deprecated use `@stacks/profile` instead */
 export const fetchProfile = async ({
   identity,
   gaiaUrl,

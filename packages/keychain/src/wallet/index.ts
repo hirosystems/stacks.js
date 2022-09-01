@@ -63,6 +63,7 @@ export interface ConstructorOptions {
   walletConfig?: WalletConfig;
 }
 
+/** @deprecated use `@stacks/wallet-sdk` instead */
 export class Wallet {
   chain: ChainID;
   encryptedBackupPhrase: string;

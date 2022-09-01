@@ -9,10 +9,12 @@ export const derivationPaths = {
   [ChainID.Testnet]: networkDerivationPath,
 };
 
+/** @deprecated */
 export function getDerivationPath(chain: ChainID) {
   return derivationPaths[chain];
 }
 
+/** @deprecated */
 export function deriveStxAddressChain(chain: ChainID) {
   return (rootNode: BIP32Interface) => {
     const childKey = rootNode.derivePath(getDerivationPath(chain));

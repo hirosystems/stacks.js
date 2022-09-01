@@ -11,12 +11,14 @@ interface HubInfo {
   read_url_prefix: string;
 }
 
+/** @deprecated use `@stacks/storage` instead */
 export const getHubInfo = async (hubUrl: string, fetchFn: FetchFn = createFetchFn()) => {
   const response = await fetchFn(`${hubUrl}/hub_info`);
   const data: HubInfo = await response.json();
   return data;
 };
 
+/** @deprecated use `@stacks/storage` instead */
 export const makeGaiaAssociationToken = (
   secretKeyHex: string,
   childPublicKeyHex: string
@@ -44,6 +46,7 @@ interface ConnectToGaiaOptions {
   gaiaHubUrl: string;
 }
 
+/** @deprecated use `@stacks/storage` instead */
 export const connectToGaiaHubWithConfig = ({
   hubInfo,
   privateKey,
@@ -68,6 +71,7 @@ interface ReadOnlyGaiaConfigOptions {
 
 /**
  * When you already know the Gaia read URL, make a Gaia config that doesn't have to fetch `/hub_info`
+ * @deprecated use `@stacks/storage` instead
  */
 export const makeReadOnlyGaiaConfig = ({
   readURL,
@@ -83,6 +87,7 @@ export const makeReadOnlyGaiaConfig = ({
   };
 };
 
+/** @deprecated use `@stacks/storage` instead */
 interface GaiaAuthPayload {
   gaiaHubUrl: string;
   iss: string;
@@ -107,6 +112,7 @@ const makeGaiaAuthToken = ({ hubInfo, privateKey, gaiaHubUrl }: ConnectToGaiaOpt
   return `v1:${token}`;
 };
 
+/** @deprecated use `@stacks/storage` instead */
 export const uploadToGaiaHub = async (
   filename: string,
   // eslint-disable-next-line node/prefer-global/buffer

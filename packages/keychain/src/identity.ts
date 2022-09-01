@@ -25,6 +25,7 @@ interface RefreshOptions {
   gaiaUrl: string;
 }
 
+/** @deprecated use `@stacks/auth` and `@stacks/profile` instead */
 export class Identity implements IdentifyInterface {
   public keyPair: IdentityKeyPair;
   public address: string;

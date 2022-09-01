@@ -3,7 +3,7 @@ import { IdentityKeyPair } from './utils';
 interface RefreshOptions {
   gaiaUrl: string;
 }
-
+/** @deprecated use `@stacks/profile` instead */
 export interface Identity {
   keyPair: IdentityKeyPair;
   address: string;
@@ -27,6 +27,7 @@ const PERSON_TYPE = 'Person';
 const CONTEXT = 'http://schema.org';
 const IMAGE_TYPE = 'ImageObject';
 
+/** @deprecated use `@stacks/profile` instead */
 export interface ProfileImage {
   '@type': typeof IMAGE_TYPE;
   name: string;
