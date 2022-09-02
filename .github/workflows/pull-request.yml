@@ -43,5 +43,5 @@ jobs:
         run: echo "::set-output name=version::$(cat lerna.json | jq -r '.version')"
       - uses: kyranjamie/pull-request-fixed-header@v1.0.1
         with:
-          header: "> This PR was published to npm with the version `${{ steps.published-version.outputs.version }}`\n>\n> e.g. `npm install @stacks/common@${{ steps.published-version.outputs.version }} --save-exact`"
+          header: "> This PR was published to npm with the version `${{ steps.published-version.outputs.version }}`\n> e.g. `npm install @stacks/common@${{ steps.published-version.outputs.version }} --save-exact`"
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
