@@ -132,6 +132,7 @@ export function ecPrivateKeyToHexString(privateKey: Uint8Array): string {
 
 /**
  * @ignore
+ * @deprecated
  */
 export function isValidPrivateKey(privateKey: string | Uint8Array): boolean {
   return utils.isValidPrivateKey(privateKeyToBytes(privateKey));

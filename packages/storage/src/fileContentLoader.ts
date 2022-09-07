@@ -23,7 +23,7 @@ export class FileContentLoader {
 
   static readonly supportedTypesMsg =
     'Supported types are: `string` (to be UTF8 encoded), ' +
-    '`Uint8Array`, `Blob`, `File`, `ArrayBuffer`, `UInt8Array` or any other typed array buffer. ';
+    '`Blob`, `File`, `ArrayBuffer`, `UInt8Array` or any other typed array buffer. ';
 
   constructor(content: PutFileContent, contentType: string) {
     this.wasString = typeof content === 'string';
@@ -115,10 +115,9 @@ export class FileContentLoader {
         return this.content;
       } else if (ArrayBuffer.isView(this.content)) {
         return new Uint8Array(
-          this.content.buffer.slice(
-            this.content.byteOffset,
-            this.content.byteOffset + this.content.byteLength
-          )
+          this.content.buffer,
+          this.content.byteOffset,
+          this.content.byteLength
         );
       } else if (typeof Blob !== 'undefined' && this.content instanceof Blob) {
         const reader = new FileReader();
