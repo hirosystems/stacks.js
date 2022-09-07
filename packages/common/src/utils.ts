@@ -475,9 +475,13 @@ export function fromTwos(value: bigint, width: bigint) {
 // The above copyright notice and this permission notice shall be included in
 // all copies or substantial portions of the Software.
 const hexes = Array.from({ length: 256 }, (_, i) => i.toString(16).padStart(2, '0'));
+
 /**
- * @example bytesToHex(Uint8Array.from([0xde, 0xad, 0xbe, 0xef]))
- * @ignore
+ * Converts bytes to the equivalent hex string
+ * @example
+ * ```
+ * bytesToHex(Uint8Array.from([0xde, 0xad, 0xbe, 0xef])) // 'deadbeef'
+ * ```
  */
 export function bytesToHex(uint8a: Uint8Array): string {
   // pre-caching improves the speed 6x
@@ -490,8 +494,11 @@ export function bytesToHex(uint8a: Uint8Array): string {
 }
 
 /**
- * @example hexToBytes('deadbeef')
- * @ignore
+ * Converts a hex string to the equivalent bytes
+ * @example
+ * ```
+ * hexToBytes('deadbeef') // Uint8Array(4) [ 222, 173, 190, 239 ]
+ * ```
  */
 export function hexToBytes(hex: string): Uint8Array {
   if (typeof hex !== 'string') {
@@ -512,24 +519,35 @@ export function hexToBytes(hex: string): Uint8Array {
 declare const TextEncoder: any;
 declare const TextDecoder: any;
 
-/** @ignore */
+/**
+ * Converts a UTF-8 string to the equivalent bytes
+ * @example
+ * ```
+ * utf8ToBytes('stacks Ӿ'); // Uint8Array(9) [ 115, 116, 97, 99, 107, 115, 32, 211, 190 ];
+ * ```
+ */
 export function utf8ToBytes(str: string): Uint8Array {
   return new TextEncoder().encode(str);
 }
 
-/** @ignore */
+/**
+ * Converts bytes to the equivalent UTF-8 string
+ * @example
+ * ```
+ * bytesToUtf8(Uint8Array.from([115, 116, 97, 99, 107, 115, 32, 211, 190])); // 'stacks Ӿ'
+ * ```
+ */
 export function bytesToUtf8(arr: Uint8Array): string {
   return new TextDecoder().decode(arr);
 }
 
-/** @ignore */
-export function toBytes(data: Uint8Array | string): Uint8Array {
-  if (typeof data === 'string') return utf8ToBytes(data);
-  if (data instanceof Uint8Array) return data;
-  throw new TypeError(`Expected input type is (Uint8Array | string) but got (${typeof data})`);
-}
-
-/** @ignore */
+/**
+ * Converts an ASCII string to the equivalent bytes
+ * @example
+ * ```
+ * asciiToBytes('stacks $'); // Uint8Array(8) [ 115, 116, 97, 99, 107, 115, 32, 36 ]
+ * ```
+ */
 export function asciiToBytes(str: string) {
   const byteArray = [];
   for (let i = 0; i < str.length; i++) {
@@ -538,9 +556,32 @@ export function asciiToBytes(str: string) {
   return new Uint8Array(byteArray);
 }
 
-/** @ignore */
+/**
+ * Converts bytes to the equivalent ASCII string
+ * @example
+ * ```
+ * bytesToAscii(Uint8Array.from([115, 116, 97, 99, 107, 115, 32, 36])); // 'stacks $'
+ * ```
+ */
 export function bytesToAscii(arr: Uint8Array) {
   return String.fromCharCode.apply(null, arr as any as number[]);
+}
+
+function isNotOctet(octet: number) {
+  return !Number.isInteger(octet) || octet < 0 || octet > 255;
+}
+
+/** @ignore */
+export function octetsToBytes(numbers: number[]) {
+  if (numbers.some(isNotOctet)) throw new Error('Some values are invalid bytes.');
+  return new Uint8Array(numbers);
+}
+
+/** @ignore */
+export function toBytes(data: Uint8Array | string): Uint8Array {
+  if (typeof data === 'string') return utf8ToBytes(data);
+  if (data instanceof Uint8Array) return data;
+  throw new TypeError(`Expected input type is (Uint8Array | string) but got (${typeof data})`);
 }
 
 /**
@@ -561,11 +602,12 @@ export function concatBytes(...arrays: Uint8Array[]): Uint8Array {
   return result;
 }
 
+/** @ignore */
 export function concatArray(elements: (Uint8Array | number[] | number)[]) {
   return concatBytes(
     ...elements.map(e => {
-      if (typeof e === 'number') return new Uint8Array([e]);
-      if (e instanceof Array) return new Uint8Array(e);
+      if (typeof e === 'number') return octetsToBytes([e]);
+      if (e instanceof Array) return octetsToBytes(e);
       return e;
     })
   );
