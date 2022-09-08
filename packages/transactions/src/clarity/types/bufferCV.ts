@@ -1,15 +1,15 @@
-import { Buffer } from '@stacks/common';
+import { utf8ToBytes } from '@stacks/common';
 import { ClarityType } from '../constants';
 
 interface BufferCV {
   readonly type: ClarityType.Buffer;
-  readonly buffer: Buffer;
+  readonly buffer: Uint8Array;
 }
 
 /**
- * Converts a buffer to BufferCV clarity type
+ * Converts a Uint8Array to a BufferCV clarity type
  *
- * @param {buffer} buffer value to be converted to clarity type
+ * @param {Uint8Array} buffer value to be converted to clarity type
  *
  * @returns {BufferCV} returns instance of type BufferCV
  *
@@ -17,18 +17,18 @@ interface BufferCV {
  * ```
  *  import { bufferCV } from '@stacks/transactions';
  *
- *  const buffer = Buffer.from('this is a test');
+ *  const buffer = utf8ToBytes('this is a test');
  *  const buf = bufferCV(buffer);
- *  // { type: 2, buffer: <Buffer 74 68 69 73 20 69 73 20 61 20 74 65 73 74> }
- *  const value = buf.buffer.toString();
+ *  // { type: 2, buffer: <Uint8Array 74 68 69 73 20 69 73 20 61 20 74 65 73 74> }
+ *  const value = bytesToUtf8(buf.buffer);
  *  // this is a test
  * ```
  *
  * @visit
  * {@link https://github.com/hirosystems/stacks.js/blob/master/packages/transactions/tests/clarity.test.ts clarity test cases for more examples}
  */
-const bufferCV = (buffer: Buffer): BufferCV => {
-  if (buffer.length > 1000000) {
+const bufferCV = (buffer: Uint8Array): BufferCV => {
+  if (buffer.length > 1_000_000) {
     throw new Error('Cannot construct clarity buffer that is greater than 1MB');
   }
 
@@ -49,13 +49,13 @@ const bufferCV = (buffer: Buffer): BufferCV => {
  *  const str = 'this is a test';
  *  const buf = bufferCVFromString(str);
  *  // { type: 2, buffer: <Buffer 74 68 69 73 20 69 73 20 61 20 74 65 73 74> }
- *  const value = buf.buffer.toString();
+ *  const value = bytesToUtf8(buf.buffer);
  *  // this is a test
  *```
  *
  * @visit
  * {@link https://github.com/hirosystems/stacks.js/blob/master/packages/transactions/tests/clarity.test.ts clarity test cases for more examples}
  */
-const bufferCVFromString = (str: string): BufferCV => bufferCV(Buffer.from(str));
+const bufferCVFromString = (str: string): BufferCV => bufferCV(utf8ToBytes(str));
 
 export { BufferCV, bufferCV, bufferCVFromString };

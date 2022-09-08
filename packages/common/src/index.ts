@@ -5,3 +5,5 @@ export * from './utils';
 export * from './constants';
 export * from './signatures';
 export * from './keys';
+export * from './buffer';
+export * from './enum';

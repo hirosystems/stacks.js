@@ -9,6 +9,7 @@ import {
   signStructuredData,
   STRUCTURED_DATA_PREFIX,
 } from '../src/structuredDataSignature';
+import { bytesToHex, hexToBytes } from '@stacks/common';
 
 const chainIds = {
   mainnet: 1,
@@ -20,9 +21,7 @@ const principal1 = 'ST1SJ3DTE5DN7X54YDH5D64R3BCB6A2AG2ZQ8YPD5';
 test('prefix buffer', () => {
   // Refer to SIP018 https://github.com/stacksgov/sips/
   // "\x53\x49\x50\x30\x31\x38" is "SIP018" in ASCII
-  expect(
-    Buffer.from([0x53, 0x49, 0x50, 0x30, 0x31, 0x38]).equals(STRUCTURED_DATA_PREFIX)
-  ).toBeTruthy();
+  expect(new Uint8Array([0x53, 0x49, 0x50, 0x30, 0x31, 0x38])).toEqual(STRUCTURED_DATA_PREFIX);
 });
 
 describe('encodeStructuredData / decodeStructuredDataSignature', () => {
@@ -191,13 +190,13 @@ describe('SIP018 test vectors', () => {
   ];
 
   test.each(inputs)('Structured data hashing', ({ input, expected }) => {
-    expect(hashStructuredData(input).toString('hex')).toEqual(expected);
+    expect(bytesToHex(hashStructuredData(input))).toEqual(expected);
   });
 
   test('Message hashing', () => {
     // Using messageHash(CV), which is sha256(Prefix || structuredDataHash(Domain) || structuredDataHash(CV)).
     const prefix = '534950303138';
-    expect(prefix).toEqual(STRUCTURED_DATA_PREFIX.toString('hex'));
+    expect(prefix).toEqual(bytesToHex(STRUCTURED_DATA_PREFIX));
     const domain = tupleCV({
       name: stringAsciiCV('Test App'),
       version: stringAsciiCV('1.0.0'),
@@ -206,7 +205,7 @@ describe('SIP018 test vectors', () => {
 
     const message = stringAsciiCV('Hello World');
     const expectedMessageHash = '1bfdab6d4158313ce34073fbb8d6b0fc32c154d439def12247a0f44bb2225259';
-    expect(Buffer.from(sha256(encodeStructuredData({ message, domain }))).toString('hex')).toEqual(
+    expect(bytesToHex(sha256(encodeStructuredData({ message, domain })))).toEqual(
       expectedMessageHash
     );
   });
@@ -234,7 +233,7 @@ describe('SIP018 test vectors', () => {
     // Verify signature
     const isSignatureVerified = verifyMessageSignatureRsv({
       signature: computedSignature.data,
-      message: Buffer.from(messageHash, 'hex'),
+      message: hexToBytes(messageHash),
       publicKey,
     });
     expect(isSignatureVerified).toBe(true);

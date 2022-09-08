@@ -1,4 +1,4 @@
-import { Buffer, IntegerType } from '@stacks/common';
+import { IntegerType, utf8ToBytes } from '@stacks/common';
 import {
   AnchorMode,
   bufferCV,
@@ -29,11 +29,12 @@ import {
   NonFungibleConditionCode,
   parseAssetInfoString,
   tupleCV,
+  bufferCVFromString,
 } from '@stacks/transactions';
 
 import { StacksNetwork } from '@stacks/network';
 
-import { bufferCVFromString, decodeFQN, getZonefileHash } from './utils';
+import { decodeFQN, getZonefileHash } from './utils';
 
 import { ChainID } from '@stacks/common';
 
@@ -310,8 +311,8 @@ export async function buildPreorderNamespaceTx({
   network,
 }: PreorderNamespaceOptions): Promise<StacksTransaction> {
   const bnsFunctionName = 'namespace-preorder';
-  const saltedNamespaceBuffer = Buffer.from(`${namespace}${salt}`);
-  const hashedSaltedNamespace = hash160(saltedNamespaceBuffer);
+  const saltedNamespaceBytes = utf8ToBytes(`${namespace}${salt}`);
+  const hashedSaltedNamespace = hash160(saltedNamespaceBytes);
 
   const burnSTXPostCondition = createSTXPostCondition(
     publicKeyToAddress(getAddressVersion(network), createStacksPublicKey(publicKey)),
@@ -533,8 +534,8 @@ export async function buildPreorderNameTx({
   if (subdomain) {
     throw new Error('Cannot preorder a subdomain using preorderName()');
   }
-  const saltedNamesBuffer = Buffer.from(`${fullyQualifiedName}${salt}`);
-  const hashedSaltedName = hash160(saltedNamesBuffer);
+  const saltedNamesBytes = utf8ToBytes(`${fullyQualifiedName}${salt}`);
+  const hashedSaltedName = hash160(saltedNamesBytes);
 
   const burnSTXPostCondition = createSTXPostCondition(
     publicKeyToAddress(getAddressVersion(network), createStacksPublicKey(publicKey)),

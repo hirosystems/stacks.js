@@ -5,8 +5,9 @@ import {
   StacksMessageType,
   TransactionVersion,
 } from './constants';
-import { Buffer } from '@stacks/common';
+
 import { c32address } from 'c32check';
+import { hexToBytes } from '@stacks/common';
 
 export interface Address {
   readonly type: StacksMessageType.Address;
@@ -20,7 +21,7 @@ export interface MessageSignature {
 }
 
 export function createMessageSignature(signature: string): MessageSignature {
-  const length = Buffer.from(signature, 'hex').byteLength;
+  const length = hexToBytes(signature).byteLength;
   if (length != RECOVERABLE_ECDSA_SIG_LENGTH_BYTES) {
     throw Error('Invalid signature');
   }
@@ -74,5 +75,5 @@ export function addressFromVersionHash(version: AddressVersion, hash: string): A
 }
 
 export function addressToString(address: Address): string {
-  return c32address(address.version, address.hash160).toString();
+  return c32address(address.version, address.hash160);
 }

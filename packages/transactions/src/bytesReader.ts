@@ -1,5 +1,4 @@
-import { Buffer } from '@stacks/common';
-import { SmartBuffer, SmartBufferOptions } from 'smart-buffer';
+import { bytesToHex, readUInt16BE, readUInt32BE, readUInt8 } from '@stacks/common';
 
 function createEnumChecker<T extends string, TEnumValue extends number>(enumVariable: {
   [key in T]: TEnumValue;
@@ -42,80 +41,69 @@ export function isEnum<T extends string, TEnumValue extends number>(
   return isEnum(enumVariable, value);
 }
 
-export class BufferReader {
-  smartBuffer: SmartBuffer;
+export class BytesReader {
+  source: Uint8Array;
+  consumed: number = 0;
 
-  static fromBuffer(buffer: Buffer): BufferReader {
-    return new BufferReader({ buff: buffer });
+  constructor(arr: Uint8Array) {
+    this.source = arr;
   }
 
-  constructor(options?: SmartBufferOptions | Buffer) {
-    if (Buffer.isBuffer(options)) {
-      this.smartBuffer = new SmartBuffer({ buff: options });
-    } else {
-      this.smartBuffer = new SmartBuffer(options);
-    }
+  readBytes(length: number): Uint8Array {
+    const view = this.source.subarray(this.consumed, this.consumed + length);
+    this.consumed += length;
+    return view;
   }
 
-  readBuffer(length: number): Buffer {
-    return this.smartBuffer.readBuffer(length);
-  }
-
-  readUInt32BE(offset?: number): number {
-    return this.smartBuffer.readUInt32BE(offset);
+  readUInt32BE(): number {
+    return readUInt32BE(this.readBytes(4), 0);
   }
 
   readUInt8(): number {
-    return this.smartBuffer.readUInt8();
+    return readUInt8(this.readBytes(1), 0);
   }
 
   readUInt16BE(): number {
-    return this.smartBuffer.readUInt16BE();
+    return readUInt16BE(this.readBytes(2), 0);
   }
 
   readBigUIntLE(length: number): bigint {
-    const buffer = Buffer.from(this.smartBuffer.readBuffer(length)).reverse();
-    const hex = buffer.toString();
-    const num = BigInt(`0x${hex}`);
-    return num;
+    const bytes = this.readBytes(length).slice().reverse();
+    const hex = bytesToHex(bytes);
+    return BigInt(`0x${hex}`);
   }
 
   readBigUIntBE(length: number): bigint {
-    const buffer = this.smartBuffer.readBuffer(length);
-    const hex = buffer.toString('hex');
-    const num = BigInt(`0x${hex}`);
-    return num;
+    const bytes = this.readBytes(length);
+    const hex = bytesToHex(bytes);
+    return BigInt(`0x${hex}`);
   }
 
-  readBigUInt64BE(): bigint {
-    return this.smartBuffer.readBigUInt64BE();
-  }
-
-  readString(arg?: number | BufferEncoding, encoding?: BufferEncoding): string {
-    return this.smartBuffer.readString(arg, encoding);
-  }
+  // todo: remove or implement with DataView?
+  // readBigUInt64BE(): bigint {
+  //   return this.source.readBigUInt64BE();
+  // }
 
   get readOffset(): number {
-    return this.smartBuffer.readOffset;
+    return this.consumed;
   }
 
   set readOffset(val: number) {
-    this.smartBuffer.readOffset = val;
+    this.consumed = val;
   }
 
-  get internalBuffer(): Buffer {
-    return this.smartBuffer.internalBuffer;
+  get internalBytes(): Uint8Array {
+    return this.source;
   }
 
   readUInt8Enum<T extends string, TEnumValue extends number>(
     enumVariable: { [key in T]: TEnumValue },
     invalidEnumErrorFormatter: (val: number) => Error
   ): TEnumValue {
-    const num = this.smartBuffer.readUInt8();
+    const num = this.readUInt8();
     if (isEnum(enumVariable, num)) {
       return num;
-    } else {
-      throw invalidEnumErrorFormatter(num);
     }
+    throw invalidEnumErrorFormatter(num);
   }
 }

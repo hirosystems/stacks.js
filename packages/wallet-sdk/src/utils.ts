@@ -1,4 +1,4 @@
-import { ChainID } from '@stacks/common';
+import { bytesToHex, ChainID } from '@stacks/common';
 import { getPublicKeyFromPrivate, publicKeyToAddress, randomBytes } from '@stacks/encryption';
 import { createFetchFn, FetchFn } from '@stacks/network';
 import { GaiaHubConfig } from '@stacks/storage';
@@ -57,7 +57,7 @@ const makeGaiaAuthToken = ({
   const challengeText = hubInfo.challenge_text;
   const iss = getPublicKeyFromPrivate(privateKey);
 
-  const salt = randomBytes(16).toString('hex');
+  const salt = bytesToHex(randomBytes(16));
   const payload: GaiaAuthPayload = {
     gaiaHubUrl,
     iss,
@@ -110,7 +110,7 @@ export const makeGaiaAssociationToken = ({
   const LIFETIME_SECONDS = 365 * 24 * 3600;
   const signerKeyHex = secretKeyHex.slice(0, 64);
   const compressedPublicKeyHex = getPublicKeyFromPrivate(signerKeyHex);
-  const salt = randomBytes(16).toString('hex');
+  const salt = bytesToHex(randomBytes(16));
   const payload = {
     childToAssociate: childPublicKeyHex,
     iss: compressedPublicKeyHex,

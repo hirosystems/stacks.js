@@ -10,18 +10,19 @@ import {
   verify,
 } from '@noble/secp256k1';
 import {
-  Buffer,
+  bigIntToBytes,
   bytesToHex,
+  bytesToUtf8,
   concatBytes,
   FailedDecryptionError,
   hexToBigInt,
   hexToBytes,
   parseRecoverableSignatureVrs,
   signatureRsvToVrs,
-  toBuffer,
+  utf8ToBytes,
 } from '@stacks/common';
+import { fromByteArray, toByteArray } from 'base64-js';
 import { createCipher } from './aesCipher';
-import { createHmacSha256 } from './hmacSha256';
 import { getPublicKeyFromPrivate } from './keys';
 import { hashMessage } from './messageSignature';
 import { hashSha256Sync, hashSha512Sync } from './sha2Hash';
@@ -41,7 +42,7 @@ utils.hmacSha256Sync = (key: Uint8Array, ...msgs: Uint8Array[]) => {
 };
 
 /**
- * Controls how the encrypted data buffer will be encoded as a string in the JSON payload.
+ * Controls how the encrypted data bytes will be encoded as a string in the JSON payload.
  * Options:
  *    `hex` -- the legacy default, file size increase 100% (2x).
  *    `base64` -- file size increased ~33%.
@@ -86,42 +87,43 @@ export enum InvalidPublicKeyReason {
  * @ignore
  */
 export async function aes256CbcEncrypt(
-  iv: Buffer,
-  key: Buffer,
-  plaintext: Buffer
-): Promise<Buffer> {
+  iv: Uint8Array,
+  key: Uint8Array,
+  plaintext: Uint8Array
+): Promise<Uint8Array> {
   const cipher = await createCipher();
-  const result = await cipher.encrypt('aes-256-cbc', key, iv, plaintext);
-  return result;
+  return await cipher.encrypt('aes-256-cbc', key, iv, plaintext);
 }
 
 /**
  * @ignore
  */
-async function aes256CbcDecrypt(iv: Buffer, key: Buffer, ciphertext: Buffer): Promise<Buffer> {
+async function aes256CbcDecrypt(
+  iv: Uint8Array,
+  key: Uint8Array,
+  ciphertext: Uint8Array
+): Promise<Uint8Array> {
   const cipher = await createCipher();
-  const result = await cipher.decrypt('aes-256-cbc', key, iv, ciphertext);
-  return result;
+  return await cipher.decrypt('aes-256-cbc', key, iv, ciphertext);
 }
 
 /**
  * @ignore
  */
-async function hmacSha256(key: Buffer, content: Buffer) {
-  const hmacSha256 = await createHmacSha256();
-  return hmacSha256.digest(key, content);
+export function hmacSha256(key: Uint8Array, content: Uint8Array): Uint8Array {
+  return hmac(sha256, key, content);
 }
 
 /**
  * @ignore
  */
-function equalConstTime(b1: Buffer, b2: Buffer) {
-  if (b1.length !== b2.length) {
+function equalsConstTime(a: Uint8Array, b: Uint8Array) {
+  if (a.length !== b.length) {
     return false;
   }
   let res = 0;
-  for (let i = 0; i < b1.length; i++) {
-    res |= b1[i] ^ b2[i]; // jshint ignore:line
+  for (let i = 0; i < a.length; i++) {
+    res |= a[i] ^ b[i];
   }
   return res === 0;
 }
@@ -129,7 +131,10 @@ function equalConstTime(b1: Buffer, b2: Buffer) {
 /**
  * @ignore
  */
-function sharedSecretToKeys(sharedSecret: Buffer): { encryptionKey: Buffer; hmacKey: Buffer } {
+function sharedSecretToKeys(sharedSecret: Uint8Array): {
+  encryptionKey: Uint8Array;
+  hmacKey: Uint8Array;
+} {
   // generate mac and encryption key from shared secret
   const hashedSecret = hashSha512Sync(sharedSecret);
   return {
@@ -215,14 +220,14 @@ export function getHexFromBN(bnInput: bigint): string {
 }
 
 /**
- * Returns a big-endian encoded 32-byte buffer instance.
- * The result Buffer is zero padded and always 32 bytes in length.
+ * Converts to zero padded 32 bytes
  * @ignore
  */
-export function getBufferFromBN(bnInput: bigint): Buffer {
-  const result = toBuffer(bnInput, 32);
+export function getBytesFromBN(bnInput: bigint): Uint8Array {
+  // todo: remove method?
+  const result = bigIntToBytes(bnInput, 32);
   if (result.byteLength !== 32) {
-    throw new Error('Failed to generate a 32-byte buffer instance');
+    throw new Error('Failed to generate a 32-byte Uint8Array');
   }
   return result;
 }
@@ -252,7 +257,7 @@ export function getCipherObjectWrapper(opts: {
   if (opts.cipherTextEncoding === 'base64') {
     shell.cipherTextEncoding = 'base64';
   }
-  // Hex encoded 16 byte buffer.
+  // Hex encoded 16 bytes.
   const ivLength = 32;
   // Hex encoded, compressed EC pubkey of 33 bytes.
   const ephemeralPKLength = 66;
@@ -336,6 +341,7 @@ export function eciesGetJsonStringLength(opts: {
   }
 }
 
+// todo: simplify and remove wasstring
 /**
  * Encrypt content to elliptic curve publicKey using ECIES
  * @param publicKey - secp256k1 public key hex string
@@ -345,13 +351,12 @@ export function eciesGetJsonStringLength(opts: {
  *  cipherText (cipher text either hex or base64 encoded),
  *  mac (message authentication code, hex encoded),
  *  ephemeral public key (hex encoded),
- *  wasString (boolean indicating with or not to return a buffer or string on decrypt)
- * @private
+ *  wasString (boolean indicating with or not to return a Uint8Array or string on decrypt)
  * @ignore
  */
 export async function encryptECIES(
   publicKey: string,
-  content: Buffer,
+  content: Uint8Array,
   wasString: boolean,
   cipherTextEncoding?: CipherTextEncoding
 ): Promise<CipherObject> {
@@ -364,24 +369,24 @@ export async function encryptECIES(
   let sharedSecret = getSharedSecret(ephemeralPrivateKey, publicKey, true);
   // Trim the compressed mode prefix byte
   sharedSecret = sharedSecret.slice(1);
-  const sharedKeys = sharedSecretToKeys(Buffer.from(sharedSecret));
+  const sharedKeys = sharedSecretToKeys(sharedSecret);
   const initializationVector = utils.randomBytes(16);
 
   const cipherText = await aes256CbcEncrypt(
-    Buffer.from(initializationVector),
+    initializationVector,
     sharedKeys.encryptionKey,
     content
   );
 
   const macData = concatBytes(initializationVector, ephemeralPublicKey, cipherText);
-  const mac = await hmacSha256(sharedKeys.hmacKey, Buffer.from(macData));
+  const mac = hmacSha256(sharedKeys.hmacKey, macData);
 
   let cipherTextString: string;
 
   if (!cipherTextEncoding || cipherTextEncoding === 'hex') {
     cipherTextString = bytesToHex(cipherText);
   } else if (cipherTextEncoding === 'base64') {
-    cipherTextString = cipherText.toString('base64');
+    cipherTextString = fromByteArray(cipherText);
   } else {
     throw new Error(`Unexpected cipherTextEncoding "${cipherTextEncoding}"`);
   }
@@ -405,16 +410,15 @@ export async function encryptECIES(
  * @param {Object} cipherObject - object to decrypt, should contain:
  *  iv (initialization vector), cipherText (cipher text),
  *  mac (message authentication code), ephemeralPublicKey
- *  wasString (boolean indicating with or not to return a buffer or string on decrypt)
- * @return {Buffer} plaintext
+ *  wasString (boolean indicating with or not to return bytes or string on decrypt)
+ * @return {Uint8Array} plaintext
  * @throws {FailedDecryptionError} if unable to decrypt
- * @private
  * @ignore
  */
 export async function decryptECIES(
   privateKey: string,
   cipherObject: CipherObject
-): Promise<Buffer | string> {
+): Promise<Uint8Array | string> {
   if (!cipherObject.ephemeralPK) {
     throw new FailedDecryptionError(
       'Unable to get public key from cipher object. ' +
@@ -425,60 +429,54 @@ export async function decryptECIES(
   let sharedSecret = getSharedSecret(privateKey, ephemeralPK, true);
   // Trim the compressed mode prefix byte
   sharedSecret = sharedSecret.slice(1);
-  const sharedKeys = sharedSecretToKeys(Buffer.from(sharedSecret));
-  const ivBuffer = hexToBytes(cipherObject.iv);
+  const sharedKeys = sharedSecretToKeys(sharedSecret);
+  const ivBytes = hexToBytes(cipherObject.iv);
 
-  let cipherTextBuffer: Buffer;
+  let cipherTextBytes: Uint8Array;
 
   if (!cipherObject.cipherTextEncoding || cipherObject.cipherTextEncoding === 'hex') {
-    cipherTextBuffer = Buffer.from(cipherObject.cipherText, 'hex');
+    cipherTextBytes = hexToBytes(cipherObject.cipherText);
   } else if (cipherObject.cipherTextEncoding === 'base64') {
-    cipherTextBuffer = Buffer.from(cipherObject.cipherText, 'base64');
+    cipherTextBytes = toByteArray(cipherObject.cipherText);
   } else {
     throw new Error(`Unexpected cipherTextEncoding "${cipherObject.cipherText}"`);
   }
 
-  const macData = concatBytes(ivBuffer, hexToBytes(ephemeralPK), cipherTextBuffer);
-  const actualMac = await hmacSha256(sharedKeys.hmacKey, Buffer.from(macData));
+  const macData = concatBytes(ivBytes, hexToBytes(ephemeralPK), cipherTextBytes);
+  const actualMac = hmacSha256(sharedKeys.hmacKey, macData);
   const expectedMac = hexToBytes(cipherObject.mac);
 
-  if (!equalConstTime(Buffer.from(expectedMac), actualMac)) {
+  if (!equalsConstTime(expectedMac, actualMac)) {
     throw new FailedDecryptionError('Decryption failed: failure in MAC check');
   }
-  const plainText = await aes256CbcDecrypt(
-    Buffer.from(ivBuffer),
-    sharedKeys.encryptionKey,
-    cipherTextBuffer
-  );
+  const plainText = await aes256CbcDecrypt(ivBytes, sharedKeys.encryptionKey, cipherTextBytes);
 
   if (cipherObject.wasString) {
-    return plainText.toString();
-  } else {
-    return plainText;
+    return bytesToUtf8(plainText);
   }
+  return plainText;
 }
 
 /**
  * Sign content using ECDSA
  *
- * @param {String} privateKey - secp256k1 private key hex string
- * @param {Object} content - content to sign
+ * @param {string} privateKey - secp256k1 private key hex string
+ * @param {string | Uint8Array} content - content to sign
  * @return {Object} contains:
  * signature - Hex encoded DER signature
  * public key - Hex encoded private string taken from privateKey
- * @private
  * @ignore
  */
 export function signECDSA(
   privateKey: string,
-  content: string | Buffer
+  content: string | Uint8Array
 ): {
   publicKey: string;
   signature: string;
 } {
-  const contentBuffer = content instanceof Buffer ? content : Buffer.from(content);
+  const contentBytes = typeof content === 'string' ? utf8ToBytes(content) : content;
   const publicKey = getPublicKeyFromPrivate(privateKey);
-  const contentHash = hashSha256Sync(contentBuffer);
+  const contentHash = hashSha256Sync(contentBytes);
   const signature = signSync(contentHash, privateKey);
 
   return {
@@ -488,30 +486,20 @@ export function signECDSA(
 }
 
 /**
- * @ignore
- */
-function getBuffer(content: string | ArrayBuffer | Buffer) {
-  if (content instanceof Buffer) return content;
-  else if (content instanceof ArrayBuffer) return Buffer.from(content);
-  else return Buffer.from(content);
-}
-
-/**
  * Verify content using ECDSA
- * @param {String | Buffer} content - Content to verify was signed
+ * @param {String | Uint8Array} content - Content to verify was signed
  * @param {String} publicKey - secp256k1 private key hex string
  * @param {String} signature - Hex encoded DER signature
  * @return {Boolean} returns true when signature matches publickey + content, false if not
- * @private
  * @ignore
  */
 export function verifyECDSA(
-  content: string | ArrayBuffer | Buffer,
+  content: string | Uint8Array,
   publicKey: string,
   signature: string
 ): boolean {
-  const contentBuffer = getBuffer(content);
-  const contentHash = hashSha256Sync(contentBuffer);
+  const contentBytes = typeof content === 'string' ? utf8ToBytes(content) : content;
+  const contentHash = hashSha256Sync(contentBytes);
   // verify() is strict: true by default. High-s signatures are rejected, which mirrors libsecp behavior
   // Set verify options to strict: false, to support the legacy stacks implementations
   // Reference: https://github.com/paulmillr/noble-secp256k1/releases/tag/1.4.0
@@ -520,7 +508,7 @@ export function verifyECDSA(
 
 interface VerifyMessageSignatureArgs {
   signature: string;
-  message: string | Buffer;
+  message: string | Uint8Array;
   publicKey: string;
 }
 

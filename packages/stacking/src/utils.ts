@@ -1,8 +1,8 @@
-/* eslint-disable node/prefer-global/buffer */
 import { base58CheckDecode, base58CheckEncode } from '@stacks/encryption';
 import {
   AddressHashMode,
   BufferCV,
+  bytesToHex,
   ClarityType,
   ClarityValue,
   TupleCV,
@@ -112,11 +112,11 @@ export function extractPoxAddressFromClarityValue(poxAddrClarityValue: ClarityVa
 }
 
 export type PoxAddressArgs =
-  | [version: Buffer, hashBytes: Buffer, network: 'mainnet' | 'testnet']
+  | [version: Uint8Array, hashBytes: Uint8Array, network: 'mainnet' | 'testnet']
   | [poxAddrClarityValue: ClarityValue, network: 'mainnet' | 'testnet'];
 
 export function poxAddressToBtcAddress(...args: PoxAddressArgs): string {
-  let version: Buffer, hashBytes: Buffer, network: 'mainnet' | 'testnet';
+  let version: Uint8Array, hashBytes: Uint8Array, network: 'mainnet' | 'testnet';
   if (args.length === 3) {
     [version, hashBytes, network] = args;
   } else if (args.length === 2) {
@@ -126,17 +126,17 @@ export function poxAddressToBtcAddress(...args: PoxAddressArgs): string {
     throw new Error('Invalid arguments');
   }
   if (version.byteLength !== 1) {
-    throw new Error(`Invalid byte length for version buffer: ${version.toString('hex')}`);
+    throw new Error(`Invalid byte length for version buffer: ${bytesToHex(version)}`);
   }
   if (hashBytes.byteLength !== 20) {
-    throw new Error(`Invalid byte length for hashBytes: ${hashBytes.toString('hex')}`);
+    throw new Error(`Invalid byte length for hashBytes: ${bytesToHex(hashBytes)}`);
   }
   const btcNetworkVersion = hashModeToBtcAddressVersion(version[0], network);
   const btcAddress = base58CheckEncode(btcNetworkVersion, hashBytes);
   return btcAddress;
 }
 
-export function getBTCAddress(version: number | Buffer, checksum: Buffer) {
+export function getBTCAddress(version: number | Uint8Array, checksum: Uint8Array) {
   const versionNumber: number = typeof version === 'number' ? version : version[0];
   return base58CheckEncode(versionNumber, checksum);
 }
