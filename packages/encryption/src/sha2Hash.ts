@@ -1,12 +1,11 @@
 import { sha256 } from '@noble/hashes/sha256';
 import { sha512 } from '@noble/hashes/sha512';
-import { Buffer } from '@stacks/common';
 import { getCryptoLib } from './cryptoUtils';
 
 type NodeCryptoCreateHash = typeof import('crypto').createHash;
 
 export interface Sha2Hash {
-  digest(data: Buffer, algorithm?: 'sha256' | 'sha512'): Promise<Buffer>;
+  digest(data: Uint8Array, algorithm?: 'sha256' | 'sha512'): Promise<Uint8Array>;
 }
 
 export class NodeCryptoSha2Hash {
@@ -16,7 +15,7 @@ export class NodeCryptoSha2Hash {
     this.createHash = createHash;
   }
 
-  async digest(data: Buffer, algorithm = 'sha256'): Promise<Buffer> {
+  async digest(data: Uint8Array, algorithm = 'sha256'): Promise<Uint8Array> {
     try {
       const result = this.createHash(algorithm).update(data).digest();
       return Promise.resolve(result);
@@ -37,7 +36,7 @@ export class WebCryptoSha2Hash implements Sha2Hash {
     this.subtleCrypto = subtleCrypto;
   }
 
-  async digest(data: Buffer, algorithm = 'sha256'): Promise<Buffer> {
+  async digest(data: Uint8Array, algorithm = 'sha256'): Promise<Uint8Array> {
     let algo: string;
     if (algorithm === 'sha256') {
       algo = 'SHA-256';
@@ -48,7 +47,7 @@ export class WebCryptoSha2Hash implements Sha2Hash {
     }
     try {
       const hash = await this.subtleCrypto.digest(algo, data);
-      return Buffer.from(hash);
+      return new Uint8Array(hash);
     } catch (error) {
       console.log(error);
       console.log(
@@ -68,10 +67,10 @@ export async function createSha2Hash(): Promise<Sha2Hash> {
   }
 }
 
-export function hashSha256Sync(data: Buffer) {
-  return Buffer.from(sha256(data));
+export function hashSha256Sync(data: Uint8Array) {
+  return sha256(data);
 }
 
-export function hashSha512Sync(data: Buffer) {
-  return Buffer.from(sha512(data));
+export function hashSha512Sync(data: Uint8Array) {
+  return sha512(data);
 }

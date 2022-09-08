@@ -13,8 +13,9 @@ import { serializeDeserialize } from './macros';
 
 import { trueCV, falseCV, standardPrincipalCV, contractPrincipalCV } from '../src/clarity';
 
-import { COINBASE_BUFFER_LENGTH_BYTES, StacksMessageType } from '../src/constants';
+import { COINBASE_BYTES_LENGTH, StacksMessageType } from '../src/constants';
 import { principalToString } from '../src/clarity/types/principalCV';
+import { bytesToUtf8 } from '@stacks/common';
 
 test('STX token transfer payload serialization and deserialization', () => {
   const recipient = standardPrincipalCV('SP3FGQ8Z7JY9BWYZ5WM53E0M9NK7WHJF0691NZ159');
@@ -118,11 +119,12 @@ test('Smart contract payload serialization and deserialization', () => {
 });
 
 test('Coinbase payload serialization and deserialization', () => {
-  const coinbaseBuffer = Buffer.alloc(COINBASE_BUFFER_LENGTH_BYTES, 0);
+  // eslint-disable-next-line node/prefer-global/buffer
+  const coinbaseBuffer = Buffer.alloc(COINBASE_BYTES_LENGTH, 0);
   coinbaseBuffer.write('coinbase buffer');
 
   const payload = createCoinbasePayload(coinbaseBuffer);
 
   const deserialized = serializeDeserialize(payload, StacksMessageType.Payload) as CoinbasePayload;
-  expect(deserialized.coinbaseBuffer.toString()).toBe(coinbaseBuffer.toString());
+  expect(bytesToUtf8(deserialized.coinbaseBytes)).toBe(coinbaseBuffer.toString());
 });

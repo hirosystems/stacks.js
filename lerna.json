@@ -12,9 +12,8 @@
     "bootstrap": {
       "forceLocal": true,
       "hoist": true,
-      "npmClientArgs": [
-        "--ci"
-      ]
+      "npmClientArgs": ["--ci"]
     }
-  }
+  },
+  "useWorkspaces": true
 }

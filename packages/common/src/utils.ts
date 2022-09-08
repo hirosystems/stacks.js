@@ -1,20 +1,5 @@
 import { Logger } from './logger';
 
-// Buffer module from NodeJS that also works in the browser https://www.npmjs.com/package/buffer
-// > The trailing slash is important, tells module lookup algorithm to use the npm module
-// > named buffer instead of the node.js core module named buffer!
-import { Buffer as BufferPolyfill } from 'buffer/';
-
-// There can be small type definition differences between the NodeJS Buffer and polyfill Buffer,
-// so export using the type definition from NodeJS (@types/node).
-import type { Buffer as NodeJSBuffer } from 'buffer';
-
-const AvailableBufferModule: typeof NodeJSBuffer =
-  // eslint-disable-next-line node/prefer-global/buffer
-  typeof Buffer !== 'undefined' ? Buffer : (BufferPolyfill as any);
-
-export { AvailableBufferModule as Buffer };
-
 /**
  *  @ignore
  */
@@ -332,9 +317,8 @@ export function getGlobalObjects<K extends Extract<keyof Window, string>>(
 type BN = import('bn.js'); // Type only import from @types/bn.js
 export type IntegerType = number | string | bigint | Uint8Array | BN;
 
-// eslint-disable-next-line node/prefer-global/buffer
-export function intToBytes(value: IntegerType, signed: boolean, byteLength: number): Buffer {
-  return toBuffer(intToBigInt(value, signed), byteLength);
+export function intToBytes(value: IntegerType, signed: boolean, byteLength: number): Uint8Array {
+  return bigIntToBytes(intToBigInt(value, signed), byteLength);
 }
 
 export function intToBigInt(value: IntegerType, signed: boolean): bigint {
@@ -347,7 +331,7 @@ export function intToBigInt(value: IntegerType, signed: boolean): bigint {
     return BigInt(parsedValue);
   }
   if (typeof parsedValue === 'string') {
-    // If hex string then convert to buffer then fall through to the buffer condition
+    // If hex string then convert to bytes then fall through to the bytes condition
     if (parsedValue.toLowerCase().startsWith('0x')) {
       // Trim '0x' hex-prefix
       let hex = parsedValue.slice(2);
@@ -355,7 +339,7 @@ export function intToBigInt(value: IntegerType, signed: boolean): bigint {
       // Allow odd-length strings like `0xf` -- some libs output these, or even just `0x${num.toString(16)}`
       hex = hex.padStart(hex.length + (hex.length % 2), '0');
 
-      parsedValue = AvailableBufferModule.from(hex, 'hex');
+      parsedValue = hexToBytes(hex);
     } else {
       try {
         return BigInt(parsedValue);
@@ -369,7 +353,7 @@ export function intToBigInt(value: IntegerType, signed: boolean): bigint {
   if (typeof parsedValue === 'bigint') {
     return parsedValue;
   }
-  if (parsedValue instanceof Uint8Array || AvailableBufferModule.isBuffer(parsedValue)) {
+  if (parsedValue instanceof Uint8Array) {
     if (signed) {
       // Allow byte arrays smaller than 128-bits to be passed.
       // This allows positive signed ints like `0x08` (8) or negative signed
@@ -393,7 +377,7 @@ export function intToBigInt(value: IntegerType, signed: boolean): bigint {
     return BigInt(parsedValue.toString());
   }
   throw new TypeError(
-    `Invalid value type. Must be a number, bigint, integer-string, hex-string, or Buffer.`
+    `Invalid value type. Must be a number, bigint, integer-string, hex-string, or Uint8Array.`
   );
 }
 
@@ -432,15 +416,14 @@ export function hexToInt(hex: string): number {
 }
 
 /**
- * Converts bigint to buffer type
- * @param {value} bigint value to be converted into buffer
- * @param {length} buffer optional length
- * @return {Buffer} buffer instance in big endian format
+ * Converts bigint to byte array
+ * @param value bigint value to be converted
+ * @param length byte array optional length
+ * @return {Uint8Array} byte array
  */
-export function toBuffer(value: bigint, length: number = 16) {
+export function bigIntToBytes(value: bigint, length: number = 16): Uint8Array {
   const hex = intToHex(value, length);
-  // buffer instance in big endian format
-  return AvailableBufferModule.from(hexToBytes(hex));
+  return hexToBytes(hex);
 }
 
 /**
@@ -492,9 +475,13 @@ export function fromTwos(value: bigint, width: bigint) {
 // The above copyright notice and this permission notice shall be included in
 // all copies or substantial portions of the Software.
 const hexes = Array.from({ length: 256 }, (_, i) => i.toString(16).padStart(2, '0'));
+
 /**
- * @example bytesToHex(Uint8Array.from([0xde, 0xad, 0xbe, 0xef]))
- * @ignore
+ * Converts bytes to the equivalent hex string
+ * @example
+ * ```
+ * bytesToHex(Uint8Array.from([0xde, 0xad, 0xbe, 0xef])) // 'deadbeef'
+ * ```
  */
 export function bytesToHex(uint8a: Uint8Array): string {
   // pre-caching improves the speed 6x
@@ -507,18 +494,21 @@ export function bytesToHex(uint8a: Uint8Array): string {
 }
 
 /**
- * @example hexToBytes('deadbeef')
- * @ignore
+ * Converts a hex string to the equivalent bytes
+ * @example
+ * ```
+ * hexToBytes('deadbeef') // Uint8Array(4) [ 222, 173, 190, 239 ]
+ * ```
  */
 export function hexToBytes(hex: string): Uint8Array {
   if (typeof hex !== 'string') {
     throw new TypeError(`hexToBytes: expected string, got ${typeof hex}`);
   }
-  if (hex.length % 2) throw new Error('hexToBytes: received invalid unpadded hex');
-  const array = new Uint8Array(hex.length / 2);
+  const paddedHex = hex.length % 2 ? `0${hex}` : hex; // left pad with a zero if odd length
+  const array = new Uint8Array(paddedHex.length / 2);
   for (let i = 0; i < array.length; i++) {
     const j = i * 2;
-    const hexByte = hex.slice(j, j + 2);
+    const hexByte = paddedHex.slice(j, j + 2);
     const byte = Number.parseInt(hexByte, 16);
     if (Number.isNaN(byte) || byte < 0) throw new Error('Invalid byte sequence');
     array[i] = byte;
@@ -527,21 +517,71 @@ export function hexToBytes(hex: string): Uint8Array {
 }
 
 declare const TextEncoder: any;
+declare const TextDecoder: any;
+
+/**
+ * Converts a UTF-8 string to the equivalent bytes
+ * @example
+ * ```
+ * utf8ToBytes('stacks Ӿ'); // Uint8Array(9) [ 115, 116, 97, 99, 107, 115, 32, 211, 190 ];
+ * ```
+ */
+export function utf8ToBytes(str: string): Uint8Array {
+  return new TextEncoder().encode(str);
+}
+
+/**
+ * Converts bytes to the equivalent UTF-8 string
+ * @example
+ * ```
+ * bytesToUtf8(Uint8Array.from([115, 116, 97, 99, 107, 115, 32, 211, 190])); // 'stacks Ӿ'
+ * ```
+ */
+export function bytesToUtf8(arr: Uint8Array): string {
+  return new TextDecoder().decode(arr);
+}
+
+/**
+ * Converts an ASCII string to the equivalent bytes
+ * @example
+ * ```
+ * asciiToBytes('stacks $'); // Uint8Array(8) [ 115, 116, 97, 99, 107, 115, 32, 36 ]
+ * ```
+ */
+export function asciiToBytes(str: string) {
+  const byteArray = [];
+  for (let i = 0; i < str.length; i++) {
+    byteArray.push(str.charCodeAt(i) & 0xff); // ignore second bytes of UTF-16 character
+  }
+  return new Uint8Array(byteArray);
+}
+
+/**
+ * Converts bytes to the equivalent ASCII string
+ * @example
+ * ```
+ * bytesToAscii(Uint8Array.from([115, 116, 97, 99, 107, 115, 32, 36])); // 'stacks $'
+ * ```
+ */
+export function bytesToAscii(arr: Uint8Array) {
+  return String.fromCharCode.apply(null, arr as any as number[]);
+}
+
+function isNotOctet(octet: number) {
+  return !Number.isInteger(octet) || octet < 0 || octet > 255;
+}
 
 /** @ignore */
-export function utf8ToBytes(str: string): Uint8Array {
-  if (typeof str !== 'string') {
-    throw new TypeError(`utf8ToBytes expected string, got ${typeof str}`);
-  }
-  return new TextEncoder().encode(str);
+export function octetsToBytes(numbers: number[]) {
+  if (numbers.some(isNotOctet)) throw new Error('Some values are invalid bytes.');
+  return new Uint8Array(numbers);
 }
 
 /** @ignore */
 export function toBytes(data: Uint8Array | string): Uint8Array {
-  if (typeof data === 'string') data = utf8ToBytes(data);
-  if (!(data instanceof Uint8Array))
-    throw new TypeError(`Expected input type is Uint8Array (got ${typeof data})`);
-  return data;
+  if (typeof data === 'string') return utf8ToBytes(data);
+  if (data instanceof Uint8Array) return data;
+  throw new TypeError(`Expected input type is (Uint8Array | string) but got (${typeof data})`);
 }
 
 /**
@@ -560,4 +600,26 @@ export function concatBytes(...arrays: Uint8Array[]): Uint8Array {
     pad += arr.length;
   }
   return result;
+}
+
+/** @ignore */
+export function concatArray(elements: (Uint8Array | number[] | number)[]) {
+  return concatBytes(
+    ...elements.map(e => {
+      if (typeof e === 'number') return octetsToBytes([e]);
+      if (e instanceof Array) return octetsToBytes(e);
+      return e;
+    })
+  );
+}
+
+/**
+ * Better `instanceof` check for ArrayBuffer types in different environments
+ * @ignore
+ */
+export function isInstance(object: any, type: any) {
+  return (
+    object instanceof type ||
+    (object?.constructor?.name != null && object.constructor.name === type.name)
+  );
 }

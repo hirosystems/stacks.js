@@ -1,13 +1,21 @@
 import { AppConfig, LOCALSTORAGE_SESSION_KEY, UserData, UserSession } from '@stacks/auth';
-import { Buffer, DoesNotExist, getAesCbcOutputLength, getBase64OutputLength } from '@stacks/common';
+import {
+  bytesToUtf8,
+  DoesNotExist,
+  getAesCbcOutputLength,
+  getBase64OutputLength,
+  hexToBytes,
+  utf8ToBytes,
+} from '@stacks/common';
 import {
   aes256CbcEncrypt,
   eciesGetJsonStringLength,
   getPublicKeyFromPrivate,
   hashSha256Sync,
-  verifySignature
+  verifySignature,
 } from '@stacks/encryption';
 import { createFetchFn, StacksMainnet } from '@stacks/network';
+import { toByteArray } from 'base64-js';
 import * as crypto from 'crypto';
 import fetchMock from 'jest-fetch-mock';
 import * as jsdom from 'jsdom';
@@ -794,8 +802,7 @@ test('putFile encrypted, using Blob content, encrypted', async () => {
     const encryptedContent = uploadToGaiaHub.mock.calls[0][1];
     fetchMock.once(encryptedContent);
     const readContent = await storage.getFile(path, decryptOptions);
-    const readContentStr = readContent.toString();
-    expect(readContentStr).toEqual(contentDataString);
+    expect(bytesToUtf8(readContent)).toEqual(contentDataString);
   } finally {
     for (const globalAPI of Object.keys(globalAPIs)) {
       delete (global as any)[globalAPI];
@@ -855,8 +862,7 @@ test('putFile unencrypted, using TypedArray content, encrypted', async () => {
       },
     });
     const readContent = await storage.getFile(path, decryptOptions);
-    const readContentStr = readContent.toString();
-    expect(readContentStr).toEqual(contentDataString);
+    expect(readContent).toEqual(contentDataString);
   } finally {
   }
 });
@@ -909,8 +915,7 @@ test('putFile encrypted, using TypedArray content, encrypted', async () => {
     const encryptedContent = uploadToGaiaHub.mock.calls[0][1];
     fetchMock.once(encryptedContent);
     const readContent = await storage.getFile(path, decryptOptions);
-    const readContentStr = readContent.toString();
-    expect(readContentStr).toEqual(contentDataString);
+    expect(bytesToUtf8(readContent)).toEqual(contentDataString);
   } finally {
   }
 });
@@ -1393,7 +1398,7 @@ test('putFile & getFile unencrypted, signed', async () => {
   const pathToReadUrl = (fname: string) => `${readPrefix}/${fname}`;
 
   const uploadToGaiaHub = jest.fn().mockImplementation((fname, contents, _, contentType) => {
-    const contentString = Buffer.from(contents).toString();
+    const contentString = contents instanceof Uint8Array ? bytesToUtf8(contents) : contents;
     putFiledContents.push([fname, contentString, contentType]);
     if (!fname.endsWith('.sig')) {
       expect(contentString).toEqual(fileContent);
@@ -1440,7 +1445,7 @@ test('putFile & getFile unencrypted, signed', async () => {
       headers: { 'Content-Type': contentType },
     });
     if (path.endsWith('.sig')) {
-      sigContents = Buffer.isBuffer(contents) ? contents.toString() : contents;
+      sigContents = typeof contents === 'string' ? contents : bytesToUtf8(contents);
     }
   });
   const sigObject = JSON.parse(sigContents);
@@ -1548,7 +1553,7 @@ test('putFile oversized -- unencrypted, signed', async () => {
   const readPrefix = 'https://gaia.testblockstack4.org/hub/1NZNxhoxobqwsNvTb16pdeiqvFvce3Yg8U';
 
   // 600 bytes
-  const fileContent = Buffer.alloc(600);
+  const fileContent = new Uint8Array(600);
   const pathToReadUrl = (fname: string) => `${readPrefix}/${fname}`;
 
   const uploadToGaiaHub = jest.fn().mockImplementation(fname => {
@@ -1599,7 +1604,7 @@ test('putFile oversized -- encrypted, signed', async () => {
   const readPrefix = 'https://gaia.testblockstack4.org/hub/1NZNxhoxobqwsNvTb16pdeiqvFvce3Yg8U';
 
   // 600 bytes
-  const fileContent = Buffer.alloc(600);
+  const fileContent = new Uint8Array(600);
   const pathToReadUrl = (fname: string) => `${readPrefix}/${fname}`;
 
   const uploadToGaiaHub = jest.fn().mockImplementation(fname => {
@@ -1650,7 +1655,7 @@ test('putFile oversized -- unencrypted', async () => {
   const readPrefix = 'https://gaia.testblockstack4.org/hub/1NZNxhoxobqwsNvTb16pdeiqvFvce3Yg8U';
 
   // 600 bytes
-  const fileContent = Buffer.alloc(600);
+  const fileContent = new Uint8Array(600);
   const pathToReadUrl = (fname: string) => `${readPrefix}/${fname}`;
 
   const uploadToGaiaHub = jest.fn().mockImplementation(fname => {
@@ -1701,7 +1706,7 @@ test('putFile oversized -- encrypted', async () => {
   const readPrefix = 'https://gaia.testblockstack4.org/hub/1NZNxhoxobqwsNvTb16pdeiqvFvce3Yg8U';
 
   // 600 bytes
-  const fileContent = Buffer.alloc(600);
+  const fileContent = new Uint8Array(600);
   const pathToReadUrl = (fname: string) => `${readPrefix}/${fname}`;
 
   const uploadToGaiaHub = jest.fn().mockImplementation(fname => {
@@ -1731,10 +1736,7 @@ test('aes256Cbc output size calculation', async () => {
     testLengths.push(Math.floor(Math.random() * Math.floor(1030)));
   }
   const iv = crypto.randomBytes(16);
-  const key = Buffer.from(
-    'a5c61c6ca7b3e7e55edee68566aeab22e4da26baa285c7bd10e8d2218aa3b229',
-    'hex'
-  );
+  const key = hexToBytes('a5c61c6ca7b3e7e55edee68566aeab22e4da26baa285c7bd10e8d2218aa3b229');
   for (const len of testLengths) {
     const data = crypto.randomBytes(len);
     const encryptedData = await aes256CbcEncrypt(iv, key, data);
@@ -1779,7 +1781,7 @@ test('payload size detection', async () => {
       } as UserData,
     },
   });
-  const data = Buffer.alloc(100);
+  const data = new Uint8Array(100);
 
   const encryptedData1 = await userSession.encryptContent(data, {
     wasString: false,
@@ -2116,13 +2118,13 @@ test('connectToGaiaHub call makeLegacyAuthToken and verify token', async () => {
   expect(hubServer).toEqual(config.server);
 
   // Get the base64 encoded token string
-  const token = config.token;
+  const { token } = config;
   // Decode the base64 token and get the DER encoded signature value
-  const decodedToken = Buffer.from(token, 'base64').toString();
+  const decodedToken = bytesToUtf8(toByteArray(token));
   // Convert decodedToken string to json
   const payload = JSON.parse(decodedToken);
   // Get the hash of original payload for verification with noble-secp256k1
-  const digest = hashSha256Sync(Buffer.from(hubInfo.challenge_text));
+  const digest = hashSha256Sync(utf8ToBytes(hubInfo.challenge_text));
   // Verify signature against message hash and public key using @noble/secp256k1 verify
   const verifyResult = verifySignature(payload.signature, digest, payload.publickey);
   // @noble/secp256k1 should verify the DER encoded signature
@@ -2132,13 +2134,16 @@ test('connectToGaiaHub call makeLegacyAuthToken and verify token', async () => {
 test('Verify compatibility of bitcoinjs DER encoding with noble-secp256k1', () => {
   // Consider a DER encoded signature base64 generated by bitcoinjs library
   // This token is real base64, DER encoded signature so no need to import bitcoinjs as devDependency for generating DER encoding
-  const encodedSignatureByBitcoinjs = 'eyJwdWJsaWNrZXkiOiIwMjdkMjhmOTk1MWNlNDY1Mzg5NTFlMzY5N2M2MjU4OGE4N2YxZjFmMjk1ZGU0YTE0ZmRkNGM3ODBmYzUyY2ZlNjkiLCJzaWduYXR1cmUiOiIzMDQ0MDIyMDQ1NGE1NTMwYTBmOWY3YjdjMDMyOWE1MTFmOWJlNWVkZTFmNjU4ZDQ5MGY0OGRjNDE4YTgwYjNlNmJiNDJjZWIwMjIwMzVmMTRiMTU0NmE3NjkxNmJjOWJmNWNjMTk5YzQ3MTY5MGYzYmNiMWE2NmU3ZTQ5ZDZhNzY5NDJiM2FhZmM1ZiJ9';
+  const encodedSignatureByBitcoinjs =
+    'eyJwdWJsaWNrZXkiOiIwMjdkMjhmOTk1MWNlNDY1Mzg5NTFlMzY5N2M2MjU4OGE4N2YxZjFmMjk1ZGU0YTE0ZmRkNGM3ODBmYzUyY2ZlNjkiLCJzaWduYXR1cmUiOiIzMDQ0MDIyMDQ1NGE1NTMwYTBmOWY3YjdjMDMyOWE1MTFmOWJlNWVkZTFmNjU4ZDQ5MGY0OGRjNDE4YTgwYjNlNmJiNDJjZWIwMjIwMzVmMTRiMTU0NmE3NjkxNmJjOWJmNWNjMTk5YzQ3MTY5MGYzYmNiMWE2NmU3ZTQ5ZDZhNzY5NDJiM2FhZmM1ZiJ9';
   // Decode the base64 token and get the DER encoded signature value
-  const decodedToken = Buffer.from(encodedSignatureByBitcoinjs, 'base64').toString();
+  const decodedToken = bytesToUtf8(toByteArray(encodedSignatureByBitcoinjs));
   // Convert decodedToken string to json
   const payload = JSON.parse(decodedToken);
   // Get the hash of original payload for verification with noble-secp256k1
-  const digest = hashSha256Sync(Buffer.from('["gaiahub","0","gaia-0","blockstack_storage_please_sign"]'));
+  const digest = hashSha256Sync(
+    utf8ToBytes('["gaiahub","0","gaia-0","blockstack_storage_please_sign"]')
+  );
   // Verify signature against message hash and public key using @noble/secp256k1 verify
   const verifyResult = verifySignature(payload.signature, digest, payload.publickey);
   // @noble/secp256k1 should accept and verify the DER encoded signature generated by bitcoinjs signature.encode method
@@ -2454,7 +2459,7 @@ test('connect to gaia hub with a user session and association token', async () =
 
   const gaiaConfig = await storage.setLocalGaiaHubConnection();
   const { token } = gaiaConfig;
-  const assocToken = (decodeToken(token.slice(2)).payload as any).associationToken;
+  const assocToken = (decodeToken(token.slice(3)).payload as any).associationToken;
   expect(assocToken).toEqual(gaiaAssociationToken);
 });
 

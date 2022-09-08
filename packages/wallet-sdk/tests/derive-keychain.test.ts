@@ -10,12 +10,11 @@ import {
 // https://github.com/paulmillr/scure-bip39
 // Secure, audited & minimal implementation of BIP39 mnemonic phrases.
 import { mnemonicToSeed } from '@scure/bip39';
-import { BIP32Interface, fromBase58 } from 'bip32';
+
 import { HDKey } from '@scure/bip32';
 import { TransactionVersion } from '@stacks/transactions';
 import { StacksMainnet } from '@stacks/network';
 import fetchMock from 'jest-fetch-mock';
-import { bytesToHex } from '@stacks/common';
 
 const SECRET_KEY =
   'sound idle panel often situate develop unit text design antenna ' +
@@ -241,45 +240,4 @@ test('fetch username defaults to mainnet', async () => {
     derivationType: DerivationType.Wallet,
   });
   expect(fetchMock.mock.calls[0][0]).toContain('stacks-node-api.mainnet');
-});
-
-test('Verify compatibility between @scure/bip32 and bip32 dependency', () => {
-  // !!! Test currently fails for node v18 !!!
-  // todo: remove test and BIP32Interface backwards compatibility in next major release
-
-  // Consider a root key in base58 format
-  const root =
-    'xprv9s21ZrQH143K3QTDL4LXw2F7HEK3wJUD2nW2nRk4stbPy6cq3jPPqjiChkVvvNKmPGJxWUtg6LnF5kejMRNNU3TGtRBeJgk33yuGBxrMPHi';
-  const bip32Node: BIP32Interface = fromBase58(root);
-
-  // Use same root key to create node using @scure/bip32
-  const keychainNode = HDKey.fromExtendedKey(root);
-
-  if (bip32Node.privateKey && keychainNode.privateKey) {
-    expect(bip32Node.privateKey.toString('hex')).toEqual(bytesToHex(keychainNode.privateKey));
-  } else {
-    // Reject test case
-    fail(
-      'No private keys: failed to verify compatibility between @scure/bip32 and bip32 dependency'
-    );
-  }
-
-  const derivationPath = 'm/0/0';
-
-  // Derive a child from bip32Node at given derivation path
-  const childBip32Node: BIP32Interface = bip32Node.derivePath(derivationPath);
-
-  // Derive a child from keychainNode at given derivation path
-  const childKeychainNode = keychainNode.derive(derivationPath);
-
-  if (childBip32Node.privateKey && childKeychainNode.privateKey) {
-    expect(childBip32Node.privateKey.toString('hex')).toEqual(
-      bytesToHex(childKeychainNode.privateKey)
-    );
-  } else {
-    // Reject test case
-    fail(
-      'No private keys: failed to verify compatibility between @scure/bip32 and bip32 dependency'
-    );
-  }
 });

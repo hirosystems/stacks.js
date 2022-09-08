@@ -1,5 +1,10 @@
 import { utils } from '@noble/secp256k1';
-import { Buffer, PRIVATE_KEY_UNCOMPRESSED_LENGTH } from '@stacks/common';
+import {
+  bytesToHex,
+  hexToBytes,
+  PRIVATE_KEY_UNCOMPRESSED_LENGTH,
+  utf8ToBytes,
+} from '@stacks/common';
 import { address, ECPair, networks } from 'bitcoinjs-lib';
 import bs58check from 'bs58check';
 import { SECP256K1Client } from 'jsontokens';
@@ -36,6 +41,7 @@ test('getPublicKeyFromPrivate matches bitcoinjs', () => {
   const privateKey = makeECPrivateKey();
   const privateKeyCompressed = `${privateKey}01`;
 
+  // eslint-disable-next-line node/prefer-global/buffer
   const keyPairCompressed = ECPair.fromPrivateKey(Buffer.from(privateKey, 'hex'), {
     compressed: true,
   });
@@ -48,6 +54,8 @@ test('getPublicKeyFromPrivate matches bitcoinjs', () => {
 
 test('getPublicKeyFromPrivate with bitcoinjs private key matches bitcoinjs', () => {
   const privateKey = ECPair.makeRandom().privateKey!.toString('hex');
+
+  // eslint-disable-next-line node/prefer-global/buffer
   const bitcoinJsKeyPair = ECPair.fromPrivateKey(Buffer.from(privateKey, 'hex'), {
     compressed: true,
   });
@@ -59,8 +67,12 @@ test('publicKeyToAddress matches bitcoinjs', () => {
   const privateKey = makeECPrivateKey();
   const publicKey = getPublicKeyFromPrivate(privateKey);
 
-  const publicKeyHash160 = hashRipemd160(hashSha256Sync(Buffer.from(publicKey, 'hex')));
-  const bitcoinJsAddress = address.toBase58Check(publicKeyHash160, networks.bitcoin.pubKeyHash);
+  const publicKeyHash160 = hashRipemd160(hashSha256Sync(hexToBytes(publicKey)));
+  const bitcoinJsAddress = address.toBase58Check(
+    // eslint-disable-next-line node/prefer-global/buffer
+    Buffer.from(publicKeyHash160),
+    networks.bitcoin.pubKeyHash
+  );
 
   expect(publicKeyToAddress(publicKey)).toEqual(bitcoinJsAddress);
 });
@@ -92,10 +104,10 @@ test('ecSign', () => {
   const signatureHex =
     'ff7803e1a6cdd6a28c368fb324f24e1e7f9b024b21524edae6e6fe21e52a92cb156621f8dd66d12f1848a3151c7f04cebe8bcf617f0cc8e43a592f883b29aa02';
 
-  const digest = hashSha256Sync(Buffer.from(challengeText));
+  const digest = hashSha256Sync(utf8ToBytes(challengeText));
   const signature = ecSign(digest, privateKey);
 
-  expect(signature.toString('hex')).toEqual(signatureHex);
+  expect(bytesToHex(signature)).toEqual(signatureHex);
 });
 
 describe(compressPrivateKey, () => {
@@ -103,9 +115,7 @@ describe(compressPrivateKey, () => {
     const privateKeyCompressed =
       '00cdce6b5f87d38f2a830cae0da82162e1b487f07c5affa8130f01fe1a2a25fb01';
 
-    expect(compressPrivateKey(privateKeyCompressed)).toEqual(
-      Buffer.from(privateKeyCompressed, 'hex')
-    );
+    expect(compressPrivateKey(privateKeyCompressed)).toEqual(hexToBytes(privateKeyCompressed));
   });
 
   it('compresses uncompressed key', () => {
@@ -113,6 +123,6 @@ describe(compressPrivateKey, () => {
     const privateKeyCompressed =
       '00cdce6b5f87d38f2a830cae0da82162e1b487f07c5affa8130f01fe1a2a25fb01';
 
-    expect(compressPrivateKey(privateKey)).toEqual(Buffer.from(privateKeyCompressed, 'hex'));
+    expect(compressPrivateKey(privateKey)).toEqual(hexToBytes(privateKeyCompressed));
   });
 });
