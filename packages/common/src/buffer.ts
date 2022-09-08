@@ -1,5 +1,3 @@
-import { isEnum } from './enum';
-
 /** @ignore */
 export function equals(a: Uint8Array, b: Uint8Array) {
   if (a.byteLength !== b.byteLength) return false;
@@ -19,20 +17,6 @@ export function alloc(length: number, value: number) {
     a[i] = value;
   }
   return a;
-}
-
-/** @ignore */
-export function readUInt8Enum<T extends string, TEnumValue extends number>(
-  source: Uint8Array,
-  offset: number,
-  enumVariable: { [key in T]: TEnumValue },
-  invalidEnumErrorFormatter: (val: number) => Error
-): TEnumValue {
-  const num = readUInt8(source, offset);
-  if (isEnum(enumVariable, num)) {
-    return num;
-  }
-  throw invalidEnumErrorFormatter(num);
 }
 
 /** @ignore */
