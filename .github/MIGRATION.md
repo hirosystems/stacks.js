@@ -3,6 +3,7 @@
 - [Stacks.js (&lt;=4.x.x) → (5.x.x)](#stacksjs-4xx--5xx)
   - [Breaking Changes](#breaking-changes)
     - [Buffer to Uint8Array](#buffer-to-uint8array)
+    - [Message Signing Prefix](#message-signing-prefix)
 - [blockstack.js → Stacks.js (1.x.x)](#blockstackjs--stacksjs-1xx)
   - [Auth](#auth)
   - [Using blockstack.js](#using-blockstackjs)
@@ -18,7 +19,8 @@
 
 ### Breaking Changes
 
-- To reduce the bundle sizes of applications using Stacks.js we are switching from Buffer (a polyfill to match Node.js APIs) to Uint8Arrays (which Buffers use in the background anyway). [Read more...](#buffer-to-uint8array)
+- To reduce the bundle sizes of applications using Stacks.js, we are switching from Buffer (a polyfill to match Node.js APIs) to Uint8Arrays (which Buffers use in the background anyway). [Read more...](#buffer-to-uint8array)
+- To allow message signing on Ledger hardware wallets, we are changing the message signing prefix. [Read more...]
 
 #### Buffer to Uint8Array
 
@@ -54,6 +56,14 @@ hexToBytes('deadbeef'); // Uint8Array(4) [ 222, 173, 190, 239 ]
 Buffer.from([222, 173, 190, 239]).toString('hex'); // 'deadbeef'
 bytesToHex(Uint8Array.from([222, 173, 190, 239])); // 'deadbeef'
 ```
+
+#### Message Signing Prefix
+
+The message signing prefix was changed from `Stacks Message Signing` to `Stacks Signed Message`.
+The change relates to the functions `verifyMessageSignature`, `encodeMessage`, `decodeMessage`, and `hashMessage`.
+The `verifyMessageSignature` functions was updated to verify against both the old and the new prefix (for unhashed message-input).
+This will generate a different hash/signature from the same input compared to previous versions of Stacks.js.
+If you have previously stored messages/signatures and compare to freshly generated ones, the messages/signatures will not match to previously stored.
 
 ---
 

@@ -528,14 +528,14 @@ export function verifyMessageSignature({
   // verify() is strict: true by default. High-s signatures are rejected, which mirrors libsecp behavior
   // Set verify options to strict: false, to support the legacy stacks implementations
   // Reference: https://github.com/paulmillr/noble-secp256k1/releases/tag/1.4.0
-  const legacyResult = verify(sig, hashedMsg, publicKey, { strict: false });
+  const verificationResult = verify(sig, hashedMsg, publicKey, { strict: false });
 
-  // Temporary Additional Check ++++++++++++++++++++++++++++++++++++++++++++++++
-  if (legacyResult || typeof message !== 'string') return legacyResult;
+  // Additional Check for Legacy Prefix ++++++++++++++++++++++++++++++++++++++++
+  if (verificationResult || typeof message !== 'string') return verificationResult;
 
-  const FUTURE_PREFIX = '\x17Stacks Signed Message:\n';
-  const futureHash = Buffer.from(sha256(encodeMessage(message, FUTURE_PREFIX)));
-  return verify(sig, futureHash, publicKey, { strict: false });
+  const LEGACY_PREFIX = '\x18Stacks Message Signing:\n';
+  const legacyHash = sha256(encodeMessage(message, LEGACY_PREFIX));
+  return verify(sig, legacyHash, publicKey, { strict: false });
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 }
 
