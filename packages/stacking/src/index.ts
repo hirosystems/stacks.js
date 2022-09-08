@@ -32,7 +32,7 @@ import {
 } from '@stacks/stacks-blockchain-api-types';
 import { StacksNetwork } from '@stacks/network';
 import { StackingErrors } from './constants';
-import { decodeBtcAddress } from './utils';
+import { decodeBtcAddress, poxAddressToTuple } from './utils';
 export * from './utils';
 
 export interface PoxInfo {
@@ -324,14 +324,7 @@ export class StackingClient {
 
     return Promise.all([balancePromise, poxInfoPromise])
       .then(([balance, poxInfo]) => {
-        const { hashMode, data } = decodeBtcAddress(poxAddress);
-        const hashModeBuffer = bufferCV(bigIntToBytes(BigInt(hashMode), 1));
-        const hashbytes = bufferCV(data);
-        const poxAddressCV = tupleCV({
-          hashbytes,
-          version: hashModeBuffer,
-        });
-
+        const address = poxAddressToTuple(poxAddress);
         const [contractAddress, contractName] = this.parseContractId(poxInfo.contract_id);
 
         return callReadOnlyFunction({
@@ -341,7 +334,7 @@ export class StackingClient {
           functionName: 'can-stack-stx',
           senderAddress: this.address,
           functionArgs: [
-            poxAddressCV,
+            address,
             uintCV(balance.toString()),
             uintCV(poxInfo.reward_cycle_id),
             uintCV(cycles.toString()),
@@ -526,15 +519,8 @@ export class StackingClient {
     contract: string;
     burnBlockHeight: number;
   }) {
-    const { hashMode, data } = decodeBtcAddress(poxAddress);
-    const hashModeBuffer = bufferCV(bigIntToBytes(BigInt(hashMode), 1));
-    const hashbytes = bufferCV(data);
-    const address = tupleCV({
-      hashbytes,
-      version: hashModeBuffer,
-    });
+    const address = poxAddressToTuple(poxAddress);
     const [contractAddress, contractName] = this.parseContractId(contract);
-    const network = this.network;
     const txOptions: ContractCallOptions = {
       contractAddress,
       contractName,
@@ -542,7 +528,7 @@ export class StackingClient {
       // sum of uStx, address, burn_block_height, num_cycles
       functionArgs: [uintCV(amountMicroStx), address, uintCV(burnBlockHeight), uintCV(cycles)],
       validateWithAbi: true,
-      network,
+      network: this.network,
       anchorMode: AnchorMode.Any,
     };
     return txOptions;
@@ -561,22 +547,8 @@ export class StackingClient {
     untilBurnBlockHeight?: number;
     poxAddress?: string;
   }) {
-    let address = undefined;
-
-    if (poxAddress) {
-      const { hashMode, data } = decodeBtcAddress(poxAddress);
-      const hashModeBuffer = bufferCV(bigIntToBytes(BigInt(hashMode), 1));
-      const hashbytes = bufferCV(data);
-      address = someCV(
-        tupleCV({
-          hashbytes,
-          version: hashModeBuffer,
-        })
-      );
-    }
-
+    const address = poxAddress ? someCV(poxAddressToTuple(poxAddress)) : noneCV();
     const [contractAddress, contractName] = this.parseContractId(contract);
-    const network = this.network;
     const txOptions: ContractCallOptions = {
       contractAddress,
       contractName,
@@ -585,10 +557,10 @@ export class StackingClient {
         uintCV(amountMicroStx),
         standardPrincipalCV(delegateTo),
         untilBurnBlockHeight ? someCV(uintCV(untilBurnBlockHeight)) : noneCV(),
-        address ? address : noneCV(),
+        address,
       ],
       validateWithAbi: true,
-      network,
+      network: this.network,
       anchorMode: AnchorMode.Any,
     };
     return txOptions;
@@ -611,16 +583,8 @@ export class StackingClient {
     cycles: number;
     nonce?: IntegerType;
   }) {
-    const { hashMode, data } = decodeBtcAddress(poxAddress);
-    const hashModeBuffer = bufferCV(bigIntToBytes(BigInt(hashMode), 1));
-    const hashbytes = bufferCV(data);
-    const address = tupleCV({
-      hashbytes,
-      version: hashModeBuffer,
-    });
-
+    const address = poxAddressToTuple(poxAddress);
     const [contractAddress, contractName] = this.parseContractId(contract);
-    const network = this.network;
     const txOptions: ContractCallOptions = {
       contractAddress,
       contractName,
@@ -633,7 +597,7 @@ export class StackingClient {
         uintCV(cycles),
       ],
       validateWithAbi: true,
-      network,
+      network: this.network,
       anchorMode: AnchorMode.Any,
     };
 
@@ -653,23 +617,15 @@ export class StackingClient {
     poxAddress: string;
     rewardCycle: number;
   }) {
-    const { hashMode, data } = decodeBtcAddress(poxAddress);
-    const hashModeBuffer = bufferCV(bigIntToBytes(BigInt(hashMode), 1));
-    const hashbytes = bufferCV(data);
-    const address = tupleCV({
-      hashbytes,
-      version: hashModeBuffer,
-    });
-
+    const address = poxAddressToTuple(poxAddress);
     const [contractAddress, contractName] = this.parseContractId(contract);
-    const network = this.network;
     const txOptions: ContractCallOptions = {
       contractAddress,
       contractName,
       functionName: 'stack-aggregation-commit',
       functionArgs: [address, uintCV(rewardCycle)],
       validateWithAbi: true,
-      network,
+      network: this.network,
       anchorMode: AnchorMode.Any,
     };
     return txOptions;
@@ -677,14 +633,13 @@ export class StackingClient {
 
   getRevokeDelegateStxOptions(contract: string) {
     const [contractAddress, contractName] = this.parseContractId(contract);
-    const network = this.network;
     const txOptions: ContractCallOptions = {
       contractAddress,
       contractName,
       functionName: 'revoke-delegate-stx',
       functionArgs: [],
       validateWithAbi: true,
-      network,
+      network: this.network,
       anchorMode: AnchorMode.Any,
     };
     return txOptions;
@@ -763,10 +718,14 @@ export class StackingClient {
   parseContractId(contract: string): string[] {
     const parts = contract.split('.');
 
-    if (parts.length !== 2 || !validateStacksAddress(parts[0]) || parts[1] !== 'pox') {
-      throw new Error('Stacking contract ID is malformed');
+    if (
+      parts.length === 2 &&
+      validateStacksAddress(parts[0]) &&
+      (parts[1] === 'pox' || parts[1] === 'pox-2') // todo: what's the new pox called?
+    ) {
+      return parts;
     }
 
-    return parts;
+    throw new Error('Stacking contract ID is malformed');
   }
 }

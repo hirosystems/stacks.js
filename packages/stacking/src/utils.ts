@@ -1,10 +1,12 @@
-import { bytesToHex } from '@stacks/common';
+import { bigIntToBytes, bytesToHex } from '@stacks/common';
 import { base58CheckDecode, base58CheckEncode } from '@stacks/encryption';
 import {
   AddressHashMode,
+  bufferCV,
   BufferCV,
   ClarityType,
   ClarityValue,
+  tupleCV,
   TupleCV,
 } from '@stacks/transactions';
 import { StackingErrors } from './constants';
@@ -182,4 +184,14 @@ export function getErrorString(error: StackingErrors): string {
     case StackingErrors.ERR_INVALID_START_BURN_HEIGHT:
       return 'Invalid start burn height';
   }
+}
+
+export function poxAddressToTuple(poxAddress: string) {
+  const { hashMode, data } = decodeBtcAddress(poxAddress);
+  const hashModeBuffer = bufferCV(bigIntToBytes(BigInt(hashMode), 1));
+  const hashbytes = bufferCV(data);
+  return tupleCV({
+    version: hashModeBuffer,
+    hashbytes,
+  });
 }
