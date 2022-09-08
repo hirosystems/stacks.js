@@ -33,13 +33,9 @@ interface IntCV {
 const intCV = (value: IntegerType): IntCV => {
   const bigInt = intToBigInt(value, true);
   if (bigInt > MAX_I128) {
-    throw new RangeError(
-      `Cannot construct clarity integer from value greater than ${MAX_I128.toString()}`
-    );
+    throw new RangeError(`Cannot construct clarity integer from value greater than ${MAX_I128}`);
   } else if (bigInt < MIN_I128) {
-    throw new RangeError(
-      `Cannot construct clarity integer form value less than ${MIN_I128.toString()}`
-    );
+    throw new RangeError(`Cannot construct clarity integer form value less than ${MIN_I128}`);
   }
   return { type: ClarityType.Int, value: bigInt };
 };
@@ -72,9 +68,7 @@ const uintCV = (value: IntegerType): UIntCV => {
   if (bigInt < MIN_U128) {
     throw new RangeError('Cannot construct unsigned clarity integer from negative value');
   } else if (bigInt > MAX_U128) {
-    throw new RangeError(
-      `Cannot construct unsigned clarity integer greater than ${MAX_U128.toString()}`
-    );
+    throw new RangeError(`Cannot construct unsigned clarity integer greater than ${MAX_U128}`);
   }
   return { type: ClarityType.UInt, value: bigInt };
 };

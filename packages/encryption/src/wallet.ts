@@ -1,4 +1,3 @@
-import { Buffer } from '@stacks/common';
 // https://github.com/paulmillr/scure-bip39
 // Secure, audited & minimal implementation of BIP39 mnemonic phrases.
 import { validateMnemonic, mnemonicToEntropy, entropyToMnemonic } from '@scure/bip39';
@@ -10,17 +9,24 @@ import { validateMnemonic, mnemonicToEntropy, entropyToMnemonic } from '@scure/b
 import { wordlist } from '@scure/bip39/wordlists/english';
 import { randomBytes, GetRandomBytes } from './cryptoRandom';
 import { createSha2Hash } from './sha2Hash';
-import { createHmacSha256 } from './hmacSha256';
 import { createCipher } from './aesCipher';
 import { createPbkdf2 } from './pbkdf2';
 import { TriplesecDecryptSignature } from './cryptoUtils';
+import {
+  bytesToHex,
+  bytesToUtf8,
+  concatBytes,
+  equals,
+  hexToBytes,
+  utf8ToBytes,
+} from '@stacks/common';
+import { hmacSha256 } from './ec';
 
 /**
  * Encrypt a raw mnemonic phrase to be password protected
  * @param {string} phrase - Raw mnemonic phrase
  * @param {string} password - Password to encrypt mnemonic with
- * @return {Promise<Buffer>} The encrypted phrase
- * @private
+ * @return {Promise<Uint8Array>} The encrypted phrase
  * @ignore
  * */
 export async function encryptMnemonic(
@@ -29,7 +35,7 @@ export async function encryptMnemonic(
   opts?: {
     getRandomBytes?: GetRandomBytes;
   }
-): Promise<Buffer> {
+): Promise<Uint8Array> {
   // hex encoded mnemonic string
   let mnemonicEntropy: string;
   try {
@@ -37,7 +43,7 @@ export async function encryptMnemonic(
     // `mnemonicToEntropy` converts mnemonic string to raw entropy in form of byte array
     const entropyBytes = mnemonicToEntropy(phrase, wordlist);
     // Convert byte array to hex string
-    mnemonicEntropy = Buffer.from(entropyBytes).toString('hex');
+    mnemonicEntropy = bytesToHex(entropyBytes);
   } catch (error) {
     console.error('Invalid mnemonic phrase provided');
     console.error(error);
@@ -45,17 +51,12 @@ export async function encryptMnemonic(
   }
 
   // normalize plaintext to fixed length byte string
-  const plaintextNormalized = Buffer.from(mnemonicEntropy, 'hex');
+  const plaintextNormalized = hexToBytes(mnemonicEntropy);
 
   // AES-128-CBC with SHA256 HMAC
   const pbkdf2 = await createPbkdf2();
-  let salt: Buffer;
-  if (opts && opts.getRandomBytes) {
-    salt = opts.getRandomBytes(16);
-  } else {
-    salt = randomBytes(16);
-  }
-  const keysAndIV = await pbkdf2.derive(password, salt, 100000, 48, 'sha512');
+  const salt = opts?.getRandomBytes ? opts.getRandomBytes(16) : randomBytes(16);
+  const keysAndIV = await pbkdf2.derive(password, salt, 100_000, 48, 'sha512');
   const encKey = keysAndIV.slice(0, 16);
   const macKey = keysAndIV.slice(16, 32);
   const iv = keysAndIV.slice(32, 48);
@@ -63,11 +64,10 @@ export async function encryptMnemonic(
   const cipher = await createCipher();
   const cipherText = await cipher.encrypt('aes-128-cbc', encKey, iv, plaintextNormalized);
 
-  const hmacPayload = Buffer.concat([salt, cipherText]);
-  const hmacSha256 = await createHmacSha256();
-  const hmacDigest = await hmacSha256.digest(macKey, hmacPayload);
+  const hmacPayload = concatBytes(salt, cipherText);
+  const hmacDigest = hmacSha256(macKey, hmacPayload);
 
-  const payload = Buffer.concat([salt, hmacDigest, cipherText]);
+  const payload = concatBytes(salt, hmacDigest, cipherText);
   return payload;
 }
 
@@ -77,11 +77,11 @@ class PasswordError extends Error {}
 /**
  * @ignore
  */
-async function decryptMnemonicBuffer(dataBuffer: Buffer, password: string): Promise<string> {
-  const salt = dataBuffer.slice(0, 16);
-  const hmacSig = dataBuffer.slice(16, 48); // 32 bytes
-  const cipherText = dataBuffer.slice(48);
-  const hmacPayload = Buffer.concat([salt, cipherText]);
+async function decryptMnemonicBytes(dataBytes: Uint8Array, password: string): Promise<string> {
+  const salt = dataBytes.slice(0, 16);
+  const hmacSig = dataBytes.slice(16, 48); // 32 bytes
+  const cipherText = dataBytes.slice(48);
+  const hmacPayload = concatBytes(salt, cipherText);
 
   const pbkdf2 = await createPbkdf2();
   const keysAndIV = await pbkdf2.derive(password, salt, 100000, 48, 'sha512');
@@ -92,8 +92,7 @@ async function decryptMnemonicBuffer(dataBuffer: Buffer, password: string): Prom
   const decipher = await createCipher();
   const decryptedResult = await decipher.decrypt('aes-128-cbc', encKey, iv, cipherText);
 
-  const hmacSha256 = await createHmacSha256();
-  const hmacDigest = await hmacSha256.digest(macKey, hmacPayload);
+  const hmacDigest = hmacSha256(macKey, hmacPayload);
 
   // hash both hmacSig and hmacDigest so string comparison time
   // is uncorrelated to the ciphertext
@@ -101,7 +100,7 @@ async function decryptMnemonicBuffer(dataBuffer: Buffer, password: string): Prom
   const hmacSigHash = await sha2Hash.digest(hmacSig);
   const hmacDigestHash = await sha2Hash.digest(hmacDigest);
 
-  if (!hmacSigHash.equals(hmacDigestHash)) {
+  if (!equals(hmacSigHash, hmacDigestHash)) {
     // not authentic
     throw new PasswordError('Wrong password (HMAC mismatch)');
   }
@@ -125,29 +124,28 @@ async function decryptMnemonicBuffer(dataBuffer: Buffer, password: string): Prom
 
 /**
  * Decrypt legacy triplesec keys
- * @param {Buffer} dataBuffer - The encrypted key
+ * @param {Uint8Array} dataBytes - The encrypted key
  * @param {String} password - Password for data
- * @return {Promise<Buffer>} Decrypted seed
- * @private
+ * @return {Promise<BuUint8Arrayffer>} Decrypted seed
  * @ignore
  */
 function decryptLegacy(
-  dataBuffer: Buffer,
+  dataBytes: Uint8Array,
   password: string,
   triplesecDecrypt?: TriplesecDecryptSignature
-): Promise<Buffer> {
-  return new Promise<Buffer>((resolve, reject) => {
+): Promise<Uint8Array> {
+  return new Promise<Uint8Array>((resolve, reject) => {
     if (!triplesecDecrypt) {
       reject(new Error('The `triplesec.decrypt` function must be provided'));
     }
     triplesecDecrypt!(
       {
-        key: Buffer.from(password),
-        data: dataBuffer,
+        key: utf8ToBytes(password),
+        data: dataBytes,
       },
-      (err, plaintextBuffer) => {
+      (err, plaintextBytes) => {
         if (!err) {
-          resolve(plaintextBuffer!);
+          resolve(plaintextBytes!);
         } else {
           reject(err);
         }
@@ -159,25 +157,22 @@ function decryptLegacy(
 /**
  * Decrypt an encrypted mnemonic phrase with a password.
  * Legacy triplesec encrypted payloads are also supported.
- * @param data - Buffer or hex-encoded string of the encrypted mnemonic
+ * @param data - Bytes or hex-encoded string of the encrypted mnemonic
  * @param password - Password for data
- * @return the raw mnemonic phrase
- * @private
+ * @return {string} the raw mnemonic phrase
  * @ignore
  */
 export async function decryptMnemonic(
-  data: string | Buffer,
+  data: string | Uint8Array,
   password: string,
   triplesecDecrypt?: TriplesecDecryptSignature
-) {
-  const dataBuffer = Buffer.isBuffer(data) ? data : Buffer.from(data, 'hex');
+): Promise<string> {
+  const dataBytes = typeof data === 'string' ? hexToBytes(data) : data;
   try {
-    return await decryptMnemonicBuffer(dataBuffer, password);
-  } catch (err) {
-    if (err instanceof PasswordError) {
-      throw err;
-    }
-    const data = await decryptLegacy(dataBuffer, password, triplesecDecrypt);
-    return data.toString();
+    return await decryptMnemonicBytes(dataBytes, password);
+  } catch (error) {
+    if (error instanceof PasswordError) throw error;
+    const data = await decryptLegacy(dataBytes, password, triplesecDecrypt);
+    return bytesToUtf8(data);
   }
 }

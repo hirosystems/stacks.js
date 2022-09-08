@@ -30,8 +30,6 @@ module.exports = {
     '@typescript-eslint/no-unsafe-member-access': [0],
     '@typescript-eslint/no-non-null-assertion': [0],
 
-    'node/prefer-global/buffer': ['error', 'never'],
-
     'import/no-extraneous-dependencies': ['error'],
   },
 };

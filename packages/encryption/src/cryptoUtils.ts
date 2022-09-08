@@ -1,5 +1,4 @@
 // @ts-ignore
-import { Buffer } from '@stacks/common';
 export function isSubtleCryptoAvailable(): boolean {
   return typeof crypto !== 'undefined' && typeof crypto.subtle !== 'undefined';
 }
@@ -34,8 +33,8 @@ export const NO_CRYPTO_LIB =
   'Crypto lib not found. Either the WebCrypto "crypto.subtle" or Node.js "crypto" module must be available.';
 
 export type TriplesecDecryptSignature = (
-  arg: { data: Buffer; key: Buffer },
-  cb: (err: Error | null, buff: Buffer | null) => void
+  arg: { data: Uint8Array; key: Uint8Array },
+  cb: (err: Error | null, buff: Uint8Array | null) => void
 ) => void;
 
 export interface WebCryptoLib {

@@ -1,4 +1,3 @@
-import { Buffer } from '@stacks/common';
 import {
   BooleanCV,
   BufferCV,
@@ -18,6 +17,7 @@ import {
 
 import { principalToString } from './types/principalCV';
 import { ClarityType } from './constants';
+import { asciiToBytes, bytesToAscii, bytesToHex, utf8ToBytes } from '@stacks/common';
 
 export type ClarityValue =
   | BooleanCV
@@ -47,12 +47,12 @@ export function cvToString(val: ClarityValue, encoding: 'tryAscii' | 'hex' = 'he
       return `u${val.value.toString()}`;
     case ClarityType.Buffer:
       if (encoding === 'tryAscii') {
-        const str = val.buffer.toString('ascii');
+        const str = bytesToAscii(val.buffer);
         if (/[ -~]/.test(str)) {
           return JSON.stringify(str);
         }
       }
-      return `0x${val.buffer.toString('hex')}`;
+      return `0x${bytesToHex(val.buffer)}`;
     case ClarityType.OptionalNone:
       return 'none';
     case ClarityType.OptionalSome:
@@ -92,11 +92,10 @@ export function cvToValue(val: ClarityValue, strictJsonCompat: boolean = false):
     case ClarityType.UInt:
       if (strictJsonCompat) {
         return val.value.toString();
-      } else {
-        return val.value;
       }
+      return val.value;
     case ClarityType.Buffer:
-      return `0x${val.buffer.toString('hex')}`;
+      return `0x${bytesToHex(val.buffer)}`;
     case ClarityType.OptionalNone:
       return null;
     case ClarityType.OptionalSome:
@@ -165,8 +164,8 @@ export function getCVTypeString(val: ClarityValue): string {
         .map(key => `(${key} ${getCVTypeString(val.data[key])})`)
         .join(' ')})`;
     case ClarityType.StringASCII:
-      return `(string-ascii ${Buffer.from(val.data, 'ascii').length})`;
+      return `(string-ascii ${asciiToBytes(val.data).length})`;
     case ClarityType.StringUTF8:
-      return `(string-utf8 ${Buffer.from(val.data, 'utf8').length})`;
+      return `(string-utf8 ${utf8ToBytes(val.data).length})`;
   }
 }

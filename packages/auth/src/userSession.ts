@@ -1,5 +1,3 @@
-// @ts-ignore
-import { Buffer } from '@stacks/common';
 import { AppConfig } from './appConfig';
 import { SessionOptions } from './sessionData';
 import { InstanceDataStore, LocalStorageStore, SessionDataStore } from './sessionStore';
@@ -346,14 +344,14 @@ export class UserSession {
 
   /**
    * Encrypts the data provided with the app public key.
-   * @param {String|Buffer} content  the data to encrypt
+   * @param {string | Uint8Array} content  the data to encrypt
    * @param options
-   * @param {String} options.publicKey the hex string of the ECDSA public
+   * @param {string} options.publicKey the hex string of the ECDSA public
    * key to use for encryption. If not provided, will use user's appPrivateKey.
    *
-   * @returns {String} Stringified ciphertext object
+   * @returns {string} Stringified ciphertext object
    */
-  encryptContent(content: string | Buffer, options?: EncryptContentOptions): Promise<string> {
+  encryptContent(content: string | Uint8Array, options?: EncryptContentOptions): Promise<string> {
     const opts = Object.assign({}, options);
     if (!opts.privateKey) {
       opts.privateKey = this.loadUserData().appPrivateKey;
@@ -364,13 +362,13 @@ export class UserSession {
   /**
    * Decrypts data encrypted with `encryptContent` with the
    * transit private key.
-   * @param {String|Buffer} content - encrypted content.
+   * @param {string | Uint8Array} content - encrypted content.
    * @param options
-   * @param {String} options.privateKey - The hex string of the ECDSA private
+   * @param {string} options.privateKey - The hex string of the ECDSA private
    * key to use for decryption. If not provided, will use user's appPrivateKey.
-   * @returns {String|Buffer} decrypted content.
+   * @returns {string | Uint8Array} decrypted content.
    */
-  decryptContent(content: string, options?: { privateKey?: string }): Promise<Buffer | string> {
+  decryptContent(content: string, options?: { privateKey?: string }): Promise<Uint8Array | string> {
     const opts = Object.assign({}, options);
     if (!opts.privateKey) {
       opts.privateKey = this.loadUserData().appPrivateKey;

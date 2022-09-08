@@ -1,7 +1,5 @@
-import { Buffer, IntegerType, intToBigInt, intToBytes } from '@stacks/common';
-import { COINBASE_BUFFER_LENGTH_BYTES, PayloadType, StacksMessageType } from './constants';
-
-import { BufferArray } from './utils';
+import { concatArray, IntegerType, intToBigInt, intToBytes, writeUInt32BE } from '@stacks/common';
+import { COINBASE_BYTES_LENGTH, PayloadType, StacksMessageType } from './constants';
 
 import {
   MemoString,
@@ -16,7 +14,7 @@ import { createAddress, LengthPrefixedString, createLPString } from './postcondi
 import { Address } from './common';
 import { ClarityValue, serializeCV, deserializeCV } from './clarity/';
 
-import { BufferReader } from './bufferReader';
+import { BytesReader } from './bytesReader';
 import { PrincipalCV, principalCV } from './clarity/types/principalCV';
 
 export type Payload =
@@ -135,71 +133,75 @@ export function createPoisonPayload(): PoisonPayload {
 export interface CoinbasePayload {
   readonly type: StacksMessageType.Payload;
   readonly payloadType: PayloadType.Coinbase;
-  readonly coinbaseBuffer: Buffer;
+  readonly coinbaseBytes: Uint8Array;
 }
 
-export function createCoinbasePayload(coinbaseBuffer: Buffer): CoinbasePayload {
-  if (coinbaseBuffer.byteLength != COINBASE_BUFFER_LENGTH_BYTES) {
-    throw Error(`Coinbase buffer size must be ${COINBASE_BUFFER_LENGTH_BYTES} bytes`);
+export function createCoinbasePayload(coinbaseBytes: Uint8Array): CoinbasePayload {
+  if (coinbaseBytes.byteLength != COINBASE_BYTES_LENGTH) {
+    throw Error(`Coinbase length must be ${COINBASE_BYTES_LENGTH} bytes`);
   }
-  return { type: StacksMessageType.Payload, payloadType: PayloadType.Coinbase, coinbaseBuffer };
+  return {
+    type: StacksMessageType.Payload,
+    payloadType: PayloadType.Coinbase,
+    coinbaseBytes: coinbaseBytes,
+  };
 }
 
-export function serializePayload(payload: PayloadInput): Buffer {
-  const bufferArray: BufferArray = new BufferArray();
-  bufferArray.appendByte(payload.payloadType);
+export function serializePayload(payload: PayloadInput): Uint8Array {
+  const bytesArray = [];
+  bytesArray.push(payload.payloadType);
 
   switch (payload.payloadType) {
     case PayloadType.TokenTransfer:
-      bufferArray.push(serializeCV(payload.recipient));
-      bufferArray.push(intToBytes(payload.amount, false, 8));
-      bufferArray.push(serializeStacksMessage(payload.memo));
+      bytesArray.push(serializeCV(payload.recipient));
+      bytesArray.push(intToBytes(payload.amount, false, 8));
+      bytesArray.push(serializeStacksMessage(payload.memo));
       break;
     case PayloadType.ContractCall:
-      bufferArray.push(serializeStacksMessage(payload.contractAddress));
-      bufferArray.push(serializeStacksMessage(payload.contractName));
-      bufferArray.push(serializeStacksMessage(payload.functionName));
-      const numArgs = Buffer.alloc(4);
-      numArgs.writeUInt32BE(payload.functionArgs.length, 0);
-      bufferArray.push(numArgs);
+      bytesArray.push(serializeStacksMessage(payload.contractAddress));
+      bytesArray.push(serializeStacksMessage(payload.contractName));
+      bytesArray.push(serializeStacksMessage(payload.functionName));
+      const numArgs = new Uint8Array(4);
+      writeUInt32BE(numArgs, payload.functionArgs.length, 0);
+      bytesArray.push(numArgs);
       payload.functionArgs.forEach(arg => {
-        bufferArray.push(serializeCV(arg));
+        bytesArray.push(serializeCV(arg));
       });
       break;
     case PayloadType.SmartContract:
-      bufferArray.push(serializeStacksMessage(payload.contractName));
-      bufferArray.push(serializeStacksMessage(payload.codeBody));
+      bytesArray.push(serializeStacksMessage(payload.contractName));
+      bytesArray.push(serializeStacksMessage(payload.codeBody));
       break;
     case PayloadType.PoisonMicroblock:
       // TODO: implement
       break;
     case PayloadType.Coinbase:
-      bufferArray.push(payload.coinbaseBuffer);
+      bytesArray.push(payload.coinbaseBytes);
       break;
   }
 
-  return bufferArray.concatBuffer();
+  return concatArray(bytesArray);
 }
 
-export function deserializePayload(bufferReader: BufferReader): Payload {
-  const payloadType = bufferReader.readUInt8Enum(PayloadType, n => {
+export function deserializePayload(bytesReader: BytesReader): Payload {
+  const payloadType = bytesReader.readUInt8Enum(PayloadType, n => {
     throw new Error(`Cannot recognize PayloadType: ${n}`);
   });
 
   switch (payloadType) {
     case PayloadType.TokenTransfer:
-      const recipient = deserializeCV(bufferReader) as PrincipalCV;
-      const amount = intToBigInt(bufferReader.readBuffer(8), false);
-      const memo = deserializeMemoString(bufferReader);
+      const recipient = deserializeCV(bytesReader) as PrincipalCV;
+      const amount = intToBigInt(bytesReader.readBytes(8), false);
+      const memo = deserializeMemoString(bytesReader);
       return createTokenTransferPayload(recipient, amount, memo);
     case PayloadType.ContractCall:
-      const contractAddress = deserializeAddress(bufferReader);
-      const contractCallName = deserializeLPString(bufferReader);
-      const functionName = deserializeLPString(bufferReader);
+      const contractAddress = deserializeAddress(bytesReader);
+      const contractCallName = deserializeLPString(bytesReader);
+      const functionName = deserializeLPString(bytesReader);
       const functionArgs: ClarityValue[] = [];
-      const numberOfArgs = bufferReader.readUInt32BE();
+      const numberOfArgs = bytesReader.readUInt32BE();
       for (let i = 0; i < numberOfArgs; i++) {
-        const clarityValue = deserializeCV(bufferReader);
+        const clarityValue = deserializeCV(bytesReader);
         functionArgs.push(clarityValue);
       }
       return createContractCallPayload(
@@ -209,14 +211,14 @@ export function deserializePayload(bufferReader: BufferReader): Payload {
         functionArgs
       );
     case PayloadType.SmartContract:
-      const smartContractName = deserializeLPString(bufferReader);
-      const codeBody = deserializeLPString(bufferReader, 4, 100000);
+      const smartContractName = deserializeLPString(bytesReader);
+      const codeBody = deserializeLPString(bytesReader, 4, 100_000);
       return createSmartContractPayload(smartContractName, codeBody);
     case PayloadType.PoisonMicroblock:
       // TODO: implement
       return createPoisonPayload();
     case PayloadType.Coinbase:
-      const coinbaseBuffer = bufferReader.readBuffer(COINBASE_BUFFER_LENGTH_BYTES);
-      return createCoinbasePayload(coinbaseBuffer);
+      const coinbaseBytes = bytesReader.readBytes(COINBASE_BYTES_LENGTH);
+      return createCoinbasePayload(coinbaseBytes);
   }
 }

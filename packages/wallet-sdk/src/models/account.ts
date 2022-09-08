@@ -2,7 +2,8 @@
 // Secure, audited & minimal implementation of BIP32 hierarchical deterministic (HD) wallets.
 import { HDKey } from '@scure/bip32';
 import { makeAuthResponse as _makeAuthResponse } from '@stacks/auth';
-import { Buffer } from '@stacks/common';
+import { utf8ToBytes } from '@stacks/common';
+
 import {
   getPublicKeyFromPrivate,
   hashCode,
@@ -53,8 +54,8 @@ export const getAppPrivateKey = ({
   account: Account;
   appDomain: string;
 }) => {
-  const hashBuffer = hashSha256Sync(Buffer.from(`${appDomain}${account.salt}`));
-  const hash = hashBuffer.toString('hex');
+  const hashBytes = hashSha256Sync(utf8ToBytes(`${appDomain}${account.salt}`));
+  const hash = bytesToHex(hashBytes);
   const appIndex = hashCode(hash);
   const appsNode = HDKey.fromExtendedKey(account.appsKey);
   const appKeychain = appsNode.deriveChild(appIndex + HARDENED_OFFSET);
