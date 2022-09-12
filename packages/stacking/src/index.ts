@@ -1,38 +1,36 @@
 // @ts-ignore
-import { bigIntToBytes, IntegerType, intToBigInt, bigIntToBytes } from '@stacks/common';
-import {
-  makeContractCall,
-  bufferCV,
-  uintCV,
-  tupleCV,
-  ClarityType,
-  broadcastTransaction,
-  standardPrincipalCV,
-  ContractCallOptions,
-  TxBroadcastResult,
-  UIntCV,
-  BufferCV,
-  ContractCallPayload,
-  StacksTransaction,
-  callReadOnlyFunction,
-  cvToString,
-  ClarityValue,
-  ResponseErrorCV,
-  TupleCV,
-  noneCV,
-  someCV,
-  validateStacksAddress,
-  AnchorMode,
-  getFee,
-} from '@stacks/transactions';
+import { IntegerType, intToBigInt } from '@stacks/common';
+import { StacksNetwork } from '@stacks/network';
 import {
   BurnchainRewardListResponse,
-  BurnchainRewardsTotal,
   BurnchainRewardSlotHolderListResponse,
+  BurnchainRewardsTotal,
 } from '@stacks/stacks-blockchain-api-types';
-import { StacksNetwork } from '@stacks/network';
+import {
+  AnchorMode,
+  broadcastTransaction,
+  BufferCV,
+  callReadOnlyFunction,
+  ClarityType,
+  ClarityValue,
+  ContractCallOptions,
+  ContractCallPayload,
+  cvToString,
+  getFee,
+  makeContractCall,
+  noneCV,
+  ResponseErrorCV,
+  someCV,
+  StacksTransaction,
+  standardPrincipalCV,
+  TupleCV,
+  TxBroadcastResult,
+  uintCV,
+  UIntCV,
+  validateStacksAddress,
+} from '@stacks/transactions';
 import { StackingErrors } from './constants';
-import { decodeBtcAddress, poxAddressToTuple } from './utils';
+import { poxAddressToTuple } from './utils';
 export * from './utils';
 
 export interface PoxInfo {
@@ -121,6 +119,18 @@ export interface LockStxOptions {
   amountMicroStx: IntegerType;
   /** the burnchain block height to begin lock */
   burnBlockHeight: number;
+}
+
+/**
+ * Stack extend stx options
+ */
+export interface StackExtendOptions {
+  /** private key to sign transaction */
+  privateKey: string;
+  /** number of cycles to extend by */
+  extendCycles: number;
+  /** the reward Bitcoin address */
+  poxAddress: string;
 }
 
 /**
@@ -389,6 +399,33 @@ export class StackingClient {
   }
 
   /**
+   * Generate and broadcast a stacking transaction to extend locked STX ()`pox-2.stack-extend`)
+   * @category PoX-2
+   * @param options - a required lock STX options object
+   * @returns a broadcasted txid if the operation succeeds
+   */
+  async stackExtend({
+    extendCycles,
+    poxAddress,
+    privateKey,
+  }: StackExtendOptions): Promise<TxBroadcastResult> {
+    const poxInfo = await this.getPoxInfo();
+    const contract = poxInfo.contract_id;
+
+    const txOptions = this.getStackExtendOptions({
+      extendCycles,
+      poxAddress,
+      contract,
+    });
+    const tx = await makeContractCall({
+      ...txOptions,
+      senderKey: privateKey,
+    });
+
+    return broadcastTransaction(tx, txOptions.network as StacksNetwork);
+  }
+
+  /**
    * As a delegatee, generate and broadcast a transaction to create a delegation relationship
    *
    * @param {DelegateStxOptions} options - a required delegate STX options object
@@ -529,6 +566,30 @@ export class StackingClient {
       functionArgs: [uintCV(amountMicroStx), address, uintCV(burnBlockHeight), uintCV(cycles)],
       validateWithAbi: true,
       network: this.network,
+      anchorMode: AnchorMode.Any,
+    };
+    return txOptions;
+  }
+
+  getStackExtendOptions({
+    extendCycles,
+    poxAddress,
+    contract,
+  }: {
+    extendCycles: number;
+    poxAddress: string;
+    contract: string;
+  }) {
+    const address = poxAddressToTuple(poxAddress);
+    const [contractAddress, contractName] = this.parseContractId(contract);
+    const network = this.network;
+    const txOptions: ContractCallOptions = {
+      contractAddress,
+      contractName,
+      functionName: 'stack-extend',
+      functionArgs: [uintCV(extendCycles), address],
+      validateWithAbi: true,
+      network,
       anchorMode: AnchorMode.Any,
     };
     return txOptions;
