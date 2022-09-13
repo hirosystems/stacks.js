@@ -24,7 +24,7 @@ import fetchMock from 'jest-fetch-mock';
 import { StackingErrors } from '../src/constants';
 import {
   decodeBtcAddress,
-  getAddressHashMode,
+  getAddressVersion,
   InvalidAddressError,
   poxAddressToBtcAddress,
 } from '../src/utils';
@@ -980,10 +980,10 @@ test('pox address hash mode', async () => {
   const p2sh = '3EktnHQD7RiAE6uzMj2ZifT9YgRrkSgzQX';
   const p2shTestnet = '2MzQwSSnBHWHqSAqtTVQ6v47XtaisrJa1Vc';
 
-  const p2pkhAddrHashmode = getAddressHashMode(p2pkh);
-  const p2pkhTestnetAddrHashmode = getAddressHashMode(p2pkhTestnet);
-  const p2shAddrHashmode = getAddressHashMode(p2sh);
-  const p2shTestnetAddrHashmode = getAddressHashMode(p2shTestnet);
+  const p2pkhAddrHashmode = getAddressVersion(p2pkh);
+  const p2pkhTestnetAddrHashmode = getAddressVersion(p2pkhTestnet);
+  const p2shAddrHashmode = getAddressVersion(p2sh);
+  const p2shTestnetAddrHashmode = getAddressVersion(p2shTestnet);
 
   expect(p2pkhAddrHashmode).toEqual(AddressHashMode.SerializeP2PKH);
   expect(p2pkhTestnetAddrHashmode).toEqual(AddressHashMode.SerializeP2PKH);
@@ -995,10 +995,10 @@ test('pox address hash mode', async () => {
   const p2wsh = 'bc1qup6umurcl7s6zw42gcxfzl346psazws74x72ty6gmlvkaxz6kv4sqsth99';
   const p2wshTestnet = 'tb1qup6umurcl7s6zw42gcxfzl346psazws74x72ty6gmlvkaxz6kv4shcacl2';
 
-  expect(() => getAddressHashMode(p2wpkh)).toThrowError(InvalidAddressError);
-  expect(() => getAddressHashMode(p2wpkhTestnet)).toThrowError(InvalidAddressError);
-  expect(() => getAddressHashMode(p2wsh)).toThrowError(InvalidAddressError);
-  expect(() => getAddressHashMode(p2wshTestnet)).toThrowError(InvalidAddressError);
+  expect(() => getAddressVersion(p2wpkh)).toThrowError(InvalidAddressError);
+  expect(() => getAddressVersion(p2wpkhTestnet)).toThrowError(InvalidAddressError);
+  expect(() => getAddressVersion(p2wsh)).toThrowError(InvalidAddressError);
+  expect(() => getAddressVersion(p2wshTestnet)).toThrowError(InvalidAddressError);
 
   expect(() => decodeBtcAddress(p2wpkh)).toThrowError(InvalidAddressError);
   expect(() => decodeBtcAddress(p2wpkhTestnet)).toThrowError(InvalidAddressError);
@@ -1049,7 +1049,7 @@ test('pox address to btc address', () => {
     const btcAddress = poxAddressToBtcAddress(item.version, item.hashBytes, item.network);
     expect(btcAddress).toBe(item.expectedBtcAddr);
     const decodedAddress = decodeBtcAddress(btcAddress);
-    expect(decodedAddress.hashMode).toBe(item.version[0]);
+    expect(decodedAddress.version).toBe(item.version[0]);
     expect(bytesToHex(decodedAddress.data)).toBe(bytesToHex(item.hashBytes));
   });
 
@@ -1070,7 +1070,7 @@ test('pox address to btc address', () => {
     const btcAddress = poxAddressToBtcAddress(clarityValue, item.network);
     expect(btcAddress).toBe(item.expectedBtcAddr);
     const decodedAddress = decodeBtcAddress(btcAddress);
-    expect(decodedAddress.hashMode).toBe(item.version[0]);
+    expect(decodedAddress.version).toBe(item.version[0]);
     expect(bytesToHex(decodedAddress.data)).toBe(bytesToHex(item.hashBytes));
   });
 });

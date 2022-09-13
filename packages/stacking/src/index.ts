@@ -33,6 +33,19 @@ import { StackingErrors } from './constants';
 import { poxAddressToTuple } from './utils';
 export * from './utils';
 
+export interface CycleInfo {
+  id: number;
+  min_threshold_ustx: number;
+  stacked_ustx: number;
+  is_pox_active: boolean;
+}
+
+export interface ContractVersion {
+  contract_id: string;
+  activation_burnchain_block_height: number;
+  first_reward_cycle_id: number;
+}
+
 export interface PoxInfo {
   contract_id: string;
   first_burnchain_block_height: number;
@@ -42,6 +55,9 @@ export interface PoxInfo {
   reward_cycle_id: number;
   reward_cycle_length: number;
   rejection_votes_left_required: number;
+  current_cycle: CycleInfo;
+  current_burnchain_block_height?: number;
+  contract_versions?: ContractVersion[];
 }
 
 export type StackerInfo =
@@ -299,6 +315,29 @@ export class StackingClient {
         return blocksToNextCycle * targetBlockTime;
       }
     );
+  }
+
+  /**
+   * Get current period of PoX operation
+   *
+   * Periods:
+   * - Period 1: This is before the 2.1 fork.
+   * - Period 2: This is after the 2.1 fork, but before cycle (N+1).
+   * - Period 3: This is after cycle (N+1) has begun. Original PoX contract state will no longer have any impact on reward sets, account lock status, etc.
+   */
+  async getCurrentPoxOperationPeriod(): Promise<1 | 2 | 3> {
+    const pox = await this.getPoxInfo();
+
+    if (pox.contract_id.endsWith('.pox')) return 1; // before the 2.1 fork
+    if (!pox.contract_versions || pox.contract_versions.length <= 1) return 1; // API does not know about pox-2
+
+    // 2.1 consensus has started
+    if (pox.contract_versions.length == 2) {
+      if (pox.current_cycle.id < pox.contract_versions[1].first_reward_cycle_id) return 2;
+      return 3;
+    }
+
+    throw Error('Failed to determine current period of PoX operation.');
   }
 
   /**
@@ -582,14 +621,13 @@ export class StackingClient {
   }) {
     const address = poxAddressToTuple(poxAddress);
     const [contractAddress, contractName] = this.parseContractId(contract);
-    const network = this.network;
     const txOptions: ContractCallOptions = {
       contractAddress,
       contractName,
       functionName: 'stack-extend',
       functionArgs: [uintCV(extendCycles), address],
       validateWithAbi: true,
-      network,
+      network: this.network,
       anchorMode: AnchorMode.Any,
     };
     return txOptions;

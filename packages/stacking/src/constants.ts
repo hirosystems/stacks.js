@@ -1,3 +1,14 @@
+export enum PoXAddressVersion {
+  // Address versions corresponding to pox.clar, pox-2.clar
+  P2PKH = 0x00,
+  P2SH = 0x01,
+  P2SHP2WPKH = 0x02, // likely unused, as indistinguishable from P2SH
+  P2SHP2WSH = 0x03, // likely unused, as indistinguishable from P2SH
+  NativeP2WPKH = 0x04,
+  NativeP2WSH = 0x05,
+  NativeP2TR = 0x06,
+}
+
 export enum StackingErrors {
   ERR_STACKING_UNREACHABLE = 255,
   ERR_STACKING_INSUFFICIENT_FUNDS = 1,
