@@ -4,15 +4,15 @@ import { decode, encode, encodingLength } from 'varuint-bitcoin';
 
 // 'Stacks Message Signing:\n'.length //  = 24
 // 'Stacks Message Signing:\n'.length.toString(16) //  = 18
-const chainPrefix = '\x18Stacks Message Signing:\n';
+const chainPrefix: string = '\x18Stacks Message Signing:\n';
 
 export function hashMessage(message: string): Buffer {
   return Buffer.from(sha256(encodeMessage(message)));
 }
 
-export function encodeMessage(message: string | Buffer): Buffer {
+export function encodeMessage(message: string | Buffer, prefix: string = chainPrefix): Buffer {
   const encoded = encode(Buffer.from(message).length);
-  return Buffer.concat([Buffer.from(chainPrefix), encoded, Buffer.from(message)]);
+  return Buffer.concat([Buffer.from(prefix), encoded, Buffer.from(message)]);
 }
 
 export function decodeMessage(encodedMessage: Buffer): Buffer {

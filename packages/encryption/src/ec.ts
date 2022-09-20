@@ -23,7 +23,7 @@ import {
 import { createCipher } from './aesCipher';
 import { createHmacSha256 } from './hmacSha256';
 import { getPublicKeyFromPrivate } from './keys';
-import { hashMessage } from './messageSignature';
+import { encodeMessage, hashMessage } from './messageSignature';
 import { hashSha256Sync, hashSha512Sync } from './sha2Hash';
 import { getAesCbcOutputLength, getBase64OutputLength } from './utils';
 
@@ -525,7 +525,7 @@ interface VerifyMessageSignatureArgs {
 }
 
 /**
- * Verify message signature with recoverable public key
+ * Verify message signature (VRS format) with recoverable public key
  * @deprecated The Clarity compatible {@link verifyMessageSignatureRsv} is preferred
  */
 export function verifyMessageSignature({
@@ -540,7 +540,15 @@ export function verifyMessageSignature({
   // verify() is strict: true by default. High-s signatures are rejected, which mirrors libsecp behavior
   // Set verify options to strict: false, to support the legacy stacks implementations
   // Reference: https://github.com/paulmillr/noble-secp256k1/releases/tag/1.4.0
-  return verify(sig, hashedMsg, publicKey, { strict: false });
+  const legacyResult = verify(sig, hashedMsg, publicKey, { strict: false });
+
+  // Temporary Additional Check ++++++++++++++++++++++++++++++++++++++++++++++++
+  if (legacyResult || typeof message !== 'string') return legacyResult;
+
+  const FUTURE_PREFIX = '\x17Stacks Signed Message:\n';
+  const futureHash = Buffer.from(sha256(encodeMessage(message, FUTURE_PREFIX)));
+  return verify(sig, futureHash, publicKey, { strict: false });
+  // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 }
 
 /**
