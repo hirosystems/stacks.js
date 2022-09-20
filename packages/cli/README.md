@@ -280,15 +280,15 @@ Example:
 ```
 ### faucet
 ```shell script 
-Encrypt a 12-word backup phrase, which can be decrypted later with the `decrypt_backup_phrase` command.  The password will be prompted if not given.
+Provide free Stacks Token (STX) on testnet for the specified address
 
 Example:
 
-     # password is "asdf"
-     blockstack-cli encrypt_keychain "section amount spend resemble spray verify night immune tattoo best emotion parrot"
-     Enter password:
-     Enter password again:
-     M+DnBHYb1fgw4N3oZ+5uTEAua5bAWkgTW/SjmmBhGGbJtjOtqVV+RrLJEJOgT35hBon4WKdGWye2vTdgqDo7+HIobwJwkQtN2YF9g3zPsKk=
+      stx faucet ST3PWZ5M026785YW8YKKEH316DYPE4AC7NNTD9ADN
+      {
+        txid: '0xd33672dd4dbb0b88f733bc67b938359843123ca3be550ca87d487d067bd1b3c3',
+        transaction: 'https://explorer.stacks.co/txid/0xd33672dd4dbb0b88f733bc67b938359843123ca3be550ca87d487d067bd1b3c3?chain=testnet'
+      }
 ```
 ### get_address
 ```shell script 
