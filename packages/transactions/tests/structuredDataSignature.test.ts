@@ -1,7 +1,8 @@
 import { sha256 } from '@noble/hashes/sha256';
-import { standardPrincipalCV, stringAsciiCV, trueCV, tupleCV, uintCV } from '../src/clarity';
-import { createStacksPrivateKey } from '../src/keys';
+import { Buffer } from '@stacks/common';
 import { verifyMessageSignatureRsv } from '@stacks/encryption';
+import { standardPrincipalCV, stringAsciiCV, trueCV, tupleCV, uintCV } from '../src/clarity';
+import { createStacksPrivateKey, publicKeyFromSignatureRsv, signMessageHashRsv } from '../src/keys';
 import {
   decodeStructuredDataSignature,
   encodeStructuredData,
@@ -239,4 +240,34 @@ describe('SIP018 test vectors', () => {
     });
     expect(isSignatureVerified).toBe(true);
   });
+});
+
+test('verifyMessageSignature works for both legacy/current and future message signing prefixes', () => {
+  const privateKey = '3b444e0e243d2faccaf8ecf1dcb4aeac98e122c79b4df3eb3cc8cec3768dbe8e';
+
+  // taken from other tests via `openssl`
+  const message = 'hello world';
+  const encodedMessageHash = '664d1478d36935361c1a8eda75fce73c49a93b58e55ed7cb45c3860317814991';
+  const encodedMessageHashAlt = '619997693db23de4b92ed152444a578a134143d9ad2c0f4dff2615de9d42ad96';
+
+  const signature = signMessageHashRsv({
+    messageHash: encodedMessageHash,
+    privateKey: createStacksPrivateKey(privateKey),
+  });
+  const signatureAlt = signMessageHashRsv({
+    messageHash: encodedMessageHashAlt,
+    privateKey: createStacksPrivateKey(privateKey),
+  });
+
+  const publicKey = publicKeyFromSignatureRsv(encodedMessageHash, signature);
+  const publicKeyAlt = publicKeyFromSignatureRsv(encodedMessageHashAlt, signatureAlt);
+
+  expect(verifyMessageSignatureRsv({ message, signature: signature.data, publicKey })).toBe(true);
+  expect(
+    verifyMessageSignatureRsv({
+      message,
+      signature: signatureAlt.data,
+      publicKey: publicKeyAlt,
+    })
+  ).toBe(true);
 });
