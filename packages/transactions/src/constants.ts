@@ -126,8 +126,8 @@ enum FungibleConditionCode {
 }
 
 enum NonFungibleConditionCode {
-  DoesNotOwn = 0x10,
-  Owns = 0x11,
+  DoesNotSend = 0x10,
+  Sends = 0x11,
 }
 
 enum PostConditionPrincipalID {

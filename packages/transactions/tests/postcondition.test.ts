@@ -87,7 +87,7 @@ test('Non-fungible post condition serialization and deserialization', () => {
   const contractName = 'contract-name';
   const principal = createContractPrincipal(address, contractName);
 
-  const conditionCode = NonFungibleConditionCode.Owns;
+  const conditionCode = NonFungibleConditionCode.Sends;
 
   const assetAddress = 'SP2ZP4GJDZJ1FDHTQ963F0292PE9J9752TZJ68F21';
   const assetContractName = 'contract_name';
@@ -124,7 +124,7 @@ test('Non-fungible post condition with string IDs serialization and deserializat
   const address = 'SP2JXKMSH007NPYAQHKJPQMAQYAD90NQGTVJVQ02B';
   const contractName = 'contract-name';
 
-  const conditionCode = NonFungibleConditionCode.Owns;
+  const conditionCode = NonFungibleConditionCode.Sends;
 
   const assetAddress = 'SP2ZP4GJDZJ1FDHTQ963F0292PE9J9752TZJ68F21';
   const assetContractName = 'contract_name';
