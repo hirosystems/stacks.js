@@ -709,7 +709,7 @@ test('transferName', async () => {
   const { namespace, name } = decodeFQN(fullyQualifiedName);
   const nameTransferPostConditionOne = createNonFungiblePostCondition(
     publicKeyToAddress(getAddressVersion(network), createStacksPublicKey(publicKey)),
-    NonFungibleConditionCode.DoesNotOwn,
+    NonFungibleConditionCode.DoesNotSend,
     parseAssetInfoString(`${getBnsContractAddress(network)}.bns::names`),
     tupleCV({
       name: bufferCVFromString(name),
@@ -718,7 +718,7 @@ test('transferName', async () => {
   );
   const nameTransferPostConditionTwo = createNonFungiblePostCondition(
     newOwnerAddress,
-    NonFungibleConditionCode.Owns,
+    NonFungibleConditionCode.Sends,
     parseAssetInfoString(`${getBnsContractAddress(network)}.bns::names`),
     tupleCV({
       name: bufferCVFromString(name),
@@ -777,7 +777,7 @@ test('transferName optionalArguments', async () => {
   const { namespace, name } = decodeFQN(fullyQualifiedName);
   const nameTransferPostConditionOne = createNonFungiblePostCondition(
     publicKeyToAddress(getAddressVersion(network), createStacksPublicKey(publicKey)),
-    NonFungibleConditionCode.DoesNotOwn,
+    NonFungibleConditionCode.DoesNotSend,
     parseAssetInfoString(`${getBnsContractAddress(network)}.bns::names`),
     tupleCV({
       name: bufferCVFromString(name),
@@ -786,7 +786,7 @@ test('transferName optionalArguments', async () => {
   );
   const nameTransferPostConditionTwo = createNonFungiblePostCondition(
     newOwnerAddress,
-    NonFungibleConditionCode.Owns,
+    NonFungibleConditionCode.Sends,
     parseAssetInfoString(`${getBnsContractAddress(network)}.bns::names`),
     tupleCV({
       name: bufferCVFromString(name),
