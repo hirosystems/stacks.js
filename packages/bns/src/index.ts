@@ -708,7 +708,7 @@ export async function buildTransferNameTx({
   ];
   const postConditionSender = createNonFungiblePostCondition(
     publicKeyToAddress(getAddressVersion(network), createStacksPublicKey(publicKey)),
-    NonFungibleConditionCode.DoesNotOwn,
+    NonFungibleConditionCode.DoesNotSend,
     parseAssetInfoString(`${getBnsContractAddress(network)}.bns::names`),
     tupleCV({
       name: bufferCVFromString(name),
@@ -717,7 +717,7 @@ export async function buildTransferNameTx({
   );
   const postConditionReceiver = createNonFungiblePostCondition(
     newOwnerAddress,
-    NonFungibleConditionCode.Owns,
+    NonFungibleConditionCode.Sends,
     parseAssetInfoString(`${getBnsContractAddress(network)}.bns::names`),
     tupleCV({
       name: bufferCVFromString(name),

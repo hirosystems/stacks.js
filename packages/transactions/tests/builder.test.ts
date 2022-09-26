@@ -870,14 +870,14 @@ test('Make contract-call with post conditions', async () => {
     ),
     makeStandardNonFungiblePostCondition(
       postConditionAddress,
-      NonFungibleConditionCode.Owns,
+      NonFungibleConditionCode.Sends,
       info,
       bufferCVFromString(tokenAssetName)
     ),
     makeContractNonFungiblePostCondition(
       postConditionAddress,
       contractName,
-      NonFungibleConditionCode.DoesNotOwn,
+      NonFungibleConditionCode.DoesNotSend,
       info,
       bufferCVFromString(tokenAssetName)
     ),
