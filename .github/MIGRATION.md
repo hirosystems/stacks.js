@@ -21,10 +21,12 @@
 
 - To reduce the bundle sizes of applications using Stacks.js, we are switching from Buffer (a polyfill to match Node.js APIs) to Uint8Arrays (which Buffers use in the background anyway). [Read more...](#buffer-to-uint8array)
 - To allow message signing on Ledger hardware wallets, we are changing the message signing prefix. [Read more...]
+- Post-conditions for NFTs were renamed to be more clear: `Owns` to `Sends`, `DoesNotOwn` to `DoesNotSend`.
 
 #### Buffer to Uint8Array
 
 To make the switch easier we have introduced a bunch of methods for converting between strings and Uint8Arrays: `hexToBytes`, `bytesToHex`, `utf8ToBytes`, `bytesToUtf8`, `asciiToBytes`, `bytesToAscii`, and `concatBytes`.
+To migrate, update code using Buffers to now use Uint8Arrays.
 The following code segments are the equivalent calls using Uint8Array rather than Buffers and assuming imports from `@stacks/common` — `import { hexToBytes, bytesToHex, utf8ToBytes, bytesToUtf8, asciiToBytes, bytesToAscii, concatBytes } from "@stacks/common"`
 
 ```ts
