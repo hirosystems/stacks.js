@@ -4,16 +4,13 @@
   "publishConfig": {
     "access": "public"
   },
-  "packages": [
-    "packages/*"
-  ],
+  "changelogPreset": "conventionalcommits",
+  "packages": ["packages/*"],
   "command": {
     "bootstrap": {
       "forceLocal": true,
       "hoist": true,
-      "npmClientArgs": [
-        "--ci"
-      ]
+      "npmClientArgs": ["--ci"]
     }
   }
 }
