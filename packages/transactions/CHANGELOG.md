@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.3.7](https://github.com/hirosystems/stacks.js/compare/v4.3.6...v4.3.7) (2022-09-28)
+
+
+### Bug Fixes
+
+* correctly verify future message signing prefix ([d27e054](https://github.com/hirosystems/stacks.js/commit/d27e054f2639fcea4c873ce942d966e2aa4ca926))
+
+
+
 ## [4.3.5](https://github.com/hirosystems/stacks.js/compare/v4.3.4...v4.3.5) (2022-08-23)
 
 **Note:** Version bump only for package @stacks/transactions
