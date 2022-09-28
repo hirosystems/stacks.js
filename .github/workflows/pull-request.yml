@@ -38,7 +38,6 @@ jobs:
       - run: npx lerna publish prepatch --preid pr.$SHA --dist-tag pr --no-verify-access --no-push --no-git-tag-version --yes
         env:
           SHA: ${{ steps.git-commit.outputs.sha }}
-          SKIP_TESTS: true
       - id: published-version
         run: echo "::set-output name=version::$(cat lerna.json | jq -r '.version')"
       - uses: kyranjamie/pull-request-fixed-header@v1.0.1

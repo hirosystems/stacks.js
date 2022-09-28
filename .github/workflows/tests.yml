@@ -38,6 +38,12 @@ jobs:
       - name: Check for circular dependencies
         run: npm run madge
 
+      - name: DEBUG test build
+        run: npx lerna run build
+
+      - name: DEBUG test prepublishOnly
+        run: npx lerna run prepublishOnly --scope @stacks/encryption
+
       - name: Run tests
         run: npm run lerna run test --stream --parallel -- -- --coverage
 
