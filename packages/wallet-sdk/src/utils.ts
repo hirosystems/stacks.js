@@ -1,5 +1,5 @@
 import { bytesToHex, ChainID } from '@stacks/common';
-import { getPublicKeyFromPrivate, publicKeyToAddress, randomBytes } from '@stacks/encryption';
+import { getPublicKeyFromPrivate, publicKeyToBtcAddress, randomBytes } from '@stacks/encryption';
 import { createFetchFn, FetchFn } from '@stacks/network';
 import { GaiaHubConfig } from '@stacks/storage';
 import { Json, TokenSigner } from 'jsontokens';
@@ -83,7 +83,7 @@ export const connectToGaiaHubWithConfig = ({
 }: ConnectToGaiaOptions): GaiaHubConfig => {
   const readURL = hubInfo.read_url_prefix;
   const token = makeGaiaAuthToken({ hubInfo, privateKey, gaiaHubUrl });
-  const address = publicKeyToAddress(getPublicKeyFromPrivate(privateKey));
+  const address = publicKeyToBtcAddress(getPublicKeyFromPrivate(privateKey));
   return {
     url_prefix: readURL,
     max_file_upload_size_megabytes: 100,

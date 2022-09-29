@@ -1,5 +1,5 @@
 import { isSameOriginAbsoluteUrl } from '@stacks/common';
-import { publicKeyToAddress } from '@stacks/encryption';
+import { publicKeyToBtcAddress } from '@stacks/encryption';
 import { decodeToken, TokenVerifier } from 'jsontokens';
 import { getAddressFromDID } from './dids';
 import { fetchAppManifest } from './provider';
@@ -53,7 +53,7 @@ export function doPublicKeysMatchIssuer(token: string): boolean {
   const addressFromIssuer = getAddressFromDID(payload.iss);
 
   if (publicKeys.length === 1) {
-    const addressFromPublicKeys = publicKeyToAddress(publicKeys[0]);
+    const addressFromPublicKeys = publicKeyToBtcAddress(publicKeys[0]);
     if (addressFromPublicKeys === addressFromIssuer) {
       return true;
     }

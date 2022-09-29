@@ -63,25 +63,25 @@ console.log(decoded);
 ### Private key to address
 
 ```typescript
-import { getPublicKeyFromPrivate, publicKeyToAddress } from '@stacks/encryption';
+import { getPublicKeyFromPrivate, publicKeyToBtcAddress } from '@stacks/encryption';
 
 const privateKey = '00cdce6b5f87d38f2a830cae0da82162e1b487f07c5affa8130f01fe1a2a25fb01';
 const expectedAddress = '1WykMawQRnLh7SWmmoRL4qTDNCgAsVRF1';
 
 const publicKey = getPublicKeyFromPrivate(privateKey);
-const address = publicKeyToAddress(publicKey);
+const address = publicKeyToBtcAddress(publicKey);
 console.log(address === expectedAddress); // true
 ```
 
 ### Make private key
 
 ```typescript
-import { makeECPrivateKey, publicKeyToAddress } from '@stacks/encryption';
+import { makeECPrivateKey, publicKeyToBtcAddress } from '@stacks/encryption';
 import { SECP256K1Client } from 'jsontokens';
 
 const privateKey = makeECPrivateKey();
 // Private key is also usable with the jsontokens package
 const publicKey = SECP256K1Client.derivePublicKey(privateKey);
-const address = publicKeyToAddress(publicKey);
+const address = publicKeyToBtcAddress(publicKey);
 console.log(address);
 ```

@@ -17,7 +17,11 @@ import {
   lookupProfile,
 } from '../src';
 
-import { makeECPrivateKey, getPublicKeyFromPrivate, publicKeyToAddress } from '@stacks/encryption';
+import {
+  makeECPrivateKey,
+  getPublicKeyFromPrivate,
+  publicKeyToBtcAddress,
+} from '@stacks/encryption';
 
 import { sampleProfiles, sampleNameRecords, sampleTokenFiles } from './sampleData';
 
@@ -40,7 +44,7 @@ test('makeAuthRequest && verifyAuthRequest', async () => {
   const decodedToken = decodeToken(authRequest);
   expect(decodedToken).toBeTruthy();
 
-  const address = publicKeyToAddress(publicKey);
+  const address = publicKeyToBtcAddress(publicKey);
   const referenceDID = makeDIDFromAddress(address);
   const origin = 'http://localhost:3000';
   expect((decodedToken.payload as any).iss).toEqual(referenceDID);
@@ -172,7 +176,7 @@ test('makeAuthResponse && verifyAuthResponse', async () => {
 
   expect(decodedToken).toBeTruthy();
 
-  const address = publicKeyToAddress(publicKey);
+  const address = publicKeyToBtcAddress(publicKey);
   const referenceDID = makeDIDFromAddress(address);
   expect((decodedToken.payload as any).iss).toEqual(referenceDID);
 

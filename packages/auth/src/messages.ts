@@ -11,7 +11,7 @@ import {
   decryptECIES,
   encryptECIES,
   makeECPrivateKey,
-  publicKeyToAddress,
+  publicKeyToBtcAddress,
 } from '@stacks/encryption';
 import { SECP256K1Client, TokenSigner } from 'jsontokens';
 import { AuthScope, DEFAULT_SCOPE } from './constants';
@@ -106,7 +106,7 @@ export function makeAuthRequest(
   /* Convert the private key to a public key to an issuer */
   const publicKey = SECP256K1Client.derivePublicKey(transitPrivateKey);
   payload.public_keys = [publicKey];
-  const address = publicKeyToAddress(publicKey);
+  const address = publicKeyToBtcAddress(publicKey);
   payload.iss = makeDIDFromAddress(address);
 
   /* Sign and return the token */
@@ -197,7 +197,7 @@ export async function makeAuthResponse(
 ): Promise<string> {
   /* Convert the private key to a public key to an issuer */
   const publicKey = SECP256K1Client.derivePublicKey(privateKey);
-  const address = publicKeyToAddress(publicKey);
+  const address = publicKeyToBtcAddress(publicKey);
 
   /* See if we should encrypt with the transit key */
   let privateKeyPayload = appPrivateKey;

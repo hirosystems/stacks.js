@@ -14,7 +14,6 @@ import {
   eciesGetJsonStringLength,
   EncryptionOptions,
   getPublicKeyFromPrivate,
-  publicKeyToAddress,
   publicKeyToBtcAddress,
   signECDSA,
   verifyECDSA,
@@ -349,7 +348,7 @@ export class Storage {
           );
         throw err;
       }
-      const signerAddress = publicKeyToAddress(publicKey);
+      const signerAddress = publicKeyToBtcAddress(publicKey);
       if (gaiaAddress !== signerAddress)
         throw new SignatureVerificationError(
           `Signer pubkey address (${signerAddress}) doesn't match gaia address (${gaiaAddress})`
@@ -421,7 +420,7 @@ export class Storage {
     const signature = sigObject.signature;
     const signerPublicKey = sigObject.publicKey;
     const cipherText = sigObject.cipherText;
-    const signerAddress = publicKeyToAddress(signerPublicKey);
+    const signerAddress = publicKeyToBtcAddress(signerPublicKey);
 
     if (!signerPublicKey || !cipherText || !signature) {
       throw new SignatureVerificationError(

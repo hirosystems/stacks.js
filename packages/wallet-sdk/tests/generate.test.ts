@@ -2,8 +2,8 @@
 // Secure, audited & minimal implementation of BIP39 mnemonic phrases.
 import {
   entropyToMnemonic,
-  mnemonicToSeed,
   mnemonicToEntropy,
+  mnemonicToSeed,
   validateMnemonic,
 } from '@scure/bip39';
 // Word lists not imported by default as that would increase bundle sizes too much as in case of bitcoinjs/bip39
@@ -12,14 +12,15 @@ import {
 // Very small in size as compared to bitcoinjs/bip39 wordlist
 // Reference: https://github.com/paulmillr/scure-bip39
 import { wordlist } from '@scure/bip39/wordlists/english';
+import { bytesToHex } from '@stacks/common';
+import { TransactionVersion } from '@stacks/transactions';
 import {
   generateSecretKey,
   generateWallet,
+  getAppPrivateKey,
   getGaiaAddress,
   getStxAddress,
-  getAppPrivateKey,
 } from '../src';
-import { bytesToHex, TransactionVersion } from '@stacks/transactions';
 
 describe(generateSecretKey, () => {
   test('generates a 24 word phrase by default', () => {

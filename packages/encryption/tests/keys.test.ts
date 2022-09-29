@@ -15,7 +15,7 @@ import {
   getPublicKeyFromPrivate,
   hashSha256Sync,
   makeECPrivateKey,
-  publicKeyToAddress,
+  publicKeyToBtcAddress,
 } from '../src';
 import { hashRipemd160 } from '../src/hashRipemd160';
 
@@ -34,7 +34,7 @@ test('getPublicKeyFromPrivate matches jsontokens', () => {
   const publicKey = getPublicKeyFromPrivate(privateKey);
   const secpClientPublicKey = SECP256K1Client.derivePublicKey(privateKey, true);
 
-  expect(publicKeyToAddress(publicKey)).toEqual(publicKeyToAddress(secpClientPublicKey));
+  expect(publicKeyToBtcAddress(publicKey)).toEqual(publicKeyToBtcAddress(secpClientPublicKey));
 });
 
 test('getPublicKeyFromPrivate matches bitcoinjs', () => {
@@ -63,7 +63,7 @@ test('getPublicKeyFromPrivate with bitcoinjs private key matches bitcoinjs', () 
   expect(getPublicKeyFromPrivate(privateKey)).toEqual(bitcoinJsPublicKey);
 });
 
-test('publicKeyToAddress matches bitcoinjs', () => {
+test('publicKeyToBtcAddress matches bitcoinjs', () => {
   const privateKey = makeECPrivateKey();
   const publicKey = getPublicKeyFromPrivate(privateKey);
 
@@ -74,17 +74,17 @@ test('publicKeyToAddress matches bitcoinjs', () => {
     networks.bitcoin.pubKeyHash
   );
 
-  expect(publicKeyToAddress(publicKey)).toEqual(bitcoinJsAddress);
+  expect(publicKeyToBtcAddress(publicKey)).toEqual(bitcoinJsAddress);
 });
 
-test('publicKeyToAddress', () => {
+test('publicKeyToBtcAddress', () => {
   const privateKey = '00cdce6b5f87d38f2a830cae0da82162e1b487f07c5affa8130f01fe1a2a25fb01';
   const expectedAddress = '1WykMawQRnLh7SWmmoRL4qTDNCgAsVRF1';
-  expect(publicKeyToAddress(getPublicKeyFromPrivate(privateKey))).toEqual(expectedAddress);
+  expect(publicKeyToBtcAddress(getPublicKeyFromPrivate(privateKey))).toEqual(expectedAddress);
 
   const privateKeyUncompressed = '00cdce6b5f87d38f2a830cae0da82162e1b487f07c5affa8130f01fe1a2a25fb';
   // getPublicKeyFromPrivate always returns compressed public key
-  expect(publicKeyToAddress(getPublicKeyFromPrivate(privateKeyUncompressed))).toEqual(
+  expect(publicKeyToBtcAddress(getPublicKeyFromPrivate(privateKeyUncompressed))).toEqual(
     expectedAddress
   );
 });
