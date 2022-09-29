@@ -1,4 +1,4 @@
-import { getPublicKeyFromPrivate, publicKeyToAddress } from '@stacks/encryption';
+import { getPublicKeyFromPrivate, publicKeyToBtcAddress } from '@stacks/encryption';
 // https://github.com/paulmillr/scure-bip32
 // Secure, audited & minimal implementation of BIP32 hierarchical deterministic (HD) wallets.
 import { HDKey } from '@scure/bip32';
@@ -73,7 +73,7 @@ export interface Wallet extends WalletKeys {
 
 export const getGaiaAddress = (account: Account) => {
   const publicKey = getPublicKeyFromPrivate(account.dataPrivateKey);
-  const address = publicKeyToAddress(publicKey);
+  const address = publicKeyToBtcAddress(publicKey);
   return address;
 };
 

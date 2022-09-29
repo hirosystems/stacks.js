@@ -17,11 +17,6 @@ export { verify as verifySignature } from '@noble/secp256k1';
  */
 export const randomBytes = (bytesLength?: number): Uint8Array => utils.randomBytes(bytesLength);
 
-/**
- * @deprecated Import from `@stacks/common` instead
- */
-export { bytesToHex };
-
 export const leftPadHex = (hexString: string): string =>
   hexString.length % 2 == 0 ? hexString : `0${hexString}`;
 

@@ -1,8 +1,8 @@
+import { bytesToHex } from '@stacks/common';
 import { base58CheckDecode, base58CheckEncode } from '@stacks/encryption';
 import {
   AddressHashMode,
   BufferCV,
-  bytesToHex,
   ClarityType,
   ClarityValue,
   TupleCV,

@@ -17,7 +17,7 @@ import {
   ecSign,
   getPublicKeyFromPrivate,
   hashSha256Sync,
-  publicKeyToAddress,
+  publicKeyToBtcAddress,
   randomBytes,
   Signature,
 } from '@stacks/encryption';
@@ -215,7 +215,7 @@ export async function connectToGaiaHub(
   const hubInfo = await response.json();
   const readURL = hubInfo.read_url_prefix;
   const token = makeV1GaiaAuthToken(hubInfo, challengeSignerHex, gaiaHubUrl, associationToken);
-  const address = publicKeyToAddress(getPublicKeyFromPrivate(challengeSignerHex));
+  const address = publicKeyToBtcAddress(getPublicKeyFromPrivate(challengeSignerHex));
   return {
     url_prefix: readURL,
     max_file_upload_size_megabytes: hubInfo.max_file_upload_size_megabytes,
@@ -241,7 +241,7 @@ export async function getBucketUrl(
   const responseText = await response.text();
   const responseJSON = JSON.parse(responseText);
   const readURL = responseJSON.read_url_prefix;
-  const address = publicKeyToAddress(getPublicKeyFromPrivate(appPrivateKey));
+  const address = publicKeyToBtcAddress(getPublicKeyFromPrivate(appPrivateKey));
   const bucketUrl = `${readURL}${address}/`;
   return bucketUrl;
 }

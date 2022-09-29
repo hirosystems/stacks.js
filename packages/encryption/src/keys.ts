@@ -80,17 +80,6 @@ export function base58CheckEncode(version: number, hash: Uint8Array) {
   return base58Encode(concatBytes(new Uint8Array([version]), hash.slice(0, 20)));
 }
 
-// todo: remove @deprecated methods
-/**
- * @ignore
- * @deprecated Use {@link publicKeyToBtcAddress} instead
- */
-export function publicKeyToAddress(publicKey: string | Uint8Array) {
-  const publicKeyBytes = typeof publicKey === 'string' ? hexToBytes(publicKey) : publicKey;
-  const publicKeyHash160 = hashRipemd160(hashSha256Sync(publicKeyBytes));
-  return base58CheckEncode(BITCOIN_PUBKEYHASH, publicKeyHash160);
-}
-
 /**
  * @ignore
  */
@@ -123,16 +112,7 @@ export function ecSign(messageHash: Uint8Array, hexPrivateKey: string | Uint8Arr
 }
 
 /**
- * @deprecated use `bytesToHex` from `@stacks/common` instead
  * @ignore
- */
-export function ecPrivateKeyToHexString(privateKey: Uint8Array): string {
-  return bytesToHex(privateKey);
-}
-
-/**
- * @ignore
- * @deprecated
  */
 export function isValidPrivateKey(privateKey: string | Uint8Array): boolean {
   return utils.isValidPrivateKey(privateKeyToBytes(privateKey));

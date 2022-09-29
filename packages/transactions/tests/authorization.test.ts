@@ -11,11 +11,10 @@ import {
 } from '../src/authorization';
 import { createMessageSignature } from '../src/common';
 import { createTransactionAuthField } from '../src/signature';
-import { bytesToHex } from '../src/utils';
 
 import { AddressHashMode, AuthType, PubKeyEncoding } from '../src/constants';
 
-import { concatArray } from '@stacks/common';
+import { bytesToHex, concatArray } from '@stacks/common';
 import { BytesReader } from '../src/bytesReader';
 import { createStacksPrivateKey, createStacksPublicKey, signWithKey } from '../src/keys';
 

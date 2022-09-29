@@ -5,7 +5,7 @@ import { CLINetworkAdapter, CLI_NETWORK_OPTS, getNetwork } from '../src/network'
 import {
   ClarityAbi,
   createStacksPrivateKey,
-  publicKeyFromSignature,
+  publicKeyFromSignatureVrs,
   signWithKey,
   verifySignature,
 } from '@stacks/transactions';
@@ -362,7 +362,7 @@ describe('Subdomain Migration', () => {
     subDomainOp.signature = sig.data; // Assign signature to subDomainOp
 
     // Verify that the generated signature is valid
-    const pubKey = publicKeyFromSignature(hash, sig);
+    const pubKey = publicKeyFromSignatureVrs(hash, sig);
     // Skip the recovery params bytes from signature and then verify
     const isValid = verifySignature(subDomainOp.signature.slice(2), hash, pubKey);
 

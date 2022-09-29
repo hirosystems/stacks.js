@@ -111,11 +111,6 @@ export function publicKeyFromSignatureRsv(
   );
 }
 
-/**
- * @deprecated use {@link publicKeyFromSignatureRsv} (recommended) or {@link publicKeyFromSignatureVrs} instead
- */
-export const publicKeyFromSignature = publicKeyFromSignatureVrs;
-
 export function publicKeyFromBytes(data: Uint8Array): StacksPublicKey {
   return { type: StacksMessageType.PublicKey, data };
 }
@@ -187,7 +182,7 @@ export function signWithKey(privateKey: StacksPrivateKey, messageHash: string): 
 
 /**
  * Signs a message using a private key. The resulting signature along with the
- * original message can be verified using {@link verifyMessageSignature}
+ * original message can be verified using {@link verifyMessageSignatureRsv}
  * @returns A recoverable signature (in RSV order)
  */
 export function signMessageHashRsv({
@@ -200,12 +195,6 @@ export function signMessageHashRsv({
   const messageSignature = signWithKey(privateKey, messageHash);
   return { ...messageSignature, data: signatureVrsToRsv(messageSignature.data) };
 }
-
-/**
- * @deprecated
- * This method is now exported from `@stacks/common` {@link parseRecoverableSignatureVrs}
- */
-export const parseRecoverableSignature = parseRecoverableSignatureVrs;
 
 export function getPublicKey(privateKey: StacksPrivateKey): StacksPublicKey {
   return pubKeyfromPrivKey(privateKey.data);

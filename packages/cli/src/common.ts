@@ -1,4 +1,4 @@
-import { publicKeyToAddress } from '@stacks/encryption';
+import { publicKeyToBtcAddress } from '@stacks/encryption';
 import { pubKeyfromPrivKey } from '@stacks/transactions';
 import * as bitcoinjs from 'bitcoinjs-lib';
 import { TransactionSigner } from 'blockstack';
@@ -51,7 +51,7 @@ export function getPrivateKeyAddress(
   }
 
   const pubKey = pubKeyfromPrivKey(privateKey);
-  const btcAddress = publicKeyToAddress(pubKey.data);
+  const btcAddress = publicKeyToBtcAddress(pubKey.data);
   return network.coerceAddress(btcAddress);
 }
 

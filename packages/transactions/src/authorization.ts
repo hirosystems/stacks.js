@@ -35,7 +35,7 @@ import {
   createStacksPublicKey,
   getPublicKey,
   isCompressed,
-  publicKeyFromSignature,
+  publicKeyFromSignatureVrs,
   signWithKey,
   StacksPrivateKey,
   StacksPublicKey,
@@ -366,7 +366,7 @@ export function nextVerification(
   const sigHashPreSign = makeSigHashPreSign(initialSigHash, authType, fee, nonce);
 
   const publicKey = createStacksPublicKey(
-    publicKeyFromSignature(sigHashPreSign, signature, pubKeyEncoding)
+    publicKeyFromSignatureVrs(sigHashPreSign, signature, pubKeyEncoding)
   );
 
   const nextSigHash = makeSigHashPostSign(sigHashPreSign, publicKey, signature);
