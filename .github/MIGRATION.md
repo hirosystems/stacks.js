@@ -26,36 +26,54 @@
 #### Buffer to Uint8Array
 
 To make the switch easier we have introduced a bunch of methods for converting between strings and Uint8Arrays: `hexToBytes`, `bytesToHex`, `utf8ToBytes`, `bytesToUtf8`, `asciiToBytes`, `bytesToAscii`, and `concatBytes`.
-To migrate, update code using Buffers to now use Uint8Arrays.
+To migrate, switch `Buffer` code to instead use `Uint8Array`.
 The following code segments are the equivalent calls using Uint8Array rather than Buffers and assuming imports from `@stacks/common` — `import { hexToBytes, bytesToHex, utf8ToBytes, bytesToUtf8, asciiToBytes, bytesToAscii, concatBytes } from "@stacks/common"`
 
 ```ts
+// old:
 Buffer.from('stacks Ӿ'); // <Buffer 73 74 61 63 6b 73 20 d3 be>
+
+// new:
 utf8ToBytes('stacks Ӿ'); // Uint8Array(9) [ 115, 116, 97, 99, 107, 115, 32, 211, 190 ];
 ```
 
 ```ts
+// old:
 Buffer.from([115, 116, 97, 99, 107, 115, 32, 211, 190]).toString(); // 'stacks Ӿ'
+
+// new:
 bytesToUtf8(Uint8Array.from([115, 116, 97, 99, 107, 115, 32, 211, 190])); // 'stacks Ӿ'
 ```
 
 ```ts
+// old:
 Buffer.from('stacks $', 'ascii'); // <Buffer 73 74 61 63 6b 73 20 24>
+
+// new:
 asciiToBytes('stacks $'); // Uint8Array(8) [ 115, 116, 97, 99, 107, 115, 32, 36 ]
 ```
 
 ```ts
+// old:
 Buffer.from([115, 116, 97, 99, 107, 115, 32, 36]).toString('ascii'); // 'stacks $'
+
+// new:
 bytesToAscii(Uint8Array.from([115, 116, 97, 99, 107, 115, 32, 36])); // 'stacks $'
 ```
 
 ```ts
+// old:
 Buffer.from('deadbeef', 'hex'); // <Buffer de ad be ef>
+
+// new:
 hexToBytes('deadbeef'); // Uint8Array(4) [ 222, 173, 190, 239 ]
 ```
 
 ```ts
+// old:
 Buffer.from([222, 173, 190, 239]).toString('hex'); // 'deadbeef'
+
+// new:
 bytesToHex(Uint8Array.from([222, 173, 190, 239])); // 'deadbeef'
 ```
 
