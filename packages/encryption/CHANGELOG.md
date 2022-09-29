@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.3.8](https://github.com/hirosystems/stacks.js/compare/v4.3.7...v4.3.8) (2022-09-29)
+
+
+### Bug Fixes
+
+* add missing customizable prefixes ([a1d385c](https://github.com/hirosystems/stacks.js/commit/a1d385c39b29ad712e61223f8473400668579035))
+
+
+
 ## [4.3.7](https://github.com/hirosystems/stacks.js/compare/v4.3.6...v4.3.7) (2022-09-28)
 
 
