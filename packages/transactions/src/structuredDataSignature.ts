@@ -6,7 +6,7 @@ import { StacksMessageType } from './constants';
 import { signMessageHashRsv, StacksPrivateKey } from './keys';
 
 // Refer to SIP018 https://github.com/stacksgov/sips/
-// > Buffer.from('SIP018', 'ascii')
+// > asciiToBytes('SIP018')
 export const STRUCTURED_DATA_PREFIX = new Uint8Array([0x53, 0x49, 0x50, 0x30, 0x31, 0x38]);
 
 export function hashStructuredData(structuredData: ClarityValue): Uint8Array {

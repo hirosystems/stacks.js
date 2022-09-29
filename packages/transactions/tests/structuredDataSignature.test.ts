@@ -1,5 +1,5 @@
 import { sha256 } from '@noble/hashes/sha256';
-import { bytesToHex, hexToBytes } from '@stacks/common';
+import { asciiToBytes, bytesToHex, hexToBytes } from '@stacks/common';
 import { verifyMessageSignatureRsv } from '@stacks/encryption';
 import { standardPrincipalCV, stringAsciiCV, trueCV, tupleCV, uintCV } from '../src/clarity';
 import { createStacksPrivateKey, publicKeyFromSignatureRsv, signMessageHashRsv } from '../src/keys';
@@ -21,7 +21,8 @@ const principal1 = 'ST1SJ3DTE5DN7X54YDH5D64R3BCB6A2AG2ZQ8YPD5';
 test('prefix buffer', () => {
   // Refer to SIP018 https://github.com/stacksgov/sips/
   // "\x53\x49\x50\x30\x31\x38" is "SIP018" in ASCII
-  expect(new Uint8Array([0x53, 0x49, 0x50, 0x30, 0x31, 0x38])).toEqual(STRUCTURED_DATA_PREFIX);
+  expect(STRUCTURED_DATA_PREFIX).toEqual(new Uint8Array([0x53, 0x49, 0x50, 0x30, 0x31, 0x38]));
+  expect(asciiToBytes('SIP018')).toEqual(STRUCTURED_DATA_PREFIX);
 });
 
 describe('encodeStructuredData / decodeStructuredDataSignature', () => {
