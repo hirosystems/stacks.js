@@ -88,24 +88,24 @@ export function createStacksPublicKey(key: string): StacksPublicKey {
 }
 
 export function publicKeyFromSignatureVrs(
-  message: string,
+  messageHash: string,
   messageSignature: MessageSignature,
   pubKeyEncoding = PubKeyEncoding.Compressed
 ): string {
   const parsedSignature = parseRecoverableSignatureVrs(messageSignature.data);
   const signature = new Signature(hexToBigInt(parsedSignature.r), hexToBigInt(parsedSignature.s));
-  const point = Point.fromSignature(message, signature, parsedSignature.recoveryId);
+  const point = Point.fromSignature(messageHash, signature, parsedSignature.recoveryId);
   const compressed = pubKeyEncoding === PubKeyEncoding.Compressed;
   return point.toHex(compressed);
 }
 
 export function publicKeyFromSignatureRsv(
-  message: string,
+  messageHash: string,
   messageSignature: MessageSignature,
   pubKeyEncoding = PubKeyEncoding.Compressed
 ): string {
   return publicKeyFromSignatureVrs(
-    message,
+    messageHash,
     { ...messageSignature, data: signatureRsvToVrs(messageSignature.data) },
     pubKeyEncoding
   );
