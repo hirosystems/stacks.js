@@ -783,7 +783,6 @@ test('get stacking status', async () => {
   expect(callReadOnlyFunction).toHaveBeenCalledWith(expectedReadOnlyFunctionCallOptions);
 
   expect(stackingStatus.stacked).toEqual(true);
-  expect(stackingStatus.details.amount_microstx).toEqual(amountMicrostx.toString());
   expect(stackingStatus.details.first_reward_cycle).toEqual(firstRewardCycle);
   expect(stackingStatus.details.lock_period).toEqual(lockPeriod);
   expect(bytesToHex(stackingStatus.details.pox_address.version)).toEqual(version);

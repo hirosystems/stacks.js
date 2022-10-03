@@ -20,15 +20,16 @@
     "typecheck:watch": "npm run typecheck -- --watch"
   },
   "dependencies": {
+    "@scure/base": "^1.1.1",
     "@stacks/common": "^5.0.0",
     "@stacks/encryption": "^5.0.0",
     "@stacks/network": "^5.0.0",
-    "@scure/base": "^1.1.1",
     "@stacks/stacks-blockchain-api-types": "^0.61.0",
     "@stacks/transactions": "^5.0.2",
     "bs58": "^5.0.0"
   },
   "devDependencies": {
+    "@stacks/blockchain-api-client": "^5.0.1",
     "@types/jest": "^26.0.22",
     "jest": "^26.6.3",
     "jest-fetch-mock": "^3.0.3",

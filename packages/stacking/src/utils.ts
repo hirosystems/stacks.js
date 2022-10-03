@@ -9,7 +9,16 @@ import {
   tupleCV,
   TupleCV,
 } from '@stacks/transactions';
-import { PoXAddressVersion, StackingErrors } from './constants';
+import {
+  B58_ADDR_PREFIXES,
+  BitcoinNetworkVersion,
+  PoXAddressVersion,
+  SegwitPrefix,
+  SEGWIT_ADDR_PREFIXES,
+  SEGWIT_V0,
+  SEGWIT_V1,
+  StackingErrors,
+} from './constants';
 
 export class InvalidAddressError extends Error {
   innerError?: Error;
@@ -24,17 +33,6 @@ export class InvalidAddressError extends Error {
     }
   }
 }
-
-export const BitcoinNetworkVersion = {
-  mainnet: {
-    P2PKH: 0x00, // 0
-    P2SH: 0x05, // 5
-  },
-  testnet: {
-    P2PKH: 0x6f, // 111
-    P2SH: 0xc4, // 196
-  },
-} as const;
 
 /** @ignore */
 export function btcAddressVersionToLegacyHashMode(btcAddressVersion: number): PoXAddressVersion {
@@ -52,25 +50,18 @@ export function btcAddressVersionToLegacyHashMode(btcAddressVersion: number): Po
   }
 }
 
-type SupportedNativeByteLength = 20 | 32;
-
 /** @ignore */
 function nativeAddressToSegwitVersion(
   witnessVersion: number,
-  dataLength: SupportedNativeByteLength
+  dataLength: number
 ): PoXAddressVersion {
-  switch ([witnessVersion, dataLength]) {
-    case [0, 20]:
-      return PoXAddressVersion.NativeP2WPKH;
-    case [0, 32]:
-      return PoXAddressVersion.NativeP2WSH;
-    case [1, 32]:
-      return PoXAddressVersion.NativeP2TR;
-    default:
-      throw new Error(
-        'Invalid native segwit witness version and byte length. Currently, only P2WPKH, P2WSH, and P2TR are supported.'
-      );
-  }
+  if (witnessVersion === SEGWIT_V0 && dataLength === 20) return PoXAddressVersion.P2WPKH;
+  if (witnessVersion === SEGWIT_V0 && dataLength === 32) return PoXAddressVersion.P2WSH;
+  if (witnessVersion === SEGWIT_V1 && dataLength === 32) return PoXAddressVersion.P2TR;
+
+  throw new Error(
+    'Invalid native segwit witness version and byte length. Currently, only P2WPKH, P2WSH, and P2TR are supported.'
+  );
 }
 
 /** @ignore */
@@ -92,7 +83,7 @@ function bech32Decode(btcAddress: string) {
 
   return {
     witnessVersion,
-    data: Uint8Array.from(bech32.fromWords(bech32Words.slice(1))),
+    data: bech32.fromWords(bech32Words.slice(1)),
   };
 }
 
@@ -105,11 +96,14 @@ function bech32MDecode(btcAddress: string) {
 
   return {
     witnessVersion,
-    data: Uint8Array.from(bech32m.fromWords(bech32MWords.slice(1))),
+    data: bech32m.fromWords(bech32MWords.slice(1)),
   };
 }
 
-function nativeSegwitDecode(btcAddress: string): { witnessVersion: number; data: Uint8Array } {
+function decodeNativeSegwitBtcAddress(btcAddress: string): {
+  witnessVersion: number;
+  data: Uint8Array;
+} {
   try {
     return bech32Decode(btcAddress);
   } catch (_) {}
@@ -120,32 +114,23 @@ function nativeSegwitDecode(btcAddress: string): { witnessVersion: number; data:
   }
 }
 
-export function decodeBtcAddress(btcAddress: string): {
-  version: PoXAddressVersion;
-  data: Uint8Array;
-} {
-  try {
+export function decodeBtcAddress(btcAddress: string): { version: number; data: Uint8Array } {
+  if (B58_ADDR_PREFIXES.test(btcAddress)) {
     const b58 = base58CheckDecode(btcAddress);
     const addressVersion = btcAddressVersionToLegacyHashMode(b58.version);
     return {
       version: addressVersion,
       data: b58.hash,
     };
-  } catch (_) {}
-
-  try {
-    const b32 = nativeSegwitDecode(btcAddress);
-    const addressVersion = nativeAddressToSegwitVersion(
-      b32.witnessVersion,
-      b32.data.length as SupportedNativeByteLength
-    );
+  } else if (SEGWIT_ADDR_PREFIXES.test(btcAddress)) {
+    const b32 = decodeNativeSegwitBtcAddress(btcAddress);
+    const addressVersion = nativeAddressToSegwitVersion(b32.witnessVersion, b32.data.length);
     return {
       version: addressVersion,
       data: b32.data,
     };
-  } catch (innerError) {
-    throw new InvalidAddressError(btcAddress, innerError as Error);
   }
+  throw new Error('Unkown BTC address prefix.');
 }
 
 export function extractPoxAddressFromClarityValue(poxAddrClarityValue: ClarityValue) {
@@ -227,9 +212,57 @@ export function rightPad(array: Uint8Array, minLength: number) {
 export function poxAddressToTuple(poxAddress: string) {
   const { version, data } = decodeBtcAddress(poxAddress);
   const versionBuff = bufferCV(bigIntToBytes(BigInt(version), 1));
-  const hashBuff = bufferCV(rightPad(data, 32));
+  const hashBuff = bufferCV(rightPad(data, 20));
   return tupleCV({
     version: versionBuff,
     hashbytes: hashBuff,
   });
+}
+
+function legacyHashModeToBtcAddressVersion(
+  hashMode: PoXAddressVersion,
+  network: 'mainnet' | 'testnet'
+): number {
+  if (hashMode === PoXAddressVersion.P2SHP2WPKH || hashMode === PoXAddressVersion.P2SHP2WSH) {
+    // P2SHP2WPKH and P2SHP2WSH are treated as P2SH for the sender
+    hashMode = PoXAddressVersion.P2SH;
+  }
+  if (hashMode === PoXAddressVersion.P2PKH && network === 'mainnet') {
+    return BitcoinNetworkVersion.mainnet.P2PKH;
+  } else if (hashMode === PoXAddressVersion.P2PKH && network === 'testnet') {
+    return BitcoinNetworkVersion.testnet.P2PKH;
+  } else if (hashMode === PoXAddressVersion.P2SH && network === 'mainnet') {
+    return BitcoinNetworkVersion.mainnet.P2SH;
+  } else if (hashMode === PoXAddressVersion.P2SH && network === 'testnet') {
+    return BitcoinNetworkVersion.testnet.P2SH;
+  }
+  throw new Error('Invalid pox address version');
+}
+
+export function poxAddressToBtcAddress(
+  version: number,
+  hashBytes: Uint8Array,
+  network: 'mainnet' | 'testnet'
+): string {
+  if (!['mainnet', 'testnet'].includes(network)) throw new Error('Invalid network.');
+
+  switch (version) {
+    case PoXAddressVersion.P2PKH:
+    case PoXAddressVersion.P2SH:
+    case PoXAddressVersion.P2SHP2WPKH:
+    case PoXAddressVersion.P2SHP2WSH: {
+      const btcAddrVersion = legacyHashModeToBtcAddressVersion(version, network);
+      return base58CheckEncode(btcAddrVersion, hashBytes);
+    }
+    case PoXAddressVersion.P2WPKH:
+    case PoXAddressVersion.P2WSH: {
+      const words = bech32.toWords(hashBytes);
+      return bech32.encode(SegwitPrefix[network], [SEGWIT_V0, ...words]);
+    }
+    case PoXAddressVersion.P2TR: {
+      const words = bech32m.toWords(hashBytes);
+      return bech32m.encode(SegwitPrefix[network], [SEGWIT_V1, ...words]);
+    }
+  }
+  throw new Error(`Unexpected address version: ${version}`);
 }

@@ -1,2 +1,2 @@
-// const fetchMock = require('jest-fetch-mock');
-// fetchMock.enableFetchMocks();
+const fetchMock = require('jest-fetch-mock');
+fetchMock.enableFetchMocks();

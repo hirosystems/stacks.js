@@ -1,16 +1,66 @@
+import { Configuration, TransactionsApi } from '@stacks/blockchain-api-client';
 import { StacksMainnet, StacksTestnet } from '@stacks/network';
-import { StackingClient } from '@stacks/stacking';
 import fetchMock from 'jest-fetch-mock';
 
+import { StackingClient } from '../src';
+
+import { apiMock, mockMatch } from './apiMock';
+
+const API_URL = 'https://stacks.tel';
+// const API_URL = 'http://localhost:3999';
+
+// const infoApi = new InfoApi(new Configuration({ basePath: API_URL }));
+// const blockApi = new BlocksApi(new Configuration({ basePath: API_URL }));
+const txApi = new TransactionsApi(new Configuration({ basePath: API_URL }));
+
+const network = new StacksTestnet({ url: API_URL });
+const client = new StackingClient('', network); // anonymouse client
+
+function sleep(ms: number) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+async function waitForTxIdSuccess(txId: string) {
+  const maxIterations = 120;
+  for (let i = 0; i < maxIterations; i++) {
+    try {
+      const txInfo = (await txApi.getTransactionById({ txId })) as any;
+      if (txInfo?.tx_status == 'success') {
+        return txInfo;
+      }
+    } catch (_) {}
+    console.log(`waiting (${i})`);
+    await sleep(1000);
+  }
+}
+
+async function waitForNextBlock(burnBlockId: number) {
+  const maxIterations = 120;
+  let current;
+  for (let i = 0; i < maxIterations; i++) {
+    try {
+      const poxInfo = (await client.getPoxInfo()) as any;
+      current = poxInfo?.current_burnchain_block_height;
+      if (current && current > burnBlockId) {
+        console.log('-> next block reached');
+        return poxInfo;
+      }
+    } catch (_) {}
+    console.log(`waiting (${i}) for: ${burnBlockId}, current: ${current}`);
+    await sleep(1000);
+  }
+}
+
 beforeEach(() => {
+  jest.setTimeout(60_000);
   fetchMock.resetMocks();
   jest.resetModules();
 });
 
-test('getting current period (stacks.tel)', async () => {
+test('getting current period', async () => {
   const address = 'STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6';
 
-  const network = new StacksTestnet({ url: 'https://stacks.tel' });
+  const network = new StacksTestnet({ url: API_URL });
   const client = new StackingClient(address, network);
 
   const period = await client.getCurrentPoxOperationPeriod();
@@ -62,7 +112,7 @@ test('getting current period (1) -- mainnet before 2.1 fork', async () => {
 });
 
 test('getting current period (2) -- after 2.1 fork, before first pox-2 cycle', async () => {
-  const network = new StacksTestnet({ url: 'https://stacks.tel' });
+  const network = new StacksTestnet({ url: API_URL });
   const client = new StackingClient('', network);
 
   fetchMock.once(
@@ -120,158 +170,160 @@ test('getting current period (2) -- after 2.1 fork, before first pox-2 cycle', a
 test('getting current period (3)', async () => {
   const address = 'STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6';
 
-  const network = new StacksTestnet({ url: 'https://stacks.tel' });
+  const network = new StacksTestnet({ url: API_URL });
   const client = new StackingClient(address, network);
 
   const period = await client.getCurrentPoxOperationPeriod();
   expect(period).toEqual(3);
 });
 
-test('check stacking eligibility true', async () => {
+test('check stacking eligibility (true)', async () => {
+  fetchMock.dontMock();
+
   const address = 'STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6';
   const poxAddress = '1Xik14zRm29UsyS6DjhYg4iZeZqsDa8D3';
 
-  const network = new StacksTestnet({ url: 'https://stacks.tel' });
+  const network = new StacksTestnet({ url: API_URL });
 
   const client = new StackingClient(address, network);
 
-  // fetchMock.mockResponse(request => {
-  //   const url = request.url;
-  //   if (url.endsWith('pox')) {
-  //     return Promise.resolve({
-  //       body: JSON.stringify(poxInfo),
-  //       status: 200,
-  //     });
-  //   } else {
-  //     return Promise.resolve({
-  //       body: JSON.stringify(balanceInfo),
-  //       status: 200,
-  //     });
-  //   }
-  // });
-
-  const cycles = 3;
+  const cycles = 1;
   const stackingEligibility = await client.canStack({ poxAddress, cycles });
 
-  expect(fetchMock.mock.calls.length).toEqual(2);
+  expect(fetchMock.mock.calls.length).toEqual(3);
   expect(fetchMock.mock.calls[0][0]).toEqual(network.getAccountApiUrl(address));
   expect(fetchMock.mock.calls[1][0]).toEqual(network.getPoxInfoUrl());
+  expect(fetchMock.mock.calls[2][0]).toContain('/pox-2/can-stack-stx');
   expect(stackingEligibility.eligible).toBe(true);
 });
 
-// test('check stacking eligibility false bad cycles', async () => {
-//   const address = 'ST3XKKN4RPV69NN1PHFDNX3TYKXT7XPC4N8KC1ARH';
-//   const poxAddress = '1Xik14zRm29UsyS6DjhYg4iZeZqsDa8D3';
-//   const network = new StacksTestnet();
+test('check stacking eligibility (false)', async () => {
+  fetchMock.mockIf(mockMatch.ALL, apiMock);
 
-//   const expectedErrorString = StackingErrors[StackingErrors.ERR_STACKING_INVALID_LOCK_PERIOD];
-//   const functionCallResponse = responseErrorCV(intCV(2));
-//   const callReadOnlyFunction = jest.fn().mockResolvedValue(functionCallResponse);
+  const address = 'ST162GBCTD9ESBF09XC2T63NCX6ZKS42ZPWGXZ6VH';
+  const poxAddress = 'mnTdnFyjxRomWaSLp4fNGSa9Gyg9XJo4j4';
 
-//   jest.mock('@stacks/transactions', () => ({
-//     ...jest.requireActual('@stacks/transactions'),
-//     callReadOnlyFunction,
-//   }));
-//   // eslint-disable-next-line @typescript-eslint/no-var-requires
-//   const { StackingClient } = require('../src'); // needed for jest.mock module
-//   const client = new StackingClient(address, network);
+  const network = new StacksTestnet({ url: API_URL });
+  const client = new StackingClient(address, network);
 
-//   fetchMock.mockResponse(request => {
-//     const url = request.url;
-//     if (url.endsWith('pox')) {
-//       return Promise.resolve({
-//         body: JSON.stringify(poxInfo),
-//         status: 200,
-//       });
-//     } else {
-//       return Promise.resolve({
-//         body: JSON.stringify(balanceInfo),
-//         status: 200,
-//       });
-//     }
-//   });
+  const cycles = 1;
+  const stackingEligibility = await client.canStack({ poxAddress, cycles });
 
-//   const invalidCycles = 150;
-//   const stackingEligibility = await client.canStack({ poxAddress, cycles: invalidCycles });
+  expect(fetchMock.mock.calls.length).toEqual(3);
+  expect(fetchMock.mock.calls[0][0]).toEqual(network.getAccountApiUrl(address));
+  expect(fetchMock.mock.calls[1][0]).toEqual(network.getPoxInfoUrl());
+  expect(fetchMock.mock.calls[2][0]).toContain('/pox-2/can-stack-stx');
+  expect(stackingEligibility.eligible).toBe(false);
+  expect(stackingEligibility.reason).toBe('ERR_STACKING_THRESHOLD_NOT_MET');
+});
 
-//   expect(fetchMock.mock.calls.length).toEqual(2);
-//   expect(fetchMock.mock.calls[0][0]).toEqual(network.getAccountApiUrl(address));
-//   expect(fetchMock.mock.calls[1][0]).toEqual(network.getPoxInfoUrl());
-//   expect(stackingEligibility.eligible).toBe(false);
-//   expect(stackingEligibility.reason).toBe(expectedErrorString);
-// });
+test('stack and extend stx', async () => {
+  fetchMock.dontMock();
 
-// test('stack stx', async () => {
-//   const address = 'ST3XKKN4RPV69NN1PHFDNX3TYKXT7XPC4N8KC1ARH';
-//   const poxAddress = '1Xik14zRm29UsyS6DjhYg4iZeZqsDa8D3';
-//   const network = new StacksTestnet();
-//   const amountMicroStx = BigInt(100000000000);
-//   const cycles = 10;
-//   const privateKey = 'd48f215481c16cbe6426f8e557df9b78895661971d71735126545abddcd5377001';
-//   const burnBlockHeight = 2000;
+  const privateKey = 'cb3df38053d132895220b9ce471f6b676db5b9bf0b4adefb55f2118ece2478df01';
+  const address = 'STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6';
+  const poxAddress = '1Xik14zRm29UsyS6DjhYg4iZeZqsDa8D3';
 
-//   const transaction = { serialize: () => 'mocktxhex' };
-//   const makeContractCall = jest.fn().mockResolvedValue(transaction);
-//   const broadcastResponse = JSON.stringify({ txid: 'mocktxid' });
-//   const broadcastTransaction = jest.fn().mockResolvedValue(broadcastResponse);
+  const network = new StacksTestnet({ url: API_URL });
+  const client = new StackingClient(address, network);
 
-//   jest.mock('@stacks/transactions', () => ({
-//     ...jest.requireActual('@stacks/transactions'),
-//     makeContractCall,
-//     broadcastTransaction,
-//   }));
+  const poxInfo = await client.getPoxInfo();
 
-//   fetchMock.mockResponse(() => {
-//     return Promise.resolve({
-//       body: JSON.stringify(poxInfo),
-//       status: 200,
-//     });
-//   });
+  const BEGIN_LOCK_HEIGHT = (poxInfo.current_burnchain_block_height as number) + 2;
+  const stackingResult = await client.stack({
+    amountMicroStx: BigInt(poxInfo.min_amount_ustx),
+    burnBlockHeight: BEGIN_LOCK_HEIGHT,
+    cycles: 10,
+    poxAddress,
+    privateKey,
+  });
 
-//   // eslint-disable-next-line @typescript-eslint/no-var-requires
-//   const { StackingClient } = require('../src'); // needed for jest.mock module
-//   const client = new StackingClient(address, network);
+  await waitForTxIdSuccess(stackingResult.txid);
+  await waitForNextBlock(BEGIN_LOCK_HEIGHT + 2);
 
-//   const stackingResults = await client.stack({
-//     amountMicroStx,
-//     poxAddress,
-//     cycles,
-//     privateKey,
-//     burnBlockHeight,
-//   });
+  const initialStatus = await client.getStatus();
+  if (!initialStatus.stacked) throw Error;
 
-//   const { version, hash } = base58CheckDecode(poxAddress);
-//   const versionBuffer = bufferCV(bigIntToBytes(BigInt(version), 1));
-//   const hashbytes = bufferCV(hash);
-//   const poxAddressCV = tupleCV({
-//     hashbytes,
-//     version: versionBuffer,
-//   });
+  const EXTEND_BY = 2;
+  const extendResult = await client.stackExtend({
+    extendCycles: EXTEND_BY,
+    poxAddress,
+    privateKey,
+  });
 
-//   const expectedContractCallOptions = {
-//     contractAddress: poxInfo.contract_id.split('.')[0],
-//     contractName: poxInfo.contract_id.split('.')[1],
-//     functionName: 'stack-stx',
-//     functionArgs: [
-//       uintCV(amountMicroStx.toString(10)),
-//       poxAddressCV,
-//       uintCV(burnBlockHeight),
-//       uintCV(cycles),
-//     ],
-//     validateWithAbi: true,
-//     network,
-//     senderKey: privateKey,
-//     anchorMode: AnchorMode.Any,
-//   };
+  await waitForTxIdSuccess(extendResult.txid);
 
-//   expect(fetchMock.mock.calls[0][0]).toEqual(network.getPoxInfoUrl());
-//   expect(makeContractCall).toHaveBeenCalledTimes(1);
-//   expect(makeContractCall).toHaveBeenCalledWith(expectedContractCallOptions);
-//   expect(broadcastTransaction).toHaveBeenCalledTimes(1);
-//   expect(broadcastTransaction).toHaveBeenCalledWith(transaction, network);
-//   expect(stackingResults).toEqual(broadcastResponse);
-//   expect(isPoxAbiValid(expectedContractCallOptions)).toBe(true);
-// });
+  const finalStatus = await client.getStatus();
+  if (!finalStatus.stacked) throw Error;
+
+  const expectedHeigth =
+    initialStatus?.details.unlock_height + EXTEND_BY * poxInfo.reward_cycle_length;
+  expect(finalStatus?.details.unlock_height).toBe(expectedHeigth);
+});
+
+test('stack stx', async () => {
+  fetchMock.dontMock();
+
+  const privateKey = 'cb3df38053d132895220b9ce471f6b676db5b9bf0b4adefb55f2118ece2478df01';
+  const address = 'STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6';
+  const poxAddress = '1Xik14zRm29UsyS6DjhYg4iZeZqsDa8D3';
+
+  const network = new StacksTestnet({ url: API_URL });
+  const client = new StackingClient(address, network);
+
+  const poxInfo = await client.getPoxInfo();
+
+  const stackingResult = await client.stack({
+    amountMicroStx: BigInt(poxInfo.min_amount_ustx),
+    burnBlockHeight: (poxInfo.current_burnchain_block_height as number) + 1,
+    cycles: 2,
+    poxAddress,
+    privateKey,
+  });
+  console.log('stackingResult', stackingResult);
+});
+
+test('tmp poxinfo', async () => {
+  fetchMock.dontMock();
+
+  console.log(await client.getPoxInfo());
+});
+
+test('tmp account stacking status', async () => {
+  fetchMock.dontMock();
+
+  const address = 'STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6';
+  const network = new StacksTestnet({ url: API_URL });
+  const client = new StackingClient(address, network);
+
+  console.log(await client.getStatus());
+});
+
+test('tmp account balance', async () => {
+  fetchMock.dontMock();
+
+  const address = 'STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6';
+  const network = new StacksTestnet({ url: API_URL });
+  const client = new StackingClient(address, network);
+
+  console.log(await client.getAccountBalance());
+});
+
+test('tmp state', async () => {
+  fetchMock.dontMock();
+  const address = 'STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6';
+  const network = new StacksTestnet({ url: API_URL });
+  const client = new StackingClient(address, network);
+
+  console.log(await client.getAccountStatus());
+  console.log(await client.getAccountBalance());
+  console.log(await client.getStatus());
+  console.log('seconds', await client.getSecondsUntilNextCycle());
+  console.log(
+    'current_burnchain_block_height',
+    (await client.getPoxInfo()).current_burnchain_block_height
+  );
+});
 
 // test('delegate stx', async () => {
 //   const address = 'ST3XKKN4RPV69NN1PHFDNX3TYKXT7XPC4N8KC1ARH';
@@ -753,7 +805,6 @@ test('check stacking eligibility true', async () => {
 //   expect(callReadOnlyFunction).toHaveBeenCalledWith(expectedReadOnlyFunctionCallOptions);
 
 //   expect(stackingStatus.stacked).toEqual(true);
-//   expect(stackingStatus.details.amount_microstx).toEqual(amountMicrostx.toString());
 //   expect(stackingStatus.details.first_reward_cycle).toEqual(firstRewardCycle);
 //   expect(stackingStatus.details.lock_period).toEqual(lockPeriod);
 //   expect(bytesToHex(stackingStatus.details.pox_address.version)).toEqual(version);

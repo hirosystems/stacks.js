@@ -42,6 +42,9 @@ export async function fetchWrapper(input: RequestInfo, init?: RequestInit): Prom
   Object.assign(fetchOpts, init, defaultFetchOpts);
 
   const fetchResult = await fetch(input, fetchOpts);
+  // todo: remove (testing) http logging
+  const copy = fetchResult.clone();
+  console.log(`=> fetch "${input}":`, JSON.stringify(await copy.json(), null, 1));
   return fetchResult;
 }
 

@@ -67,7 +67,6 @@ export type StackerInfo =
   | {
       stacked: true;
       details: {
-        amount_microstx: string;
         first_reward_cycle: number;
         lock_period: number;
         unlock_height: number;
@@ -432,6 +431,7 @@ export class StackingClient {
     const tx = await makeContractCall({
       ...txOptions,
       senderKey: privateKey,
+      fee: 10000, // todo: remove
     });
 
     return broadcastTransaction(tx, txOptions.network as StacksNetwork);
@@ -459,6 +459,7 @@ export class StackingClient {
     const tx = await makeContractCall({
       ...txOptions,
       senderKey: privateKey,
+      fee: 10000, // todo: remove
     });
 
     return broadcastTransaction(tx, txOptions.network as StacksNetwork);
@@ -767,7 +768,6 @@ export class StackingClient {
         const someCV = responseCV;
         const tupleCV: TupleCV = someCV.value as TupleCV;
         const poxAddress: TupleCV = tupleCV.data['pox-addr'] as TupleCV;
-        const amountMicroStx: UIntCV = tupleCV.data['amount-ustx'] as UIntCV;
         const firstRewardCycle: UIntCV = tupleCV.data['first-reward-cycle'] as UIntCV;
         const lockPeriod: UIntCV = tupleCV.data['lock-period'] as UIntCV;
         const version: BufferCV = poxAddress.data['version'] as BufferCV;
@@ -776,7 +776,6 @@ export class StackingClient {
         return {
           stacked: true,
           details: {
-            amount_microstx: amountMicroStx.value.toString(),
             first_reward_cycle: Number(firstRewardCycle.value),
             lock_period: Number(lockPeriod.value),
             unlock_height: account.unlock_height,
