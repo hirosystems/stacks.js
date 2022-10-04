@@ -459,8 +459,8 @@ const contractFungiblePostCondition = makeContractFungiblePostCondition(
 ### Non-fungible token post condition
 
 > **Warning**
-> The post-condition codes for NFTs are currently misleading. The Stacks blockchain's post-condition processor does NOT check ownership.
-> It checks whether or not a principal **sent** or **did not send** an NFT.
+> The Stacks blockchain's post-condition processor can NOT check ownership.
+> It checks whether or not a principal **will send** or **will not send** an NFT.
 > Post-conditions can NOT verify anything about the recipient of an asset.
 > If you want to verify conditions about asset recipients, you will need to use [Clarity](https://docs.stacks.co/docs/write-smart-contracts/).
 

@@ -8,7 +8,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 ### ⚠ BREAKING CHANGES
 
-* Post-conditions for NFTs were renamed to be more clear: `Owns` to `Sends`, `DoesNotOwn` to `DoesNotSend`.
+* Post-conditions for NFTs were renamed to be more clear: `Owns` to `DoesNotSend`, `DoesNotOwn` to `Sends`.
 * **encryption:** The message signing prefix was changed from `Stacks Message Signing` to `Stacks Signed Message`.
 * remove previously deprecated functions
 * Removes compatibility with `bip32` package from @stacks/wallet-sdk. Now all derivation methods only rely on HDKey from @scure/bip32.

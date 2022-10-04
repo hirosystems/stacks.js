@@ -21,7 +21,7 @@
 
 - To reduce the bundle sizes of applications using Stacks.js, we are switching from Buffer (a polyfill to match Node.js APIs) to Uint8Arrays (which Buffers use in the background anyway). [Read more...](#buffer-to-uint8array)
 - To allow message signing on Ledger hardware wallets, we are changing the message signing prefix. [Read more...]
-- Post-conditions for NFTs were renamed to be more clear: `Owns` to `Sends`, `DoesNotOwn` to `DoesNotSend`.
+- Post-conditions for NFTs were renamed to be more clear: `Owns` to `DoesNotSend`, `DoesNotOwn` to `Sends`.
 
 #### Buffer to Uint8Array
 
