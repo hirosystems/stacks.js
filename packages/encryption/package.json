@@ -32,6 +32,7 @@
   },
   "devDependencies": {
     "@peculiar/webcrypto": "^1.1.6",
+    "@stacks/transactions": "^5.0.1",
     "@types/bs58check": "^2.1.0",
     "@types/elliptic": "^6.4.12",
     "@types/jest": "^26.0.22",
