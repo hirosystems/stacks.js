@@ -1,6 +1,6 @@
 {
   "name": "@stacks/storage",
-  "version": "5.0.0",
+  "version": "5.0.1",
   "description": "Stacks storage library",
   "license": "MIT",
   "author": "Hiro Systems PBC (https://hiro.so)",
@@ -20,7 +20,7 @@
     "typecheck:watch": "npm run typecheck -- --watch"
   },
   "dependencies": {
-    "@stacks/auth": "^5.0.0",
+    "@stacks/auth": "^5.0.1",
     "@stacks/common": "^5.0.0",
     "@stacks/encryption": "^5.0.0",
     "@stacks/network": "^5.0.0",
