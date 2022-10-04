@@ -18,7 +18,7 @@
     "test:watch": "jest --watch --coverage=false"
   },
   "dependencies": {
-    "@scure/bip32": "^1.1.0",
+    "@scure/bip32": "^1.1.1",
     "@scure/bip39": "^1.1.0",
     "@stacks/auth": "^5.0.3",
     "@stacks/blockchain-api-client": "4.0.1",
