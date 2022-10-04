@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.0.1](https://github.com/blockstack/stacks.js/compare/v5.0.0...v5.0.1) (2022-10-04)
+
+
+### Bug Fixes
+
+* rename incorrect nft post-condition codes ([dddeb68](https://github.com/blockstack/stacks.js/commit/dddeb6891b5ff2f6c2d2a7eb089c850a9a8c32b7))
+
+
+
 ## [5.0.0](https://github.com/blockstack/stacks.js/compare/v4.3.8...v5.0.0) (2022-09-30)
 
 
