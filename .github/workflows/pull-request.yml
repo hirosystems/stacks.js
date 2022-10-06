@@ -1,5 +1,10 @@
 name: pull-request
-on: [pull_request, workflow_dispatch]
+on:
+  pull_request:
+    paths-ignore:
+      - "**.md"
+
+  workflow_dispatch:
 
 jobs:
   pre-run:
