@@ -25,7 +25,7 @@ This repo is home to most of the stacks.js libraries, which provide everything y
 #### Others
 
 - [`@stacks/cli`](https://github.com/hirosystems/stacks.js/tree/master/packages/cli) Command line interface to interact with auth, storage and Stacks transactions.
-- [`@stacks/keychain`](https://github.com/hirosystems/stacks.js/tree/master/packages/keychain) _**DEPRECATED:** replaced by `@stacks/wallet-sdk`_
+- `@stacks/keychain` _**DEPRECATED:** replaced by [`@stacks/wallet-sdk`](https://github.com/hirosystems/stacks.js/tree/master/packages/wallet-sdk)_
 
 See the respective `README` in each package directory for installation instructions and usage.
 
