@@ -7,7 +7,7 @@
 
 export interface PublicPersonProfile {
   '@context'?: string;
-  '@type'?: string;
+  '@type': string;
   '@id'?: string;
   name?: string;
   givenName?: string;
