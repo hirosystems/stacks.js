@@ -475,7 +475,7 @@ import {
 
 // With a standard principal
 const postConditionAddress = 'SP2ZD731ANQZT6J4K3F5N8A40ZXWXC1XFXHVVQFKE';
-const postConditionCode = NonFungibleConditionCode.Sends;
+const postConditionCode = NonFungibleConditionCode.DoesNotSend;
 const assetAddress = 'SP62M8MEFH32WGSB7XSF9WJZD7TQB48VQB5ANWSJ';
 const assetContractName = 'test-asset-contract';
 const assetName = 'test-asset';
