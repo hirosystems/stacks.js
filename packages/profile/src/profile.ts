@@ -24,6 +24,7 @@ import * as inspector from 'schema-inspector';
 
 import { Logger } from '@stacks/common';
 import { createFetchFn, FetchFn } from '@stacks/network';
+import { PublicPersonProfile } from './types';
 
 const schemaDefinition: { [key: string]: any } = {
   type: 'object',
@@ -165,7 +166,7 @@ const personSchemaDefinition = {
  * @ignore
  */
 export class Person extends Profile {
-  constructor(profile = {}) {
+  constructor(profile: PublicPersonProfile = {}) {
     super(profile);
     this._profile = Object.assign(
       {},

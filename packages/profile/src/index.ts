@@ -14,3 +14,5 @@ export {
   verifyProfileToken,
   extractProfile,
 } from './profileTokens';
+
+export { PublicPersonProfile } from './types';
