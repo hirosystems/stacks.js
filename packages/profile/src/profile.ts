@@ -166,7 +166,7 @@ const personSchemaDefinition = {
  * @ignore
  */
 export class Person extends Profile {
-  constructor(profile: PublicPersonProfile = {}) {
+  constructor(profile: PublicPersonProfile = { '@type': 'Person' }) {
     super(profile);
     this._profile = Object.assign(
       {},

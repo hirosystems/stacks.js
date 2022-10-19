@@ -15,4 +15,4 @@ export {
   extractProfile,
 } from './profileTokens';
 
-export { PublicPersonProfile } from './types';
+export { PublicProfile, PublicPersonProfile } from './types';
