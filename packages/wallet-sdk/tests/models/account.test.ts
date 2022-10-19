@@ -1,5 +1,9 @@
 import { decryptPrivateKey } from '@stacks/auth';
-import { getPublicKeyFromPrivate, makeECPrivateKey, publicKeyToAddress } from '@stacks/encryption';
+import {
+  getPublicKeyFromPrivate,
+  makeECPrivateKey,
+  publicKeyToBtcAddress,
+} from '@stacks/encryption';
 import fetchMock from 'jest-fetch-mock';
 import { decodeToken } from 'jsontokens';
 import { getAppPrivateKey, getGaiaAddress, makeAuthResponse } from '../../src';
@@ -88,7 +92,7 @@ describe(makeAuthResponse, () => {
     expect(appPrivateKey).not.toBeNull();
 
     const publicKey = getPublicKeyFromPrivate(appPrivateKey!);
-    const address = publicKeyToAddress(publicKey);
+    const address = publicKeyToBtcAddress(publicKey);
     const expectedDomain = `https://gaia.blockstack.org/hub/${address}/`;
     expect(apps[appDomain]).toEqual(expectedDomain);
     expect(appsMeta[appDomain]).not.toBeFalsy();

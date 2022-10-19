@@ -1,6 +1,6 @@
 import {
   BadPathError,
-  Buffer,
+  bytesToHex,
   ConflictError,
   DoesNotExist,
   GaiaHubErrorResponse,
@@ -9,6 +9,7 @@ import {
   NotEnoughProofError,
   PayloadTooLargeError,
   PreconditionFailedError,
+  utf8ToBytes,
   ValidationError,
 } from '@stacks/common';
 import {
@@ -16,11 +17,12 @@ import {
   ecSign,
   getPublicKeyFromPrivate,
   hashSha256Sync,
-  publicKeyToAddress,
+  publicKeyToBtcAddress,
   randomBytes,
   Signature,
 } from '@stacks/encryption';
 import { createFetchFn, FetchFn } from '@stacks/network';
+import { fromByteArray } from 'base64-js';
 import { TokenSigner } from 'jsontokens';
 
 /**
@@ -57,7 +59,7 @@ interface UploadResponse {
  */
 export async function uploadToGaiaHub(
   filename: string,
-  contents: Blob | Buffer | ArrayBufferView | string,
+  contents: Blob | Uint8Array | ArrayBufferView | string,
   hubConfig: GaiaHubConfig,
   contentType = 'application/octet-stream',
   newFile = true,
@@ -148,19 +150,16 @@ function makeLegacyAuthToken(challengeText: string, signerKeyHex: string): strin
     throw new Error('Failed in parsing legacy challenge text from the gaia hub.');
   }
   if (parsedChallenge[0] === 'gaiahub' && parsedChallenge[3] === 'blockstack_storage_please_sign') {
-    const digest = hashSha256Sync(Buffer.from(challengeText));
-    const signatureBuffer = ecSign(digest, compressPrivateKey(signerKeyHex));
+    const digest = hashSha256Sync(utf8ToBytes(challengeText));
+    const signatureBytes = ecSign(digest, compressPrivateKey(signerKeyHex));
     // We only want the DER encoding so use toDERHex provided by @noble/secp256k1
-    const signature = Signature.fromCompact(signatureBuffer.toString('hex')).toDERHex();
+    const signature = Signature.fromCompact(bytesToHex(signatureBytes)).toDERHex();
 
     const publickey = getPublicKeyFromPrivate(signerKeyHex);
-    const token = Buffer.from(JSON.stringify({ publickey, signature })).toString('base64');
+    const token = fromByteArray(utf8ToBytes(JSON.stringify({ publickey, signature })));
     return token;
-  } else {
-    throw new Error(
-      'Failed to connect to legacy gaia hub. If you operate this hub, please update.'
-    );
   }
+  throw new Error('Failed to connect to legacy gaia hub. If you operate this hub, please update.');
 }
 
 /**
@@ -187,7 +186,7 @@ function makeV1GaiaAuthToken(
     return makeLegacyAuthToken(challengeText, signerKeyHex);
   }
 
-  const salt = randomBytes(16).toString('hex');
+  const salt = bytesToHex(randomBytes(16));
   const payload = {
     gaiaChallenge: challengeText,
     hubUrl,
@@ -216,7 +215,7 @@ export async function connectToGaiaHub(
   const hubInfo = await response.json();
   const readURL = hubInfo.read_url_prefix;
   const token = makeV1GaiaAuthToken(hubInfo, challengeSignerHex, gaiaHubUrl, associationToken);
-  const address = publicKeyToAddress(getPublicKeyFromPrivate(challengeSignerHex));
+  const address = publicKeyToBtcAddress(getPublicKeyFromPrivate(challengeSignerHex));
   return {
     url_prefix: readURL,
     max_file_upload_size_megabytes: hubInfo.max_file_upload_size_megabytes,
@@ -242,7 +241,7 @@ export async function getBucketUrl(
   const responseText = await response.text();
   const responseJSON = JSON.parse(responseText);
   const readURL = responseJSON.read_url_prefix;
-  const address = publicKeyToAddress(getPublicKeyFromPrivate(appPrivateKey));
+  const address = publicKeyToBtcAddress(getPublicKeyFromPrivate(appPrivateKey));
   const bucketUrl = `${readURL}${address}/`;
   return bucketUrl;
 }

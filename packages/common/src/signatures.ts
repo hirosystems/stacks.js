@@ -4,6 +4,7 @@ const COORDINATE_BYTES = 32;
 
 /** @ignore */
 export function parseRecoverableSignatureVrs(signature: string) {
+  // todo: prefer RSV format or add format options of message signing functions
   if (signature.length < COORDINATE_BYTES * 2 * 2 + 1) {
     throw new Error('Invalid signature');
   }

@@ -1,5 +1,5 @@
 // @ts-ignore
-import { Buffer, IntegerType, intToBigInt, toBuffer } from '@stacks/common';
+import { bigIntToBytes, IntegerType, intToBigInt, bigIntToBytes } from '@stacks/common';
 import {
   makeContractCall,
   bufferCV,
@@ -58,8 +58,8 @@ export type StackerInfo =
         lock_period: number;
         unlock_height: number;
         pox_address: {
-          version: Buffer;
-          hashbytes: Buffer;
+          version: Uint8Array;
+          hashbytes: Uint8Array;
         };
       };
     };
@@ -325,7 +325,7 @@ export class StackingClient {
     return Promise.all([balancePromise, poxInfoPromise])
       .then(([balance, poxInfo]) => {
         const { hashMode, data } = decodeBtcAddress(poxAddress);
-        const hashModeBuffer = bufferCV(toBuffer(BigInt(hashMode), 1));
+        const hashModeBuffer = bufferCV(bigIntToBytes(BigInt(hashMode), 1));
         const hashbytes = bufferCV(data);
         const poxAddressCV = tupleCV({
           hashbytes,
@@ -527,7 +527,7 @@ export class StackingClient {
     burnBlockHeight: number;
   }) {
     const { hashMode, data } = decodeBtcAddress(poxAddress);
-    const hashModeBuffer = bufferCV(toBuffer(BigInt(hashMode), 1));
+    const hashModeBuffer = bufferCV(bigIntToBytes(BigInt(hashMode), 1));
     const hashbytes = bufferCV(data);
     const address = tupleCV({
       hashbytes,
@@ -565,7 +565,7 @@ export class StackingClient {
 
     if (poxAddress) {
       const { hashMode, data } = decodeBtcAddress(poxAddress);
-      const hashModeBuffer = bufferCV(toBuffer(BigInt(hashMode), 1));
+      const hashModeBuffer = bufferCV(bigIntToBytes(BigInt(hashMode), 1));
       const hashbytes = bufferCV(data);
       address = someCV(
         tupleCV({
@@ -612,7 +612,7 @@ export class StackingClient {
     nonce?: IntegerType;
   }) {
     const { hashMode, data } = decodeBtcAddress(poxAddress);
-    const hashModeBuffer = bufferCV(toBuffer(BigInt(hashMode), 1));
+    const hashModeBuffer = bufferCV(bigIntToBytes(BigInt(hashMode), 1));
     const hashbytes = bufferCV(data);
     const address = tupleCV({
       hashbytes,
@@ -654,7 +654,7 @@ export class StackingClient {
     rewardCycle: number;
   }) {
     const { hashMode, data } = decodeBtcAddress(poxAddress);
-    const hashModeBuffer = bufferCV(toBuffer(BigInt(hashMode), 1));
+    const hashModeBuffer = bufferCV(bigIntToBytes(BigInt(hashMode), 1));
     const hashbytes = bufferCV(data);
     const address = tupleCV({
       hashbytes,

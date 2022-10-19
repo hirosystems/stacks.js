@@ -1,5 +1,10 @@
 name: pull-request
-on: [pull_request, workflow_dispatch]
+on:
+  pull_request:
+    paths-ignore:
+      - "**.md"
+
+  workflow_dispatch:
 
 jobs:
   pre-run:
@@ -41,7 +46,7 @@ jobs:
           SKIP_TESTS: true
       - id: published-version
         run: echo "::set-output name=version::$(cat lerna.json | jq -r '.version')"
-      - uses: kyranjamie/pull-request-fixed-header@v1.0.1
+      - uses: janniks/pull-request-fixed-header@v1.0.1
         with:
-          header: "> This PR was published as an *alpha* to npm with the version `${{ steps.published-version.outputs.version }}` — e.g. `npm install @stacks/common@${{ steps.published-version.outputs.version }}`"
+          header: "> This PR was published to npm with the version `${{ steps.published-version.outputs.version }}`\n> e.g. `npm install @stacks/common@${{ steps.published-version.outputs.version }} --save-exact`"
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

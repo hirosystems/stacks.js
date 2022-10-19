@@ -2,15 +2,16 @@
 // Secure, audited & minimal implementation of BIP32 hierarchical deterministic (HD) wallets.
 import { HDKey } from '@scure/bip32';
 import { makeAuthResponse as _makeAuthResponse } from '@stacks/auth';
-import { Buffer } from '@stacks/common';
+import { bytesToHex, utf8ToBytes } from '@stacks/common';
+
 import {
   getPublicKeyFromPrivate,
   hashCode,
   hashSha256Sync,
-  publicKeyToAddress,
+  publicKeyToBtcAddress,
 } from '@stacks/encryption';
 import { createFetchFn, FetchFn } from '@stacks/network';
-import { bytesToHex, getAddressFromPrivateKey, TransactionVersion } from '@stacks/transactions';
+import { getAddressFromPrivateKey, TransactionVersion } from '@stacks/transactions';
 import { connectToGaiaHubWithConfig, getHubInfo, makeGaiaAssociationToken } from '../utils';
 import { Account, HARDENED_OFFSET } from './common';
 import {
@@ -53,8 +54,8 @@ export const getAppPrivateKey = ({
   account: Account;
   appDomain: string;
 }) => {
-  const hashBuffer = hashSha256Sync(Buffer.from(`${appDomain}${account.salt}`));
-  const hash = hashBuffer.toString('hex');
+  const hashBytes = hashSha256Sync(utf8ToBytes(`${appDomain}${account.salt}`));
+  const hash = bytesToHex(hashBytes);
   const appIndex = hashCode(hash);
   const appsNode = HDKey.fromExtendedKey(account.appsKey);
   const appKeychain = appsNode.deriveChild(appIndex + HARDENED_OFFSET);
@@ -88,7 +89,7 @@ export const makeAuthResponse = async ({
       profile.apps = {};
     }
     const publicKey = getPublicKeyFromPrivate(appPrivateKey);
-    const address = publicKeyToAddress(publicKey);
+    const address = publicKeyToBtcAddress(publicKey);
     const storageUrl = `${hubInfo.read_url_prefix}${address}/`;
     profile.apps[appDomain] = storageUrl;
     if (!profile.appsMeta) {

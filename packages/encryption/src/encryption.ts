@@ -1,4 +1,4 @@
-import { Buffer } from '@stacks/common';
+import { utf8ToBytes } from '@stacks/common';
 import {
   CipherTextEncoding,
   decryptECIES,
@@ -17,7 +17,7 @@ export interface EncryptionOptions {
    */
   sign?: boolean | string;
   /**
-   * String encoding format for the cipherText buffer.
+   * String encoding format for the cipherText bytes.
    * Currently defaults to 'hex' for legacy backwards-compatibility.
    * Only used if the `encrypt` option is also used.
    * Note: in the future this should default to 'base64' for the significant
@@ -28,7 +28,7 @@ export interface EncryptionOptions {
    * Specifies if the original unencrypted content is a ASCII or UTF-8 string.
    * For example stringified JSON.
    * If true, then when the ciphertext is decrypted, it will be returned as
-   * a `string` type variable, otherwise will be returned as a Buffer.
+   * a `string` type variable, otherwise will be returned as bytes.
    */
   wasString?: boolean;
 }
@@ -49,14 +49,14 @@ export interface EncryptContentOptions extends EncryptionOptions {
 
 /**
  * Encrypts the data provided with the app public key.
- * @param {String|Buffer} content - data to encrypt
+ * @param {string | Uint8Array} content - data to encrypt
  * @param {Object} [options=null] - options object
  * @param {String} options.publicKey - the hex string of the ECDSA public
  * key to use for encryption. If not provided, will use user's appPublicKey.
  * @return {String} Stringified ciphertext object
  */
 export async function encryptContent(
-  content: string | Buffer,
+  content: string | Uint8Array,
   options?: EncryptContentOptions
 ): Promise<string> {
   const opts = Object.assign({}, options);
@@ -67,16 +67,12 @@ export async function encryptContent(
     }
     opts.publicKey = getPublicKeyFromPrivate(opts.privateKey);
   }
-  let wasString: boolean;
-  if (typeof opts.wasString === 'boolean') {
-    wasString = opts.wasString;
-  } else {
-    wasString = typeof content === 'string';
-  }
-  const contentBuffer = typeof content === 'string' ? Buffer.from(content) : content;
+  const wasString =
+    typeof opts.wasString === 'boolean' ? opts.wasString : typeof content === 'string';
+  const contentBytes = typeof content === 'string' ? utf8ToBytes(content) : content;
   const cipherObject = await encryptECIES(
     opts.publicKey,
-    contentBuffer,
+    contentBytes,
     wasString,
     opts.cipherTextEncoding
   );
@@ -101,18 +97,18 @@ export async function encryptContent(
 /**
  * Decrypts data encrypted with `encryptContent` with the
  * transit private key.
- * @param {String|Buffer} content - encrypted content.
+ * @param {string | Uint8Array} content - encrypted content.
  * @param {Object} [options=null] - options object
- * @param {String} options.privateKey - the hex string of the ECDSA private
+ * @param {string} options.privateKey - the hex string of the ECDSA private
  * key to use for decryption. If not provided, will use user's appPrivateKey.
- * @return {String|Buffer} decrypted content.
+ * @return {string | Uint8Array} decrypted content.
  */
 export function decryptContent(
   content: string,
   options?: {
     privateKey?: string;
   }
-): Promise<string | Buffer> {
+): Promise<string | Uint8Array> {
   const opts = Object.assign({}, options);
   if (!opts.privateKey) {
     throw new Error('Private key is required for decryption.');

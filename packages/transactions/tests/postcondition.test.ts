@@ -26,6 +26,7 @@ import {
 import { serializeDeserialize } from './macros';
 
 import { bufferCVFromString, BufferCV } from '../src/clarity';
+import { bytesToUtf8 } from '@stacks/common';
 
 test('STX post condition serialization and deserialization', () => {
   const postConditionType = PostConditionType.STX;
@@ -86,7 +87,7 @@ test('Non-fungible post condition serialization and deserialization', () => {
   const contractName = 'contract-name';
   const principal = createContractPrincipal(address, contractName);
 
-  const conditionCode = NonFungibleConditionCode.Owns;
+  const conditionCode = NonFungibleConditionCode.DoesNotSend;
 
   const assetAddress = 'SP2ZP4GJDZJ1FDHTQ963F0292PE9J9752TZJ68F21';
   const assetContractName = 'contract_name';
@@ -114,7 +115,7 @@ test('Non-fungible post condition serialization and deserialization', () => {
   expect(addressToString(deserialized.assetInfo.address)).toBe(assetAddress);
   expect(deserialized.assetInfo.contractName.content).toBe(assetContractName);
   expect(deserialized.assetInfo.assetName.content).toBe(assetName);
-  expect((deserialized.assetName as BufferCV).buffer.toString()).toEqual(nftAssetName);
+  expect(bytesToUtf8((deserialized.assetName as BufferCV).buffer)).toEqual(nftAssetName);
 });
 
 test('Non-fungible post condition with string IDs serialization and deserialization', () => {
@@ -123,7 +124,7 @@ test('Non-fungible post condition with string IDs serialization and deserializat
   const address = 'SP2JXKMSH007NPYAQHKJPQMAQYAD90NQGTVJVQ02B';
   const contractName = 'contract-name';
 
-  const conditionCode = NonFungibleConditionCode.Owns;
+  const conditionCode = NonFungibleConditionCode.DoesNotSend;
 
   const assetAddress = 'SP2ZP4GJDZJ1FDHTQ963F0292PE9J9752TZJ68F21';
   const assetContractName = 'contract_name';
@@ -150,5 +151,5 @@ test('Non-fungible post condition with string IDs serialization and deserializat
   expect(addressToString(deserialized.assetInfo.address)).toBe(assetAddress);
   expect(deserialized.assetInfo.contractName.content).toBe(assetContractName);
   expect(deserialized.assetInfo.assetName.content).toBe(assetName);
-  expect((deserialized.assetName as BufferCV).buffer.toString()).toEqual(nftAssetName);
+  expect(bytesToUtf8((deserialized.assetName as BufferCV).buffer)).toEqual(nftAssetName);
 });

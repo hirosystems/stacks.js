@@ -2,7 +2,7 @@ import { ripemd160 } from '@noble/hashes/ripemd160';
 import { sha256 } from '@noble/hashes/sha256';
 import { sha512_256 } from '@noble/hashes/sha512';
 import { utils } from '@noble/secp256k1';
-import { Buffer, bytesToHex, with0x } from '@stacks/common';
+import { bytesToHex, concatArray, concatBytes, utf8ToBytes, with0x } from '@stacks/common';
 import { c32addressDecode } from 'c32check';
 import lodashCloneDeep from 'lodash.clonedeep';
 import { ClarityValue, deserializeCV, serializeCV } from './clarity';
@@ -12,40 +12,10 @@ export { verify as verifySignature } from '@noble/secp256k1';
 
 /**
  * Use utils.randomBytes to replace randombytes dependency
- * Generates a buffer with random bytes of given length
- * @param {bytesLength} an optional bytes length, default is 32 bytes
- * @return {Buffer} For return type compatibility converting utils.randomBytes return value to buffer
+ * Generates random bytes of given length
+ * @param {number} bytesLength an optional bytes length, default is 32 bytes
  */
-export const randomBytes = (bytesLength?: number) => Buffer.from(utils.randomBytes(bytesLength));
-
-/**
- * @deprecated Import from `@stacks/common` instead
- */
-export { bytesToHex };
-
-export class BufferArray {
-  _value: Buffer[] = [];
-  get value() {
-    return this._value;
-  }
-  appendHexString(hexString: string) {
-    this.value.push(Buffer.from(hexString, 'hex'));
-  }
-
-  push(buffer: Buffer) {
-    return this._value.push(buffer);
-  }
-  appendByte(octet: number) {
-    if (!Number.isInteger(octet) || octet < 0 || octet > 255) {
-      throw new Error(`Value ${octet} is not a valid byte`);
-    }
-    this.value.push(Buffer.from([octet]));
-  }
-
-  concatBuffer(): Buffer {
-    return Buffer.concat(this.value);
-  }
-}
+export const randomBytes = (bytesLength?: number): Uint8Array => utils.randomBytes(bytesLength);
 
 export const leftPadHex = (hexString: string): string =>
   hexString.length % 2 == 0 ? hexString : `0${hexString}`;
@@ -57,7 +27,7 @@ export const rightPadHexToLength = (hexString: string, length: number): string =
   hexString.padEnd(length, '0');
 
 export const exceedsMaxLengthBytes = (string: string, maxLengthBytes: number): boolean =>
-  string ? Buffer.from(string).length > maxLengthBytes : false;
+  string ? utf8ToBytes(string).length > maxLengthBytes : false;
 
 export function cloneDeep<T>(obj: T): T {
   return lodashCloneDeep(obj);
@@ -70,93 +40,87 @@ export function omit<T, K extends keyof any>(obj: T, prop: K): Omit<T, K> {
   return clone;
 }
 
-export const txidFromData = (data: Buffer): string => {
-  return Buffer.from(sha512_256(data)).toString('hex');
+export const txidFromData = (data: Uint8Array): string => {
+  return bytesToHex(sha512_256(data));
 };
 
-export const hash160 = (input: Buffer): Buffer => {
-  return Buffer.from(ripemd160(sha256(input)));
+export const hash160 = (input: Uint8Array): Uint8Array => {
+  return ripemd160(sha256(input));
 };
 
 // Internally, the Stacks blockchain encodes address the same as Bitcoin
 // single-sig address (p2pkh)
-export const hashP2PKH = (input: Buffer): string => {
-  return hash160(input).toString('hex');
+export const hashP2PKH = (input: Uint8Array): string => {
+  return bytesToHex(hash160(input));
 };
 
 // Internally, the Stacks blockchain encodes address the same as Bitcoin
 // single-sig address over p2sh (p2h-p2wpkh)
-export const hashP2WPKH = (input: Buffer): string => {
+export const hashP2WPKH = (input: Uint8Array): string => {
   const keyHash = hash160(input);
-
-  const bufferArray = new BufferArray();
-  bufferArray.appendByte(0);
-  bufferArray.appendByte(keyHash.length);
-  bufferArray.push(keyHash);
-
-  const redeemScript = bufferArray.concatBuffer();
+  const redeemScript = concatBytes(new Uint8Array([0]), new Uint8Array([keyHash.length]), keyHash);
   const redeemScriptHash = hash160(redeemScript);
-  return redeemScriptHash.toString('hex');
+  return bytesToHex(redeemScriptHash);
 };
 
 // Internally, the Stacks blockchain encodes address the same as Bitcoin
 // multi-sig address (p2sh)
-export const hashP2SH = (numSigs: number, pubKeys: Buffer[]): string => {
+export const hashP2SH = (numSigs: number, pubKeys: Uint8Array[]): string => {
   if (numSigs > 15 || pubKeys.length > 15) {
     throw Error('P2SH multisig address can only contain up to 15 public keys');
   }
 
   // construct P2SH script
-  const bufferArray = new BufferArray();
+  const bytesArray = [];
   // OP_n
-  bufferArray.appendByte(80 + numSigs);
+  bytesArray.push(80 + numSigs);
   // public keys prepended by their length
   pubKeys.forEach(pubKey => {
-    bufferArray.appendByte(pubKey.length);
-    bufferArray.push(pubKey);
+    bytesArray.push(pubKey.length);
+    bytesArray.push(pubKey);
   });
   // OP_m
-  bufferArray.appendByte(80 + pubKeys.length);
+  bytesArray.push(80 + pubKeys.length);
   // OP_CHECKMULTISIG
-  bufferArray.appendByte(174);
+  bytesArray.push(174);
 
-  const redeemScript = bufferArray.concatBuffer();
+  const redeemScript = concatArray(bytesArray);
   const redeemScriptHash = hash160(redeemScript);
-  return redeemScriptHash.toString('hex');
+  return bytesToHex(redeemScriptHash);
 };
 
 // Internally, the Stacks blockchain encodes address the same as Bitcoin
 // multisig address over p2sh (p2sh-p2wsh)
-export const hashP2WSH = (numSigs: number, pubKeys: Buffer[]): string => {
+export const hashP2WSH = (numSigs: number, pubKeys: Uint8Array[]): string => {
   if (numSigs > 15 || pubKeys.length > 15) {
     throw Error('P2WSH multisig address can only contain up to 15 public keys');
   }
 
   // construct P2SH script
-  const scriptArray = new BufferArray();
+  const scriptArray = [];
   // OP_n
-  scriptArray.appendByte(80 + numSigs);
+  scriptArray.push(80 + numSigs);
   // public keys prepended by their length
   pubKeys.forEach(pubKey => {
-    scriptArray.appendByte(pubKey.length);
+    scriptArray.push(pubKey.length);
     scriptArray.push(pubKey);
   });
   // OP_m
-  scriptArray.appendByte(80 + pubKeys.length);
+  scriptArray.push(80 + pubKeys.length);
   // OP_CHECKMULTISIG
-  scriptArray.appendByte(174);
+  scriptArray.push(174);
 
-  const script = scriptArray.concatBuffer();
-  const digest = Buffer.from(sha256(script));
+  const script = concatArray(scriptArray);
+  const digest = sha256(script);
 
-  const bufferArray = new BufferArray();
-  bufferArray.appendByte(0);
-  bufferArray.appendByte(digest.length);
-  bufferArray.push(digest);
+  const bytesArray = [];
+  bytesArray.push(0);
+  bytesArray.push(digest.length);
+  bytesArray.push(digest);
 
-  const redeemScript = bufferArray.concatBuffer();
+  const redeemScript = concatArray(bytesArray);
   const redeemScriptHash = hash160(redeemScript);
-  return redeemScriptHash.toString('hex');
+  return bytesToHex(redeemScriptHash);
 };
 
 export function isClarityName(name: string) {
@@ -170,7 +134,7 @@ export function isClarityName(name: string) {
  */
 export function cvToHex(cv: ClarityValue) {
   const serialized = serializeCV(cv);
-  return `0x${serialized.toString('hex')}`;
+  return `0x${bytesToHex(serialized)}`;
 }
 
 /**

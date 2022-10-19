@@ -161,14 +161,14 @@ The serialized transaction can now be passed to the sponsoring party which will 
 ```typescript
 import {
   sponsorTransaction,
-  BufferReader,
+  BytesReader,
   deserializeTransaction,
   broadcastTransaction,
 } from '@stacks/transactions';
 import { StacksTestnet, StacksMainnet } from '@stacks/network';
 
-const bufferReader = new BufferReader(Buffer.from(serializedTx, 'hex'));
-const deserializedTx = deserializeTransaction(bufferReader);
+const bytesReader = new BytesReader(Buffer.from(serializedTx, 'hex'));
+const deserializedTx = deserializeTransaction(bytesReader);
 const sponsorKey = '770287b9471081c8acd37d57190c7a70f0da2633311cc120853537362d32e67c01';
 const fee = 1000n;
 
@@ -201,7 +201,7 @@ import {
   publicKeyToString,
   TransactionSigner,
   standardPrincipalCV,
-  BufferReader,
+  BytesReader,
   AnchorMode,
 } from '@stacks/transactions';
 
@@ -241,9 +241,9 @@ transaction must be appended to the signature.
 
 ```typescript
 // deserialize and sign transaction
-const bufferReader = new BufferReader(serializedTx);
+const bytesReader = new BytesReader(serializedTx);
 // Partially signed or unsigned multi-sig tx can be deserialized to add the required signatures
-const deserializedTx = deserializeTransaction(bufferReader);
+const deserializedTx = deserializeTransaction(bytesReader);
 
 const signer = new TransactionSigner(deserializedTx);
 
@@ -329,7 +329,7 @@ import {
   tupleCV,
   bufferCV,
 } from '@stacks/transactions';
-import { Buffer } from '@stacks/common';
+import { utf8ToBytes } from '@stacks/common';
 
 // construct boolean clarity values
 const t = trueCV();
@@ -339,9 +339,9 @@ const f = falseCV();
 const nothing = noneCV();
 const something = someCV(t);
 
-// construct a buffer clarity value from an existing Buffer
-const buffer = Buffer.from('foo');
-const bufCV = bufferCV(buffer);
+// construct a buffer clarity value from an existing byte array
+const bytes = utf8ToBytes('foo'); // Uint8Array(3) [ 102, 111, 111 ]
+const bufCV = bufferCV(bytes);
 
 // construct signed and unsigned integer clarity values
 const i = intCV(-10);
@@ -459,8 +459,8 @@ const contractFungiblePostCondition = makeContractFungiblePostCondition(
 ### Non-fungible token post condition
 
 > **Warning**
-> The post-condition codes for NFTs are currently misleading. The Stacks blockchain's post-condition processor does NOT check ownership.
-> It checks whether or not a principal **sent** or **did not send** an NFT.
+> The Stacks blockchain's post-condition processor can NOT check ownership.
+> It checks whether or not a principal **will send** or **will not send** an NFT.
 > Post-conditions can NOT verify anything about the recipient of an asset.
 > If you want to verify conditions about asset recipients, you will need to use [Clarity](https://docs.stacks.co/docs/write-smart-contracts/).
 
@@ -475,7 +475,7 @@ import {
 
 // With a standard principal
 const postConditionAddress = 'SP2ZD731ANQZT6J4K3F5N8A40ZXWXC1XFXHVVQFKE';
-const postConditionCode = NonFungibleConditionCode.Owns;
+const postConditionCode = NonFungibleConditionCode.DoesNotSend;
 const assetAddress = 'SP62M8MEFH32WGSB7XSF9WJZD7TQB48VQB5ANWSJ';
 const assetContractName = 'test-asset-contract';
 const assetName = 'test-asset';

@@ -1,13 +1,13 @@
-import { Buffer } from '@stacks/common';
+import { utf8ToBytes } from '@stacks/common';
 import { decryptECIES, encryptECIES, signECDSA, verifyECDSA } from '../src/ec';
-import { getPublicKeyFromPrivate, publicKeyToAddress } from '../src/keys';
+import { getPublicKeyFromPrivate, publicKeyToBtcAddress } from '../src/keys';
 
 test('Private key to address', () => {
   const privateKey = '00cdce6b5f87d38f2a830cae0da82162e1b487f07c5affa8130f01fe1a2a25fb01';
   const expectedAddress = '1WykMawQRnLh7SWmmoRL4qTDNCgAsVRF1';
 
   const publicKey = getPublicKeyFromPrivate(privateKey);
-  const address = publicKeyToAddress(publicKey);
+  const address = publicKeyToBtcAddress(publicKey);
 
   expect(address).toEqual(expectedAddress);
 });
@@ -18,7 +18,7 @@ test('Encrypt and decrypt string', async () => {
 
   const testString = 'all work and no play makes jack a dull boy';
 
-  const cipherObj = await encryptECIES(publicKey, Buffer.from(testString), true);
+  const cipherObj = await encryptECIES(publicKey, utf8ToBytes(testString), true);
   const deciphered = await decryptECIES(privateKey, cipherObj);
 
   expect(deciphered).toEqual(testString);

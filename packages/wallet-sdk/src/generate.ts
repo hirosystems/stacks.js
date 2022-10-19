@@ -15,6 +15,7 @@ import { Wallet, getRootNode } from './models/common';
 import { encrypt } from './encryption';
 import { deriveAccount, deriveWalletKeys } from './derive';
 import { DerivationType } from '.';
+import { bytesToHex } from '@stacks/common';
 
 export type AllowedKeyEntropyBits = 128 | 256;
 
@@ -35,8 +36,8 @@ export const generateWallet = async ({
   secretKey: string;
   password: string;
 }): Promise<Wallet> => {
-  const ciphertextBuffer = await encrypt(secretKey, password);
-  const encryptedSecretKey = ciphertextBuffer.toString('hex');
+  const ciphertextBytes = await encrypt(secretKey, password);
+  const encryptedSecretKey = bytesToHex(ciphertextBytes);
 
   const rootPrivateKey = await mnemonicToSeed(secretKey);
   const rootNode = HDKey.fromMasterSeed(rootPrivateKey);

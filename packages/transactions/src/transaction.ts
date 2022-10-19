@@ -1,4 +1,11 @@
-import { Buffer, IntegerType, intToBigInt } from '@stacks/common';
+import {
+  bytesToHex,
+  concatArray,
+  hexToBytes,
+  IntegerType,
+  intToBigInt,
+  writeUInt32BE,
+} from '@stacks/common';
 import {
   AnchorMode,
   AuthType,
@@ -27,7 +34,7 @@ import {
 } from './authorization';
 import { createTransactionAuthField } from './signature';
 
-import { BufferArray, cloneDeep, txidFromData } from './utils';
+import { cloneDeep, txidFromData } from './utils';
 
 import { deserializePayload, Payload, PayloadInput, serializePayload } from './payload';
 
@@ -35,7 +42,7 @@ import { createLPList, deserializeLPList, LengthPrefixedList, serializeLPList } 
 
 import { isCompressed, StacksPrivateKey, StacksPublicKey } from './keys';
 
-import { BufferReader } from './bufferReader';
+import { BytesReader } from './bytesReader';
 
 import { SerializationError, SigningError } from './errors';
 
@@ -160,7 +167,7 @@ export class StacksTransaction {
     if (isSingleSig(condition)) {
       condition.signature = nextSig;
     } else {
-      const compressed = privateKey.data.toString('hex').endsWith('01');
+      const compressed = bytesToHex(privateKey.data).endsWith('01');
       condition.fields.push(
         createTransactionAuthField(
           compressed ? PubKeyEncoding.Compressed : PubKeyEncoding.Uncompressed,
@@ -216,7 +223,7 @@ export class StacksTransaction {
     this.auth = setSponsorNonce(this.auth, nonce);
   }
 
-  serialize(): Buffer {
+  serialize(): Uint8Array {
     if (this.version === undefined) {
       throw new SerializationError('"version" is undefined');
     }
@@ -233,51 +240,51 @@ export class StacksTransaction {
       throw new SerializationError('"payload" is undefined');
     }
 
-    const bufferArray: BufferArray = new BufferArray();
+    const bytesArray = [];
 
-    bufferArray.appendByte(this.version);
-    const chainIdBuffer = Buffer.alloc(4);
-    chainIdBuffer.writeUInt32BE(this.chainId, 0);
-    bufferArray.push(chainIdBuffer);
-    bufferArray.push(serializeAuthorization(this.auth));
-    bufferArray.appendByte(this.anchorMode);
-    bufferArray.appendByte(this.postConditionMode);
-    bufferArray.push(serializeLPList(this.postConditions));
-    bufferArray.push(serializePayload(this.payload));
+    bytesArray.push(this.version);
+    const chainIdBytes = new Uint8Array(4);
+    writeUInt32BE(chainIdBytes, this.chainId, 0);
+    bytesArray.push(chainIdBytes);
+    bytesArray.push(serializeAuthorization(this.auth));
+    bytesArray.push(this.anchorMode);
+    bytesArray.push(this.postConditionMode);
+    bytesArray.push(serializeLPList(this.postConditions));
+    bytesArray.push(serializePayload(this.payload));
 
-    return bufferArray.concatBuffer();
+    return concatArray(bytesArray);
   }
 }
 
 /**
- * @param data Buffer or hex string
+ * @param data Uint8Array or hex string
  */
-export function deserializeTransaction(data: BufferReader | Buffer | string) {
-  let bufferReader: BufferReader;
+export function deserializeTransaction(data: BytesReader | Uint8Array | string) {
+  let bytesReader: BytesReader;
   if (typeof data === 'string') {
     if (data.slice(0, 2).toLowerCase() === '0x') {
-      bufferReader = new BufferReader(Buffer.from(data.slice(2), 'hex'));
+      bytesReader = new BytesReader(hexToBytes(data.slice(2)));
     } else {
-      bufferReader = new BufferReader(Buffer.from(data, 'hex'));
+      bytesReader = new BytesReader(hexToBytes(data));
     }
-  } else if (Buffer.isBuffer(data)) {
-    bufferReader = new BufferReader(data);
+  } else if (data instanceof Uint8Array) {
+    bytesReader = new BytesReader(data);
   } else {
-    bufferReader = data;
+    bytesReader = data;
   }
-  const version = bufferReader.readUInt8Enum(TransactionVersion, n => {
+  const version = bytesReader.readUInt8Enum(TransactionVersion, n => {
     throw new Error(`Could not parse ${n} as TransactionVersion`);
   });
-  const chainId = bufferReader.readUInt32BE();
-  const auth = deserializeAuthorization(bufferReader);
-  const anchorMode = bufferReader.readUInt8Enum(AnchorMode, n => {
+  const chainId = bytesReader.readUInt32BE();
+  const auth = deserializeAuthorization(bytesReader);
+  const anchorMode = bytesReader.readUInt8Enum(AnchorMode, n => {
     throw new Error(`Could not parse ${n} as AnchorMode`);
   });
-  const postConditionMode = bufferReader.readUInt8Enum(PostConditionMode, n => {
+  const postConditionMode = bytesReader.readUInt8Enum(PostConditionMode, n => {
     throw new Error(`Could not parse ${n} as PostConditionMode`);
   });
-  const postConditions = deserializeLPList(bufferReader, StacksMessageType.PostCondition);
-  const payload = deserializePayload(bufferReader);
+  const postConditions = deserializeLPList(bytesReader, StacksMessageType.PostCondition);
+  const payload = deserializePayload(bytesReader);
 
   return new StacksTransaction(
     version,

@@ -1,6 +1,6 @@
 {
   "name": "@stacks/encryption",
-  "version": "4.3.5",
+  "version": "5.0.0",
   "description": "Encryption utilities for Stacks",
   "license": "MIT",
   "author": "Hiro Systems PBC (https://hiro.so)",
@@ -23,8 +23,9 @@
     "@noble/hashes": "^1.0.0",
     "@noble/secp256k1": "^1.5.5",
     "@scure/bip39": "^1.1.0",
-    "@stacks/common": "^4.3.5",
+    "@stacks/common": "^5.0.0",
     "@types/node": "^18.0.4",
+    "base64-js": "^1.5.1",
     "bs58": "^5.0.0",
     "ripemd160-min": "^0.0.6",
     "varuint-bitcoin": "^1.1.2"
@@ -43,17 +44,12 @@
     "jest": "^26.6.3",
     "jest-fetch-mock": "^3.0.3",
     "jest-module-name-mapper": "^0.1.5",
-    "jsontokens": "^3.1.1",
+    "jsontokens": "^4.0.1",
     "process": "^0.11.10",
     "rimraf": "^3.0.2",
     "stream-browserify": "^3.0.0",
     "triplesec": "^4.0.3",
-    "ts-jest": "^26.5.5",
-    "ts-loader": "^9.1.1",
-    "typescript": "^4.2.4",
-    "webpack": "^5.36.1",
-    "webpack-bundle-analyzer": "^4.5.0",
-    "webpack-cli": "^4.6.0"
+    "ts-jest": "^26.5.5"
   },
   "sideEffects": false,
   "typings": "dist/index.d.ts",

@@ -26,8 +26,7 @@ module.exports = {
   },
   plugins: [
     new webpack.ProvidePlugin({
-      Buffer: ['buffer', 'Buffer'],
-      process: require.resolve('process/browser'), // unclear which @stacks package dependencies introduce this (not common, not network)
+      process: require.resolve('process/browser'),
     }),
     isAnalyze && new DuplicatesPlugin(),
     isAnalyze && new BundleAnalyzerPlugin({ analyzerMode: 'static' }),

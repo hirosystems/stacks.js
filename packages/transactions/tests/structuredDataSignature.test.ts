@@ -1,7 +1,8 @@
 import { sha256 } from '@noble/hashes/sha256';
-import { standardPrincipalCV, stringAsciiCV, trueCV, tupleCV, uintCV } from '../src/clarity';
-import { createStacksPrivateKey } from '../src/keys';
+import { asciiToBytes, bytesToHex, hexToBytes } from '@stacks/common';
 import { verifyMessageSignatureRsv } from '@stacks/encryption';
+import { standardPrincipalCV, stringAsciiCV, trueCV, tupleCV, uintCV } from '../src/clarity';
+import { createStacksPrivateKey, publicKeyFromSignatureRsv, signMessageHashRsv } from '../src/keys';
 import {
   decodeStructuredDataSignature,
   encodeStructuredData,
@@ -20,9 +21,8 @@ const principal1 = 'ST1SJ3DTE5DN7X54YDH5D64R3BCB6A2AG2ZQ8YPD5';
 test('prefix buffer', () => {
   // Refer to SIP018 https://github.com/stacksgov/sips/
   // "\x53\x49\x50\x30\x31\x38" is "SIP018" in ASCII
-  expect(
-    Buffer.from([0x53, 0x49, 0x50, 0x30, 0x31, 0x38]).equals(STRUCTURED_DATA_PREFIX)
-  ).toBeTruthy();
+  expect(STRUCTURED_DATA_PREFIX).toEqual(new Uint8Array([0x53, 0x49, 0x50, 0x30, 0x31, 0x38]));
+  expect(asciiToBytes('SIP018')).toEqual(STRUCTURED_DATA_PREFIX);
 });
 
 describe('encodeStructuredData / decodeStructuredDataSignature', () => {
@@ -191,13 +191,13 @@ describe('SIP018 test vectors', () => {
   ];
 
   test.each(inputs)('Structured data hashing', ({ input, expected }) => {
-    expect(hashStructuredData(input).toString('hex')).toEqual(expected);
+    expect(bytesToHex(hashStructuredData(input))).toEqual(expected);
   });
 
   test('Message hashing', () => {
     // Using messageHash(CV), which is sha256(Prefix || structuredDataHash(Domain) || structuredDataHash(CV)).
     const prefix = '534950303138';
-    expect(prefix).toEqual(STRUCTURED_DATA_PREFIX.toString('hex'));
+    expect(prefix).toEqual(bytesToHex(STRUCTURED_DATA_PREFIX));
     const domain = tupleCV({
       name: stringAsciiCV('Test App'),
       version: stringAsciiCV('1.0.0'),
@@ -206,7 +206,7 @@ describe('SIP018 test vectors', () => {
 
     const message = stringAsciiCV('Hello World');
     const expectedMessageHash = '1bfdab6d4158313ce34073fbb8d6b0fc32c154d439def12247a0f44bb2225259';
-    expect(Buffer.from(sha256(encodeStructuredData({ message, domain }))).toString('hex')).toEqual(
+    expect(bytesToHex(sha256(encodeStructuredData({ message, domain })))).toEqual(
       expectedMessageHash
     );
   });
@@ -234,9 +234,39 @@ describe('SIP018 test vectors', () => {
     // Verify signature
     const isSignatureVerified = verifyMessageSignatureRsv({
       signature: computedSignature.data,
-      message: Buffer.from(messageHash, 'hex'),
+      message: hexToBytes(messageHash),
       publicKey,
     });
     expect(isSignatureVerified).toBe(true);
   });
+});
+
+test('verifyMessageSignature works for both legacy/current and future message signing prefixes', () => {
+  const privateKey = '3b444e0e243d2faccaf8ecf1dcb4aeac98e122c79b4df3eb3cc8cec3768dbe8e';
+
+  // taken from other tests via `openssl`
+  const message = 'hello world';
+  const encodedMessageHash = '664d1478d36935361c1a8eda75fce73c49a93b58e55ed7cb45c3860317814991';
+  const encodedMessageHashAlt = '619997693db23de4b92ed152444a578a134143d9ad2c0f4dff2615de9d42ad96';
+
+  const signature = signMessageHashRsv({
+    messageHash: encodedMessageHash,
+    privateKey: createStacksPrivateKey(privateKey),
+  });
+  const signatureAlt = signMessageHashRsv({
+    messageHash: encodedMessageHashAlt,
+    privateKey: createStacksPrivateKey(privateKey),
+  });
+
+  const publicKey = publicKeyFromSignatureRsv(encodedMessageHash, signature);
+  const publicKeyAlt = publicKeyFromSignatureRsv(encodedMessageHashAlt, signatureAlt);
+
+  expect(verifyMessageSignatureRsv({ message, signature: signature.data, publicKey })).toBe(true);
+  expect(
+    verifyMessageSignatureRsv({
+      message,
+      signature: signatureAlt.data,
+      publicKey: publicKeyAlt,
+    })
+  ).toBe(true);
 });

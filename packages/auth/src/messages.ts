@@ -1,9 +1,17 @@
-import { Buffer, getGlobalObject, makeUUID4, nextMonth } from '@stacks/common';
+import {
+  bytesToHex,
+  bytesToUtf8,
+  getGlobalObject,
+  hexToBytes,
+  makeUUID4,
+  nextMonth,
+  utf8ToBytes,
+} from '@stacks/common';
 import {
   decryptECIES,
   encryptECIES,
   makeECPrivateKey,
-  publicKeyToAddress,
+  publicKeyToBtcAddress,
 } from '@stacks/encryption';
 import { SECP256K1Client, TokenSigner } from 'jsontokens';
 import { AuthScope, DEFAULT_SCOPE } from './constants';
@@ -98,7 +106,7 @@ export function makeAuthRequest(
   /* Convert the private key to a public key to an issuer */
   const publicKey = SECP256K1Client.derivePublicKey(transitPrivateKey);
   payload.public_keys = [publicKey];
-  const address = publicKeyToAddress(publicKey);
+  const address = publicKeyToBtcAddress(publicKey);
   payload.iss = makeDIDFromAddress(address);
 
   /* Sign and return the token */
@@ -118,9 +126,9 @@ export function makeAuthRequest(
  * @ignore
  */
 export async function encryptPrivateKey(publicKey: string, privateKey: string): Promise<string> {
-  const encryptedObj = await encryptECIES(publicKey, Buffer.from(privateKey), true);
+  const encryptedObj = await encryptECIES(publicKey, utf8ToBytes(privateKey), true);
   const encryptedJSON = JSON.stringify(encryptedObj);
-  return Buffer.from(encryptedJSON).toString('hex');
+  return bytesToHex(utf8ToBytes(encryptedJSON));
 }
 
 /**
@@ -138,7 +146,7 @@ export async function decryptPrivateKey(
   privateKey: string,
   hexedEncrypted: string
 ): Promise<string | null> {
-  const unhexedString = Buffer.from(hexedEncrypted, 'hex').toString();
+  const unhexedString = bytesToUtf8(hexToBytes(hexedEncrypted));
   const encryptedObj = JSON.parse(unhexedString);
   const decrypted = await decryptECIES(privateKey, encryptedObj);
   if (typeof decrypted !== 'string') {
@@ -189,7 +197,7 @@ export async function makeAuthResponse(
 ): Promise<string> {
   /* Convert the private key to a public key to an issuer */
   const publicKey = SECP256K1Client.derivePublicKey(privateKey);
-  const address = publicKeyToAddress(publicKey);
+  const address = publicKeyToBtcAddress(publicKey);
 
   /* See if we should encrypt with the transit key */
   let privateKeyPayload = appPrivateKey;

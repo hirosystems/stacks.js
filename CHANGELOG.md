@@ -3,16 +3,82 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-## [4.3.5](https://github.com/hirosystems/stacks.js/compare/v4.3.4...v4.3.5) (2022-08-23)
+## [5.0.2](https://github.com/hirosystems/stacks.js/compare/v5.0.1...v5.0.2) (2022-10-19)
+
+
+### Bug Fixes
+
+* rename incorrect nft post-condition codes ([9fed6a4](https://github.com/hirosystems/stacks.js/commit/9fed6a425a2803a27cf919c3038e6a5220ada465))
+
+
+
+## [5.0.1](https://github.com/hirosystems/stacks.js/compare/v5.0.0...v5.0.1) (2022-10-04)
+
+
+### Bug Fixes
+
+* rename incorrect nft post-condition codes ([dddeb68](https://github.com/hirosystems/stacks.js/commit/dddeb6891b5ff2f6c2d2a7eb089c850a9a8c32b7))
+
+
+
+## [5.0.0](https://github.com/hirosystems/stacks.js/compare/v4.3.8...v5.0.0) (2022-09-30)
+
+
+### ⚠ BREAKING CHANGES
+
+* Post-conditions for NFTs were renamed to be more clear: `Owns` to `DoesNotSend`, `DoesNotOwn` to `Sends`.
+* **encryption:** The message signing prefix was changed from `Stacks Message Signing` to `Stacks Signed Message`.
+* remove previously deprecated functions
+* Removes compatibility with `bip32` package from @stacks/wallet-sdk. Now all derivation methods only rely on HDKey from @scure/bip32.
+* To reduce the bundle sizes of applications using Stacks.js we are moving away from Buffer (a polyfill to match Node.js APIs) to Uint8Arrays (which Buffers use in the background anyway). To make the switch easier we have introduced a variety of methods for converting between strings and Uint8Arrays: `hexToBytes`, `bytesToHex`, `utf8ToBytes`, `bytesToUtf8`, `asciiToBytes`, `bytesToAscii`, and `concatBytes`.
+
+
+### Features
+
+* switch from buffer to uint8array ([#1343](https://github.com/hirosystems/stacks.js/issues/1343)) ([5445b73](https://github.com/hirosystems/stacks.js/commit/5445b73e05ec0c09414395331bfd37788545f1e1))
+
+
+### Bug Fixes
+
+* **encryption:** change message signing prefix, closes [#1328](https://github.com/hirosystems/stacks.js/issues/1328) ([65ce121](https://github.com/hirosystems/stacks.js/commit/65ce1218d62a8a1a0d82599611af4b11eaaed75c))
+* remove duplicate helper method ([f57bbef](https://github.com/hirosystems/stacks.js/commit/f57bbeffb898b9073cc8f15457ca4032dcc28d45))
+* remove previously deprecated functions ([b2a5f96](https://github.com/hirosystems/stacks.js/commit/b2a5f96fd24e8da7cb9b4e1cf4d7b654f6e5b00c))
+* update post-condition names for non-fungible tokens ([9fbdcea](https://github.com/hirosystems/stacks.js/commit/9fbdcea262a4f8af24740e35b58c886e636ad292))
+
+
+
+## [4.3.8](https://github.com/hirosystems/stacks.js/compare/v4.3.7...v4.3.8) (2022-09-29)
+
+
+### Bug Fixes
+
+* add missing customizable prefixes ([a1d385c](https://github.com/hirosystems/stacks.js/commit/a1d385c39b29ad712e61223f8473400668579035))
+
+
+
+## [4.3.7](https://github.com/hirosystems/stacks.js/compare/v4.3.6...v4.3.7) (2022-09-28)
+
+
+### Bug Fixes
+
+* correctly verify future message signing prefix ([d27e054](https://github.com/hirosystems/stacks.js/commit/d27e054f2639fcea4c873ce942d966e2aa4ca926))
+
+
+
+## [4.3.6](https://github.com/hirosystems/stacks.js/compare/v4.3.5...v4.3.6) (2022-09-23)
+
+
+### Bug Fixes
+
+* add deprecation notices for upcoming major release ([9341e20](https://github.com/hirosystems/stacks.js/commit/9341e20501618d0cd565f24395277aa5c876aa78))
+* export profile functions for wallet-sdk ([7426add](https://github.com/hirosystems/stacks.js/commit/7426add76b3d3b5a8f65256caaa19edc78e616dc))
+
+## [4.3.5](https://github.com/hirosystems/stacks.js/compare/v4.3.4...v4.3.5) (2022-08-24)
 
 
 ### Bug Fixes
 
 * offload bip39 from keychain ([132e0c5](https://github.com/hirosystems/stacks.js/commit/132e0c5beae1fcc5623256ee89988d7ac99725ac))
-
-
-
-
 
 ## [4.3.4](https://github.com/hirosystems/stacks.js/compare/v4.3.3...v4.3.4) (2022-08-02)
 
@@ -22,10 +88,6 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 * migrate subdomains to wallet key address ([b32cb41](https://github.com/hirosystems/stacks.js/commit/b32cb417f593200b1de13a704eceda7c3ab7f5a8))
 * update subdomainOpToZFPieces ([159157d](https://github.com/hirosystems/stacks.js/commit/159157d778476c8392a3c5bc274b57596b47f6f9))
 
-
-
-
-
 ## [4.3.3](https://github.com/hirosystems/stacks.js/compare/v4.3.2...v4.3.3) (2022-07-19)
 
 
@@ -34,22 +96,14 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 * update make_keychain command ([62355bc](https://github.com/hirosystems/stacks.js/commit/62355bc69dbeddd90773ed093e634c06460e86ce))
 * update version buffer size for pox addresses ([b7acc7d](https://github.com/hirosystems/stacks.js/commit/b7acc7de73e90a1969048696c481182d7ada21eb))
 
-
-
-
-
-## [4.3.2](https://github.com/hirosystems/stacks.js/compare/v4.3.1...v4.3.2) (2022-07-11)
+## [4.3.2](https://github.com/hirosystems/stacks.js/compare/v4.3.1...v4.3.2) (2022-07-12)
 
 
 ### Bug Fixes
 
 * convert checksum to buffer ([963b028](https://github.com/hirosystems/stacks.js/commit/963b028d0db7b1fb57fef0a68f540ec35c80743a))
 
-
-
-
-
-## [4.3.1](https://github.com/hirosystems/stacks.js/compare/v4.3.0...v4.3.1) (2022-07-01)
+## [4.3.1](https://github.com/hirosystems/stacks.js/compare/v4.3.0...v4.3.1) (2022-07-05)
 
 
 ### Bug Fixes
@@ -57,17 +111,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 * support legacy signature verification ([8446724](https://github.com/hirosystems/stacks.js/commit/844672480c6540b65df8d793b4bac0ec7ddd9205))
 * use correct buffer size for hashmode in stacking ([ca51914](https://github.com/hirosystems/stacks.js/commit/ca51914276da9434ac8df9cb9e7fb1e648ad2173))
 
-
-
-
-
-# [4.3.0](https://github.com/hirosystems/stacks.js/compare/v4.2.2...v4.3.0) (2022-06-16)
-
-
-### Bug Fixes
-
-* add clarity typedoc annotations ([b95783d](https://github.com/hirosystems/stacks.js/commit/b95783db54d8a5294c7f10e67ccb0f2c529aef75))
-* export structuredDataSignature ([5e8736b](https://github.com/hirosystems/stacks.js/commit/5e8736bcf572d7334947c040b218a82598bfb2e0))
+## [4.3.0](https://github.com/hirosystems/stacks.js/compare/v4.2.2...v4.3.0) (2022-06-16)
 
 
 ### Features
@@ -75,17 +119,17 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 * add SIP-018 support ([a4c0577](https://github.com/hirosystems/stacks.js/commit/a4c0577c7e6fb5010eb886c3b04c2636282e442a)), closes [#1283](https://github.com/hirosystems/stacks.js/issues/1283) [#1281](https://github.com/hirosystems/stacks.js/issues/1281)
 
 
+### Bug Fixes
 
+* add clarity typedoc annotations ([b95783d](https://github.com/hirosystems/stacks.js/commit/b95783db54d8a5294c7f10e67ccb0f2c529aef75))
+* export structuredDataSignature ([5e8736b](https://github.com/hirosystems/stacks.js/commit/5e8736bcf572d7334947c040b218a82598bfb2e0))
 
-
-## [4.2.2](https://github.com/hirosystems/stacks.js/compare/v4.2.2-beta.0...v4.2.2) (2022-06-01)
+## [4.2.2](https://github.com/hirosystems/stacks.js/compare/v4.2.1...v4.2.2) (2022-06-01)
 
 
 ### Bug Fixes
 
 * update jsontokens lib ([462f5e2](https://github.com/hirosystems/stacks.js/commit/462f5e2fe5809e8c0f471054b9ed31d8b311076b))
-
-
 
 ## [4.2.1](https://github.com/hirosystems/stacks.js/compare/v4.2.0...v4.2.1) (2022-05-28)
 
@@ -94,14 +138,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 * revert polyfill removal ([695ceb9](https://github.com/hirosystems/stacks.js/commit/695ceb9a93f60af79419d92ece70cb7075abdad9))
 
-
-
-# [4.2.0](https://github.com/hirosystems/stacks.js/compare/v4.1.2...v4.2.0) (2022-05-25)
-
-
-### Bug Fixes
-
-* offload bitcoinjs from stacking, closes [#1259](https://github.com/hirosystems/stacks.js/issues/1259) ([8912bca](https://github.com/hirosystems/stacks.js/commit/8912bca06b1281e453ff09b3513f0e08906eeae6))
+## [4.2.0](https://github.com/hirosystems/stacks.js/compare/v4.1.2...v4.2.0) (2022-05-25)
 
 
 ### Features
@@ -109,78 +146,56 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 * add missing rsv functions ([4e7fcf5](https://github.com/hirosystems/stacks.js/commit/4e7fcf5b9ae2000a903d49ac31a424349f839637))
 
 
-
-
-
-## [4.1.2](https://github.com/hirosystems/stacks.js/compare/v4.2.0-beta.3...v4.1.2) (2022-05-23)
-
 ### Bug Fixes
 
-* add blockstack dependency ([79152d3](https://github.com/hirosystems/stacks.js/commit/79152d30918401fcc3b9799aaab38da6d7be056d))
+* offload bitcoinjs from stacking, closes [#1259](https://github.com/hirosystems/stacks.js/issues/1259) ([8912bca](https://github.com/hirosystems/stacks.js/commit/8912bca06b1281e453ff09b3513f0e08906eeae6))
 
+## [4.1.2](https://github.com/hirosystems/stacks.js/compare/v4.1.1...v4.1.2) (2022-05-23)
 
-
-
-
-## [4.1.1](https://github.com/hirosystems/stacks.js/compare/v4.2.0-beta.1...v4.1.1) (2022-05-19)
 
 ### Bug Fixes
 
 * update api client ([f8cd319](https://github.com/hirosystems/stacks.js/commit/f8cd319212360cb87f537436278415f4f8d4cacc))
 
+## [4.1.1](https://github.com/hirosystems/stacks.js/compare/v4.1.0...v4.1.1) (2022-05-19)
 
 
+### Bug Fixes
 
+* add blockstack dependency ([79152d3](https://github.com/hirosystems/stacks.js/commit/79152d30918401fcc3b9799aaab38da6d7be056d))
 
-# [4.1.0](https://github.com/hirosystems/stacks.js/compare/v4.0.2...v4.1.0) (2022-05-19)
+## [4.1.0](https://github.com/hirosystems/stacks.js/compare/v4.0.2...v4.1.0) (2022-05-19)
 
 
 ### Features
 
 * add fetch middleware for api keys and request init ([ef45632](https://github.com/hirosystems/stacks.js/commit/ef456327a3e1dcdc2aa364cbe55e47225029c5d2))
 
-
-
-
-
-## [4.0.2](https://github.com/hirosystems/stacks.js/compare/v4.0.2-beta.1...v4.0.2) (2022-05-19)
+## [4.0.2](https://github.com/hirosystems/stacks.js/compare/v4.0.1...v4.0.2) (2022-05-19)
 
 
 ### Bug Fixes
 
 * **message-signing:** add working utility fn ([20b721c](https://github.com/hirosystems/stacks.js/commit/20b721cdccc2fb73f98aad80eb6d5e8e9cb987d0))
+* offload bitcoinjs dependency from storage ([78d2050](https://github.com/hirosystems/stacks.js/commit/78d2050d86574ec524a030a9ee9b15ec4d557240))
+* offload bn.js dependency ([91b511b](https://github.com/hirosystems/stacks.js/commit/91b511b45a9a64953fe9418a50dcb122ca948996))
+* update get btc address ([8ad4d83](https://github.com/hirosystems/stacks.js/commit/8ad4d8361ae72472764105c2c8e0cea96f9b5a2c))
 
-
-
-
-
-## [4.0.1](https://github.com/hirosystems/stacks.js/compare/v4.0.1-beta.1...v4.0.1) (2022-05-09)
+## [4.0.1](https://github.com/hirosystems/stacks.js/compare/v4.0.0...v4.0.1) (2022-05-09)
 
 
 ### Bug Fixes
 
 * allow referrer header in request options ([70ea915](https://github.com/hirosystems/stacks.js/commit/70ea9156f6916f32e40adf7464322476a9acd8ab))
+* offload bip39 from wallet-sdk ([701416a](https://github.com/hirosystems/stacks.js/commit/701416a634ac730b8ca9f8b1e355aa5032fae0f4))
+* support length estimation in fee estimate interface ([194442c](https://github.com/hirosystems/stacks.js/commit/194442c489a4eba3a90296bc3187abb84fe8053e))
+
+## [4.0.0](https://github.com/hirosystems/stacks.js/compare/v3.5.0...v4.0.0) (2022-04-20)
 
 
-
-
-
-# [4.0.0](https://github.com/hirosystems/stacks.js/compare/v3.5.0...v4.0.0) (2022-04-20)
-
-
-### BREAKING CHANGES
+### ⚠ BREAKING CHANGES
 
 * This change REMOVES the `username` attribute from auth token payloads and therefore also from userData in @stacks/connect. Hence, there is NO MORE username verification done by @stacks/connect automatically.
-
-### Bug Fixes
-
-* remove doPublicKeysMatchUsername ([e2f3cf9](https://github.com/hirosystems/stacks.js/commit/e2f3cf93f1ae5148f78620e37786104cd482d7e1))
-* remove username checking ([e32781b](https://github.com/hirosystems/stacks.js/commit/e32781ba2a8af5afbe83b4a02419e0cc4a6f5bb0))
-* deserialize partially signed multisig transaction ([52d4045](https://github.com/hirosystems/stacks.js/commit/52d4045abb5b91fe48756f743cfda5eff135f7dc))
-* offload bip32 dependency from wallet-sdk ([c729006](https://github.com/hirosystems/stacks.js/commit/c729006b8d37a18005adff146aea5f0f9aaf6d5d))
-* offload bip39 dependency from encryption ([7973100](https://github.com/hirosystems/stacks.js/commit/797310003c981b8eb5e081f0f89e082986cd76d2))
-* private key compression ([cf0a3ab](https://github.com/hirosystems/stacks.js/commit/cf0a3ab9b04876c942d241e554e96db17e512b5b))
-
 
 ### Features
 
@@ -188,19 +203,16 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 * remove username from payload and userdata ([926c549](https://github.com/hirosystems/stacks.js/commit/926c549d15ea5488820f5a4a144ca74e6d30211d))
 
 
-
-
-
-# [3.5.0](https://github.com/hirosystems/stacks.js/compare/v3.4.0...v3.5.0) (2022-03-30)
-
-
 ### Bug Fixes
 
-* offload ramdombytes library from encryption ([fe3f30e](https://github.com/hirosystems/stacks.js/commit/fe3f30ee4ea110ef150a1b407bde0af2feba6783))
-* use noble-secp256k1 in encryption to replace elliptic dependency ([8cc1774](https://github.com/hirosystems/stacks.js/commit/8cc1774d06cbe63ba4188800b57cc8cc159712a6))
-* use noble-secp256k1 in encryption to replace elliptic dependency ([ca778e4](https://github.com/hirosystems/stacks.js/commit/ca778e493e4b8651b0db896a469617be65139b30))
-* offload ramdombytes library from transactions ([c06e5b8](https://github.com/hirosystems/stacks.js/commit/c06e5b838fe42c376b9347f486393ea31bc54ddb))
-* remove unused dependency ramdombytes from wallet-sdk ([61eeb57](https://github.com/hirosystems/stacks.js/commit/61eeb57ab0b4e41838e154701165ac0fe98b760c))
+* deserialize partially signed multisig transaction ([52d4045](https://github.com/hirosystems/stacks.js/commit/52d4045abb5b91fe48756f743cfda5eff135f7dc))
+* offload bip32 dependency from wallet-sdk ([c729006](https://github.com/hirosystems/stacks.js/commit/c729006b8d37a18005adff146aea5f0f9aaf6d5d))
+* offload bip39 dependency from encryption ([7973100](https://github.com/hirosystems/stacks.js/commit/797310003c981b8eb5e081f0f89e082986cd76d2))
+* private key compression ([cf0a3ab](https://github.com/hirosystems/stacks.js/commit/cf0a3ab9b04876c942d241e554e96db17e512b5b))
+* remove doPublicKeysMatchUsername ([e2f3cf9](https://github.com/hirosystems/stacks.js/commit/e2f3cf93f1ae5148f78620e37786104cd482d7e1))
+* remove username checking ([e32781b](https://github.com/hirosystems/stacks.js/commit/e32781ba2a8af5afbe83b4a02419e0cc4a6f5bb0))
+
+## [3.5.0](https://github.com/hirosystems/stacks.js/compare/v3.4.0...v3.5.0) (2022-03-30)
 
 
 ### Features
@@ -208,21 +220,22 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 * add appPrivateKeyFromWalletSalt ([#1212](https://github.com/hirosystems/stacks.js/issues/1212)) ([ac3858c](https://github.com/hirosystems/stacks.js/commit/ac3858cc0c5bd6aba0ff2c71704161bb4926e387))
 
 
+### Bug Fixes
 
+* offload ramdombytes library from encryption ([fe3f30e](https://github.com/hirosystems/stacks.js/commit/fe3f30ee4ea110ef150a1b407bde0af2feba6783))
+* offload ramdombytes library from transactions ([c06e5b8](https://github.com/hirosystems/stacks.js/commit/c06e5b838fe42c376b9347f486393ea31bc54ddb))
+* remove unused dependency ramdombytes from wallet-sdk ([61eeb57](https://github.com/hirosystems/stacks.js/commit/61eeb57ab0b4e41838e154701165ac0fe98b760c))
+* use noble-secp256k1 in encryption to replace elliptic dependency ([8cc1774](https://github.com/hirosystems/stacks.js/commit/8cc1774d06cbe63ba4188800b57cc8cc159712a6))
+* use noble-secp256k1 in encryption to replace elliptic dependency ([ca778e4](https://github.com/hirosystems/stacks.js/commit/ca778e493e4b8651b0db896a469617be65139b30))
 
-
-# [3.4.0](https://github.com/hirosystems/stacks.js/compare/v3.3.0...v3.4.0) (2022-03-02)
+## [3.4.0](https://github.com/hirosystems/stacks.js/compare/v3.3.0...v3.4.0) (2022-03-02)
 
 
 ### Features
 
 * on restoreWalletAccounts, only support stxPrivateKey ([#1204](https://github.com/hirosystems/stacks.js/issues/1204)) ([1fbd30e](https://github.com/hirosystems/stacks.js/commit/1fbd30e8d1bc459efae2967ed084151e57cc90a9))
 
-
-
-
-
-# [3.3.0](https://github.com/hirosystems/stacks.js/compare/v3.2.0...v3.3.0) (2022-02-23)
+## [3.3.0](https://github.com/hirosystems/stacks.js/compare/v3.2.0...v3.3.0) (2022-02-23)
 
 
 ### Bug Fixes
@@ -231,165 +244,138 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 * add register command in cli ([85c7dd9](https://github.com/hirosystems/stacks.js/commit/85c7dd9d770aba5c6a60b8702bb57239c7fd14bc))
 * use noble-secp256k1 in transaction to replace elliptic dependency ([534f1b8](https://github.com/hirosystems/stacks.js/commit/534f1b8acf5ab1267860af0d2a9f1ba19bb35303))
 
-
-
-
-
-# [3.2.0](https://github.com/blockstack/blockstack.js/compare/v3.1.1...v3.2.0) (2022-02-02)
-
-
-### Bug Fixes
-
-* remove lodash dependency ([96b3064](https://github.com/blockstack/blockstack.js/commit/96b306446510eba33fe99665e0e02a84bca901c5))
+## [3.2.0](https://github.com/hirosystems/stacks.js/compare/v3.1.1...v3.2.0) (2022-02-02)
 
 
 ### Features
 
-* reduce reliance on network package ([422fda3](https://github.com/blockstack/blockstack.js/commit/422fda3cd43e16ae24ea9d97297b423a90823672))
-
-
-
-
-
-## [3.1.1](https://github.com/blockstack/blockstack.js/compare/v3.1.0...v3.1.1) (2021-12-20)
+* reduce reliance on network package ([422fda3](https://github.com/hirosystems/stacks.js/commit/422fda3cd43e16ae24ea9d97297b423a90823672))
 
 
 ### Bug Fixes
 
-* key exposed in api call, closes [#1152](https://github.com/blockstack/blockstack.js/issues/1152) ([08012b2](https://github.com/blockstack/blockstack.js/commit/08012b2728f8aad0b18f751456532dceaf1108de))
+* remove lodash dependency ([96b3064](https://github.com/hirosystems/stacks.js/commit/96b306446510eba33fe99665e0e02a84bca901c5))
 
-
-
-
-
-# [3.1.0](https://github.com/blockstack/blockstack.js/compare/v3.0.0...v3.1.0) (2021-12-16)
+## [3.1.1](https://github.com/hirosystems/stacks.js/compare/v3.1.0...v3.1.1) (2021-12-20)
 
 
 ### Bug Fixes
 
-* update default core node url ([1208996](https://github.com/blockstack/blockstack.js/commit/120899670b35cca31f49daa9cc5c05a6061dc9aa))
+* key exposed in api call, closes [#1152](https://github.com/hirosystems/stacks.js/issues/1152) ([08012b2](https://github.com/hirosystems/stacks.js/commit/08012b2728f8aad0b18f751456532dceaf1108de))
 
-
-
-
-
-# [3.0.0](https://github.com/blockstack/blockstack.js/compare/v2.0.1...v3.0.0) (2021-11-30)
+## [3.1.0](https://github.com/hirosystems/stacks.js/compare/v3.0.0...v3.1.0) (2021-12-16)
 
 
 ### Bug Fixes
 
-* add custom bigint pow to prevent transpilers incorrect conversion ([f0334cf](https://github.com/blockstack/blockstack.js/commit/f0334cf8581bc5aced724e8f151a826018e0f3f8))
-* avoid use of getters to enable safer serialization ([6f626a1](https://github.com/blockstack/blockstack.js/commit/6f626a120229632ee215f28bc5d2ebaa40857c43))
-* bigint -> number ([78c7960](https://github.com/blockstack/blockstack.js/commit/78c79600c1a0b7fde1af689f83a0c63f94d036aa))
-* check if spending condition has too many sigs ([6ad03fd](https://github.com/blockstack/blockstack.js/commit/6ad03fd15e218647299e44a40616501f5b8f4f91))
-* cli add missing clarity types in contract call ([a02665a](https://github.com/blockstack/blockstack.js/commit/a02665ad38cbf49e79dc315d97b23b766886eae0))
-* endpoint response type ([647833a](https://github.com/blockstack/blockstack.js/commit/647833a0ca3f61d1ce549155c94c2d2127dff772))
-* fix etags deletion from localstorage on parallel calls to delete file ([1af7a18](https://github.com/blockstack/blockstack.js/commit/1af7a18b1017981f5b44c1006d940eb4648d0491))
-* github action for generating updated docs on release ([6d9ff4d](https://github.com/blockstack/blockstack.js/commit/6d9ff4df00469bb1015e031bb04cc3423357de5b))
-* improve signOrigin oversign check; fields which are not a MessageSignature don't count in overlap check ([abe2909](https://github.com/blockstack/blockstack.js/commit/abe29096f682abb327a8134a5d4d0e7d6e20d5dc))
-* jsdom failing with init bigint ([ba4d351](https://github.com/blockstack/blockstack.js/commit/ba4d3511ae023afc325faece1a4faf7a154806cb))
-* **network:** upgrade and republish ([f061612](https://github.com/blockstack/blockstack.js/commit/f0616128699bf5634c4f0e93f913b41921e908ba))
-* remove circular dependencies form keychain package ([140f62d](https://github.com/blockstack/blockstack.js/commit/140f62ddbf56b6aeca30198164a3b2dde26fa41b))
-* remove circular dependencies from cli ([4a29e42](https://github.com/blockstack/blockstack.js/commit/4a29e42ceae7c0c4bde52d2827e234ebac2548ea))
-* remove circular dependencies from transactions ([0d0b5fb](https://github.com/blockstack/blockstack.js/commit/0d0b5fbddea4cb5e64c62481cea6feb904b583a9))
-* remove circular dependencies from wallet-sdk ([e9e626d](https://github.com/blockstack/blockstack.js/commit/e9e626d8b3b4dbfab6c39701e8b29fb6f3131ad3))
-* return correct signature in sponsored spending conditions ([e83cdc6](https://github.com/blockstack/blockstack.js/commit/e83cdc64a215f393d75808934c8bb747f8770acb))
-* review and update bns readme ([3d36f8e](https://github.com/blockstack/blockstack.js/commit/3d36f8ed2cf0387e6b39995178dcc7e9d2952755))
-* review and update cli readme ([ae8c7f7](https://github.com/blockstack/blockstack.js/commit/ae8c7f7285291b48799e784b34d13e5220e0b4be))
-* review and update encryption readme ([79735f4](https://github.com/blockstack/blockstack.js/commit/79735f44b8f5489a2840f146b4a168f46a34609f))
-* review and update keychain readme ([a834742](https://github.com/blockstack/blockstack.js/commit/a834742f72fffe63bc89a1745be87788dd6d098d))
-* review and update profile readme ([227b25a](https://github.com/blockstack/blockstack.js/commit/227b25a9f7821e986e6a8aa9afd958ec0a35c437))
-* review and update stacking readme ([d4bc99e](https://github.com/blockstack/blockstack.js/commit/d4bc99e4cdb3ad59932d1627d971da9416e252c3))
-* review and update storage readme ([d9df8f5](https://github.com/blockstack/blockstack.js/commit/d9df8f506c5fb5ead427d3717b320f8ee7ce673c))
-* review and update transactions readme ([0421590](https://github.com/blockstack/blockstack.js/commit/0421590c84fda94ae22f78e12076b9dd7533201f))
-* throw error if authType not set ([8ae3f34](https://github.com/blockstack/blockstack.js/commit/8ae3f34ce5c75236c4aeec56de2a991509cfcc13))
-* trigger workflows on external pull requests [#1114](https://github.com/blockstack/blockstack.js/issues/1114) ([8b4fdb5](https://github.com/blockstack/blockstack.js/commit/8b4fdb5bdf5e14f80e8c8169d3d281a6940ba087))
-* update getFee usage in stacking lib ([34dab52](https://github.com/blockstack/blockstack.js/commit/34dab525304426e0a0d594eb46968541900fad7c))
-* update readme for broadcastTransaction ([c575ee9](https://github.com/blockstack/blockstack.js/commit/c575ee9ee8645fea646da0ea17dabe3f2aff85af))
-* update test and fix oversign check ([a26898e](https://github.com/blockstack/blockstack.js/commit/a26898e3c6e10c779e9e4d96125241c7f412e223))
+* update default core node url ([1208996](https://github.com/hirosystems/stacks.js/commit/120899670b35cca31f49daa9cc5c05a6061dc9aa))
+
+## [3.0.0](https://github.com/hirosystems/stacks.js/compare/v2.0.1...v3.0.0) (2021-11-30)
+
+
+### ⚠ BREAKING CHANGES
+
+* use new /v2/fees/transaction endpoint for fee estimation
+* address Matt's comment and add type guard
+* avoid mutating Auth
+* change Authorization from a class to functional interface
+
+### Features
+
+* add address/signer verification to verifySingleSig() ([589b14d](https://github.com/hirosystems/stacks.js/commit/589b14df3ae6454c202e56e60ff90bd4294c07d8))
+* add more spending condition tests ([930f34d](https://github.com/hirosystems/stacks.js/commit/930f34d3d23f24e7c849593d50a1bf469d068986))
+* add unsigned equivalent of make contract deploy ([792c2ae](https://github.com/hirosystems/stacks.js/commit/792c2ae615a1cd2dca4104b1da22293e7b2381f2))
+* add verifyMultiSig() ([0378747](https://github.com/hirosystems/stacks.js/commit/03787470ffbf87673cda7d2a9d13581992376491))
+* bring back cli command get_app_keys ([f7d2c6c](https://github.com/hirosystems/stacks.js/commit/f7d2c6c474146d6a7129b91ffac7f3e62802ceba))
+* ci job to list circular dependencies ([9816b3c](https://github.com/hirosystems/stacks.js/commit/9816b3c7ae4e9a8f7fcff219239f8b6952f70471))
+* cli add custom derivation path option ([9ba53be](https://github.com/hirosystems/stacks.js/commit/9ba53be4dd0cc09286a525017553218f8e5870b2))
+* construct TransactionSigner with partially signed multi-sig transaction ([0ada72a](https://github.com/hirosystems/stacks.js/commit/0ada72aaeaa66ade8c01243feb50ac2aab7a6e0e))
+* construct TransactionSigner with partially signed multi-sig transaction ([c0ae13f](https://github.com/hirosystems/stacks.js/commit/c0ae13fdbd49dd2034475c59952b4c9f2a595152))
+* export user app file url from storage ([28d5187](https://github.com/hirosystems/stacks.js/commit/28d5187c836318876a0115da8264ab8b66509f95))
+* multisig spending condition tests use integers, not BigNums ([e34ba2e](https://github.com/hirosystems/stacks.js/commit/e34ba2e76fabccb77b39d329bcc75bdac2b93b3e))
+
+
+### Bug Fixes
+
+* add custom bigint pow to prevent transpilers incorrect conversion ([f0334cf](https://github.com/hirosystems/stacks.js/commit/f0334cf8581bc5aced724e8f151a826018e0f3f8))
+* avoid use of getters to enable safer serialization ([6f626a1](https://github.com/hirosystems/stacks.js/commit/6f626a120229632ee215f28bc5d2ebaa40857c43))
+* bigint -> number ([78c7960](https://github.com/hirosystems/stacks.js/commit/78c79600c1a0b7fde1af689f83a0c63f94d036aa))
+* check if spending condition has too many sigs ([6ad03fd](https://github.com/hirosystems/stacks.js/commit/6ad03fd15e218647299e44a40616501f5b8f4f91))
+* cli add missing clarity types in contract call ([a02665a](https://github.com/hirosystems/stacks.js/commit/a02665ad38cbf49e79dc315d97b23b766886eae0))
+* endpoint response type ([647833a](https://github.com/hirosystems/stacks.js/commit/647833a0ca3f61d1ce549155c94c2d2127dff772))
+* fix etags deletion from localstorage on parallel calls to delete file ([1af7a18](https://github.com/hirosystems/stacks.js/commit/1af7a18b1017981f5b44c1006d940eb4648d0491))
+* github action for generating updated docs on release ([6d9ff4d](https://github.com/hirosystems/stacks.js/commit/6d9ff4df00469bb1015e031bb04cc3423357de5b))
+* improve signOrigin oversign check; fields which are not a MessageSignature don't count in overlap check ([abe2909](https://github.com/hirosystems/stacks.js/commit/abe29096f682abb327a8134a5d4d0e7d6e20d5dc))
+* jsdom failing with init bigint ([ba4d351](https://github.com/hirosystems/stacks.js/commit/ba4d3511ae023afc325faece1a4faf7a154806cb))
+* **network:** upgrade and republish ([f061612](https://github.com/hirosystems/stacks.js/commit/f0616128699bf5634c4f0e93f913b41921e908ba))
+* remove circular dependencies form keychain package ([140f62d](https://github.com/hirosystems/stacks.js/commit/140f62ddbf56b6aeca30198164a3b2dde26fa41b))
+* remove circular dependencies from cli ([4a29e42](https://github.com/hirosystems/stacks.js/commit/4a29e42ceae7c0c4bde52d2827e234ebac2548ea))
+* remove circular dependencies from transactions ([0d0b5fb](https://github.com/hirosystems/stacks.js/commit/0d0b5fbddea4cb5e64c62481cea6feb904b583a9))
+* remove circular dependencies from wallet-sdk ([e9e626d](https://github.com/hirosystems/stacks.js/commit/e9e626d8b3b4dbfab6c39701e8b29fb6f3131ad3))
+* return correct signature in sponsored spending conditions ([e83cdc6](https://github.com/hirosystems/stacks.js/commit/e83cdc64a215f393d75808934c8bb747f8770acb))
+* review and update bns readme ([3d36f8e](https://github.com/hirosystems/stacks.js/commit/3d36f8ed2cf0387e6b39995178dcc7e9d2952755))
+* review and update cli readme ([ae8c7f7](https://github.com/hirosystems/stacks.js/commit/ae8c7f7285291b48799e784b34d13e5220e0b4be))
+* review and update encryption readme ([79735f4](https://github.com/hirosystems/stacks.js/commit/79735f44b8f5489a2840f146b4a168f46a34609f))
+* review and update keychain readme ([a834742](https://github.com/hirosystems/stacks.js/commit/a834742f72fffe63bc89a1745be87788dd6d098d))
+* review and update profile readme ([227b25a](https://github.com/hirosystems/stacks.js/commit/227b25a9f7821e986e6a8aa9afd958ec0a35c437))
+* review and update stacking readme ([d4bc99e](https://github.com/hirosystems/stacks.js/commit/d4bc99e4cdb3ad59932d1627d971da9416e252c3))
+* review and update storage readme ([d9df8f5](https://github.com/hirosystems/stacks.js/commit/d9df8f506c5fb5ead427d3717b320f8ee7ce673c))
+* review and update transactions readme ([0421590](https://github.com/hirosystems/stacks.js/commit/0421590c84fda94ae22f78e12076b9dd7533201f))
+* throw error if authType not set ([8ae3f34](https://github.com/hirosystems/stacks.js/commit/8ae3f34ce5c75236c4aeec56de2a991509cfcc13))
+* trigger workflows on external pull requests [#1114](https://github.com/hirosystems/stacks.js/issues/1114) ([8b4fdb5](https://github.com/hirosystems/stacks.js/commit/8b4fdb5bdf5e14f80e8c8169d3d281a6940ba087))
+* update getFee usage in stacking lib ([34dab52](https://github.com/hirosystems/stacks.js/commit/34dab525304426e0a0d594eb46968541900fad7c))
+* update readme for broadcastTransaction ([c575ee9](https://github.com/hirosystems/stacks.js/commit/c575ee9ee8645fea646da0ea17dabe3f2aff85af))
+* update test and fix oversign check ([a26898e](https://github.com/hirosystems/stacks.js/commit/a26898e3c6e10c779e9e4d96125241c7f412e223))
+* use new /v2/fees/transaction endpoint for fee estimation ([888e8fa](https://github.com/hirosystems/stacks.js/commit/888e8fafc48b137c0fdfb16dfc3b66ce0ea9bd77))
+
+
+### Code Refactoring
+
+* address Matt's comment and add type guard ([642f281](https://github.com/hirosystems/stacks.js/commit/642f281397a114a6b09b7c3baf5f0aa89febeebc))
+* avoid mutating Auth ([c91decb](https://github.com/hirosystems/stacks.js/commit/c91decbfb39d4ab794115c895fe9d4b84f908c35))
+* change Authorization from a class to functional interface ([327a153](https://github.com/hirosystems/stacks.js/commit/327a153a721dc40b152057090f8cd0b0bfb3495b))
+
+## [2.0.1](https://github.com/hirosystems/stacks.js/compare/v1.5.0-alpha.0...v2.0.1) (2021-08-09)
 
 
 ### Features
 
-* add address/signer verification to verifySingleSig() ([589b14d](https://github.com/blockstack/blockstack.js/commit/589b14df3ae6454c202e56e60ff90bd4294c07d8))
-* add more spending condition tests ([930f34d](https://github.com/blockstack/blockstack.js/commit/930f34d3d23f24e7c849593d50a1bf469d068986))
-* add unsigned equivalent of make contract deploy ([792c2ae](https://github.com/blockstack/blockstack.js/commit/792c2ae615a1cd2dca4104b1da22293e7b2381f2))
-* add verifyMultiSig() ([0378747](https://github.com/blockstack/blockstack.js/commit/03787470ffbf87673cda7d2a9d13581992376491))
-* bring back cli command get_app_keys ([f7d2c6c](https://github.com/blockstack/blockstack.js/commit/f7d2c6c474146d6a7129b91ffac7f3e62802ceba))
-* ci job to list circular dependencies ([9816b3c](https://github.com/blockstack/blockstack.js/commit/9816b3c7ae4e9a8f7fcff219239f8b6952f70471))
-* cli add custom derivation path option ([9ba53be](https://github.com/blockstack/blockstack.js/commit/9ba53be4dd0cc09286a525017553218f8e5870b2))
-* construct TransactionSigner with partially signed multi-sig transaction ([0ada72a](https://github.com/blockstack/blockstack.js/commit/0ada72aaeaa66ade8c01243feb50ac2aab7a6e0e))
-* construct TransactionSigner with partially signed multi-sig transaction ([c0ae13f](https://github.com/blockstack/blockstack.js/commit/c0ae13fdbd49dd2034475c59952b4c9f2a595152))
-* export user app file url from storage ([28d5187](https://github.com/blockstack/blockstack.js/commit/28d5187c836318876a0115da8264ab8b66509f95))
-* multisig spending condition tests use integers, not BigNums ([e34ba2e](https://github.com/blockstack/blockstack.js/commit/e34ba2e76fabccb77b39d329bcc75bdac2b93b3e))
-
-
-## [2.0.1](https://github.com/blockstack/blockstack.js/compare/v2.0.1-beta.2...v2.0.1) (2021-08-09)
-
-**Note:** Version bump only for package stacks.js
-
-
-
-
-
-## [2.0.1-beta.2](https://github.com/blockstack/blockstack.js/compare/v2.0.1-beta.1...v2.0.1-beta.2) (2021-08-06)
+* add @stacks/wallet-sdk package ([49783f9](https://github.com/hirosystems/stacks.js/commit/49783f9713e7a016909f76ab816fdd486d22daae))
+* add regtest to list of available networks ([f572477](https://github.com/hirosystems/stacks.js/commit/f572477ca0e5bc5e862c8a4e2fcc276655ee55a3)), closes [#1041](https://github.com/hirosystems/stacks.js/issues/1041)
+* add reward methods for set address in stacking package ([2676d71](https://github.com/hirosystems/stacks.js/commit/2676d71fc579702d3f8bfb81261f8bcdc93814e1))
+* allow nested concrete ClarityValue types to be specified ([da68307](https://github.com/hirosystems/stacks.js/commit/da68307499114de106f8fa5b4171580461997824))
+* function to convert pox address details to a btc address ([b6ae9ef](https://github.com/hirosystems/stacks.js/commit/b6ae9efea30e14950ae65e290e229a1ea9ebfc3a))
+* refactor all js `number` and `bn.js` usages in Clarity integer values to native bigint ([1f78339](https://github.com/hirosystems/stacks.js/commit/1f783397e7f5b38aabb6e0342af71b58022aed4c))
+* remove default anchormode from tx builders ([768cc57](https://github.com/hirosystems/stacks.js/commit/768cc57ddfbabfabaa4138e6aba71a131f38f229))
+* support parsing btc address from a Clarity tuple value ([cb06f12](https://github.com/hirosystems/stacks.js/commit/cb06f12ea2080f0ef024d994bff4559edfb2455b))
+* use lerna hoisting for fast monorepo bootstrapping ([cfd76ab](https://github.com/hirosystems/stacks.js/commit/cfd76abe7819c23489721120be0c7f712b932d96))
 
 
 ### Bug Fixes
 
-* fix coreNode error when fetching public data with no user session ([144754b](https://github.com/blockstack/blockstack.js/commit/144754b80f05bff1a4656be87d4ab09b4076d37c))
-
-
-
-
-
-## [2.0.1-beta.1](https://github.com/blockstack/blockstack.js/compare/v2.0.0-beta.1...v2.0.1-beta.1) (2021-07-26)
-
-
-### Bug Fixes
-
-* add missing stx burn and NFT post conditions ([7e0fcba](https://github.com/blockstack/blockstack.js/commit/7e0fcba3f52062e9531923e82676e1121a9a3eb0))
-* always return string quoted integer rather than `number | string` depending on bit size ([6af4abe](https://github.com/blockstack/blockstack.js/commit/6af4abe92e995140d4e8becab3aacabd17dbce92))
-* bn.js lib accepts strings containing non-integer values and results in weird behavior ([da07f10](https://github.com/blockstack/blockstack.js/commit/da07f108061a29af1879eef6b6054e0a45b6b9d1))
-* BREAKING CHANGE: make coreApiUrl readonly for stacks network and initialize in constructor ([5d8cf6d](https://github.com/blockstack/blockstack.js/commit/5d8cf6d366665dace2df8102049d3f7ac1bf437e))
-* BREAKING CHANGE: make the broadcastTransaction response type consistent and always return an object ([3e4c197](https://github.com/blockstack/blockstack.js/commit/3e4c197f3a4763bc4ec6b7165cbd9db793bc2c2d))
-* broken types following diverged network config changes ([1cd9612](https://github.com/blockstack/blockstack.js/commit/1cd96128334465c461665cf079532f66b893b938))
-* fix optional argument encoding and update test cases in bns transferName, renewName calls ([6f4f8fa](https://github.com/blockstack/blockstack.js/commit/6f4f8fa67e208541adf9acbe780f74a8d002e5a2))
-* fix stx balance command crash if address not valid ([8cc69df](https://github.com/blockstack/blockstack.js/commit/8cc69df21bc33eda6e9ec3cd6be6bfca2ec7b8ad))
-* fixed lint issue ([1dab3a9](https://github.com/blockstack/blockstack.js/commit/1dab3a9d17fec2e4dd9f075f97cf28a1b93a6da7))
-* generated explorer URL for faucet command ([38540a9](https://github.com/blockstack/blockstack.js/commit/38540a9e328a42e90a78861d9c62c8033a0679bc))
-* handle empty list in getCVTypeString ([#1033](https://github.com/blockstack/blockstack.js/issues/1033)) ([1ff5b03](https://github.com/blockstack/blockstack.js/commit/1ff5b03c28c664953260105d333cebfa2fd64e5f))
-* prettify ([b471de9](https://github.com/blockstack/blockstack.js/commit/b471de968acba970b1c5337100220cc75a05e44e))
-* remove console.log ([3e55c94](https://github.com/blockstack/blockstack.js/commit/3e55c94d1bef2417aa3f25710c3171632c1ac8f3))
-* remove unused const ([e506cf3](https://github.com/blockstack/blockstack.js/commit/e506cf3b5faf2d030b4e6da82e330002783db1c0))
-* removeread only and add private field to prevent run time assignment ([62709aa](https://github.com/blockstack/blockstack.js/commit/62709aa5b6483299718063482bc26d6e94cc8c1c))
-* The transaction ABI validation should accept lists that are less than or equal to the max size specified in the arguments type ([53dd641](https://github.com/blockstack/blockstack.js/commit/53dd6410554dea195dc7e206d39a1995c6fc1fae))
-* use stacks.js repo url ([cd2a684](https://github.com/blockstack/blockstack.js/commit/cd2a6849d6a2bf20109f85ac2c9afe467accf1a9))
-* verify that the public key is a secp256k1 point ([1cfef11](https://github.com/blockstack/blockstack.js/commit/1cfef115515aaa6f97fe188f29c4f66f198aefcd))
-* make `lookupProfile` work with newest stacks API ([598ce15](https://github.com/blockstack/blockstack.js/commit/598ce158e51e133c25a8f5d1822567310c133739))
-* updated downstream dependencies ([c636819](https://github.com/blockstack/blockstack.js/commit/c636819ae20315b4f232beb15044641689288396))
-* debugging jest tests from any cwd ([626c5fc](https://github.com/blockstack/blockstack.js/commit/626c5fccb4dff213f000923ab69c7ed4f5eb48a0))
-* **keychain:** do not use default import ([3528b65](https://github.com/blockstack/blockstack.js/commit/3528b6509ef69b2cb70d734fb15e3d4ad2a1f8e3))
-* correct version when converting address in auth verification ([71202b4](https://github.com/blockstack/blockstack.js/commit/71202b40513fa0d2e7d85b6d6b8bfa8cbde5560f))
-* support multiple lookup URLs for auth verification ([93ad6e1](https://github.com/blockstack/blockstack.js/commit/93ad6e192b917c90a5ef3031ad344b67b400c7ea))
-* use only mainnet URLs during auth BNS checks ([1434262](https://github.com/blockstack/blockstack.js/commit/1434262dd5ff34b8ef837fa33c4219eac57d0436))
-* use registrar for fallback, avoid duplicate lookups ([1dde71f](https://github.com/blockstack/blockstack.js/commit/1dde71f07a78bdafdb35015950cdc9b72e8ead7c))
-* version of network in auth package ([e0ab244](https://github.com/blockstack/blockstack.js/commit/e0ab2446a6bddda49e915b1c2e95f35b35449597))
-
-
-### Features
-
-* add @stacks/wallet-sdk package ([49783f9](https://github.com/blockstack/blockstack.js/commit/49783f9713e7a016909f76ab816fdd486d22daae))
-* add regtest to list of available networks ([f572477](https://github.com/blockstack/blockstack.js/commit/f572477ca0e5bc5e862c8a4e2fcc276655ee55a3)), closes [#1041](https://github.com/blockstack/blockstack.js/issues/1041)
-* refactor all js `number` and `bn.js` usages in Clarity integer values to native bigint ([1f78339](https://github.com/blockstack/blockstack.js/commit/1f783397e7f5b38aabb6e0342af71b58022aed4c))
-* allow nested concrete ClarityValue types to be specified ([da68307](https://github.com/blockstack/blockstack.js/commit/da68307499114de106f8fa5b4171580461997824))
-* remove default anchormode from tx builders ([768cc57](https://github.com/blockstack/blockstack.js/commit/768cc57ddfbabfabaa4138e6aba71a131f38f229))
-* function to convert pox address details to a btc address ([b6ae9ef](https://github.com/blockstack/blockstack.js/commit/b6ae9efea30e14950ae65e290e229a1ea9ebfc3a))
-* support parsing btc address from a Clarity tuple value ([cb06f12](https://github.com/blockstack/blockstack.js/commit/cb06f12ea2080f0ef024d994bff4559edfb2455b))
-* use lerna hoisting for fast monorepo bootstrapping ([cfd76ab](https://github.com/blockstack/blockstack.js/commit/cfd76abe7819c23489721120be0c7f712b932d96))
-* match authResponse username with 2.0 bns lookup ([d40efe3](https://github.com/blockstack/blockstack.js/commit/d40efe395d07e329bd74c84049bb8443452cd432))
-
-
+* add missing stx burn and NFT post conditions ([7e0fcba](https://github.com/hirosystems/stacks.js/commit/7e0fcba3f52062e9531923e82676e1121a9a3eb0))
+* always return string quoted integer rather than `number | string` depending on bit size ([6af4abe](https://github.com/hirosystems/stacks.js/commit/6af4abe92e995140d4e8becab3aacabd17dbce92))
+* bn.js lib accepts strings containing non-integer values and results in weird behavior ([da07f10](https://github.com/hirosystems/stacks.js/commit/da07f108061a29af1879eef6b6054e0a45b6b9d1))
+* BREAKING CHANGE: make coreApiUrl readonly for stacks network and initialize in constructor ([5d8cf6d](https://github.com/hirosystems/stacks.js/commit/5d8cf6d366665dace2df8102049d3f7ac1bf437e))
+* BREAKING CHANGE: make the broadcastTransaction response type consistent and always return an object ([3e4c197](https://github.com/hirosystems/stacks.js/commit/3e4c197f3a4763bc4ec6b7165cbd9db793bc2c2d))
+* broken types following diverged network config changes ([1cd9612](https://github.com/hirosystems/stacks.js/commit/1cd96128334465c461665cf079532f66b893b938))
+* debugging jest tests from any cwd ([626c5fc](https://github.com/hirosystems/stacks.js/commit/626c5fccb4dff213f000923ab69c7ed4f5eb48a0))
+* fix coreNode error when fetching public data with no user session ([144754b](https://github.com/hirosystems/stacks.js/commit/144754b80f05bff1a4656be87d4ab09b4076d37c))
+* fix optional argument encoding and update test cases in bns transferName, renewName calls ([6f4f8fa](https://github.com/hirosystems/stacks.js/commit/6f4f8fa67e208541adf9acbe780f74a8d002e5a2))
+* fix stx balance command crash if address not valid ([8cc69df](https://github.com/hirosystems/stacks.js/commit/8cc69df21bc33eda6e9ec3cd6be6bfca2ec7b8ad))
+* fixed lint issue ([1dab3a9](https://github.com/hirosystems/stacks.js/commit/1dab3a9d17fec2e4dd9f075f97cf28a1b93a6da7))
+* generated explorer URL for faucet command ([38540a9](https://github.com/hirosystems/stacks.js/commit/38540a9e328a42e90a78861d9c62c8033a0679bc))
+* handle empty list in getCVTypeString ([#1033](https://github.com/hirosystems/stacks.js/issues/1033)) ([1ff5b03](https://github.com/hirosystems/stacks.js/commit/1ff5b03c28c664953260105d333cebfa2fd64e5f))
+* **keychain:** do not use default import ([3528b65](https://github.com/hirosystems/stacks.js/commit/3528b6509ef69b2cb70d734fb15e3d4ad2a1f8e3))
+* make `lookupProfile` work with newest stacks API ([598ce15](https://github.com/hirosystems/stacks.js/commit/598ce158e51e133c25a8f5d1822567310c133739))
+* prettify ([b471de9](https://github.com/hirosystems/stacks.js/commit/b471de968acba970b1c5337100220cc75a05e44e))
+* remove console.log ([3e55c94](https://github.com/hirosystems/stacks.js/commit/3e55c94d1bef2417aa3f25710c3171632c1ac8f3))
+* remove unused const ([e506cf3](https://github.com/hirosystems/stacks.js/commit/e506cf3b5faf2d030b4e6da82e330002783db1c0))
+* removeread only and add private field to prevent run time assignment ([62709aa](https://github.com/hirosystems/stacks.js/commit/62709aa5b6483299718063482bc26d6e94cc8c1c))
+* The transaction ABI validation should accept lists that are less than or equal to the max size specified in the arguments type ([53dd641](https://github.com/hirosystems/stacks.js/commit/53dd6410554dea195dc7e206d39a1995c6fc1fae))
+* updated downstream dependencies ([c636819](https://github.com/hirosystems/stacks.js/commit/c636819ae20315b4f232beb15044641689288396))
+* use stacks.js repo url ([cd2a684](https://github.com/hirosystems/stacks.js/commit/cd2a6849d6a2bf20109f85ac2c9afe467accf1a9))
+* verify that the public key is a secp256k1 point ([1cfef11](https://github.com/hirosystems/stacks.js/commit/1cfef115515aaa6f97fe188f29c4f66f198aefcd))
 
 ## [1.4.1](https://github.com/blockstack/blockstack.js/compare/v1.4.1-alpha.0...v1.4.1) (2021-04-20)
 **Note:** Version bump only for package stacks.js
@@ -404,7 +390,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 
 
-# [1.4.0-alpha.0](https://github.com/blockstack/blockstack.js/compare/v1.3.5...v1.4.0-alpha.0) (2021-04-12)
+## [1.4.0-alpha.0](https://github.com/blockstack/blockstack.js/compare/v1.3.5...v1.4.0-alpha.0) (2021-04-12)
 
 
 ### Bug Fixes
@@ -474,7 +460,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 **Note:** Version bump only for package stacks.js
 
 
-# [1.3.0](https://github.com/blockstack/blockstack.js/compare/v1.2.4...v1.3.0) (2021-03-08)
+## [1.3.0](https://github.com/blockstack/blockstack.js/compare/v1.2.4...v1.3.0) (2021-03-08)
 
 
 ### Features
@@ -516,7 +502,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 **Note:** Version bump only for package stacks.js
 
 
-# [1.2.0](https://github.com/blockstack/blockstack.js/compare/v1.1.0...v1.2.0) (2021-02-15)
+## [1.2.0](https://github.com/blockstack/blockstack.js/compare/v1.1.0...v1.2.0) (2021-02-15)
 
 
 ### Bug Fixes
@@ -533,7 +519,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 
 
-# [1.1.0](https://github.com/blockstack/blockstack.js/compare/v1.0.2...v1.1.0) (2021-01-29)
+## [1.1.0](https://github.com/blockstack/blockstack.js/compare/v1.0.2...v1.1.0) (2021-01-29)
 
 
 ### Bug Fixes
@@ -582,7 +568,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 
 
-# [1.0.0](https://github.com/blockstack/blockstack.js/compare/v1.0.0-beta.20...v1.0.0) (2021-01-14)
+## [1.0.0](https://github.com/blockstack/blockstack.js/compare/v1.0.0-beta.20...v1.0.0) (2021-01-14)
 
 
 ### Bug Fixes
@@ -601,7 +587,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 
 
-# [1.0.0-beta.20](https://github.com/blockstack/blockstack.js/compare/v1.0.0-beta.18...v1.0.0-beta.20) (2020-12-10)
+## [1.0.0-beta.20](https://github.com/blockstack/blockstack.js/compare/v1.0.0-beta.18...v1.0.0-beta.20) (2020-12-10)
 
 
 ### Bug Fixes
@@ -623,7 +609,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 
 
-# [1.0.0-beta.18](https://github.com/blockstack/blockstack.js/compare/v1.0.0-beta.13...v1.0.0-beta.18) (2020-12-03)
+## [1.0.0-beta.18](https://github.com/blockstack/blockstack.js/compare/v1.0.0-beta.13...v1.0.0-beta.18) (2020-12-03)
 
 
 ### Bug Fixes
@@ -649,7 +635,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 
 
-# [1.0.0-beta.13](https://github.com/blockstack/blockstack.js/compare/v1.0.0-beta.12...v1.0.0-beta.13) (2020-11-25)
+## [1.0.0-beta.13](https://github.com/blockstack/blockstack.js/compare/v1.0.0-beta.12...v1.0.0-beta.13) (2020-11-25)
 
 
 ### Bug Fixes
@@ -658,7 +644,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 
 
-# [1.0.0-beta.12](https://github.com/blockstack/blockstack.js/compare/v1.0.0-beta.11...v1.0.0-beta.12) (2020-11-20)
+## [1.0.0-beta.12](https://github.com/blockstack/blockstack.js/compare/v1.0.0-beta.11...v1.0.0-beta.12) (2020-11-20)
 
 
 ### Features
@@ -670,7 +656,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 
 
-# [1.0.0-beta.11](https://github.com/blockstack/blockstack.js/compare/v1.0.0-beta.10...v1.0.0-beta.11) (2020-11-20)
+## [1.0.0-beta.11](https://github.com/blockstack/blockstack.js/compare/v1.0.0-beta.10...v1.0.0-beta.11) (2020-11-20)
 
 
 ### Bug Fixes
@@ -694,7 +680,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 
 
-# [1.0.0-beta.10](https://github.com/blockstack/blockstack.js/compare/v1.0.0-beta.9...v1.0.0-beta.10) (2020-11-17)
+## [1.0.0-beta.10](https://github.com/blockstack/blockstack.js/compare/v1.0.0-beta.9...v1.0.0-beta.10) (2020-11-17)
 
 
 ### Bug Fixes
@@ -705,7 +691,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 
 
-# [1.0.0-beta.9](https://github.com/blockstack/blockstack.js/compare/v1.0.0-beta.8...v1.0.0-beta.9) (2020-11-06)
+## [1.0.0-beta.9](https://github.com/blockstack/blockstack.js/compare/v1.0.0-beta.8...v1.0.0-beta.9) (2020-11-06)
 
 
 ### Bug Fixes
@@ -723,7 +709,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 
 
-# [1.0.0-beta.8](https://github.com/blockstack/blockstack.js/compare/v1.0.0-beta.7...v1.0.0-beta.8) (2020-10-27)
+## [1.0.0-beta.8](https://github.com/blockstack/blockstack.js/compare/v1.0.0-beta.7...v1.0.0-beta.8) (2020-10-27)
 
 
 ### Bug Fixes
@@ -741,11 +727,11 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 
 
-# [1.0.0-beta.7](https://github.com/blockstack/blockstack.js/compare/v1.0.0-beta.6...v1.0.0-beta.7) (2020-10-15)
+## [1.0.0-beta.7](https://github.com/blockstack/blockstack.js/compare/v1.0.0-beta.6...v1.0.0-beta.7) (2020-10-15)
 
 
 
-# [1.0.0-beta.6](https://github.com/blockstack/blockstack.js/compare/v1.0.0-beta.5...v1.0.0-beta.6) (2020-10-15)
+## [1.0.0-beta.6](https://github.com/blockstack/blockstack.js/compare/v1.0.0-beta.5...v1.0.0-beta.6) (2020-10-15)
 
 
 ### Bug Fixes
@@ -756,7 +742,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 
 
-# [1.0.0-beta.5](https://github.com/blockstack/blockstack.js/compare/v1.0.0-beta.4...v1.0.0-beta.5) (2020-10-15)
+## [1.0.0-beta.5](https://github.com/blockstack/blockstack.js/compare/v1.0.0-beta.4...v1.0.0-beta.5) (2020-10-15)
 
 
 ### Bug Fixes
@@ -774,11 +760,11 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 
 
-# [1.0.0-beta.2](https://github.com/blockstack/blockstack.js/compare/v1.0.0-beta.1...v1.0.0-beta.2) (2020-10-06)
+## [1.0.0-beta.2](https://github.com/blockstack/blockstack.js/compare/v1.0.0-beta.1...v1.0.0-beta.2) (2020-10-06)
 
 
 
-# [1.0.0-beta.4](https://github.com/blockstack/blockstack.js/compare/v1.0.0-beta.3...v1.0.0-beta.4) (2020-10-09)
+## [1.0.0-beta.4](https://github.com/blockstack/blockstack.js/compare/v1.0.0-beta.3...v1.0.0-beta.4) (2020-10-09)
 
 
 ### Bug Fixes
@@ -789,7 +775,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 
 
-# [1.0.0-beta.3](https://github.com/blockstack/blockstack.js/compare/v1.0.0-beta.2...v1.0.0-beta.3) (2020-10-09)
+## [1.0.0-beta.3](https://github.com/blockstack/blockstack.js/compare/v1.0.0-beta.2...v1.0.0-beta.3) (2020-10-09)
 
 
 ### Bug Fixes
@@ -807,7 +793,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 
 
-# [1.0.0-beta.2](https://github.com/blockstack/blockstack.js/compare/v1.0.0-beta.1...v1.0.0-beta.2) (2020-10-06)
+## [1.0.0-beta.2](https://github.com/blockstack/blockstack.js/compare/v1.0.0-beta.1...v1.0.0-beta.2) (2020-10-06)
 
 
 ### Bug Fixes
@@ -825,7 +811,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 
 
-# [1.0.0-beta.1](https://github.com/blockstack/blockstack.js/compare/v21.1.1...v1.0.0-beta.1) (2020-09-28)
+## [1.0.0-beta.1](https://github.com/blockstack/blockstack.js/compare/v21.1.1...v1.0.0-beta.1) (2020-09-28)
 
 
 ### Bug Fixes

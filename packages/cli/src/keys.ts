@@ -1,3 +1,4 @@
+/* eslint-disable node/prefer-global/buffer */
 // TODO: most of this code should be in blockstack.js
 // Will remove most of this code once the wallet functionality is there instead.
 
@@ -6,7 +7,7 @@ const c32check = require('c32check');
 
 import { HDKey } from '@scure/bip32';
 import * as scureBip39 from '@scure/bip39';
-import { Buffer } from '@stacks/common';
+
 import {
   compressPrivateKey,
   getPublicKeyFromPrivate,

@@ -1,4 +1,4 @@
-import { Buffer, IntegerType, intToBigInt } from '@stacks/common';
+import { bytesToHex, hexToBytes, IntegerType, intToBigInt } from '@stacks/common';
 import {
   StacksNetwork,
   StacksMainnet,
@@ -38,7 +38,7 @@ import {
   createStacksPublicKey,
   getPublicKey,
   pubKeyfromPrivKey,
-  publicKeyFromBuffer,
+  publicKeyFromBytes,
   publicKeyToAddress,
   publicKeyToString,
 } from './keys';
@@ -185,7 +185,7 @@ export async function estimateTransaction(
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      transaction_payload: serializePayload(transactionPayload).toString('hex'),
+      transaction_payload: bytesToHex(serializePayload(transactionPayload)),
       ...(estimatedLen ? { estimated_len: estimatedLen } : {}),
     }),
   };
@@ -400,7 +400,7 @@ export type TxBroadcastResult = TxBroadcastResultOk | TxBroadcastResultRejected;
 export async function broadcastTransaction(
   transaction: StacksTransaction,
   network?: StacksNetworkName | StacksNetwork,
-  attachment?: Buffer
+  attachment?: Uint8Array
 ): Promise<TxBroadcastResult> {
   const rawTx = transaction.serialize();
   const derivedNetwork = StacksNetwork.fromNameOrNetwork(network ?? deriveNetwork(transaction));
@@ -412,15 +412,15 @@ export async function broadcastTransaction(
 /**
  * Broadcast the signed transaction to a core node
  *
- * @param {Buffer} rawTx - the raw serialized transaction buffer to broadcast
+ * @param {Uint8Array} rawTx - the raw serialized transaction bytes to broadcast
  * @param {string} url - the broadcast endpoint URL
  *
  * @returns {Promise} that resolves to a response if the operation succeeds
  */
 export async function broadcastRawTransaction(
-  rawTx: Buffer,
+  rawTx: Uint8Array,
   url: string,
-  attachment?: Buffer,
+  attachment?: Uint8Array,
   fetchFn: FetchFn = createFetchFn()
 ): Promise<TxBroadcastResult> {
   const options = {
@@ -428,8 +428,8 @@ export async function broadcastRawTransaction(
     headers: { 'Content-Type': attachment ? 'application/json' : 'application/octet-stream' },
     body: attachment
       ? JSON.stringify({
-          tx: rawTx.toString('hex'),
-          attachment: attachment.toString('hex'),
+          tx: bytesToHex(rawTx),
+          attachment: bytesToHex(attachment),
         })
       : rawTx,
   };
@@ -673,12 +673,12 @@ export async function makeSTXTokenTransfer(
     let pubKeys = txOptions.publicKeys;
     for (const key of txOptions.signerKeys) {
       const pubKey = pubKeyfromPrivKey(key);
-      pubKeys = pubKeys.filter(pk => pk !== pubKey.data.toString('hex'));
+      pubKeys = pubKeys.filter(pk => pk !== bytesToHex(pubKey.data));
       signer.signOrigin(createStacksPrivateKey(key));
     }
 
     for (const key of pubKeys) {
-      signer.appendOrigin(publicKeyFromBuffer(Buffer.from(key, 'hex')));
+      signer.appendOrigin(publicKeyFromBytes(hexToBytes(key)));
     }
 
     return transaction;
@@ -1105,12 +1105,12 @@ export async function makeContractCall(
     let pubKeys = txOptions.publicKeys;
     for (const key of txOptions.signerKeys) {
       const pubKey = pubKeyfromPrivKey(key);
-      pubKeys = pubKeys.filter(pk => pk !== pubKey.data.toString('hex'));
+      pubKeys = pubKeys.filter(pk => pk !== bytesToHex(pubKey.data));
       signer.signOrigin(createStacksPrivateKey(key));
     }
 
     for (const key of pubKeys) {
-      signer.appendOrigin(publicKeyFromBuffer(Buffer.from(key, 'hex')));
+      signer.appendOrigin(publicKeyFromBytes(hexToBytes(key)));
     }
 
     return transaction;
