@@ -183,7 +183,7 @@ export class Person extends Profile {
   }
 
   static fromToken(token: string, publicKeyOrAddress: string | null = null): Person {
-    const profile = extractProfile(token, publicKeyOrAddress);
+    const profile = extractProfile(token, publicKeyOrAddress) as PublicPersonProfile;
     return new Person(profile);
   }
 
