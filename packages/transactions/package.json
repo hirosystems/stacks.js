@@ -1,6 +1,6 @@
 {
   "name": "@stacks/transactions",
-  "version": "5.0.1",
+  "version": "5.0.2",
   "description": "Javascript library for constructing transactions on the Stacks blockchain.",
   "license": "MIT",
   "author": "Hiro Systems PBC (https://hiro.so)",

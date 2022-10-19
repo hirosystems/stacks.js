@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.0.2](https://github.com/hirosystems/stacks.js/compare/v5.0.1...v5.0.2) (2022-10-19)
+
+
+### Bug Fixes
+
+* rename incorrect nft post-condition codes ([9fed6a4](https://github.com/hirosystems/stacks.js/commit/9fed6a425a2803a27cf919c3038e6a5220ada465))
+
+
+
 ## [5.0.1](https://github.com/hirosystems/stacks.js/compare/v5.0.0...v5.0.1) (2022-10-04)
 
 
