@@ -1,21 +1,37 @@
-export interface PublicProfile {
-  '@context'?: string;
-  '@type': string;
-  '@id'?: string;
+const PERSON_TYPE = 'Person';
+const CONTEXT = 'http://schema.org';
+const IMAGE_TYPE = 'ImageObject';
+
+export type ProfileType = typeof PERSON_TYPE;
+
+export interface ProfileImage {
+  '@type': typeof IMAGE_TYPE;
+  name?: string;
+  contentUrl?: string;
   [k: string]: unknown;
 }
 
-export interface PublicPersonProfile extends PublicProfile {
+export interface PublicProfileBase {
+  '@type'?: ProfileType;
+  '@context'?: typeof CONTEXT;
+  apps?: {
+    [origin: string]: string;
+  };
+  appsMeta?: {
+    [origin: string]: {
+      publicKey: string;
+      storage: string;
+    };
+  };
+}
+
+export interface PublicPersonProfile extends PublicProfileBase {
+  '@type': typeof PERSON_TYPE;
   name?: string;
   givenName?: string;
   familyName?: string;
   description?: string;
-  image?: {
-    '@type'?: string;
-    name?: string;
-    contentUrl?: string;
-    [k: string]: unknown;
-  }[];
+  image?: ProfileImage[];
   website?: {
     '@type'?: string;
     url?: string;
@@ -53,3 +69,5 @@ export interface PublicPersonProfile extends PublicProfile {
   taxID?: string;
   [k: string]: unknown;
 }
+
+export type PublicProfile = PublicPersonProfile;

@@ -1,3 +1,5 @@
+import { ProfileType } from "../types";
+
 /**
  *
  * @param serviceName
@@ -27,7 +29,7 @@ function formatAccount(serviceName: string, data: any) {
  */
 export function getPersonFromLegacyFormat(profile: any) {
   const profileData: {
-    ['@type']: string;
+    ['@type']: ProfileType;
     account?: any[];
     name?: string;
     description?: string;
