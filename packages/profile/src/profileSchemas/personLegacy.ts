@@ -1,4 +1,4 @@
-import { ProfileType } from "../types";
+import { ProfileType } from '../types';
 
 /**
  *
