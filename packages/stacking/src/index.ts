@@ -149,6 +149,16 @@ export interface StackExtendOptions {
 }
 
 /**
+ * Stack increase stx options
+ */
+export interface StackIncreaseOptions {
+  /** private key to sign transaction */
+  privateKey: string;
+  /** number of ustx to increase by */
+  increaseBy: IntegerType;
+}
+
+/**
  * Delegate stx options
  */
 export interface DelegateStxOptions {
@@ -243,6 +253,15 @@ export class StackingClient {
     return this.getAccountStatus().then(res => {
       return BigInt(res.balance);
     });
+  }
+
+  /**
+   * Get account balance of locked tokens
+   *
+   * @returns promise resolves to a bigint if the operation succeeds
+   */
+  async getAccountBalanceLocked(): Promise<bigint> {
+    return this.getAccountStatus().then(res => BigInt(res.locked));
   }
 
   /**
@@ -438,9 +457,9 @@ export class StackingClient {
   }
 
   /**
-   * Generate and broadcast a stacking transaction to extend locked STX ()`pox-2.stack-extend`)
+   * Generate and broadcast a stacking transaction to extend locked STX (`pox-2.stack-extend`)
    * @category PoX-2
-   * @param options - a required lock STX options object
+   * @param StackExtendOptions - a required extend STX options object
    * @returns a broadcasted txid if the operation succeeds
    */
   async stackExtend({
@@ -454,6 +473,32 @@ export class StackingClient {
     const txOptions = this.getStackExtendOptions({
       extendCycles,
       poxAddress,
+      contract,
+    });
+    const tx = await makeContractCall({
+      ...txOptions,
+      senderKey: privateKey,
+      fee: 10000, // todo: remove
+    });
+
+    return broadcastTransaction(tx, txOptions.network as StacksNetwork);
+  }
+
+  /**
+   * Generate and broadcast a stacking transaction to increase locked STX (`pox-2.stack-increase`)
+   * @category PoX-2
+   * @param StackIncreaseOptions - a required increase STX options object
+   * @returns a broadcasted txid if the operation succeeds
+   */
+  async stackIncrease({
+    increaseBy,
+    privateKey,
+  }: StackIncreaseOptions): Promise<TxBroadcastResult> {
+    const poxInfo = await this.getPoxInfo();
+    const contract = poxInfo.contract_id;
+
+    const txOptions = this.getStackIncreaseOptions({
+      increaseBy,
       contract,
     });
     const tx = await makeContractCall({
@@ -627,6 +672,20 @@ export class StackingClient {
       contractName,
       functionName: 'stack-extend',
       functionArgs: [uintCV(extendCycles), address],
+      validateWithAbi: true,
+      network: this.network,
+      anchorMode: AnchorMode.Any,
+    };
+    return txOptions;
+  }
+
+  getStackIncreaseOptions({ increaseBy, contract }: { increaseBy: IntegerType; contract: string }) {
+    const [contractAddress, contractName] = this.parseContractId(contract);
+    const txOptions: ContractCallOptions = {
+      contractAddress,
+      contractName,
+      functionName: 'stack-increase',
+      functionArgs: [uintCV(increaseBy)],
       validateWithAbi: true,
       network: this.network,
       anchorMode: AnchorMode.Any,

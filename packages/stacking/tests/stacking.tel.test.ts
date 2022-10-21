@@ -261,6 +261,49 @@ test('stack and extend stx', async () => {
   expect(finalStatus?.details.unlock_height).toBe(expectedHeigth);
 });
 
+test('stack and increase stx', async () => {
+  fetchMock.dontMock();
+
+  const privateKey = 'cb3df38053d132895220b9ce471f6b676db5b9bf0b4adefb55f2118ece2478df01';
+  const address = 'STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6';
+  const poxAddress = '1Xik14zRm29UsyS6DjhYg4iZeZqsDa8D3';
+
+  const network = new StacksTestnet({ url: API_URL });
+  const client = new StackingClient(address, network);
+
+  const poxInfo = await client.getPoxInfo();
+
+  const BEGIN_LOCK_HEIGHT = (poxInfo.current_burnchain_block_height as number) + 2;
+  const INITIAL_AMOUNT = BigInt(poxInfo.min_amount_ustx);
+  const stackingResult = await client.stack({
+    amountMicroStx: INITIAL_AMOUNT,
+    burnBlockHeight: BEGIN_LOCK_HEIGHT,
+    cycles: 10,
+    poxAddress,
+    privateKey,
+  });
+
+  await waitForTxIdSuccess(stackingResult.txid);
+  await waitForNextBlock(BEGIN_LOCK_HEIGHT + 2);
+
+  const initialBalanceLocked = await client.getAccountBalanceLocked();
+  if (initialBalanceLocked === 0n) throw Error;
+
+  const INCREASE_BY = 40_000_000n;
+  const increaseResult = await client.stackIncrease({
+    increaseBy: INCREASE_BY,
+    privateKey,
+  });
+
+  await waitForTxIdSuccess(increaseResult.txid);
+
+  const finalBalanceLocked = await client.getAccountBalanceLocked();
+  if (finalBalanceLocked === 0n) throw Error;
+
+  const expectedBalanceLocked = initialBalanceLocked + INCREASE_BY;
+  expect(finalBalanceLocked).toBe(expectedBalanceLocked);
+});
+
 test('stack stx', async () => {
   fetchMock.dontMock();
 
