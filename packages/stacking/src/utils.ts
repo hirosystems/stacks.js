@@ -6,6 +6,7 @@ import {
   BufferCV,
   ClarityType,
   ClarityValue,
+  OptionalCV,
   tupleCV,
   TupleCV,
 } from '@stacks/transactions';
@@ -265,4 +266,16 @@ export function poxAddressToBtcAddress(
     }
   }
   throw new Error(`Unexpected address version: ${version}`);
+}
+
+export function unwrap<T extends ClarityValue>(optional: OptionalCV<T>) {
+  if (optional.type === ClarityType.OptionalSome) return optional.value;
+  if (optional.type === ClarityType.OptionalNone) return undefined;
+  throw new Error("Object is not an 'Optional'");
+}
+
+export function unwrapMap<T extends ClarityValue, U>(optional: OptionalCV<T>, map: (t: T) => U) {
+  if (optional.type === ClarityType.OptionalSome) return map(optional.value);
+  if (optional.type === ClarityType.OptionalNone) return undefined;
+  throw new Error("Object is not an 'Optional'");
 }

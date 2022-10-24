@@ -326,6 +326,30 @@ test('stack stx', async () => {
   console.log('stackingResult', stackingResult);
 });
 
+test('delegate stack stx', async () => {
+  fetchMock.dontMock();
+
+  const privateKey = 'cb3df38053d132895220b9ce471f6b676db5b9bf0b4adefb55f2118ece2478df01';
+  const address = 'STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6';
+  const poxAddress = '1Xik14zRm29UsyS6DjhYg4iZeZqsDa8D3';
+
+  const delegateTo = 'ST2MCYPWTFMD2MGR5YY695EJG0G1R4J2BTJPRGM7H';
+
+  const network = new StacksTestnet({ url: API_URL });
+  const client = new StackingClient(address, network);
+
+  const poxInfo = await client.getPoxInfo();
+
+  const delegationResult = await client.delegateStx({
+    delegateTo,
+    amountMicroStx: BigInt(poxInfo.min_amount_ustx),
+    untilBurnBlockHeight: (poxInfo.current_burnchain_block_height as number) + 5,
+    poxAddress,
+    privateKey,
+  });
+  await waitForTxIdSuccess(delegationResult.txid);
+});
+
 test('tmp poxinfo', async () => {
   fetchMock.dontMock();
 
@@ -340,6 +364,16 @@ test('tmp account stacking status', async () => {
   const client = new StackingClient(address, network);
 
   console.log(await client.getStatus());
+});
+
+test('tmp account delegation status', async () => {
+  fetchMock.dontMock();
+
+  const address = 'STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6';
+  const network = new StacksTestnet({ url: API_URL });
+  const client = new StackingClient(address, network);
+
+  console.log(await client.getDelegationStatus());
 });
 
 test('tmp account balance', async () => {

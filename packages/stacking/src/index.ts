@@ -7,6 +7,7 @@ import {
   BurnchainRewardsTotal,
 } from '@stacks/stacks-blockchain-api-types';
 import {
+  addressToString,
   AnchorMode,
   broadcastTransaction,
   BufferCV,
@@ -19,6 +20,8 @@ import {
   getFee,
   makeContractCall,
   noneCV,
+  OptionalCV,
+  PrincipalCV,
   ResponseErrorCV,
   someCV,
   StacksTransaction,
@@ -30,7 +33,7 @@ import {
   validateStacksAddress,
 } from '@stacks/transactions';
 import { StackingErrors } from './constants';
-import { poxAddressToTuple } from './utils';
+import { poxAddressToTuple, unwrap, unwrapMap } from './utils';
 export * from './utils';
 
 export interface CycleInfo {
@@ -74,6 +77,25 @@ export type StackerInfo =
           version: Uint8Array;
           hashbytes: Uint8Array;
         };
+      };
+    };
+
+export type DelegationInfo =
+  | {
+      delegated: false;
+    }
+  | {
+      delegated: true;
+      details: {
+        amount_micro_stx: bigint;
+        delegated_to: string;
+        pox_address:
+          | {
+              version: Uint8Array;
+              hashbytes: Uint8Array;
+            }
+          | undefined;
+        until_burn_ht: number | undefined;
       };
     };
 
@@ -538,6 +560,7 @@ export class StackingClient {
     const tx = await makeContractCall({
       ...txOptions,
       senderKey: privateKey,
+      fee: 10000, // todo: remove
     });
 
     return broadcastTransaction(tx, txOptions.network as StacksNetwork);
@@ -850,6 +873,55 @@ export class StackingClient {
         };
       } else {
         throw new Error(`Error fetching stacker info`);
+      }
+    });
+  }
+
+  /**
+   * Check delegation status
+   *
+   * @returns {Promise<DelegationInfo>} that resolves to a DelegationInfo object if the operation succeeds
+   */
+  async getDelegationStatus(): Promise<DelegationInfo> {
+    const poxInfo = await this.getPoxInfo();
+    const [contractAddress, contractName] = this.parseContractId(poxInfo.contract_id);
+    const functionName = 'get-delegation-info';
+
+    return callReadOnlyFunction({
+      contractAddress,
+      contractName,
+      functionName,
+      senderAddress: this.address,
+      functionArgs: [standardPrincipalCV(this.address)],
+      network: this.network,
+    }).then((responseCV: ClarityValue) => {
+      if (responseCV.type === ClarityType.OptionalSome) {
+        const tupleCV = responseCV.value as TupleCV;
+        const amountMicroStx = tupleCV.data['amount-ustx'] as UIntCV;
+        const delegatedTo = tupleCV.data['delegated-to'] as PrincipalCV;
+
+        const poxAddress = unwrapMap(tupleCV.data['pox-addr'] as OptionalCV<TupleCV>, tuple => ({
+          version: (tuple.data['version'] as BufferCV).buffer,
+          hashbytes: (tuple.data['hashbytes'] as BufferCV).buffer,
+        }));
+
+        const untilBurnBlockHeight = unwrap(tupleCV.data['until-burn-ht'] as OptionalCV<UIntCV>);
+
+        return {
+          delegated: true,
+          details: {
+            amount_micro_stx: BigInt(amountMicroStx.value),
+            delegated_to: addressToString(delegatedTo.address),
+            pox_address: poxAddress,
+            until_burn_ht: Number(untilBurnBlockHeight?.value),
+          },
+        };
+      } else if (responseCV.type === ClarityType.OptionalNone) {
+        return {
+          delegated: false,
+        };
+      } else {
+        throw new Error(`Error fetching delegation info`);
       }
     });
   }
