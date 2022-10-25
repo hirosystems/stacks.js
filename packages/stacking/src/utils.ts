@@ -157,9 +157,9 @@ export function extractPoxAddressFromClarityValue(poxAddrClarityValue: ClarityVa
   };
 }
 
-export function getBTCAddress(version: number | Uint8Array, checksum: Uint8Array) {
+export function getBTCAddress(version: number | Uint8Array, hash: Uint8Array) {
   const versionNumber: number = typeof version === 'number' ? version : version[0];
-  return base58CheckEncode(versionNumber, checksum);
+  return base58CheckEncode(versionNumber, hash);
 }
 
 export function getErrorString(error: StackingErrors): string {

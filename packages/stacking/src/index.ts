@@ -60,6 +60,8 @@ export interface PoxInfo {
   rejection_votes_left_required: number;
   current_cycle: CycleInfo;
   current_burnchain_block_height?: number;
+  prepare_phase_block_length: number;
+  reward_phase_block_length: number;
   contract_versions?: ContractVersion[];
 }
 
@@ -210,6 +212,22 @@ export interface DelegateStackStxOptions {
   burnBlockHeight: number;
   /** number of cycles to lock */
   cycles: number;
+  /** private key to sign transaction */
+  privateKey: string;
+  /** nonce for the transaction */
+  nonce?: IntegerType;
+}
+
+/**
+ * Delegate stack extend stx options
+ */
+export interface DelegateStackExtendStxOptions {
+  /** the STX address of the delegator */
+  stacker: string;
+  /** the reward Bitcoin address of the delegator */
+  poxAddress: string;
+  /** number of cycles to extend by */
+  extendCount: number;
   /** private key to sign transaction */
   privateKey: string;
   /** nonce for the transaction */
@@ -597,6 +615,40 @@ export class StackingClient {
     const tx = await makeContractCall({
       ...txOptions,
       senderKey: privateKey,
+      fee: 10000, // todo: remove
+    });
+
+    return broadcastTransaction(tx, txOptions.network as StacksNetwork);
+  }
+
+  /**
+   * As a delegator, generate and broadcast transactions to extend stack for multiple delegatees.
+   *
+   * @param {DelegateStackExtendStxOptions} options - a required delegate stack extend STX options object
+   *
+   * @returns {Promise<string>} that resolves to a broadcasted txid if the operation succeeds
+   */
+  async delegateStackExtend({
+    stacker,
+    poxAddress,
+    extendCount,
+    privateKey,
+    nonce,
+  }: DelegateStackExtendStxOptions): Promise<TxBroadcastResult> {
+    const poxInfo = await this.getPoxInfo();
+    const contract = poxInfo.contract_id;
+
+    const txOptions = this.getDelegateStackExtendOptions({
+      contract,
+      stacker,
+      poxAddress,
+      extendCount,
+      nonce,
+    });
+    const tx = await makeContractCall({
+      ...txOptions,
+      senderKey: privateKey,
+      fee: 10000, // todo: remove
     });
 
     return broadcastTransaction(tx, txOptions.network as StacksNetwork);
@@ -646,6 +698,7 @@ export class StackingClient {
     const tx = await makeContractCall({
       ...txOptions,
       senderKey: privateKey,
+      fee: 10000, // todo: remove
     });
 
     return broadcastTransaction(tx, txOptions.network as StacksNetwork);
@@ -778,6 +831,38 @@ export class StackingClient {
         uintCV(burnBlockHeight),
         uintCV(cycles),
       ],
+      validateWithAbi: true,
+      network: this.network,
+      anchorMode: AnchorMode.Any,
+    };
+
+    if (nonce) {
+      txOptions.nonce = nonce;
+    }
+
+    return txOptions;
+  }
+
+  getDelegateStackExtendOptions({
+    contract,
+    stacker,
+    poxAddress,
+    extendCount,
+    nonce,
+  }: {
+    contract: string;
+    stacker: string;
+    poxAddress: string;
+    extendCount: number;
+    nonce?: IntegerType;
+  }) {
+    const address = poxAddressToTuple(poxAddress);
+    const [contractAddress, contractName] = this.parseContractId(contract);
+    const txOptions: ContractCallOptions = {
+      contractAddress,
+      contractName,
+      functionName: 'delegate-stack-extend',
+      functionArgs: [standardPrincipalCV(stacker), address, uintCV(extendCount)],
       validateWithAbi: true,
       network: this.network,
       anchorMode: AnchorMode.Any,
