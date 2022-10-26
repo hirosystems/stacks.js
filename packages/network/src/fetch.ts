@@ -1,4 +1,5 @@
 import 'cross-fetch/polyfill';
+import * as fs from 'fs';
 
 // Define a default request options and allow modification using getters, setters
 // Reference: https://developer.mozilla.org/en-US/docs/Web/API/Request/Request
@@ -42,9 +43,18 @@ export async function fetchWrapper(input: RequestInfo, init?: RequestInit): Prom
   Object.assign(fetchOpts, init, defaultFetchOpts);
 
   const fetchResult = await fetch(input, fetchOpts);
+
   // todo: remove (testing) http logging
-  // const copy = fetchResult.clone();
-  // console.log(`=> fetch "${input}":`, JSON.stringify(await copy.json(), null, 1));
+  const copy = fetchResult.clone();
+  const json = await copy.json();
+  // console.log(`=> fetch "${input}":`, );
+
+  fs.appendFile(
+    `${__dirname}/network-log.txt`,
+    `'${input}': \`${JSON.stringify(json)}\`,\n`,
+    () => null
+  );
+
   return fetchResult;
 }
 

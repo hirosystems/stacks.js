@@ -402,13 +402,14 @@ export class StackingClient {
   async getCurrentPoxOperationPeriod(): Promise<1 | 2 | 3> {
     const pox = await this.getPoxInfo();
 
-    if (pox.contract_id.endsWith('.pox')) return 1; // before the 2.1 fork
+    // pre 2.1
     if (!pox.contract_versions || pox.contract_versions.length <= 1) return 1; // API does not know about pox-2
+    if (pox.contract_id.endsWith('.pox')) return 1; // before the 2.1 fork
 
-    // 2.1 consensus has started
+    // in 2.1 fork
     if (pox.contract_versions.length == 2) {
-      if (pox.current_cycle.id < pox.contract_versions[1].first_reward_cycle_id) return 2;
-      return 3;
+      if (pox.current_cycle.id < pox.contract_versions[1].first_reward_cycle_id) return 2; // before pox-2
+      return 3; // in pox-2
     }
 
     throw Error('Failed to determine current period of PoX operation.');

@@ -3,18 +3,25 @@ import { StacksMainnet, StacksTestnet } from '@stacks/network';
 import fetchMock from 'jest-fetch-mock';
 
 import { StackingClient } from '../src';
+import {
+  enableApiMocks,
+  MOCK_2_1_PERIOD1_MAINNET,
+  MOCK_2_1_PERIOD1_REGTEST,
+  MOCK_2_1_PERIOD3_STACKS_TEL,
+  MOCK_EMPTY_ACCOUNT,
+  MOCK_FULL_ACCOUNT,
+} from './apiMock';
 
-import { apiMock, mockMatch } from './apiMock';
-
-const API_URL = 'https://stacks.tel';
-// const API_URL = 'http://localhost:3999';
+// const API_URL = 'https://stacks.tel';
+const API_URL = 'http://localhost:3999';
+// const API_URL = 'http://localhost:20443';
 
 // const infoApi = new InfoApi(new Configuration({ basePath: API_URL }));
 // const blockApi = new BlocksApi(new Configuration({ basePath: API_URL }));
 const txApi = new TransactionsApi(new Configuration({ basePath: API_URL }));
 
 const network = new StacksTestnet({ url: API_URL });
-const client = new StackingClient('', network); // anonymouse client
+const client = new StackingClient('', network); // anonymous client
 
 function sleep(ms: number) {
   return new Promise(resolve => setTimeout(resolve, ms));
@@ -55,12 +62,14 @@ async function waitForNextBlock(burnBlockId: number) {
 }
 
 beforeEach(() => {
-  jest.setTimeout(60_000);
-  fetchMock.resetMocks();
+  jest.setTimeout(120_000); // todo: remove timeout
   jest.resetModules();
+  fetchMock.resetMocks();
 });
 
-test('getting current period', async () => {
+test('getting current period (0)', async () => {
+  fetchMock.dontMock();
+
   const address = 'STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6';
 
   const network = new StacksTestnet({ url: API_URL });
@@ -71,44 +80,20 @@ test('getting current period', async () => {
 });
 
 test('getting current period (1) -- mainnet before 2.1 fork', async () => {
+  enableApiMocks(MOCK_2_1_PERIOD1_MAINNET);
+
   const network = new StacksMainnet();
   const client = new StackingClient('', network);
 
-  fetchMock.once(
-    JSON.stringify({
-      contract_id: 'SP000000000000000000002Q6VF78.pox',
-      pox_activation_threshold_ustx: 66818426279656,
-      first_burnchain_block_height: 666050,
-      prepare_phase_block_length: 100,
-      reward_phase_block_length: 2000,
-      reward_slots: 4000,
-      rejection_fraction: 25,
-      total_liquid_supply_ustx: 1336368525593131,
-      current_cycle: {
-        id: 42,
-        min_threshold_ustx: 140000000000,
-        stacked_ustx: 528062660869340,
-        is_pox_active: true,
-      },
-      next_cycle: {
-        id: 43,
-        min_threshold_ustx: 120000000000,
-        min_increment_ustx: 66818426279,
-        stacked_ustx: 441243465796508,
-        prepare_phase_start_block_height: 756250,
-        blocks_until_prepare_phase: 182,
-        reward_phase_start_block_height: 756350,
-        blocks_until_reward_phase: 282,
-        ustx_until_pox_rejection: 334092131398275,
-      },
-      min_amount_ustx: 120000000000,
-      prepare_cycle_length: 100,
-      reward_cycle_id: 42,
-      reward_cycle_length: 2100,
-      rejection_votes_left_required: 334092131398275,
-      next_reward_cycle_in: 282,
-    })
-  );
+  const period = await client.getCurrentPoxOperationPeriod();
+  expect(period).toEqual(1);
+});
+
+test('getting current period (1) -- next/testnet before 2.1 fork', async () => {
+  enableApiMocks(MOCK_2_1_PERIOD1_REGTEST);
+
+  const network = new StacksMainnet();
+  const client = new StackingClient('', network);
 
   const period = await client.getCurrentPoxOperationPeriod();
   expect(period).toEqual(1);
@@ -118,59 +103,13 @@ test('getting current period (2) -- after 2.1 fork, before first pox-2 cycle', a
   const network = new StacksTestnet({ url: API_URL });
   const client = new StackingClient('', network);
 
-  fetchMock.once(
-    JSON.stringify({
-      contract_id: 'SP000000000000000000002Q6VF78.pox',
-      pox_activation_threshold_ustx: 600152877629389,
-      first_burnchain_block_height: 0,
-      current_burnchain_block_height: 500,
-      prepare_phase_block_length: 1,
-      reward_phase_block_length: 4,
-      reward_slots: 8,
-      rejection_fraction: 3333333333333333,
-      total_liquid_supply_ustx: 60015287762938911,
-      current_cycle: {
-        id: 2000,
-        min_threshold_ustx: 1875480000000000,
-        stacked_ustx: 0,
-        is_pox_active: false,
-      },
-      next_cycle: {
-        id: 1930,
-        min_threshold_ustx: 1875480000000000,
-        min_increment_ustx: 7501910970367,
-        stacked_ustx: 0,
-        prepare_phase_start_block_height: 9649,
-        blocks_until_prepare_phase: 2,
-        reward_phase_start_block_height: 9650,
-        blocks_until_reward_phase: 3,
-        ustx_until_pox_rejection: 9870800290081931281,
-      },
-      min_amount_ustx: 1875480000000000,
-      prepare_cycle_length: 1,
-      reward_cycle_id: 1929,
-      reward_cycle_length: 5,
-      rejection_votes_left_required: 9870800290081931281,
-      next_reward_cycle_in: 3,
-      contract_versions: [
-        {
-          contract_id: 'ST000000000000000000002AMW42H.pox',
-          activation_burnchain_block_height: 0,
-          first_reward_cycle_id: 0,
-        },
-        {
-          contract_id: 'ST000000000000000000002AMW42H.pox-2',
-          activation_burnchain_block_height: 1000,
-          first_reward_cycle_id: 3000,
-        },
-      ],
-    })
-  );
-
   const period = await client.getCurrentPoxOperationPeriod();
   expect(period).toEqual(2);
 });
+
 test('getting current period (3)', async () => {
+  enableApiMocks(MOCK_2_1_PERIOD3_STACKS_TEL);
+
   const address = 'STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6';
 
   const network = new StacksTestnet({ url: API_URL });
@@ -181,7 +120,7 @@ test('getting current period (3)', async () => {
 });
 
 test('check stacking eligibility (true)', async () => {
-  fetchMock.dontMock();
+  enableApiMocks(MOCK_FULL_ACCOUNT);
 
   const address = 'STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6';
   const poxAddress = '1Xik14zRm29UsyS6DjhYg4iZeZqsDa8D3';
@@ -201,7 +140,7 @@ test('check stacking eligibility (true)', async () => {
 });
 
 test('check stacking eligibility (false)', async () => {
-  fetchMock.mockIf(mockMatch.ALL, apiMock);
+  enableApiMocks(MOCK_EMPTY_ACCOUNT);
 
   const address = 'ST162GBCTD9ESBF09XC2T63NCX6ZKS42ZPWGXZ6VH';
   const poxAddress = 'mnTdnFyjxRomWaSLp4fNGSa9Gyg9XJo4j4';
@@ -236,13 +175,13 @@ test('stack and extend stx', async () => {
   const stackingResult = await client.stack({
     amountMicroStx: BigInt(poxInfo.min_amount_ustx),
     burnBlockHeight: BEGIN_LOCK_HEIGHT,
-    cycles: 10,
+    cycles: 2,
     poxAddress,
     privateKey,
   });
 
   await waitForTxIdSuccess(stackingResult.txid);
-  await waitForNextBlock(BEGIN_LOCK_HEIGHT + 2);
+  await waitForNextBlock(BEGIN_LOCK_HEIGHT);
 
   const initialStatus = await client.getStatus();
   if (!initialStatus.stacked) throw Error;
@@ -259,9 +198,10 @@ test('stack and extend stx', async () => {
   const finalStatus = await client.getStatus();
   if (!finalStatus.stacked) throw Error;
 
-  const expectedHeigth =
-    initialStatus?.details.unlock_height + EXTEND_BY * poxInfo.reward_cycle_length;
-  expect(finalStatus?.details.unlock_height).toBe(expectedHeigth);
+  const expectedHeight =
+    initialStatus?.details.unlock_height +
+    EXTEND_BY * (poxInfo.prepare_phase_block_length + poxInfo.reward_phase_block_length);
+  expect(finalStatus?.details.unlock_height).toBe(expectedHeight);
 });
 
 test('stack and increase stx', async () => {
