@@ -406,8 +406,11 @@ export class StackingClient {
     if (!pox.contract_versions || pox.contract_versions.length <= 1) return 1; // API does not know about pox-2
     if (pox.contract_id.endsWith('.pox')) return 1; // before the 2.1 fork
 
+    // todo: detect period 2
+
     // in 2.1 fork
     if (pox.contract_versions.length == 2) {
+      // FAULTY, could be period 1
       if (pox.current_cycle.id < pox.contract_versions[1].first_reward_cycle_id) return 2; // before pox-2
       return 3; // in pox-2
     }
