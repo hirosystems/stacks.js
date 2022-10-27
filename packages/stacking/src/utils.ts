@@ -65,16 +65,6 @@ function nativeAddressToSegwitVersion(
   );
 }
 
-/** @ignore */
-export function getAddressVersion(btcAddress: string) {
-  try {
-    const { version } = base58CheckDecode(btcAddress);
-    return btcAddressVersionToLegacyHashMode(version);
-  } catch (error: any) {
-    throw new InvalidAddressError(btcAddress, error);
-  }
-}
-
 function bech32Decode(btcAddress: string) {
   const { words: bech32Words } = bech32.decode(btcAddress);
   const witnessVersion = bech32Words[0];
@@ -115,7 +105,10 @@ function decodeNativeSegwitBtcAddress(btcAddress: string): {
   }
 }
 
-export function decodeBtcAddress(btcAddress: string): { version: number; data: Uint8Array } {
+export function decodeBtcAddress(btcAddress: string): {
+  version: PoXAddressVersion;
+  data: Uint8Array;
+} {
   if (B58_ADDR_PREFIXES.test(btcAddress)) {
     const b58 = base58CheckDecode(btcAddress);
     const addressVersion = btcAddressVersionToLegacyHashMode(b58.version);
@@ -152,7 +145,7 @@ export function extractPoxAddressFromClarityValue(poxAddrClarityValue: ClarityVa
     );
   }
   return {
-    version: versionCV.buffer,
+    version: versionCV.buffer[0],
     hashBytes: hashBytesCV.buffer,
   };
 }
@@ -240,7 +233,7 @@ function legacyHashModeToBtcAddressVersion(
   throw new Error('Invalid pox address version');
 }
 
-export function poxAddressToBtcAddress(
+function _poxAddressToBtcAddressValues(
   version: number,
   hashBytes: Uint8Array,
   network: 'mainnet' | 'testnet'
@@ -266,6 +259,28 @@ export function poxAddressToBtcAddress(
     }
   }
   throw new Error(`Unexpected address version: ${version}`);
+}
+
+function _poxAddressToBtcAddressClarityValue(
+  poxAddrClarityValue: ClarityValue,
+  network: 'mainnet' | 'testnet'
+): string {
+  const poxAddr = extractPoxAddressFromClarityValue(poxAddrClarityValue);
+  return _poxAddressToBtcAddressValues(poxAddr.version, poxAddr.hashBytes, network);
+}
+
+export function poxAddressToBtcAddress(
+  version: number,
+  hashBytes: Uint8Array,
+  network: 'mainnet' | 'testnet'
+): string;
+export function poxAddressToBtcAddress(
+  poxAddrClarityValue: ClarityValue,
+  network: 'mainnet' | 'testnet'
+): string;
+export function poxAddressToBtcAddress(...args: any[]): string {
+  if (typeof args[0] === 'number') return _poxAddressToBtcAddressValues(args[0], args[1], args[2]);
+  return _poxAddressToBtcAddressClarityValue(args[0], args[1]);
 }
 
 export function unwrap<T extends ClarityValue>(optional: OptionalCV<T>) {

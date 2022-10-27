@@ -1,14 +1,14 @@
 import { StacksMainnet, StacksTestnet } from '@stacks/network';
-import fetchMock from 'jest-fetch-mock';
+
 import { StackingClient } from '../src';
 import {
-  MOCK_2_1_PERIOD1_MAINNET,
-  MOCK_2_1_PERIOD1_REGTEST,
-  MOCK_2_1_PERIOD3_STACKS_TEL,
   MOCK_EMPTY_ACCOUNT,
   MOCK_FULL_ACCOUNT,
   MOCK_POX_2_REGTEST,
   setApiMocks,
+  V2_POX_2_1_PERIOD1_MAINNET,
+  V2_POX_2_1_PERIOD1_REGTEST,
+  V2_POX_2_1_PERIOD3_STACKS_TEL,
   waitForNextBlock,
   waitForTx,
 } from './apiMockingHelpers';
@@ -22,7 +22,7 @@ beforeEach(() => {
 
 describe('2.1 periods', () => {
   test('period 1 -- mainnet before 2.1 fork', async () => {
-    setApiMocks(MOCK_2_1_PERIOD1_MAINNET);
+    setApiMocks({ '/v2/pox': V2_POX_2_1_PERIOD1_MAINNET });
 
     const network = new StacksMainnet();
     const client = new StackingClient('', network);
@@ -32,7 +32,7 @@ describe('2.1 periods', () => {
   });
 
   test('period 1 -- next/regtest before 2.1 fork', async () => {
-    setApiMocks(MOCK_2_1_PERIOD1_REGTEST);
+    setApiMocks({ '/v2/pox': V2_POX_2_1_PERIOD1_REGTEST });
 
     const network = new StacksMainnet();
     const client = new StackingClient('', network);
@@ -52,7 +52,7 @@ describe('2.1 periods', () => {
   });
 
   test('period 3', async () => {
-    setApiMocks(MOCK_2_1_PERIOD3_STACKS_TEL);
+    setApiMocks({ '/v2/pox': V2_POX_2_1_PERIOD3_STACKS_TEL });
 
     const address = 'STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6';
 

@@ -510,7 +510,6 @@ export class StackingClient {
     const tx = await makeContractCall({
       ...txOptions,
       senderKey: privateKey,
-      fee: 10000, // todo: remove
     });
 
     return broadcastTransaction(tx, txOptions.network as StacksNetwork);
@@ -538,7 +537,6 @@ export class StackingClient {
     const tx = await makeContractCall({
       ...txOptions,
       senderKey: privateKey,
-      fee: 10000, // todo: remove
     });
 
     return broadcastTransaction(tx, txOptions.network as StacksNetwork);
@@ -564,7 +562,6 @@ export class StackingClient {
     const tx = await makeContractCall({
       ...txOptions,
       senderKey: privateKey,
-      fee: 10000, // todo: remove
     });
 
     return broadcastTransaction(tx, txOptions.network as StacksNetwork);
@@ -598,7 +595,6 @@ export class StackingClient {
     const tx = await makeContractCall({
       ...txOptions,
       senderKey: privateKey,
-      fee: 10000, // todo: remove
     });
 
     return broadcastTransaction(tx, txOptions.network as StacksNetwork);
@@ -635,7 +631,6 @@ export class StackingClient {
     const tx = await makeContractCall({
       ...txOptions,
       senderKey: privateKey,
-      fee: 10000, // todo: remove
     });
 
     return broadcastTransaction(tx, txOptions.network as StacksNetwork);
@@ -668,7 +663,6 @@ export class StackingClient {
     const tx = await makeContractCall({
       ...txOptions,
       senderKey: privateKey,
-      fee: 10000, // todo: remove
     });
 
     return broadcastTransaction(tx, txOptions.network as StacksNetwork);
@@ -701,7 +695,6 @@ export class StackingClient {
     const tx = await makeContractCall({
       ...txOptions,
       senderKey: privateKey,
-      fee: 10000, // todo: remove
     });
 
     return broadcastTransaction(tx, txOptions.network as StacksNetwork);
@@ -751,7 +744,6 @@ export class StackingClient {
     const tx = await makeContractCall({
       ...txOptions,
       senderKey: privateKey,
-      fee: 10000, // todo: remove
     });
 
     return broadcastTransaction(tx, txOptions.network as StacksNetwork);

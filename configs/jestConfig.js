@@ -11,7 +11,7 @@ module.exports = packageDirname => {
     preset: 'ts-jest',
     testEnvironment: 'node',
     coverageDirectory: './coverage/',
-    collectCoverage: false, // todo: undo
+    collectCoverage: true,
     moduleNameMapper: require('jest-module-name-mapper').default(
       path.resolve(packageDirname, 'tsconfig.json')
     ),

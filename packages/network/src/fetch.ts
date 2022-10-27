@@ -41,7 +41,8 @@ export async function fetchWrapper(input: RequestInfo, init?: RequestInit): Prom
   // Use the provided options in request options along with default or user provided values
   Object.assign(fetchOpts, init, defaultFetchOpts);
 
-  return await fetch(input, fetchOpts);
+  const fetchResult = await fetch(input, fetchOpts);
+  return fetchResult;
 }
 
 export type FetchFn = (url: string, init?: RequestInit) => Promise<Response>;
