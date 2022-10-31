@@ -1,6 +1,8 @@
+import { hexToBytes } from '@stacks/common';
 import { StacksMainnet, StacksTestnet } from '@stacks/network';
 
 import { StackingClient } from '../src';
+import { PoxOperationPeriod } from '../src/constants';
 import {
   MOCK_EMPTY_ACCOUNT,
   MOCK_FULL_ACCOUNT,
@@ -12,6 +14,7 @@ import {
   waitForNextBlock,
   waitForTx,
 } from './apiMockingHelpers';
+import { BTC_ADDRESS_CASES } from './utils.test';
 
 const API_URL = 'http://localhost:3999';
 
@@ -27,8 +30,9 @@ describe('2.1 periods', () => {
     const network = new StacksMainnet();
     const client = new StackingClient('', network);
 
-    const period = await client.getCurrentPoxOperationPeriod();
+    const period = await client.getCurrentPoxOperationInfo();
     expect(period).toEqual(1);
+    expect(period).toEqual(PoxOperationPeriod.Period1);
   });
 
   test('period 1 -- next/regtest before 2.1 fork', async () => {
@@ -37,8 +41,9 @@ describe('2.1 periods', () => {
     const network = new StacksMainnet();
     const client = new StackingClient('', network);
 
-    const period = await client.getCurrentPoxOperationPeriod();
+    const period = await client.getCurrentPoxOperationInfo();
     expect(period).toEqual(1);
+    expect(period).toEqual(PoxOperationPeriod.Period1);
   });
 
   test.skip('period 2 -- after 2.1 fork, before first pox-2 cycle', async () => {
@@ -47,8 +52,9 @@ describe('2.1 periods', () => {
     const network = new StacksTestnet({ url: API_URL });
     const client = new StackingClient('', network);
 
-    const period = await client.getCurrentPoxOperationPeriod();
+    const period = await client.getCurrentPoxOperationInfo();
     expect(period).toEqual(2);
+    expect(period).toEqual(PoxOperationPeriod.Period2);
   });
 
   test('period 3', async () => {
@@ -59,8 +65,9 @@ describe('2.1 periods', () => {
     const network = new StacksTestnet({ url: API_URL });
     const client = new StackingClient(address, network);
 
-    const period = await client.getCurrentPoxOperationPeriod();
+    const period = await client.getCurrentPoxOperationInfo();
     expect(period).toEqual(3);
+    expect(period).toEqual(PoxOperationPeriod.Period3);
   });
 });
 
@@ -517,4 +524,46 @@ describe('delegated stacking', () => {
     balanceLocked = await client.getAccountBalanceLocked();
     expect(balanceLocked).toBe(fullAmount);
   });
+});
+
+describe('btc addresses', () => {
+  test.each(BTC_ADDRESS_CASES)(
+    'stack with btc address',
+    async ({ address: btcAddress, expectedHash, expectedVersion, mockedResult }) => {
+      const privateKey = 'cb3df38053d132895220b9ce471f6b676db5b9bf0b4adefb55f2118ece2478df01';
+      const address = 'STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6';
+
+      const network = new StacksTestnet({ url: API_URL });
+      const client = new StackingClient(address, network);
+
+      setApiMocks({
+        ...MOCK_POX_2_REGTEST,
+        '/v2/accounts/STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6?proof=0': `{"balance":"0x0000000000000000002386f26fbe67f0","locked":"0x00000000000000000000000000000000","unlock_height":0,"nonce":17}`,
+        '/v2/contracts/call-read/ST000000000000000000002AMW42H/pox-2/get-stacker-info': `{"okay":true,"result":"0x09"}`,
+      });
+
+      const poxInfo = await client.getPoxInfo();
+      const stackingResult = await client.stack({
+        amountMicroStx: BigInt(poxInfo.min_amount_ustx),
+        burnBlockHeight: (poxInfo.current_burnchain_block_height as number) + 1,
+        poxAddress: btcAddress,
+        cycles: 2,
+        privateKey,
+      });
+      await waitForTx(stackingResult.txid);
+
+      setApiMocks({
+        ...MOCK_POX_2_REGTEST,
+        '/v2/accounts/STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6?proof=0': `{"balance":"0x0000000000000000001cdd687194e8e0","locked":"0x00000000000000000006a989fe295800","unlock_height":2675,"nonce":18}`,
+        '/v2/contracts/call-read/ST000000000000000000002AMW42H/pox-2/get-stacker-info': `{"okay":true,"result":"${mockedResult}"}`,
+      });
+
+      const stackingStatus = await client.getStatus();
+      if (!stackingStatus.stacked) throw Error;
+
+      expect(stackingStatus.details.pox_address.hashbytes).toEqual(hexToBytes(expectedHash));
+      expect(stackingStatus.details.pox_address.version).toHaveLength(1);
+      expect(stackingStatus.details.pox_address.version[0]).toEqual(expectedVersion);
+    }
+  );
 });

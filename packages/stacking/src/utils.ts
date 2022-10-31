@@ -1,5 +1,5 @@
 import { bech32, bech32m } from '@scure/base';
-import { bigIntToBytes, concatBytes, hexToBytes } from '@stacks/common';
+import { bigIntToBytes } from '@stacks/common';
 import { base58CheckDecode, base58CheckEncode } from '@stacks/encryption';
 import {
   bufferCV,
@@ -10,10 +10,12 @@ import {
   tupleCV,
   TupleCV,
 } from '@stacks/transactions';
+import { PoxInfo } from '.';
 import {
   B58_ADDR_PREFIXES,
   BitcoinNetworkVersion,
   PoXAddressVersion,
+  PoxOperationPeriod,
   SegwitPrefix,
   SEGWIT_ADDR_PREFIXES,
   SEGWIT_V0,
@@ -150,6 +152,7 @@ export function extractPoxAddressFromClarityValue(poxAddrClarityValue: ClarityVa
   };
 }
 
+// todo: remove
 export function getBTCAddress(version: number | Uint8Array, hash: Uint8Array) {
   const versionNumber: number = typeof version === 'number' ? version : version[0];
   return base58CheckEncode(versionNumber, hash);
@@ -197,16 +200,11 @@ export function getErrorString(error: StackingErrors): string {
       return 'Invalid start burn height';
   }
 }
-/** @ignore */
-export function rightPad(array: Uint8Array, minLength: number) {
-  if (array.length >= minLength) return array;
-  return concatBytes(array, hexToBytes('00'.repeat(Math.max(0, minLength - array.length))));
-}
 
 export function poxAddressToTuple(poxAddress: string) {
   const { version, data } = decodeBtcAddress(poxAddress);
   const versionBuff = bufferCV(bigIntToBytes(BigInt(version), 1));
-  const hashBuff = bufferCV(rightPad(data, 20));
+  const hashBuff = bufferCV(data);
   return tupleCV({
     version: versionBuff,
     hashbytes: hashBuff,
@@ -293,4 +291,29 @@ export function unwrapMap<T extends ClarityValue, U>(optional: OptionalCV<T>, ma
   if (optional.type === ClarityType.OptionalSome) return map(optional.value);
   if (optional.type === ClarityType.OptionalNone) return undefined;
   throw new Error("Object is not an 'Optional'");
+}
+
+/**
+ * Get current period of PoX operation from a PoxInfo response
+ *
+ * Periods:
+ * - Period 1: This is before the 2.1 fork.
+ * - Period 2: This is after the 2.1 fork, but before cycle (N+1).
+ * - Period 3: This is after cycle (N+1) has begun. Original PoX contract state will no longer have any impact on reward sets, account lock status, etc.
+ */
+export function poxInfoOperationPeriod(poxInfo: PoxInfo): PoxOperationPeriod {
+  // pre 2.1
+  if (!poxInfo.contract_versions || poxInfo.contract_versions.length <= 1) return 1; // API does not know about pox-2
+  if (poxInfo.contract_id.endsWith('.pox')) return 1; // before the 2.1 fork
+
+  // todo: detect period 2
+
+  // in 2.1 fork
+  if (poxInfo.contract_versions.length == 2) {
+    // FAULTY, could be period 1
+    if (poxInfo.current_cycle.id < poxInfo.contract_versions[1].first_reward_cycle_id) return 2; // before pox-2
+    return 3; // in pox-2
+  }
+
+  throw Error('Failed to determine current period of PoX operation.');
 }

@@ -63,6 +63,15 @@ export const SEGWIT_V1 = 1;
 //   mainnet P2TR: bc1p5d7rjq7g6rdk2yhzks9smlaqtedr4dekq08ge8ztwac72sfr9rusxg3297
 //   testnet P2TR: tb1p6h5fuzmnvpdthf5shf0qqjzwy7wsqc5rhmgq2ks9xrak4ry6mtrscsqvzp
 
+export enum PoxOperationPeriod {
+  /** Period 1: This is before the 2.1 fork. */
+  Period1 = 1,
+  /** Period 2: This is after the 2.1 fork, but before cycle (N+1). */
+  Period2 = 2,
+  /** Period 3: This is after cycle (N+1) has begun. Original PoX contract state will no longer have any impact on reward sets, account lock status, etc. */
+  Period3 = 3,
+}
+
 export enum StackingErrors {
   ERR_STACKING_UNREACHABLE = 255,
   ERR_STACKING_INSUFFICIENT_FUNDS = 1,

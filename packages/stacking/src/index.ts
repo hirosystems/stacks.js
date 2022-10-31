@@ -32,8 +32,8 @@ import {
   UIntCV,
   validateStacksAddress,
 } from '@stacks/transactions';
-import { StackingErrors } from './constants';
-import { poxAddressToTuple, unwrap, unwrapMap } from './utils';
+import { PoxOperationPeriod, StackingErrors } from './constants';
+import { poxAddressToTuple, poxInfoOperationPeriod, unwrap, unwrapMap } from './utils';
 export * from './utils';
 
 export interface CycleInfo {
@@ -63,6 +63,11 @@ export interface PoxInfo {
   prepare_phase_block_length: number;
   reward_phase_block_length: number;
   contract_versions?: ContractVersion[];
+}
+
+export interface PoxOperationInfo {
+  period: PoxOperationPeriod;
+  blocksUntilNextContractVersion?: number;
 }
 
 export type StackerInfo =
@@ -392,30 +397,34 @@ export class StackingClient {
   }
 
   /**
-   * Get current period of PoX operation
-   *
-   * Periods:
-   * - Period 1: This is before the 2.1 fork.
-   * - Period 2: This is after the 2.1 fork, but before cycle (N+1).
-   * - Period 3: This is after cycle (N+1) has begun. Original PoX contract state will no longer have any impact on reward sets, account lock status, etc.
+   * Get information on current PoX operation
+   * @returns {Promise<PoxOperationInfo>} that resolves to PoX operation info
    */
-  async getCurrentPoxOperationPeriod(): Promise<1 | 2 | 3> {
-    const pox = await this.getPoxInfo();
+  async getCurrentPoxOperationInfo(): Promise<PoxOperationInfo> {
+    const poxInfo = await this.getPoxInfo();
+    if (!poxInfo?.current_burnchain_block_height)
+      throw new Error("No 'current_burnchain_block_height' received'");
 
-    // pre 2.1
-    if (!pox.contract_versions || pox.contract_versions.length <= 1) return 1; // API does not know about pox-2
-    if (pox.contract_id.endsWith('.pox')) return 1; // before the 2.1 fork
+    const period = poxInfoOperationPeriod(poxInfo);
+    if (period <= 1) return { period };
 
-    // todo: detect period 2
+    const blocksUntilNextContractVersion = poxInfo.contract_versions
+      ?.map(version => version.activation_burnchain_block_height) // map to height
+      .map(height => height - (poxInfo.current_burnchain_block_height as number)) // map to blocks until contract version
+      .filter(relativeHeight => relativeHeight > 0) // keep only future heights
+      .sort()[0]; // smallest height is upcoming contract version
+    return {
+      period,
+      blocksUntilNextContractVersion,
+    };
+  }
 
-    // in 2.1 fork
-    if (pox.contract_versions.length == 2) {
-      // FAULTY, could be period 1
-      if (pox.current_cycle.id < pox.contract_versions[1].first_reward_cycle_id) return 2; // before pox-2
-      return 3; // in pox-2
-    }
-
-    throw Error('Failed to determine current period of PoX operation.');
+  private async ensurePox2IsLive() {
+    const currentPeriod = (await this.getCurrentPoxOperationInfo()).period;
+    if (currentPeriod <= 2)
+      throw new Error(
+        `PoX-2 is not live yet (currently in period ${currentPeriod} of PoX-2 operation)`
+      );
   }
 
   /**
@@ -518,7 +527,7 @@ export class StackingClient {
   /**
    * Generate and broadcast a stacking transaction to extend locked STX (`pox-2.stack-extend`)
    * @category PoX-2
-   * @param StackExtendOptions - a required extend STX options object
+   * @param {StackExtendOptions} - a required extend STX options object
    * @returns a broadcasted txid if the operation succeeds
    */
   async stackExtend({
@@ -526,6 +535,8 @@ export class StackingClient {
     poxAddress,
     privateKey,
   }: StackExtendOptions): Promise<TxBroadcastResult> {
+    await this.ensurePox2IsLive();
+
     const poxInfo = await this.getPoxInfo();
     const contract = poxInfo.contract_id;
 
@@ -545,13 +556,15 @@ export class StackingClient {
   /**
    * Generate and broadcast a stacking transaction to increase locked STX (`pox-2.stack-increase`)
    * @category PoX-2
-   * @param StackIncreaseOptions - a required increase STX options object
+   * @param {StackIncreaseOptions} - a required increase STX options object
    * @returns a broadcasted txid if the operation succeeds
    */
   async stackIncrease({
     increaseBy,
     privateKey,
   }: StackIncreaseOptions): Promise<TxBroadcastResult> {
+    await this.ensurePox2IsLive();
+
     const poxInfo = await this.getPoxInfo();
     const contract = poxInfo.contract_id;
 
@@ -638,9 +651,8 @@ export class StackingClient {
 
   /**
    * As a delegator, generate and broadcast transactions to extend stack for multiple delegatees.
-   *
+   * @category PoX-2
    * @param {DelegateStackExtendOptions} options - a required delegate stack extend STX options object
-   *
    * @returns {Promise<string>} that resolves to a broadcasted txid if the operation succeeds
    */
   async delegateStackExtend({
@@ -670,9 +682,8 @@ export class StackingClient {
 
   /**
    * As a delegator, generate and broadcast transactions to stack increase for multiple delegatees.
-   *
-   * @param {DelegateStackIncreaseOptions} options - a required delegate stack increase STX options object
-   *
+   * @category PoX-2
+   * @param {DelegateStackIncreaseOptions} - a required delegate stack increase STX options object
    * @returns {Promise<string>} that resolves to a broadcasted txid if the operation succeeds
    */
   async delegateStackIncrease({
@@ -682,6 +693,8 @@ export class StackingClient {
     privateKey,
     nonce,
   }: DelegateStackIncreaseOptions): Promise<TxBroadcastResult> {
+    await this.ensurePox2IsLive();
+
     const poxInfo = await this.getPoxInfo();
     const contract = poxInfo.contract_id;
 
