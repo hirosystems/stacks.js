@@ -33,7 +33,7 @@ import {
   validateStacksAddress,
 } from '@stacks/transactions';
 import { PoxOperationPeriod, StackingErrors } from './constants';
-import { poxAddressToTuple, poxInfoOperationPeriod, unwrap, unwrapMap } from './utils';
+import { ensurePox2IsLive, poxAddressToTuple, unwrap, unwrapMap } from './utils';
 export * from './utils';
 
 export interface CycleInfo {
@@ -65,10 +65,14 @@ export interface PoxInfo {
   contract_versions?: ContractVersion[];
 }
 
-export interface PoxOperationInfo {
-  period: PoxOperationPeriod;
-  blocksUntilNextContractVersion?: number;
-}
+export type PoxOperationInfo =
+  | {
+      period: PoxOperationPeriod.Period1 | PoxOperationPeriod.Period3;
+    }
+  | {
+      period: PoxOperationPeriod.Period2;
+      burnBlocksUntilPox2: number;
+    };
 
 export type StackerInfo =
   | {
@@ -382,7 +386,7 @@ export class StackingClient {
    */
   async getSecondsUntilNextCycle(): Promise<number> {
     const poxInfoPromise = this.getPoxInfo();
-    const targetBlockTimePromise = await this.getTargetBlockTime();
+    const targetBlockTimePromise = this.getTargetBlockTime();
     const coreInfoPromise = this.getCoreInfo();
 
     return Promise.all([poxInfoPromise, targetBlockTimePromise, coreInfoPromise]).then(
@@ -398,33 +402,58 @@ export class StackingClient {
 
   /**
    * Get information on current PoX operation
+   *
+   * Periods:
+   * - Period 1: This is before the 2.1 fork.
+   * - Period 2: This is after the 2.1 fork, but before cycle (N+1).
+   * - Period 3: This is after cycle (N+1) has begun. Original PoX contract state will no longer have any impact on reward sets, account lock status, etc.
+   *
    * @returns {Promise<PoxOperationInfo>} that resolves to PoX operation info
    */
-  async getCurrentPoxOperationInfo(): Promise<PoxOperationInfo> {
-    const poxInfo = await this.getPoxInfo();
-    if (!poxInfo?.current_burnchain_block_height)
-      throw new Error("No 'current_burnchain_block_height' received'");
+  async getPoxOperationInfo(poxInfo?: PoxInfo): Promise<PoxOperationInfo> {
+    poxInfo = poxInfo ?? (await this.getPoxInfo());
 
-    const period = poxInfoOperationPeriod(poxInfo);
-    if (period <= 1) return { period };
+    // == Before 2.1 ===========================================================
+    // => Period 1
+    if (
+      !poxInfo.current_burnchain_block_height ||
+      !poxInfo.contract_versions ||
+      poxInfo.contract_versions.length <= 1
+    ) {
+      // Node does not know about other pox versions yet
+      return { period: 1 };
+    }
 
-    const blocksUntilNextContractVersion = poxInfo.contract_versions
-      ?.map(version => version.activation_burnchain_block_height) // map to height
-      .map(height => height - (poxInfo.current_burnchain_block_height as number)) // map to blocks until contract version
-      .filter(relativeHeight => relativeHeight > 0) // keep only future heights
-      .sort()[0]; // smallest height is upcoming contract version
-    return {
-      period,
-      blocksUntilNextContractVersion,
-    };
-  }
+    const [pox1, pox2] = [...poxInfo.contract_versions].sort(
+      (a, b) => a.activation_burnchain_block_height - b.activation_burnchain_block_height
+    );
+    const [address, name] = pox2.contract_id.split('.');
+    const pox2ConfiguredUrl = this.network.getDataVarUrl(address, name, 'configured');
+    const isPox2Configured =
+      (await this.network.fetchFn(pox2ConfiguredUrl).then(r => r.text())) === '{"data":"0x03"}'; // PoX-2 is configured on fork
+    const burnBlocksUntilPox2 =
+      pox2.activation_burnchain_block_height - (poxInfo.current_burnchain_block_height as number);
 
-  private async ensurePox2IsLive() {
-    const currentPeriod = (await this.getCurrentPoxOperationInfo()).period;
-    if (currentPeriod <= 2)
-      throw new Error(
-        `PoX-2 is not live yet (currently in period ${currentPeriod} of PoX-2 operation)`
-      );
+    // => Period 1
+    if (!isPox2Configured) {
+      // Node hasn't forked yet (unclear if this case can happen)
+      return { period: 1, burnBlocksUntilPox2 };
+    }
+
+    // == In 2.1 Fork ==========================================================
+    // => Period 2
+    if (poxInfo.contract_id === pox1.contract_id) {
+      // In 2.1 fork, but PoX-2 hasn't been activated yet
+      return { period: 2, burnBlocksUntilPox2 };
+    }
+
+    // => Period 3
+    if (poxInfo.contract_id === pox2.contract_id) {
+      // In 2.1 fork and PoX-2 is live
+      return { period: 3 };
+    }
+
+    throw new Error('Could not determine PoX Operation Period');
   }
 
   /**
@@ -535,15 +564,14 @@ export class StackingClient {
     poxAddress,
     privateKey,
   }: StackExtendOptions): Promise<TxBroadcastResult> {
-    await this.ensurePox2IsLive();
-
     const poxInfo = await this.getPoxInfo();
-    const contract = poxInfo.contract_id;
+    const poxOperationInfo = await this.getPoxOperationInfo(poxInfo);
+    ensurePox2IsLive(poxOperationInfo);
 
     const txOptions = this.getStackExtendOptions({
+      contract: poxInfo.contract_id,
       extendCycles,
       poxAddress,
-      contract,
     });
     const tx = await makeContractCall({
       ...txOptions,
@@ -563,14 +591,13 @@ export class StackingClient {
     increaseBy,
     privateKey,
   }: StackIncreaseOptions): Promise<TxBroadcastResult> {
-    await this.ensurePox2IsLive();
-
     const poxInfo = await this.getPoxInfo();
-    const contract = poxInfo.contract_id;
+    const poxOperationInfo = await this.getPoxOperationInfo(poxInfo);
+    ensurePox2IsLive(poxOperationInfo);
 
     const txOptions = this.getStackIncreaseOptions({
+      contract: poxInfo.contract_id,
       increaseBy,
-      contract,
     });
     const tx = await makeContractCall({
       ...txOptions,
@@ -693,13 +720,12 @@ export class StackingClient {
     privateKey,
     nonce,
   }: DelegateStackIncreaseOptions): Promise<TxBroadcastResult> {
-    await this.ensurePox2IsLive();
-
     const poxInfo = await this.getPoxInfo();
-    const contract = poxInfo.contract_id;
+    const poxOperationInfo = await this.getPoxOperationInfo(poxInfo);
+    ensurePox2IsLive(poxOperationInfo);
 
     const txOptions = this.getDelegateStackIncreaseOptions({
-      contract,
+      contract: poxInfo.contract_id,
       stacker,
       poxAddress,
       increaseBy,

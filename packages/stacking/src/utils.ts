@@ -10,7 +10,7 @@ import {
   tupleCV,
   TupleCV,
 } from '@stacks/transactions';
-import { PoxInfo } from '.';
+import { PoxOperationInfo } from '.';
 import {
   B58_ADDR_PREFIXES,
   BitcoinNetworkVersion,
@@ -293,27 +293,9 @@ export function unwrapMap<T extends ClarityValue, U>(optional: OptionalCV<T>, ma
   throw new Error("Object is not an 'Optional'");
 }
 
-/**
- * Get current period of PoX operation from a PoxInfo response
- *
- * Periods:
- * - Period 1: This is before the 2.1 fork.
- * - Period 2: This is after the 2.1 fork, but before cycle (N+1).
- * - Period 3: This is after cycle (N+1) has begun. Original PoX contract state will no longer have any impact on reward sets, account lock status, etc.
- */
-export function poxInfoOperationPeriod(poxInfo: PoxInfo): PoxOperationPeriod {
-  // pre 2.1
-  if (!poxInfo.contract_versions || poxInfo.contract_versions.length <= 1) return 1; // API does not know about pox-2
-  if (poxInfo.contract_id.endsWith('.pox')) return 1; // before the 2.1 fork
-
-  // todo: detect period 2
-
-  // in 2.1 fork
-  if (poxInfo.contract_versions.length == 2) {
-    // FAULTY, could be period 1
-    if (poxInfo.current_cycle.id < poxInfo.contract_versions[1].first_reward_cycle_id) return 2; // before pox-2
-    return 3; // in pox-2
-  }
-
-  throw Error('Failed to determine current period of PoX operation.');
+export function ensurePox2IsLive(operationInfo: PoxOperationInfo) {
+  if (operationInfo.period !== PoxOperationPeriod.Period3)
+    throw new Error(
+      `PoX-2 is not live yet (currently in period ${operationInfo.period} of PoX-2 operation)`
+    );
 }
