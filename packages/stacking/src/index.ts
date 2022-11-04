@@ -71,7 +71,8 @@ export type PoxOperationInfo =
     }
   | {
       period: PoxOperationPeriod.Period2;
-      burnBlocksUntilPox2: number;
+      /** Remaining burn blocks until PoX-2 is active */
+      blocks_until_pox_2: number; // todo: should this maybe not be relative but the absolute height?
     };
 
 export type StackerInfo =
@@ -437,14 +438,14 @@ export class StackingClient {
     // => Period 1
     if (!isPox2Configured) {
       // Node hasn't forked yet (unclear if this case can happen)
-      return { period: 1, burnBlocksUntilPox2 };
+      return { period: 1, blocks_until_pox_2: burnBlocksUntilPox2 };
     }
 
     // == In 2.1 Fork ==========================================================
     // => Period 2
     if (poxInfo.contract_id === pox1.contract_id) {
       // In 2.1 fork, but PoX-2 hasn't been activated yet
-      return { period: 2, burnBlocksUntilPox2 };
+      return { period: 2, blocks_until_pox_2: burnBlocksUntilPox2 };
     }
 
     // => Period 3

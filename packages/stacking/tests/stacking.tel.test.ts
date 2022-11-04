@@ -8,7 +8,8 @@ import {
   MOCK_FULL_ACCOUNT,
   MOCK_POX_2_REGTEST,
   setApiMocks,
-  waitForNextBlock,
+  V2_POX_INTERFACE_POX_2,
+  waitForBlock,
   waitForTx,
 } from './apiMockingHelpers';
 import { BTC_ADDRESS_CASES } from './utils.test';
@@ -62,7 +63,7 @@ describe('2.1 periods', () => {
 
     expect(periodInfo.period).toBe(2);
     expect(periodInfo.period).toBe(PoxOperationPeriod.Period2);
-    expect(periodInfo.burnBlocksUntilPox2).toBe(9);
+    expect(periodInfo.blocks_until_pox_2).toBe(9);
   });
 
   test('period 3', async () => {
@@ -183,7 +184,7 @@ describe('normal stacking', () => {
       privateKey,
     });
     await waitForTx(stackingResult.txid);
-    await waitForNextBlock(BEGIN_LOCK_HEIGHT, client);
+    await waitForBlock(BEGIN_LOCK_HEIGHT + 1, client);
 
     setApiMocks({
       ...MOCK_POX_2_REGTEST,
@@ -239,7 +240,7 @@ describe('normal stacking', () => {
       privateKey,
     });
     await waitForTx(stackingResult.txid);
-    await waitForNextBlock(BEGIN_LOCK_HEIGHT + 2, client);
+    await waitForBlock(BEGIN_LOCK_HEIGHT + 3, client);
 
     setApiMocks({
       ...MOCK_POX_2_REGTEST,
