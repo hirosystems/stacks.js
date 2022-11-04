@@ -75,6 +75,20 @@ export type PoxOperationInfo =
       blocks_until_pox_2: number; // todo: should this maybe not be relative but the absolute height?
     };
 
+export interface AccountExtendedBalances {
+  stx: {
+    balance: IntegerType;
+    total_sent: IntegerType;
+    total_received: IntegerType;
+    locked: IntegerType;
+    lock_height: number;
+    burnchain_lock_height: number;
+    burnchain_unlock_height: number;
+  };
+  fungible_tokens: any;
+  non_fungible_tokens: any;
+}
+
 export type StackerInfo =
   | {
       stacked: false;
@@ -319,6 +333,16 @@ export class StackingClient {
     return this.getAccountStatus().then(res => {
       return BigInt(res.balance);
     });
+  }
+
+  /**
+   * Get extended account balances
+   *
+   * @returns promise resolves to a bigint if the operation succeeds
+   */
+  async getAccountExtendedBalances(): Promise<AccountExtendedBalances> {
+    const url = this.network.getAccountExtendedBalancesApiUrl(this.address);
+    return this.network.fetchFn(url).then(res => res.json());
   }
 
   /**

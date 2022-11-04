@@ -131,7 +131,7 @@ describe('stacking transition', () => {
     // * PoX-2 activation at block 120 (`STACKS_POX2_HEIGHT=120`)
     //
     // Step-by-step:
-    // * User stacks for a long time (12 cycles, which is around 70 blocks in regtest)
+    // * User stacks for a long time (12 cycles, which is around ~70 blocks in regtest)
     //   * We are in `Period 1`
     //   * Users funds are stacked
     // * We wait until after the fork (block 111)
@@ -196,6 +196,8 @@ describe('stacking transition', () => {
       '/v2/data_var/ST000000000000000000002AMW42H/pox-2/configured?proof=0': `{"data":"0x03"}`,
       '/v2/accounts/STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6?proof=0': `{"balance":"0x0000000000000000002386f26fc0d8f0","locked":"0x00000000000000000000000000000000","unlock_height":0,"nonce":1}`,
       '/v2/contracts/call-read/ST000000000000000000002AMW42H/pox-2/get-stacker-info': `{"okay":true,"result":"0x09"}`,
+      // todo: replace with working data once api receives events (this test will fail for now)
+      '/extended/v1/address/STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6/balances': `{"stx": {"balance": "-10000","total_sent": "0","total_received": "0","total_fees_sent": "10000","total_miner_rewards_received": "0","lock_tx_id": "0xfd191616adc625d9b26e5331d46cee009cfb12acd4f86e338a195920ccb6e152","locked": "1875180000000000","lock_height": 4,"burnchain_lock_height": 107,"burnchain_unlock_height": 170 },"fungible_tokens": {},"non_fungible_tokens":}`,
     });
     poxInfo = await client.getPoxInfo();
     expect(poxInfo.current_burnchain_block_height).toBeLessThan(initialUnlockHeight);
