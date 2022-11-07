@@ -6,19 +6,42 @@
   },
   "typedocOptions": {
     "name": "Stacks.js",
+    "entryPointStrategy": "packages",
+    "entryPoints": [
+      // "packages/*", without packages/cli
+      "packages/auth",
+      "packages/encryption",
+      "packages/network",
+      "packages/stacking",
+      "packages/transactions",
+      "packages/bns",
+      "packages/common",
+      "packages/keychain",
+      "packages/profile",
+      "packages/storage",
+      "packages/wallet-sdk",
+    ],
     "json": "docs/docs.json",
     "out": "docs",
-    "readme": "./readme.md",
-    "theme": "stacks",
     "excludePrivate": true,
     "excludeProtected": true,
-    "listInvalidSymbolLinks": true,
     "categoryOrder": [
       "*",
       "Other"
     ],
-    // theme and plugin options
-    "external-modulemap": ".*\/packages\/([\\w\\-_]+)\/",
-    "package-prefix": "@stacks",
+    "gaID": "GTM-M8P6G7Z",
+    "theme": "stacks",
+    "replaceText": {
+      "replacements": [
+        {
+          "pattern": "https://github.com/hirosystems/stacks.js/tree/master/packages/wallet-sdk",
+          "replace": "/modules/_stacks_wallet_sdk"
+        },
+        {
+          "pattern": "https://github.com/hirosystems/stacks.js/tree/master/packages/",
+          "replace": "/modules/_stacks_"
+        }
+      ]
+    }
   }
 }
