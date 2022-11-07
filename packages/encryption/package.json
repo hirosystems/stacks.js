@@ -70,5 +70,8 @@
   },
   "bugs": {
     "url": "https://github.com/blockstack/blockstack.js/issues"
+  },
+  "typedoc": {
+    "entryPoint": "./src/index.ts"
   }
 }
