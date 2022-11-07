@@ -207,6 +207,10 @@ describe('stacking transition', () => {
     expect(status.stacked).toBeFalsy();
     const balanceLocked = await client.getAccountBalanceLocked();
     expect(balanceLocked).toBe(0n);
+
+    // todo: replace with working data once api receives events (this test will fail for now)
+    const extendedAccountInfo = await client.getAccountExtendedBalances();
+    expect(extendedAccountInfo.stx.locked).toBe(0);
   });
 });
 
