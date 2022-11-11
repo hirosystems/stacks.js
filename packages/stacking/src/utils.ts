@@ -10,7 +10,7 @@ import {
   tupleCV,
   TupleCV,
 } from '@stacks/transactions';
-import { PoxOperationInfo } from '.';
+import { PoxInfo, PoxOperationInfo } from '.';
 import {
   B58_ADDR_PREFIXES,
   BitcoinNetworkVersion,
@@ -298,4 +298,24 @@ export function ensurePox2IsLive(operationInfo: PoxOperationInfo) {
     throw new Error(
       `PoX-2 is not live yet (currently in period ${operationInfo.period} of PoX-2 operation)`
     );
+}
+
+export function ensurePox1DoesNotCreateStateIntoPeriod3({
+  poxInfo,
+  poxOperationInfo,
+  cycles,
+  burnBlockHeight: startBurnBlockHeight,
+}: {
+  poxInfo: PoxInfo;
+  poxOperationInfo: PoxOperationInfo;
+  cycles: number;
+  burnBlockHeight: number;
+}) {
+  if (poxOperationInfo.period !== PoxOperationPeriod.Period2) return;
+
+  const blocksLocked = cycles * poxInfo.reward_cycle_length;
+  const unlockBlockHeight = startBurnBlockHeight + blocksLocked;
+
+  if (unlockBlockHeight >= poxOperationInfo.pox2.activation_burnchain_block_height)
+    throw new Error(`Transaction would fail, since it create state into Period 3 (PoX-2)`);
 }

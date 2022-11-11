@@ -72,6 +72,7 @@ export enum PoxOperationPeriod {
   Period3 = 3,
 }
 
+// todo: add pox-2 error codes here
 export enum StackingErrors {
   ERR_STACKING_UNREACHABLE = 255,
   ERR_STACKING_INSUFFICIENT_FUNDS = 1,

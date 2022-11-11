@@ -14,15 +14,17 @@ import {
 } from './apiMockingHelpers';
 import { BTC_ADDRESS_CASES } from './utils.test';
 
-const API_URL = 'http://localhost:3999'; // use regtest for e2e tests
+const API_URL = 'http://localhost:3999'; // uses regtest for most unmocked tests
+
+jest.setTimeout(120_000);
 
 beforeEach(() => {
   jest.resetModules();
   fetchMock.resetMocks();
 });
 
-describe('2.1 periods', () => {
-  test('period 1 -- mainnet before 2.1 fork', async () => {
+describe('2.1 period detection', () => {
+  test('period 1 -- before 2.1 fork (mainnet)', async () => {
     setApiMocks({
       '/v2/pox': `{"contract_id":"SP000000000000000000002Q6VF78.pox","pox_activation_threshold_ustx":66818426279656,"first_burnchain_block_height":666050,"prepare_phase_block_length":100,"reward_phase_block_length":2000,"reward_slots":4000,"rejection_fraction":25,"total_liquid_supply_ustx":1336368525593131,"current_cycle":{"id":42,"min_threshold_ustx":140000000000,"stacked_ustx":528062660869340,"is_pox_active":true},"next_cycle":{"id":43,"min_threshold_ustx":120000000000,"min_increment_ustx":66818426279,"stacked_ustx":441243465796508,"prepare_phase_start_block_height":756250,"blocks_until_prepare_phase":182,"reward_phase_start_block_height":756350,"blocks_until_reward_phase":282,"ustx_until_pox_rejection":334092131398275},"min_amount_ustx":120000000000,"prepare_cycle_length":100,"reward_cycle_id":42,"reward_cycle_length":2100,"rejection_votes_left_required":334092131398275,"next_reward_cycle_in":282}`,
     });
@@ -33,9 +35,10 @@ describe('2.1 periods', () => {
     const periodInfo = await client.getPoxOperationInfo();
     expect(periodInfo.period).toBe(1);
     expect(periodInfo.period).toBe(PoxOperationPeriod.Period1);
+    expect(periodInfo.pox1.contract_id).toBe('SP000000000000000000002Q6VF78.pox');
   });
 
-  test('period 1 -- next/regtest before 2.1 fork', async () => {
+  test('period 1 -- before 2.1 fork (next/regtest)', async () => {
     setApiMocks({
       '/v2/pox': `{"contract_id":"ST000000000000000000002AMW42H.pox","pox_activation_threshold_ustx":600057388429055,"first_burnchain_block_height":0,"current_burnchain_block_height":108,"prepare_phase_block_length":1,"reward_phase_block_length":4,"reward_slots":8,"rejection_fraction":3333333333333333,"total_liquid_supply_ustx":60005738842905579,"current_cycle":{"id":21,"min_threshold_ustx":1875180000000000,"stacked_ustx":0,"is_pox_active":false},"next_cycle":{"id":22,"min_threshold_ustx":1875180000000000,"min_increment_ustx":7500717355363,"stacked_ustx":0,"prepare_phase_start_block_height":109,"blocks_until_prepare_phase":1,"reward_phase_start_block_height":110,"blocks_until_reward_phase":2,"ustx_until_pox_rejection":8484139029839119787},"min_amount_ustx":1875180000000000,"prepare_cycle_length":1,"reward_cycle_id":21,"reward_cycle_length":5,"rejection_votes_left_required":8484139029839119787,"next_reward_cycle_in":2,"contract_versions":[{"contract_id":"ST000000000000000000002AMW42H.pox","activation_burnchain_block_height":0,"first_reward_cycle_id":0},{"contract_id":"ST000000000000000000002AMW42H.pox-2","activation_burnchain_block_height":120,"first_reward_cycle_id":25}]}`,
       '/v2/data_var/ST000000000000000000002AMW42H/pox-2/configured?proof=0': `Data var not found`, // 404
@@ -44,9 +47,13 @@ describe('2.1 periods', () => {
     const network = new StacksTestnet({ url: API_URL });
     const client = new StackingClient('', network);
 
+    const poxInfo = await client.getPoxInfo();
+    expect(poxInfo.contract_id).toBe('ST000000000000000000002AMW42H.pox');
+
     const periodInfo = await client.getPoxOperationInfo();
     expect(periodInfo.period).toBe(1);
     expect(periodInfo.period).toBe(PoxOperationPeriod.Period1);
+    expect(periodInfo.pox1.contract_id).toBe('ST000000000000000000002AMW42H.pox');
   });
 
   test('period 2 -- after 2.1 fork, before first pox-2 cycle', async () => {
@@ -58,12 +65,18 @@ describe('2.1 periods', () => {
     const network = new StacksTestnet({ url: API_URL });
     const client = new StackingClient('', network);
 
+    const poxInfo = await client.getPoxInfo();
+    expect(poxInfo.contract_id).toBe('ST000000000000000000002AMW42H.pox');
+
     const periodInfo = await client.getPoxOperationInfo();
     if (periodInfo.period !== 2) throw Error;
 
     expect(periodInfo.period).toBe(2);
     expect(periodInfo.period).toBe(PoxOperationPeriod.Period2);
-    expect(periodInfo.blocks_until_pox_2).toBe(9);
+    expect(periodInfo.pox1.contract_id).toBe('ST000000000000000000002AMW42H.pox');
+    expect(periodInfo.pox2.contract_id).toBe('ST000000000000000000002AMW42H.pox-2');
+    expect(periodInfo.pox2.activation_burnchain_block_height).toBe(120);
+    expect(periodInfo.pox2.first_reward_cycle_id).toBe(25);
   });
 
   test('period 3', async () => {
@@ -75,61 +88,30 @@ describe('2.1 periods', () => {
     const network = new StacksTestnet({ url: API_URL });
     const client = new StackingClient('', network);
 
+    const poxInfo = await client.getPoxInfo();
+    expect(poxInfo.contract_id).toBe('ST000000000000000000002AMW42H.pox-2');
+
     const periodInfo = await client.getPoxOperationInfo();
+    if (periodInfo.period !== 3) throw Error;
+
     expect(periodInfo.period).toBe(3);
     expect(periodInfo.period).toBe(PoxOperationPeriod.Period3);
-  });
-});
-
-describe('stacking eligibility', () => {
-  test('eligible', async () => {
-    setApiMocks(MOCK_FULL_ACCOUNT);
-
-    const address = 'STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6';
-    const poxAddress = '1Xik14zRm29UsyS6DjhYg4iZeZqsDa8D3';
-
-    const network = new StacksTestnet({ url: API_URL });
-
-    const client = new StackingClient(address, network);
-
-    const cycles = 1;
-    const stackingEligibility = await client.canStack({ poxAddress, cycles });
-
-    expect(fetchMock.mock.calls.length).toEqual(3);
-    expect(fetchMock.mock.calls[0][0]).toEqual(network.getAccountApiUrl(address));
-    expect(fetchMock.mock.calls[1][0]).toEqual(network.getPoxInfoUrl());
-    expect(fetchMock.mock.calls[2][0]).toContain('/pox-2/can-stack-stx');
-    expect(stackingEligibility.eligible).toBe(true);
-  });
-
-  test('not eligible', async () => {
-    setApiMocks(MOCK_EMPTY_ACCOUNT);
-
-    const address = 'ST162GBCTD9ESBF09XC2T63NCX6ZKS42ZPWGXZ6VH';
-    const poxAddress = 'mnTdnFyjxRomWaSLp4fNGSa9Gyg9XJo4j4';
-
-    const network = new StacksTestnet({ url: API_URL });
-    const client = new StackingClient(address, network);
-
-    const cycles = 1;
-    const stackingEligibility = await client.canStack({ poxAddress, cycles });
-
-    expect(fetchMock.mock.calls.length).toEqual(3);
-    expect(fetchMock.mock.calls[0][0]).toEqual(network.getAccountApiUrl(address));
-    expect(fetchMock.mock.calls[1][0]).toEqual(network.getPoxInfoUrl());
-    expect(fetchMock.mock.calls[2][0]).toContain('/pox-2/can-stack-stx');
-    expect(stackingEligibility.eligible).toBe(false);
-    expect(stackingEligibility.reason).toBe('ERR_STACKING_THRESHOLD_NOT_MET');
+    expect(periodInfo.pox1.contract_id).toBe('ST000000000000000000002AMW42H.pox');
+    expect(periodInfo.pox2.contract_id).toBe('ST000000000000000000002AMW42H.pox-2');
+    expect(periodInfo.pox2.activation_burnchain_block_height).toBe(120);
+    expect(periodInfo.pox2.first_reward_cycle_id).toBe(25);
   });
 });
 
 describe('stacking transition', () => {
-  test('locked stx unlock automatically on period 3', async () => {
-    // Prerequisites:
-    // * Assumming a freshly booted (or epoch 2.05) regtest around block ~100
-    // * 2.1 fork at block 110 (`STACKS_21_HEIGHT=110`)
-    // * PoX-2 activation at block 120 (`STACKS_POX2_HEIGHT=120`)
-    //
+  // Prerequisites for all tests in transition `describe`:
+  // * Assumming a freshly booted (or epoch 2.05) regtest around block ~100
+  // * 2.1 fork at block 110 (`STACKS_21_HEIGHT=110`)
+  // * PoX-2 activation at block 120 (`STACKS_POX2_HEIGHT=120`)
+
+  // todo: unskip
+  test.skip('previously locked stx unlock automatically on period 3', async () => {
+    // See Prerequisites!
     // Step-by-step:
     // * User stacks for a long time (12 cycles, which is around ~70 blocks in regtest)
     //   * We are in `Period 1`
@@ -211,6 +193,119 @@ describe('stacking transition', () => {
     // todo: replace with working data once api receives events (this test will fail for now)
     const extendedAccountInfo = await client.getAccountExtendedBalances();
     expect(extendedAccountInfo.stx.locked).toBe(0);
+  });
+
+  test('in period 1, pox-1 functions that create state into period 3 work', async () => {
+    // See Prerequisites!
+    // Step-by-step:
+    // * Stack for long enough to overlap with Period 3
+
+    const privateKey = 'cb3df38053d132895220b9ce471f6b676db5b9bf0b4adefb55f2118ece2478df01';
+    const address = 'STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6';
+    const poxAddress = '1Xik14zRm29UsyS6DjhYg4iZeZqsDa8D3';
+
+    const network = new StacksTestnet({ url: API_URL });
+    const client = new StackingClient(address, network);
+
+    setApiMocks({
+      '/v2/pox': `{"contract_id":"ST000000000000000000002AMW42H.pox","pox_activation_threshold_ustx":600057388429055,"first_burnchain_block_height":0,"current_burnchain_block_height":107,"prepare_phase_block_length":1,"reward_phase_block_length":4,"reward_slots":8,"rejection_fraction":3333333333333333,"total_liquid_supply_ustx":60005738842905579,"current_cycle":{"id":21,"min_threshold_ustx":1875180000000000,"stacked_ustx":0,"is_pox_active":false},"next_cycle":{"id":22,"min_threshold_ustx":1875180000000000,"min_increment_ustx":7500717355363,"stacked_ustx":0,"prepare_phase_start_block_height":109,"blocks_until_prepare_phase":2,"reward_phase_start_block_height":110,"blocks_until_reward_phase":3,"ustx_until_pox_rejection":8484139029839119787},"min_amount_ustx":1875180000000000,"prepare_cycle_length":1,"reward_cycle_id":21,"reward_cycle_length":5,"rejection_votes_left_required":8484139029839119787,"next_reward_cycle_in":3,"contract_versions":[{"contract_id":"ST000000000000000000002AMW42H.pox","activation_burnchain_block_height":0,"first_reward_cycle_id":0},{"contract_id":"ST000000000000000000002AMW42H.pox-2","activation_burnchain_block_height":120,"first_reward_cycle_id":25}]}`,
+      '/v2/data_var/ST000000000000000000002AMW42H/pox-2/configured?proof=0': `Data var not found`,
+      '/v2/accounts/STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6?proof=0': `{"balance":"0x0000000000000000001cdd7b11f6a0f0","locked":"0x00000000000000000006a9775dca3800","unlock_height":170,"nonce":1}`,
+      '/v2/contracts/interface/ST000000000000000000002AMW42H/pox': V2_POX_INTERFACE_POX_2,
+    });
+
+    const poxOperation = await client.getPoxOperationInfo();
+    expect(poxOperation.period).toBe(PoxOperationPeriod.Period1);
+
+    const poxInfo = await client.getPoxInfo();
+
+    const stackingResult = await client.stack({
+      amountMicroStx: poxInfo.min_amount_ustx,
+      burnBlockHeight: poxInfo.next_cycle.prepare_phase_start_block_height,
+      cycles: 12,
+      poxAddress,
+      privateKey,
+    });
+
+    await waitForTx(stackingResult.txid, API_URL);
+
+    const balanceLocked = await client.getAccountBalanceLocked();
+    expect(balanceLocked).toBe(BigInt(poxInfo.min_amount_ustx));
+  });
+
+  test('in period 2, pox-1 functions that create state into period 3 throw before broadcast', async () => {
+    fetchMock.dontMock();
+    // See Prerequisites!
+    // Step-by-step:
+    // * Wait for Period 2
+    // * Stack for long enough to overlap with Period 3
+
+    const privateKey = 'cb3df38053d132895220b9ce471f6b676db5b9bf0b4adefb55f2118ece2478df01';
+    const address = 'STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6';
+    const poxAddress = '1Xik14zRm29UsyS6DjhYg4iZeZqsDa8D3';
+
+    const network = new StacksTestnet({ url: API_URL });
+    const client = new StackingClient(address, network);
+
+    await waitForBlock(111);
+
+    const poxOperation = await client.getPoxOperationInfo();
+    expect(poxOperation.period).toBe(PoxOperationPeriod.Period2);
+
+    const poxInfo = await client.getPoxInfo();
+    console.log('poxInfo', poxInfo);
+
+    await expect(
+      client.stack({
+        amountMicroStx: 10_000,
+        burnBlockHeight: (poxInfo.current_burnchain_block_height as number) + 1,
+        cycles: 12,
+        poxAddress,
+        privateKey,
+      })
+    ).rejects.toThrow('Transaction would fail, since it create state into Period 3 (PoX-2)');
+  });
+});
+
+describe('stacking eligibility', () => {
+  test('eligible', async () => {
+    setApiMocks(MOCK_FULL_ACCOUNT);
+
+    const address = 'STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6';
+    const poxAddress = '1Xik14zRm29UsyS6DjhYg4iZeZqsDa8D3';
+
+    const network = new StacksTestnet({ url: API_URL });
+
+    const client = new StackingClient(address, network);
+
+    const cycles = 1;
+    const stackingEligibility = await client.canStack({ poxAddress, cycles });
+
+    expect(fetchMock.mock.calls.length).toEqual(3);
+    expect(fetchMock.mock.calls[0][0]).toEqual(network.getAccountApiUrl(address));
+    expect(fetchMock.mock.calls[1][0]).toEqual(network.getPoxInfoUrl());
+    expect(fetchMock.mock.calls[2][0]).toContain('/pox-2/can-stack-stx');
+    expect(stackingEligibility.eligible).toBe(true);
+  });
+
+  test('not eligible', async () => {
+    setApiMocks(MOCK_EMPTY_ACCOUNT);
+
+    const address = 'ST162GBCTD9ESBF09XC2T63NCX6ZKS42ZPWGXZ6VH';
+    const poxAddress = 'mnTdnFyjxRomWaSLp4fNGSa9Gyg9XJo4j4';
+
+    const network = new StacksTestnet({ url: API_URL });
+    const client = new StackingClient(address, network);
+
+    const cycles = 1;
+    const stackingEligibility = await client.canStack({ poxAddress, cycles });
+
+    expect(fetchMock.mock.calls.length).toEqual(3);
+    expect(fetchMock.mock.calls[0][0]).toEqual(network.getAccountApiUrl(address));
+    expect(fetchMock.mock.calls[1][0]).toEqual(network.getPoxInfoUrl());
+    expect(fetchMock.mock.calls[2][0]).toContain('/pox-2/can-stack-stx');
+    expect(stackingEligibility.eligible).toBe(false);
+    expect(stackingEligibility.reason).toBe('ERR_STACKING_THRESHOLD_NOT_MET');
   });
 });
 

@@ -33,7 +33,13 @@ import {
   validateStacksAddress,
 } from '@stacks/transactions';
 import { PoxOperationPeriod, StackingErrors } from './constants';
-import { ensurePox2IsLive, poxAddressToTuple, unwrap, unwrapMap } from './utils';
+import {
+  ensurePox1DoesNotCreateStateIntoPeriod3,
+  ensurePox2IsLive,
+  poxAddressToTuple,
+  unwrap,
+  unwrapMap,
+} from './utils';
 export * from './utils';
 
 export interface CycleInfo {
@@ -51,28 +57,37 @@ export interface ContractVersion {
 
 export interface PoxInfo {
   contract_id: string;
+  contract_versions?: ContractVersion[];
+  current_burnchain_block_height?: number;
   first_burnchain_block_height: number;
   min_amount_ustx: string;
-  registration_window_length: 250;
+  next_reward_cycle_in: number;
+  prepare_cycle_length: number;
+  prepare_phase_block_length: number;
   rejection_fraction: number;
+  rejection_votes_left_required: number;
   reward_cycle_id: number;
   reward_cycle_length: number;
-  rejection_votes_left_required: number;
-  current_cycle: CycleInfo;
-  current_burnchain_block_height?: number;
-  prepare_phase_block_length: number;
   reward_phase_block_length: number;
-  contract_versions?: ContractVersion[];
+  reward_slots: number;
+  current_cycle: CycleInfo;
+  next_cycle: CycleInfo & {
+    prepare_phase_start_block_height: number;
+    blocks_until_prepare_phase: number;
+    reward_phase_start_block_height: number;
+    blocks_until_reward_phase: number;
+  };
 }
 
 export type PoxOperationInfo =
   | {
-      period: PoxOperationPeriod.Period1 | PoxOperationPeriod.Period3;
+      period: PoxOperationPeriod.Period1;
+      pox1: { contract_id: string };
     }
   | {
-      period: PoxOperationPeriod.Period2;
-      /** Remaining burn blocks until PoX-2 is active */
-      blocks_until_pox_2: number; // todo: should this maybe not be relative but the absolute height?
+      period: PoxOperationPeriod.Period2 | PoxOperationPeriod.Period3;
+      pox1: { contract_id: string };
+      pox2: ContractVersion;
     };
 
 export interface AccountExtendedBalances {
@@ -220,6 +235,8 @@ export interface DelegateStxOptions {
   poxAddress?: string;
   /** private key to sign transaction */
   privateKey: string;
+  /** the contract to use (mainly to specify which contract to use during Period 2) */
+  poxContract?: string; // todo: add example
 }
 
 /**
@@ -438,7 +455,7 @@ export class StackingClient {
   async getPoxOperationInfo(poxInfo?: PoxInfo): Promise<PoxOperationInfo> {
     poxInfo = poxInfo ?? (await this.getPoxInfo());
 
-    // == Before 2.1 ===========================================================
+    // == Before 2.1 Fork ======================================================
     // => Period 1
     if (
       !poxInfo.current_burnchain_block_height ||
@@ -446,36 +463,37 @@ export class StackingClient {
       poxInfo.contract_versions.length <= 1
     ) {
       // Node does not know about other pox versions yet
-      return { period: 1 };
+      return { period: 1, pox1: { contract_id: poxInfo.contract_id } };
     }
+
+    // todo: ? filter out multiple expired pox-contracts
+    // could be useful for a generic function and potential next forks
 
     const [pox1, pox2] = [...poxInfo.contract_versions].sort(
       (a, b) => a.activation_burnchain_block_height - b.activation_burnchain_block_height
     );
     const [address, name] = pox2.contract_id.split('.');
     const pox2ConfiguredUrl = this.network.getDataVarUrl(address, name, 'configured');
-    const isPox2Configured =
-      (await this.network.fetchFn(pox2ConfiguredUrl).then(r => r.text())) === '{"data":"0x03"}'; // PoX-2 is configured on fork
-    const burnBlocksUntilPox2 =
-      pox2.activation_burnchain_block_height - (poxInfo.current_burnchain_block_height as number);
+    const isPox2NotYetConfigured =
+      (await this.network.fetchFn(pox2ConfiguredUrl).then(r => r.text())) !== '{"data":"0x03"}'; // PoX-2 is configured on fork
 
     // => Period 1
-    if (!isPox2Configured) {
+    if (isPox2NotYetConfigured) {
       // Node hasn't forked yet (unclear if this case can happen)
-      return { period: 1, blocks_until_pox_2: burnBlocksUntilPox2 };
+      return { period: 1, pox1, pox2 };
     }
 
     // == In 2.1 Fork ==========================================================
     // => Period 2
     if (poxInfo.contract_id === pox1.contract_id) {
       // In 2.1 fork, but PoX-2 hasn't been activated yet
-      return { period: 2, blocks_until_pox_2: burnBlocksUntilPox2 };
+      return { period: 2, pox1, pox2 };
     }
 
     // => Period 3
     if (poxInfo.contract_id === pox2.contract_id) {
       // In 2.1 fork and PoX-2 is live
-      return { period: 3 };
+      return { period: 3, pox1, pox2 };
     }
 
     throw new Error('Could not determine PoX Operation Period');
@@ -561,8 +579,16 @@ export class StackingClient {
     burnBlockHeight,
   }: LockStxOptions): Promise<TxBroadcastResult> {
     const poxInfo = await this.getPoxInfo();
-    const contract = poxInfo.contract_id;
+    const poxOperationInfo = await this.getPoxOperationInfo(poxInfo);
 
+    ensurePox1DoesNotCreateStateIntoPeriod3({
+      poxInfo,
+      poxOperationInfo,
+      cycles,
+      burnBlockHeight,
+    });
+
+    const contract = poxInfo.contract_id;
     const txOptions = this.getStackOptions({
       amountMicroStx,
       cycles,
@@ -645,9 +671,17 @@ export class StackingClient {
     untilBurnBlockHeight,
     poxAddress,
     privateKey,
+    poxContract,
   }: DelegateStxOptions): Promise<TxBroadcastResult> {
     const poxInfo = await this.getPoxInfo();
-    const contract = poxInfo.contract_id;
+    const poxOperationInfo = await this.getPoxOperationInfo(poxInfo);
+
+    // Stackers can already delegate STX during Period 2
+    const defaultContract =
+      poxOperationInfo.period === PoxOperationPeriod.Period1
+        ? poxOperationInfo.pox1.contract_id
+        : poxOperationInfo.pox2.contract_id;
+    const contract = poxContract ?? defaultContract;
 
     const txOptions = this.getDelegateOptions({
       contract,
