@@ -162,6 +162,8 @@ export function getErrorString(error: StackingErrors): string {
   switch (error) {
     case StackingErrors.ERR_STACKING_UNREACHABLE:
       return 'Stacking unreachable';
+    case StackingErrors.ERR_STACKING_CORRUPTED_STATE:
+      return 'Stacking state is corrupted';
     case StackingErrors.ERR_STACKING_INSUFFICIENT_FUNDS:
       return 'Insufficient funds';
     case StackingErrors.ERR_STACKING_INVALID_LOCK_PERIOD:
@@ -198,6 +200,16 @@ export function getErrorString(error: StackingErrors): string {
       return 'PoX address required for delegation';
     case StackingErrors.ERR_INVALID_START_BURN_HEIGHT:
       return 'Invalid start burn height';
+    case StackingErrors.ERR_NOT_CURRENT_STACKER: // not used in pox contract
+      return 'ERR_NOT_CURRENT_STACKER';
+    case StackingErrors.ERR_STACK_EXTEND_NOT_LOCKED:
+      return 'Stacker must be currently locked';
+    case StackingErrors.ERR_STACK_INCREASE_NOT_LOCKED:
+      return 'Stacker must be currently locked';
+    case StackingErrors.ERR_DELEGATION_NO_REWARD_SLOT:
+      return 'Invalid reward-cycle and reward-cycle-index';
+    case StackingErrors.ERR_DELEGATION_WRONG_REWARD_SLOT:
+      return 'PoX address must match the one on record';
   }
 }
 

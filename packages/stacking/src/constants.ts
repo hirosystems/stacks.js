@@ -72,9 +72,10 @@ export enum PoxOperationPeriod {
   Period3 = 3,
 }
 
-// todo: add pox-2 error codes here
 export enum StackingErrors {
+  // taken from https://github.com/stacks-network/stacks-blockchain/blob/4f6d7d416f6af641f838f154dc54a3baa9cd8d48/src/chainstate/stacks/boot/pox-2.clar
   ERR_STACKING_UNREACHABLE = 255,
+  ERR_STACKING_CORRUPTED_STATE = 254,
   ERR_STACKING_INSUFFICIENT_FUNDS = 1,
   ERR_STACKING_INVALID_LOCK_PERIOD = 2,
   ERR_STACKING_ALREADY_STACKED = 3,
@@ -93,4 +94,9 @@ export enum StackingErrors {
   ERR_DELEGATION_TOO_MUCH_LOCKED = 22,
   ERR_DELEGATION_POX_ADDR_REQUIRED = 23,
   ERR_INVALID_START_BURN_HEIGHT = 24,
+  ERR_NOT_CURRENT_STACKER = 25,
+  ERR_STACK_EXTEND_NOT_LOCKED = 26,
+  ERR_STACK_INCREASE_NOT_LOCKED = 27,
+  ERR_DELEGATION_NO_REWARD_SLOT = 28,
+  ERR_DELEGATION_WRONG_REWARD_SLOT = 29,
 }
