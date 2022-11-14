@@ -17,7 +17,8 @@ export function setApiMocks(responseMap: { [key: string]: any }, mockTxBroadcast
 
   if (mockTxBroadcast)
     responseMap = {
-      '/v2/transactions': V2_TXS, // don't override if included in `responseMap`
+      '/v2/transactions': V2_TXS,
+      '/v2/fees/transaction': V2_FEES,
       ...responseMap,
     };
 
@@ -104,6 +105,7 @@ export const MOCK_POX_2_REGTEST = {
   '/v2/fees/transaction': V2_FEES,
   '/v2/pox': V2_POX_REGTEST,
   '/v2/contracts/interface/ST000000000000000000002AMW42H/pox-2': V2_POX_INTERFACE_POX_2,
+  '/v2/data_var/ST000000000000000000002AMW42H/pox-2/configured?proof=0': `{"data":"0x03"}`,
 };
 
 export const MOCK_EMPTY_ACCOUNT = {

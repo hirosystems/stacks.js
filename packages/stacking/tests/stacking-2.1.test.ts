@@ -246,12 +246,15 @@ describe('stacking transition', () => {
 
     await waitForBlock(111);
 
+    setApiMocks({
+      '/v2/pox': `{"contract_id":"ST000000000000000000002AMW42H.pox","pox_activation_threshold_ustx":600057388429055,"first_burnchain_block_height":0,"current_burnchain_block_height":111,"prepare_phase_block_length":1,"reward_phase_block_length":4,"reward_slots":8,"rejection_fraction":3333333333333333,"total_liquid_supply_ustx":60005738842905579,"current_cycle":{"id":22,"min_threshold_ustx":1875180000000000,"stacked_ustx":0,"is_pox_active":false},"next_cycle":{"id":23,"min_threshold_ustx":1875180000000000,"min_increment_ustx":7500717355363,"stacked_ustx":0,"prepare_phase_start_block_height":114,"blocks_until_prepare_phase":3,"reward_phase_start_block_height":115,"blocks_until_reward_phase":4,"ustx_until_pox_rejection":8484139029839119787},"min_amount_ustx":1875180000000000,"prepare_cycle_length":1,"reward_cycle_id":22,"reward_cycle_length":5,"rejection_votes_left_required":8484139029839119787,"next_reward_cycle_in":4,"contract_versions":[{"contract_id":"ST000000000000000000002AMW42H.pox","activation_burnchain_block_height":0,"first_reward_cycle_id":0},{"contract_id":"ST000000000000000000002AMW42H.pox-2","activation_burnchain_block_height":120,"first_reward_cycle_id":25}]}`,
+      '/v2/data_var/ST000000000000000000002AMW42H/pox-2/configured?proof=0': `{"data":"0x03"}`,
+    });
+
     const poxOperation = await client.getPoxOperationInfo();
     expect(poxOperation.period).toBe(PoxOperationPeriod.Period2);
 
     const poxInfo = await client.getPoxInfo();
-    console.log('poxInfo', poxInfo);
-
     await expect(
       client.stack({
         amountMicroStx: 10_000,
