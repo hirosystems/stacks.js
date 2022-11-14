@@ -16,8 +16,6 @@ import { BTC_ADDRESS_CASES } from './utils.test';
 
 const API_URL = 'http://localhost:3999'; // uses regtest for most unmocked tests
 
-jest.setTimeout(120_000);
-
 beforeEach(() => {
   jest.resetModules();
   fetchMock.resetMocks();
@@ -109,7 +107,7 @@ describe('stacking transition', () => {
   // * 2.1 fork at block 110 (`STACKS_21_HEIGHT=110`)
   // * PoX-2 activation at block 120 (`STACKS_POX2_HEIGHT=120`)
 
-  // todo: unskip
+  // todo: unskip when api receives events from blockchain about transition unlocks
   test.skip('previously locked stx unlock automatically on period 3', async () => {
     // See Prerequisites!
     // Step-by-step:
