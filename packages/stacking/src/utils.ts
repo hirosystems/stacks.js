@@ -152,12 +152,6 @@ export function extractPoxAddressFromClarityValue(poxAddrClarityValue: ClarityVa
   };
 }
 
-// todo: remove
-export function getBTCAddress(version: number | Uint8Array, hash: Uint8Array) {
-  const versionNumber: number = typeof version === 'number' ? version : version[0];
-  return base58CheckEncode(versionNumber, hash);
-}
-
 export function getErrorString(error: StackingErrors): string {
   switch (error) {
     case StackingErrors.ERR_STACKING_UNREACHABLE:
