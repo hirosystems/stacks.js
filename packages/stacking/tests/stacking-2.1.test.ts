@@ -232,7 +232,6 @@ describe('stacking transition', () => {
   });
 
   test('in period 2, pox-1 functions that create state into period 3 throw before broadcast', async () => {
-    fetchMock.dontMock();
     // See Prerequisites!
     // Step-by-step:
     // * Wait for Period 2
