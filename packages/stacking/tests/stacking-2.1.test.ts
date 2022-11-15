@@ -723,6 +723,50 @@ describe('delegated stacking', () => {
 });
 
 describe('btc addresses', () => {
+  test('stack to pox-1 with non-b58 addresses throws', async () => {
+    const privateKey = 'cb3df38053d132895220b9ce471f6b676db5b9bf0b4adefb55f2118ece2478df01';
+    const address = 'STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6';
+
+    const poxAddressNativeSegwitP2WPKH = 'bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4';
+    const poxAddressNativeSegwitP2WSH =
+      'bc1p5d7rjq7g6rdk2yhzks9smlaqtedr4dekq08ge8ztwac72sfr9rusxg3297';
+
+    const network = new StacksTestnet({ url: API_URL });
+    const client = new StackingClient(address, network);
+
+    setApiMocks({
+      '/v2/pox': `{"contract_id":"ST000000000000000000002AMW42H.pox","pox_activation_threshold_ustx":600057388429055,"first_burnchain_block_height":0,"current_burnchain_block_height":107,"prepare_phase_block_length":1,"reward_phase_block_length":4,"reward_slots":8,"rejection_fraction":3333333333333333,"total_liquid_supply_ustx":60005738842905579,"current_cycle":{"id":21,"min_threshold_ustx":1875180000000000,"stacked_ustx":0,"is_pox_active":false},"next_cycle":{"id":22,"min_threshold_ustx":1875180000000000,"min_increment_ustx":7500717355363,"stacked_ustx":0,"prepare_phase_start_block_height":109,"blocks_until_prepare_phase":2,"reward_phase_start_block_height":110,"blocks_until_reward_phase":3,"ustx_until_pox_rejection":8484139029839119787},"min_amount_ustx":1875180000000000,"prepare_cycle_length":1,"reward_cycle_id":21,"reward_cycle_length":5,"rejection_votes_left_required":8484139029839119787,"next_reward_cycle_in":3,"contract_versions":[{"contract_id":"ST000000000000000000002AMW42H.pox","activation_burnchain_block_height":0,"first_reward_cycle_id":0},{"contract_id":"ST000000000000000000002AMW42H.pox-2","activation_burnchain_block_height":120,"first_reward_cycle_id":25}]}`,
+      '/v2/data_var/ST000000000000000000002AMW42H/pox-2/configured?proof=0': `Data var not found`,
+      '/v2/accounts/STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6?proof=0': `{"balance":"0x0000000000000000001cdd7b11f6a0f0","locked":"0x00000000000000000006a9775dca3800","unlock_height":170,"nonce":1}`,
+      '/v2/contracts/interface/ST000000000000000000002AMW42H/pox': V2_POX_INTERFACE_POX_2,
+    });
+
+    const poxOperation = await client.getPoxOperationInfo();
+    expect(poxOperation.period).toBe(PoxOperationPeriod.Period1);
+
+    const poxInfo = await client.getPoxInfo();
+
+    await expect(
+      client.stack({
+        amountMicroStx: poxInfo.min_amount_ustx,
+        burnBlockHeight: poxInfo.next_cycle.prepare_phase_start_block_height,
+        cycles: 1,
+        poxAddress: poxAddressNativeSegwitP2WPKH,
+        privateKey,
+      })
+    ).rejects.toThrow();
+
+    await expect(
+      client.stack({
+        amountMicroStx: poxInfo.min_amount_ustx,
+        burnBlockHeight: poxInfo.next_cycle.prepare_phase_start_block_height,
+        cycles: 1,
+        poxAddress: poxAddressNativeSegwitP2WSH,
+        privateKey,
+      })
+    ).rejects.toThrow();
+  });
+
   test.each(BTC_ADDRESS_CASES)(
     'stack with btc address',
     async ({ address: btcAddress, expectedHash, expectedVersion, mockedResult }) => {

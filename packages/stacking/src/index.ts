@@ -34,6 +34,7 @@ import {
 } from '@stacks/transactions';
 import { PoxOperationPeriod, StackingErrors } from './constants';
 import {
+  ensureLegacyBtcAddressForPox1,
   ensurePox1DoesNotCreateStateIntoPeriod3,
   ensurePox2IsLive,
   poxAddressToTuple,
@@ -589,6 +590,8 @@ export class StackingClient {
     });
 
     const contract = poxInfo.contract_id;
+    ensureLegacyBtcAddressForPox1({ contract, poxAddress });
+
     const txOptions = this.getStackOptions({
       amountMicroStx,
       cycles,
@@ -682,6 +685,7 @@ export class StackingClient {
         ? poxOperationInfo.pox1.contract_id
         : poxOperationInfo.pox2.contract_id;
     const contract = poxContract ?? defaultContract;
+    ensureLegacyBtcAddressForPox1({ contract, poxAddress });
 
     const txOptions = this.getDelegateOptions({
       contract,
@@ -716,7 +720,17 @@ export class StackingClient {
     nonce,
   }: DelegateStackStxOptions): Promise<TxBroadcastResult> {
     const poxInfo = await this.getPoxInfo();
+    const poxOperationInfo = await this.getPoxOperationInfo(poxInfo);
+
+    ensurePox1DoesNotCreateStateIntoPeriod3({
+      poxInfo,
+      poxOperationInfo,
+      cycles,
+      burnBlockHeight,
+    });
+
     const contract = poxInfo.contract_id;
+    ensureLegacyBtcAddressForPox1({ contract, poxAddress });
 
     const txOptions = this.getDelegateStackOptions({
       contract,
@@ -811,7 +825,9 @@ export class StackingClient {
     privateKey,
   }: StackAggregationCommitOptions): Promise<TxBroadcastResult> {
     const poxInfo = await this.getPoxInfo();
+
     const contract = poxInfo.contract_id;
+    ensureLegacyBtcAddressForPox1({ contract, poxAddress });
 
     const txOptions = this.getStackAggregationCommitOptions({
       contract,
@@ -1164,7 +1180,6 @@ export class StackingClient {
           version: (tuple.data['version'] as BufferCV).buffer,
           hashbytes: (tuple.data['hashbytes'] as BufferCV).buffer,
         }));
-
         const untilBurnBlockHeight = unwrap(tupleCV.data['until-burn-ht'] as OptionalCV<UIntCV>);
 
         return {
