@@ -1,3 +1,10 @@
 {
-  "cleanUrls": true
+  "cleanUrls": true,
+  "redirects": [
+    {
+      "source": "/modules/:path((?!_stacks_).*)",
+      "destination": "/modules/_stacks_:path*",
+      "permanent": false
+    }
+  ]
 }
