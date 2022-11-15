@@ -23,6 +23,11 @@ import {
   StackingErrors,
 } from './constants';
 
+// Valid prefixes for supported segwit address, structure is:
+//   HRP PREFIX + SEPARATOR (always '1') + C32_ENCODED SEGWIT_VERSION_BYTE ('q' for 0, 'p' for 1) + HASHDATA
+const SEGWIT_V0_ADDR_PREFIX = /^(bc1q|tb1q|bcrt1q)/i;
+const SEGWIT_V1_ADDR_PREFIX = /^(bc1p|tb1p|bcrt1p)/i;
+
 export class InvalidAddressError extends Error {
   innerError?: Error;
   constructor(address: string, innerError?: Error) {
@@ -97,14 +102,11 @@ function decodeNativeSegwitBtcAddress(btcAddress: string): {
   witnessVersion: number;
   data: Uint8Array;
 } {
-  try {
-    return bech32Decode(btcAddress);
-  } catch (_) {}
-  try {
-    return bech32MDecode(btcAddress);
-  } catch (e) {
-    throw new Error('Address is not a valid bech32/bech32m address');
-  }
+  if (SEGWIT_V0_ADDR_PREFIX.test(btcAddress)) return bech32Decode(btcAddress);
+  if (SEGWIT_V1_ADDR_PREFIX.test(btcAddress)) return bech32MDecode(btcAddress);
+  throw new Error(
+    `Native segwit address ${btcAddress} does not match valid prefix ${SEGWIT_V0_ADDR_PREFIX} or ${SEGWIT_V1_ADDR_PREFIX}`
+  );
 }
 
 export function decodeBtcAddress(btcAddress: string): {
@@ -127,7 +129,7 @@ export function decodeBtcAddress(btcAddress: string): {
         data: b32.data,
       };
     }
-    throw new Error('Unkown BTC address prefix.');
+    throw new Error('Unknown BTC address prefix.');
   } catch (error) {
     throw new InvalidAddressError(btcAddress, error as Error);
   }
