@@ -1,3 +1,4 @@
+import { bytesToHex, utf8ToBytes } from '@stacks/common';
 import {
   createApiKeyMiddleware,
   createFetchFn,
@@ -17,11 +18,11 @@ import {
   SponsoredAuthorization,
   StandardAuthorization,
 } from '../src/authorization';
-import { BytesReader } from '../src/bytesReader';
 import {
   broadcastTransaction,
   callReadOnlyFunction,
   estimateTransaction,
+  estimateTransactionByteLength,
   getNonce,
   makeContractCall,
   makeContractDeploy,
@@ -40,8 +41,8 @@ import {
   TxBroadcastResult,
   TxBroadcastResultOk,
   TxBroadcastResultRejected,
-  estimateTransactionByteLength,
 } from '../src/builders';
+import { BytesReader } from '../src/bytesReader';
 import { bufferCV, bufferCVFromString, serializeCV, standardPrincipalCV } from '../src/clarity';
 import { createMessageSignature } from '../src/common';
 import {
@@ -70,7 +71,6 @@ import { createTransactionAuthField } from '../src/signature';
 import { TransactionSigner } from '../src/signer';
 import { deserializeTransaction, StacksTransaction } from '../src/transaction';
 import { cloneDeep } from '../src/utils';
-import { bytesToHex, utf8ToBytes } from '@stacks/common';
 
 function setSignature(
   unsignedTransaction: StacksTransaction,
@@ -655,10 +655,6 @@ test('addSignature to an unsigned transaction', async () => {
     sig
   );
   expect(unsignedTx).not.toBe(signedTx);
-});
-
-test('Make coinbase pay to alt recipient transaction', () => {
-  // todo: add test vector to pay to alt
 });
 
 test('Make versioned smart contract deploy', async () => {
