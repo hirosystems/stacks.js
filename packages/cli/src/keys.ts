@@ -165,6 +165,7 @@ export async function getStacksWalletKeyInfo(
 
   return {
     privateKey: privkey,
+    publicKey: pubkey.toString('hex'),
     address: c32check.b58ToC32(addr),
     btcAddress,
     wif: walletImportFormat,
