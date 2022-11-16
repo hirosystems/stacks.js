@@ -287,14 +287,6 @@ const BTC_ADDRESS_CASES_HASH = [
     address: '3LRW7jeCvQCRdPF8S3yUCfRAx4eqXFmdcr',
   },
   {
-    hash: '332bdfb31f688c0be0137c7c038a6d0fea0de0b6',
-    address: 'MCZjFcwYJwwYqXAbd3bbnxaCVGs81cp43Z',
-  },
-  {
-    hash: '6ac624143d19a3c91d2ac5605f0aebdfeac5b826',
-    address: 'LUxXFcwXFPpRZdMv4aYu6bDwPdC2skQ5YW',
-  },
-  {
     hash: '751e76e8199196d454941c45d1b3a323f1433bd6',
     address: 'mrCDrCybB6J1vRfbwM5hemdJz73FwDBC8r',
   },
@@ -314,10 +306,14 @@ const BTC_ADDRESS_CASES_HASH = [
     hash: '000000c4a5cad46221b2a187905e5266362b99d5e91c6ce24d165dab93e86433',
     address: 'tb1qqqqqp399et2xygdj5xreqhjjvcmzhxw4aywxecjdzew6hylgvsesrxh6hy',
   },
-  {
-    hash: '751e76e8199196d454941c45d1b3a323f1433bd6751e76e8199196d454941c45d1b3a323f1433bd6',
-    address: 'bc1pw508d6qejxtdg4y5r3zarvary0c5xw7kw508d6qejxtdg4y5r3zarvary0c5xw7k7grplx',
-  },
+];
+
+test.each(BTC_ADDRESS_CASES_HASH)('decoding btc address hash', ({ address, hash }) => {
+  const decoded = decodeBtcAddress(address);
+  expect(bytesToHex(decoded.data)).toBe(hash);
+});
+
+const BTC_ADDRESS_CASES_INVALID_POX_ADDRESS = [
   {
     hash: '751e76e8199196d454941c45d1b3a323',
     address: 'bc1zw508d6qejxtdg4y5r3zarvaryvg6kdaj',
@@ -326,9 +322,23 @@ const BTC_ADDRESS_CASES_HASH = [
     hash: '751e',
     address: 'BC1SW50QA3JX3S',
   },
+  {
+    hash: '332bdfb31f688c0be0137c7c038a6d0fea0de0b6',
+    address: 'MCZjFcwYJwwYqXAbd3bbnxaCVGs81cp43Z',
+  },
+  {
+    hash: '6ac624143d19a3c91d2ac5605f0aebdfeac5b826',
+    address: 'LUxXFcwXFPpRZdMv4aYu6bDwPdC2skQ5YW',
+  },
+  {
+    hash: '751e76e8199196d454941c45d1b3a323f1433bd6751e76e8199196d454941c45d1b3a323f1433bd6',
+    address: 'bc1pw508d6qejxtdg4y5r3zarvary0c5xw7kw508d6qejxtdg4y5r3zarvary0c5xw7k7grplx',
+  },
 ];
 
-test.each(BTC_ADDRESS_CASES_HASH)('decoding btc address hash', ({ address, hash }) => {
-  const decoded = decodeBtcAddress(address);
-  expect(bytesToHex(decoded.data)).toBe(hash);
-});
+test.each(BTC_ADDRESS_CASES_INVALID_POX_ADDRESS)(
+  'decoding valid btc address, but invalid for pox, throws',
+  ({ address }) => {
+    expect(() => decodeBtcAddress(address)).toThrow();
+  }
+);
