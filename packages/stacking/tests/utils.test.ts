@@ -275,3 +275,60 @@ test.each(BTC_ADDRESS_CASES_API)(
     expect(encoded2).toBe(address);
   }
 );
+
+const BTC_ADDRESS_CASES_HASH = [
+  // Test vectors taken from https://github.com/trezor-graveyard/bitcoinjs-trezor/blob/13b1c0be67abfea0bddbf5360548630c82331ce9/test/fixtures/address.json
+  {
+    hash: '751e76e8199196d454941c45d1b3a323f1433bd6',
+    address: '1BgGZ9tcN4rm9KBzDn7KprQz87SZ26SAMH',
+  },
+  {
+    hash: 'cd7b44d0b03f2d026d1e586d7ae18903b0d385f6',
+    address: '3LRW7jeCvQCRdPF8S3yUCfRAx4eqXFmdcr',
+  },
+  {
+    hash: '332bdfb31f688c0be0137c7c038a6d0fea0de0b6',
+    address: 'MCZjFcwYJwwYqXAbd3bbnxaCVGs81cp43Z',
+  },
+  {
+    hash: '6ac624143d19a3c91d2ac5605f0aebdfeac5b826',
+    address: 'LUxXFcwXFPpRZdMv4aYu6bDwPdC2skQ5YW',
+  },
+  {
+    hash: '751e76e8199196d454941c45d1b3a323f1433bd6',
+    address: 'mrCDrCybB6J1vRfbwM5hemdJz73FwDBC8r',
+  },
+  {
+    hash: 'cd7b44d0b03f2d026d1e586d7ae18903b0d385f6',
+    address: '2NByiBUaEXrhmqAsg7BbLpcQSAQs1EDwt5w',
+  },
+  {
+    hash: '751e76e8199196d454941c45d1b3a323f1433bd6',
+    address: 'BC1QW508D6QEJXTDG4Y5R3ZARVARY0C5XW7KV8F3T4',
+  },
+  {
+    hash: '1863143c14c5166804bd19203356da136c985678cd4d27a1b8c6329604903262',
+    address: 'tb1qrp33g0q5c5txsp9arysrx4k6zdkfs4nce4xj0gdcccefvpysxf3q0sl5k7',
+  },
+  {
+    hash: '000000c4a5cad46221b2a187905e5266362b99d5e91c6ce24d165dab93e86433',
+    address: 'tb1qqqqqp399et2xygdj5xreqhjjvcmzhxw4aywxecjdzew6hylgvsesrxh6hy',
+  },
+  {
+    hash: '751e76e8199196d454941c45d1b3a323f1433bd6751e76e8199196d454941c45d1b3a323f1433bd6',
+    address: 'bc1pw508d6qejxtdg4y5r3zarvary0c5xw7kw508d6qejxtdg4y5r3zarvary0c5xw7k7grplx',
+  },
+  {
+    hash: '751e76e8199196d454941c45d1b3a323',
+    address: 'bc1zw508d6qejxtdg4y5r3zarvaryvg6kdaj',
+  },
+  {
+    hash: '751e',
+    address: 'BC1SW50QA3JX3S',
+  },
+];
+
+test.each(BTC_ADDRESS_CASES_HASH)('decoding btc address hash', ({ address, hash }) => {
+  const decoded = decodeBtcAddress(address);
+  expect(bytesToHex(decoded.data)).toBe(hash);
+});
