@@ -14,7 +14,6 @@ import {
   getPublicKeyFromPrivate,
   publicKeyToBtcAddress,
 } from '@stacks/encryption';
-import { createStacksPrivateKey, privateKeyToString } from '@stacks/transactions';
 import { DerivationType, deriveAccount, generateWallet, getRootNode } from '@stacks/wallet-sdk';
 import * as bip32 from 'bip32';
 import * as bip39 from 'bip39';
@@ -155,7 +154,7 @@ export async function getStacksWalletKeyInfo(
   const pubkey = Buffer.from(child.publicKey!);
   const privkeyBuffer = Buffer.from(child.privateKey!);
   const privkey = bytesToHex(compressPrivateKey(privkeyBuffer));
-  const wifVersion = network.isMainnet() ? BITCOIN_WIF : BITCOIN_WIF_TESTNET;
+  const wifVersion = network.isTestnet() ? BITCOIN_WIF_TESTNET : BITCOIN_WIF;
   const walletImportFormat = wif.encode(wifVersion, privkeyBuffer, true);
 
   const addr = getPrivateKeyAddress(network, privkey);
