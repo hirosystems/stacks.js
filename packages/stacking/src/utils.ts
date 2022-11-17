@@ -340,7 +340,6 @@ export function ensureLegacyBtcAddressForPox1({
   poxAddress?: string;
 }) {
   if (!poxAddress) return;
-
   if (contract.endsWith('.pox') && !B58_ADDR_PREFIXES.test(poxAddress)) {
     throw new Error('PoX-1 requires P2PKH/P2SH/P2SH-P2WPKH/P2SH-P2WSH bitcoin addresses');
   }

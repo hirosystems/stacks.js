@@ -824,12 +824,54 @@ export class StackingClient {
     rewardCycle,
     privateKey,
   }: StackAggregationCommitOptions): Promise<TxBroadcastResult> {
+    // todo: deprecate this method in favor of Indexed as soon as PoX-2 is live
     const poxInfo = await this.getPoxInfo();
 
     const contract = poxInfo.contract_id;
     ensureLegacyBtcAddressForPox1({ contract, poxAddress });
 
     const txOptions = this.getStackAggregationCommitOptions({
+      contract,
+      poxAddress,
+      rewardCycle,
+    });
+    const tx = await makeContractCall({
+      ...txOptions,
+      senderKey: privateKey,
+    });
+
+    return broadcastTransaction(tx, txOptions.network as StacksNetwork);
+  }
+
+  /**
+   * As a delegator, generate and broadcast a transaction to commit partially committed delegatee tokens
+   *
+   * Commit partially stacked STX and allocate a new PoX reward address slot.
+   *   This allows a stacker/delegate to lock fewer STX than the minimal threshold in multiple transactions,
+   *   so long as: 1. The pox-addr is the same.
+   *               2. This "commit" transaction is called _before_ the PoX anchor block.
+   *   This ensures that each entry in the reward set returned to the stacks-node is greater than the threshold,
+   *   but does not require it be all locked up within a single transaction
+   *
+   * `stack-aggregation-commit-indexed` returns (ok uint) on success, where the given uint is the reward address's index in the list of reward
+   * addresses allocated in this reward cycle. This index can then be passed to `stack-aggregation-increase`
+   * to later increment the STX this PoX address represents, in amounts less than the stacking minimum.
+   *
+   * @param {StackAggregationCommitOptions} options - a required stack aggregation commit options object
+   *
+   * @returns {Promise<string>} that resolves to a broadcasted txid if the operation succeeds
+   */
+  async stackAggregationCommitIndexed({
+    poxAddress,
+    rewardCycle,
+    privateKey,
+  }: StackAggregationCommitOptions): Promise<TxBroadcastResult> {
+    const poxInfo = await this.getPoxInfo();
+
+    const contract = poxInfo.contract_id;
+    ensureLegacyBtcAddressForPox1({ contract, poxAddress });
+
+    const txOptions = this.getStackAggregationCommitOptionsIndexed({
       contract,
       poxAddress,
       rewardCycle,
@@ -1081,6 +1123,29 @@ export class StackingClient {
       contractAddress,
       contractName,
       functionName: 'stack-aggregation-commit',
+      functionArgs: [address, uintCV(rewardCycle)],
+      validateWithAbi: true,
+      network: this.network,
+      anchorMode: AnchorMode.Any,
+    };
+    return txOptions;
+  }
+
+  getStackAggregationCommitOptionsIndexed({
+    contract,
+    poxAddress,
+    rewardCycle,
+  }: {
+    contract: string;
+    poxAddress: string;
+    rewardCycle: number;
+  }) {
+    const address = poxAddressToTuple(poxAddress);
+    const [contractAddress, contractName] = this.parseContractId(contract);
+    const txOptions: ContractCallOptions = {
+      contractAddress,
+      contractName,
+      functionName: 'stack-aggregation-commit-indexed',
       functionArgs: [address, uintCV(rewardCycle)],
       validateWithAbi: true,
       network: this.network,
