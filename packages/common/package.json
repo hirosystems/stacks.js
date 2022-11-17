@@ -24,14 +24,10 @@
     "@types/node": "^18.0.4"
   },
   "devDependencies": {
-    "@types/jest": "^27.5.2",
     "bn.js": "^5.2.1",
-    "jest": "^27.5.1",
-    "jest-fetch-mock": "^3.0.3",
-    "jest-module-name-mapper": "^0.1.5",
+
     "process": "^0.11.10",
-    "rimraf": "^3.0.2",
-    "ts-jest": "^27.1.5"
+    "rimraf": "^3.0.2"
   },
   "sideEffects": false,
   "publishConfig": {

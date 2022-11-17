@@ -29,16 +29,12 @@
   },
   "devDependencies": {
     "@stacks/network": "^4.1.0",
-    "@types/jest": "^27.5.2",
     "@types/jsdom": "^16.2.10",
-    "jest": "^27.5.1",
-    "jest-fetch-mock": "^3.0.3",
-    "jest-module-name-mapper": "^0.1.5",
+
     "jsdom": "^16.5.3",
     "process": "^0.11.10",
     "rimraf": "^3.0.2",
-    "stream-browserify": "^3.0.0",
-    "ts-jest": "^27.1.5"
+    "stream-browserify": "^3.0.0"
   },
   "sideEffects": false,
   "typings": "dist/index.d.ts",
