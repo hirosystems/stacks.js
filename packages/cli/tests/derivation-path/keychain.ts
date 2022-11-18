@@ -28,7 +28,7 @@ export const makekeychainTests: Array<[string, MakeKeychainResult]> = [
         privateKey: 'd1124855494c883c5e1df0201be40a835f08ae5fc3a6520224b2239db94a818001',
         address: 'ST1J28031BYDX19TYXSNDG9Q4HDB2TBDAM921Y7MS',
         btcAddress: 'mpeSzfUTBba7qzKNcg8ojNm4GAfwmNPX8X',
-        wif: 'L4E7pXmqdm8C8TakpX7YDDmFopaQw32Ak6V5BpRFNDJmo7wjGVqc',
+        wif: 'cUb7HSmh4ppTHu42CvvfaYGKS3spbV7rp8dYJEsksKxn3s4zqRJD',
         index: 0
       }
     }
@@ -43,7 +43,7 @@ export const makekeychainTests: Array<[string, MakeKeychainResult]> = [
         privateKey: 'd4d30d4fdaa59e166865b836548015c2780063b82e7b2a364c8a2e32df7139ce01',
         address: 'ST1WT20920NVRQ892MS535R7XEMV6KD6M6X2HQPK3',
         btcAddress: 'mrc4w3oQZ39Yvkimk9DDJQnHFjv1e336mg',
-        wif: 'L4MQx6c6ZmoiwFYUHnmt39THRGeQnPmfA2AFobwWmssZJabi3qXm',
+        wif: 'cUiQR1bwzqVz6h1jgCb1QTxM3VwpSqsME4Jiv2Q2GzXZZKjjSNHg',
         index: 0
       }
     }
@@ -59,7 +59,7 @@ export const keyInfoTests: Array<[string, WalletKeyInfoResult]> = [
       privateKey: 'd1124855494c883c5e1df0201be40a835f08ae5fc3a6520224b2239db94a818001',
       address: 'ST1J28031BYDX19TYXSNDG9Q4HDB2TBDAM921Y7MS',
       btcAddress: 'mpeSzfUTBba7qzKNcg8ojNm4GAfwmNPX8X',
-      wif: 'L4E7pXmqdm8C8TakpX7YDDmFopaQw32Ak6V5BpRFNDJmo7wjGVqc',
+      wif: 'cUb7HSmh4ppTHu42CvvfaYGKS3spbV7rp8dYJEsksKxn3s4zqRJD',
       index: 0
     }
   ],
@@ -71,7 +71,7 @@ export const keyInfoTests: Array<[string, WalletKeyInfoResult]> = [
       privateKey: 'd4d30d4fdaa59e166865b836548015c2780063b82e7b2a364c8a2e32df7139ce01',
       address: 'ST1WT20920NVRQ892MS535R7XEMV6KD6M6X2HQPK3',
       btcAddress: 'mrc4w3oQZ39Yvkimk9DDJQnHFjv1e336mg',
-      wif: 'L4MQx6c6ZmoiwFYUHnmt39THRGeQnPmfA2AFobwWmssZJabi3qXm',
+      wif: 'cUiQR1bwzqVz6h1jgCb1QTxM3VwpSqsME4Jiv2Q2GzXZZKjjSNHg',
       index: 0
     }
   ]

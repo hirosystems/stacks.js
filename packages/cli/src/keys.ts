@@ -26,7 +26,6 @@ import { CLINetworkAdapter } from './network';
 const BITCOIN_PUBKEYHASH = 0;
 const BITCOIN_PUBKEYHASH_TESTNET = 111;
 const BITCOIN_WIF = 128;
-// @ts-ignore
 const BITCOIN_WIF_TESTNET = 239;
 
 export const STX_WALLET_COMPATIBLE_SEED_STRENGTH = 256;
@@ -155,7 +154,11 @@ export async function getStacksWalletKeyInfo(
   const pubkey = Buffer.from(child.publicKey!);
   const privkeyBuffer = Buffer.from(child.privateKey!);
   const privkey = privateKeyToString(createStacksPrivateKey(compressPrivateKey(privkeyBuffer)));
-  const walletImportFormat = wif.encode(BITCOIN_WIF, privkeyBuffer, true);
+  const walletImportFormat = wif.encode(
+    network.isTestnet() ? BITCOIN_WIF_TESTNET : BITCOIN_WIF,
+    privkeyBuffer,
+    true
+  );
 
   const addr = getPrivateKeyAddress(network, privkey);
   const btcAddress = publicKeyToBtcAddress(
