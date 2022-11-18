@@ -41,6 +41,7 @@ import {
   unwrap,
   unwrapMap,
 } from './utils';
+
 export * from './utils';
 
 export interface CycleInfo {
@@ -160,13 +161,27 @@ export interface BalanceInfo {
   nonce: number;
 }
 
+export interface PaginationOptions {
+  limit: number;
+  offset: number;
+}
+
 export interface RewardsError {
   error: string;
 }
 
-export interface RewardOptions {
-  limit: number;
-  offset: number;
+export interface RewardSetOptions {
+  contractId: string;
+  rewardCyleId: number;
+  rewardSetIndex: number;
+}
+
+export interface RewardSetInfo {
+  pox_address: {
+    version: Uint8Array;
+    hashbytes: Uint8Array;
+  };
+  total_ustx: bigint;
 }
 
 export interface StackingEligibility {
@@ -298,6 +313,13 @@ export interface StackAggregationCommitOptions {
   privateKey: string;
 }
 
+export interface StackAggregationCommitIncreaseOptions {
+  poxAddress: string;
+  rewardCycle: number;
+  rewardIndex: number;
+  privateKey: string;
+}
+
 export class StackingClient {
   constructor(public address: string, public network: StacksNetwork) {}
 
@@ -404,7 +426,7 @@ export class StackingClient {
    * @returns {Promise<RewardsResponse | RewardsError>} that resolves to RewardsResponse or RewardsError
    */
   async getRewardsForBtcAddress(
-    options?: RewardOptions
+    options?: PaginationOptions
   ): Promise<BurnchainRewardListResponse | RewardsError> {
     const url = `${this.network.getRewardsUrl(this.address, options)}`;
     return this.network.fetchFn(url).then(res => res.json());
@@ -416,10 +438,35 @@ export class StackingClient {
    * @returns {Promise<RewardHoldersResponse | RewardsError>} that resolves to RewardHoldersResponse or RewardsError
    */
   async getRewardHoldersForBtcAddress(
-    options?: RewardOptions
+    options?: PaginationOptions
   ): Promise<BurnchainRewardSlotHolderListResponse | RewardsError> {
     const url = `${this.network.getRewardHoldersUrl(this.address, options)}`;
     return this.network.fetchFn(url).then(res => res.json());
+  }
+
+  /**
+   * Get PoX address from reward set by index
+   *
+   * @returns {Promise<RewardSetInfo | undefined>} that resolves to RewardSetInfo if the entry exists
+   */
+  async getRewardSet(options: RewardSetOptions): Promise<RewardSetInfo | undefined> {
+    const [contractAddress, contractName] = this.parseContractId(options?.contractId);
+    const result = await callReadOnlyFunction({
+      network: this.network,
+      senderAddress: this.address,
+      contractAddress,
+      contractName,
+      functionArgs: [uintCV(options.rewardCyleId), uintCV(options.rewardSetIndex)],
+      functionName: 'get-reward-set-pox-address',
+    });
+
+    return unwrapMap(result as OptionalCV<TupleCV>, tuple => ({
+      pox_address: {
+        version: ((tuple.data['pox-addr'] as TupleCV).data['version'] as BufferCV).buffer,
+        hashbytes: ((tuple.data['pox-addr'] as TupleCV).data['hashbytes'] as BufferCV).buffer,
+      },
+      total_ustx: (tuple.data['total-ustx'] as UIntCV).value,
+    }));
   }
 
   /**
@@ -879,6 +926,50 @@ export class StackingClient {
     const tx = await makeContractCall({
       ...txOptions,
       senderKey: privateKey,
+      fee: 10000, // todo: remove
+    });
+
+    return broadcastTransaction(tx, txOptions.network as StacksNetwork);
+  }
+
+  /**
+   * As a delegator, generate and broadcast a transaction to increase partial commitment committed delegatee tokens
+   *
+   * Commit partially stacked STX to a PoX address which has already received some STX (more than the Stacking min).
+   * This allows a delegator to lock up marginally more STX from new delegates, even if they collectively do not
+   * exceed the Stacking minimum, so long as the target PoX address already represents at least as many STX as the
+   * Stacking minimum.
+   *
+   * The `rewardCycleIndex` is emitted as a contract event from `stack-aggregation-commit` when the initial STX are
+   * locked up by this delegator. It must be passed here to add more STX behind this PoX address.
+   *
+   * A delegator can also use `stackAggregationCommitIncreaseIndexed` to receive the `rewardCycleIndex` of their
+   * PoX address.
+   *
+   * @param {StackAggregationCommitOptions} options - a required stack aggregation commit options object
+   *
+   * @returns {Promise<string>} that resolves to a broadcasted txid if the operation succeeds
+   */
+  async stackAggregationCommitIncrease({
+    poxAddress,
+    rewardCycle,
+    // rewardCycleIndex, // todo: continue
+    privateKey,
+  }: StackAggregationCommitOptions): Promise<TxBroadcastResult> {
+    // todo: deprecate this method in favor of Indexed as soon as PoX-2 is live
+    const poxInfo = await this.getPoxInfo();
+
+    const contract = poxInfo.contract_id;
+    ensureLegacyBtcAddressForPox1({ contract, poxAddress });
+
+    const txOptions = this.getStackAggregationCommitOptions({
+      contract,
+      poxAddress,
+      rewardCycle,
+    });
+    const tx = await makeContractCall({
+      ...txOptions,
+      senderKey: privateKey,
     });
 
     return broadcastTransaction(tx, txOptions.network as StacksNetwork);
@@ -1290,7 +1381,7 @@ export class StackingClient {
     if (
       parts.length === 2 &&
       validateStacksAddress(parts[0]) &&
-      (parts[1] === 'pox' || parts[1] === 'pox-2') // todo: what's the new pox called?
+      (parts[1] === 'pox' || parts[1] === 'pox-2')
     ) {
       return parts;
     }

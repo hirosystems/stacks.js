@@ -1,13 +1,13 @@
 import { Configuration, TransactionsApi } from '@stacks/blockchain-api-client';
 import { StacksTestnet } from '@stacks/network';
 import { MockResponseInitFunction } from 'jest-fetch-mock';
-import { StackingClient } from '../src';
+import { PoxInfo, StackingClient } from '../src';
 
-function isMocking(): boolean {
-  const result = fetchMock.isMocking(''); // be careful using .isMocking, it will consume .mockOnce
-  if (typeof result === 'boolean') return result;
-  return result[0];
-}
+// Helpers for creating tests with unmocked environments =======================
+
+const MATCHER = {
+  ALL: /.*/,
+};
 
 // todo: maybe something similar could be generalized to work in all package tests
 export function setApiMocks(responseMap: { [key: string]: any }, mockTxBroadcast = true) {
@@ -40,12 +40,14 @@ export function setApiMocks(responseMap: { [key: string]: any }, mockTxBroadcast
   }) as MockResponseInitFunction);
 }
 
-export const MATCHER = {
-  ALL: /.*/,
-};
-
 function sleep(ms: number) {
   return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+function isMocking(): boolean {
+  const result = fetchMock.isMocking(''); // be careful using .isMocking, it will consume .mockOnce's
+  if (typeof result === 'boolean') return result;
+  return result[0];
 }
 
 const MAX_ITERATIONS = 120;
@@ -66,29 +68,56 @@ export async function waitForTx(txId: string, apiUrl = 'http://localhost:3999') 
       } else if (txInfo?.tx_result) {
         return console.log(`✕ ${JSON.stringify(txInfo.tx_result)}`);
       }
-    } catch (_) {}
+    } catch (e: any) {
+      if (e?.ok === false) throw Error(`✕ ${e?.status}: ${txId}`);
+      throw e;
+    }
     console.log(`waiting (${i}x)`);
     await sleep(ITERATION_INTERVAL);
   }
 }
 
-// helpers for creating tests with unmocked environments
 export async function waitForBlock(burnBlockId: number, client?: StackingClient) {
   if (isMocking()) return;
 
   client = client ?? new StackingClient('', new StacksTestnet({ url: 'http://localhost:3999' }));
 
-  let current;
+  let current: number;
   for (let i = 1; i <= MAX_ITERATIONS; i++) {
     try {
-      const poxInfo = (await client.getPoxInfo()) as any;
-      current = poxInfo?.current_burnchain_block_height;
+      const poxInfo = (await client.getPoxInfo()) as PoxInfo;
+      current = poxInfo?.current_burnchain_block_height as number;
       if (current && current >= burnBlockId) {
         console.log(`→ block ${current} reached`);
-        return poxInfo;
+        return;
       }
-    } catch (_) {}
+    } catch (e: any) {
+      throw e;
+    }
     console.log(`waiting (${i}x) for block ${burnBlockId} (current block: ${current})`);
+    await sleep(ITERATION_INTERVAL);
+  }
+}
+
+// todo: add more generic method (ie merge with previous method)
+export async function waitForCycle(cycleId: number, client?: StackingClient) {
+  if (isMocking()) return;
+
+  client = client ?? new StackingClient('', new StacksTestnet({ url: 'http://localhost:3999' }));
+
+  let current: number;
+  for (let i = 1; i <= MAX_ITERATIONS; i++) {
+    try {
+      const poxInfo = (await client.getPoxInfo()) as PoxInfo;
+      current = poxInfo?.reward_cycle_id;
+      if (current && current >= cycleId) {
+        console.log(`→ cycle ${current} reached`);
+        return;
+      }
+    } catch (e: any) {
+      throw e;
+    }
+    console.log(`waiting (${i}x) for cycle ${cycleId} (current cycle: ${current})`);
     await sleep(ITERATION_INTERVAL);
   }
 }

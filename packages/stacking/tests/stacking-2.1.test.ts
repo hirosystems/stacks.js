@@ -1,7 +1,8 @@
 import { hexToBytes } from '@stacks/common';
 import { StacksMainnet, StacksTestnet } from '@stacks/network';
+import { getNonce } from '@stacks/transactions';
 
-import { StackingClient } from '../src';
+import { decodeBtcAddress, StackingClient } from '../src';
 import { PoxOperationPeriod } from '../src/constants';
 import {
   MOCK_EMPTY_ACCOUNT,
@@ -10,6 +11,7 @@ import {
   setApiMocks,
   V2_POX_INTERFACE_POX_2,
   waitForBlock,
+  waitForCycle,
   waitForTx,
 } from './apiMockingHelpers';
 import { BTC_ADDRESS_CASES } from './utils.test';
@@ -719,6 +721,139 @@ describe('delegated stacking', () => {
 
     balanceLocked = await client.getAccountBalanceLocked();
     expect(balanceLocked).toBe(fullAmount);
+  });
+
+  test('multiple stackers in a pool (compatible with pox-1)', async () => {
+    // Prerequisites:
+    // * Assumes no other stackers are stacking for these reward cycles
+    // Step-by-step:
+    // * Two stackers (A and B) delegate to a pool
+    // * The pool stacks for both stackers (partially)
+    // * The pool commits a total stacking amount (covering all of its stackers)
+    //   * This is required for a pools pox-address to be "commited" into the reward-set
+    fetchMock.dontMock();
+
+    const network = new StacksTestnet({ url: API_URL });
+
+    const stackerAKey = 'cb3df38053d132895220b9ce471f6b676db5b9bf0b4adefb55f2118ece2478df01';
+    const stackerAAddress = 'STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6';
+    const clientA = new StackingClient(stackerAAddress, network);
+
+    const stackerBKey = 'c71700b07d520a8c9731e4d0f095aa6efb91e16e25fb27ce2b72e7b698f8127a01';
+    const stackerBAddress = 'ST1HB1T8WRNBYB0Y3T7WXZS38NKKPTBR3EG9EPJKR';
+    const clientB = new StackingClient(stackerBAddress, network);
+
+    const poolPrivateKey = '21d43d2ae0da1d9d04cfcaac7d397a33733881081f0b2cd038062cf0ccbb752601';
+    const poolAddress = 'ST11NJTTKGVT6D1HY4NJRVQWMQM7TVAR091EJ8P2Y';
+    const poolPoxAddress = '1797Pp1o8A7a8X8Qs7ejXtYyw8gbecFK2b';
+    const clientPool = new StackingClient(poolAddress, network);
+
+    setApiMocks({
+      ...MOCK_POX_2_REGTEST,
+    });
+
+    let poxInfo = await clientPool.getPoxInfo();
+    const START_BLOCK_HEIGHT = poxInfo.current_burnchain_block_height as number;
+    const DELEGATE_UNTIL = START_BLOCK_HEIGHT + 100;
+    const FULL_AMOUNT = BigInt(poxInfo.min_amount_ustx);
+    const HALF_AMOUNT = FULL_AMOUNT / 2n;
+
+    // Stacker A delegates half the funds
+    const delegateA = await clientA.delegateStx({
+      delegateTo: poolAddress,
+      amountMicroStx: HALF_AMOUNT,
+      untilBurnBlockHeight: DELEGATE_UNTIL,
+      poxAddress: poolPoxAddress,
+      privateKey: stackerAKey,
+    });
+
+    // Stacker B delegates the other half of the funds
+    const delegateB = await clientA.delegateStx({
+      delegateTo: poolAddress,
+      amountMicroStx: HALF_AMOUNT,
+      untilBurnBlockHeight: DELEGATE_UNTIL,
+      poxAddress: poolPoxAddress,
+      privateKey: stackerBKey,
+    });
+
+    await waitForTx(delegateA.txid);
+    await waitForTx(delegateB.txid);
+
+    const delegationStatusA = await clientA.getDelegationStatus();
+    expect(delegationStatusA.delegated).toBeTruthy();
+
+    const delegationStatusB = await clientB.getDelegationStatus();
+    expect(delegationStatusB.delegated).toBeTruthy();
+
+    poxInfo = await clientPool.getPoxInfo();
+
+    // Manual nonce setting is required for multiple transactions in the same block
+    let noncePool = await getNonce(poolAddress, network);
+
+    // Pool stacks for stacker A
+    const stackAPool = await clientPool.delegateStackStx({
+      stacker: stackerAAddress,
+      amountMicroStx: HALF_AMOUNT,
+      burnBlockHeight: poxInfo.current_burnchain_block_height as number,
+      cycles: 2,
+      poxAddress: poolPoxAddress,
+      privateKey: poolPrivateKey,
+      nonce: noncePool++,
+    });
+
+    // Pool stacks for stacker B
+    const stackBPool = await clientPool.delegateStackStx({
+      stacker: stackerBAddress,
+      amountMicroStx: HALF_AMOUNT,
+      burnBlockHeight: poxInfo.current_burnchain_block_height as number,
+      cycles: 2,
+      poxAddress: poolPoxAddress,
+      privateKey: poolPrivateKey,
+      nonce: noncePool++,
+    });
+
+    await waitForTx(stackAPool.txid);
+    await waitForTx(stackBPool.txid);
+
+    setApiMocks({
+      ...MOCK_POX_2_REGTEST,
+    });
+
+    // Balances are now locked for stackers (only partially stacked at this point)
+    const stackingStatusA = await clientA.getStatus();
+    if (!stackingStatusA.stacked) throw Error;
+
+    const stackingStatusB = await clientB.getStatus();
+    if (!stackingStatusB.stacked) throw Error;
+
+    expect(
+      stackingStatusA.details.first_reward_cycle === stackingStatusB.details.first_reward_cycle
+    ).toBeTruthy();
+
+    const balanceLockedA = await clientA.getAccountBalanceLocked();
+    expect(balanceLockedA).toBe(HALF_AMOUNT);
+
+    const balanceLockedB = await clientB.getAccountBalanceLocked();
+    expect(balanceLockedB).toBe(HALF_AMOUNT);
+
+    const commitPool = await clientPool.stackAggregationCommit({
+      poxAddress: poolPoxAddress,
+      privateKey: poolPrivateKey,
+      rewardCycle: stackingStatusA.details.first_reward_cycle,
+    });
+
+    await waitForTx(commitPool.txid);
+    await waitForCycle(stackingStatusA.details.first_reward_cycle);
+
+    const rewardSet = await clientPool.getRewardSet({
+      contractId: poxInfo.contract_id,
+      rewardCyleId: stackingStatusA.details.first_reward_cycle,
+      rewardSetIndex: 0, // first and only entry in reward set
+    });
+    expect(rewardSet).toBeDefined();
+    expect(rewardSet?.total_ustx).toBe(FULL_AMOUNT);
+    expect(rewardSet?.pox_address.version[0]).toEqual(decodeBtcAddress(poolPoxAddress).version);
+    expect(rewardSet?.pox_address.hashbytes).toEqual(decodeBtcAddress(poolPoxAddress).data);
   });
 });
 
