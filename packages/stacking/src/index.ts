@@ -313,7 +313,7 @@ export interface StackAggregationCommitOptions {
   privateKey: string;
 }
 
-export interface StackAggregationCommitIncreaseOptions {
+export interface StackAggregationIncreaseOptions {
   poxAddress: string;
   rewardCycle: number;
   rewardIndex: number;
@@ -935,37 +935,27 @@ export class StackingClient {
   /**
    * As a delegator, generate and broadcast a transaction to increase partial commitment committed delegatee tokens
    *
-   * Commit partially stacked STX to a PoX address which has already received some STX (more than the Stacking min).
-   * This allows a delegator to lock up marginally more STX from new delegates, even if they collectively do not
-   * exceed the Stacking minimum, so long as the target PoX address already represents at least as many STX as the
-   * Stacking minimum.
-   *
-   * The `rewardCycleIndex` is emitted as a contract event from `stack-aggregation-commit` when the initial STX are
-   * locked up by this delegator. It must be passed here to add more STX behind this PoX address.
-   *
-   * A delegator can also use `stackAggregationCommitIncreaseIndexed` to receive the `rewardCycleIndex` of their
-   * PoX address.
-   *
-   * @param {StackAggregationCommitOptions} options - a required stack aggregation commit options object
+   * @param {StackAggregationIncreaseOptions} options - a required stack aggregation increase options object
    *
    * @returns {Promise<string>} that resolves to a broadcasted txid if the operation succeeds
    */
-  async stackAggregationCommitIncrease({
+  async stackAggregationIncrease({
     poxAddress,
     rewardCycle,
-    // rewardCycleIndex, // todo: continue
+    rewardIndex,
     privateKey,
-  }: StackAggregationCommitOptions): Promise<TxBroadcastResult> {
+  }: StackAggregationIncreaseOptions): Promise<TxBroadcastResult> {
     // todo: deprecate this method in favor of Indexed as soon as PoX-2 is live
     const poxInfo = await this.getPoxInfo();
 
     const contract = poxInfo.contract_id;
     ensureLegacyBtcAddressForPox1({ contract, poxAddress });
 
-    const txOptions = this.getStackAggregationCommitOptions({
+    const txOptions = this.getStackAggregationIncreaseOptions({
       contract,
       poxAddress,
       rewardCycle,
+      rewardCycleIndex: rewardIndex,
     });
     const tx = await makeContractCall({
       ...txOptions,
@@ -1215,6 +1205,31 @@ export class StackingClient {
       contractName,
       functionName: 'stack-aggregation-commit',
       functionArgs: [address, uintCV(rewardCycle)],
+      validateWithAbi: true,
+      network: this.network,
+      anchorMode: AnchorMode.Any,
+    };
+    return txOptions;
+  }
+
+  getStackAggregationIncreaseOptions({
+    contract,
+    poxAddress,
+    rewardCycle,
+    rewardCycleIndex,
+  }: {
+    contract: string;
+    poxAddress: string;
+    rewardCycle: number;
+    rewardCycleIndex: number;
+  }) {
+    const address = poxAddressToTuple(poxAddress);
+    const [contractAddress, contractName] = this.parseContractId(contract);
+    const txOptions: ContractCallOptions = {
+      contractAddress,
+      contractName,
+      functionName: 'stack-aggregation-increase',
+      functionArgs: [address, uintCV(rewardCycle), uintCV(rewardCycleIndex)],
       validateWithAbi: true,
       network: this.network,
       anchorMode: AnchorMode.Any,

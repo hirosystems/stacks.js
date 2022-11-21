@@ -16,7 +16,12 @@ import {
 } from './apiMockingHelpers';
 import { BTC_ADDRESS_CASES } from './utils.test';
 
-const API_URL = 'http://localhost:3999'; // uses regtest for most unmocked tests
+const API_URL = 'http://localhost:3999'; // default regtest url
+
+
+// HOW-TO: Run tests unmocked (e.g. with a local regtest environment)
+// * Add a root-level `jest.setTimeout(240_000);` with a high value to the file (outside of describe/test/before's)
+// * Add `fetchMock.dontMock();` to any test that should NOT be mocked and will use the regtest
 
 beforeEach(() => {
   jest.resetModules();
@@ -723,7 +728,7 @@ describe('delegated stacking', () => {
     expect(balanceLocked).toBe(fullAmount);
   });
 
-  test('multiple stackers in a pool (compatible with pox-1)', async () => {
+  test('delegator stacks for multiple stackers in a pool (compatible with pox-1)', async () => {
     // Prerequisites:
     // * Assumes no other stackers are stacking for these reward cycles
     // Step-by-step:
@@ -731,7 +736,6 @@ describe('delegated stacking', () => {
     // * The pool stacks for both stackers (partially)
     // * The pool commits a total stacking amount (covering all of its stackers)
     //   * This is required for a pools pox-address to be "commited" into the reward-set
-    fetchMock.dontMock();
 
     const network = new StacksTestnet({ url: API_URL });
 
@@ -750,11 +754,14 @@ describe('delegated stacking', () => {
 
     setApiMocks({
       ...MOCK_POX_2_REGTEST,
+      '/v2/pox': `{"contract_id":"ST000000000000000000002AMW42H.pox-2","pox_activation_threshold_ustx":600072605053055,"first_burnchain_block_height":0,"current_burnchain_block_height":1710,"prepare_phase_block_length":1,"reward_phase_block_length":4,"reward_slots":8,"rejection_fraction":3333333333333333,"total_liquid_supply_ustx":60007260505305579,"current_cycle":{"id":341,"min_threshold_ustx":1875230000000000,"stacked_ustx":0,"is_pox_active":false},"next_cycle":{"id":342,"min_threshold_ustx":1875230000000000,"min_increment_ustx":7500907563163,"stacked_ustx":0,"prepare_phase_start_block_height":1714,"blocks_until_prepare_phase":4,"reward_phase_start_block_height":1715,"blocks_until_reward_phase":5,"ustx_until_pox_rejection":17088607629875529003},"min_amount_ustx":1875230000000000,"prepare_cycle_length":1,"reward_cycle_id":341,"reward_cycle_length":5,"rejection_votes_left_required":17088607629875529003,"next_reward_cycle_in":5,"contract_versions":[{"contract_id":"ST000000000000000000002AMW42H.pox","activation_burnchain_block_height":0,"first_reward_cycle_id":0},{"contract_id":"ST000000000000000000002AMW42H.pox-2","activation_burnchain_block_height":120,"first_reward_cycle_id":25}]}`,
+      '/v2/accounts/STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6?proof=0': `{"balance":"0x0000000000000000002386f26fc015a0","locked":"0x00000000000000000000000000000000","unlock_height":0,"nonce":6}`,
+      '/v2/accounts/ST1HB1T8WRNBYB0Y3T7WXZS38NKKPTBR3EG9EPJKR?proof=0': `{"balance":"0x0000000000000000002386f26fc015a0","locked":"0x00000000000000000000000000000000","unlock_height":0,"nonce":6}`,
     });
 
     let poxInfo = await clientPool.getPoxInfo();
     const START_BLOCK_HEIGHT = poxInfo.current_burnchain_block_height as number;
-    const DELEGATE_UNTIL = START_BLOCK_HEIGHT + 100;
+    const DELEGATE_UNTIL = START_BLOCK_HEIGHT + 25;
     const FULL_AMOUNT = BigInt(poxInfo.min_amount_ustx);
     const HALF_AMOUNT = FULL_AMOUNT / 2n;
 
@@ -778,6 +785,13 @@ describe('delegated stacking', () => {
 
     await waitForTx(delegateA.txid);
     await waitForTx(delegateB.txid);
+
+    setApiMocks({
+      ...MOCK_POX_2_REGTEST,
+      '/v2/pox': `{"contract_id":"ST000000000000000000002AMW42H.pox-2","pox_activation_threshold_ustx":600072615157055,"first_burnchain_block_height":0,"current_burnchain_block_height":1711,"prepare_phase_block_length":1,"reward_phase_block_length":4,"reward_slots":8,"rejection_fraction":3333333333333333,"total_liquid_supply_ustx":60007261515705579,"current_cycle":{"id":342,"min_threshold_ustx":1875230000000000,"stacked_ustx":0,"is_pox_active":false},"next_cycle":{"id":343,"min_threshold_ustx":1875230000000000,"min_increment_ustx":7500907689463,"stacked_ustx":0,"prepare_phase_start_block_height":1714,"blocks_until_prepare_phase":3,"reward_phase_start_block_height":1715,"blocks_until_reward_phase":4,"ustx_until_pox_rejection":13333929036230910187},"min_amount_ustx":1875230000000000,"prepare_cycle_length":1,"reward_cycle_id":342,"reward_cycle_length":5,"rejection_votes_left_required":13333929036230910187,"next_reward_cycle_in":4,"contract_versions":[{"contract_id":"ST000000000000000000002AMW42H.pox","activation_burnchain_block_height":0,"first_reward_cycle_id":0},{"contract_id":"ST000000000000000000002AMW42H.pox-2","activation_burnchain_block_height":120,"first_reward_cycle_id":25}]}`,
+      '/v2/contracts/call-read/ST000000000000000000002AMW42H/pox-2/get-delegation-info': `{"okay":true,"result":"0x0a0c000000040b616d6f756e742d75737478010000000000000000000354c18102d6000c64656c6567617465642d746f051a43596b5386f466863e25658ddf94bd0fadab004808706f782d616464720a0c0000000209686173686279746573020000001443596b5386f466863e25658ddf94bd0fadab00480776657273696f6e0200000001000d756e74696c2d6275726e2d68740a01000000000000000000000000000006c7"}`,
+      '/v2/accounts/ST11NJTTKGVT6D1HY4NJRVQWMQM7TVAR091EJ8P2Y?proof=0': `{"balance":"0x0000000000000000002386f26fbda4a0","locked":"0x00000000000000000000000000000000","unlock_height":0,"nonce":22}`,
+    });
 
     const delegationStatusA = await clientA.getDelegationStatus();
     expect(delegationStatusA.delegated).toBeTruthy();
@@ -817,6 +831,10 @@ describe('delegated stacking', () => {
 
     setApiMocks({
       ...MOCK_POX_2_REGTEST,
+      '/v2/contracts/call-read/ST000000000000000000002AMW42H/pox-2/get-stacker-info': `{"okay":true,"result":"0x0a0c000000041266697273742d7265776172642d6379636c6501000000000000000000000000000001570b6c6f636b2d706572696f64010000000000000000000000000000000208706f782d616464720c0000000209686173686279746573020000001443596b5386f466863e25658ddf94bd0fadab00480776657273696f6e020000000100127265776172642d7365742d696e64657865730b00000000"}`,
+      '/v2/accounts/STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6?proof=0': `{"balance":"0x000000000000000000203230eebd1890","locked":"0x0000000000000000000354c18102d600","unlock_height":1725,"nonce":7}`,
+      '/v2/accounts/ST1HB1T8WRNBYB0Y3T7WXZS38NKKPTBR3EG9EPJKR?proof=0': `{"balance":"0x000000000000000000203230eebd1890","locked":"0x0000000000000000000354c18102d600","unlock_height":1725,"nonce":7}`,
+      '/v2/accounts/ST11NJTTKGVT6D1HY4NJRVQWMQM7TVAR091EJ8P2Y?proof=0': `{"balance":"0x0000000000000000002386f26fbd5680","locked":"0x00000000000000000000000000000000","unlock_height":0,"nonce":24}`,
     });
 
     // Balances are now locked for stackers (only partially stacked at this point)
@@ -845,6 +863,10 @@ describe('delegated stacking', () => {
     await waitForTx(commitPool.txid);
     await waitForCycle(stackingStatusA.details.first_reward_cycle);
 
+    setApiMocks({
+      '/v2/contracts/call-read/ST000000000000000000002AMW42H/pox-2/get-reward-set-pox-address': `{"okay":true,"result":"0x0a0c0000000308706f782d616464720c0000000209686173686279746573020000001443596b5386f466863e25658ddf94bd0fadab00480776657273696f6e02000000010007737461636b6572090a746f74616c2d757374780100000000000000000006a9830205ac00"}`,
+    });
+
     const rewardSet = await clientPool.getRewardSet({
       contractId: poxInfo.contract_id,
       rewardCyleId: stackingStatusA.details.first_reward_cycle,
@@ -852,6 +874,184 @@ describe('delegated stacking', () => {
     });
     expect(rewardSet).toBeDefined();
     expect(rewardSet?.total_ustx).toBe(FULL_AMOUNT);
+    expect(rewardSet?.pox_address.version[0]).toEqual(decodeBtcAddress(poolPoxAddress).version);
+    expect(rewardSet?.pox_address.hashbytes).toEqual(decodeBtcAddress(poolPoxAddress).data);
+  });
+
+  test('delegator stacks for multiple stackers in a pool, then increases commitment (requires pox-2)', async () => {
+    // Prerequisites:
+    // * Assumes no other stackers are stacking for these reward cycles
+    // Step-by-step:
+    // * Two stackers (A and B) delegate to a pool
+    //   * Both provide more than half the required funds
+    // * The pool stacks some of the funds for both stackers (partially)
+    //   * The pool didn't realize how much it could stack and only stacks the minimum amount (even though more was delegated)
+    // * The pool commits a total stacking amount (not yet covering the full amount of its stackers)
+    // * The pool realizes the mistake and increases the amount to all of its stackers' funds
+    //   * This will only work if the reward cycle anchor block hasn't been reached yet!
+
+    const network = new StacksTestnet({ url: API_URL });
+
+    const stackerAKey = 'cb3df38053d132895220b9ce471f6b676db5b9bf0b4adefb55f2118ece2478df01';
+    const stackerAAddress = 'STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6';
+    const clientA = new StackingClient(stackerAAddress, network);
+
+    const stackerBKey = 'c71700b07d520a8c9731e4d0f095aa6efb91e16e25fb27ce2b72e7b698f8127a01';
+    const stackerBAddress = 'ST1HB1T8WRNBYB0Y3T7WXZS38NKKPTBR3EG9EPJKR';
+    const clientB = new StackingClient(stackerBAddress, network);
+
+    const poolPrivateKey = '21d43d2ae0da1d9d04cfcaac7d397a33733881081f0b2cd038062cf0ccbb752601';
+    const poolAddress = 'ST11NJTTKGVT6D1HY4NJRVQWMQM7TVAR091EJ8P2Y';
+    const poolPoxAddress = '1797Pp1o8A7a8X8Qs7ejXtYyw8gbecFK2b';
+    const clientPool = new StackingClient(poolAddress, network);
+
+    setApiMocks({
+      ...MOCK_POX_2_REGTEST,
+      '/v2/pox': `{"contract_id":"ST000000000000000000002AMW42H.pox-2","pox_activation_threshold_ustx":600070180093055,"first_burnchain_block_height":0,"current_burnchain_block_height":1470,"prepare_phase_block_length":1,"reward_phase_block_length":4,"reward_slots":8,"rejection_fraction":3333333333333333,"total_liquid_supply_ustx":60007018009305579,"current_cycle":{"id":293,"min_threshold_ustx":1875220000000000,"stacked_ustx":0,"is_pox_active":false},"next_cycle":{"id":294,"min_threshold_ustx":1875220000000000,"min_increment_ustx":7500877251163,"stacked_ustx":0,"prepare_phase_start_block_height":1474,"blocks_until_prepare_phase":4,"reward_phase_start_block_height":1475,"blocks_until_reward_phase":5,"ustx_until_pox_rejection":14321010492816015659},"min_amount_ustx":1875220000000000,"prepare_cycle_length":1,"reward_cycle_id":293,"reward_cycle_length":5,"rejection_votes_left_required":14321010492816015659,"next_reward_cycle_in":5,"contract_versions":[{"contract_id":"ST000000000000000000002AMW42H.pox","activation_burnchain_block_height":0,"first_reward_cycle_id":0},{"contract_id":"ST000000000000000000002AMW42H.pox-2","activation_burnchain_block_height":120,"first_reward_cycle_id":25}]}`,
+      // Stacker A
+      '/v2/accounts/STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6?proof=0': `{"balance":"0x0000000000000000002386f26fc03cb0","locked":"0x00000000000000000000000000000000","unlock_height":0,"nonce":5}`,
+      // Stacker B
+      '/v2/accounts/ST1HB1T8WRNBYB0Y3T7WXZS38NKKPTBR3EG9EPJKR?proof=0': `{"balance":"0x0000000000000000002386f26fc03cb0","locked":"0x00000000000000000000000000000000","unlock_height":0,"nonce":5}`,
+    });
+
+    let poxInfo = await clientPool.getPoxInfo();
+    const START_BLOCK_HEIGHT = poxInfo.current_burnchain_block_height as number;
+    const DELEGATE_UNTIL = START_BLOCK_HEIGHT + 25;
+    const FULL_AMOUNT = BigInt(poxInfo.min_amount_ustx); // full amount required for a reward set
+    const HALF_AMOUNT = FULL_AMOUNT / 2n;
+    const AMOUNT_75 = BigInt(Number(FULL_AMOUNT) * 0.75); // 3/4 of the required funds
+
+    // Stacker A delegates some funds
+    const delegateA = await clientA.delegateStx({
+      delegateTo: poolAddress,
+      amountMicroStx: AMOUNT_75,
+      untilBurnBlockHeight: DELEGATE_UNTIL,
+      poxAddress: poolPoxAddress,
+      privateKey: stackerAKey,
+    });
+
+    // Stacker B delegates some funds
+    const delegateB = await clientA.delegateStx({
+      delegateTo: poolAddress,
+      amountMicroStx: AMOUNT_75,
+      untilBurnBlockHeight: DELEGATE_UNTIL,
+      poxAddress: poolPoxAddress,
+      privateKey: stackerBKey,
+    });
+
+    await waitForTx(delegateA.txid);
+    await waitForTx(delegateB.txid);
+
+    setApiMocks({
+      ...MOCK_POX_2_REGTEST,
+      '/v2/pox': `{"contract_id":"ST000000000000000000002AMW42H.pox-2","pox_activation_threshold_ustx":600070190197055,"first_burnchain_block_height":0,"current_burnchain_block_height":1471,"prepare_phase_block_length":1,"reward_phase_block_length":4,"reward_slots":8,"rejection_fraction":3333333333333333,"total_liquid_supply_ustx":60007019019705579,"current_cycle":{"id":294,"min_threshold_ustx":1875220000000000,"stacked_ustx":0,"is_pox_active":false},"next_cycle":{"id":295,"min_threshold_ustx":1875220000000000,"min_increment_ustx":7500877377463,"stacked_ustx":0,"prepare_phase_start_block_height":1474,"blocks_until_prepare_phase":3,"reward_phase_start_block_height":1475,"blocks_until_reward_phase":4,"ustx_until_pox_rejection":10566331899171396843},"min_amount_ustx":1875220000000000,"prepare_cycle_length":1,"reward_cycle_id":294,"reward_cycle_length":5,"rejection_votes_left_required":10566331899171396843,"next_reward_cycle_in":4,"contract_versions":[{"contract_id":"ST000000000000000000002AMW42H.pox","activation_burnchain_block_height":0,"first_reward_cycle_id":0},{"contract_id":"ST000000000000000000002AMW42H.pox-2","activation_burnchain_block_height":120,"first_reward_cycle_id":25}]}`,
+      // Pool
+      '/v2/accounts/ST11NJTTKGVT6D1HY4NJRVQWMQM7TVAR091EJ8P2Y?proof=0': `{"balance":"0x0000000000000000002386f26fbe67f0","locked":"0x00000000000000000000000000000000","unlock_height":0,"nonce":17}`,
+    });
+
+    poxInfo = await clientPool.getPoxInfo();
+
+    // Manual nonce setting is required for multiple transactions in the same block
+    let noncePool = await getNonce(poolAddress, network);
+
+    // Pool stacks for stacker A (stacks all 3/4)
+    const stackAPool = await clientPool.delegateStackStx({
+      stacker: stackerAAddress,
+      amountMicroStx: AMOUNT_75,
+      burnBlockHeight: poxInfo.current_burnchain_block_height as number,
+      cycles: 2,
+      poxAddress: poolPoxAddress,
+      privateKey: poolPrivateKey,
+      nonce: noncePool++,
+    });
+
+    // Pool stacks for stacker B (stacks only 1/2)
+    const stackBPool = await clientPool.delegateStackStx({
+      stacker: stackerBAddress,
+      amountMicroStx: HALF_AMOUNT,
+      burnBlockHeight: poxInfo.current_burnchain_block_height as number,
+      cycles: 2,
+      poxAddress: poolPoxAddress,
+      privateKey: poolPrivateKey,
+      nonce: noncePool++,
+    });
+
+    await waitForTx(stackAPool.txid);
+    await waitForTx(stackBPool.txid);
+
+    setApiMocks({
+      ...MOCK_POX_2_REGTEST,
+      '/v2/pox': `{"contract_id":"ST000000000000000000002AMW42H.pox-2","pox_activation_threshold_ustx":600070200301055,"first_burnchain_block_height":0,"current_burnchain_block_height":1472,"prepare_phase_block_length":1,"reward_phase_block_length":4,"reward_slots":8,"rejection_fraction":3333333333333333,"total_liquid_supply_ustx":60007020030105579,"current_cycle":{"id":294,"min_threshold_ustx":1875220000000000,"stacked_ustx":0,"is_pox_active":false},"next_cycle":{"id":295,"min_threshold_ustx":1875220000000000,"min_increment_ustx":7500877503763,"stacked_ustx":0,"prepare_phase_start_block_height":1474,"blocks_until_prepare_phase":2,"reward_phase_start_block_height":1475,"blocks_until_reward_phase":3,"ustx_until_pox_rejection":6811653305526778027},"min_amount_ustx":1875220000000000,"prepare_cycle_length":1,"reward_cycle_id":294,"reward_cycle_length":5,"rejection_votes_left_required":6811653305526778027,"next_reward_cycle_in":3,"contract_versions":[{"contract_id":"ST000000000000000000002AMW42H.pox","activation_burnchain_block_height":0,"first_reward_cycle_id":0},{"contract_id":"ST000000000000000000002AMW42H.pox-2","activation_burnchain_block_height":120,"first_reward_cycle_id":25}]}`,
+      '/v2/contracts/call-read/ST000000000000000000002AMW42H/pox-2/get-stacker-info': `{"okay":true,"result":"0x0a0c000000041266697273742d7265776172642d6379636c6501000000000000000000000000000001270b6c6f636b2d706572696f64010000000000000000000000000000000208706f782d616464720c0000000209686173686279746573020000001443596b5386f466863e25658ddf94bd0fadab00480776657273696f6e020000000100127265776172642d7365742d696e64657865730b00000000"}`,
+      // Stacker A
+      '/v2/accounts/STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6?proof=0': `{"balance":"0x0000000000000000001e87d1ed44bfa0","locked":"0x00000000000000000004ff20827b5600","unlock_height":1485,"nonce":6}`,
+      // Stacker B
+      '/v2/accounts/ST1HB1T8WRNBYB0Y3T7WXZS38NKKPTBR3EG9EPJKR?proof=0': `{"balance":"0x00000000000000000020323218c331a0","locked":"0x0000000000000000000354c056fce400","unlock_height":1485,"nonce":6}`,
+      // Pool
+      '/v2/accounts/ST11NJTTKGVT6D1HY4NJRVQWMQM7TVAR091EJ8P2Y?proof=0': `{"balance":"0x0000000000000000002386f26fbe19d0","locked":"0x00000000000000000000000000000000","unlock_height":0,"nonce":19}`,
+    });
+
+    // Balances are now locked for stackers (only partially stacked at this point)
+    const stackingStatusA = await clientA.getStatus();
+    if (!stackingStatusA.stacked) throw Error;
+
+    const stackingStatusB = await clientB.getStatus();
+    if (!stackingStatusB.stacked) throw Error;
+
+    expect(
+      stackingStatusA.details.first_reward_cycle === stackingStatusB.details.first_reward_cycle
+    ).toBeTruthy();
+
+    const balanceLockedA = await clientA.getAccountBalanceLocked();
+    expect(balanceLockedA).toBe(AMOUNT_75);
+
+    const balanceLockedB = await clientB.getAccountBalanceLocked();
+    expect(balanceLockedB).toBe(HALF_AMOUNT);
+
+    // In this test the pool uses the new .stackAggregationCommitIndexed (PoX-2)
+    // Which is basically the same as .stackAggregationCommit, but the tx will
+    // return the commits index in the reward set
+    const commitIndexed = await clientPool.stackAggregationCommitIndexed({
+      poxAddress: poolPoxAddress,
+      privateKey: poolPrivateKey,
+      rewardCycle: stackingStatusA.details.first_reward_cycle,
+    });
+
+    await waitForTx(commitIndexed.txid);
+
+    // Oops, the pool realized they didn't stack all delegated funds for stacker B
+    // Pool increases for stacker B (to all 3/4)
+    const increaseBPool = await clientPool.delegateStackIncrease({
+      stacker: stackerBAddress,
+      increaseBy: AMOUNT_75 - HALF_AMOUNT, // increase by the missing amount
+      poxAddress: poolPoxAddress,
+      privateKey: poolPrivateKey,
+    });
+
+    await waitForTx(increaseBPool.txid);
+
+    const commitIncrease = await clientPool.stackAggregationIncrease({
+      poxAddress: poolPoxAddress,
+      privateKey: poolPrivateKey,
+      rewardCycle: stackingStatusA.details.first_reward_cycle,
+      rewardIndex: 0, // would now also be returned by the commitIndexed tx
+    });
+
+    await waitForTx(commitIncrease.txid);
+    // to be included, the latest commit (increase) needs to be mined before the reward cycles' anchor block
+    await waitForCycle(stackingStatusA.details.first_reward_cycle);
+
+    setApiMocks({
+      '/v2/contracts/call-read/ST000000000000000000002AMW42H/pox-2/get-reward-set-pox-address': `{"okay":true,"result":"0x0a0c0000000308706f782d616464720c0000000209686173686279746573020000001443596b5386f466863e25658ddf94bd0fadab00480776657273696f6e02000000010007737461636b6572090a746f74616c2d757374780100000000000000000009fe4104f6ac00"}`,
+    });
+
+    const rewardSet = await clientPool.getRewardSet({
+      contractId: poxInfo.contract_id,
+      rewardCyleId: stackingStatusA.details.first_reward_cycle,
+      rewardSetIndex: 0,
+    });
+    expect(rewardSet).toBeDefined();
+    expect(rewardSet?.total_ustx).toBe(AMOUNT_75 * 2n); // 1.5x the FULL_AMOUNT (aka everything the stackers stacked together)
     expect(rewardSet?.pox_address.version[0]).toEqual(decodeBtcAddress(poolPoxAddress).version);
     expect(rewardSet?.pox_address.hashbytes).toEqual(decodeBtcAddress(poolPoxAddress).data);
   });
