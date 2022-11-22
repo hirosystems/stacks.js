@@ -306,7 +306,7 @@ export function unwrapMap<T extends ClarityValue, U>(optional: OptionalCV<T>, ma
 }
 
 export function ensurePox2IsLive(operationInfo: PoxOperationInfo) {
-  if (operationInfo.period !== PoxOperationPeriod.Period3)
+  if (operationInfo.period === PoxOperationPeriod.Period1)
     throw new Error(
       `PoX-2 is not live yet (currently in period ${operationInfo.period} of PoX-2 operation)`
     );
@@ -329,7 +329,7 @@ export function ensurePox1DoesNotCreateStateIntoPeriod3({
   const unlockBlockHeight = startBurnBlockHeight + blocksLocked;
 
   if (unlockBlockHeight >= poxOperationInfo.pox2.activation_burnchain_block_height)
-    throw new Error('Transaction would fail, since it create state into Period 3 (PoX-2)');
+    throw new Error('Transaction would fail, since it creates state into Period 3 (PoX-2)');
 }
 
 export function ensureLegacyBtcAddressForPox1({

@@ -18,7 +18,6 @@ import { BTC_ADDRESS_CASES } from './utils.test';
 
 const API_URL = 'http://localhost:3999'; // default regtest url
 
-
 // HOW-TO: Run tests unmocked (e.g. with a local regtest environment)
 // * Add a root-level `jest.setTimeout(240_000);` with a high value to the file (outside of describe/test/before's)
 // * Add `fetchMock.dontMock();` to any test that should NOT be mocked and will use the regtest
@@ -200,7 +199,7 @@ describe('stacking transition', () => {
     expect(extendedAccountInfo.stx.locked).toBe(0);
   });
 
-  test('in period 1, pox-1 functions that create state into period 3 work', async () => {
+  test('in period 1, pox-1 functions that creates state into period 3 work', async () => {
     // See Prerequisites!
     // Step-by-step:
     // * Stack for long enough to overlap with Period 3
@@ -238,7 +237,7 @@ describe('stacking transition', () => {
     expect(balanceLocked).toBe(BigInt(poxInfo.min_amount_ustx));
   });
 
-  test('in period 2, pox-1 functions that create state into period 3 throw before broadcast', async () => {
+  test('in period 2, pox-1 functions that creates state into period 3 throw before broadcast', async () => {
     // See Prerequisites!
     // Step-by-step:
     // * Wait for Period 2
@@ -270,7 +269,7 @@ describe('stacking transition', () => {
         poxAddress,
         privateKey,
       })
-    ).rejects.toThrow('Transaction would fail, since it create state into Period 3 (PoX-2)');
+    ).rejects.toThrow('Transaction would fail, since it creates state into Period 3 (PoX-2)');
   });
 });
 

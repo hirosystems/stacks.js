@@ -251,8 +251,6 @@ export interface DelegateStxOptions {
   poxAddress?: string;
   /** private key to sign transaction */
   privateKey: string;
-  /** the contract to use (mainly to specify which contract to use during Period 2) */
-  poxContract?: string; // todo: add example
 }
 
 /**
@@ -514,9 +512,6 @@ export class StackingClient {
       return { period: 1, pox1: { contract_id: poxInfo.contract_id } };
     }
 
-    // todo: ? filter out multiple expired pox-contracts
-    // could be useful for a generic function and potential next forks
-
     const [pox1, pox2] = [...poxInfo.contract_versions].sort(
       (a, b) => a.activation_burnchain_block_height - b.activation_burnchain_block_height
     );
@@ -636,7 +631,7 @@ export class StackingClient {
       burnBlockHeight,
     });
 
-    const contract = poxInfo.contract_id;
+    const contract = await this.getStackingContract(poxOperationInfo);
     ensureLegacyBtcAddressForPox1({ contract, poxAddress });
 
     const txOptions = this.getStackOptions({
@@ -721,17 +716,12 @@ export class StackingClient {
     untilBurnBlockHeight,
     poxAddress,
     privateKey,
-    poxContract,
-  }: DelegateStxOptions): Promise<TxBroadcastResult> {
+  }: // todo: should we provide manual contract definitions? (for users to choose which contract to use)
+  DelegateStxOptions): Promise<TxBroadcastResult> {
     const poxInfo = await this.getPoxInfo();
     const poxOperationInfo = await this.getPoxOperationInfo(poxInfo);
 
-    // Stackers can already delegate STX during Period 2
-    const defaultContract =
-      poxOperationInfo.period === PoxOperationPeriod.Period1
-        ? poxOperationInfo.pox1.contract_id
-        : poxOperationInfo.pox2.contract_id;
-    const contract = poxContract ?? defaultContract;
+    const contract = await this.getStackingContract(poxOperationInfo);
     ensureLegacyBtcAddressForPox1({ contract, poxAddress });
 
     const txOptions = this.getDelegateOptions({
@@ -776,7 +766,7 @@ export class StackingClient {
       burnBlockHeight,
     });
 
-    const contract = poxInfo.contract_id;
+    const contract = await this.getStackingContract(poxOperationInfo);
     ensureLegacyBtcAddressForPox1({ contract, poxAddress });
 
     const txOptions = this.getDelegateStackOptions({
@@ -872,9 +862,7 @@ export class StackingClient {
     privateKey,
   }: StackAggregationCommitOptions): Promise<TxBroadcastResult> {
     // todo: deprecate this method in favor of Indexed as soon as PoX-2 is live
-    const poxInfo = await this.getPoxInfo();
-
-    const contract = poxInfo.contract_id;
+    const contract = await this.getStackingContract();
     ensureLegacyBtcAddressForPox1({ contract, poxAddress });
 
     const txOptions = this.getStackAggregationCommitOptions({
@@ -913,9 +901,7 @@ export class StackingClient {
     rewardCycle,
     privateKey,
   }: StackAggregationCommitOptions): Promise<TxBroadcastResult> {
-    const poxInfo = await this.getPoxInfo();
-
-    const contract = poxInfo.contract_id;
+    const contract = await this.getStackingContract();
     ensureLegacyBtcAddressForPox1({ contract, poxAddress });
 
     const txOptions = this.getStackAggregationCommitOptionsIndexed({
@@ -946,9 +932,7 @@ export class StackingClient {
     privateKey,
   }: StackAggregationIncreaseOptions): Promise<TxBroadcastResult> {
     // todo: deprecate this method in favor of Indexed as soon as PoX-2 is live
-    const poxInfo = await this.getPoxInfo();
-
-    const contract = poxInfo.contract_id;
+    const contract = await this.getStackingContract();
     ensureLegacyBtcAddressForPox1({ contract, poxAddress });
 
     const txOptions = this.getStackAggregationIncreaseOptions({
@@ -1370,6 +1354,16 @@ export class StackingClient {
         throw new Error(`Error fetching delegation info`);
       }
     });
+  }
+
+  /**
+   * @returns {Promise<string>} that resolves to the contract id (address and name) to use for stacking
+   */
+  async getStackingContract(poxOperationInfo?: PoxOperationInfo): Promise<string> {
+    poxOperationInfo = poxOperationInfo ?? (await this.getPoxOperationInfo());
+    return poxOperationInfo.period === PoxOperationPeriod.Period1
+      ? poxOperationInfo.pox1.contract_id
+      : poxOperationInfo.pox2.contract_id; // in the 2.1 fork we can always stack to PoX-2
   }
 
   /**
