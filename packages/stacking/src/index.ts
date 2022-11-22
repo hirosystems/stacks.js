@@ -87,7 +87,7 @@ export type PoxOperationInfo =
       pox1: { contract_id: string };
     }
   | {
-      period: PoxOperationPeriod.Period2 | PoxOperationPeriod.Period3;
+      period: PoxOperationPeriod;
       pox1: { contract_id: string };
       pox2: ContractVersion;
     };
@@ -509,7 +509,7 @@ export class StackingClient {
       poxInfo.contract_versions.length <= 1
     ) {
       // Node does not know about other pox versions yet
-      return { period: 1, pox1: { contract_id: poxInfo.contract_id } };
+      return { period: PoxOperationPeriod.Period1, pox1: { contract_id: poxInfo.contract_id } };
     }
 
     const [pox1, pox2] = [...poxInfo.contract_versions].sort(
@@ -523,20 +523,26 @@ export class StackingClient {
     // => Period 1
     if (isPox2NotYetConfigured) {
       // Node hasn't forked yet (unclear if this case can happen)
-      return { period: 1, pox1, pox2 };
+      return { period: PoxOperationPeriod.Period1, pox1, pox2 };
     }
 
     // == In 2.1 Fork ==========================================================
-    // => Period 2
+    // => Period 2a
     if (poxInfo.contract_id === pox1.contract_id) {
       // In 2.1 fork, but PoX-2 hasn't been activated yet
-      return { period: 2, pox1, pox2 };
+      return { period: PoxOperationPeriod.Period2a, pox1, pox2 };
     }
 
-    // => Period 3
+    // == PoX-2 is Live ========================================================
     if (poxInfo.contract_id === pox2.contract_id) {
-      // In 2.1 fork and PoX-2 is live
-      return { period: 3, pox1, pox2 };
+      // => Period 2b
+      if (poxInfo.current_cycle.id < pox2.first_reward_cycle_id) {
+        // In 2.1 fork and PoX-2 is live
+        return { period: PoxOperationPeriod.Period2b, pox1, pox2 };
+      }
+
+      // => Period 3
+      return { period: PoxOperationPeriod.Period3, pox1, pox2 };
     }
 
     throw new Error('Could not determine PoX Operation Period');

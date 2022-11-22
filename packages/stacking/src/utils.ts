@@ -323,7 +323,12 @@ export function ensurePox1DoesNotCreateStateIntoPeriod3({
   cycles: number;
   burnBlockHeight: number;
 }) {
-  if (poxOperationInfo.period !== PoxOperationPeriod.Period2) return;
+  if (
+    poxOperationInfo.period === PoxOperationPeriod.Period1 ||
+    poxOperationInfo.period === PoxOperationPeriod.Period3
+  ) {
+    return;
+  }
 
   const blocksLocked = cycles * poxInfo.reward_cycle_length;
   const unlockBlockHeight = startBurnBlockHeight + blocksLocked;

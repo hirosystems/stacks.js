@@ -65,11 +65,13 @@ export const SEGWIT_V1 = 1;
 
 export enum PoxOperationPeriod {
   /** Period 1: This is before the 2.1 fork. */
-  Period1 = 1,
-  /** Period 2: This is after the 2.1 fork, but before cycle (N+1). */
-  Period2 = 2,
-  /** Period 3: This is after cycle (N+1) has begun. Original PoX contract state will no longer have any impact on reward sets, account lock status, etc. */
-  Period3 = 3,
+  Period1 = 'Period1',
+  /** Period 2a: This is after the 2.1 fork, but before v1_unlock_height. */
+  Period2a = 'Period2a', //
+  /** Period 2b: This is after the 2.1 fork, after v1_unlock_height, but before the first PoX-2 reward cycle. */
+  Period2b = 'Period2b',
+  /** Period 3: This is after the first PoX-2 reward cycle has begun. The original PoX contract state will no longer have any impact on reward sets. */
+  Period3 = 'Period3',
 }
 
 export enum StackingErrors {
