@@ -24,6 +24,22 @@ export type Payload =
   | PoisonPayload
   | CoinbasePayload;
 
+export function isTokenTransferPayload(p: Payload): p is TokenTransferPayload {
+  return p.payloadType === PayloadType.TokenTransfer;
+}
+export function isContractCallPayload(p: Payload): p is ContractCallPayload {
+  return p.payloadType === PayloadType.ContractCall;
+}
+export function isSmartContractPayload(p: Payload): p is SmartContractPayload {
+  return p.payloadType === PayloadType.SmartContract;
+}
+export function isPoisonPayload(p: Payload): p is PoisonPayload {
+  return p.payloadType === PayloadType.PoisonMicroblock;
+}
+export function isCoinbasePayload(p: Payload): p is CoinbasePayload {
+  return p.payloadType === PayloadType.Coinbase;
+}
+
 export interface TokenTransferPayload {
   readonly type: StacksMessageType.Payload;
   readonly payloadType: PayloadType.TokenTransfer;

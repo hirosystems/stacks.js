@@ -18,6 +18,11 @@ export {
   PoisonPayload,
   CoinbasePayload,
   serializePayload,
+  isTokenTransferPayload,
+  isContractCallPayload,
+  isSmartContractPayload,
+  isPoisonPayload,
+  isCoinbasePayload,
 } from './payload';
 
 export {
