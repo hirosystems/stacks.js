@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.0.0](https://github.com/hirosystems/stacks.js/compare/v5.0.3...v6.0.0) (2022-11-23)
+
+
+### ⚠ BREAKING CHANGES
+
+* Removes the getBTCAddress method, since it does not work with modern BTC addresses.
+
+### Features
+
+* A StackingClient will now automatically detect which PoX version to use for Stacking.
+* Adds the following PoX Stacking methods to the StackingClient: `stackExtend`, `stackIncrease`, `delegateStackExtend`, `delegateStackIncrease`, `stackAggregationCommitIndexed`, `stackAggregationIncrease`.
+* Adds the following helper methods to the StackingClient: `getAccountExtendedBalances`, `getAccountBalanceLocked`, `getDelegationStatus`, `getRewardSet`.
+* Add PoX-2 methods to @stacks/stacking client ([#1354](https://github.com/hirosystems/stacks.js/issues/1354)) ([25e326a](https://github.com/hirosystems/stacks.js/commit/25e326a8df74b92fd09b1e4dfa218eb77fd8a952))
+
+
+
 ## [5.0.3](https://github.com/hirosystems/stacks.js/compare/v5.0.2...v5.0.3) (2022-11-18)
 
 **Note:** Version bump only for package @stacks/stacking
