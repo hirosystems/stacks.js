@@ -19,14 +19,11 @@ import {
   SegwitPrefix,
   SEGWIT_ADDR_PREFIXES,
   SEGWIT_V0,
+  SEGWIT_V0_ADDR_PREFIX,
   SEGWIT_V1,
+  SEGWIT_V1_ADDR_PREFIX,
   StackingErrors,
 } from './constants';
-
-// Valid prefixes for supported segwit address, structure is:
-//   HRP PREFIX + SEPARATOR (always '1') + C32_ENCODED SEGWIT_VERSION_BYTE ('q' for 0, 'p' for 1) + HASHDATA
-const SEGWIT_V0_ADDR_PREFIX = /^(bc1q|tb1q|bcrt1q)/i;
-const SEGWIT_V1_ADDR_PREFIX = /^(bc1p|tb1p|bcrt1p)/i;
 
 export class InvalidAddressError extends Error {
   innerError?: Error;
@@ -225,30 +222,27 @@ export function poxAddressToTuple(poxAddress: string) {
 
 function legacyHashModeToBtcAddressVersion(
   hashMode: PoXAddressVersion,
-  network: 'mainnet' | 'testnet'
+  network: 'mainnet' | 'testnet' | 'regtest'
 ): number {
-  if (hashMode === PoXAddressVersion.P2SHP2WPKH || hashMode === PoXAddressVersion.P2SHP2WSH) {
-    // P2SHP2WPKH and P2SHP2WSH are treated as P2SH for the sender
-    hashMode = PoXAddressVersion.P2SH;
+  switch (hashMode) {
+    case PoXAddressVersion.P2PKH:
+      return BitcoinNetworkVersion[network].P2PKH;
+    case PoXAddressVersion.P2SH:
+    case PoXAddressVersion.P2SHP2WPKH:
+    case PoXAddressVersion.P2SHP2WSH:
+      // P2SHP2WPKH and P2SHP2WSH are treated as P2SH for the sender
+      return BitcoinNetworkVersion[network].P2SH;
+    default:
+      throw new Error('Invalid pox address version');
   }
-  if (hashMode === PoXAddressVersion.P2PKH && network === 'mainnet') {
-    return BitcoinNetworkVersion.mainnet.P2PKH;
-  } else if (hashMode === PoXAddressVersion.P2PKH && network === 'testnet') {
-    return BitcoinNetworkVersion.testnet.P2PKH;
-  } else if (hashMode === PoXAddressVersion.P2SH && network === 'mainnet') {
-    return BitcoinNetworkVersion.mainnet.P2SH;
-  } else if (hashMode === PoXAddressVersion.P2SH && network === 'testnet') {
-    return BitcoinNetworkVersion.testnet.P2SH;
-  }
-  throw new Error('Invalid pox address version');
 }
 
 function _poxAddressToBtcAddress_Values(
   version: number,
   hashBytes: Uint8Array,
-  network: 'mainnet' | 'testnet'
+  network: 'mainnet' | 'testnet' | 'regtest'
 ): string {
-  if (!['mainnet', 'testnet'].includes(network)) throw new Error('Invalid network.');
+  if (!['mainnet', 'testnet', 'regtest'].includes(network)) throw new Error('Invalid network.');
 
   switch (version) {
     case PoXAddressVersion.P2PKH:
@@ -273,7 +267,7 @@ function _poxAddressToBtcAddress_Values(
 
 function _poxAddressToBtcAddress_ClarityValue(
   poxAddrClarityValue: ClarityValue,
-  network: 'mainnet' | 'testnet'
+  network: 'mainnet' | 'testnet' | 'regtest'
 ): string {
   const poxAddr = extractPoxAddressFromClarityValue(poxAddrClarityValue);
   return _poxAddressToBtcAddress_Values(poxAddr.version, poxAddr.hashBytes, network);
@@ -282,11 +276,11 @@ function _poxAddressToBtcAddress_ClarityValue(
 export function poxAddressToBtcAddress(
   version: number,
   hashBytes: Uint8Array,
-  network: 'mainnet' | 'testnet'
+  network: 'mainnet' | 'testnet' | 'regtest'
 ): string;
 export function poxAddressToBtcAddress(
   poxAddrClarityValue: ClarityValue,
-  network: 'mainnet' | 'testnet'
+  network: 'mainnet' | 'testnet' | 'regtest'
 ): string;
 export function poxAddressToBtcAddress(...args: any[]): string {
   if (typeof args[0] === 'number') return _poxAddressToBtcAddress_Values(args[0], args[1], args[2]);
