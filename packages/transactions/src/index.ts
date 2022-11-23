@@ -15,9 +15,16 @@ export {
   TokenTransferPayload,
   ContractCallPayload,
   SmartContractPayload,
+  VersionedSmartContractPayload,
   PoisonPayload,
   CoinbasePayload,
+  CoinbasePayloadToAltRecipient,
   serializePayload,
+  isTokenTransferPayload,
+  isContractCallPayload,
+  isSmartContractPayload,
+  isPoisonPayload,
+  isCoinbasePayload,
 } from './payload';
 
 export {

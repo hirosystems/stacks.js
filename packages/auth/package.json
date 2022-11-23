@@ -1,6 +1,6 @@
 {
   "name": "@stacks/auth",
-  "version": "5.0.2",
+  "version": "5.0.3",
   "description": "Authentication for Stacks apps.",
   "license": "MIT",
   "author": "Hiro Systems PBC (https://hiro.so)",
@@ -20,22 +20,17 @@
     "typecheck:watch": "npm run typecheck -- --watch"
   },
   "dependencies": {
-    "@stacks/common": "^5.0.0",
-    "@stacks/encryption": "^5.0.0",
-    "@stacks/network": "^5.0.0",
-    "@stacks/profile": "^5.0.2",
+    "@stacks/common": "^5.0.3",
+    "@stacks/encryption": "^5.0.3",
+    "@stacks/network": "^5.0.3",
+    "@stacks/profile": "^5.0.3",
     "cross-fetch": "^3.1.5",
     "jsontokens": "^4.0.1",
     "query-string": "^6.13.1"
   },
   "devDependencies": {
-    "@types/jest": "^26.0.22",
-    "jest": "^26.6.3",
-    "jest-fetch-mock": "^3.0.3",
-    "jest-module-name-mapper": "^0.1.5",
     "process": "^0.11.10",
-    "rimraf": "^3.0.2",
-    "ts-jest": "^26.5.5"
+    "rimraf": "^3.0.2"
   },
   "sideEffects": false,
   "typings": "dist/index.d.ts",
@@ -64,5 +59,8 @@
   },
   "bugs": {
     "url": "https://github.com/blockstack/blockstack.js/issues"
+  },
+  "typedoc": {
+    "entryPoint": "./src/index.ts"
   }
 }

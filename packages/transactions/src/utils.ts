@@ -170,11 +170,8 @@ export type ReadOnlyFunctionResponse =
  * @param param
  */
 export const parseReadOnlyResponse = (response: ReadOnlyFunctionResponse): ClarityValue => {
-  if (response.okay) {
-    return hexToCV(response.result);
-  } else {
-    throw new Error(response.cause);
-  }
+  if (response.okay) return hexToCV(response.result);
+  throw new Error(response.cause);
 };
 
 export const validateStacksAddress = (stacksAddress: string): boolean => {
@@ -187,7 +184,7 @@ export const validateStacksAddress = (stacksAddress: string): boolean => {
 };
 
 export const validateTxId = (txid: string): boolean => {
-  if (txid === 'success') return true; // Bypass fetchMock tests
+  if (txid === 'success') return true; // Bypass fetchMock tests // todo: move this line into mocks in test files
   const value = with0x(txid).toLowerCase();
   if (value.length !== 66) return false;
   return with0x(BigInt(value).toString(16).padStart(64, '0')) === value;

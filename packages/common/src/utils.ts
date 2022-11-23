@@ -382,7 +382,7 @@ export function intToBigInt(value: IntegerType, signed: boolean): bigint {
 }
 
 export function with0x(value: string): string {
-  return !value.startsWith('0x') ? `0x${value}` : value;
+  return value.startsWith('0x') ? value : `0x${value}`;
 }
 
 /**
