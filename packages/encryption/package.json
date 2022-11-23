@@ -1,6 +1,6 @@
 {
   "name": "@stacks/encryption",
-  "version": "5.0.3",
+  "version": "6.0.0",
   "description": "Encryption utilities for Stacks",
   "license": "MIT",
   "author": "Hiro Systems PBC (https://hiro.so)",
@@ -23,7 +23,7 @@
     "@noble/hashes": "^1.1.3",
     "@noble/secp256k1": "^1.6.3",
     "@scure/bip39": "^1.1.0",
-    "@stacks/common": "^5.0.3",
+    "@stacks/common": "^6.0.0",
     "@types/node": "^18.0.4",
     "base64-js": "^1.5.1",
     "bs58": "^5.0.0",
@@ -32,7 +32,7 @@
   },
   "devDependencies": {
     "@peculiar/webcrypto": "^1.1.6",
-    "@stacks/transactions": "^5.0.1",
+    "@stacks/transactions": "^6.0.0",
     "@types/bs58check": "^2.1.0",
     "@types/elliptic": "^6.4.12",
     "@types/sha.js": "^2.4.0",

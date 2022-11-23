@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.0.0](https://github.com/hirosystems/stacks.js/compare/v5.0.3...v6.0.0) (2022-11-23)
+
+
+### Features
+
+* add coinbase-to-alt-recipient payload type ([836b181](https://github.com/hirosystems/stacks.js/commit/836b181eca3fd2904baf2587c7875d6a6e8c95bd))
+* add payload type assertions ([#1395](https://github.com/hirosystems/stacks.js/issues/1395)) ([cdd32e9](https://github.com/hirosystems/stacks.js/commit/cdd32e9323069452a4d0345174b049be1c8e1069))
+* support `versioned-smart-contract` tx types introduced in Stacks 2.1 ([#1341](https://github.com/hirosystems/stacks.js/issues/1341)) ([0062a45](https://github.com/hirosystems/stacks.js/commit/0062a453fec80de93d36e0d8c5e3f37a7522c300))
+
+
+
 ## [5.0.3](https://github.com/hirosystems/stacks.js/compare/v5.0.2...v5.0.3) (2022-11-18)
 
 **Note:** Version bump only for package @stacks/transactions
