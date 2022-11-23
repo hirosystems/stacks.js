@@ -447,13 +447,8 @@ export async function broadcastRawTransaction(
   const text = await response.text();
   // Replace extra quotes around txid string
   const txid = text.replace(/["]+/g, '');
-  const isValidTxId = validateTxId(txid);
-  if (!isValidTxId) {
-    throw new Error(text);
-  }
-  return {
-    txid,
-  } as TxBroadcastResult;
+  if (!validateTxId(txid)) throw new Error(text);
+  return { txid } as TxBroadcastResult;
 }
 
 /**

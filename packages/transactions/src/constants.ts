@@ -17,6 +17,7 @@ const UNCOMPRESSED_PUBKEY_LENGTH_BYTES = 64;
 const MEMO_MAX_LENGTH_BYTES = 34;
 const DEFAULT_CORE_NODE_API_URL = 'https://stacks-node-api.mainnet.stacks.co';
 
+// todo: add explicit enum values
 enum StacksMessageType {
   Address,
   Principal,
