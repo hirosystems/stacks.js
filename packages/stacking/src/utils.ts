@@ -1,18 +1,34 @@
-import { bytesToHex } from '@stacks/common';
+import { bech32, bech32m } from '@scure/base';
+import { bigIntToBytes } from '@stacks/common';
 import { base58CheckDecode, base58CheckEncode } from '@stacks/encryption';
 import {
-  AddressHashMode,
+  bufferCV,
   BufferCV,
   ClarityType,
   ClarityValue,
+  OptionalCV,
+  tupleCV,
   TupleCV,
 } from '@stacks/transactions';
-import { StackingErrors } from './constants';
+import { PoxInfo, PoxOperationInfo } from '.';
+import {
+  B58_ADDR_PREFIXES,
+  BitcoinNetworkVersion,
+  PoXAddressVersion,
+  PoxOperationPeriod,
+  SegwitPrefix,
+  SEGWIT_ADDR_PREFIXES,
+  SEGWIT_V0,
+  SEGWIT_V0_ADDR_PREFIX,
+  SEGWIT_V1,
+  SEGWIT_V1_ADDR_PREFIX,
+  StackingErrors,
+} from './constants';
 
 export class InvalidAddressError extends Error {
   innerError?: Error;
   constructor(address: string, innerError?: Error) {
-    const msg = `${address} is not a valid P2PKH or P2SH address -- native P2WPKH and native P2WSH are not supported in PoX.`;
+    const msg = `'${address}' is not a valid P2PKH/P2SH/P2WPKH/P2WSH/P2TR address`;
     super(msg);
     this.message = msg;
     this.name = this.constructor.name;
@@ -23,68 +39,96 @@ export class InvalidAddressError extends Error {
   }
 }
 
-export const BitcoinNetworkVersion = {
-  mainnet: {
-    P2PKH: 0x00, // 0
-    P2SH: 0x05, // 5
-  },
-  testnet: {
-    P2PKH: 0x6f, // 111
-    P2SH: 0xc4, // 196
-  },
-} as const;
-
-export function btcAddressVersionToHashMode(btcAddressVersion: number): AddressHashMode {
+/** @ignore */
+export function btcAddressVersionToLegacyHashMode(btcAddressVersion: number): PoXAddressVersion {
   switch (btcAddressVersion) {
     case BitcoinNetworkVersion.mainnet.P2PKH:
-      return AddressHashMode.SerializeP2PKH;
+      return PoXAddressVersion.P2PKH;
     case BitcoinNetworkVersion.testnet.P2PKH:
-      return AddressHashMode.SerializeP2PKH;
+      return PoXAddressVersion.P2PKH;
     case BitcoinNetworkVersion.mainnet.P2SH:
-      return AddressHashMode.SerializeP2SH;
+      return PoXAddressVersion.P2SH;
     case BitcoinNetworkVersion.testnet.P2SH:
-      return AddressHashMode.SerializeP2SH;
+      return PoXAddressVersion.P2SH;
     default:
       throw new Error('Invalid pox address version');
   }
 }
 
-export function hashModeToBtcAddressVersion(
-  hashMode: AddressHashMode,
-  network: 'mainnet' | 'testnet'
-): number {
-  if (!['mainnet', 'testnet'].includes(network)) {
-    throw new Error(`Invalid network argument: ${network}`);
-  }
-  switch (hashMode) {
-    case AddressHashMode.SerializeP2PKH:
-      return BitcoinNetworkVersion[network].P2PKH;
-    case AddressHashMode.SerializeP2SH:
-      return BitcoinNetworkVersion[network].P2SH;
-    default:
-      throw new Error(`Invalid pox address hash mode: ${hashMode}`);
-  }
+/** @ignore */
+function nativeAddressToSegwitVersion(
+  witnessVersion: number,
+  dataLength: number
+): PoXAddressVersion {
+  if (witnessVersion === SEGWIT_V0 && dataLength === 20) return PoXAddressVersion.P2WPKH;
+  if (witnessVersion === SEGWIT_V0 && dataLength === 32) return PoXAddressVersion.P2WSH;
+  if (witnessVersion === SEGWIT_V1 && dataLength === 32) return PoXAddressVersion.P2TR;
+
+  throw new Error(
+    'Invalid native segwit witness version and byte length. Currently, only P2WPKH, P2WSH, and P2TR are supported.'
+  );
 }
 
-export function getAddressHashMode(btcAddress: string) {
-  try {
-    const { version } = base58CheckDecode(btcAddress);
-    return btcAddressVersionToHashMode(version);
-  } catch (error: any) {
-    throw new InvalidAddressError(btcAddress, error);
-  }
+function bech32Decode(btcAddress: string) {
+  const { words: bech32Words } = bech32.decode(btcAddress);
+  const witnessVersion = bech32Words[0];
+
+  if (witnessVersion > 0)
+    throw new Error('Addresses with a witness version >= 1 should be encoded in bech32m');
+
+  return {
+    witnessVersion,
+    data: bech32.fromWords(bech32Words.slice(1)),
+  };
 }
 
-export function decodeBtcAddress(btcAddress: string) {
+function bech32MDecode(btcAddress: string) {
+  const { words: bech32MWords } = bech32m.decode(btcAddress);
+  const witnessVersion = bech32MWords[0];
+
+  if (witnessVersion == 0)
+    throw new Error('Addresses with witness version 1 should be encoded in bech32');
+
+  return {
+    witnessVersion,
+    data: bech32m.fromWords(bech32MWords.slice(1)),
+  };
+}
+
+function decodeNativeSegwitBtcAddress(btcAddress: string): {
+  witnessVersion: number;
+  data: Uint8Array;
+} {
+  if (SEGWIT_V0_ADDR_PREFIX.test(btcAddress)) return bech32Decode(btcAddress);
+  if (SEGWIT_V1_ADDR_PREFIX.test(btcAddress)) return bech32MDecode(btcAddress);
+  throw new Error(
+    `Native segwit address ${btcAddress} does not match valid prefix ${SEGWIT_V0_ADDR_PREFIX} or ${SEGWIT_V1_ADDR_PREFIX}`
+  );
+}
+
+export function decodeBtcAddress(btcAddress: string): {
+  version: PoXAddressVersion;
+  data: Uint8Array;
+} {
   try {
-    const b58Result = base58CheckDecode(btcAddress);
-    const hashMode = btcAddressVersionToHashMode(b58Result.version);
-    return {
-      hashMode,
-      data: b58Result.hash,
-    };
-  } catch (error: any) {
-    throw new InvalidAddressError(btcAddress, error);
+    if (B58_ADDR_PREFIXES.test(btcAddress)) {
+      const b58 = base58CheckDecode(btcAddress);
+      const addressVersion = btcAddressVersionToLegacyHashMode(b58.version);
+      return {
+        version: addressVersion,
+        data: b58.hash,
+      };
+    } else if (SEGWIT_ADDR_PREFIXES.test(btcAddress)) {
+      const b32 = decodeNativeSegwitBtcAddress(btcAddress);
+      const addressVersion = nativeAddressToSegwitVersion(b32.witnessVersion, b32.data.length);
+      return {
+        version: addressVersion,
+        data: b32.data,
+      };
+    }
+    throw new Error('Unknown BTC address prefix.');
+  } catch (error) {
+    throw new InvalidAddressError(btcAddress, error as Error);
   }
 }
 
@@ -106,45 +150,17 @@ export function extractPoxAddressFromClarityValue(poxAddrClarityValue: ClarityVa
     );
   }
   return {
-    version: versionCV.buffer,
+    version: versionCV.buffer[0],
     hashBytes: hashBytesCV.buffer,
   };
-}
-
-export type PoxAddressArgs =
-  | [version: Uint8Array, hashBytes: Uint8Array, network: 'mainnet' | 'testnet']
-  | [poxAddrClarityValue: ClarityValue, network: 'mainnet' | 'testnet'];
-
-export function poxAddressToBtcAddress(...args: PoxAddressArgs): string {
-  let version: Uint8Array, hashBytes: Uint8Array, network: 'mainnet' | 'testnet';
-  if (args.length === 3) {
-    [version, hashBytes, network] = args;
-  } else if (args.length === 2) {
-    ({ version, hashBytes } = extractPoxAddressFromClarityValue(args[0]));
-    network = args[1];
-  } else {
-    throw new Error('Invalid arguments');
-  }
-  if (version.byteLength !== 1) {
-    throw new Error(`Invalid byte length for version buffer: ${bytesToHex(version)}`);
-  }
-  if (hashBytes.byteLength !== 20) {
-    throw new Error(`Invalid byte length for hashBytes: ${bytesToHex(hashBytes)}`);
-  }
-  const btcNetworkVersion = hashModeToBtcAddressVersion(version[0], network);
-  const btcAddress = base58CheckEncode(btcNetworkVersion, hashBytes);
-  return btcAddress;
-}
-
-export function getBTCAddress(version: number | Uint8Array, checksum: Uint8Array) {
-  const versionNumber: number = typeof version === 'number' ? version : version[0];
-  return base58CheckEncode(versionNumber, checksum);
 }
 
 export function getErrorString(error: StackingErrors): string {
   switch (error) {
     case StackingErrors.ERR_STACKING_UNREACHABLE:
       return 'Stacking unreachable';
+    case StackingErrors.ERR_STACKING_CORRUPTED_STATE:
+      return 'Stacking state is corrupted';
     case StackingErrors.ERR_STACKING_INSUFFICIENT_FUNDS:
       return 'Insufficient funds';
     case StackingErrors.ERR_STACKING_INVALID_LOCK_PERIOD:
@@ -181,5 +197,149 @@ export function getErrorString(error: StackingErrors): string {
       return 'PoX address required for delegation';
     case StackingErrors.ERR_INVALID_START_BURN_HEIGHT:
       return 'Invalid start burn height';
+    case StackingErrors.ERR_NOT_CURRENT_STACKER: // not used in pox contract
+      return 'ERR_NOT_CURRENT_STACKER';
+    case StackingErrors.ERR_STACK_EXTEND_NOT_LOCKED:
+      return 'Stacker must be currently locked';
+    case StackingErrors.ERR_STACK_INCREASE_NOT_LOCKED:
+      return 'Stacker must be currently locked';
+    case StackingErrors.ERR_DELEGATION_NO_REWARD_SLOT:
+      return 'Invalid reward-cycle and reward-cycle-index';
+    case StackingErrors.ERR_DELEGATION_WRONG_REWARD_SLOT:
+      return 'PoX address must match the one on record';
+  }
+}
+
+export function poxAddressToTuple(poxAddress: string) {
+  const { version, data } = decodeBtcAddress(poxAddress);
+  const versionBuff = bufferCV(bigIntToBytes(BigInt(version), 1));
+  const hashBuff = bufferCV(data);
+  return tupleCV({
+    version: versionBuff,
+    hashbytes: hashBuff,
+  });
+}
+
+function legacyHashModeToBtcAddressVersion(
+  hashMode: PoXAddressVersion,
+  network: 'mainnet' | 'testnet' | 'regtest'
+): number {
+  switch (hashMode) {
+    case PoXAddressVersion.P2PKH:
+      return BitcoinNetworkVersion[network].P2PKH;
+    case PoXAddressVersion.P2SH:
+    case PoXAddressVersion.P2SHP2WPKH:
+    case PoXAddressVersion.P2SHP2WSH:
+      // P2SHP2WPKH and P2SHP2WSH are treated as P2SH for the sender
+      return BitcoinNetworkVersion[network].P2SH;
+    default:
+      throw new Error('Invalid pox address version');
+  }
+}
+
+function _poxAddressToBtcAddress_Values(
+  version: number,
+  hashBytes: Uint8Array,
+  network: 'mainnet' | 'testnet' | 'regtest'
+): string {
+  if (!['mainnet', 'testnet', 'regtest'].includes(network)) throw new Error('Invalid network.');
+
+  switch (version) {
+    case PoXAddressVersion.P2PKH:
+    case PoXAddressVersion.P2SH:
+    case PoXAddressVersion.P2SHP2WPKH:
+    case PoXAddressVersion.P2SHP2WSH: {
+      const btcAddrVersion = legacyHashModeToBtcAddressVersion(version, network);
+      return base58CheckEncode(btcAddrVersion, hashBytes);
+    }
+    case PoXAddressVersion.P2WPKH:
+    case PoXAddressVersion.P2WSH: {
+      const words = bech32.toWords(hashBytes);
+      return bech32.encode(SegwitPrefix[network], [SEGWIT_V0, ...words]);
+    }
+    case PoXAddressVersion.P2TR: {
+      const words = bech32m.toWords(hashBytes);
+      return bech32m.encode(SegwitPrefix[network], [SEGWIT_V1, ...words]);
+    }
+  }
+  throw new Error(`Unexpected address version: ${version}`);
+}
+
+function _poxAddressToBtcAddress_ClarityValue(
+  poxAddrClarityValue: ClarityValue,
+  network: 'mainnet' | 'testnet' | 'regtest'
+): string {
+  const poxAddr = extractPoxAddressFromClarityValue(poxAddrClarityValue);
+  return _poxAddressToBtcAddress_Values(poxAddr.version, poxAddr.hashBytes, network);
+}
+
+export function poxAddressToBtcAddress(
+  version: number,
+  hashBytes: Uint8Array,
+  network: 'mainnet' | 'testnet' | 'regtest'
+): string;
+export function poxAddressToBtcAddress(
+  poxAddrClarityValue: ClarityValue,
+  network: 'mainnet' | 'testnet' | 'regtest'
+): string;
+export function poxAddressToBtcAddress(...args: any[]): string {
+  if (typeof args[0] === 'number') return _poxAddressToBtcAddress_Values(args[0], args[1], args[2]);
+  return _poxAddressToBtcAddress_ClarityValue(args[0], args[1]);
+}
+
+export function unwrap<T extends ClarityValue>(optional: OptionalCV<T>) {
+  if (optional.type === ClarityType.OptionalSome) return optional.value;
+  if (optional.type === ClarityType.OptionalNone) return undefined;
+  throw new Error("Object is not an 'Optional'");
+}
+
+export function unwrapMap<T extends ClarityValue, U>(optional: OptionalCV<T>, map: (t: T) => U) {
+  if (optional.type === ClarityType.OptionalSome) return map(optional.value);
+  if (optional.type === ClarityType.OptionalNone) return undefined;
+  throw new Error("Object is not an 'Optional'");
+}
+
+export function ensurePox2IsLive(operationInfo: PoxOperationInfo) {
+  if (operationInfo.period === PoxOperationPeriod.Period1)
+    throw new Error(
+      `PoX-2 is not live yet (currently in period ${operationInfo.period} of PoX-2 operation)`
+    );
+}
+
+export function ensurePox1DoesNotCreateStateIntoPeriod3({
+  poxInfo,
+  poxOperationInfo,
+  cycles,
+  burnBlockHeight: startBurnBlockHeight,
+}: {
+  poxInfo: PoxInfo;
+  poxOperationInfo: PoxOperationInfo;
+  cycles: number;
+  burnBlockHeight: number;
+}) {
+  if (
+    poxOperationInfo.period === PoxOperationPeriod.Period1 ||
+    poxOperationInfo.period === PoxOperationPeriod.Period3
+  ) {
+    return;
+  }
+
+  const blocksLocked = cycles * poxInfo.reward_cycle_length;
+  const unlockBlockHeight = startBurnBlockHeight + blocksLocked;
+
+  if (unlockBlockHeight >= poxOperationInfo.pox2.activation_burnchain_block_height)
+    throw new Error('Transaction would fail, since it creates state into Period 3 (PoX-2)');
+}
+
+export function ensureLegacyBtcAddressForPox1({
+  contract,
+  poxAddress,
+}: {
+  contract: string;
+  poxAddress?: string;
+}) {
+  if (!poxAddress) return;
+  if (contract.endsWith('.pox') && !B58_ADDR_PREFIXES.test(poxAddress)) {
+    throw new Error('PoX-1 requires P2PKH/P2SH/P2SH-P2WPKH/P2SH-P2WSH bitcoin addresses');
   }
 }

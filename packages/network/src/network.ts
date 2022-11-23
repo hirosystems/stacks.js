@@ -66,6 +66,8 @@ export class StacksNetwork {
     `${this.coreApiUrl}${this.transactionFeeEstimateEndpoint}`;
   getAccountApiUrl = (address: string) =>
     `${this.coreApiUrl}${this.accountEndpoint}/${address}?proof=0`;
+  getAccountExtendedBalancesApiUrl = (address: string) =>
+    `${this.coreApiUrl}/extended/v1/address/${address}/balances`;
   getAbiApiUrl = (address: string, contract: string) =>
     `${this.coreApiUrl}${this.contractAbiEndpoint}/${address}/${contract}`;
   getReadOnlyFunctionCallApiUrl = (
@@ -98,6 +100,8 @@ export class StacksNetwork {
   getStackerInfoUrl = (contractAddress: string, contractName: string) =>
     `${this.coreApiUrl}${this.readOnlyFunctionCallEndpoint}
     ${contractAddress}/${contractName}/get-stacker-info`;
+  getDataVarUrl = (contractAddress: string, contractName: string, dataVarName: string) =>
+    `${this.coreApiUrl}/v2/data_var/${contractAddress}/${contractName}/${dataVarName}?proof=0`;
   getNameInfo(fullyQualifiedName: string) {
     /*
       TODO: Update to v2 API URL for name lookups
