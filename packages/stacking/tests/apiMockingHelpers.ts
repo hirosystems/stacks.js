@@ -50,29 +50,28 @@ function isMocking(): boolean {
   return result[0];
 }
 
-const MAX_ITERATIONS = 120;
-const ITERATION_INTERVAL = 1000;
+const ITERATION_INTERVAL = 200; // in milliseconds
 
 export async function waitForTx(txId: string, apiUrl = 'http://localhost:3999') {
   if (isMocking()) return;
 
   const txApi = new TransactionsApi(new Configuration({ basePath: apiUrl }));
 
-  for (let i = 1; i <= MAX_ITERATIONS; i++) {
+  // let i = 0;
+  while (true) {
     try {
       const txInfo = (await txApi.getTransactionById({ txId })) as any;
-      console.log('txInfo', txInfo);
       if (txInfo?.tx_status === 'success') {
         console.log(`✓ ${JSON.stringify(txInfo?.tx_result)}`);
         return txInfo;
       } else if (txInfo?.tx_result) {
-        return console.log(`✕ ${JSON.stringify(txInfo.tx_result)}`);
+        console.log(`✕ ${JSON.stringify(txInfo.tx_result)}`);
+        return txInfo;
       }
     } catch (e: any) {
-      if (e?.ok === false) throw Error(`✕ ${e?.status}: ${txId}`);
-      throw e;
+      if (e?.ok === false) console.log(`✕ ${e?.status}: ${txId}`);
     }
-    console.log(`waiting (${i}x)`);
+    // console.log(`waiting for tx -- ${i++}x`);
     await sleep(ITERATION_INTERVAL);
   }
 }
@@ -83,7 +82,8 @@ export async function waitForBlock(burnBlockId: number, client?: StackingClient)
   client = client ?? new StackingClient('', new StacksTestnet({ url: 'http://localhost:3999' }));
 
   let current: number;
-  for (let i = 1; i <= MAX_ITERATIONS; i++) {
+  // let i = 0;
+  while (true) {
     try {
       const poxInfo = (await client.getPoxInfo()) as PoxInfo;
       current = poxInfo?.current_burnchain_block_height as number;
@@ -94,7 +94,7 @@ export async function waitForBlock(burnBlockId: number, client?: StackingClient)
     } catch (e: any) {
       throw e;
     }
-    console.log(`waiting (${i}x) for block ${burnBlockId} (current block: ${current})`);
+    // console.log(`waiting for block ${burnBlockId} (current block: ${current}) -- ${i++}x`);
     await sleep(ITERATION_INTERVAL);
   }
 }
@@ -106,7 +106,8 @@ export async function waitForCycle(cycleId: number, client?: StackingClient) {
   client = client ?? new StackingClient('', new StacksTestnet({ url: 'http://localhost:3999' }));
 
   let current: number;
-  for (let i = 1; i <= MAX_ITERATIONS; i++) {
+  // let i = 0;
+  while (true) {
     try {
       const poxInfo = (await client.getPoxInfo()) as PoxInfo;
       current = poxInfo?.reward_cycle_id;
@@ -117,7 +118,7 @@ export async function waitForCycle(cycleId: number, client?: StackingClient) {
     } catch (e: any) {
       throw e;
     }
-    console.log(`waiting (${i}x) for cycle ${cycleId} (current cycle: ${current})`);
+    // console.log(`waiting for cycle ${cycleId} (current cycle: ${current}) -- ${i++}x`);
     await sleep(ITERATION_INTERVAL);
   }
 }

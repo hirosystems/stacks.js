@@ -1,6 +1,16 @@
 import { bytesToHex, hexToBytes } from '@stacks/common';
+import { StacksTestnet } from '@stacks/network';
+import { StackingClient } from '../src';
 import { PoXAddressVersion } from '../src/constants';
-import { decodeBtcAddress, poxAddressToBtcAddress, poxAddressToTuple } from '../src/utils';
+import {
+  decodeBtcAddress,
+  ensureValidBurnBlockHeight,
+  poxAddressToBtcAddress,
+  poxAddressToTuple,
+} from '../src/utils';
+import { waitForBlock, waitForTx } from './apiMockingHelpers';
+
+export const API_URL = 'http://localhost:3999'; // default regtest url
 
 export const BTC_ADDRESS_CASES = [
   // privateKey: cb3df38053d132895220b9ce471f6b676db5b9bf0b4adefb55f2118ece2478df
@@ -340,5 +350,69 @@ test.each(BTC_ADDRESS_CASES_INVALID_POX_ADDRESS)(
   'decoding valid btc address, but invalid for pox, throws',
   ({ address }) => {
     expect(() => decodeBtcAddress(address)).toThrow();
+  }
+);
+
+const DETECT_ERR_24_MATRIX = [];
+for (let i = 1; i <= 1; i++) {
+  // todo: run with more cycles
+  for (let j = 0; j <= 5; j++) {
+    for (let k = 0; k <= 3; k++) {
+      DETECT_ERR_24_MATRIX.push({ cycles: i, height: j, shift: k });
+    }
+  }
+}
+
+test.skip.each(DETECT_ERR_24_MATRIX)(
+  'throw on potential (err 24)',
+  async ({ cycles, height, shift }) => {
+    fetchMock.dontMock();
+
+    const privateKey = 'cb3df38053d132895220b9ce471f6b676db5b9bf0b4adefb55f2118ece2478df01';
+    const address = 'STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6';
+    const poxAddress = '1Xik14zRm29UsyS6DjhYg4iZeZqsDa8D3';
+
+    const network = new StacksTestnet({ url: API_URL });
+    const client = new StackingClient(address, network);
+
+    let status = await client.getStatus();
+    expect(status.stacked).toBeFalsy();
+
+    let poxInfo = await client.getPoxInfo();
+    await waitForBlock((poxInfo.current_burnchain_block_height as number) + height);
+
+    poxInfo = await client.getPoxInfo();
+    const startHeight = (poxInfo.current_burnchain_block_height as number) + shift;
+
+    let throws = false;
+    try {
+      console.log('🛠', cycles, height, shift);
+      ensureValidBurnBlockHeight({ poxInfo, burnBlockHeight: startHeight });
+    } catch {
+      throws = true;
+    }
+
+    const stackingResult = await client.stack({
+      amountMicroStx: BigInt(poxInfo.min_amount_ustx),
+      burnBlockHeight: startHeight,
+      cycles,
+      poxAddress,
+      privateKey,
+    });
+
+    const txInfo = await waitForTx(stackingResult.txid);
+
+    status = await client.getStatus();
+    if (!status.stacked) {
+      expect(throws).toBeTruthy();
+      expect(txInfo?.tx_result.repr).toBe('(err 24)');
+      console.log('success');
+      return;
+    }
+
+    expect(txInfo?.tx_result.repr).toContain('(ok ');
+
+    await waitForBlock(status.details.unlock_height + 2); // wait for unlock for next iteration
+    console.log('success');
   }
 );

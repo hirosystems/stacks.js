@@ -14,13 +14,13 @@ import {
   waitForCycle,
   waitForTx,
 } from './apiMockingHelpers';
-import { BTC_ADDRESS_CASES } from './utils.test';
-
-const API_URL = 'http://localhost:3999'; // default regtest url
+import { API_URL, BTC_ADDRESS_CASES } from './utils.test';
 
 // HOW-TO: Run tests unmocked (e.g. with a local regtest environment)
 // * Add a root-level `jest.setTimeout(240_000);` with a high value to the file (outside of describe/test/before's)
 // * Add `fetchMock.dontMock();` to any test that should NOT be mocked and will use the regtest
+
+jest.setTimeout(240_000);
 
 beforeEach(() => {
   jest.resetModules();

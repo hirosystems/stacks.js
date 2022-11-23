@@ -306,16 +306,66 @@ export function ensurePox2IsLive(operationInfo: PoxOperationInfo) {
     );
 }
 
+export function ensureValidBurnBlockHeight({
+  poxInfo,
+  burnBlockHeight,
+}: {
+  poxInfo: PoxInfo;
+  burnBlockHeight: number;
+}) {
+  // taken from: https://github.com/stacks-network/stacks-blockchain/blob/9ea9b94268d1397d101699dbe6511468ea970a1b/src/chainstate/stacks/boot/pox-2.clar#L574
+
+  // We can't trust .current_cycle or .next_reward_cycle_in/.reward_cycle_id/etc. (at least not for testing)
+  // So, for legacy PoxInfo objects we trust our PoxInfo responses, but going forward we calculate everything from:
+  // - current_burnchain_block_height
+  // - first_burnchain_block_height
+  // - reward_cycle_length
+
+  const currentCycleId = !poxInfo.current_burnchain_block_height
+    ? poxInfo.current_cycle.id
+    : burnHeightToRewardCycle({
+        poxInfo,
+        burnBlockHeight: poxInfo.current_burnchain_block_height,
+      });
+
+  const nextRewardCycleIn = !poxInfo.current_burnchain_block_height
+    ? poxInfo.next_reward_cycle_in
+    : poxInfo.reward_cycle_length -
+      ((poxInfo.current_burnchain_block_height - poxInfo.first_burnchain_block_height) %
+        poxInfo.reward_cycle_length);
+
+  console.log(
+    'nextRewardCycleIn',
+    nextRewardCycleIn,
+    'poxInfo.next_reward_cycle_in',
+    poxInfo.next_reward_cycle_in
+  );
+
+  const firstRewardCycle = currentCycleId + 1; // the next cycle is the first possible cycle to stack in
+  const specifiedRewardCycle = burnHeightToRewardCycle({ poxInfo, burnBlockHeight }) + 1;
+
+  if (firstRewardCycle !== specifiedRewardCycle) {
+    console.log('would fail 🚨');
+    throw new Error(getErrorString(StackingErrors.ERR_INVALID_START_BURN_HEIGHT));
+  } else {
+    console.log(
+      'looks good 🦁',
+      currentCycleId,
+      nextRewardCycleIn,
+      firstRewardCycle,
+      specifiedRewardCycle
+    );
+  }
+}
+
 export function ensurePox1DoesNotCreateStateIntoPeriod3({
   poxInfo,
   poxOperationInfo,
   cycles,
-  burnBlockHeight: startBurnBlockHeight,
 }: {
   poxInfo: PoxInfo;
   poxOperationInfo: PoxOperationInfo;
   cycles: number;
-  burnBlockHeight: number;
 }) {
   if (
     poxOperationInfo.period === PoxOperationPeriod.Period1 ||
@@ -324,9 +374,7 @@ export function ensurePox1DoesNotCreateStateIntoPeriod3({
     return;
   }
 
-  const blocksLocked = cycles * poxInfo.reward_cycle_length;
-  const unlockBlockHeight = startBurnBlockHeight + blocksLocked;
-
+  const unlockBlockHeight = estimateUnlockHeight({ poxInfo, cycles });
   if (unlockBlockHeight >= poxOperationInfo.pox2.activation_burnchain_block_height)
     throw new Error('Transaction would fail, since it creates state into Period 3 (PoX-2)');
 }
@@ -340,6 +388,62 @@ export function ensureLegacyBtcAddressForPox1({
 }) {
   if (!poxAddress) return;
   if (contract.endsWith('.pox') && !B58_ADDR_PREFIXES.test(poxAddress)) {
-    throw new Error('PoX-1 requires P2PKH/P2SH/P2SH-P2WPKH/P2SH-P2WSH bitcoin addresses');
+    throw new Error('PoX-1 requires a P2PKH/P2SH/P2SH-P2WPKH/P2SH-P2WSH bitcoin address');
   }
+}
+/**
+ * Estimates the unlock heigth of Stacking parameters.
+ *
+ * NOTE: This calculation is not perfect, as the current PoxInfo could look
+ * different by the time the transaction is mined.
+ *
+ * @returns an estimated unlock block height
+ */
+export function estimateUnlockHeight({ poxInfo, cycles }: { poxInfo: PoxInfo; cycles: number }) {
+  const currentCycleId = !poxInfo.current_burnchain_block_height
+    ? poxInfo.current_cycle.id
+    : burnHeightToRewardCycle({
+        poxInfo,
+        burnBlockHeight:
+          poxInfo.current_burnchain_block_height - poxInfo.first_burnchain_block_height,
+      });
+
+  const nextRewardCycleIn = !poxInfo.current_burnchain_block_height
+    ? poxInfo.next_reward_cycle_in
+    : poxInfo.reward_cycle_length -
+      ((poxInfo.current_burnchain_block_height - poxInfo.first_burnchain_block_height) %
+        poxInfo.reward_cycle_length);
+
+  const firstRewardCycle =
+    nextRewardCycleIn === 1
+      ? currentCycleId + 2 // if the next block starts a new cycle, increase to next
+      : currentCycleId + 1; // the next cycle is the first possible cycle to stack in
+
+  const unlockRewardCycle = firstRewardCycle + cycles; // non-inclusive
+
+  return rewardCycleToBurnHeight({ poxInfo, rewardCycle: unlockRewardCycle });
+}
+
+export function burnHeightToRewardCycle({
+  poxInfo,
+  burnBlockHeight,
+}: {
+  poxInfo: PoxInfo;
+  burnBlockHeight: number;
+}) {
+  // taken from: https://github.com/stacks-network/stacks-blockchain/blob/9ea9b94268d1397d101699dbe6511468ea970a1b/src/chainstate/stacks/boot/pox-2.clar#L206
+  return Math.floor(
+    (burnBlockHeight - poxInfo.first_burnchain_block_height) / poxInfo.reward_cycle_length
+  );
+}
+
+export function rewardCycleToBurnHeight({
+  poxInfo,
+  rewardCycle,
+}: {
+  poxInfo: PoxInfo;
+  rewardCycle: number;
+}) {
+  // taken from: https://github.com/stacks-network/stacks-blockchain/blob/9ea9b94268d1397d101699dbe6511468ea970a1b/src/chainstate/stacks/boot/pox-2.clar#L210
+  return poxInfo.first_burnchain_block_height + rewardCycle * poxInfo.reward_cycle_length;
 }
