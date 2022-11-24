@@ -7,6 +7,7 @@ if (process.env.SKIP_TESTS) {
 
 module.exports = packageDirname => {
   return {
+    bail: true,
     rootDir: packageDirname,
     preset: 'ts-jest',
     testEnvironment: 'node',

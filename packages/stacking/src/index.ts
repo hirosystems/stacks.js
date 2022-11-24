@@ -211,7 +211,12 @@ export interface LockStxOptions {
   poxAddress: string;
   /** number of microstacks to lock */
   amountMicroStx: IntegerType;
-  /** the burnchain block height to begin lock */
+  /**
+   * the burnchain block height to begin lock
+   * (recommended: `current_block_height`)
+   *
+   * The start burn lock height needs to be in the cycle before the next stackable cycle (it can not be dated into the future/past)
+   */
   burnBlockHeight: number;
 }
 
@@ -634,7 +639,6 @@ export class StackingClient {
       poxInfo,
       poxOperationInfo,
       cycles,
-      burnBlockHeight,
     });
 
     const contract = await this.getStackingContract(poxOperationInfo);
@@ -650,6 +654,7 @@ export class StackingClient {
     const tx = await makeContractCall({
       ...txOptions,
       senderKey: privateKey,
+      // fee: 10000, // todo: remove
     });
 
     return broadcastTransaction(tx, txOptions.network as StacksNetwork);
@@ -769,7 +774,6 @@ export class StackingClient {
       poxInfo,
       poxOperationInfo,
       cycles,
-      burnBlockHeight,
     });
 
     const contract = await this.getStackingContract(poxOperationInfo);
@@ -918,7 +922,7 @@ export class StackingClient {
     const tx = await makeContractCall({
       ...txOptions,
       senderKey: privateKey,
-      fee: 10000, // todo: remove
+      // fee: 10000, // todo: remove
     });
 
     return broadcastTransaction(tx, txOptions.network as StacksNetwork);
