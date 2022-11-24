@@ -143,6 +143,7 @@ describe('2.1 period detection', () => {
       '/v2/data_var/ST000000000000000000002AMW42H/pox-2/configured?proof=0': `Data var not found`,
     });
     expect((await client.getPoxOperationInfo()).period).toBe(PoxOperationPeriod.Period1);
+    expect((await client.getPoxInfo()).current_burnchain_block_height).toBeLessThan(109);
 
     await waitForBlock(109);
     setApiMocks({
@@ -150,6 +151,7 @@ describe('2.1 period detection', () => {
       '/v2/data_var/ST000000000000000000002AMW42H/pox-2/configured?proof=0': `Data var not found`,
     });
     expect((await client.getPoxOperationInfo()).period).toBe(PoxOperationPeriod.Period1);
+    expect((await client.getPoxInfo()).current_burnchain_block_height).toBe(109);
 
     await waitForBlock(110);
     setApiMocks({
@@ -157,6 +159,7 @@ describe('2.1 period detection', () => {
       '/v2/data_var/ST000000000000000000002AMW42H/pox-2/configured?proof=0': `{"data":"0x03"}`,
     });
     expect((await client.getPoxOperationInfo()).period).toBe(PoxOperationPeriod.Period2a);
+    expect((await client.getPoxInfo()).current_burnchain_block_height).toBe(110);
 
     await waitForBlock(111);
     setApiMocks({
@@ -164,6 +167,7 @@ describe('2.1 period detection', () => {
       '/v2/data_var/ST000000000000000000002AMW42H/pox-2/configured?proof=0': `{"data":"0x03"}`,
     });
     expect((await client.getPoxOperationInfo()).period).toBe(PoxOperationPeriod.Period2a);
+    expect((await client.getPoxInfo()).current_burnchain_block_height).toBe(111);
 
     await waitForBlock(119);
     setApiMocks({
@@ -171,6 +175,7 @@ describe('2.1 period detection', () => {
       '/v2/data_var/ST000000000000000000002AMW42H/pox-2/configured?proof=0': `{"data":"0x03"}`,
     });
     expect((await client.getPoxOperationInfo()).period).toBe(PoxOperationPeriod.Period2a);
+    expect((await client.getPoxInfo()).current_burnchain_block_height).toBe(119);
 
     await waitForBlock(120);
     setApiMocks({
@@ -178,6 +183,7 @@ describe('2.1 period detection', () => {
       '/v2/data_var/ST000000000000000000002AMW42H/pox-2/configured?proof=0': `{"data":"0x03"}`,
     });
     expect((await client.getPoxOperationInfo()).period).toBe(PoxOperationPeriod.Period2a);
+    expect((await client.getPoxInfo()).current_burnchain_block_height).toBe(120);
 
     await waitForBlock(121);
     setApiMocks({
@@ -185,6 +191,7 @@ describe('2.1 period detection', () => {
       '/v2/data_var/ST000000000000000000002AMW42H/pox-2/configured?proof=0': `{"data":"0x03"}`,
     });
     expect((await client.getPoxOperationInfo()).period).toBe(PoxOperationPeriod.Period2b);
+    expect((await client.getPoxInfo()).current_burnchain_block_height).toBe(121);
 
     await waitForBlock(125);
     setApiMocks({
@@ -192,6 +199,7 @@ describe('2.1 period detection', () => {
       '/v2/data_var/ST000000000000000000002AMW42H/pox-2/configured?proof=0': `{"data":"0x03"}`,
     });
     expect((await client.getPoxOperationInfo()).period).toBe(PoxOperationPeriod.Period2b);
+    expect((await client.getPoxInfo()).current_burnchain_block_height).toBe(125);
 
     await waitForBlock(126);
     setApiMocks({
@@ -199,6 +207,7 @@ describe('2.1 period detection', () => {
       '/v2/data_var/ST000000000000000000002AMW42H/pox-2/configured?proof=0': `{"data":"0x03"}`,
     });
     expect((await client.getPoxOperationInfo()).period).toBe(PoxOperationPeriod.Period3);
+    expect((await client.getPoxInfo()).current_burnchain_block_height).toBe(126);
 
     await waitForBlock(135);
     setApiMocks({
@@ -206,6 +215,7 @@ describe('2.1 period detection', () => {
       '/v2/data_var/ST000000000000000000002AMW42H/pox-2/configured?proof=0': `{"data":"0x03"}`,
     });
     expect((await client.getPoxOperationInfo()).period).toBe(PoxOperationPeriod.Period3);
+    expect((await client.getPoxInfo()).current_burnchain_block_height).toBe(135);
   });
 });
 

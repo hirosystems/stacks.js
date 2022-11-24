@@ -354,16 +354,16 @@ test.each(BTC_ADDRESS_CASES_INVALID_POX_ADDRESS)(
 );
 
 const DETECT_ERR_24_MATRIX = [];
-for (let i = 1; i <= 1; i++) {
+for (let i = 1; i <= 3; i++) {
   // todo: run with more cycles
   for (let j = 0; j <= 5; j++) {
-    for (let k = 0; k <= 3; k++) {
+    for (let k = 0; k <= 5; k++) {
       DETECT_ERR_24_MATRIX.push({ cycles: i, height: j, shift: k });
     }
   }
 }
 
-test.skip.each(DETECT_ERR_24_MATRIX)(
+test.each(DETECT_ERR_24_MATRIX)(
   'throw on potential (err 24)',
   async ({ cycles, height, shift }) => {
     fetchMock.dontMock();

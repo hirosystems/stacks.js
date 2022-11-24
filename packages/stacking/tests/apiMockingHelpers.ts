@@ -89,7 +89,7 @@ export async function waitForBlock(burnBlockId: number, client?: StackingClient)
       current = poxInfo?.current_burnchain_block_height as number;
       if (current && current >= burnBlockId) {
         console.log(`→ block ${current} reached`);
-        return;
+        return await sleep(100);
       }
     } catch (e: any) {
       throw e;
@@ -113,7 +113,7 @@ export async function waitForCycle(cycleId: number, client?: StackingClient) {
       current = poxInfo?.reward_cycle_id;
       if (current && current >= cycleId) {
         console.log(`→ cycle ${current} reached`);
-        return;
+        return await sleep(100);
       }
     } catch (e: any) {
       throw e;
