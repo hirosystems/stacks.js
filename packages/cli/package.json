@@ -1,6 +1,6 @@
 {
   "name": "@stacks/cli",
-  "version": "5.0.2",
+  "version": "6.0.1",
   "description": "Stacks command line tool",
   "license": "MIT",
   "author": "Hiro Systems PBC (https://hiro.so)",
@@ -18,18 +18,18 @@
     "test:watch": "jest --watch --coverage=false"
   },
   "dependencies": {
-    "@scure/bip32": "^1.1.0",
+    "@scure/bip32": "^1.1.1",
     "@scure/bip39": "^1.1.0",
-    "@stacks/auth": "^5.0.2",
+    "@stacks/auth": "^6.0.0",
     "@stacks/blockchain-api-client": "4.0.1",
-    "@stacks/bns": "^5.0.2",
-    "@stacks/common": "^5.0.0",
-    "@stacks/encryption": "^5.0.0",
-    "@stacks/network": "^5.0.0",
-    "@stacks/stacking": "^5.0.2",
-    "@stacks/storage": "^5.0.2",
-    "@stacks/transactions": "^5.0.2",
-    "@stacks/wallet-sdk": "^5.0.2",
+    "@stacks/bns": "^6.0.0",
+    "@stacks/common": "^6.0.0",
+    "@stacks/encryption": "^6.0.0",
+    "@stacks/network": "^6.0.0",
+    "@stacks/stacking": "^6.0.1",
+    "@stacks/storage": "^6.0.0",
+    "@stacks/transactions": "^6.0.0",
+    "@stacks/wallet-sdk": "^6.0.0",
     "ajv": "6.12.3",
     "bip32": "^2.0.6",
     "bip39": "^3.0.2",
@@ -53,21 +53,11 @@
     "@types/express": "^4.16.1",
     "@types/express-winston": "^3.0.1",
     "@types/inquirer": "^6.5.0",
-    "@types/jest": "^26.0.22",
     "@types/node": "^18.0.4",
     "@types/node-fetch": "^2.5.0",
     "@types/ripemd160": "^2.0.0",
     "@types/wif": "^2.0.2",
-    "jest": "^26.6.3",
-    "jest-fetch-mock": "^3.0.3",
-    "jest-module-name-mapper": "^0.1.5",
-    "rimraf": "^3.0.2",
-    "ts-jest": "^26.5.5"
-  },
-  "overrides": {
-    "ajv": "6.12.3",
-    "nth-check": "2.0.1",
-    "schema-inspector": "2.0.1"
+    "rimraf": "^3.0.2"
   },
   "publishConfig": {
     "access": "public"

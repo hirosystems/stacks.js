@@ -3,6 +3,45 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.0.1](https://github.com/hirosystems/stacks.js/compare/v6.0.0...v6.0.1) (2022-11-24)
+
+
+### Bug Fixes
+
+* remove hard-coded fee for `stackAggregationCommitIndexed` ([1edb181](https://github.com/hirosystems/stacks.js/commit/1edb181f521231b516d15b4f198600cd4c7bbeff))
+
+
+
+## [6.0.0](https://github.com/hirosystems/stacks.js/compare/v5.0.3...v6.0.0) (2022-11-23)
+
+
+### ⚠ BREAKING CHANGES
+
+* Removes the getBTCAddress method, since it does not work with modern BTC addresses.
+
+### Features
+
+* A StackingClient will now automatically detect which PoX version to use for Stacking.
+* Adds the following PoX Stacking methods to the StackingClient: `stackExtend`, `stackIncrease`, `delegateStackExtend`, `delegateStackIncrease`, `stackAggregationCommitIndexed`, `stackAggregationIncrease`.
+* Adds the following helper methods to the StackingClient: `getAccountExtendedBalances`, `getAccountBalanceLocked`, `getDelegationStatus`, `getRewardSet`.
+* add coinbase-to-alt-recipient payload type ([836b181](https://github.com/hirosystems/stacks.js/commit/836b181eca3fd2904baf2587c7875d6a6e8c95bd))
+* add payload type assertions ([#1395](https://github.com/hirosystems/stacks.js/issues/1395)) ([cdd32e9](https://github.com/hirosystems/stacks.js/commit/cdd32e9323069452a4d0345174b049be1c8e1069))
+* Add PoX-2 methods to @stacks/stacking client ([#1354](https://github.com/hirosystems/stacks.js/issues/1354)) ([25e326a](https://github.com/hirosystems/stacks.js/commit/25e326a8df74b92fd09b1e4dfa218eb77fd8a952))
+* Add types for profiles ([#1383](https://github.com/hirosystems/stacks.js/issues/1383)) ([872478c](https://github.com/hirosystems/stacks.js/commit/872478cff87a6e7b78a3327516ed2b761b4b80a6))
+* support `versioned-smart-contract` tx types introduced in Stacks 2.1 ([#1341](https://github.com/hirosystems/stacks.js/issues/1341)) ([0062a45](https://github.com/hirosystems/stacks.js/commit/0062a453fec80de93d36e0d8c5e3f37a7522c300))
+
+
+
+## [5.0.3](https://github.com/hirosystems/stacks.js/compare/v5.0.2...v5.0.3) (2022-11-18)
+
+
+### Bug Fixes
+
+* add public key to make_keychain ([2b69958](https://github.com/hirosystems/stacks.js/commit/2b69958b4807105dffb01c61d7ce39cf569437b0))
+* use correct wif encoding for testnet ([a89cc05](https://github.com/hirosystems/stacks.js/commit/a89cc054e7cc17988133364fd8a0ef776ee5ea4f))
+
+
+
 ## [5.0.2](https://github.com/hirosystems/stacks.js/compare/v5.0.1...v5.0.2) (2022-10-19)
 
 

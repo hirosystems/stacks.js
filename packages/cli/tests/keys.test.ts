@@ -17,6 +17,7 @@ test('getStacksWalletKeyInfo', async () => {
 
   expect(info).toEqual({
     privateKey: '25899fab1b9b95cc2d1692529f00fb788e85664df3d14db1a660f33c5f96d8ab01',
+    publicKey: '02614ab79b4b66595d7fc78590a0bf798a4432c454dc013ceea129d751e0b55220',
     address: 'SP3RBZ4TZ3EK22SZRKGFZYBCKD7WQ5B8FFS0AYVF7',
     btcAddress: '1Nwxfx7VoYAg2mEN35dTRw4H7gte8ajFki',
     wif: 'KxUgLbeVeFZEUUQpc3ncYn5KFB3WH5MVRv3SJ2g5yPwkrXs3QRaP',

@@ -1,6 +1,6 @@
 {
   "name": "@stacks/bns",
-  "version": "5.0.2",
+  "version": "6.0.0",
   "description": "Library for working with the Stacks Blockchain Naming System BNS.",
   "license": "MIT",
   "author": "Hiro Systems PBC (https://hiro.so)",
@@ -20,18 +20,13 @@
     "typecheck:watch": "npm run typecheck -- --watch"
   },
   "dependencies": {
-    "@stacks/common": "^5.0.0",
-    "@stacks/network": "^5.0.0",
-    "@stacks/transactions": "^5.0.2"
+    "@stacks/common": "^6.0.0",
+    "@stacks/network": "^6.0.0",
+    "@stacks/transactions": "^6.0.0"
   },
   "devDependencies": {
-    "@types/jest": "^26.0.22",
-    "jest": "^26.6.3",
-    "jest-fetch-mock": "^3.0.3",
-    "jest-module-name-mapper": "^0.1.5",
     "process": "^0.11.10",
-    "rimraf": "^3.0.2",
-    "ts-jest": "^26.5.5"
+    "rimraf": "^3.0.2"
   },
   "sideEffects": false,
   "typings": "dist/index.d.ts",

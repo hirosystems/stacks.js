@@ -7,13 +7,13 @@ const c32check = require('c32check');
 
 import { HDKey } from '@scure/bip32';
 import * as scureBip39 from '@scure/bip39';
+import { bytesToHex } from '@stacks/common';
 
 import {
   compressPrivateKey,
   getPublicKeyFromPrivate,
   publicKeyToBtcAddress,
 } from '@stacks/encryption';
-import { createStacksPrivateKey, privateKeyToString } from '@stacks/transactions';
 import { DerivationType, deriveAccount, generateWallet, getRootNode } from '@stacks/wallet-sdk';
 import * as bip32 from 'bip32';
 import * as bip39 from 'bip39';
@@ -26,7 +26,6 @@ import { CLINetworkAdapter } from './network';
 const BITCOIN_PUBKEYHASH = 0;
 const BITCOIN_PUBKEYHASH_TESTNET = 111;
 const BITCOIN_WIF = 128;
-// @ts-ignore
 const BITCOIN_WIF_TESTNET = 239;
 
 export const STX_WALLET_COMPATIBLE_SEED_STRENGTH = 256;
@@ -154,8 +153,9 @@ export async function getStacksWalletKeyInfo(
   const child = master.derive(derivationPath);
   const pubkey = Buffer.from(child.publicKey!);
   const privkeyBuffer = Buffer.from(child.privateKey!);
-  const privkey = privateKeyToString(createStacksPrivateKey(compressPrivateKey(privkeyBuffer)));
-  const walletImportFormat = wif.encode(BITCOIN_WIF, privkeyBuffer, true);
+  const privkey = bytesToHex(compressPrivateKey(privkeyBuffer));
+  const wifVersion = network.isTestnet() ? BITCOIN_WIF_TESTNET : BITCOIN_WIF;
+  const walletImportFormat = wif.encode(wifVersion, privkeyBuffer, true);
 
   const addr = getPrivateKeyAddress(network, privkey);
   const btcAddress = publicKeyToBtcAddress(
@@ -165,6 +165,7 @@ export async function getStacksWalletKeyInfo(
 
   return {
     privateKey: privkey,
+    publicKey: pubkey.toString('hex'),
     address: c32check.b58ToC32(addr),
     btcAddress,
     wif: walletImportFormat,

@@ -1,6 +1,6 @@
 {
   "name": "@stacks/storage",
-  "version": "5.0.2",
+  "version": "6.0.0",
   "description": "Stacks storage library",
   "license": "MIT",
   "author": "Hiro Systems PBC (https://hiro.so)",
@@ -20,25 +20,20 @@
     "typecheck:watch": "npm run typecheck -- --watch"
   },
   "dependencies": {
-    "@stacks/auth": "^5.0.2",
-    "@stacks/common": "^5.0.0",
-    "@stacks/encryption": "^5.0.0",
-    "@stacks/network": "^5.0.0",
+    "@stacks/auth": "^6.0.0",
+    "@stacks/common": "^6.0.0",
+    "@stacks/encryption": "^6.0.0",
+    "@stacks/network": "^6.0.0",
     "base64-js": "^1.5.1",
     "jsontokens": "^4.0.1"
   },
   "devDependencies": {
     "@stacks/network": "^4.1.0",
-    "@types/jest": "^26.0.22",
     "@types/jsdom": "^16.2.10",
-    "jest": "^26.6.3",
-    "jest-fetch-mock": "^3.0.3",
-    "jest-module-name-mapper": "^0.1.5",
     "jsdom": "^16.5.3",
     "process": "^0.11.10",
     "rimraf": "^3.0.2",
-    "stream-browserify": "^3.0.0",
-    "ts-jest": "^26.5.5"
+    "stream-browserify": "^3.0.0"
   },
   "sideEffects": false,
   "typings": "dist/index.d.ts",
