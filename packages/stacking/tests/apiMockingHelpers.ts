@@ -148,3 +148,18 @@ export const MOCK_FULL_ACCOUNT = {
   '/v2/accounts/STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6?proof=0': `{"balance":"0x0000000000000000002386f26fb76310","locked":"0x00000000000000000000000000000000","unlock_height":0,"nonce":63}`,
   '/v2/contracts/call-read/ST000000000000000000002AMW42H/pox-2/can-stack-stx': `{"okay":true,"result":"0x0703"}`,
 };
+
+// === FETCHMOCK TESTING HELPERS ===============================================
+
+/**
+ * Gets latest fetchMock broadcast to /transactions
+ * @ignore
+ */
+export function getFetchMockBroadcast() {
+  const broadcast = (Array.from(fetchMock.mock.calls) as any)
+    .reverse()
+    .find((m: any) => m[0].endsWith('/transactions'));
+  return {
+    body: broadcast[1].body,
+  };
+}
