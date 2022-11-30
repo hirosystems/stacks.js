@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.0.2](https://github.com/hirosystems/stacks.js/compare/v6.0.1...v6.0.2) (2022-11-30)
+
+
+### Bug Fixes
+
+* remove stacking into period3 check ([#1402](https://github.com/hirosystems/stacks.js/issues/1402)) ([d38fcc2](https://github.com/hirosystems/stacks.js/commit/d38fcc2a92e2079e34ab4a1fa94353f0ccdb2a6c))
+
+
+
 ## [6.0.1](https://github.com/hirosystems/stacks.js/compare/v6.0.0...v6.0.1) (2022-11-24)
 
 
