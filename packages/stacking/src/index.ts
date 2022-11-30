@@ -35,7 +35,6 @@ import {
 import { PoxOperationPeriod, StackingErrors } from './constants';
 import {
   ensureLegacyBtcAddressForPox1,
-  ensurePox1DoesNotCreateStateIntoPeriod3,
   ensurePox2IsLive,
   poxAddressToTuple,
   unwrap,
@@ -630,13 +629,6 @@ export class StackingClient {
     const poxInfo = await this.getPoxInfo();
     const poxOperationInfo = await this.getPoxOperationInfo(poxInfo);
 
-    ensurePox1DoesNotCreateStateIntoPeriod3({
-      poxInfo,
-      poxOperationInfo,
-      cycles,
-      burnBlockHeight,
-    });
-
     const contract = await this.getStackingContract(poxOperationInfo);
     ensureLegacyBtcAddressForPox1({ contract, poxAddress });
 
@@ -764,13 +756,6 @@ export class StackingClient {
   }: DelegateStackStxOptions): Promise<TxBroadcastResult> {
     const poxInfo = await this.getPoxInfo();
     const poxOperationInfo = await this.getPoxOperationInfo(poxInfo);
-
-    ensurePox1DoesNotCreateStateIntoPeriod3({
-      poxInfo,
-      poxOperationInfo,
-      cycles,
-      burnBlockHeight,
-    });
 
     const contract = await this.getStackingContract(poxOperationInfo);
     ensureLegacyBtcAddressForPox1({ contract, poxAddress });
