@@ -18,7 +18,8 @@ import { SubdomainOp, subdomainOpToZFPieces } from '../src/utils';
 import {
   keyInfoTests,
   MakeKeychainResult,
-  makekeychainTests,
+  makekeychainTestsMainnet,
+  makekeychainTestsTestnet,
   WalletKeyInfoResult,
 } from './derivation-path/keychain';
 import * as fixtures from './fixtures/cli.fixture';
@@ -174,7 +175,27 @@ describe('Contract function call', () => {
 });
 
 describe('Keychain custom derivation path', () => {
-  test.each(makekeychainTests)(
+  test.each(makekeychainTestsMainnet)(
+    'Make keychain using custom derivation path %#',
+    async (derivationPath: string, keyChainResult: MakeKeychainResult) => {
+      const encrypted =
+        'vim+XrRNSm+SqSn0MyWNEi/e+UK5kX8WGCLE/sevT6srZG+quzpp911sWP0CcvsExCH1M4DgOfOldMitLdkq1b6rApDwtAcOWdAqiaBk37M=';
+      const args = [encrypted, derivationPath];
+
+      // Mock TTY
+      process.stdin.isTTY = true;
+      process.env.password = 'supersecret';
+
+      const keyChain = await makeKeychain(mainnetNetwork, args);
+      const result = JSON.parse(keyChain);
+      expect(result).toEqual(keyChainResult);
+      // Unmock TTY
+      process.stdin.isTTY = false;
+      process.env.password = undefined;
+    }
+  );
+
+  test.each(makekeychainTestsTestnet)(
     'Make keychain using custom derivation path %#',
     async (derivationPath: string, keyChainResult: MakeKeychainResult) => {
       const encrypted =

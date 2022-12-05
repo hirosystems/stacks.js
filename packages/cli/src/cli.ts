@@ -1649,7 +1649,7 @@ async function stackingStatus(network: CLINetworkAdapter, args: string[]): Promi
     .then((status: StackerInfo) => {
       if (status.stacked) {
         return {
-          amount_microstx: status.details.amount_microstx,
+          // amount_microstx: status.details.amount_microstx, // todo: add again via other api call?
           first_reward_cycle: status.details.first_reward_cycle,
           lock_period: status.details.lock_period,
           unlock_height: status.details.unlock_height,

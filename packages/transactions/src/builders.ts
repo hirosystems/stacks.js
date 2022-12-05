@@ -31,6 +31,7 @@ import {
   TxRejectedReason,
   RECOVERABLE_ECDSA_SIG_LENGTH_BYTES,
   StacksMessageType,
+  ClarityVersion,
 } from './constants';
 import { ClarityAbi, validateContractCall } from './contract-abi';
 import {
@@ -446,13 +447,8 @@ export async function broadcastRawTransaction(
   const text = await response.text();
   // Replace extra quotes around txid string
   const txid = text.replace(/["]+/g, '');
-  const isValidTxId = validateTxId(txid);
-  if (!isValidTxId) {
-    throw new Error(text);
-  }
-  return {
-    txid,
-  } as TxBroadcastResult;
+  if (!validateTxId(txid)) throw new Error(text);
+  return { txid } as TxBroadcastResult;
 }
 
 /**
@@ -689,6 +685,7 @@ export async function makeSTXTokenTransfer(
  * Contract deploy transaction options
  */
 export interface BaseContractDeployOptions {
+  clarityVersion?: ClarityVersion;
   contractName: string;
   /** the Clarity code to be deployed */
   codeBody: string;
@@ -734,7 +731,10 @@ export async function estimateContractDeploy(
   transaction: StacksTransaction,
   network?: StacksNetworkName | StacksNetwork
 ): Promise<bigint> {
-  if (transaction.payload.payloadType !== PayloadType.SmartContract) {
+  if (
+    transaction.payload.payloadType !== PayloadType.SmartContract &&
+    transaction.payload.payloadType !== PayloadType.VersionedSmartContract
+  ) {
     throw new Error(
       `Contract deploy fee estimation only possible with ${
         PayloadType[PayloadType.SmartContract]
@@ -808,7 +808,11 @@ export async function makeUnsignedContractDeploy(
 
   const options = Object.assign(defaultOptions, txOptions);
 
-  const payload = createSmartContractPayload(options.contractName, options.codeBody);
+  const payload = createSmartContractPayload(
+    options.contractName,
+    options.codeBody,
+    options.clarityVersion
+  );
 
   const addressHashMode = AddressHashMode.SerializeP2PKH;
   const pubKey = createStacksPublicKey(options.publicKey);
@@ -1384,6 +1388,7 @@ export async function sponsorTransaction(
     switch (options.transaction.payload.payloadType) {
       case PayloadType.TokenTransfer:
       case PayloadType.SmartContract:
+      case PayloadType.VersionedSmartContract:
       case PayloadType.ContractCall:
         const estimatedLen = estimateTransactionByteLength(options.transaction);
         try {
