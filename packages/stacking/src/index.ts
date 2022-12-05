@@ -883,8 +883,8 @@ export class StackingClient {
    * addresses allocated in this reward cycle. This index can then be passed to `stack-aggregation-increase`
    * to later increment the STX this PoX address represents, in amounts less than the stacking minimum.
    *
+   * @category PoX-2
    * @param {StackAggregationCommitOptions} options - a required stack aggregation commit options object
-   *
    * @returns {Promise<string>} that resolves to a broadcasted txid if the operation succeeds
    */
   async stackAggregationCommitIndexed({
@@ -912,7 +912,7 @@ export class StackingClient {
    * As a delegator, generate and broadcast a transaction to increase partial commitment committed delegatee tokens
    *
    * @param {StackAggregationIncreaseOptions} options - a required stack aggregation increase options object
-   *
+   * @category PoX-2
    * @returns {Promise<string>} that resolves to a broadcasted txid if the operation succeeds
    */
   async stackAggregationIncrease({
