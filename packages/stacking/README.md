@@ -2,6 +2,8 @@
 
 Library for PoX Stacking.
 
+> **Note**: [Not all methods](https://stacks.js.org/classes/_stacks_stacking.StackingClient#:~:text=methods%20-%20pox-2) are available before the 2.1 fork. These will throw if used on a <2.1 chain.
+
 ## Installation <!-- omit in toc -->
 
 ```shell
@@ -12,6 +14,8 @@ npm install @stacks/stacking
 - [Stack STX](#stack-stx)
   - [Check stacking eligibility](#check-stacking-eligibility)
   - [Broadcast the stacking transaction](#broadcast-the-stacking-transaction)
+  - [Extend stacking](#extend-stacking)
+  - [Increase amount stacked](#increase-amount-stacked)
 - [Client helpers](#client-helpers)
   - [Will Stacking be executed in the next cycle?](#will-stacking-be-executed-in-the-next-cycle)
   - [How long (in seconds) is a Stacking cycle?](#how-long-in-seconds-is-a-stacking-cycle)
@@ -20,18 +24,25 @@ npm install @stacks/stacking
   - [Get PoX info](#get-pox-info)
   - [Get Stacks node info](#get-stacks-node-info)
   - [Get account balance](#get-account-balance)
+  - [Get account balance locked](#get-account-balance-locked)
+  - [Get account balances (from API)](#get-account-balances-from-api)
   - [Get account stacking status](#get-account-stacking-status)
+  - [Get PoX operation info (current period and PoX contract versions)](#get-pox-operation-info-current-period-and-pox-contract-versions)
 - [Delegated stacking](#delegated-stacking)
   - [Stacking in a pool](#stacking-in-a-pool)
     - [Delegate STX](#delegate-stx)
     - [Revoke delegation](#revoke-delegation)
-  - [Operating a pool](#operating-a-pool)
+  - [Operating a pool / Stacking for others](#operating-a-pool--stacking-for-others)
     - [Stack delegated STX](#stack-delegated-stx)
+    - [Extend delegated STX stacking](#extend-delegated-stx-stacking)
+    - [Increase delegated STX](#increase-delegated-stx)
     - [Commit to stacking](#commit-to-stacking)
+    - [Increase existing commitment](#increase-existing-commitment)
     - [Pool helpers](#pool-helpers)
       - [Get burnchain rewards](#get-burnchain-rewards)
       - [Get burnchain rewards total](#get-burnchain-rewards-total)
       - [Get burnchain reward holders](#get-burnchain-reward-holders)
+      - [Get reward set by index](#get-reward-set-by-index)
 
 ## Initialization
 
@@ -90,6 +101,49 @@ const stackingResults = await client.stack({
   cycles,
   privateKey,
   burnBlockHeight,
+});
+
+// {
+//   txid: '0xf6e9dbf6a26c1b73a14738606cb2232375d1b440246e6bbc14a45b3a66618481',
+// }
+```
+
+### Extend stacking
+
+Extends previously stacked funds without cooldown.
+
+```typescript
+// number cycles to extend stacking by
+const extendCycles = 3;
+// a BTC address for reward payouts
+const poxAddress = 'mvuYDknzDtPgGqm2GnbAbmGMLwiyW3AwFP';
+// private key for transaction signing
+const privateKey = 'd48f215481c16cbe6426f8e557df9b78895661971d71735126545abddcd5377001';
+
+const extendResults = await client.stackExtend({
+  extendCycles,
+  poxAddress,
+  privateKey,
+});
+
+// {
+//   txid: '0xf6e9dbf6a26c1b73a14738606cb2232375d1b440246e6bbc14a45b3a66618481',
+// }
+```
+
+### Increase amount stacked
+
+Increases the amount of funds stacked/locked after previously stacking.
+
+```typescript
+// how much to increase by, in microSTX
+const increaseBy = 3000000;
+// private key for transaction signing
+const privateKey = 'd48f215481c16cbe6426f8e557df9b78895661971d71735126545abddcd5377001';
+
+const increaseResults = await client.stackIncrease({
+  increaseBy,
+  privateKey,
 });
 
 // {
@@ -179,6 +233,35 @@ const responseBalanceInfo = await client.getAccountBalance();
 // 800000000000
 ```
 
+### Get account balance locked
+
+```typescript
+const responseBalanceLockedInfo = await client.getAccountBalanceLocked();
+
+// 40000000000
+```
+
+### Get account balances (from API)
+
+```typescript
+const responseBalancesInfo = await client.getAccountExtendedBalances();
+
+// {
+//   stx: {
+//     balance: '1000000',
+//     total_sent: '0',
+//     total_received: '1000000',
+//     lock_tx_id: '0xec94e7d20af8979b44d17a0520c126bf742b999a0fc7ddbcbe0ab21b228ecc8c',
+//     locked: '50000',
+//     lock_height: 100,
+//     burnchain_lock_height: 100,
+//     burnchain_unlock_height: 200,
+//   },
+//   fungible_tokens: {},
+//   non_fungible_tokens: {},
+// }
+```
+
 ### Get account stacking status
 
 ```typescript
@@ -196,6 +279,26 @@ const stackingStatus = await client.getStatus();
 //       hashbytes: '05cf52a44bf3e6829b4f8c221cc675355bf83b7d'
 //     }
 //   }
+// }
+```
+
+### Get PoX operation info (current period and PoX contract versions)
+
+```typescript
+const poxOperationInfo = await client.getPoxOperationInfo();
+
+// {
+//   period: 'Period3',
+//   pox1: {
+//     contract_id: 'ST000000000000000000002AMW42H.pox',
+//     activation_burnchain_block_height: 0,
+//     first_reward_cycle_id: 0,
+//   },
+//   pox2: {
+//     contract_id: 'ST000000000000000000002AMW42H.pox-2',
+//     activation_burnchain_block_height: 120,
+//     first_reward_cycle_id: 25,
+//   },
 // }
 ```
 
@@ -259,13 +362,18 @@ const revokeResponse = await client.revokeDelegateStx(privateKey);
 // }
 ```
 
-### Operating a pool
+### Operating a pool / Stacking for others
 
-If you are the pool operator, you can stack ("lock up") tokens for your users and commit to stacking participation for upcoming reward cycles.
+If you are a pool operator (or wish to stack with someone else's funds), you can stack ("lock up") tokens for your users and commit to stacking participation for upcoming reward cycles.
+These users need to first "delegate" some or all of their funds to you (the "delegator").
+The following examples refer to the "delegator" as pool, but in practice a delegator can also stack for only single or few individuals.
+Even a group of friends could stack together and share a multi-sig BTC wallet for payouts.
 
 #### Stack delegated STX
 
 Stack STX, which have been previously delegated to the pool.
+This step only locks the funds.
+The pool operator will also need to ["commit"](#commit-to-stacking) to a reward cycle.
 
 ```typescript
 import { getNonce } from '@stacks/transactions';
@@ -304,12 +412,94 @@ const delegetateStackResponses = await poolClient.delegateStackStx({
   nonce, // optional
 });
 
-//   {
-//     txid: '0xf6e9dbf6a26c1b73a14738606cb2232375d1b440246e6bbc14a45b3a66618481',
-//   }
+// {
+//   txid: '0xf6e9dbf6a26c1b73a14738606cb2232375d1b440246e6bbc14a45b3a66618481',
+// }
+```
+
+#### Extend delegated STX stacking
+
+Extend stacking of STX previously delegated to the pool.
+
+```typescript
+import { getNonce } from '@stacks/transactions';
+import { StacksTestnet, StacksMainnet } from '@stacks/network';
+import { StackingClient } from '@stacks/stacking';
+
+// for mainnet: const network = new StacksMainnet();
+const network = new StacksTestnet();
+// the stacks STX address
+const address = 'ST3XKKN4RPV69NN1PHFDNX3TYKXT7XPC4N8KC1ARH';
+// pools would initiate a different client
+const poolAddress = 'ST22X605P0QX2BJC3NXEENXDPFCNJPHE02DTX5V74';
+// pool private key for transaction signing
+const poolPrivateKey = 'd48f215481c16cbe6426f8e557df9b78895661971d71735126545abddcd5377001';
+// the BTC address for reward payouts
+const poolBtcAddress = 'msiYwJCvXEzjgq6hDwD9ueBka6MTfN962Z';
+// number of cycles to extend by
+const extendCount = 3;
+// if you call this method multiple times in the same block, you need to increase the nonce manually
+let nonce = await getNonce(poolAddress, network);
+nonce = nonce + 1n;
+
+const poolClient = new StackingClient(poolAddress, network);
+
+const delegetateExtendResponses = await poolClient.delegateStackExtend({
+  extendCount,
+  stacker: address,
+  poxAddress: poolBtcAddress,
+  privateKey: poolPrivateKey,
+  nonce, // optional
+});
+
+// {
+//   txid: '0xf6e9dbf6a26c1b73a14738606cb2232375d1b440246e6bbc14a45b3a66618481',
+// }
+```
+
+#### Increase delegated STX
+
+Increase the loacked amount of delegated STX stacked.
+
+```typescript
+import { getNonce } from '@stacks/transactions';
+import { StacksTestnet, StacksMainnet } from '@stacks/network';
+import { StackingClient } from '@stacks/stacking';
+
+// for mainnet: const network = new StacksMainnet();
+const network = new StacksTestnet();
+// the stacks STX address
+const address = 'ST3XKKN4RPV69NN1PHFDNX3TYKXT7XPC4N8KC1ARH';
+// pools would initiate a different client
+const poolAddress = 'ST22X605P0QX2BJC3NXEENXDPFCNJPHE02DTX5V74';
+// pool private key for transaction signing
+const poolPrivateKey = 'd48f215481c16cbe6426f8e557df9b78895661971d71735126545abddcd5377001';
+// the BTC address for reward payouts
+const poolBtcAddress = 'msiYwJCvXEzjgq6hDwD9ueBka6MTfN962Z';
+// amount to increase by, in microSTX
+const increaseBy = 3;
+// if you call this method multiple times in the same block, you need to increase the nonce manually
+let nonce = await getNonce(poolAddress, network);
+nonce = nonce + 1n;
+
+const poolClient = new StackingClient(poolAddress, network);
+
+const delegetateIncreaseResponses = await poolClient.delegateStackIncrease({
+  increaseBy,
+  stacker: address,
+  poxAddress: poolBtcAddress,
+  privateKey: poolPrivateKey,
+  nonce, // optional
+});
+
+// {
+//   txid: '0xf6e9dbf6a26c1b73a14738606cb2232375d1b440246e6bbc14a45b3a66618481',
+// }
 ```
 
 #### Commit to stacking
+
+The result of this commit transaction will contain the index of the pools reward set entry.
 
 ```typescript
 // reward cycle id to commit to
@@ -319,9 +509,35 @@ const poolBtcAddress = 'msiYwJCvXEzjgq6hDwD9ueBka6MTfN962Z';
 // Private key
 const privateKeyDelegate = 'd48f215481c16cbe6426f8e557df9b78895661971d71735126545abddcd5377001';
 
-const delegetateCommitResponse = await poolClient.stackAggregationCommit({
-  poxAddress: poolBtcAddress,
+const delegetateCommitResponse = await poolClient.stackAggregationCommitIndexed({
   rewardCycle,
+  poxAddress: poolBtcAddress,
+  privateKey: privateKeyDelegate,
+});
+
+// {
+//   txid: '0xf6e9dbf6a26c1b73a14738606cb2232375d1b440246e6bbc14a45b3a66618481',
+// }
+```
+
+#### Increase existing commitment
+
+The result of this commit transaction will contain the index of the pools reward set entry.
+
+```typescript
+// reward cycle id to commit to
+const rewardCycle = 12;
+// reward set entry index
+const rewardIndex = 3;
+// the BTC address for reward payouts
+const poolBtcAddress = 'msiYwJCvXEzjgq6hDwD9ueBka6MTfN962Z';
+// Private key
+const privateKeyDelegate = 'd48f215481c16cbe6426f8e557df9b78895661971d71735126545abddcd5377001';
+
+const delegetateIncreaseResponse = await poolClient.stackAggregationIncrease({
+  rewardCycle,
+  rewardIndex,
+  poxAddress: poolBtcAddress,
   privateKey: privateKeyDelegate,
 });
 
@@ -345,7 +561,8 @@ const client = new StackingClient(address, network);
 const options = { limit: 2, offset: 0 };
 
 const rewards = await client.getRewardsForBtcAddress(options);
-//{
+
+// {
 //   limit: 2,
 //   offset: 0,
 //   results: [
@@ -383,10 +600,10 @@ const network = new StacksTestnet();
 const client = new StackingClient(address, network);
 
 const total = await client.getRewardsTotalForBtcAddress();
-//{
-// reward_recipient: 'myfTfju9XSMRusaY2qTitSEMSchsWRA441',
-// reward_amount: '0'
-//}
+// {
+//   reward_recipient: 'myfTfju9XSMRusaY2qTitSEMSchsWRA441',
+//   reward_amount: '0'
+// }
 ```
 
 ##### Get burnchain reward holders
@@ -423,4 +640,29 @@ const rewardHolders = await client.getRewardHoldersForBtcAddress(options);
 //     }
 //   ]
 // };
+```
+
+##### Get reward set by index
+
+```typescript
+import { StacksTestnet, StacksMainnet } from '@stacks/network';
+import { StackingClient } from '@stacks/stacking';
+
+const address = 'myfTfju9XSMRusaY2qTitSEMSchsWRA441';
+// for mainnet: const network = new StacksMainnet();
+const network = new StacksTestnet();
+const client = new StackingClient(address, network);
+
+const rewardSetItem = await client.getRewardSet({
+  rewardCyleId: 49,
+  rewardSetIndex: 3,
+});
+
+// {
+//   pox_address: {
+//     version: 0,
+//     hashbytes: [ 67, 89, 107, 83, 134, 244, 102, 134, 62, 37, 101, 141, 223, 148, 189, 15, 173, 171, 0, 72 ]
+//   },
+//   total_ustx: 1875230000000000
+// }
 ```
