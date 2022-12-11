@@ -146,6 +146,7 @@ const txOptions = {
   contractName: 'contract_name',
   functionName: 'contract_function',
   functionArgs: [bufferCVFromString('foo')],
+  fee: 0,
   senderKey: 'b244296d5907de9864c0b0d51f98a13c52890be0404e83f273144cd5b9960eed01',
   validateWithAbi: true,
   sponsored: true,
@@ -176,6 +177,7 @@ const sponsorOptions = {
   transaction: deserializedTx,
   sponsorPrivateKey: sponsorKey,
   fee,
+  sponsorNonce: 0,
 };
 
 const sponsoredTx = await sponsorTransaction(sponsorOptions);
