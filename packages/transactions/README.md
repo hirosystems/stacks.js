@@ -50,7 +50,8 @@ const txOptions = {
 const transaction = await makeSTXTokenTransfer(txOptions);
 
 // to see the raw serialized tx
-const serializedTx = transaction.serialize().toString('hex');
+const serializedTx = transaction.serialize(); // Uint8Array
+const serializedTxHex = bytesToHex(serializedTx); // hex string
 
 // broadcasting transaction to the specified network
 const broadcastResponse = await broadcastTransaction(transaction);
@@ -139,6 +140,7 @@ const abi: ClarityAbi = JSON.parse(readFileSync('abi.json').toString());
 To generate a sponsored transaction, first create and sign the transaction as the origin. The `sponsored` property in the options object must be set to true.
 
 ```typescript
+import { bytesToHex } from '@stacks/common';
 import { makeContractCall, BufferCV, AnchorMode, bufferCVFromString } from '@stacks/transactions';
 
 const txOptions = {
@@ -154,7 +156,7 @@ const txOptions = {
 };
 
 const transaction = await makeContractCall(txOptions);
-const serializedTx = transaction.serialize().toString('hex');
+const serializedTx = bytesToHex(transaction.serialize());
 ```
 
 The serialized transaction can now be passed to the sponsoring party which will sign the sponsor portion of the transaction and set the fee.

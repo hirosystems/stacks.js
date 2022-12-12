@@ -44,7 +44,7 @@ console.log(result); // true
 ### `encryptMnemonic` and `decryptMnemonic`
 
 ```typescript
-import { hexToBytes } from '@stacks/common';
+import { bytesToHex, hexToBytes } from '@stacks/common';
 import { encryptMnemonic, decryptMnemonic } from '@stacks/encryption';
 
 const rawPhrase = 'march eager husband pilot waste rely exclude taste twist donkey actress scene';
@@ -55,7 +55,7 @@ const mockSalt = hexToBytes('ff'.repeat(16));
 const encoded = await encryptMnemonic(rawPhrase, rawPassword, { getRandomBytes: () => mockSalt });
 
 // Decrypt an encrypted mnemonic phrase with a password
-const decoded = await decryptMnemonic(encoded.toString('hex'), rawPassword);
+const decoded = await decryptMnemonic(bytesToHex(encoded), rawPassword);
 
 console.log(decoded);
 ```
