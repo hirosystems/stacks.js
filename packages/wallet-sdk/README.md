@@ -120,12 +120,16 @@ interface Wallet {
 
 Accounts allow users to use separate Stacks addresses from within the same wallet. Each account has it's own Stacks address and balance. When a user logs into an app, they choose a specific account.
 
-When using `generateNewAccount`, the new account is created with next index, based on the existing accounts in a wallet. For example, if a wallet has 5 accounts, calling `generateNewAccount` will make the sixth account.
+When using `generateNewAccount`, the new account is created with next index, based on the existing accounts in a wallet. For example, if a wallet has 5 accounts, calling `generateNewAccount` will make the sixth account. The `generateNewAccount` treats as the input wallet as immutable. It returns a new wallet object with all available accounts (based on the input wallet object and the additional generated account).
 
 ```typescript
-import { generateNewAccount } from '@stacks/wallet-sdk';
+import { generateWallet, generateNewAccount } from '@stacks/wallet-sdk';
 
-const account = generateNewAccount(wallet);
+let wallet = await generateWallet({
+  secretKey,
+  password,
+});
+wallet = generateNewAccount(wallet); // adds a new account to an existing wallet object, immutable, NOT in-place
 ```
 
 An `Account` is a JavaScript object with these properties:
