@@ -1,8 +1,6 @@
-/* eslint-disable node/prefer-global/buffer */
 import { bytesToHex } from '@stacks/common';
 import * as bitcoin from 'bitcoinjs-lib';
 import * as blockstack from 'blockstack';
-import cors from 'cors';
 import * as crypto from 'crypto';
 import * as fs from 'fs';
 import * as process from 'process';
@@ -43,7 +41,6 @@ import {
   TxBroadcastResult,
   validateContractCall,
 } from '@stacks/transactions';
-import express from 'express';
 import { prompt } from 'inquirer';
 import fetch from 'node-fetch';
 import * as path from 'path';
@@ -121,15 +118,16 @@ import {
   getAppPrivateKey,
   restoreWalletAccounts,
 } from '@stacks/wallet-sdk';
-import { handleAuth, handleSignIn } from './auth';
+
 import { getMaxIDSearchIndex, getPrivateKeyAddress, setMaxIDSearchIndex } from './common';
+
 // global CLI options
 let txOnly = false;
 let estimateOnly = false;
 let safetyChecks = true;
 let receiveFeesPeriod = 52595;
 let gracePeriod = 5000;
-let noExit = false;
+const noExit = false;
 
 let BLOCKSTACK_TEST = !!process.env.BLOCKSTACK_TEST;
 
@@ -1499,7 +1497,7 @@ function addressConvert(network: CLINetworkAdapter, args: string[]): Promise<str
   });
 }
 
-/*
+/**
  * Run an authentication daemon on a given port.
  * args:
  * @gaiaHubUrl (string) the write endpoint of your app Gaia hub, where app data will be stored
@@ -1508,49 +1506,10 @@ function addressConvert(network: CLINetworkAdapter, args: string[]): Promise<str
  * @profileGaiaHubUrl (string) the write endpoint of your profile Gaia hub, where your profile
  *   will be stored (optional)
  * @port (number) the port to listen on (optional)
+ * @deprecated
  */
-function authDaemon(network: CLINetworkAdapter, args: string[]): Promise<string> {
-  const gaiaHubUrl = args[0];
-  const mnemonicOrCiphertext = args[1];
-  let port = 3000; // default port
-  let profileGaiaHub = gaiaHubUrl;
-
-  if (args.length > 2 && !!args[2]) {
-    profileGaiaHub = args[2];
-  }
-
-  if (args.length > 3 && !!args[3]) {
-    port = parseInt(args[3]);
-  }
-
-  if (port < 0 || port > 65535) {
-    return Promise.resolve().then(() => JSONStringify({ error: 'Invalid port' }));
-  }
-
-  const mnemonicPromise = getBackupPhrase(mnemonicOrCiphertext);
-
-  return mnemonicPromise
-    .then((mnemonic: string) => {
-      noExit = true;
-
-      // load up all of our identity addresses, profiles, profile URLs, and Gaia connections
-      const authServer = express();
-      authServer.use(cors());
-
-      authServer.get(/^\/auth\/*$/, (req: express.Request, res: express.Response) => {
-        void handleAuth(network, mnemonic, gaiaHubUrl, profileGaiaHub, port, req, res);
-      });
-
-      authServer.get(/^\/signin\/*$/, (req: express.Request, res: express.Response) => {
-        void handleSignIn(network, mnemonic, gaiaHubUrl, profileGaiaHub, req, res);
-      });
-
-      authServer.listen(port, () => console.log(`Authentication server started on ${port}`));
-      return 'Press Ctrl+C to exit';
-    })
-    .catch((e: Error) => {
-      return JSONStringify({ error: e.message });
-    });
+function authDaemon(_network: CLINetworkAdapter, _args: string[]): Promise<string> {
+  throw new Error('The `authenticator` command was removed (last included in version 6.x.x)');
 }
 
 /*
