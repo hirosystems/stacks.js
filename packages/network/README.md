@@ -55,7 +55,7 @@ Some Stacks APIs make use API keys to provide less rate-limited plans.
 
 ```typescript
 import { createApiKeyMiddleware, createFetchFn, StacksMainnet } from '@stacks/network';
-import { broadcastResponse, getNonce, makeSTXTokenTransfer } from '@stacks/transactions';
+import { broadcastTransaction, getNonce, makeSTXTokenTransfer } from '@stacks/transactions';
 
 const myApiMiddleware = createApiKeyMiddleware('example_e8e044a3_41d8b0fe_3dd3988ef302');
 const myFetchFn = createFetchFn(myApiMiddleware); // middlewares can be used to create a new fetch function
@@ -71,7 +71,7 @@ const txOptions = {
 };
 const transaction = await makeSTXTokenTransfer(txOptions); // fee-estimation will use the custom fetchFn
 
-const response = await broadcastResponse(transaction, myMainnet); // make sure to broadcast via the custom network object
+const response = await broadcastTransaction(transaction, myMainnet); // make sure to broadcast via the custom network object
 
 // stacks.js functions, which take a StacksNetwork object will use the custom fetchFn
 const nonce = await getNonce('SP3FGQ8Z7JY9BWYZ5WM53E0M9NK7WHJF0691NZ159', myMainnet);
@@ -83,7 +83,7 @@ Middleware can be used to hook into network calls before sending a request or af
 
 ```typescript
 import { createFetchFn, RequestContext, ResponseContext, StacksTestnet } from '@stacks/network';
-import { broadcastResponse, getNonce, makeSTXTokenTransfer } from '@stacks/transactions';
+import { broadcastTransaction, getNonce, makeSTXTokenTransfer } from '@stacks/transactions';
 
 const preMiddleware = (ctx: RequestContext) => {
   ctx.init.headers = new Headers();
