@@ -270,7 +270,6 @@ const stackingStatus = await client.getStatus();
 // {
 //   stacked: true,
 //   details: {
-//     amount_microstx: '80000000000000',
 //     first_reward_cycle: 18,
 //     lock_period: 10,
 //     unlock_height: 3020,
