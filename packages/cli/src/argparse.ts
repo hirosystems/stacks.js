@@ -342,6 +342,7 @@ export const CLI_ARGS = {
         'If the command succeeds, it prints out a transaction ID.' +
         '\n' +
         'Example:\n' +
+        '\n' +
         '    $ export PAYMENT="bfeffdf57f29b0cc1fab9ea197bb1413da2561fe4b83e962c7f02fbbe2b1cd5401"\n' +
         '    $ stx call_contract_func SPBMRFRPPGCDE3F384WCJPK8PQJGZ8K9QKK7F59X contract_name' +
         '      contract_function 1 0 "$PAYMENT"\n' +
@@ -388,6 +389,7 @@ export const CLI_ARGS = {
         'If the command succeeds, it prints out a Clarity value.' +
         '\n' +
         'Example:\n' +
+        '\n' +
         '    $ stx call_read_only_contract_func SPBMRFRPPGCDE3F384WCJPK8PQJGZ8K9QKK7F59X contract_name' +
         '     contract_function SPBMRFRPPGCDE3F384WCJPK8PQJGZ8K9QKK7F59X\n' +
         '     {\n' +
@@ -524,6 +526,7 @@ export const CLI_ARGS = {
         'If the command succeeds, it prints out a transaction ID.' +
         '\n' +
         'Example:\n' +
+        '\n' +
         '    $ export PAYMENT="bfeffdf57f29b0cc1fab9ea197bb1413da2561fe4b83e962c7f02fbbe2b1cd5401"\n' +
         '    $ stx deploy_contract ./my_contract.clar my_contract 1 0 "$PAYMENT"\n' +
         '     {\n' +
