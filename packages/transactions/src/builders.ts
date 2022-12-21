@@ -34,6 +34,7 @@ import {
   ClarityVersion,
 } from './constants';
 import { ClarityAbi, validateContractCall } from './contract-abi';
+import { NoEstimateAvailableError } from './errors';
 import {
   createStacksPrivateKey,
   createStacksPublicKey,
@@ -100,7 +101,7 @@ export async function getNonce(
 }
 
 /**
- * @deprecated Use the new {@link estimateTransaction} function insterad.
+ * @deprecated Use the new {@link estimateTransaction} function instead.
  *
  * Estimate the total transaction fee in microstacks for a token transfer
  *
@@ -121,6 +122,17 @@ export async function estimateTransfer(
     );
   }
 
+  return estimateTransferUnsafe(transaction, network);
+}
+
+/**
+ * @deprecated Use the new {@link estimateTransaction} function instead.
+ * @internal
+ */
+export async function estimateTransferUnsafe(
+  transaction: StacksTransaction,
+  network?: StacksNetworkName | StacksNetwork
+): Promise<bigint> {
   const requestHeaders = {
     Accept: 'application/text',
   };
@@ -197,12 +209,14 @@ export async function estimateTransaction(
   const response = await derivedNetwork.fetchFn(url, options);
 
   if (!response.ok) {
-    let msg = '';
-    try {
-      msg = await response.text();
-    } catch (error) {}
+    const body = await response.json().catch(() => ({}));
+
+    if (body?.reason === 'NoEstimateAvailable') {
+      throw new NoEstimateAvailableError(body?.reason_data?.message ?? '');
+    }
+
     throw new Error(
-      `Error estimating transaction fee. Response ${response.status}: ${response.statusText}. Attempted to fetch ${url} and failed with the message: "${msg}"`
+      `Error estimating transaction fee. Response ${response.status}: ${response.statusText}. Attempted to fetch ${url} and failed with the message: "${body}"`
     );
   }
 
@@ -619,9 +633,8 @@ export async function makeUnsignedSTXTokenTransfer(
   );
 
   if (txOptions.fee === undefined || txOptions.fee === null) {
-    const estimatedLen = estimateTransactionByteLength(transaction);
-    const txFee = await estimateTransaction(payload, estimatedLen, options.network);
-    transaction.setFee(txFee[1].fee);
+    const fee = await estimateTransactionFeeWithFallback(transaction, network);
+    transaction.setFee(fee);
   }
 
   if (txOptions.nonce === undefined || txOptions.nonce === null) {
@@ -853,9 +866,8 @@ export async function makeUnsignedContractDeploy(
   );
 
   if (txOptions.fee === undefined || txOptions.fee === null) {
-    const estimatedLen = estimateTransactionByteLength(transaction);
-    const txFee = await estimateTransaction(payload, estimatedLen, options.network);
-    transaction.setFee(txFee[1].fee);
+    const fee = await estimateTransactionFeeWithFallback(transaction, network);
+    transaction.setFee(fee);
   }
 
   if (txOptions.nonce === undefined || txOptions.nonce === null) {
@@ -1061,9 +1073,8 @@ export async function makeUnsignedContractCall(
   );
 
   if (txOptions.fee === undefined || txOptions.fee === null) {
-    const estimatedLen = estimateTransactionByteLength(transaction);
-    const txFee = await estimateTransaction(payload, estimatedLen, network);
-    transaction.setFee(txFee[1].fee);
+    const fee = await estimateTransactionFeeWithFallback(transaction, network);
+    transaction.setFee(fee);
   }
 
   if (txOptions.nonce === undefined || txOptions.nonce === null) {
@@ -1474,5 +1485,25 @@ export function estimateTransactionByteLength(transaction: StacksTransaction): n
     // Single-sig transaction
     // Signature space already allocated by empty message signature
     return transaction.serialize().byteLength;
+  }
+}
+
+/**
+ * Estimates the fee using {@link estimateTransfer} as a fallback if
+ * {@link estimateTransaction} does not get an estimation due to the
+ * {@link NoEstimateAvailableError} error.
+ */
+export async function estimateTransactionFeeWithFallback(
+  transaction: StacksTransaction,
+  network: StacksNetwork
+): Promise<bigint | number> {
+  try {
+    const estimatedLen = estimateTransactionByteLength(transaction);
+    return (await estimateTransaction(transaction.payload, estimatedLen, network))[1].fee;
+  } catch (error) {
+    if (error instanceof NoEstimateAvailableError) {
+      return await estimateTransferUnsafe(transaction, network);
+    }
+    throw error;
   }
 }

@@ -23,6 +23,7 @@ import {
   callReadOnlyFunction,
   estimateTransaction,
   estimateTransactionByteLength,
+  estimateTransactionFeeWithFallback,
   getNonce,
   makeContractCall,
   makeContractDeploy,
@@ -43,7 +44,15 @@ import {
   TxBroadcastResultRejected,
 } from '../src/builders';
 import { BytesReader } from '../src/bytesReader';
-import { bufferCV, bufferCVFromString, serializeCV, standardPrincipalCV } from '../src/clarity';
+import {
+  bufferCV,
+  bufferCVFromString,
+  noneCV,
+  serializeCV,
+  standardPrincipalCV,
+  uintCV,
+} from '../src/clarity';
+import { principalCV } from '../src/clarity/types/principalCV';
 import { createMessageSignature } from '../src/common';
 import {
   AddressHashMode,
@@ -1132,6 +1141,59 @@ test('Estimate transaction transfer fee', async () => {
   );
   expect(resultEstimateFee.map(f => f.fee)).toEqual([140, 17, 125]);
   expect(resultEstimateFee2.map(f => f.fee)).toEqual([140, 17, 125]);
+});
+
+test('Estimate transaction fee fallback', async () => {
+  const privateKey = 'cb3df38053d132895220b9ce471f6b676db5b9bf0b4adefb55f2118ece2478df01';
+  const poolAddress = 'ST11NJTTKGVT6D1HY4NJRVQWMQM7TVAR091EJ8P2Y';
+  const network = new StacksTestnet({ url: 'http://localhost:3999' });
+
+  // http://localhost:3999/v2/fees/transaction
+  fetchMock.once(
+    `{"error":"Estimation could not be performed","reason":"NoEstimateAvailable","reason_data":{"message":"No estimate available for the provided payload."}}`,
+    { status: 400 }
+  );
+
+  // http://localhost:3999/v2/fees/transfer
+  fetchMock.once('1');
+
+  const tx = await makeContractCall({
+    senderKey: privateKey,
+    contractAddress: 'ST000000000000000000002AMW42H',
+    contractName: 'pox-2',
+    functionName: 'delegate-stx',
+    functionArgs: [uintCV(100_000), principalCV(poolAddress), noneCV(), noneCV()],
+    anchorMode: AnchorMode.OnChainOnly,
+    nonce: 1,
+    network,
+  });
+
+  // http://localhost:3999/v2/fees/transaction
+  fetchMock.once(
+    `{"error":"Estimation could not be performed","reason":"NoEstimateAvailable","reason_data":{"message":"No estimate available for the provided payload."}}`,
+    { status: 400 }
+  );
+
+  // http://localhost:3999/v2/fees/transfer
+  fetchMock.once('1');
+
+  const testnet = new StacksTestnet();
+  const resultEstimateFee = await estimateTransactionFeeWithFallback(tx, testnet);
+  expect(resultEstimateFee).toBe(201n);
+
+  // http://localhost:3999/v2/fees/transaction
+  fetchMock.once(
+    `{"error":"Estimation could not be performed","reason":"NoEstimateAvailable","reason_data":{"message":"No estimate available for the provided payload."}}`,
+    { status: 400 }
+  );
+
+  // http://localhost:3999/v2/fees/transfer
+  fetchMock.once('2'); // double
+
+  const doubleRate = await estimateTransactionFeeWithFallback(tx, testnet);
+  expect(doubleRate).toBe(402n);
+
+  expect(fetchMock.mock.calls.length).toEqual(6);
 });
 
 test('Single-sig transaction byte length must include signature', async () => {
