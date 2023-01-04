@@ -61,7 +61,7 @@
   "overrides": {
     "ajv": "6.12.3",
     "nth-check": "2.0.1",
-    "schema-inspector": "2.0.1",
+    "schema-inspector": "2.0.2",
     "socket.io-client": "4.5.3"
   },
   "repository": {

@@ -24,7 +24,7 @@
     "@stacks/network": "^6.1.0",
     "@stacks/transactions": "^6.1.0",
     "jsontokens": "^4.0.1",
-    "schema-inspector": "2.0.1",
+    "schema-inspector": "^2.0.2",
     "zone-file": "^2.0.0-beta.3"
   },
   "devDependencies": {
