@@ -3390,7 +3390,7 @@ export function checkArgs(argList: string[]): CheckArgsSuccessType | CheckArgsFa
     }
   }
 
-  const ajv = Ajv();
+  const ajv = new Ajv();
   const valid = ajv.validate(commandSchema, commandArgs);
   if (!valid) {
     let errorMsg = '';
