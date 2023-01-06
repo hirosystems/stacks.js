@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.1.0](https://github.com/hirosystems/stacks.js/compare/v6.0.2...v6.1.0) (2023-01-06)
+
+
+### Features
+
+* add estimation fallback ([782a3c3](https://github.com/hirosystems/stacks.js/commit/782a3c392969e8736a4d6c7c27d491bf2e35bac6))
+
+
+
 ## [6.0.2](https://github.com/hirosystems/stacks.js/compare/v6.0.1...v6.0.2) (2022-11-30)
 
 
