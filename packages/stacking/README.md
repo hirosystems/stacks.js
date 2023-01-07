@@ -458,7 +458,7 @@ const delegetateExtendResponses = await poolClient.delegateStackExtend({
 
 #### Increase delegated STX
 
-Increase the loacked amount of delegated STX stacked.
+Increase the locked amount of delegated STX stacked.
 
 ```typescript
 import { getNonce } from '@stacks/transactions';
