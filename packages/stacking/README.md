@@ -34,7 +34,7 @@ npm install @stacks/stacking
     - [Revoke delegation](#revoke-delegation)
   - [Operating a pool / Stacking for others](#operating-a-pool--stacking-for-others)
     - [Stack delegated STX](#stack-delegated-stx)
-    - [Extend delegated STX stacking](#extend-delegated-stx-stacking)
+    - [Extend delegated STX](#extend-delegated-stx)
     - [Increase delegated STX](#increase-delegated-stx)
     - [Commit to stacking](#commit-to-stacking)
     - [Increase existing commitment](#increase-existing-commitment)
@@ -371,7 +371,7 @@ Even a group of friends could stack together and share a multi-sig BTC wallet fo
 #### Stack delegated STX
 
 Stack STX, which have been previously delegated to the pool.
-This step only locks the funds.
+This step only locks the funds (partial stacking).
 The pool operator will also need to ["commit"](#commit-to-stacking) to a reward cycle.
 
 ```typescript
@@ -416,7 +416,7 @@ const delegetateStackResponses = await poolClient.delegateStackStx({
 // }
 ```
 
-#### Extend delegated STX stacking
+#### Extend delegated STX
 
 Extend stacking of STX previously delegated to the pool.
 
