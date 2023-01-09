@@ -720,10 +720,14 @@ describe('delegated stacking', () => {
     setApiMocks({
       ...MOCK_POX_2_REGTEST,
       '/v2/contracts/call-read/ST000000000000000000002AMW42H/pox-2/get-delegation-info': `{"okay":true,"result":"0x0a0c000000040b616d6f756e742d757374780100000000000000000006a9b192f37c000c64656c6567617465642d746f051aa8cf5b9a7d1a2a4305f78c92ba50040382484bd408706f782d616464720a0c0000000209686173686279746573020000001405cf52a44bf3e6829b4f8c221cc675355bf83b7d0776657273696f6e0200000001000d756e74696c2d6275726e2d68740a0100000000000000000000000000001eb4"}`,
+      '/v2/accounts/STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6?proof=0': `{"balance":"0x0000000000000000002386f26fc0fde0","locked":"0x00000000000000000000000000000000","unlock_height":0,"nonce":2}`,
     });
 
     status = await client.getDelegationStatus();
     expect(status.delegated).toBeTruthy();
+
+    const balanceLocked = await client.getAccountBalanceLocked();
+    expect(balanceLocked).toBe(0n); // no funds are locked yet, because the pool hasn't (partially) stacked yet
   });
 
   test('delegate stack, and delegator stack', async () => {
@@ -784,6 +788,9 @@ describe('delegated stacking', () => {
 
     stackingStatus = await client.getStatus();
     expect(stackingStatus.stacked).toBeTruthy();
+
+    const balanceLocked = await client.getAccountBalanceLocked();
+    expect(balanceLocked).toBeGreaterThan(0n); // now some of the users funds are locked in delegated (partial) stacking
   });
 
   test('delegate stack, delegator stack, and delegator extend stack', async () => {
