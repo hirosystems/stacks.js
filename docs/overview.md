@@ -16,6 +16,6 @@ All three of these integrations can be used together to create powerful new user
 
 While integration is possible for any type of app, the resources available here are for web developers experienced with JavaScript.
 
-<!-- import StacksjsStartersNote from '../includes/_stacks.js-starters-note.mdx';
+import StacksjsStartersNote from '../includes/stacks.js-starters-note.mdx';
 
-<StacksjsStartersNote/> -->
+<StacksjsStartersNote/>
