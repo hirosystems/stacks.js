@@ -46,9 +46,7 @@ npm install --save @stacks/stacking @stacks/network @stacks/transactions bn.js
 ```
 
 :::info
-
 See additional [Stacking library reference](https://github.com/blockstack/stacks.js/tree/master/packages/stacking)
-
 :::
 
 ## Step 2: Delegate STX tokens
@@ -100,9 +98,7 @@ const delegetateResponse = await client.delegateStx({
 This method calls the [`delegate-stx`](https://docs.stacks.co/references/stacking-contract#delegate-stx) method of the Stacking contract. Note, that the amount can be higher or lower than the current account balance. Delegation does not yet lock the STX tokens, users can still transfer them.
 
 :::tip
-
 To avoid handling private keys, it is recommended to use the [Stacks Wallet](https://www.hiro.so/wallet) to sign the delegation transaction
-
 :::
 
 **Congratulations!** With the completion of this step, you successfully learnt how to use the Stacking library to delegate STX tokens as an account holder.
@@ -124,9 +120,7 @@ const revokeResponse = await client.revokeDelegateStx(privateKey);
 This method calls the [`revoke-delegate-stx`](https://docs.stacks.co/references/stacking-contract#revoke-delegate-stx) method of the Stacking contract.
 
 :::tip
-
 To avoid handling private keys, it is recommended to use the [Stacks Wallet](https://www.hiro.so/wallet) to sign the revoke transaction
-
 :::
 
 ## Step 3: Stack delegated STX tokens
@@ -176,9 +170,7 @@ This function calls the [`delegate-stack-stx`](https://docs.stacks.co/references
 The delegator must call this method multiple times (for all stackers), until enough tokens are locked up to participate in Stacking. This is the first part of delegated stacking for the delegator.
 
 :::info
-
 Reward slots are assigned based on the number of STX tokens locked up for a specific Bitcoin reward address
-
 :::
 
 ## Step 4: Commit to Stacking

@@ -35,9 +35,7 @@ Gaia serves as a key-value store in which data is saved and retrieved as files t
 The default Gaia hub for users who authenticate to apps with [the Stacks Wallet](https://www.hiro.so/wallet/install-web) is run by Hiro PBC at `https://gaia.blockstack.org/`. It supports files up to 25 megabytes in size.
 
 :::tip
-
 Hiro recommends breaking data instances greater than 25 MB into several files, saving them individually, and recomposing them on retrieval.
-
 :::
 
 These files can comprise any type of data such as text, image, video or binary.
@@ -80,9 +78,7 @@ Whereas saving privately encrypted data is possible for all authenticated apps w
 The `putFile` method returns the URL where the the file can be retrieved from the user's Gaia hub, as used here to set the value of `fileUrl`.
 
 :::info
-
 You'll need to save an entirely new string of modified data using `putFile` with the same `fileName` every time you want to update a record. There is no separate update method.
-
 :::
 
 ## Get data for session user
@@ -170,8 +166,5 @@ storage.deleteFile(fileName).then(() => {
 ```
 
 :::info
-
 Apps can save and delete data only for the active session user.
-
 :::
-

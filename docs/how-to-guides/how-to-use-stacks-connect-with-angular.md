@@ -4,11 +4,9 @@ title: Angular Authenticator
 
 In this tutorial, you'll learn how to work with Stacks Connect when using [Angular](https://angular.io/) as your framework of choice. It builds on what you've learnt in the [Authentication Overview](/build-apps/authentication).
 
->  **_NOTE:_**
-
-> This article presumes some familiarity with [Angular](https://angular.io/), as well as [Reactive Extensions (RxJS)](https://rxjs.dev/).
-
-
+:::note
+This article presumes some familiarity with [Angular](https://angular.io/), as well as [Reactive Extensions (RxJS)](https://rxjs.dev/).
+:::
 
 ### Prerequisites
 
@@ -42,9 +40,7 @@ npm install --save @stacks/connect blockstack
 ```
 
 :::info
-
 We're also installing the `blockstack` package, as it's a [peer dependency](https://docs.npmjs.com/cli/v7/configuring-npm/package-json#peerdependencies) of Stacks Connect
-
 :::
 
 ## Step 3: Declare missing globals
@@ -52,9 +48,7 @@ We're also installing the `blockstack` package, as it's a [peer dependency](http
 Some dependencies of these packages were written for a Nodejs environment. In a browser environment, tools such as Webpack (v4) often abstract the polyfilling of Nodejs specific APIs. Using the Angular CLI, this must be done manually.
 
 :::info
-
 `Buffer`, for example, is a global class in a Nodejs environment. In the browser is it `undefined` so we must declare it to avoid runtime exceptions
-
 :::
 
 Add the following snippet to your `src/polyfills.ts`
@@ -62,10 +56,10 @@ Add the following snippet to your `src/polyfills.ts`
 ```typescript
 (window as any).global = window;
 (window as any).process = {
-  version: "",
+  version: '',
   env: {},
 };
-global.Buffer = require("buffer").Buffer;
+global.Buffer = require('buffer').Buffer;
 ```
 
 This does 3 things:
@@ -91,10 +85,10 @@ Enter the name: `stacks-sign-in-button`. You'll find the newly generated compone
 Here's our Sign In button component. Let's replace this example with the following code.
 
 ```typescript
-import { Component, OnInit, Output, EventEmitter } from "@angular/core";
+import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 
 @Component({
-  selector: "app-stacks-sign-in-button",
+  selector: 'app-stacks-sign-in-button',
   template: ` <button (click)="onSignIn.emit()">Sign In</button> `,
 })
 export class StacksSignInButtonComponent {
@@ -108,7 +102,7 @@ Let's add this button to our `app-root` component (`app.component.ts`) and wire 
 
 ```typescript
 @Component({
-  selector: "app-root",
+  selector: 'app-root',
   template: `<app-stacks-sign-in-button
     (onSignIn)="stacksAuth$.next()"
   ></app-stacks-sign-in-button>`,
@@ -125,17 +119,15 @@ Here we're using an Rxjs `Subject` to represent a stream of sign in events. `sta
 First, describe the auth options we need to pass to Connect. [Learn more about `AuthOptions` here](/build-apps/authentication). Let's modify the default component to look like this:
 
 ```typescript
-import { Component } from "@angular/core";
-import { AuthOptions, FinishedData } from "@stacks/connect";
-import { ReplaySubject, Subject } from "rxjs";
-import { switchMap } from "rxjs/operators";
+import { Component } from '@angular/core';
+import { AuthOptions, FinishedData } from '@stacks/connect';
+import { ReplaySubject, Subject } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
 
 @Component({
-  selector: "app-root",
+  selector: 'app-root',
   template: `
-    <app-stacks-sign-in-button
-      (onSignIn)="stacksAuth$.next()"
-    ></app-stacks-sign-in-button>
+    <app-stacks-sign-in-button (onSignIn)="stacksAuth$.next()"></app-stacks-sign-in-button>
     <code>
       <pre>{{ authResponse$ | async | json }}</pre>
     </code>
@@ -146,19 +138,17 @@ export class AppComponent {
   authResponse$ = new ReplaySubject<FinishedData>(1);
 
   authOptions: AuthOptions = {
-    finished: (response) => this.authResponse$.next(response),
+    finished: response => this.authResponse$.next(response),
     appDetails: {
-      name: "Angular Stacks Connect Demo",
-      icon: "http://placekitten.com/g/100/100",
+      name: 'Angular Stacks Connect Demo',
+      icon: 'http://placekitten.com/g/100/100',
     },
   };
 
   ngOnInit() {
     this.stacksAuth$
-      .pipe(switchMap(() => import("@stacks/connect")))
-      .subscribe((connectLibrary) =>
-        connectLibrary.showBlockstackConnect(this.authOptions)
-      );
+      .pipe(switchMap(() => import('@stacks/connect')))
+      .subscribe(connectLibrary => connectLibrary.showBlockstackConnect(this.authOptions));
   }
 }
 ```
@@ -166,9 +156,7 @@ export class AppComponent {
 Let's run through what's going on. In the `authOptions` field, we're using the `finished` handler to emit a value to the `authResponse$` which uses a `ReplaySubject` to persist the latest response.
 
 :::info
-
 A [`ReplaySubject`](https://rxjs.dev/api/index/class/ReplaySubject) is an Observable that starts without an initial value, but replays the latest x emissions when subscribed to
-
 :::
 
 For initial load performance, we're using `import("@stacks/connect")` to only load the Stacks Connect library when it's needed. The `switchMap` operators "switches" out the `stacksAuth$` event for the library.
@@ -202,10 +190,10 @@ Let's add a `loading` input to the `StacksSignInButtonComponent` component.
 
 ```typescript highlight=3,6
 @Component({
-  selector: "app-stacks-sign-in-button",
+  selector: 'app-stacks-sign-in-button',
   template: `
     <button (click)="onSignIn.emit()">
-      {{ loading ? "Loading" : "Sign in" }}
+      {{ loading ? 'Loading' : 'Sign in' }}
     </button>
   `,
 })
