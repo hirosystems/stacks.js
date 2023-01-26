@@ -27,7 +27,13 @@ import {
 
 import { ListCV, listCV } from './types/listCV';
 import { TupleCV, tupleCV } from './types/tupleCV';
-import { StringAsciiCV, StringUtf8CV, stringUtf8CV, stringAsciiCV, stringCV } from './types/stringCV';
+import {
+  StringAsciiCV,
+  StringUtf8CV,
+  stringUtf8CV,
+  stringAsciiCV,
+  stringCV,
+} from './types/stringCV';
 import { serializeCV } from './serialize';
 import deserializeCV from './deserialize';
 
