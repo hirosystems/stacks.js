@@ -20,7 +20,7 @@
     "typecheck:watch": "npm run typecheck -- --watch"
   },
   "dependencies": {
-    "@scure/base": "^1.1.1",
+    "@scure/base": "1.1.1",
     "@stacks/common": "^6.0.0",
     "@stacks/encryption": "^6.1.0",
     "@stacks/network": "^6.1.0",
