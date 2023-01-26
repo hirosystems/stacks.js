@@ -46,4 +46,22 @@ const trueCV = (): BooleanCV => ({ type: ClarityType.BoolTrue });
  */
 const falseCV = (): BooleanCV => ({ type: ClarityType.BoolFalse });
 
-export { BooleanCV, TrueCV, FalseCV, trueCV, falseCV };
+/**
+ * Converts a boolean to BooleanCV clarity type
+ *
+ * @returns {BooleanCV} returns instance of type BooleanCV
+ *
+ * @example
+ * ```
+ *  import { boolCV } from '@stacks/transactions';
+ *
+ *  const boolCV = boolCV(false);
+ *  // { type: 4 }
+ * ```
+ *
+ * @visit
+ * {@link https://github.com/hirosystems/stacks.js/blob/master/packages/transactions/tests/clarity.test.ts clarity test cases for more examples}
+ */
+const boolCV = (bool: boolean) => (bool ? trueCV() : falseCV());
+
+export { BooleanCV, TrueCV, FalseCV, boolCV, trueCV, falseCV };
