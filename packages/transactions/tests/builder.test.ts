@@ -57,6 +57,7 @@ import { createMessageSignature } from '../src/common';
 import {
   AddressHashMode,
   AnchorMode,
+  AnchorModeName,
   AuthType,
   ClarityVersion,
   DEFAULT_CORE_NODE_API_URL,
@@ -122,6 +123,45 @@ test('API key middleware - get nonce', async () => {
   expect(callHeaders.has('x-api-key')).toBeTruthy();
   expect(callHeaders.get('x-api-key')).toBe(apiKey);
 });
+
+const anchorModeNameCases: [AnchorModeName | AnchorMode, AnchorMode | null][] = [
+  ['onChainOnly', AnchorMode.OnChainOnly],
+  ['offChainOnly', AnchorMode.OffChainOnly],
+  ['any', AnchorMode.Any],
+  [AnchorMode.OnChainOnly, AnchorMode.OnChainOnly],
+  [AnchorMode.OffChainOnly, AnchorMode.OffChainOnly],
+  [AnchorMode.Any, AnchorMode.Any],
+  ['invalid' as AnchorModeName, null],
+  [0x20 as AnchorMode, null],
+];
+
+test.each(anchorModeNameCases)(
+  'Build transaction with AnchorMode name %p',
+  async (anchorModeName, anchorModeValue) => {
+    const recipient = standardPrincipalCV('SP3FGQ8Z7JY9BWYZ5WM53E0M9NK7WHJF0691NZ159');
+    const amount = 12345;
+    const fee = 0;
+    const nonce = 0;
+    const senderKey = 'edf9aee84d9b7abc145504dde6726c64f369d37ee34ded868fabd876c26570bc01';
+    const memo = 'test memo';
+    const txOptions: SignedTokenTransferOptions = {
+      recipient,
+      amount,
+      senderKey,
+      fee,
+      nonce,
+      memo,
+      anchorMode: anchorModeName,
+    };
+    if (anchorModeValue === null) {
+      expect.assertions(1);
+      await expect(makeSTXTokenTransfer(txOptions)).rejects.toThrow(/Invalid anchor mode/);
+    } else {
+      const transaction = await makeSTXTokenTransfer(txOptions);
+      expect(transaction.anchorMode).toBe(anchorModeValue);
+    }
+  }
+);
 
 test('Make STX token transfer with set tx fee', async () => {
   const recipient = standardPrincipalCV('SP3FGQ8Z7JY9BWYZ5WM53E0M9NK7WHJF0691NZ159');

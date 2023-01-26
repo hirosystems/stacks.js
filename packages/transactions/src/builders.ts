@@ -32,6 +32,7 @@ import {
   RECOVERABLE_ECDSA_SIG_LENGTH_BYTES,
   StacksMessageType,
   ClarityVersion,
+  AnchorModeName,
 } from './constants';
 import { ClarityAbi, validateContractCall } from './contract-abi';
 import { NoEstimateAvailableError } from './errors';
@@ -528,7 +529,7 @@ export interface TokenTransferOptions {
   network?: StacksNetworkName | StacksNetwork;
   /** the transaction anchorMode, which specifies whether it should be
    * included in an anchor block or a microblock */
-  anchorMode: AnchorMode;
+  anchorMode: AnchorModeName | AnchorMode;
   /** an arbitrary string to include in the transaction, must be less than 34 bytes */
   memo?: string;
   /** the post condition mode, specifying whether or not post-conditions must fully cover all
@@ -710,7 +711,7 @@ export interface BaseContractDeployOptions {
   network?: StacksNetworkName | StacksNetwork;
   /** the transaction anchorMode, which specifies whether it should be
    * included in an anchor block or a microblock */
-  anchorMode: AnchorMode;
+  anchorMode: AnchorModeName | AnchorMode;
   /** the post condition mode, specifying whether or not post-conditions must fully cover all
    * transfered assets */
   postConditionMode?: PostConditionMode;
@@ -901,7 +902,7 @@ export interface ContractCallOptions {
   network?: StacksNetworkName | StacksNetwork;
   /** the transaction anchorMode, which specifies whether it should be
    * included in an anchor block or a microblock */
-  anchorMode: AnchorMode;
+  anchorMode: AnchorModeName | AnchorMode;
   /** the post condition mode, specifying whether or not post-conditions must fully cover all
    * transfered assets */
   postConditionMode?: PostConditionMode;
