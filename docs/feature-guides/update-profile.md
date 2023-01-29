@@ -1,7 +1,10 @@
 ---
 title: Update User Profile
 ---
+import StacksjsStartersNote from '../includes/stacks.js-starters-note.mdx';
 import StacksProviderSection from '../includes/connect-stacks-provider-section.mdx';
+
+<StacksjsStartersNote/>
 
 This guide explains how to change the universal profile of an authenticated user.
 
@@ -12,9 +15,7 @@ only a public key. It can be extended to contain personal information like an av
 Hiro provides a hosting services for storage hubs. Learn about hosting a storage hub at [this tutorial](https://docs.hiro.so/tutorials/gaia-amazon-deploy).
 :::
 
-For users with BNS names, the profile can be read by any user using 
-the [`stacks.js`](https://github.com/hirosystems/stacks.js) [`lookupProfile`](https://stacks.js.org/functions/_stacks_auth.lookupProfile) method.
-This extended profile can be used by any application to show a personalized user card
+For users with BNS names, the profile can be read by any user. This extended profile can be used by any application to show a personalized user card
 like this:
 
 ![image](https://user-images.githubusercontent.com/1449049/215344771-455d3345-b890-49d0-9cfa-fd1f92bf5b1e.png)
@@ -42,7 +43,7 @@ See the [authentication guide](https://docs.hiro.so/build-apps/authentication) b
 
 ## Prompt to update the profile
 
-After the user chose the content of the profile, create a `PublicPersonProfile` object from this data and call the `openProfileUpdateRequestPopup` function provided by the `connect`  package to trigger the display of the profile update prompt.
+After the user chose the content of the profile, create a `PublicPersonProfile` object from that data and call the `openProfileUpdateRequestPopup` function provided by the `connect`  package to trigger the display of the profile update prompt.
 
 ```tsx
 import { openProfileUpdateRequestPopup } from '@stacks/connect';
@@ -65,7 +66,7 @@ openProfileUpdateRequestPopup({
 });
 ```
 
-Several parameters are available for calling `openProfileUpdateRequestPopup`. Here's the exact interface for them:
+Several parameters are available for calling `openProfileUpdateRequestPopup`. Here is the exact interface for them:
 ```tsx
 interface ProfileUpdateRequestOptions {
   profile: PublicPersonProfile;
@@ -83,9 +84,74 @@ interface ProfileUpdateRequestOptions {
 
 After the profile was updated, the user can share the profile with other users. 
 
-## Verify a Public Profile
+## Lookup a Public Profile
 
+The public profile for a given BNS name can be looked up using
+the [`stacks.js`](https://github.com/hirosystems/stacks.js) [`lookupProfile`](https://stacks.js.org/functions/_stacks_auth.lookupProfile) method.
 
+The functions takes an object of type `ProfileLookupOptions`
+
+```tsx
+export interface ProfileLookupOptions {
+  username: string;
+  zoneFileLookupURL?: string;
+  network?: StacksNetworkName | StacksNetwork;
+}
+```
+
+The function returns a promise with the data of the public profile if the data could be retrieved from the BNS name owner's storage and if the retrieved JSON token was sucessfully verified.
+
+The recommended schema for the profile is as follows:
+```tsx
+export interface PublicPersonProfile extends PublicProfileBase {
+  '@type': 'Person';
+  name?: string;
+  givenName?: string;
+  familyName?: string;
+  description?: string;
+  image?: {'@type': 'ImageObject';
+    name?: string;
+    contentUrl?: string;
+    [k: string]: unknown;
+  }[];
+  website?: {
+    '@type'?: string;
+    url?: string;
+    [k: string]: unknown;
+  }[];
+  account?: {
+    '@type'?: string;
+    service?: string;
+    identifier?: string;
+    proofType?: string;
+    proofUrl?: string;
+    proofMessage?: string;
+    proofSignature?: string;
+    [k: string]: unknown;
+  }[];
+  worksFor?: {
+    '@type'?: string;
+    '@id'?: string;
+    [k: string]: unknown;
+  }[];
+  knows?: {
+    '@type'?: string;
+    '@id'?: string;
+    [k: string]: unknown;
+  }[];
+  address?: {
+    '@type'?: string;
+    streetAddress?: string;
+    addressLocality?: string;
+    postalCode?: string;
+    addressCountry?: string;
+    [k: string]: unknown;
+  };
+  birthDate?: string;
+  taxID?: string;
+  [k: string]: unknown;
+}
+```
 ## Usage in React Apps
 
 Import the `useConnect` helper from [`connect-react`](https://github.com/hirosystems/connect) package to update profiles more seamlessly with React apps.
@@ -105,12 +171,12 @@ const MyComponent = () => {
 
   const onClick = async () => {
     const options = {
-      /** See examples above */
+      /** See description above */
     };
     await doProfileUpdate(options);
   };
 
-  return <span onClick={onClick}>Sign message</span>;
+  return <span onClick={onClick}>Update Profile</span>;
 };
 ```
 
@@ -145,4 +211,4 @@ interface ProfileUpdatePayload {
 After the user confirms the update, a `profileUpdateResponse` payload of type `PublicProfile` is sent back to your app. It contains the updated profile as confirmed by the user. Note, that this profile can be different to the requested profile by the app because the user might have modified the profile in the wallet before confirming the changes.
 
 
-<StacksProviderSection />
+<StacksProviderSection/>

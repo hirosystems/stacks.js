@@ -3,6 +3,7 @@ title: Sign Messages
 ---
 
 import StacksjsStartersNote from '../includes/stacks.js-starters-note.mdx';
+import StacksProviderSection from '../includes/connect-stacks-provider-section.mdx';
 
 <StacksjsStartersNote/>
 
@@ -203,46 +204,4 @@ interface SignatureData {
 }
 ```
 
-## StacksProvider injected variable
-
-When users have the [Hiro Wallet](https://www.hiro.so/wallet/install-web) extension installed, the extension will inject a global `StacksProvider` variable into the JavaScript context of your web app. This allows your JavaScript code to hook into the extension, and make authentication, transaction and signature requests. `@stacks/connect` automatically detects and uses this global variable for you.
-
-At the moment, only the Hiro Wallet extension includes a `StacksProvider`, however, ideally more wallets (and mobile wallets) will support this format, so that your app can be compatible with any Stacks wallet that has functionality to embed web applications.
-
-In your web application, you can check to see if the user has a compatible wallet installed by checking for the presence of `window.StacksProvider`.
-
-Here is the interface for the `StacksProvider` variable.
-
-```ts
-interface StacksProvider {
-  /** @deprecated */
-  getURL: () => Promise<string>;
-  /**
-   * Make a transaction request
-   *
-   * @param payload - a JSON web token representing a transaction request
-   */
-  transactionRequest(payload: string): Promise<FinishedTxPayload | SponsoredFinishedTxPayload>;
-  /**
-   * Make an authentication request
-   *
-   * @param payload - a JSON web token representing an auth request
-   *
-   * @returns an authResponse string in the form of a JSON web token
-   */
-  authenticationRequest(payload: string): Promise<string>;
-  signatureRequest(payload: string): Promise<SignatureData>;
-  getProductInfo:
-    | undefined
-    | (() => {
-        version: string;
-        name: string;
-        meta?: {
-          tag?: string;
-          commit?: string;
-          [key: string]: any;
-        };
-        [key: string]: any;
-      });
-}
-```
+<StacksProviderSection/>
