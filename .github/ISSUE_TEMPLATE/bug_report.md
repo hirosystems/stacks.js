@@ -1,47 +1,30 @@
 ---
 name: Bug report
 about: Create a report to help us improve
+labels: 'bug'
 title: ''
-labels: ''
 assignees: ''
 ---
 
-**Describe the bug**
-A clear and concise description of what the bug is.
+### What version of Stacks.js are you using?
 
-**What version of Stacks.js are you using?**
+<!-- Check if you're using the latest release, and if not let us know which version you are on -->
 
-**Is the bug present in the Stacks.js CLI, Gaia hub, Connect or Blockstack Browser?**
+### Describe the bug
 
-**To Reproduce**
-Steps to reproduce the behavior:
+<!-- Please describe the problem in detail -->
 
-1. Go to '...'
-2. Click on '....'
-3. Scroll down to '....'
-4. See error
+#### How to reproduce
 
-**Expected behavior**
-A clear and concise description of what you expected to happen.
+<!-- Help us reproduce the bug, e.g. with a CodeSandbox or example repository showing the problem -->
 
-**Screenshots**
-If applicable, add screenshots to help explain your problem.
+#### Expected behavior
 
-**Console log**
-If applicable, add console log to help explain your problem.
+<!-- If it's unclear, what should be happening instead? -->
 
-**Desktop (please complete the following information):**
+### Additional context
 
-- OS: [e.g. iOS]
-- Browser [e.g. chrome, safari]
-- Version [e.g. 22]
+- Desktop/Smartphone OS: <!-- e.g. Windows 10, iOS 13.1 -->
+- Browser <!-- e.g. Chrome 76, Safari 12 -->
 
-**Smartphone (please complete the following information):**
-
-- Device: [e.g. iPhone6]
-- OS: [e.g. iOS8.1]
-- Browser [e.g. stock browser, safari]
-- Version [e.g. 22]
-
-**Additional context**
-Add any other context about the problem here.
+<!-- If applicable, add console logs, screenshots, or anything else to help explain the problem -->
