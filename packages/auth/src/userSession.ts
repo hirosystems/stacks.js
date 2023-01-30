@@ -23,7 +23,7 @@ import {
 } from '@stacks/common';
 import { extractProfile } from '@stacks/profile';
 import { AuthScope, DEFAULT_PROFILE } from './constants';
-import * as queryString from 'query-string';
+
 import { UserData } from './userData';
 import { createFetchFn, FetchFn, StacksMainnet } from '@stacks/network';
 import { protocolEchoReplyDetection } from './protocolEchoDetection';
@@ -162,11 +162,9 @@ export class UserSession {
       throwIfUnavailable: true,
       usageDesc: 'getAuthResponseToken',
     })?.search;
-    if (search) {
-      const queryDict = queryString.parse(search);
-      return queryDict.authResponse ? (queryDict.authResponse as string) : '';
-    }
-    return '';
+
+    const params = new URLSearchParams(search);
+    return params.get('authResponse') ?? '';
   }
 
   /**
