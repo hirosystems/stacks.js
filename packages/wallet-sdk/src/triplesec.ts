@@ -1,4 +1,3 @@
-/* eslint-disable node/prefer-global/buffer */
 import * as triplesec from 'triplesec';
 
 export function triplesecDecrypt(

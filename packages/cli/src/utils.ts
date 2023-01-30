@@ -1,4 +1,3 @@
-/* eslint-disable node/prefer-global/buffer */
 import * as logger from 'winston';
 import * as bitcoinjs from 'bitcoinjs-lib';
 import * as readline from 'readline';

@@ -11,7 +11,7 @@ export interface NetworkConfig {
 }
 
 export const StacksNetworks = ['mainnet', 'testnet'] as const;
-export type StacksNetworkName = typeof StacksNetworks[number];
+export type StacksNetworkName = (typeof StacksNetworks)[number];
 
 /**
  * @related {@link StacksMainnet}, {@link StacksTestnet}, {@link StacksMocknet}
