@@ -1,6 +1,6 @@
 {
   "name": "@stacks/network",
-  "version": "6.1.0",
+  "version": "6.1.1",
   "description": "Library for Stacks network operations",
   "license": "MIT",
   "author": "Hiro Systems PBC (https://hiro.so)",
