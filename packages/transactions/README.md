@@ -435,7 +435,8 @@ const postConditionCode = FungibleConditionCode.GreaterEqual;
 const postConditionAmount = 12345n;
 const assetAddress = 'SP62M8MEFH32WGSB7XSF9WJZD7TQB48VQB5ANWSJ';
 const assetContractName = 'test-asset-contract';
-const fungibleAssetInfo = createAssetInfo(assetAddress, assetContractName);
+const assetName = 'test-token';
+const fungibleAssetInfo = createAssetInfo(assetAddress, assetContractName, assetName);
 
 const standardFungiblePostCondition = makeStandardFungiblePostCondition(
   postConditionAddress,
@@ -449,7 +450,8 @@ const contractAddress = 'SPBMRFRPPGCDE3F384WCJPK8PQJGZ8K9QKK7F59X';
 const contractName = 'test-contract';
 const assetAddress = 'SP62M8MEFH32WGSB7XSF9WJZD7TQB48VQB5ANWSJ';
 const assetContractName = 'test-asset-contract';
-const fungibleAssetInfo = createAssetInfo(assetAddress, assetContractName);
+const assetName = 'test-token';
+const fungibleAssetInfo = createAssetInfo(assetAddress, assetContractName, assetName);
 
 const contractFungiblePostCondition = makeContractFungiblePostCondition(
   contractAddress,
