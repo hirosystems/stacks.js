@@ -38,7 +38,7 @@ test('makeAuthRequest && verifyAuthRequest', async () => {
   const appConfig = new AppConfig(['store_write'], 'http://localhost:3000');
   const blockstack = new UserSession({ appConfig });
 
-  const authRequest = blockstack.makeAuthRequest(privateKey);
+  const authRequest = blockstack.makeAuthRequestToken(privateKey);
   expect(authRequest).toBeTruthy();
 
   const decodedToken = decodeToken(authRequest);
@@ -92,7 +92,7 @@ test('make and verify auth request with extraParams', async () => {
   const appConfig = new AppConfig(['store_write'], 'http://localhost:3000');
   const blockstack = new UserSession({ appConfig });
 
-  const authRequest = blockstack.makeAuthRequest(
+  const authRequest = blockstack.makeAuthRequestToken(
     privateKey,
     undefined,
     undefined,
@@ -117,7 +117,7 @@ test('invalid auth request - signature not verified', async () => {
   const appConfig = new AppConfig(['store_write'], 'http://localhost:3000');
   const blockstack = new UserSession({ appConfig });
 
-  const authRequest = blockstack.makeAuthRequest(privateKey);
+  const authRequest = blockstack.makeAuthRequestToken(privateKey);
   const invalidAuthRequest = authRequest.substring(0, authRequest.length - 1);
 
   expect(doSignaturesMatchPublicKeys(invalidAuthRequest)).toEqual(false);
@@ -140,7 +140,7 @@ test('invalid auth request - invalid redirect uri', async () => {
   appConfig.redirectURI = () => 'https://example.com'; // monkey patch for test
   const blockstack = new UserSession({ appConfig });
 
-  const invalidAuthRequest = blockstack.makeAuthRequest(privateKey);
+  const invalidAuthRequest = blockstack.makeAuthRequestToken(privateKey);
   expect(isRedirectUriValid(invalidAuthRequest)).toBe(false);
 
   await verifyAuthRequest(invalidAuthRequest).then(verified => {
@@ -159,7 +159,7 @@ test('invalid auth request - invalid manifest uri', async () => {
   const appConfig = new AppConfig(['store_write'], 'http://localhost:3000');
   appConfig.manifestURI = () => 'https://example.com/manifest.json'; // monkey patch for test
   const blockstack = new UserSession({ appConfig });
-  const invalidAuthRequest = blockstack.makeAuthRequest(privateKey);
+  const invalidAuthRequest = blockstack.makeAuthRequestToken(privateKey);
 
   expect(isManifestUriValid(invalidAuthRequest)).toBe(false);
 

@@ -106,9 +106,9 @@ export class UserSession {
    * pass options that aren't part of the Blockstack authentication specification,
    * but might be supported by special authenticators.
    *
-   * @returns {String} the authentication request
+   * @returns {String} the authentication request token
    */
-  makeAuthRequest(
+  makeAuthRequestToken(
     transitKey?: string,
     redirectURI?: string,
     manifestURI?: string,
@@ -126,7 +126,7 @@ export class UserSession {
     manifestURI = manifestURI || appConfig.manifestURI();
     scopes = scopes || appConfig.scopes;
     appDomain = appDomain || appConfig.appDomain;
-    return authMessages.makeAuthRequest(
+    return authMessages.makeAuthRequestToken(
       transitKey,
       redirectURI,
       manifestURI,
@@ -403,3 +403,14 @@ export class UserSession {
     }
   }
 }
+
+// Add method aliases for backwards compatibility
+export interface UserSession {
+  /** @deprecated {@link makeAuthRequest} was renamed to {@link makeAuthRequestToken} */
+  makeAuthRequest(
+    ...args: Parameters<typeof UserSession.prototype.makeAuthRequestToken>
+  ): ReturnType<typeof UserSession.prototype.makeAuthRequestToken>;
+}
+
+// eslint-disable-next-line @typescript-eslint/unbound-method
+UserSession.prototype.makeAuthRequest = UserSession.prototype.makeAuthRequestToken;

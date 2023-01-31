@@ -37,6 +37,9 @@ export function generateTransitKey() {
   return transitKey;
 }
 
+/** @deprecated {@link makeAuthRequest} was renamed to {@link makeAuthRequestToken} */
+export const makeAuthRequest = makeAuthRequestToken;
+
 /**
  * Generates an authentication request that can be sent to the Blockstack
  * browser for the user to approve sign in. This authentication request can
@@ -58,7 +61,7 @@ export function generateTransitKey() {
  * by special authenticators.
  * @return {String} the authentication request
  */
-export function makeAuthRequest(
+export function makeAuthRequestToken(
   transitPrivateKey: string,
   redirectURI?: string,
   manifestURI?: string,
