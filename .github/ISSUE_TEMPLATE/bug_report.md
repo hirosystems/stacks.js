@@ -25,6 +25,6 @@ assignees: ''
 ### Additional context
 
 - Desktop/Smartphone OS: <!-- e.g. Windows 10, iOS 13.1 -->
-- Browser <!-- e.g. Chrome 76, Safari 12 -->
+- Browser: <!-- e.g. Chrome 76, Safari 12 -->
 
 <!-- If applicable, add console logs, screenshots, or anything else to help explain the problem -->
