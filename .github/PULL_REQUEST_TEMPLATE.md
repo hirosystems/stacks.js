@@ -2,16 +2,13 @@
 
 <!-- Describe the changes made in this PR. Link to any related issues and PRs -->
 
-### Type of change
+#### Breaking change?
 
-- [ ] New feature
-- [ ] Bug fix
-- [ ] Documentation update
-- [ ] Other
+<!-- If applicable, list the APIs/functionality which this PR breaks -->
 
-### Is this a breaking change?
+### Example
 
-<!-- List the APIs or describe the functionality that this PR breaks, as well as related information, e.g. deprecation timline -->
+<!-- If applicable, add an example on how this improves upon the previous usage -->
 
 ---
 
