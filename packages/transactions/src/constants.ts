@@ -74,6 +74,25 @@ enum AnchorMode {
   Any = 0x03,
 }
 
+const AnchorModeNames = ['onChainOnly', 'offChainOnly', 'any'] as const;
+type AnchorModeName = typeof AnchorModeNames[number];
+
+const AnchorModeMap = {
+  [AnchorModeNames[0]]: AnchorMode.OnChainOnly,
+  [AnchorModeNames[1]]: AnchorMode.OffChainOnly,
+  [AnchorModeNames[2]]: AnchorMode.Any,
+  [AnchorMode.OnChainOnly]: AnchorMode.OnChainOnly,
+  [AnchorMode.OffChainOnly]: AnchorMode.OffChainOnly,
+  [AnchorMode.Any]: AnchorMode.Any,
+};
+
+function anchorModeFromNameOrValue(mode: AnchorModeName | AnchorMode): AnchorMode {
+  if (mode in AnchorModeMap) {
+    return AnchorModeMap[mode];
+  }
+  throw new Error(`Invalid anchor mode "${mode}", must be one of: ${AnchorModeNames.join(', ')}`);
+}
+
 enum TransactionVersion {
   Mainnet = 0x00,
   Testnet = 0x80,
@@ -188,6 +207,9 @@ export {
   PayloadType,
   ClarityVersion,
   AnchorMode,
+  AnchorModeName,
+  AnchorModeNames,
+  anchorModeFromNameOrValue,
   TransactionVersion,
   PostConditionMode,
   PostConditionType,

@@ -43,6 +43,16 @@ import {
 
 export * from './utils';
 
+/** @internal */
+interface BaseTxOptions {
+  /** the fee for the transaction */
+  fee?: IntegerType;
+  /** the nonce for the transaction */
+  nonce?: IntegerType;
+  /** the private key (aka `senderkey`) for the transaction */
+  privateKey: string;
+}
+
 export interface CycleInfo {
   id: number;
   min_threshold_ustx: number;
@@ -268,8 +278,6 @@ export interface DelegateStackStxOptions {
   cycles: number;
   /** private key to sign transaction */
   privateKey: string;
-  /** nonce for the transaction */
-  nonce?: IntegerType;
 }
 
 /**
@@ -284,8 +292,6 @@ export interface DelegateStackExtendOptions {
   extendCount: number;
   /** private key to sign transaction */
   privateKey: string;
-  /** nonce for the transaction */
-  nonce?: IntegerType;
 }
 
 /**
@@ -623,16 +629,16 @@ export class StackingClient {
     amountMicroStx,
     poxAddress,
     cycles,
-    privateKey,
     burnBlockHeight,
-  }: LockStxOptions): Promise<TxBroadcastResult> {
+    ...txOptions
+  }: LockStxOptions & BaseTxOptions): Promise<TxBroadcastResult> {
     const poxInfo = await this.getPoxInfo();
     const poxOperationInfo = await this.getPoxOperationInfo(poxInfo);
 
     const contract = await this.getStackingContract(poxOperationInfo);
     ensureLegacyBtcAddressForPox1({ contract, poxAddress });
 
-    const txOptions = this.getStackOptions({
+    const callOptions = this.getStackOptions({
       amountMicroStx,
       cycles,
       poxAddress,
@@ -640,11 +646,11 @@ export class StackingClient {
       burnBlockHeight,
     });
     const tx = await makeContractCall({
-      ...txOptions,
-      senderKey: privateKey,
+      ...callOptions,
+      ...renamePrivateKey(txOptions),
     });
 
-    return broadcastTransaction(tx, txOptions.network as StacksNetwork);
+    return broadcastTransaction(tx, callOptions.network as StacksNetwork);
   }
 
   /**
@@ -656,23 +662,23 @@ export class StackingClient {
   async stackExtend({
     extendCycles,
     poxAddress,
-    privateKey,
-  }: StackExtendOptions): Promise<TxBroadcastResult> {
+    ...txOptions
+  }: StackExtendOptions & BaseTxOptions): Promise<TxBroadcastResult> {
     const poxInfo = await this.getPoxInfo();
     const poxOperationInfo = await this.getPoxOperationInfo(poxInfo);
     ensurePox2IsLive(poxOperationInfo);
 
-    const txOptions = this.getStackExtendOptions({
+    const callOptions = this.getStackExtendOptions({
       contract: poxInfo.contract_id,
       extendCycles,
       poxAddress,
     });
     const tx = await makeContractCall({
-      ...txOptions,
-      senderKey: privateKey,
+      ...callOptions,
+      ...renamePrivateKey(txOptions),
     });
 
-    return broadcastTransaction(tx, txOptions.network as StacksNetwork);
+    return broadcastTransaction(tx, callOptions.network as StacksNetwork);
   }
 
   /**
@@ -683,22 +689,22 @@ export class StackingClient {
    */
   async stackIncrease({
     increaseBy,
-    privateKey,
-  }: StackIncreaseOptions): Promise<TxBroadcastResult> {
+    ...txOptions
+  }: StackIncreaseOptions & BaseTxOptions): Promise<TxBroadcastResult> {
     const poxInfo = await this.getPoxInfo();
     const poxOperationInfo = await this.getPoxOperationInfo(poxInfo);
     ensurePox2IsLive(poxOperationInfo);
 
-    const txOptions = this.getStackIncreaseOptions({
+    const callOptions = this.getStackIncreaseOptions({
       contract: poxInfo.contract_id,
       increaseBy,
     });
     const tx = await makeContractCall({
-      ...txOptions,
-      senderKey: privateKey,
+      ...callOptions,
+      ...renamePrivateKey(txOptions),
     });
 
-    return broadcastTransaction(tx, txOptions.network as StacksNetwork);
+    return broadcastTransaction(tx, callOptions.network as StacksNetwork);
   }
 
   /**
@@ -713,16 +719,16 @@ export class StackingClient {
     delegateTo,
     untilBurnBlockHeight,
     poxAddress,
-    privateKey,
+    ...txOptions
   }: // todo: should we provide manual contract definitions? (for users to choose which contract to use)
-  DelegateStxOptions): Promise<TxBroadcastResult> {
+  DelegateStxOptions & BaseTxOptions): Promise<TxBroadcastResult> {
     const poxInfo = await this.getPoxInfo();
     const poxOperationInfo = await this.getPoxOperationInfo(poxInfo);
 
     const contract = await this.getStackingContract(poxOperationInfo);
     ensureLegacyBtcAddressForPox1({ contract, poxAddress });
 
-    const txOptions = this.getDelegateOptions({
+    const callOptions = this.getDelegateOptions({
       contract,
       amountMicroStx,
       delegateTo,
@@ -731,11 +737,11 @@ export class StackingClient {
     });
 
     const tx = await makeContractCall({
-      ...txOptions,
-      senderKey: privateKey,
+      ...callOptions,
+      ...renamePrivateKey(txOptions),
     });
 
-    return broadcastTransaction(tx, txOptions.network as StacksNetwork);
+    return broadcastTransaction(tx, callOptions.network as StacksNetwork);
   }
 
   /**
@@ -751,30 +757,28 @@ export class StackingClient {
     poxAddress,
     burnBlockHeight,
     cycles,
-    privateKey,
-    nonce,
-  }: DelegateStackStxOptions): Promise<TxBroadcastResult> {
+    ...txOptions
+  }: DelegateStackStxOptions & BaseTxOptions): Promise<TxBroadcastResult> {
     const poxInfo = await this.getPoxInfo();
     const poxOperationInfo = await this.getPoxOperationInfo(poxInfo);
 
     const contract = await this.getStackingContract(poxOperationInfo);
     ensureLegacyBtcAddressForPox1({ contract, poxAddress });
 
-    const txOptions = this.getDelegateStackOptions({
+    const callOptions = this.getDelegateStackOptions({
       contract,
       stacker,
       amountMicroStx,
       poxAddress,
       burnBlockHeight,
       cycles,
-      nonce,
     });
     const tx = await makeContractCall({
-      ...txOptions,
-      senderKey: privateKey,
+      ...callOptions,
+      ...renamePrivateKey(txOptions),
     });
 
-    return broadcastTransaction(tx, txOptions.network as StacksNetwork);
+    return broadcastTransaction(tx, callOptions.network as StacksNetwork);
   }
 
   /**
@@ -787,25 +791,23 @@ export class StackingClient {
     stacker,
     poxAddress,
     extendCount,
-    privateKey,
-    nonce,
-  }: DelegateStackExtendOptions): Promise<TxBroadcastResult> {
+    ...txOptions
+  }: DelegateStackExtendOptions & BaseTxOptions): Promise<TxBroadcastResult> {
     const poxInfo = await this.getPoxInfo();
     const contract = poxInfo.contract_id;
 
-    const txOptions = this.getDelegateStackExtendOptions({
+    const callOptions = this.getDelegateStackExtendOptions({
       contract,
       stacker,
       poxAddress,
       extendCount,
-      nonce,
     });
     const tx = await makeContractCall({
-      ...txOptions,
-      senderKey: privateKey,
+      ...callOptions,
+      ...renamePrivateKey(txOptions),
     });
 
-    return broadcastTransaction(tx, txOptions.network as StacksNetwork);
+    return broadcastTransaction(tx, callOptions.network as StacksNetwork);
   }
 
   /**
@@ -818,26 +820,24 @@ export class StackingClient {
     stacker,
     poxAddress,
     increaseBy,
-    privateKey,
-    nonce,
-  }: DelegateStackIncreaseOptions): Promise<TxBroadcastResult> {
+    ...txOptions
+  }: DelegateStackIncreaseOptions & BaseTxOptions): Promise<TxBroadcastResult> {
     const poxInfo = await this.getPoxInfo();
     const poxOperationInfo = await this.getPoxOperationInfo(poxInfo);
     ensurePox2IsLive(poxOperationInfo);
 
-    const txOptions = this.getDelegateStackIncreaseOptions({
+    const callOptions = this.getDelegateStackIncreaseOptions({
       contract: poxInfo.contract_id,
       stacker,
       poxAddress,
       increaseBy,
-      nonce,
     });
     const tx = await makeContractCall({
-      ...txOptions,
-      senderKey: privateKey,
+      ...callOptions,
+      ...renamePrivateKey(txOptions),
     });
 
-    return broadcastTransaction(tx, txOptions.network as StacksNetwork);
+    return broadcastTransaction(tx, callOptions.network as StacksNetwork);
   }
 
   /**
@@ -850,23 +850,23 @@ export class StackingClient {
   async stackAggregationCommit({
     poxAddress,
     rewardCycle,
-    privateKey,
-  }: StackAggregationCommitOptions): Promise<TxBroadcastResult> {
+    ...txOptions
+  }: StackAggregationCommitOptions & BaseTxOptions): Promise<TxBroadcastResult> {
     // todo: deprecate this method in favor of Indexed as soon as PoX-2 is live
     const contract = await this.getStackingContract();
     ensureLegacyBtcAddressForPox1({ contract, poxAddress });
 
-    const txOptions = this.getStackAggregationCommitOptions({
+    const callOptions = this.getStackAggregationCommitOptions({
       contract,
       poxAddress,
       rewardCycle,
     });
     const tx = await makeContractCall({
-      ...txOptions,
-      senderKey: privateKey,
+      ...callOptions,
+      ...renamePrivateKey(txOptions),
     });
 
-    return broadcastTransaction(tx, txOptions.network as StacksNetwork);
+    return broadcastTransaction(tx, callOptions.network as StacksNetwork);
   }
 
   /**
@@ -890,22 +890,22 @@ export class StackingClient {
   async stackAggregationCommitIndexed({
     poxAddress,
     rewardCycle,
-    privateKey,
-  }: StackAggregationCommitOptions): Promise<TxBroadcastResult> {
+    ...txOptions
+  }: StackAggregationCommitOptions & BaseTxOptions): Promise<TxBroadcastResult> {
     const contract = await this.getStackingContract();
     ensureLegacyBtcAddressForPox1({ contract, poxAddress });
 
-    const txOptions = this.getStackAggregationCommitOptionsIndexed({
+    const callOptions = this.getStackAggregationCommitOptionsIndexed({
       contract,
       poxAddress,
       rewardCycle,
     });
     const tx = await makeContractCall({
-      ...txOptions,
-      senderKey: privateKey,
+      ...callOptions,
+      ...renamePrivateKey(txOptions),
     });
 
-    return broadcastTransaction(tx, txOptions.network as StacksNetwork);
+    return broadcastTransaction(tx, callOptions.network as StacksNetwork);
   }
 
   /**
@@ -919,45 +919,52 @@ export class StackingClient {
     poxAddress,
     rewardCycle,
     rewardIndex,
-    privateKey,
-  }: StackAggregationIncreaseOptions): Promise<TxBroadcastResult> {
+    ...txOptions
+  }: StackAggregationIncreaseOptions & BaseTxOptions): Promise<TxBroadcastResult> {
     // todo: deprecate this method in favor of Indexed as soon as PoX-2 is live
     const contract = await this.getStackingContract();
     ensureLegacyBtcAddressForPox1({ contract, poxAddress });
 
-    const txOptions = this.getStackAggregationIncreaseOptions({
+    const callOptions = this.getStackAggregationIncreaseOptions({
       contract,
       poxAddress,
       rewardCycle,
       rewardCycleIndex: rewardIndex,
     });
     const tx = await makeContractCall({
-      ...txOptions,
-      senderKey: privateKey,
+      ...callOptions,
+      ...renamePrivateKey(txOptions),
     });
 
-    return broadcastTransaction(tx, txOptions.network as StacksNetwork);
+    return broadcastTransaction(tx, callOptions.network as StacksNetwork);
   }
 
   /**
    * As a delegatee, generate and broadcast a transaction to terminate the delegation relationship
-   *
    * @param {string} privateKey - the private key to be used for the revoke call
-   *
    * @returns {Promise<string>} that resolves to a broadcasted txid if the operation succeeds
    */
-  async revokeDelegateStx(privateKey: string): Promise<TxBroadcastResult> {
+  async revokeDelegateStx(privateKey: string): Promise<TxBroadcastResult>;
+  /**
+   * As a delegatee, generate and broadcast a transaction to terminate the delegation relationship
+   * @param {BaseTxOptions} txOptions - the private key, fee, and nonce to be used for the revoke call
+   * @returns {Promise<string>} that resolves to a broadcasted txid if the operation succeeds
+   */
+  async revokeDelegateStx(txOptions: BaseTxOptions): Promise<TxBroadcastResult>;
+  async revokeDelegateStx(arg: string | BaseTxOptions): Promise<TxBroadcastResult> {
+    if (typeof arg === 'string') arg = { privateKey: arg };
+
     const poxInfo = await this.getPoxInfo();
     const contract = poxInfo.contract_id;
 
-    const txOptions = this.getRevokeDelegateStxOptions(contract);
+    const callOptions = this.getRevokeDelegateStxOptions(contract);
 
     const tx = await makeContractCall({
-      ...txOptions,
-      senderKey: privateKey,
+      ...callOptions,
+      ...renamePrivateKey(arg),
     });
 
-    return broadcastTransaction(tx, txOptions.network as StacksNetwork);
+    return broadcastTransaction(tx, callOptions.network as StacksNetwork);
   }
 
   getStackOptions({
@@ -975,7 +982,7 @@ export class StackingClient {
   }) {
     const address = poxAddressToTuple(poxAddress);
     const [contractAddress, contractName] = this.parseContractId(contract);
-    const txOptions: ContractCallOptions = {
+    const callOptions: ContractCallOptions = {
       contractAddress,
       contractName,
       functionName: 'stack-stx',
@@ -985,7 +992,7 @@ export class StackingClient {
       network: this.network,
       anchorMode: AnchorMode.Any,
     };
-    return txOptions;
+    return callOptions;
   }
 
   getStackExtendOptions({
@@ -999,7 +1006,7 @@ export class StackingClient {
   }) {
     const address = poxAddressToTuple(poxAddress);
     const [contractAddress, contractName] = this.parseContractId(contract);
-    const txOptions: ContractCallOptions = {
+    const callOptions: ContractCallOptions = {
       contractAddress,
       contractName,
       functionName: 'stack-extend',
@@ -1008,12 +1015,12 @@ export class StackingClient {
       network: this.network,
       anchorMode: AnchorMode.Any,
     };
-    return txOptions;
+    return callOptions;
   }
 
   getStackIncreaseOptions({ increaseBy, contract }: { increaseBy: IntegerType; contract: string }) {
     const [contractAddress, contractName] = this.parseContractId(contract);
-    const txOptions: ContractCallOptions = {
+    const callOptions: ContractCallOptions = {
       contractAddress,
       contractName,
       functionName: 'stack-increase',
@@ -1022,7 +1029,7 @@ export class StackingClient {
       network: this.network,
       anchorMode: AnchorMode.Any,
     };
-    return txOptions;
+    return callOptions;
   }
 
   getDelegateOptions({
@@ -1040,7 +1047,7 @@ export class StackingClient {
   }) {
     const address = poxAddress ? someCV(poxAddressToTuple(poxAddress)) : noneCV();
     const [contractAddress, contractName] = this.parseContractId(contract);
-    const txOptions: ContractCallOptions = {
+    const callOptions: ContractCallOptions = {
       contractAddress,
       contractName,
       functionName: 'delegate-stx',
@@ -1054,7 +1061,7 @@ export class StackingClient {
       network: this.network,
       anchorMode: AnchorMode.Any,
     };
-    return txOptions;
+    return callOptions;
   }
 
   getDelegateStackOptions({
@@ -1064,7 +1071,6 @@ export class StackingClient {
     poxAddress,
     burnBlockHeight,
     cycles,
-    nonce,
   }: {
     contract: string;
     stacker: string;
@@ -1072,11 +1078,10 @@ export class StackingClient {
     poxAddress: string;
     burnBlockHeight: number;
     cycles: number;
-    nonce?: IntegerType;
   }) {
     const address = poxAddressToTuple(poxAddress);
     const [contractAddress, contractName] = this.parseContractId(contract);
-    const txOptions: ContractCallOptions = {
+    const callOptions: ContractCallOptions = {
       contractAddress,
       contractName,
       functionName: 'delegate-stack-stx',
@@ -1092,11 +1097,7 @@ export class StackingClient {
       anchorMode: AnchorMode.Any,
     };
 
-    if (nonce) {
-      txOptions.nonce = nonce;
-    }
-
-    return txOptions;
+    return callOptions;
   }
 
   getDelegateStackExtendOptions({
@@ -1104,17 +1105,15 @@ export class StackingClient {
     stacker,
     poxAddress,
     extendCount,
-    nonce,
   }: {
     contract: string;
     stacker: string;
     poxAddress: string;
     extendCount: number;
-    nonce?: IntegerType;
   }) {
     const address = poxAddressToTuple(poxAddress);
     const [contractAddress, contractName] = this.parseContractId(contract);
-    const txOptions: ContractCallOptions = {
+    const callOptions: ContractCallOptions = {
       contractAddress,
       contractName,
       functionName: 'delegate-stack-extend',
@@ -1124,11 +1123,7 @@ export class StackingClient {
       anchorMode: AnchorMode.Any,
     };
 
-    if (nonce) {
-      txOptions.nonce = nonce;
-    }
-
-    return txOptions;
+    return callOptions;
   }
 
   getDelegateStackIncreaseOptions({
@@ -1136,17 +1131,15 @@ export class StackingClient {
     stacker,
     poxAddress,
     increaseBy,
-    nonce,
   }: {
     contract: string;
     stacker: string;
     poxAddress: string;
     increaseBy: IntegerType;
-    nonce?: IntegerType;
   }) {
     const address = poxAddressToTuple(poxAddress);
     const [contractAddress, contractName] = this.parseContractId(contract);
-    const txOptions: ContractCallOptions = {
+    const callOptions: ContractCallOptions = {
       contractAddress,
       contractName,
       functionName: 'delegate-stack-increase',
@@ -1156,11 +1149,7 @@ export class StackingClient {
       anchorMode: AnchorMode.Any,
     };
 
-    if (nonce) {
-      txOptions.nonce = nonce;
-    }
-
-    return txOptions;
+    return callOptions;
   }
 
   getStackAggregationCommitOptions({
@@ -1174,7 +1163,7 @@ export class StackingClient {
   }) {
     const address = poxAddressToTuple(poxAddress);
     const [contractAddress, contractName] = this.parseContractId(contract);
-    const txOptions: ContractCallOptions = {
+    const callOptions: ContractCallOptions = {
       contractAddress,
       contractName,
       functionName: 'stack-aggregation-commit',
@@ -1183,7 +1172,7 @@ export class StackingClient {
       network: this.network,
       anchorMode: AnchorMode.Any,
     };
-    return txOptions;
+    return callOptions;
   }
 
   getStackAggregationIncreaseOptions({
@@ -1199,7 +1188,7 @@ export class StackingClient {
   }) {
     const address = poxAddressToTuple(poxAddress);
     const [contractAddress, contractName] = this.parseContractId(contract);
-    const txOptions: ContractCallOptions = {
+    const callOptions: ContractCallOptions = {
       contractAddress,
       contractName,
       functionName: 'stack-aggregation-increase',
@@ -1208,7 +1197,7 @@ export class StackingClient {
       network: this.network,
       anchorMode: AnchorMode.Any,
     };
-    return txOptions;
+    return callOptions;
   }
 
   getStackAggregationCommitOptionsIndexed({
@@ -1222,7 +1211,7 @@ export class StackingClient {
   }) {
     const address = poxAddressToTuple(poxAddress);
     const [contractAddress, contractName] = this.parseContractId(contract);
-    const txOptions: ContractCallOptions = {
+    const callOptions: ContractCallOptions = {
       contractAddress,
       contractName,
       functionName: 'stack-aggregation-commit-indexed',
@@ -1231,12 +1220,12 @@ export class StackingClient {
       network: this.network,
       anchorMode: AnchorMode.Any,
     };
-    return txOptions;
+    return callOptions;
   }
 
   getRevokeDelegateStxOptions(contract: string) {
     const [contractAddress, contractName] = this.parseContractId(contract);
-    const txOptions: ContractCallOptions = {
+    const callOptions: ContractCallOptions = {
       contractAddress,
       contractName,
       functionName: 'revoke-delegate-stx',
@@ -1245,7 +1234,7 @@ export class StackingClient {
       network: this.network,
       anchorMode: AnchorMode.Any,
     };
-    return txOptions;
+    return callOptions;
   }
 
   /**
@@ -1387,4 +1376,17 @@ export class StackingClient {
 
     throw new Error('Stacking contract ID is malformed');
   }
+}
+
+/** Rename `privateKey` to `senderKey`, for backwards compatibility */
+function renamePrivateKey(txOptions: BaseTxOptions) {
+  // @ts-ignore
+  txOptions.senderKey = txOptions.privateKey;
+  // @ts-ignore
+  delete txOptions.privateKey;
+  return txOptions as any as {
+    fee?: IntegerType;
+    nonce?: IntegerType;
+    senderKey: string;
+  };
 }

@@ -8,6 +8,8 @@ import {
 } from '@stacks/common';
 import {
   AnchorMode,
+  anchorModeFromNameOrValue,
+  AnchorModeName,
   AuthType,
   ChainID,
   DEFAULT_CHAIN_ID,
@@ -61,7 +63,7 @@ export class StacksTransaction {
     payload: PayloadInput,
     postConditions?: LengthPrefixedList,
     postConditionMode?: PostConditionMode,
-    anchorMode?: AnchorMode,
+    anchorMode?: AnchorModeName | AnchorMode,
     chainId?: ChainID
   ) {
     this.version = version;
@@ -79,7 +81,7 @@ export class StacksTransaction {
     this.postConditions = postConditions ?? createLPList([]);
 
     if (anchorMode) {
-      this.anchorMode = anchorMode;
+      this.anchorMode = anchorModeFromNameOrValue(anchorMode);
     } else {
       switch (payload.payloadType) {
         case PayloadType.Coinbase:

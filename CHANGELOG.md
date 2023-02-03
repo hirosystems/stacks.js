@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.1.1](https://github.com/hirosystems/stacks.js/compare/v6.1.0...v6.1.1) (2023-01-30)
+
+
+### Bug Fixes
+
+* export unexported methods ([0406085](https://github.com/hirosystems/stacks.js/commit/04060859809371dfe363dc44565c494f956b34ce))
+
+
+
 ## [6.1.0](https://github.com/hirosystems/stacks.js/compare/v6.0.2...v6.1.0) (2023-01-06)
 
 

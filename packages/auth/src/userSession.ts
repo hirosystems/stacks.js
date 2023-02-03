@@ -23,7 +23,7 @@ import {
 } from '@stacks/common';
 import { extractProfile } from '@stacks/profile';
 import { AuthScope, DEFAULT_PROFILE } from './constants';
-import * as queryString from 'query-string';
+
 import { UserData } from './userData';
 import { createFetchFn, FetchFn, StacksMainnet } from '@stacks/network';
 import { protocolEchoReplyDetection } from './protocolEchoDetection';
@@ -106,9 +106,9 @@ export class UserSession {
    * pass options that aren't part of the Blockstack authentication specification,
    * but might be supported by special authenticators.
    *
-   * @returns {String} the authentication request
+   * @returns {String} the authentication request token
    */
-  makeAuthRequest(
+  makeAuthRequestToken(
     transitKey?: string,
     redirectURI?: string,
     manifestURI?: string,
@@ -126,7 +126,7 @@ export class UserSession {
     manifestURI = manifestURI || appConfig.manifestURI();
     scopes = scopes || appConfig.scopes;
     appDomain = appDomain || appConfig.appDomain;
-    return authMessages.makeAuthRequest(
+    return authMessages.makeAuthRequestToken(
       transitKey,
       redirectURI,
       manifestURI,
@@ -162,11 +162,9 @@ export class UserSession {
       throwIfUnavailable: true,
       usageDesc: 'getAuthResponseToken',
     })?.search;
-    if (search) {
-      const queryDict = queryString.parse(search);
-      return queryDict.authResponse ? (queryDict.authResponse as string) : '';
-    }
-    return '';
+
+    const params = new URLSearchParams(search);
+    return params.get('authResponse') ?? '';
   }
 
   /**
@@ -403,3 +401,14 @@ export class UserSession {
     }
   }
 }
+
+// Add method aliases for backwards compatibility
+export interface UserSession {
+  /** @deprecated {@link makeAuthRequest} was renamed to {@link makeAuthRequestToken} */
+  makeAuthRequest(
+    ...args: Parameters<typeof UserSession.prototype.makeAuthRequestToken>
+  ): ReturnType<typeof UserSession.prototype.makeAuthRequestToken>;
+}
+
+// eslint-disable-next-line @typescript-eslint/unbound-method
+UserSession.prototype.makeAuthRequest = UserSession.prototype.makeAuthRequestToken;

@@ -11,13 +11,22 @@ jobs:
     uses: ./.github/workflows/pre-run.yml
     secrets: inherit
 
+  commitlint:
+    runs-on: ubuntu-latest
+    needs: pre-run
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - uses: wagoid/commitlint-github-action@v5
+
   tests:
     needs: pre-run
     uses: ./.github/workflows/tests.yml
 
   publish-pr:
     runs-on: ubuntu-latest
-    needs: [pre-run, tests]
+    needs: [pre-run, commitlint, tests]
     if: needs.pre-run.outputs.is-not-fork == 'true'
     steps:
       - uses: actions/checkout@v3
