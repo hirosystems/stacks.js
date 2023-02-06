@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.2.0](https://github.com/hirosystems/stacks.js/compare/v6.1.1...v6.2.0) (2023-02-06)
+
+**Note:** Version bump only for package @stacks/encryption
+
+
+
+
+
 ## [6.1.1](https://github.com/hirosystems/stacks.js/compare/v6.1.0...v6.1.1) (2023-01-30)
 
 **Note:** Version bump only for package @stacks/encryption

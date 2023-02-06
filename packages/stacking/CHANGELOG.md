@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.2.0](https://github.com/hirosystems/stacks.js/compare/v6.1.1...v6.2.0) (2023-02-06)
+
+
+### Bug Fixes
+
+* add missing fee and nonce to all stacking methods ([d81cfd1](https://github.com/hirosystems/stacks.js/commit/d81cfd1b8d1f21e737e6d98bfaa65924b3c871cc))
+
+
+
 ## [6.1.1](https://github.com/hirosystems/stacks.js/compare/v6.1.0...v6.1.1) (2023-01-30)
 
 **Note:** Version bump only for package @stacks/stacking
