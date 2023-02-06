@@ -37,7 +37,7 @@ jobs:
         if: github.event_name == 'workflow_dispatch'
       - uses: actions/setup-node@v3
         with:
-          node-version: 16
+          node-version: 18
           cache: npm
       - run: npm ci
       - run: npm run bootstrap
