@@ -2,6 +2,7 @@ import { getPublicKeyFromPrivate, publicKeyToBtcAddress } from '@stacks/encrypti
 // https://github.com/paulmillr/scure-bip32
 // Secure, audited & minimal implementation of BIP32 hierarchical deterministic (HD) wallets.
 import { HDKey } from '@scure/bip32';
+import { Profile } from '@stacks/profile';
 
 export interface Account {
   /** The private key used for STX payments */
@@ -23,33 +24,6 @@ export interface Account {
 // Reference:  https://github.com/bitcoinjs/bip32/blob/79c6dedb3edfdc8505fe74d9f34c115c33e8a2da/ts-src/bip32.ts#L102
 // Used to replicate deriveHardened bip32 method using deriveChild of scure-bip32 to offload old bip32 library
 export const HARDENED_OFFSET = 0x80_00_00_00;
-
-const PERSON_TYPE = 'Person';
-const CONTEXT = 'http://schema.org';
-const IMAGE_TYPE = 'ImageObject';
-
-export interface ProfileImage {
-  '@type': typeof IMAGE_TYPE;
-  name: string;
-  contentUrl: string;
-}
-
-export interface Profile {
-  '@type': typeof PERSON_TYPE;
-  '@context': typeof CONTEXT;
-  apps?: {
-    [origin: string]: string;
-  };
-  appsMeta?: {
-    [origin: string]: {
-      publicKey: string;
-      storage: string;
-    };
-  };
-  name?: string;
-  image?: ProfileImage[];
-  [key: string]: any;
-}
 
 /**
  * This object represents the keys that were derived from the root-level

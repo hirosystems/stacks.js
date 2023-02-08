@@ -36,7 +36,6 @@ const schemaDefinition: { [key: string]: any } = {
 
 /**
  * Represents a user profile
- *
  */
 export class Profile {
   _profile: { [key: string]: any };
