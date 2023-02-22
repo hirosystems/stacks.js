@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.2.0](https://github.com/hirosystems/stacks.js/compare/v6.1.1...v6.2.0) (2023-02-22)
+
+
+### Features
+
+* add additional data to auth resp ([3c9b72f](https://github.com/hirosystems/stacks.js/commit/3c9b72f61b0a0d1f618ffe47313a5ad99128627b))
+
+
+
 ## [6.1.1](https://github.com/hirosystems/stacks.js/compare/v6.1.0...v6.1.1) (2023-01-30)
 
 
