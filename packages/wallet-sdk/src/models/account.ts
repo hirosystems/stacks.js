@@ -70,6 +70,7 @@ export const makeAuthResponse = async ({
   scopes = [],
   gaiaHubUrl,
   appPrivateKeyFromWalletSalt = null,
+  additionalData = {},
   fetchFn = createFetchFn(),
 }: {
   account: Account;
@@ -78,6 +79,7 @@ export const makeAuthResponse = async ({
   scopes?: string[];
   gaiaHubUrl: string;
   appPrivateKeyFromWalletSalt?: string | null;
+  additionalData?: Record<string, any>;
   fetchFn?: FetchFn;
 }) => {
   const appPrivateKey = getAppPrivateKey({ account, appDomain });
@@ -121,6 +123,7 @@ export const makeAuthResponse = async ({
         testnet: getStxAddress({ account, transactionVersion: TransactionVersion.Testnet }),
         mainnet: getStxAddress({ account, transactionVersion: TransactionVersion.Mainnet }),
       },
+      ...additionalData,
     },
     {
       profileUrl,
