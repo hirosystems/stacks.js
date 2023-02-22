@@ -29,6 +29,7 @@ jobs:
           node-version: 18
           cache: npm
 
+      - run: npm install -g npm@latest
       - run: npm ci
       - run: npm run bootstrap
       - run: npm run build
