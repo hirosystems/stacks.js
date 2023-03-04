@@ -30,7 +30,7 @@
     "@stacks/storage": "^6.2.0",
     "@stacks/transactions": "^6.2.0",
     "@stacks/wallet-sdk": "^6.2.0",
-    "ajv": "^8.12.0",
+    "ajv": "^6.12.6",
     "bip32": "^2.0.6",
     "bip39": "^3.0.2",
     "bitcoinjs-lib": "^5.2.0",
