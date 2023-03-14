@@ -462,6 +462,7 @@ export async function decryptECIES(
  *
  * @param {string} privateKey - secp256k1 private key hex string
  * @param {string | Uint8Array} content - content to sign
+ * @param {boolean} strict - Use stricter signature mode? (default: false)
  * @return {Object} contains:
  * signature - Hex encoded DER signature
  * public key - Hex encoded private string taken from privateKey
@@ -469,20 +470,43 @@ export async function decryptECIES(
  */
 export function signECDSA(
   privateKey: string,
-  content: string | Uint8Array
+  content: string | Uint8Array,
+  strict: boolean = false
 ): {
   publicKey: string;
   signature: string;
 } {
   const contentBytes = typeof content === 'string' ? utf8ToBytes(content) : content;
   const publicKey = getPublicKeyFromPrivate(privateKey);
-  const contentHash = hashSha256Sync(contentBytes);
+  const contentHash = strict
+    ? hashSha256Sync(concatBytes(hexToBytes(publicKey), contentBytes))
+    : hashSha256Sync(contentBytes);
   const signature = signSync(contentHash, privateKey);
 
   return {
     signature: bytesToHex(signature),
     publicKey,
   };
+}
+
+/**
+ * Sign content using a stricter form of ECDSA
+ *
+ * @param {string} privateKey - secp256k1 private key hex string
+ * @param {string | Uint8Array} content - content to sign
+ * @return {Object} contains:
+ * signature - Hex encoded DER signature
+ * public key - Hex encoded private string taken from privateKey
+ * @ignore
+ */
+export function signStrictECDSA(
+  privateKey: string,
+  content: string | Uint8Array
+): {
+  publicKey: string;
+  signature: string;
+} {
+  return signECDSA(privateKey, content, true);
 }
 
 /**
@@ -540,6 +564,25 @@ export function verifyMessageSignature({
 }
 
 /**
+ * Verify message signature (VRS format) with recoverable public key
+ */
+export function verifyStrictMessageSignature({
+  signature,
+  message,
+  publicKey,
+}: VerifyMessageSignatureArgs): boolean {
+  const { r, s } = parseRecoverableSignatureVrs(signature);
+  const sig = new Signature(hexToBigInt(r), hexToBigInt(s));
+  const hashedMsg = sha256(
+    concatBytes(
+      hexToBytes(publicKey),
+      typeof message === 'string' ? encodeMessage(message) : message
+    )
+  );
+  return verify(sig, hashedMsg, publicKey);
+}
+
+/**
  * Verifies a Clarity compatible signed message using a public key. The
  * `signature` option needs to be in RSV format.
  */
@@ -549,6 +592,24 @@ export function verifyMessageSignatureRsv({
   publicKey,
 }: VerifyMessageSignatureArgs): boolean {
   return verifyMessageSignature({
+    signature: signatureRsvToVrs(signature),
+    message,
+    publicKey,
+  });
+}
+
+/**
+ * Verifies a Clarity compatible signed message using a public key. The
+ * `signature` option needs to be in RSV format.
+ *
+ * This is a stricter signature format than verifyMessageSignatureRsv expects
+ */
+export function verifyStrictMessageSignatureRsv({
+  signature,
+  message,
+  publicKey,
+}: VerifyMessageSignatureArgs): boolean {
+  return verifyStrictMessageSignature({
     signature: signatureRsvToVrs(signature),
     message,
     publicKey,
