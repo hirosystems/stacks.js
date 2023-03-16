@@ -14,7 +14,8 @@ import {
   makeNamespaceRevealSkeleton, makeNamespaceReadySkeleton,
   makeNameImportSkeleton, makeAnnounceSkeleton, BlockstackNamespace,
   makeTokenTransferSkeleton, makeV2TokenTransferSkeleton, makeV2PreStxOpSkeleton,
-  makeStackingSkeleton
+  makeStackingSkeleton,
+  makeDelegateSkeleton
 } from './skeletons'
 
 import { config } from '../config'
@@ -1220,6 +1221,48 @@ function makeStacking(poxAddress: string,
     .then(signingTxB => returnTransactionHex(signingTxB, buildIncomplete))
 }
 
+function makeDelegate(amount: BigInteger,
+                      delegateTo: string,
+                      poxAddress?: string,
+                      untilBurnHeight?: BigInteger,
+                      senderKeyIn: string | TransactionSigner,
+                      btcFunderKeyIn?: string | TransactionSigner,
+                      buildIncomplete?: boolean = false
+) {
+  const network = config.network
+  const separateFunder = !!btcFunderKeyIn
+
+  const senderKey = getTransactionSigner(senderKeyIn)
+  const btcKey = btcFunderKeyIn ? getTransactionSigner(btcFunderKeyIn) : senderKey
+
+  const txPromise = makeDelegateSkeleton(amount, delegateTo, poxAddress, untilBurnHeight)
+
+  return Promise.all([senderKey.getAddress(), btcKey.getAddress()])
+    .then(([senderAddress, btcAddress]) => {
+      const btcUTXOsPromise = separateFunder
+        ? network.getUTXOs(btcAddress) : Promise.resolve([])
+      const networkPromises = [network.getUTXOs(senderAddress),
+                               btcUTXOsPromise,
+                               network.getFeeRate(),
+                               txPromise]
+      return Promise.all(networkPromises)
+        .then(([senderUTXOs, btcUTXOs, feeRate, tokenTransferTX]) => {
+          const txB = bitcoinjs.TransactionBuilder.fromTransaction(tokenTransferTX, network.layer1)
+
+          if (separateFunder) {
+            const payerInput = addOwnerInput(senderUTXOs, senderAddress, txB)
+            const signingTxB = fundTransaction(txB, btcAddress, btcUTXOs, feeRate, payerInput.value)
+            return signInputs(signingTxB, btcKey,
+                              [{ index: payerInput.index, signer: senderKey }])
+          } else {
+            const signingTxB = fundTransaction(txB, senderAddress, senderUTXOs, feeRate, 0)
+            return signInputs(signingTxB, senderKey)
+          }
+        })
+    })
+    .then(signingTxB => returnTransactionHex(signingTxB, buildIncomplete))
+}
+
 function makeV2PreStxOp(
   senderKeyIn: string | TransactionSigner,
   btcFunderKeyIn?: string | TransactionSigner,
@@ -1366,6 +1409,7 @@ export const transactions = {
   makeV2TokenTransfer,
   makeV2PreStxOp,
   makeStacking,
+  makeDelegate,
   BlockstackNamespace,
   estimatePreorder,
   estimateRegister,
