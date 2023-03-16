@@ -1,6 +1,6 @@
 {
   "name": "blockstack",
-  "version": "18.1.5",
+  "version": "18.1.6",
   "description": "The Blockstack Javascript library for authentication, identity, and storage.",
   "main": "lib/index",
   "scripts": {
@@ -15,7 +15,7 @@
     "unit-test": "npm run lint && npm run flow && npm run compile && npm run compile-tests && npm run browserify && node ./tests/unitTests/lib/index.js",
     "integration-test-auth": "npm run compile; npm run compile-tests; npm run browserify; node ./tests/authTests/lib/index.js",
     "integration-test-ops": "npm run lint && npm run flow && npm run compile && npm run compile-tests && npm run browserify && node ./tests/operationsTests/lib/index.js",
-    "build": "npm run build-documentation && npm run compile && npm run browserify",
+    "build": "npm run compile && npm run browserify",
     "flow": "flow",
     "lint": "eslint src && eslint tests",
     "test": "nyc --reporter=text npm run unit-test",

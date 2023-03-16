@@ -133,6 +133,9 @@ export class BlockstackNamespace {
   }
 }
 
+function isNullish(value: any): boolean {
+  return value === null || value === undefined
+}
 
 function asAmountV2(amount: AmountType): AmountTypeV2 {
   // convert an AmountType v1 or v2 to an AmountTypeV2.
@@ -821,6 +824,71 @@ export function makeV2PreStxOpSkeleton(
 
   tx.addOutput(nullOutput, 0)
   // tx.addOutput(prepareAddress, DUST_MINIMUM)
+
+  return tx.buildIncomplete()
+}
+
+export function makeDelegateSkeleton(
+  amount: BigInteger,
+  delegateTo: string,
+  poxAddress: ?string,
+  untilBurnHeight: ?BigInteger
+) {
+  /*
+  Format:
+  https://github.com/stacksgov/sips/blob/feat/sip-015/sips/sip-015/sip-015-network-upgrade.md#new-burnchain-transaction-delegate-stx
+
+  0      2   3                          19       20                          24       25                      33
+  |------|---|--------------------------|--------|---------------------------|--------|-----------------------|
+     magic  op    uSTX to delegate (u128)    00|01   output of pox-addr (?u32)    00|01    until-burn-ht (?u64)
+
+  where
+    op: # (0x23)
+    output 0: sip-015 wire format
+    output 1: delegate-to address (required)
+    output 2: pox reward address (optional)
+  */
+
+  const opReturnBuffer = Buffer.alloc(33)
+
+  // arg amount
+  const amountHex = amount.toHex()
+  if (amountHex.length > 32) {
+    // exceeds u128 = 16 bytes = 32 hex chars
+    throw new Error(`Cannot delegate: cannot fit amount ${amount.toString()} into 16 bytes`)
+  }
+  const amountHexPadded = `0000000000000000000000000000000000000000${amountHex}`.slice(-32)
+
+  // arg untilBurnHeight
+  const untilBurnHeightToggle = isNullish(untilBurnHeight) ? '00' : '01'
+  const untilBurnHeightHex = isNullish(untilBurnHeight) ? '00' : untilBurnHeight.toHex()
+  if (untilBurnHeightHex.length > 16) {
+    // exceeds u64 = 8 bytes = 16 hex chars
+    throw new Error(`Cannot delegate: cannot fit until-burn-ht ${amount.toString()} into 16 bytes`)
+  }
+  const untilBurnHeightHexPadded = `00000000000000000000${untilBurnHeightHex}`.slice(-16)
+
+  // arg poxAddress
+  const poxAddressToggle = isNullish(poxAddress) ? '00' : '01'
+  const poxAddressIndexHex = '00000001' // u32 = 4 bytes = 8 hex chars
+  // index is always 1 here, because the pox address is the second output (zero-indexed) after the op return
+
+  opReturnBuffer.write('X2#', 0, 3, 'ascii') // 0-3; magic + op
+  opReturnBuffer.write(amountHexPadded, 3, 16, 'hex') // 3-19; u128
+  opReturnBuffer.write(poxAddressToggle, 19, 1, 'hex') // 19-20; 00|01
+  opReturnBuffer.write(poxAddressIndexHex, 20, 4, 'hex') // 20-24; u32
+  opReturnBuffer.write(untilBurnHeightToggle, 24, 1, 'hex') // 24-25; 00|01
+  opReturnBuffer.write(untilBurnHeightHexPadded, 25, 8, 'hex') // 25-33; u64
+
+  const nullOutput = bitcoin.payments.embed({ data: [opReturnBuffer] }).output
+  const tx = makeTXbuilder()
+
+  tx.addOutput(nullOutput, 0) // op return (sip-015 wire format)
+  tx.addOutput(delegateTo, DUST_MINIMUM) // first output after op return
+
+  if (!isNullish(poxAddress)) {
+    tx.addOutput(poxAddress, DUST_MINIMUM) // second output after op return
+  }
 
   return tx.buildIncomplete()
 }
