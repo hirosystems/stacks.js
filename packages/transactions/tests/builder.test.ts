@@ -24,6 +24,7 @@ import {
   estimateTransaction,
   estimateTransactionByteLength,
   estimateTransactionFeeWithFallback,
+  getContractMapEntry,
   getNonce,
   makeContractCall,
   makeContractDeploy,
@@ -47,9 +48,11 @@ import { BytesReader } from '../src/bytesReader';
 import {
   bufferCV,
   bufferCVFromString,
+  ClarityType,
   noneCV,
   serializeCV,
   standardPrincipalCV,
+  UIntCV,
   uintCV,
 } from '../src/clarity';
 import { principalCV } from '../src/clarity/types/principalCV';
@@ -2083,4 +2086,40 @@ test('Call read-only function with network string', async () => {
 
   expect(fetchMock.mock.calls.length).toEqual(1);
   expect(result).toEqual(mockResult);
+});
+
+test('Get contract map entry - success', async () => {
+  const mockValue = 60n;
+  const mockResult = uintCV(mockValue);
+  fetchMock.mockOnce(`{"data": "0x${bytesToHex(serializeCV(mockResult))}"}`);
+
+  const result = await getContractMapEntry<UIntCV>({
+    contractAddress: 'SPSCWDV3RKV5ZRN1FQD84YE1NQFEDJ9R1F4DYQ11',
+    contractName: 'newyorkcitycoin-core-v2',
+    mapName: 'UserIds',
+    mapKey: principalCV('SP25V8V2QQ2K8N3JAS15Z14W4YW7ABFDZHK5ZPGW7'),
+  });
+
+  expect(fetchMock.mock.calls.length).toEqual(1);
+  expect(result).toEqual(mockResult);
+  expect(result.type).toBe(ClarityType.UInt);
+  if (result.type === ClarityType.UInt) {
+    expect(result.value).toBe(mockValue);
+  }
+});
+
+test('Get contract map entry - no match', async () => {
+  const mockResult = noneCV();
+  fetchMock.mockOnce(`{"data": "0x${bytesToHex(serializeCV(mockResult))}"}`);
+
+  const result = await getContractMapEntry({
+    contractAddress: 'SPSCWDV3RKV5ZRN1FQD84YE1NQFEDJ9R1F4DYQ11',
+    contractName: 'newyorkcitycoin-core-v2',
+    mapName: 'UserIds',
+    mapKey: principalCV('SP34EBMKMRR6SXX65GRKJ1FHEXV7AGHJ2D8ASQ5M3'),
+  });
+
+  expect(fetchMock.mock.calls.length).toEqual(1);
+  expect(result).toEqual(mockResult);
+  expect(result.type).toBe(ClarityType.OptionalNone);
 });

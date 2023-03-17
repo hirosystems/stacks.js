@@ -17,7 +17,7 @@ import {
   SpendingCondition,
   MultiSigSpendingCondition,
 } from './authorization';
-import { ClarityValue, PrincipalCV } from './clarity';
+import { ClarityValue, deserializeCV, NoneCV, PrincipalCV, serializeCV } from './clarity';
 import {
   AddressHashMode,
   AddressVersion,
@@ -1348,6 +1348,75 @@ export async function callReadOnlyFunction(
   }
 
   return response.json().then(responseJson => parseReadOnlyResponse(responseJson));
+}
+
+export interface GetContractMapEntryOptions {
+  /** the contracts address */
+  contractAddress: string;
+  /** the contracts name */
+  contractName: string;
+  /** the map name */
+  mapName: string;
+  /** key to lookup in the map */
+  mapKey: ClarityValue;
+  /** the network that has the contract */
+  network?: StacksNetworkName | StacksNetwork;
+}
+
+/**
+ * Fetch data from a contract data map.
+ * @param getContractMapEntryOptions - the options object
+ * @returns
+ * Promise that resolves to a ClarityValue if the operation succeeds.
+ * Resolves to NoneCV if the map does not contain the given key, if the map does not exist, or if the contract prinicipal does not exist
+ */
+export async function getContractMapEntry<T extends ClarityValue = ClarityValue>(
+  getContractMapEntryOptions: GetContractMapEntryOptions
+): Promise<T | NoneCV> {
+  const defaultOptions = {
+    network: new StacksMainnet(),
+  };
+  const { contractAddress, contractName, mapName, mapKey, network } = Object.assign(
+    defaultOptions,
+    getContractMapEntryOptions
+  );
+
+  const derivedNetwork = StacksNetwork.fromNameOrNetwork(network);
+  const url = derivedNetwork.getMapEntryUrl(contractAddress, contractName, mapName);
+
+  const serializedKeyBytes = serializeCV(mapKey);
+  const serializedKeyHex = '0x' + bytesToHex(serializedKeyBytes);
+
+  const fetchOptions: RequestInit = {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+    },
+    body: JSON.stringify(serializedKeyHex), // endpoint expects a JSON string atom (quote wrapped string)
+  };
+
+  const response = await derivedNetwork.fetchFn(url, fetchOptions);
+  if (!response.ok) {
+    const msg = await response.text().catch(() => '');
+    throw new Error(
+      `Error fetching map entry for map "${mapName}" in contract "${contractName}" at address ${contractAddress}, using map key "${serializedKeyHex}". Response ${response.status}: ${response.statusText}. Attempted to fetch ${url} and failed with the message: "${msg}"`
+    );
+  }
+  const responseBody = await response.text();
+  const responseJson: { data?: string } = JSON.parse(responseBody);
+  if (!responseJson.data) {
+    throw new Error(
+      `Error fetching map entry for map "${mapName}" in contract "${contractName}" at address ${contractAddress}, using map key "${serializedKeyHex}". Response ${response.status}: ${response.statusText}. Attempted to fetch ${url} and failed with the response: "${responseBody}"`
+    );
+  }
+  let deserializedCv: T;
+  try {
+    deserializedCv = deserializeCV<T>(responseJson.data);
+  } catch (error) {
+    throw new Error(`Error deserializing Clarity value "${responseJson.data}": ${error}`);
+  }
+  return deserializedCv;
 }
 
 /**

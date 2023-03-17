@@ -102,6 +102,8 @@ export class StacksNetwork {
     ${contractAddress}/${contractName}/get-stacker-info`;
   getDataVarUrl = (contractAddress: string, contractName: string, dataVarName: string) =>
     `${this.coreApiUrl}/v2/data_var/${contractAddress}/${contractName}/${dataVarName}?proof=0`;
+  getMapEntryUrl = (contractAddress: string, contractName: string, mapName: string) =>
+    `${this.coreApiUrl}/v2/map_entry/${contractAddress}/${contractName}/${mapName}?proof=0`;
   getNameInfo(fullyQualifiedName: string) {
     /*
       TODO: Update to v2 API URL for name lookups
