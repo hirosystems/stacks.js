@@ -818,6 +818,7 @@ export async function makeUnsignedContractDeploy(
     network: new StacksMainnet(),
     postConditionMode: PostConditionMode.Deny,
     sponsored: false,
+    clarityVersion: ClarityVersion.Clarity2,
   };
 
   const options = Object.assign(defaultOptions, txOptions);
