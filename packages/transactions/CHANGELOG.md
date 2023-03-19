@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.4.0](https://github.com/hirosystems/stacks.js/compare/v6.3.0...v6.4.0) (2023-03-19)
+
+
+### Features
+
+* switch makeContractDeploy and makeUnsignedContractDeploy to use clarity 2 by default ([244636f](https://github.com/hirosystems/stacks.js/commit/244636fbd07a8c5f0fefa4671a88036412932fa0))
+
+
+
 ## [6.3.0](https://github.com/hirosystems/stacks.js/compare/v6.2.1...v6.3.0) (2023-03-17)
 
 
