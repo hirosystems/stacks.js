@@ -565,7 +565,7 @@ export interface SignedMultiSigTokenTransferOptions extends TokenTransferOptions
  *
  * Returns a Stacks token transfer transaction.
  *
- * @param  {UnsignedTokenTransferOptions | UnsignedMultiSigTokenTransferOptions} txOptions - an options object for the token transfer
+ * @param {UnsignedTokenTransferOptions | UnsignedMultiSigTokenTransferOptions} txOptions - an options object for the token transfer
  *
  * @return {Promise<StacksTransaction>}
  */
@@ -656,7 +656,7 @@ export async function makeUnsignedSTXTokenTransfer(
  *
  * Returns a signed Stacks token transfer transaction.
  *
- * @param  {SignedTokenTransferOptions | SignedMultiSigTokenTransferOptions} txOptions - an options object for the token transfer
+ * @param {SignedTokenTransferOptions | SignedMultiSigTokenTransferOptions} txOptions - an options object for the token transfer
  *
  * @return {StacksTransaction}
  */
@@ -786,7 +786,7 @@ export async function estimateContractDeploy(
 /**
  * Generates a Clarity smart contract deploy transaction
  *
- * @param  {ContractDeployOptions} txOptions - an options object for the contract deploy
+ * @param {ContractDeployOptions} txOptions - an options object for the contract deploy
  *
  * Returns a signed Stacks smart contract deploy transaction.
  *
@@ -1095,7 +1095,7 @@ export async function makeUnsignedContractCall(
 /**
  * Generates a Clarity smart contract function call transaction
  *
- * @param  {SignedContractCallOptions | SignedMultiSigContractCallOptions} txOptions - an options object for the contract function call
+ * @param {SignedContractCallOptions | SignedMultiSigContractCallOptions} txOptions - an options object for the contract function call
  *
  * Returns a signed Stacks smart contract function call transaction.
  *
@@ -1141,7 +1141,7 @@ export async function makeContractCall(
  *
  * @param address - the c32check address
  * @param conditionCode - the condition code
- * @param amount - the amount of STX tokens
+ * @param amount - the amount of STX tokens (denoted in micro-STX)
  */
 export function makeStandardSTXPostCondition(
   address: string,
@@ -1159,7 +1159,7 @@ export function makeStandardSTXPostCondition(
  * @param address - the c32check address of the contract
  * @param contractName - the name of the contract
  * @param conditionCode - the condition code
- * @param amount - the amount of STX tokens
+ * @param amount - the amount of STX tokens (denoted in micro-STX)
  *
  * @return {STXPostCondition}
  */
@@ -1183,7 +1183,7 @@ export function makeContractSTXPostCondition(
  *
  * @param address - the c32check address
  * @param conditionCode - the condition code
- * @param amount - the amount of fungible tokens
+ * @param amount - the amount of fungible tokens (in their respective base unit)
  * @param assetInfo - asset info describing the fungible token
  */
 export function makeStandardFungiblePostCondition(
@@ -1208,7 +1208,7 @@ export function makeStandardFungiblePostCondition(
  * @param address - the c32check address
  * @param contractName - the name of the contract
  * @param conditionCode - the condition code
- * @param amount - the amount of fungible tokens
+ * @param amount - the amount of fungible tokens (in their respective base unit)
  * @param assetInfo - asset info describing the fungible token
  */
 export function makeContractFungiblePostCondition(
@@ -1231,10 +1231,10 @@ export function makeContractFungiblePostCondition(
  *
  * Returns a non-fungible token post condition object
  *
- * @param  {String} address - the c32check address
- * @param  {FungibleConditionCode} conditionCode - the condition code
- * @param  {AssetInfo} assetInfo - asset info describing the non-fungible token
- * @param  {ClarityValue} assetName - asset name describing the non-fungible token
+ * @param {String} address - the c32check address
+ * @param {FungibleConditionCode} conditionCode - the condition code
+ * @param {AssetInfo} assetInfo - asset info describing the non-fungible token
+ * @param {ClarityValue} assetId - asset identifier of the nft instance (typically a uint/buffer/string)
  *
  * @return {NonFungiblePostCondition}
  */
@@ -1242,13 +1242,13 @@ export function makeStandardNonFungiblePostCondition(
   address: string,
   conditionCode: NonFungibleConditionCode,
   assetInfo: string | AssetInfo,
-  assetName: ClarityValue
+  assetId: ClarityValue
 ): NonFungiblePostCondition {
   return createNonFungiblePostCondition(
     createStandardPrincipal(address),
     conditionCode,
     assetInfo,
-    assetName
+    assetId
   );
 }
 
@@ -1257,11 +1257,11 @@ export function makeStandardNonFungiblePostCondition(
  *
  * Returns a non-fungible token post condition object
  *
- * @param  {String} address - the c32check address
- * @param  {String} contractName - the name of the contract
- * @param  {FungibleConditionCode} conditionCode - the condition code
- * @param  {AssetInfo} assetInfo - asset info describing the non-fungible token
- * @param  {ClarityValue} assetName - asset name describing the non-fungible token
+ * @param {String} address - the c32check address
+ * @param {String} contractName - the name of the contract
+ * @param {FungibleConditionCode} conditionCode - the condition code
+ * @param {AssetInfo} assetInfo - asset info describing the non-fungible token
+ * @param {ClarityValue} assetId - asset identifier of the nft instance (typically a uint/buffer/string)
  *
  * @return {NonFungiblePostCondition}
  */
@@ -1270,25 +1270,25 @@ export function makeContractNonFungiblePostCondition(
   contractName: string,
   conditionCode: NonFungibleConditionCode,
   assetInfo: string | AssetInfo,
-  assetName: ClarityValue
+  assetId: ClarityValue
 ): NonFungiblePostCondition {
   return createNonFungiblePostCondition(
     createContractPrincipal(address, contractName),
     conditionCode,
     assetInfo,
-    assetName
+    assetId
   );
 }
 
 /**
  * Read only function options
  *
- * @param  {String} contractAddress - the c32check address of the contract
- * @param  {String} contractName - the contract name
- * @param  {String} functionName - name of the function to be called
- * @param  {[ClarityValue]} functionArgs - an array of Clarity values as arguments to the function call
- * @param  {StacksNetwork} network - the Stacks blockchain network this transaction is destined for
- * @param  {String} senderAddress - the c32check address of the sender
+ * @param {String} contractAddress - the c32check address of the contract
+ * @param {String} contractName - the contract name
+ * @param {String} functionName - name of the function to be called
+ * @param {[ClarityValue]} functionArgs - an array of Clarity values as arguments to the function call
+ * @param {StacksNetwork} network - the Stacks blockchain network this transaction is destined for
+ * @param {String} senderAddress - the c32check address of the sender
  */
 
 export interface ReadOnlyFunctionOptions {
@@ -1306,7 +1306,7 @@ export interface ReadOnlyFunctionOptions {
  * Calls a function as read-only from a contract interface
  * It is not necessary that the function is defined as read-only in the contract
  *
- * @param  {ReadOnlyFunctionOptions} readOnlyFunctionOptions - the options object
+ * @param {ReadOnlyFunctionOptions} readOnlyFunctionOptions - the options object
  *
  * Returns an object with a status bool (okay) and a result string that is a serialized clarity value in hex format.
  *
@@ -1441,7 +1441,7 @@ export interface SponsorOptionsOpts {
 /**
  * Constructs and signs a sponsored transaction as the sponsor
  *
- * @param  {SponsorOptionsOpts} sponsorOptions - the sponsor options object
+ * @param {SponsorOptionsOpts} sponsorOptions - the sponsor options object
  *
  * Returns a signed sponsored transaction.
  *
