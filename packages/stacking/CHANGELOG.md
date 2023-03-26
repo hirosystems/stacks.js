@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.5.0](https://github.com/hirosystems/stacks.js/compare/v6.4.0...v6.5.0) (2023-03-26)
+
+
+### Bug Fixes
+
+* allow contract principals in stackingclient ([ade6345](https://github.com/hirosystems/stacks.js/commit/ade63453fc5150bc2f849702ec4b814e1a51780c))
+
+
+
 ## [6.4.0](https://github.com/hirosystems/stacks.js/compare/v6.3.0...v6.4.0) (2023-03-19)
 
 **Note:** Version bump only for package @stacks/stacking
