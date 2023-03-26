@@ -22,10 +22,10 @@ import {
   noneCV,
   OptionalCV,
   PrincipalCV,
+  principalCV,
   ResponseErrorCV,
   someCV,
   StacksTransaction,
-  standardPrincipalCV,
   TupleCV,
   TxBroadcastResult,
   uintCV,
@@ -1053,7 +1053,7 @@ export class StackingClient {
       functionName: 'delegate-stx',
       functionArgs: [
         uintCV(amountMicroStx),
-        standardPrincipalCV(delegateTo),
+        principalCV(delegateTo),
         untilBurnBlockHeight ? someCV(uintCV(untilBurnBlockHeight)) : noneCV(),
         address,
       ],
@@ -1086,7 +1086,7 @@ export class StackingClient {
       contractName,
       functionName: 'delegate-stack-stx',
       functionArgs: [
-        standardPrincipalCV(stacker),
+        principalCV(stacker),
         uintCV(amountMicroStx),
         address,
         uintCV(burnBlockHeight),
@@ -1117,7 +1117,7 @@ export class StackingClient {
       contractAddress,
       contractName,
       functionName: 'delegate-stack-extend',
-      functionArgs: [standardPrincipalCV(stacker), address, uintCV(extendCount)],
+      functionArgs: [principalCV(stacker), address, uintCV(extendCount)],
       validateWithAbi: true,
       network: this.network,
       anchorMode: AnchorMode.Any,
@@ -1143,7 +1143,7 @@ export class StackingClient {
       contractAddress,
       contractName,
       functionName: 'delegate-stack-increase',
-      functionArgs: [standardPrincipalCV(stacker), address, uintCV(increaseBy)],
+      functionArgs: [principalCV(stacker), address, uintCV(increaseBy)],
       validateWithAbi: true,
       network: this.network,
       anchorMode: AnchorMode.Any,
@@ -1253,7 +1253,7 @@ export class StackingClient {
       contractName,
       functionName,
       senderAddress: this.address,
-      functionArgs: [standardPrincipalCV(this.address)],
+      functionArgs: [principalCV(this.address)],
       network: this.network,
     }).then((responseCV: ClarityValue) => {
       if (responseCV.type === ClarityType.OptionalSome) {
@@ -1302,7 +1302,7 @@ export class StackingClient {
       contractName,
       functionName,
       senderAddress: this.address,
-      functionArgs: [standardPrincipalCV(this.address)],
+      functionArgs: [principalCV(this.address)],
       network: this.network,
     }).then((responseCV: ClarityValue) => {
       if (responseCV.type === ClarityType.OptionalSome) {

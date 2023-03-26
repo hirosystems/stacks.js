@@ -22,6 +22,7 @@ import {
 import fetchMock from 'jest-fetch-mock';
 import { PoXAddressVersion, StackingErrors } from '../src/constants';
 import { decodeBtcAddress, poxAddressToBtcAddress } from '../src/utils';
+import { V2_POX_REGTEST } from './apiMockingHelpers';
 
 const poxInfo = {
   contract_id: 'ST000000000000000000002AMW42H.pox',
@@ -1066,4 +1067,20 @@ test('pox address to btc address', () => {
     expect(decodedAddress.version).toBe(item.version);
     expect(bytesToHex(decodedAddress.data)).toBe(bytesToHex(item.hashBytes));
   });
+});
+
+test('client operations with contract principal stacker', () => {
+  fetchMock.mockOnce(V2_POX_REGTEST);
+  fetchMock.mockOnce(
+    `{"balance":"0x0000000000000000000000001e22f616","locked":"0x00000000000000000000000000000000","unlock_height":0,"nonce":0}`
+  );
+  fetchMock.mockOnce(`{"okay":true,"result":"0x09"}`);
+
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const { StackingClient } = require('../src'); // needed for jest.mock module
+  const client = new StackingClient(
+    'SP2HNY1HNF5X25VC7GZ3Y48JC4762AYFHKS061BM0.stacking-contract',
+    new StacksTestnet()
+  );
+  expect(async () => await client.getStatus()).not.toThrow();
 });
