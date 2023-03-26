@@ -23,10 +23,20 @@ const FT_ASSET_NAME = 'SUP';
 
 const NFT_CONTRACT_ADDRESS = 'ST13F481SBR0R7Z6NMMH8YV2FJJYXA5JPA0AD3HP9';
 const NFT_CONTRACT_NAME = 'super-nft';
-const NFT_ASSET_NAME = 'super';
+const NFT_TOKEN_NAME = 'super';
 const NFT_ASSET_ID = uintCV(21);
 
 describe('pc -- post condition builder', () => {
+  test('fully-qualified token name', () => {
+    const pcA = Pc.principal(STANDARD_ADDRESS)
+      .willSendAsset()
+      .nft(`${NFT_CONTRACT_ADDRESS}.${NFT_CONTRACT_NAME}::${NFT_TOKEN_NAME}`, NFT_ASSET_ID);
+    const pcB = Pc.principal(STANDARD_ADDRESS)
+      .willSendAsset()
+      .nft(`${NFT_CONTRACT_ADDRESS}.${NFT_CONTRACT_NAME}`, NFT_TOKEN_NAME, NFT_ASSET_ID);
+    expect(pcA).toEqual(pcB);
+  });
+
   describe('invalid input', () => {
     test('invalid addresses', () => {
       expect(() => Pc.principal(STANDARD_ADDRESS).willSendEq(100).ustx()).not.toThrow();
@@ -45,15 +55,37 @@ describe('pc -- post condition builder', () => {
       expect(() =>
         Pc.principal(STANDARD_ADDRESS)
           .willSendAsset()
-          .nft(`${NFT_CONTRACT_ADDRESS}.${NFT_CONTRACT_NAME}`, NFT_ASSET_NAME, NFT_ASSET_ID)
+          .nft(`${NFT_CONTRACT_ADDRESS}.${NFT_CONTRACT_NAME}`, NFT_TOKEN_NAME, NFT_ASSET_ID)
       ).not.toThrow();
       expect(() =>
         Pc.principal(STANDARD_ADDRESS)
           .willSendAsset()
-          .nft('invalid' as any, NFT_ASSET_NAME, NFT_ASSET_ID)
+          .nft('invalid' as any, NFT_TOKEN_NAME, NFT_ASSET_ID)
       ).toThrow();
       expect(() =>
-        Pc.principal(STANDARD_ADDRESS).willSendAsset().nft('inv.alid', NFT_ASSET_NAME, NFT_ASSET_ID)
+        Pc.principal(STANDARD_ADDRESS).willSendAsset().nft('inv.alid', NFT_TOKEN_NAME, NFT_ASSET_ID)
+      ).toThrow();
+    });
+
+    test('invalid fully-qualified token name', () => {
+      expect(() =>
+        Pc.principal(STANDARD_ADDRESS)
+          .willSendAsset()
+          .nft(
+            // e.g. using ;; instead of ::
+            `${NFT_CONTRACT_ADDRESS}.${NFT_CONTRACT_NAME};;${NFT_TOKEN_NAME}` as any,
+            NFT_ASSET_ID
+          )
+      ).toThrow();
+
+      expect(() =>
+        Pc.principal(CONTRACT_ADDRESS)
+          .willSendAsset()
+          .nft(
+            // e.g. using , instead of .
+            `${NFT_CONTRACT_ADDRESS},${NFT_CONTRACT_NAME}::${NFT_TOKEN_NAME}` as any,
+            NFT_ASSET_ID
+          )
       ).toThrow();
     });
   });
@@ -182,11 +214,11 @@ describe('pc -- post condition builder', () => {
       test('will send nft', () => {
         const pc = Pc.principal(STANDARD_ADDRESS)
           .willSendAsset()
-          .nft(`${NFT_CONTRACT_ADDRESS}.${NFT_CONTRACT_NAME}`, NFT_ASSET_NAME, NFT_ASSET_ID);
+          .nft(`${NFT_CONTRACT_ADDRESS}.${NFT_CONTRACT_NAME}`, NFT_TOKEN_NAME, NFT_ASSET_ID);
         const postCondition = makeStandardNonFungiblePostCondition(
           STANDARD_ADDRESS,
           NonFungibleConditionCode.Sends,
-          createAssetInfo(NFT_CONTRACT_ADDRESS, NFT_CONTRACT_NAME, NFT_ASSET_NAME),
+          createAssetInfo(NFT_CONTRACT_ADDRESS, NFT_CONTRACT_NAME, NFT_TOKEN_NAME),
           NFT_ASSET_ID
         );
         expect(pc).toEqual(postCondition);
@@ -195,11 +227,11 @@ describe('pc -- post condition builder', () => {
       test('will not send nft', () => {
         const pc = Pc.principal(STANDARD_ADDRESS)
           .willNotSendAsset()
-          .nft(`${NFT_CONTRACT_ADDRESS}.${NFT_CONTRACT_NAME}`, NFT_ASSET_NAME, NFT_ASSET_ID);
+          .nft(`${NFT_CONTRACT_ADDRESS}.${NFT_CONTRACT_NAME}`, NFT_TOKEN_NAME, NFT_ASSET_ID);
         const postCondition = makeStandardNonFungiblePostCondition(
           STANDARD_ADDRESS,
           NonFungibleConditionCode.DoesNotSend,
-          createAssetInfo(NFT_CONTRACT_ADDRESS, NFT_CONTRACT_NAME, NFT_ASSET_NAME),
+          createAssetInfo(NFT_CONTRACT_ADDRESS, NFT_CONTRACT_NAME, NFT_TOKEN_NAME),
           NFT_ASSET_ID
         );
         expect(pc).toEqual(postCondition);
@@ -341,12 +373,12 @@ describe('pc -- post condition builder', () => {
       test('will send nft', () => {
         const pc = Pc.principal(`${CONTRACT_ADDRESS}.${CONTRACT_NAME}`)
           .willSendAsset()
-          .nft(`${NFT_CONTRACT_ADDRESS}.${NFT_CONTRACT_NAME}`, NFT_ASSET_NAME, NFT_ASSET_ID);
+          .nft(`${NFT_CONTRACT_ADDRESS}.${NFT_CONTRACT_NAME}`, NFT_TOKEN_NAME, NFT_ASSET_ID);
         const postCondition = makeContractNonFungiblePostCondition(
           CONTRACT_ADDRESS,
           CONTRACT_NAME,
           NonFungibleConditionCode.Sends,
-          createAssetInfo(NFT_CONTRACT_ADDRESS, NFT_CONTRACT_NAME, NFT_ASSET_NAME),
+          createAssetInfo(NFT_CONTRACT_ADDRESS, NFT_CONTRACT_NAME, NFT_TOKEN_NAME),
           NFT_ASSET_ID
         );
         expect(pc).toEqual(postCondition);
@@ -355,12 +387,12 @@ describe('pc -- post condition builder', () => {
       test('will not send nft', () => {
         const pc = Pc.principal(`${CONTRACT_ADDRESS}.${CONTRACT_NAME}`)
           .willNotSendAsset()
-          .nft(`${NFT_CONTRACT_ADDRESS}.${NFT_CONTRACT_NAME}`, NFT_ASSET_NAME, NFT_ASSET_ID);
+          .nft(`${NFT_CONTRACT_ADDRESS}.${NFT_CONTRACT_NAME}`, NFT_TOKEN_NAME, NFT_ASSET_ID);
         const postCondition = makeContractNonFungiblePostCondition(
           CONTRACT_ADDRESS,
           CONTRACT_NAME,
           NonFungibleConditionCode.DoesNotSend,
-          createAssetInfo(NFT_CONTRACT_ADDRESS, NFT_CONTRACT_NAME, NFT_ASSET_NAME),
+          createAssetInfo(NFT_CONTRACT_ADDRESS, NFT_CONTRACT_NAME, NFT_TOKEN_NAME),
           NFT_ASSET_ID
         );
         expect(pc).toEqual(postCondition);
