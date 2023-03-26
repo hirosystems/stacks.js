@@ -39,6 +39,7 @@ type NftString = `${ContractIdString}::${string}`;
 
 /**
  * ### `Pc.` Post Condition Builder
+ * @beta Interface may be subject to change in future releases.
  * @param {AddressString | ContractIdString} principal The principal to check, which should/should-not be sending assets. A string in the format "address" or "address.contractId".
  * @returns A partial post condition builder, which can be chained into a final post condition.
  * @example
@@ -64,8 +65,13 @@ class PartialPcWithPrincipal {
 
   /**
    * ### Fungible Token Post Condition
-   * A post-condition sending `FungibleConditionCode.Equal` uSTX or other fungible tokens.
+   * A post-condition sending tokens `FungibleConditionCode.Equal` (equal to) the given amount of uSTX or fungible-tokens.
    * Finalize with the chained `.ustx()` or `.ft(…)` method.
+   * @example
+   * ```
+   * import { Pc } from '@stacks/transactions';
+   * Pc.principal('STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6').willSendEq(100).stx();
+   * ```
    */
   willSendEq(amount: IntegerType) {
     return new PartialPcFtWithCode(
@@ -78,8 +84,13 @@ class PartialPcWithPrincipal {
 
   /**
    * ### Fungible Token Post Condition
-   * A post-condition sending `FungibleConditionCode.LessEqual` uSTX or other fungible tokens.
+   * A post-condition sending tokens `FungibleConditionCode.LessEqual` (less-than or equal to) the given amount of uSTX or fungible-tokens.
    * Finalize with the chained `.ustx()` or `.ft(…)` method.
+   * @example
+   * ```
+   * import { Pc } from '@stacks/transactions';
+   * Pc.principal('STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6').willSendLte(100).stx();
+   * ```
    */
   willSendLte(amount: IntegerType) {
     return new PartialPcFtWithCode(
@@ -92,8 +103,13 @@ class PartialPcWithPrincipal {
 
   /**
    * ### Fungible Token Post Condition
-   * A post-condition sending `FungibleConditionCode.Less` uSTX or other fungible tokens.
+   * A post-condition sending tokens `FungibleConditionCode.Less` (less-than) the given amount of uSTX or fungible-tokens.
    * Finalize with the chained `.ustx()` or `.ft(…)` method.
+   * @example
+   * ```
+   * import { Pc } from '@stacks/transactions';
+   * Pc.principal('STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6').willSendLt(100).stx();
+   * ```
    */
   willSendLt(amount: IntegerType) {
     return new PartialPcFtWithCode(
@@ -106,8 +122,13 @@ class PartialPcWithPrincipal {
 
   /**
    * ### Fungible Token Post Condition
-   * A post-condition sending `FungibleConditionCode.GreaterEqual` uSTX or other fungible tokens.
+   * A post-condition sending tokens `FungibleConditionCode.GreaterEqual` (greater-than or equal to) the given amount of uSTX or fungible-tokens.
    * Finalize with the chained `.ustx()` or `.ft(…)` method.
+   * @example
+   * ```
+   * import { Pc } from '@stacks/transactions';
+   * Pc.principal('STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6').willSendGte(100).stx();
+   * ```
    */
   willSendGte(amount: IntegerType) {
     return new PartialPcFtWithCode(
@@ -120,8 +141,13 @@ class PartialPcWithPrincipal {
 
   /**
    * ### Fungible Token Post Condition
-   * A post-condition sending `FungibleConditionCode.Greater` uSTX or other fungible tokens.
+   * A post-condition sending tokens `FungibleConditionCode.Greater` (greater-than) the given amount of uSTX or fungible-tokens.
    * Finalize with the chained `.ustx()` or `.ft(…)` method.
+   * @example
+   * ```
+   * import { Pc } from '@stacks/transactions';
+   * Pc.principal('STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6').willSendGt(100).stx();
+   * ```
    */
   willSendGt(amount: IntegerType) {
     return new PartialPcFtWithCode(
@@ -136,6 +162,11 @@ class PartialPcWithPrincipal {
    * ### NFT Post Condition
    * A post-condition which `NonFungibleConditionCode.Sends` an NFT.
    * Finalize with the chained `.nft(…)` method.
+   * @example
+   * ```
+   * import { Pc } from '@stacks/transactions';
+   * Pc.principal('STB4…K6.nft-contract').willSendAsset().nft('STB4…K6.super-nft::super', uintCV(1));
+   * ```
    */
   willSendAsset() {
     return new PartialPcNftWithCode(
@@ -149,6 +180,11 @@ class PartialPcWithPrincipal {
    * ### NFT Post Condition
    * A post-condition which `NonFungibleConditionCode.DoesNotSend` an NFT.
    * Finalize with the chained `.nft(…)` method.
+   * @example
+   * ```
+   * import { Pc } from '@stacks/transactions';
+   * Pc.principal('STB4…K6.nft-contract').willNotSendAsset().nft('STB4…K6.super-nft::super', uintCV(1));
+   * ```
    */
   willNotSendAsset() {
     return new PartialPcNftWithCode(
@@ -251,12 +287,14 @@ class PartialPcNftWithCode {
   }
 }
 
+/** @internal */
 function parseContractId(contractId: ContractIdString) {
   const [address, name] = contractId.split('.');
   if (!address || !name) throw new Error(`Invalid contract identifier: ${contractId}`);
   return [address, name];
 }
 
+/** @internal */
 function parseNft(nftAssetName: NftString) {
   const [principal, tokenName] = nftAssetName.split('::') as [ContractIdString, string];
   if (!principal || !tokenName)
@@ -265,6 +303,7 @@ function parseNft(nftAssetName: NftString) {
   return { contractAddress: address, contractName: name, tokenName };
 }
 
+/** @internal */
 function isContractIdString(value: AddressString | ContractIdString): value is ContractIdString {
   return value.includes('.');
 }
