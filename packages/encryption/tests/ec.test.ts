@@ -1,14 +1,12 @@
 import { sha256 } from '@noble/hashes/sha256';
-import { bytesToHex, concatBytes, hexToBytes } from '@stacks/common';
+import { bytesToHex, concatBytes } from '@stacks/common';
+import { getPublicKey, makeRandomPrivKey, signMessageHashRsv } from '../../transactions/src';
+import { encodeMessage } from '../src';
 import {
-  signECDSA,
-  signStrictECDSA,
   verifyMessageSignature,
   verifyMessageSignatureRsv,
   verifyStrictMessageSignatureRsv,
 } from '../src/ec';
-import { randomPrivateKey } from '../src/cryptoRandom';
-import { getPublicKeyFromPrivate } from '../src/keys';
 
 test('verifyMessageSignature', () => {
   // $ clarinet console
@@ -48,25 +46,21 @@ test('verifyMessageSignatureRsv', () => {
 });
 
 test('verifyStrictMessageSignatureRsv', () => {
-  const secretKey = bytesToHex(randomPrivateKey());
-  const publicKey = getPublicKeyFromPrivate(secretKey);
-  const message = sha256('Hello World');
-  expect(bytesToHex(message)).toBe(
-    'a591a6d40bf420404a011733cfb7b190d62c65bf0bcda32b57b277d9ad9f146e'
-  );
-  const signature = signStrictECDSA(secretKey, message);
-  const signatureRsv = signature.signature;
-  expect(verifyStrictMessageSignatureRsv({ signature: signatureRsv, publicKey, message })).toBe(
-    true
-  );
+  const privateKey = makeRandomPrivKey();
+  const publicKey = getPublicKey(privateKey);
 
-  const publicKeyAndMessage = sha256(
-    concatBytes(
-      hexToBytes(publicKey),
-      new Uint8Array([0x48, 0x65, 0x6c, 0x6c, 0x6f, 0x20, 0x57, 0x6f, 0x72, 0x6c, 0x64])
-    )
-  );
+  const message = 'Hello World';
+
+  const strictMessage = concatBytes(publicKey.data, encodeMessage(message));
+  const strictMessageHash = bytesToHex(sha256(strictMessage));
+
+  const signature = signMessageHashRsv({ messageHash: strictMessageHash, privateKey });
+
   expect(
-    verifyMessageSignatureRsv({ signature: signatureRsv, publicKey, message: publicKeyAndMessage })
+    verifyStrictMessageSignatureRsv({
+      signature: signature.data,
+      publicKey: bytesToHex(publicKey.data),
+      message,
+    })
   ).toBe(true);
 });
