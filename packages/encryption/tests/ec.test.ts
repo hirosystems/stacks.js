@@ -1,8 +1,10 @@
 import { sha256 } from '@noble/hashes/sha256';
-import { bytesToHex, concatBytes } from '@stacks/common';
+import { verify } from '@noble/secp256k1';
+import { bytesToHex, concatBytes, hexToBytes } from '@stacks/common';
 import { getPublicKey, makeRandomPrivKey, signMessageHashRsv } from '../../transactions/src';
-import { encodeMessage } from '../src';
+import { encodeMessage, getPublicKeyFromPrivate, randomPrivateKey } from '../src';
 import {
+  signStrictECDSA,
   verifyMessageSignature,
   verifyMessageSignatureRsv,
   verifyStrictMessageSignatureRsv,
@@ -63,4 +65,21 @@ test('verifyStrictMessageSignatureRsv', () => {
       message,
     })
   ).toBe(true);
+});
+
+test('signStrictECDSA', () => {
+  const secretKey = bytesToHex(randomPrivateKey());
+  const publicKey = getPublicKeyFromPrivate(secretKey);
+  const message = 'Hello World';
+
+  const signature = signStrictECDSA(secretKey, message);
+  const signatureDer = signature.signature;
+
+  const publicKeyAndMessage = sha256(
+    concatBytes(
+      hexToBytes(publicKey),
+      new Uint8Array([0x48, 0x65, 0x6c, 0x6c, 0x6f, 0x20, 0x57, 0x6f, 0x72, 0x6c, 0x64])
+    )
+  );
+  expect(verify(signatureDer, publicKeyAndMessage, publicKey)).toBe(true);
 });
