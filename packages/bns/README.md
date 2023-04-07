@@ -1,6 +1,6 @@
 # `@stacks/bns`
 
-A package for interacting with the [BNS contract](https://explorer.stacks.co/txid/SP000000000000000000002Q6VF78.bns?chain=mainnet)
+A package for interacting with the [BNS contract](https://explorer.hiro.so/txid/SP000000000000000000002Q6VF78.bns?chain=mainnet)
 on the Stacks blockchain.
 
 ## What is BNS?
