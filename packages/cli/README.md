@@ -96,7 +96,7 @@ Example:
     stx call_contract_func SPBMRFRPPGCDE3F384WCJPK8PQJGZ8K9QKK7F59X contract_name contract_function 1 0 "$PAYMENT"
      {
        txid: '0x2e33ad647a9cedacb718ce247967dc705bc0c878db899fdba5eae2437c6fa1e1',
-       transaction: 'https://explorer.stacks.co/txid/0x2e33ad647a9cedacb718ce247967dc705bc0c878db899fdba5eae2437c6fa1e1'
+       transaction: 'https://explorer.hiro.so/txid/0x2e33ad647a9cedacb718ce247967dc705bc0c878db899fdba5eae2437c6fa1e1'
      }
 
 ```
@@ -114,7 +114,7 @@ Example:
     stx call_read_only_contract_func SPBMRFRPPGCDE3F384WCJPK8PQJGZ8K9QKK7F59X contract_name contract_function SPBMRFRPPGCDE3F384WCJPK8PQJGZ8K9QKK7F59X
      {
        txid: '0x2e33ad647a9cedacb718ce247967dc705bc0c878db899fdba5eae2437c6fa1e1',
-       transaction: 'https://explorer.stacks.co/txid/0x2e33ad647a9cedacb718ce247967dc705bc0c878db899fdba5eae2437c6fa1e1'
+       transaction: 'https://explorer.hiro.so/txid/0x2e33ad647a9cedacb718ce247967dc705bc0c878db899fdba5eae2437c6fa1e1'
      }
 
 ```
@@ -176,7 +176,7 @@ Example:
     stx deploy_contract ./my_contract.clar my_contract 1 0 "$PAYMENT"
      {
        txid: '0x2e33ad647a9cedacb718ce247967dc705bc0c878db899fdba5eae2437c6fa1e1',
-       transaction: 'https://explorer.stacks.co/txid/0x2e33ad647a9cedacb718ce247967dc705bc0c878db899fdba5eae2437c6fa1e1'
+       transaction: 'https://explorer.hiro.so/txid/0x2e33ad647a9cedacb718ce247967dc705bc0c878db899fdba5eae2437c6fa1e1'
      }
 ```
 
@@ -240,7 +240,7 @@ Example:
     stx send_tokens SP1P10PS2T517S4SQGZT5WNX8R00G1ECTRKYCPMHY 12345 1 0 "$PAYMENT"
     {
        txid: '0x2e33ad647a9cedacb718ce247967dc705bc0c878db899fdba5eae2437c6fa1e1',
-       transaction: 'https://explorer.stacks.co/txid/0x2e33ad647a9cedacb718ce247967dc705bc0c878db899fdba5eae2437c6fa1e1'
+       transaction: 'https://explorer.hiro.so/txid/0x2e33ad647a9cedacb718ce247967dc705bc0c878db899fdba5eae2437c6fa1e1'
     }
     a9d387a925fb0ba7a725fb1e11f2c3f1647473699dd5a147c312e6453d233456
 
@@ -267,7 +267,7 @@ Example:
     stx stack 10000000 20 16pm276FpJYpm7Dv3GEaRqTVvGPTdceoY4 136ff26efa5db6f06b28f9c8c7a0216a1a52598045162abfe435d13036154a1b01
      {
        txid: '0x2e33ad647a9cedacb718ce247967dc705bc0c878db899fdba5eae2437c6fa1e1',
-       transaction: 'https://explorer.stacks.co/txid/0x2e33ad647a9cedacb718ce247967dc705bc0c878db899fdba5eae2437c6fa1e1'
+       transaction: 'https://explorer.hiro.so/txid/0x2e33ad647a9cedacb718ce247967dc705bc0c878db899fdba5eae2437c6fa1e1'
      }
 ```
 
@@ -321,7 +321,7 @@ Example:
       stx faucet ST3PWZ5M026785YW8YKKEH316DYPE4AC7NNTD9ADN
       {
         txid: '0xd33672dd4dbb0b88f733bc67b938359843123ca3be550ca87d487d067bd1b3c3',
-        transaction: 'https://explorer.stacks.co/txid/0xd33672dd4dbb0b88f733bc67b938359843123ca3be550ca87d487d067bd1b3c3?chain=testnet'
+        transaction: 'https://explorer.hiro.so/txid/0xd33672dd4dbb0b88f733bc67b938359843123ca3be550ca87d487d067bd1b3c3?chain=testnet'
       }
 ```
 

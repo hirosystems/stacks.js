@@ -477,7 +477,7 @@ async function migrateSubdomains(network: CLINetworkAdapter, args: string[]): Pr
     .then(response => {
       if (response.txid)
         console.log(
-          `The transaction will take some time to complete. Track its progress using the explorer: https://explorer.stacks.co/txid/0x${response.txid}`
+          `The transaction will take some time to complete. Track its progress using the explorer: https://explorer.hiro.so/txid/0x${response.txid}`
         );
       return Promise.resolve(JSONStringify(response));
     })

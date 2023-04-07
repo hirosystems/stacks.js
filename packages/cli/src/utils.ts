@@ -763,9 +763,9 @@ export function answerToClarityValue(answer: any, arg: ClarityFunctionArg): Clar
 
 export function generateExplorerTxPageUrl(txid: string, network: StacksNetwork): string {
   if (network.version === TransactionVersion.Testnet) {
-    return `https://explorer.stacks.co/txid/0x${txid}?chain=testnet`;
+    return `https://explorer.hiro.so/txid/0x${txid}?chain=testnet`;
   } else {
-    return `https://explorer.stacks.co/txid/0x${txid}?chain=mainnet`;
+    return `https://explorer.hiro.so/txid/0x${txid}?chain=mainnet`;
   }
 }
 
