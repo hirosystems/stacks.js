@@ -9,9 +9,9 @@ interface ListCV<T extends ClarityValue = ClarityValue> {
 /**
  * Create list of clarity types
  *
- * @param {ClarityValue>values: T[]} list of  ClarityValues to be converted to ListCV clarity type
+ * @param {ClarityValue[]} values list of  ClarityValues to be converted to ListCV clarity type
  *
- * @returns {ListCV<T>} returns instance of type ListCV<T>
+ * @returns {ListCV<T>} instance of type ListCV<T> of the provided values
  *
  * @example
  * ```

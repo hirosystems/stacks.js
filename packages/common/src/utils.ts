@@ -614,12 +614,9 @@ export function concatArray(elements: (Uint8Array | number[] | number)[]) {
 }
 
 /**
- * Better `instanceof` check for ArrayBuffer types in different environments
+ * Better `instanceof` check for types in different environments
  * @ignore
  */
 export function isInstance(object: any, type: any) {
-  return (
-    object instanceof type ||
-    (object?.constructor?.name != null && object.constructor.name === type.name)
-  );
+  return object instanceof type || object?.constructor?.name?.toLowerCase() === type.name;
 }
