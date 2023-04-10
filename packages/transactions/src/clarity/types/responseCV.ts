@@ -30,7 +30,7 @@ interface ResponseOkCV<T extends ClarityValue = ClarityValue> {
  * ```
  *
  * @visit
- * {@link https://github.com/hirosystems/stacks.js/blob/master/packages/transactions/tests/clarity.test.ts clarity test cases for more examples}
+ * {@link https://github.com/hirosystems/stacks.js/blob/master/packages/transactions/tests/clarity.test.ts | clarity test cases for more examples}
  */
 function responseErrorCV<T extends ClarityValue = ClarityValue>(value: T): ResponseErrorCV<T> {
   return { type: ClarityType.ResponseErr, value };
@@ -53,7 +53,7 @@ function responseErrorCV<T extends ClarityValue = ClarityValue>(value: T): Respo
  * ```
  *
  * @visit
- * {@link https://github.com/hirosystems/stacks.js/blob/master/packages/transactions/tests/clarity.test.ts clarity test cases for more examples}
+ * {@link https://github.com/hirosystems/stacks.js/blob/master/packages/transactions/tests/clarity.test.ts | clarity test cases for more examples}
  */
 function responseOkCV<T extends ClarityValue = ClarityValue>(value: T): ResponseOkCV<T> {
   return { type: ClarityType.ResponseOk, value };

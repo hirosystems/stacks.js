@@ -50,7 +50,7 @@ function principalCV(principal: string): PrincipalCV {
  * ```
  *
  * @see
- * {@link https://github.com/hirosystems/stacks.js/blob/master/packages/transactions/tests/clarity.test.ts clarity test cases for more examples}
+ * {@link https://github.com/hirosystems/stacks.js/blob/master/packages/transactions/tests/clarity.test.ts | clarity test cases for more examples}
  */
 function standardPrincipalCV(addressString: string): StandardPrincipalCV {
   const addr = createAddress(addressString);
@@ -77,7 +77,7 @@ function standardPrincipalCV(addressString: string): StandardPrincipalCV {
  * ```
  *
  * @see
- * {@link https://github.com/hirosystems/stacks.js/blob/master/packages/transactions/tests/clarity.test.ts clarity test cases for more examples}
+ * {@link https://github.com/hirosystems/stacks.js/blob/master/packages/transactions/tests/clarity.test.ts | clarity test cases for more examples}
  */
 function standardPrincipalCVFromAddress(address: Address): StandardPrincipalCV {
   return { type: ClarityType.PrincipalStandard, address };
@@ -98,7 +98,7 @@ function standardPrincipalCVFromAddress(address: Address): StandardPrincipalCV {
  * ```
  *
  * @see
- * {@link https://github.com/hirosystems/stacks.js/blob/master/packages/transactions/tests/clarity.test.ts clarity test cases for more examples}
+ * {@link https://github.com/hirosystems/stacks.js/blob/master/packages/transactions/tests/clarity.test.ts | clarity test cases for more examples}
  */
 function contractPrincipalCV(addressString: string, contractName: string): ContractPrincipalCV {
   const addr = createAddress(addressString);
@@ -122,7 +122,7 @@ function contractPrincipalCV(addressString: string, contractName: string): Contr
  * ```
  *
  * @see
- * {@link https://github.com/hirosystems/stacks.js/blob/master/packages/transactions/tests/clarity.test.ts clarity test cases for more examples}
+ * {@link https://github.com/hirosystems/stacks.js/blob/master/packages/transactions/tests/clarity.test.ts | clarity test cases for more examples}
  */
 function contractPrincipalCVFromAddress(
   address: Address,

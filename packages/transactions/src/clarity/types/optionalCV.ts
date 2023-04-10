@@ -25,7 +25,7 @@ interface SomeCV<T extends ClarityValue = ClarityValue> {
  * ```
  *
  * @visit
- * {@link https://github.com/hirosystems/stacks.js/blob/master/packages/transactions/tests/clarity.test.ts clarity test cases for more examples}
+ * {@link https://github.com/hirosystems/stacks.js/blob/master/packages/transactions/tests/clarity.test.ts | clarity test cases for more examples}
  */
 function noneCV(): NoneCV {
   return { type: ClarityType.OptionalNone };
@@ -47,7 +47,7 @@ function noneCV(): NoneCV {
  * ```
  *
  * @visit
- * {@link https://github.com/hirosystems/stacks.js/blob/master/packages/transactions/tests/clarity.test.ts clarity test cases for more examples}
+ * {@link https://github.com/hirosystems/stacks.js/blob/master/packages/transactions/tests/clarity.test.ts | clarity test cases for more examples}
  */
 function someCV<T extends ClarityValue = ClarityValue>(value: T): OptionalCV<T> {
   return { type: ClarityType.OptionalSome, value };

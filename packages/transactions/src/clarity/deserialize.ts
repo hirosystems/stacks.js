@@ -41,7 +41,7 @@ import { bytesToAscii, bytesToUtf8, hexToBytes } from '@stacks/common';
  * ```
  *
  * @visit
- * {@link https://github.com/hirosystems/stacks.js/blob/master/packages/transactions/tests/clarity.test.ts clarity test cases for more examples}
+ * {@link https://github.com/hirosystems/stacks.js/blob/master/packages/transactions/tests/clarity.test.ts | clarity test cases for more examples}
  */
 export default function deserializeCV<T extends ClarityValue = ClarityValue>(
   serializedClarityValue: BytesReader | Uint8Array | string

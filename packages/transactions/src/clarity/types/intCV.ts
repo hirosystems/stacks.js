@@ -28,7 +28,7 @@ interface IntCV {
  * ```
  *
  * @visit
- * {@link https://github.com/hirosystems/stacks.js/blob/master/packages/transactions/tests/clarity.test.ts clarity test cases for more examples}
+ * {@link https://github.com/hirosystems/stacks.js/blob/master/packages/transactions/tests/clarity.test.ts | clarity test cases for more examples}
  */
 const intCV = (value: IntegerType): IntCV => {
   const bigInt = intToBigInt(value, true);
@@ -61,7 +61,7 @@ interface UIntCV {
  * ```
  *
  * @visit
- * {@link https://github.com/hirosystems/stacks.js/blob/master/packages/transactions/tests/clarity.test.ts clarity test cases for more examples}
+ * {@link https://github.com/hirosystems/stacks.js/blob/master/packages/transactions/tests/clarity.test.ts | clarity test cases for more examples}
  */
 const uintCV = (value: IntegerType): UIntCV => {
   const bigInt = intToBigInt(value, false);
