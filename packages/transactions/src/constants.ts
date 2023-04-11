@@ -75,7 +75,7 @@ enum AnchorMode {
 }
 
 const AnchorModeNames = ['onChainOnly', 'offChainOnly', 'any'] as const;
-type AnchorModeName = typeof AnchorModeNames[number];
+type AnchorModeName = (typeof AnchorModeNames)[number];
 
 const AnchorModeMap = {
   [AnchorModeNames[0]]: AnchorMode.OnChainOnly,

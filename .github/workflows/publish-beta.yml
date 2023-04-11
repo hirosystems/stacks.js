@@ -30,9 +30,10 @@ jobs:
 
       - uses: actions/setup-node@v3
         with:
-          node-version: 16
+          node-version: 18
           cache: npm
 
+      - run: npm install -g npm@latest
       - run: npm ci
       - run: npm run bootstrap
 
@@ -47,9 +48,9 @@ jobs:
         run: |
           LATEST=$(git describe --tags --abbrev=0)
           npx lerna version $LATEST --force-publish --no-changelog --no-push --no-git-tag-version --yes
-          git commit -a -m 'DONT PUSH: fast-forward to latest npm release' --allow-empty
+          git commit -a -m 'DONT PUSH: fast-forward to latest npm release' --allow-empty --no-verify
           npx lerna version --force-publish --no-changelog --conventional-commits --conventional-prerelease --preid beta --no-push --no-git-tag-version --yes
-          git commit -a -m 'DONT PUSH: version beta release' --allow-empty
+          git commit -a -m 'DONT PUSH: version beta release' --allow-empty --no-verify
           RELEASE=$(cat lerna.json | jq -r '.version')
           npx lerna publish from-package --no-verify-access --pre-dist-tag beta --yes
           git reset HEAD~2 --hard

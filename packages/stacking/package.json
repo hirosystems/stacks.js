@@ -1,6 +1,6 @@
 {
   "name": "@stacks/stacking",
-  "version": "6.1.1",
+  "version": "6.5.0",
   "description": "Library for Stacking.",
   "license": "MIT",
   "author": "Hiro Systems PBC (https://hiro.so)",
@@ -22,14 +22,15 @@
   "dependencies": {
     "@scure/base": "1.1.1",
     "@stacks/common": "^6.0.0",
-    "@stacks/encryption": "^6.1.1",
-    "@stacks/network": "^6.1.1",
+    "@stacks/encryption": "^6.5.0",
+    "@stacks/network": "^6.3.0",
     "@stacks/stacks-blockchain-api-types": "^0.61.0",
-    "@stacks/transactions": "^6.1.1",
+    "@stacks/transactions": "^6.5.0",
     "bs58": "^5.0.0"
   },
   "devDependencies": {
     "@stacks/blockchain-api-client": "^6.2.1",
+    "jest-fetch-mock": "^3.0.3",
     "process": "^0.11.10",
     "rimraf": "^3.0.2",
     "stream-browserify": "^3.0.0"

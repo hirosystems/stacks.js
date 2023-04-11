@@ -1,5 +1,5 @@
 import { CLI_CONFIG_TYPE } from '../src/argparse';
-import { testables } from '../src/cli';
+import { CLIMain, testables } from '../src/cli';
 import { CLINetworkAdapter, CLI_NETWORK_OPTS, getNetwork } from '../src/network';
 
 import {
@@ -415,4 +415,12 @@ test('can_stack', async () => {
   expect(fetchMock.mock.calls[3][1]?.body).toBe(
     '{"sender":"ST3VJVZ265JZMG1N61YE3EQ7GNTQHF6PXP0E7YACV","arguments":["0x0c000000020968617368627974657302000000147046a658021260485e1ba9eb6c3e4c26b60953290776657273696f6e020000000100","0x010000000000000000000005a74678d000","0x010000000000000000000000000000010d","0x010000000000000000000000000000000a"]}'
   );
+});
+
+describe('CLI Main', () => {
+  test('argparse should work', () => {
+    process.argv = ['node', 'stx', 'make_keychain'];
+    jest.spyOn(process, 'exit').mockImplementation();
+    expect(() => CLIMain()).not.toThrow();
+  });
 });

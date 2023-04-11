@@ -13,22 +13,28 @@ npm install @stacks/cli
 See [documentation](https://docs.hiro.so/references/stacks-cli)
 
 ### Examples
+
 Open the terminal to try these basic commands
 
 ### List of commands
-To see the usage and options for the command in general  
+
+To see the usage and options for the command in general
+
 ```shell script
 stx
-``` 
-To see a list of subcommands  
+```
+
+To see a list of subcommands
+
 ```shell script
 stx help
 ```
 
-
 ## Authentication
+
 ### authenticator
-```shell script 
+
+```shell script
 Run an authentication endpoint for the set of names owned by the given backup phrase.  Send applications the given Gaia hub URL on sign-in, so the application will use it to read/write user data.
 
 You can supply your encrypted backup phrase instead of the raw backup phrase.  If so, then you will be prompted for your password before any authentication takes place.
@@ -43,9 +49,12 @@ Example:
     Authentication server started on 8888
 
 ```
+
 ## Account Management
+
 ### balance
-```shell script 
+
+```shell script
 Query the balance of an account.  Returns the balances of each kind of token that the account owns.  The balances will be in the *smallest possible units* of the token (i.e. satoshis for BTC, microStacks for Stacks, etc.).
 
 Example:
@@ -59,8 +68,10 @@ Example:
     }
 
 ```
+
 ### can_stack
-```shell script 
+
+```shell script
 Check if specified account can stack a number of Stacks tokens for given number of cycles.
 
 Example:
@@ -71,8 +82,10 @@ Example:
     }
 
 ```
+
 ### call_contract_func
-```shell script 
+
+```shell script
 Call a function in a deployed Clarity smart contract.
 
 If the command succeeds, it prints out a transaction ID.
@@ -83,12 +96,14 @@ Example:
     stx call_contract_func SPBMRFRPPGCDE3F384WCJPK8PQJGZ8K9QKK7F59X contract_name contract_function 1 0 "$PAYMENT"
      {
        txid: '0x2e33ad647a9cedacb718ce247967dc705bc0c878db899fdba5eae2437c6fa1e1',
-       transaction: 'https://explorer.stacks.co/txid/0x2e33ad647a9cedacb718ce247967dc705bc0c878db899fdba5eae2437c6fa1e1'  
+       transaction: 'https://explorer.hiro.so/txid/0x2e33ad647a9cedacb718ce247967dc705bc0c878db899fdba5eae2437c6fa1e1'
      }
 
 ```
+
 ### call_read_only_contract_func
-```shell script 
+
+```shell script
 Call a read-only function in a deployed Clarity smart contract.
 
 If the command succeeds, it prints out a Clarity value.
@@ -98,13 +113,15 @@ Example:
 
     stx call_read_only_contract_func SPBMRFRPPGCDE3F384WCJPK8PQJGZ8K9QKK7F59X contract_name contract_function SPBMRFRPPGCDE3F384WCJPK8PQJGZ8K9QKK7F59X
      {
-       txid: '0x2e33ad647a9cedacb718ce247967dc705bc0c878db899fdba5eae2437c6fa1e1', 
-       transaction: 'https://explorer.stacks.co/txid/0x2e33ad647a9cedacb718ce247967dc705bc0c878db899fdba5eae2437c6fa1e1' 
+       txid: '0x2e33ad647a9cedacb718ce247967dc705bc0c878db899fdba5eae2437c6fa1e1',
+       transaction: 'https://explorer.hiro.so/txid/0x2e33ad647a9cedacb718ce247967dc705bc0c878db899fdba5eae2437c6fa1e1'
      }
 
 ```
+
 ### convert_address
-```shell script 
+
+```shell script
 Convert a Bitcoin address to a Stacks address and vice versa.
 
 Example:
@@ -146,22 +163,26 @@ Example:
     }
 
 ```
+
 ### deploy_contract
-```shell script 
+
+```shell script
 Deploys a Clarity smart contract on the network.
 
 If the command succeeds, it prints out a transaction ID.
 Example:
-    // Specify -t for testnet. By default mainnet will be used. 
+    // Specify -t for testnet. By default mainnet will be used.
     export PAYMENT="bfeffdf57f29b0cc1fab9ea197bb1413da2561fe4b83e962c7f02fbbe2b1cd5401"
     stx deploy_contract ./my_contract.clar my_contract 1 0 "$PAYMENT"
      {
        txid: '0x2e33ad647a9cedacb718ce247967dc705bc0c878db899fdba5eae2437c6fa1e1',
-       transaction: 'https://explorer.stacks.co/txid/0x2e33ad647a9cedacb718ce247967dc705bc0c878db899fdba5eae2437c6fa1e1'  
+       transaction: 'https://explorer.hiro.so/txid/0x2e33ad647a9cedacb718ce247967dc705bc0c878db899fdba5eae2437c6fa1e1'
      }
 ```
+
 ### get_account_history
-```shell script 
+
+```shell script
 Query the history of account debits and credits over a given block range.  Returns the history one page at a time.  An empty result indicates that the page number has exceeded the number of historic operations in the given block range.
 
 Example:
@@ -192,8 +213,10 @@ Example:
 
 
 ```
+
 ### send_tokens
-```shell script 
+
+```shell script
 Send a particular type of tokens to the given `ADDRESS`.  Right now, only supported `TOKEN-TYPE` is `STACKS`.  Optionally include a memo string (`MEMO`) up to 34 characters long.
 
 If the command succeeds, it prints out a transaction ID.  You can track the confirmations on the transaction via the `get_confirmations` command.  Once the transaction has 7 confirmations, the Blockstack peer network will have processed it, and your payment key balance and recipient balance will be updated.
@@ -216,8 +239,8 @@ Example:
     # send tokens
     stx send_tokens SP1P10PS2T517S4SQGZT5WNX8R00G1ECTRKYCPMHY 12345 1 0 "$PAYMENT"
     {
-       txid: '0x2e33ad647a9cedacb718ce247967dc705bc0c878db899fdba5eae2437c6fa1e1', 
-       transaction: 'https://explorer.stacks.co/txid/0x2e33ad647a9cedacb718ce247967dc705bc0c878db899fdba5eae2437c6fa1e1' 
+       txid: '0x2e33ad647a9cedacb718ce247967dc705bc0c878db899fdba5eae2437c6fa1e1',
+       transaction: 'https://explorer.hiro.so/txid/0x2e33ad647a9cedacb718ce247967dc705bc0c878db899fdba5eae2437c6fa1e1'
     }
     a9d387a925fb0ba7a725fb1e11f2c3f1647473699dd5a147c312e6453d233456
 
@@ -233,30 +256,37 @@ Example:
     }
 
 ```
+
 ### stack
-```shell script 
+
+```shell script
 Stack the specified number of Stacks tokens for given number of cycles.
 
 Example:
     // Use -t option for testnet address
     stx stack 10000000 20 16pm276FpJYpm7Dv3GEaRqTVvGPTdceoY4 136ff26efa5db6f06b28f9c8c7a0216a1a52598045162abfe435d13036154a1b01
      {
-       txid: '0x2e33ad647a9cedacb718ce247967dc705bc0c878db899fdba5eae2437c6fa1e1',  
-       transaction: 'https://explorer.stacks.co/txid/0x2e33ad647a9cedacb718ce247967dc705bc0c878db899fdba5eae2437c6fa1e1' 
+       txid: '0x2e33ad647a9cedacb718ce247967dc705bc0c878db899fdba5eae2437c6fa1e1',
+       transaction: 'https://explorer.hiro.so/txid/0x2e33ad647a9cedacb718ce247967dc705bc0c878db899fdba5eae2437c6fa1e1'
      }
 ```
+
 ### stacking_status
-```shell script 
+
+```shell script
 Get stacking status for specified address.
 
 Example:
-    // Use -t option for testnet adddress 
+    // Use -t option for testnet adddress
     stx stacking_status SPZY1V53Z4TVRHHW9Z7SFG8CZNRAG7BD8WJ6SXD0
 
 ```
+
 ## Key Management
+
 ### decrypt_keychain
-```shell script 
+
+```shell script
 Decrypt an encrypted backup phrase with a password.  Decrypts to a 12-word backup phrase if done correctly.  The password will be prompted if not given.
 
 Example:
@@ -266,8 +296,10 @@ Example:
     Enter password:
     section amount spend resemble spray verify night immune tattoo best emotion parrot
 ```
+
 ### encrypt_keychain
-```shell script 
+
+```shell script
 Encrypt a 12-word backup phrase, which can be decrypted later with the `decrypt_backup_phrase` command.  The password will be prompted if not given.
 
 Example:
@@ -278,8 +310,10 @@ Example:
      Enter password again:
      M+DnBHYb1fgw4N3oZ+5uTEAua5bAWkgTW/SjmmBhGGbJtjOtqVV+RrLJEJOgT35hBon4WKdGWye2vTdgqDo7+HIobwJwkQtN2YF9g3zPsKk=
 ```
+
 ### faucet
-```shell script 
+
+```shell script
 Provide free Stacks Token (STX) on testnet for the specified address
 
 Example:
@@ -287,11 +321,13 @@ Example:
       stx faucet ST3PWZ5M026785YW8YKKEH316DYPE4AC7NNTD9ADN
       {
         txid: '0xd33672dd4dbb0b88f733bc67b938359843123ca3be550ca87d487d067bd1b3c3',
-        transaction: 'https://explorer.stacks.co/txid/0xd33672dd4dbb0b88f733bc67b938359843123ca3be550ca87d487d067bd1b3c3?chain=testnet'
+        transaction: 'https://explorer.hiro.so/txid/0xd33672dd4dbb0b88f733bc67b938359843123ca3be550ca87d487d067bd1b3c3?chain=testnet'
       }
 ```
+
 ### get_address
-```shell script 
+
+```shell script
 Get the address of a private key or multisig private key bundle.  Gives the BTC and STACKS addresses
 
 Example:
@@ -307,8 +343,10 @@ Example:
       "STACKS": "SMQWZ30EXVG6XEC1K4QTDP16C1CAWSK1JSWMS0QN"
     }
 ```
+
 ### get_app_keys
-```shell script 
+
+```shell script
 Get the application private key from a 12-word backup phrase and a name or ID-address.  This is the private key used to sign data in Gaia, and its address is the Gaia bucket address.  If you provide your encrypted backup phrase, you will be asked to decrypt it.  If you provide a name instead of an ID-address, its ID-address will be queried automatically (note that this means that the name must already be registered).
 
 NOTE: This command does NOT verify whether or not the name or ID-address was created by the backup phrase. You should do this yourself via the `get_owner_keys` command if you are not sure.
@@ -331,8 +369,10 @@ Example:
       "ownerKeyIndex": 0
     }
 ```
+
 ### get_owner_keys
-```shell script 
+
+```shell script
 Get the list of owner private keys and ID-addresses from a 12-word backup phrase.  Pass non-zero values for INDEX to generate the sequence of ID-addresses that can be used to own Blockstack IDs.  If you provide an encrypted 12-word backup phrase, you will be asked for your password to decrypt it.
 
 Example:
@@ -364,8 +404,10 @@ Example:
 
 
 ```
+
 ### get_payment_key
-```shell script 
+
+```shell script
 Get the payment private key from a 12-word backup phrase.  If you provide an encrypted backup phrase, you will be asked for your password to decrypt it.  This command will tell you your Bitcoin and Stacks token addresses as well.
 
 Example
@@ -383,8 +425,10 @@ Example
     ]
 
 ```
+
 ### get_stacks_wallet_key
-```shell script 
+
+```shell script
 Get the payment private key from a 24-word backup phrase used by the Stacks wallet.  If you provide an encrypted backup phrase, you will be asked for your password to decrypt it.  This command will tell you your Bitcoin and Stacks token addresses as well.
 
 Example
@@ -402,8 +446,10 @@ Example
     ]
 
 ```
+
 ### make_keychain
-```shell script 
+
+```shell script
 Generate the owner and payment private keys, optionally from a given 12-word backup phrase.  If no backup phrase is given, a new one will be generated.  If you provide your encrypted backup phrase, you will be asked to decrypt it.
 
 Example:
@@ -421,14 +467,20 @@ Example:
     }
 
 ```
+
 ## CLI
+
 ### docs
-```shell script 
+
+```shell script
 Dump the documentation for all commands as JSON to standard out.
 ```
+
 ## Gaia
+
 ### gaia_dump_bucket
-```shell script 
+
+```shell script
 Download the contents of a Gaia hub bucket to a given directory.  The `GAIA_HUB` argument must correspond to the *write* endpoint of the Gaia hub -- that is, you should be able to fetch `$GAIA_HUB/hub_info`.  If `DUMP_DIR` does not exist, it will be created.
 
 Example:
@@ -442,8 +494,10 @@ Example:
     3
 
 ```
+
 ### gaia_getfile
-```shell script 
+
+```shell script
 Get a file from another user's Gaia hub.  Prints the file data to stdout.  If you want to read an encrypted file, and/or verify a signed file, then you must pass an app private key, and pass 1 for `DECRYPT` and/or `VERIFY`.  If the file is encrypted, and you do not pass an app private key, then this command downloads the ciphertext.  If the file is signed, and you want to download its data and its signature, then you must run this command twice -- once to get the file contents at `FILENAME`, and once to get the signature (whose name will be `FILENAME`.sig).
 
 Gaia is a key-value store, so it does not have any built-in notion of directories.  However, most underlying storage systems do -- directory separators in the name of a file in Gaia may be internally treated as first-class directories (it depends on the Gaia hub's driver).As such, repeated directory separators will be treated as a single directory separator by this command.  For example, the file name `a/b.txt`, `/a/b.txt`, and `///a////b.txt` will be treated as identical.
@@ -464,8 +518,10 @@ Example with encryption:
     stx gaia_getfile ryan.id https://app.graphitedocs.com documentscollection.json "$APP_KEY" 1 0
 
 ```
+
 ### gaia_putfile
-```shell script 
+
+```shell script
 Put a file into a given Gaia hub, authenticating with the given app private key.  Optionally encrypt and/or sign the data with the given app private key.  If the file is successfully stored, this command prints out the URLs at which it can be fetched.
 
 Gaia is a key-value store, so it does not have any built-in notion of directories.  However, most underlying storage systems do -- directory separators in the name of a file in Gaia may be internally treated as first-class directories (it depends on the Gaia hub's driver).As such, repeated directory separators will be treated as a single directory separator by this command.  For example, the file name `a/b.txt`, `/a/b.txt`, and `///a////b.txt` will be treated as identical.
@@ -493,8 +549,10 @@ Example:
     }
 
 ```
+
 ### gaia_deletefile
-```shell script 
+
+```shell script
 Delete a file in a Gaia hub, as well as its signature metadata (which is stored in a separate file).
 Example:
 
@@ -503,8 +561,10 @@ Example:
     stx gaia_deletefile https://hub.blockstack.org "$APP_KEY" file.txt false
     ok
 ```
+
 ### gaia_listfiles
-```shell script 
+
+```shell script
 List all the files in a Gaia hub bucket.  You must have the private key for the bucket in order to list its contents.  The command prints each file name on its own line, and when finished, it prints the number of files listed.
 
 Example:
@@ -518,8 +578,10 @@ Example:
     3
 
 ```
+
 ### gaia_restore_bucket
-```shell script 
+
+```shell script
 Upload the contents of a previously-dumped Gaia bucket to a new Gaia hub.  The `GAIA_HUB` argument must correspond to the *write* endpoint of the Gaia hub -- that is, you should be able to fetch `$GAIA_HUB/hub_info`.  `DUMP_DIR` must contain the file contents created by a previous successful run of the gaia_dump_bucket command, and both `NAME_OR_ID_ADDRESS` and `APP_ORIGIN` must be the same as they were when it was run.
 
 Example:
@@ -532,8 +594,10 @@ Example:
     3
 
 ```
+
 ### gaia_sethub
-```shell script 
+
+```shell script
 Set the Gaia hub for a particular application for a Blockstack ID.  If the command succeeds, the URLs to your updated profile will be printed and your profile will contain an entry in its "apps" key that links the given `APP_ORIGIN` to the given `APP_GAIA_HUB`.
 
 NOTE: Both `OWNER_GAIA_HUB` and `APP_GAIA_HUB` must be the *write* endpoints of their respective Gaia hubs.
@@ -552,7 +616,7 @@ Example:
         ]
       }
     }
-    
+
     # You can check the new apps entry with curl and jq as follows:
     curl -sL https://gaia.blockstack.org/hub/1ArdkA2oLaKnbNbLccBaFhEV4pYju8hJ82/profile.json | jq ".[0].decodedToken.payload.claim.apps"
     {
@@ -561,9 +625,12 @@ Example:
 
 
 ```
+
 ## Profiles
+
 ### profile_sign
-```shell script 
+
+```shell script
 Sign a profile on disk with a given owner private key.  Print out the signed profile JWT.
 
 Example:
@@ -573,12 +640,16 @@ Example:
 
 
 ```
+
 ### profile_store
-```shell script 
+
+```shell script
 Store a profile on disk to a Gaia hub.  `USER_ID` can be either a Blockstack ID or an ID-address.  The `GAIA_HUB` argument must be the *write* endpoint for the user's Gaia hub (e.g. https://hub.blockstack.org).  You can verify this by ensuring that you can run `curl "$GAIA_HUB/hub_info"` successfully.
 ```
+
 ### profile_verify
-```shell script 
+
+```shell script
 Verify a JWT encoding a profile on disk using an ID-address.  Prints out the contained profile on success.
 
 Example:

@@ -3,6 +3,47 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.5.0](https://github.com/hirosystems/stacks.js/compare/v6.4.0...v6.5.0) (2023-03-26)
+
+**Note:** Version bump only for package @stacks/cli
+
+
+
+
+
+## [6.4.0](https://github.com/hirosystems/stacks.js/compare/v6.3.0...v6.4.0) (2023-03-19)
+
+**Note:** Version bump only for package @stacks/cli
+
+
+
+
+
+## [6.3.0](https://github.com/hirosystems/stacks.js/compare/v6.2.1...v6.3.0) (2023-03-17)
+
+**Note:** Version bump only for package @stacks/cli
+
+
+
+
+
+## [6.2.1](https://github.com/hirosystems/stacks.js/compare/v6.2.0...v6.2.1) (2023-03-04)
+
+
+### Bug Fixes
+
+* revert ajv update to fix broken cli argparse ([d29754d](https://github.com/hirosystems/stacks.js/commit/d29754df72546bafce2968362dfd104e49ecd1fe))
+
+
+
+## [6.2.0](https://github.com/hirosystems/stacks.js/compare/v6.1.1...v6.2.0) (2023-02-22)
+
+**Note:** Version bump only for package @stacks/cli
+
+
+
+
+
 ## [6.1.1](https://github.com/hirosystems/stacks.js/compare/v6.1.0...v6.1.1) (2023-01-30)
 
 **Note:** Version bump only for package @stacks/cli

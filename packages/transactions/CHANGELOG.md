@@ -3,6 +3,47 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.5.0](https://github.com/hirosystems/stacks.js/compare/v6.4.0...v6.5.0) (2023-03-26)
+
+
+### Features
+
+* add pc post condition builder ([#1466](https://github.com/hirosystems/stacks.js/issues/1466)) ([ac254ba](https://github.com/hirosystems/stacks.js/commit/ac254badb73401a77f984f6fe62e8f198419786b))
+
+
+
+## [6.4.0](https://github.com/hirosystems/stacks.js/compare/v6.3.0...v6.4.0) (2023-03-19)
+
+
+### Features
+
+* switch makeContractDeploy and makeUnsignedContractDeploy to use clarity 2 by default ([244636f](https://github.com/hirosystems/stacks.js/commit/244636fbd07a8c5f0fefa4671a88036412932fa0))
+
+
+
+## [6.3.0](https://github.com/hirosystems/stacks.js/compare/v6.2.1...v6.3.0) (2023-03-17)
+
+
+### Features
+
+* implement `getContractMapEntry` function ([#1461](https://github.com/hirosystems/stacks.js/issues/1461)) ([7031ead](https://github.com/hirosystems/stacks.js/commit/7031ead112f7333d165f5946eae0481f6aa9a20f))
+
+
+
+## [6.2.0](https://github.com/hirosystems/stacks.js/compare/v6.1.1...v6.2.0) (2023-02-22)
+
+
+### Features
+
+* allow string name for AnchorMode ([a039c33](https://github.com/hirosystems/stacks.js/commit/a039c33292436057bd5e73d4f796441794141f96))
+
+
+### Bug Fixes
+
+* a few Clarity value construction functions were not being exported ([f0ba4a2](https://github.com/hirosystems/stacks.js/commit/f0ba4a2f0d597c27839ff1f15b2b73514ca25fd3))
+
+
+
 ## [6.1.1](https://github.com/hirosystems/stacks.js/compare/v6.1.0...v6.1.1) (2023-01-30)
 
 **Note:** Version bump only for package @stacks/transactions

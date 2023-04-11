@@ -1,6 +1,6 @@
 {
   "name": "@stacks/profile",
-  "version": "6.1.1",
+  "version": "6.5.0",
   "description": "Library for Stacks profiles",
   "license": "MIT",
   "author": "Hiro Systems PBC (https://hiro.so)",
@@ -21,8 +21,8 @@
   },
   "dependencies": {
     "@stacks/common": "^6.0.0",
-    "@stacks/network": "^6.1.1",
-    "@stacks/transactions": "^6.1.1",
+    "@stacks/network": "^6.3.0",
+    "@stacks/transactions": "^6.5.0",
     "jsontokens": "^4.0.1",
     "schema-inspector": "^2.0.2",
     "zone-file": "^2.0.0-beta.3"

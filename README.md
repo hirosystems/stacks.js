@@ -51,8 +51,7 @@ functionality so that we can make sure your contribution can be included!
 To setup the development environment for this repository, follow these steps:
 
 > **Prerequisites**:
->
-> - Node v16.x.x is recommended (Node v17 may run into [issues](https://github.com/hirosystems/stacks.js/issues/1176) that can be [worked around](https://github.com/webpack/webpack/issues/14532#issuecomment-947012063))
+> NodeJS & npm are required (v18.x.x is currently recommended)
 
 1. Clone this package.
 2. Run `npm install` to install dependencies
