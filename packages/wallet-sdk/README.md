@@ -157,7 +157,7 @@ interface Account {
 
 When a user restores their wallet in a new app, you can automatically restore any previously-used accounts from the same wallet. It will also restore any usernames owned by this user.
 
-The private keys used to encrypt this data is derived from the path `m/44/5757'/0'/1`. This data is stored in [Gaia](https://docs.blockstack.org/build-apps/references/gaia), the decentralized storage system in the Stacks network. Users can host their own Gaia hub, and this library's API can use that Gaia hub, if provided.
+The private keys used to encrypt this data is derived from the path `m/44/5757'/0'/1`. This data is stored in [Gaia](https://docs.stacks.co/docs/gaia/), the decentralized storage system in the Stacks network. Users can host their own Gaia hub, and this library's API can use that Gaia hub, if provided.
 
 ```typescript
 import { restoreWalletAccounts } from '@stacks/wallet-sdk';
@@ -172,7 +172,7 @@ const restoredWallet = await restoreWalletAccounts({
 
 ### Making an authentication response
 
-With an account, you can generate an authentication response, which conforms to the Stacks authentication protocol. The resulting `authResponse` is a string, representing a signed JSON web token. [Learn more about the authentication protocol](https://docs.blockstack.org/build-apps/guides/authentication#authresponse-payload-schema).
+With an account, you can generate an authentication response, which conforms to the Stacks authentication protocol. The resulting `authResponse` is a string, representing a signed JSON web token. [Learn more about the authentication protocol](https://docs.hiro.so/build-apps/authentication#authresponse-payload-schema).
 
 ```typescript
 // The transit public key is provided in an "authentication request"
