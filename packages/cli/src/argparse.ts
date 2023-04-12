@@ -81,9 +81,9 @@ const LOG_CONFIG_DEFAULTS: CLI_LOG_CONFIG_TYPE = {
 };
 
 const CONFIG_DEFAULTS: CLI_CONFIG_TYPE = {
-  blockstackAPIUrl: 'http://stacks-node-api.stacks.co',
-  blockstackNodeUrl: 'http://stacks-node-api.stacks.co',
-  broadcastServiceUrl: 'http://stacks-node-api.stacks.co/v2/transactions',
+  blockstackAPIUrl: 'https://stacks-node-api.stacks.co',
+  blockstackNodeUrl: 'https://stacks-node-api.stacks.co',
+  broadcastServiceUrl: 'https://stacks-node-api.stacks.co/v2/transactions',
   utxoServiceUrl: 'https://blockchain.info',
   logConfig: LOG_CONFIG_DEFAULTS,
 };
@@ -96,13 +96,11 @@ const CONFIG_LOCALNET_DEFAULTS = {
   logConfig: Object.assign({}, LOG_CONFIG_DEFAULTS, { level: 'debug' }),
 };
 
-const PUBLIC_TESTNET_HOST = 'testnet-master.blockstack.org';
-
 const CONFIG_TESTNET_DEFAULTS = {
-  blockstackAPIUrl: `http://${PUBLIC_TESTNET_HOST}:20443`,
-  blockstackNodeUrl: `http://${PUBLIC_TESTNET_HOST}:20443`,
-  broadcastServiceUrl: `http://${PUBLIC_TESTNET_HOST}:20443/v2/transactions`,
-  utxoServiceUrl: `http://${PUBLIC_TESTNET_HOST}:18332`,
+  blockstackAPIUrl: `https://stacks-node-api.testnet.stacks.co`,
+  blockstackNodeUrl: `https://stacks-node-api.testnet.stacks.co`,
+  broadcastServiceUrl: `https://stacks-node-api.testnet.stacks.co/v2/transactions`,
+  utxoServiceUrl: `https://blockchain.info`, // todo: this likely doesn't work anymore
   logConfig: Object.assign({}, LOG_CONFIG_DEFAULTS, { level: 'debug' }),
 };
 
