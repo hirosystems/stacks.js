@@ -5,7 +5,7 @@ on the Stacks blockchain.
 
 ## What is BNS?
 
-The [Blockchain Naming System](https://docs.blockstack.org/build-apps/references/bns)
+The [Blockchain Naming System](https://docs.stacks.co/docs/stacks-academy/bns)
 (BNS) is a network system that binds Stacks usernames to off-chain
 state without relying on any central points of control.
 
