@@ -1981,7 +1981,7 @@ const COMMANDS: Record<string, CommandFunction> = {
   profile_sign: profileSign,
   profile_store: profileStore,
   profile_verify: profileVerify,
-  // 'send_btc': sendBTC,
+  // 'send_btc': sendBTC, // todo: fix
   register: register,
   tx_preorder: preorder,
   send_tokens: sendTokens,
