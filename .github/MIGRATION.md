@@ -1,11 +1,10 @@
 # Migration Guides
 
-- [Stacks.js (&lt;=4.x.x) → (5.x.x)](#stacksjs-4xx--5xx)
+- [Stacks.js (\<=4.x.x) → (5.x.x)](#stacksjs-4xx--5xx)
   - [Breaking Changes](#breaking-changes)
     - [Buffer to Uint8Array](#buffer-to-uint8array)
     - [Message Signing Prefix](#message-signing-prefix)
 - [blockstack.js → Stacks.js (1.x.x)](#blockstackjs--stacksjs-1xx)
-  - [Auth](#auth)
   - [Using blockstack.js](#using-blockstackjs)
     - [Using Blockstack Connect](#using-blockstack-connect)
   - [Storage](#storage)
@@ -122,8 +121,6 @@ if (userSession.isSignInPending()) {
 ```
 
 #### Using Blockstack Connect
-
-See full tutorial [here](https://docs.blockstack.org/authentication/connect)
 
 ```typescript
 // Configuring your app
