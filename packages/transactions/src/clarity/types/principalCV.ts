@@ -15,7 +15,7 @@ interface ContractPrincipalCV {
   readonly address: Address;
   readonly contractName: LengthPrefixedString;
 }
-
+/** Returns a string in the format `address` or `address.contract-name` from a principal (standard or contract) */
 function principalToString(principal: PrincipalCV): string {
   if (principal.type === ClarityType.PrincipalStandard) {
     return addressToString(principal.address);
