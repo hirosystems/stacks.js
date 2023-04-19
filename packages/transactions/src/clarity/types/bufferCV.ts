@@ -24,7 +24,7 @@ interface BufferCV {
  *  // this is a test
  * ```
  *
- * @visit
+ * @see
  * {@link https://github.com/hirosystems/stacks.js/blob/master/packages/transactions/tests/clarity.test.ts | clarity test cases for more examples}
  */
 const bufferCV = (buffer: Uint8Array): BufferCV => {
@@ -53,7 +53,7 @@ const bufferCV = (buffer: Uint8Array): BufferCV => {
  *  // this is a test
  *```
  *
- * @visit
+ * @see
  * {@link https://github.com/hirosystems/stacks.js/blob/master/packages/transactions/tests/clarity.test.ts | clarity test cases for more examples}
  */
 const bufferCVFromString = (str: string): BufferCV => bufferCV(utf8ToBytes(str));

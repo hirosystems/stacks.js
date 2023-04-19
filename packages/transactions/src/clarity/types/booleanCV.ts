@@ -23,7 +23,7 @@ interface FalseCV {
  *  // { type: 3 }
  * ```
  *
- * @visit
+ * @see
  * {@link https://github.com/hirosystems/stacks.js/blob/master/packages/transactions/tests/clarity.test.ts | clarity test cases for more examples}
  */
 const trueCV = (): BooleanCV => ({ type: ClarityType.BoolTrue });
@@ -41,7 +41,7 @@ const trueCV = (): BooleanCV => ({ type: ClarityType.BoolTrue });
  *  // { type: 4 }
  * ```
  *
- * @visit
+ * @see
  * {@link https://github.com/hirosystems/stacks.js/blob/master/packages/transactions/tests/clarity.test.ts | clarity test cases for more examples}
  */
 const falseCV = (): BooleanCV => ({ type: ClarityType.BoolFalse });
@@ -59,7 +59,7 @@ const falseCV = (): BooleanCV => ({ type: ClarityType.BoolFalse });
  *  // { type: 4 }
  * ```
  *
- * @visit
+ * @see
  * {@link https://github.com/hirosystems/stacks.js/blob/master/packages/transactions/tests/clarity.test.ts | clarity test cases for more examples}
  */
 const boolCV = (bool: boolean) => (bool ? trueCV() : falseCV());

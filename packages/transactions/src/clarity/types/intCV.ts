@@ -27,7 +27,7 @@ interface IntCV {
  *  // { type: 0, value: 100n }
  * ```
  *
- * @visit
+ * @see
  * {@link https://github.com/hirosystems/stacks.js/blob/master/packages/transactions/tests/clarity.test.ts | clarity test cases for more examples}
  */
 const intCV = (value: IntegerType): IntCV => {
@@ -60,7 +60,7 @@ interface UIntCV {
  *  // { type: 1, value: 100n }
  * ```
  *
- * @visit
+ * @see
  * {@link https://github.com/hirosystems/stacks.js/blob/master/packages/transactions/tests/clarity.test.ts | clarity test cases for more examples}
  */
 const uintCV = (value: IntegerType): UIntCV => {

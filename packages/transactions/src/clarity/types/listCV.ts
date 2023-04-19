@@ -21,7 +21,7 @@ interface ListCV<T extends ClarityValue = ClarityValue> {
  *  // { type: 11, list: [ { type: 0, value: 1n }, { type: 0, value: 2n }, { type: 0, value: 3n }, { type: 0, value: -4n } ] }
  * ```
  *
- * @visit
+ * @see
  * {@link https://github.com/hirosystems/stacks.js/blob/master/packages/transactions/tests/clarity.test.ts | clarity test cases for more examples}
  */
 function listCV<T extends ClarityValue = ClarityValue>(values: T[]): ListCV<T> {

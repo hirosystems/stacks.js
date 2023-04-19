@@ -29,7 +29,7 @@ interface ResponseOkCV<T extends ClarityValue = ClarityValue> {
  *  // { type: 8, value: { type: 0, value: 1n } }
  * ```
  *
- * @visit
+ * @see
  * {@link https://github.com/hirosystems/stacks.js/blob/master/packages/transactions/tests/clarity.test.ts | clarity test cases for more examples}
  */
 function responseErrorCV<T extends ClarityValue = ClarityValue>(value: T): ResponseErrorCV<T> {
@@ -52,7 +52,7 @@ function responseErrorCV<T extends ClarityValue = ClarityValue>(value: T): Respo
  *  // { type: 7, value: { type: 0, value: 1n } }
  * ```
  *
- * @visit
+ * @see
  * {@link https://github.com/hirosystems/stacks.js/blob/master/packages/transactions/tests/clarity.test.ts | clarity test cases for more examples}
  */
 function responseOkCV<T extends ClarityValue = ClarityValue>(value: T): ResponseOkCV<T> {
