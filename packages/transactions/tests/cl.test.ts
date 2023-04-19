@@ -26,10 +26,6 @@ describe('Cl', () => {
     { cv: intCV, cl: Cl.int, args: [-5] },
     { cv: boolCV, cl: Cl.bool, args: [true] },
     { cv: boolCV, cl: Cl.bool, args: [false] },
-    { cv: trueCV, cl: Cl.trueBool, args: [] },
-    { cv: falseCV, cl: Cl.falseBool, args: [] },
-    { cv: boolCV, cl: Cl.trueBool, args: [true] },
-    { cv: boolCV, cl: Cl.falseBool, args: [false] },
     { cv: trueCV, cl: Cl.bool, args: [true] },
     { cv: falseCV, cl: Cl.bool, args: [false] },
     {

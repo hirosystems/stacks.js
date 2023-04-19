@@ -5,7 +5,6 @@ import {
   bufferCV,
   contractPrincipalCV,
   deserializeCV,
-  falseCV,
   intCV,
   listCV,
   noneCV,
@@ -16,7 +15,6 @@ import {
   standardPrincipalCV,
   stringAsciiCV,
   stringUtf8CV,
-  trueCV,
   tupleCV,
   uintCV,
 } from './clarity';
@@ -31,21 +29,6 @@ import {
  * @see {@link serialize}, {@link deserialize}
  */
 export const bool = boolCV;
-/**
- * `Cl.trueBool` — Creates a Clarity boolean `true` type, represented as a JS object
- *
- * Alias for {@link trueCV}
- * @see {@link serialize}, {@link deserialize}
- */
-export const trueBool = trueCV;
-/**
- * `Cl.falseBool` — Creates a Clarity boolean `false` type, represented as a JS object
- *
- * Alias for {@link falseCV}
- * @see {@link serialize}, {@link deserialize}
- */
-export const falseBool = falseCV;
-
 /**
  * `Cl.int` — Creates a Clarity `int` type, represented as a JS object
  *
