@@ -81,9 +81,9 @@ const LOG_CONFIG_DEFAULTS: CLI_LOG_CONFIG_TYPE = {
 };
 
 const CONFIG_DEFAULTS: CLI_CONFIG_TYPE = {
-  blockstackAPIUrl: 'http://stacks-node-api.stacks.co',
-  blockstackNodeUrl: 'http://stacks-node-api.stacks.co',
-  broadcastServiceUrl: 'http://stacks-node-api.stacks.co/v2/transactions',
+  blockstackAPIUrl: 'https://stacks-node-api.stacks.co',
+  blockstackNodeUrl: 'https://stacks-node-api.stacks.co',
+  broadcastServiceUrl: 'https://stacks-node-api.stacks.co/v2/transactions',
   utxoServiceUrl: 'https://blockchain.info',
   logConfig: LOG_CONFIG_DEFAULTS,
 };
@@ -96,13 +96,11 @@ const CONFIG_LOCALNET_DEFAULTS = {
   logConfig: Object.assign({}, LOG_CONFIG_DEFAULTS, { level: 'debug' }),
 };
 
-const PUBLIC_TESTNET_HOST = 'testnet-master.blockstack.org';
-
 const CONFIG_TESTNET_DEFAULTS = {
-  blockstackAPIUrl: `http://${PUBLIC_TESTNET_HOST}:20443`,
-  blockstackNodeUrl: `http://${PUBLIC_TESTNET_HOST}:20443`,
-  broadcastServiceUrl: `http://${PUBLIC_TESTNET_HOST}:20443/v2/transactions`,
-  utxoServiceUrl: `http://${PUBLIC_TESTNET_HOST}:18332`,
+  blockstackAPIUrl: `https://stacks-node-api.testnet.stacks.co`,
+  blockstackNodeUrl: `https://stacks-node-api.testnet.stacks.co`,
+  broadcastServiceUrl: `https://stacks-node-api.testnet.stacks.co/v2/transactions`,
+  utxoServiceUrl: `https://blockchain.info`, // todo: this likely doesn't work anymore
   logConfig: Object.assign({}, LOG_CONFIG_DEFAULTS, { level: 'debug' }),
 };
 
@@ -2151,58 +2149,59 @@ export const CLI_ARGS = {
         '    $ stx register_addr example.id "$ID_ADDRESS" "$PAYMENT" https://gaia.blockstack.org/hub',
       group: 'Blockstack ID Management',
     },
-    register_subdomain: {
-      type: 'array',
-      items: [
-        {
-          name: 'blockstack_id',
-          type: 'string',
-          realtype: 'blockstack_id',
-          pattern: SUBDOMAIN_PATTERN,
-        },
-        {
-          name: 'owner_key',
-          type: 'string',
-          realtype: 'private_key',
-          pattern: PRIVATE_KEY_PATTERN,
-        },
-        {
-          name: 'gaia_hub',
-          type: 'string',
-          realtype: 'url',
-        },
-        {
-          name: 'registrar',
-          type: 'string',
-          realtype: 'url',
-        },
-        {
-          name: 'zonefile',
-          type: 'string',
-          realtype: 'path',
-        },
-      ],
-      minItems: 4,
-      maxItems: 5,
-      help:
-        'Register a subdomain.  This will generate and sign a subdomain zone file record ' +
-        'with the given `GAIA_HUB` URL and send it to the given subdomain registrar (`REGISTRAR`).\n' +
-        '\n' +
-        'This command generates, signs, and uploads a profile to the `GAIA_HUB` url.  Note that the `GAIA_HUB` ' +
-        'argument must correspond to the *write* endpoint of your Gaia hub (i.e. you should be able ' +
-        "to run 'curl \"$GAIA_HUB/hub_info\"' successfully).  If you are using Blockstack PBC's default " +
-        'Gaia hub, this argument should be "https://hub.blockstack.org".\n' +
-        '\n' +
-        'WARNING: At this time, no validation will occur on the registrar URL.  Be sure that the URL ' +
-        'corresponds to the registrar for the on-chain name before running this command!\n' +
-        '\n' +
-        'Example:\n' +
-        '\n' +
-        '    $ export OWNER="6e50431b955fe73f079469b24f06480aee44e4519282686433195b3c4b5336ef01"\n' +
-        '    $ # NOTE: https://registrar.blockstack.org is the registrar for personal.id!\n' +
-        '    $ stx register_subdomain hello.personal.id "$OWNER" https://hub.blockstack.org https://registrar.blockstack.org\n',
-      group: 'Blockstack ID Management',
-    },
+    // todo: implement register_subdomain
+    // register_subdomain: {
+    //   type: 'array',
+    //   items: [
+    //     {
+    //       name: 'blockstack_id',
+    //       type: 'string',
+    //       realtype: 'blockstack_id',
+    //       pattern: SUBDOMAIN_PATTERN,
+    //     },
+    //     {
+    //       name: 'owner_key',
+    //       type: 'string',
+    //       realtype: 'private_key',
+    //       pattern: PRIVATE_KEY_PATTERN,
+    //     },
+    //     {
+    //       name: 'gaia_hub',
+    //       type: 'string',
+    //       realtype: 'url',
+    //     },
+    //     {
+    //       name: 'registrar',
+    //       type: 'string',
+    //       realtype: 'url',
+    //     },
+    //     {
+    //       name: 'zonefile',
+    //       type: 'string',
+    //       realtype: 'path',
+    //     },
+    //   ],
+    //   minItems: 4,
+    //   maxItems: 5,
+    //   help:
+    //     'Register a subdomain.  This will generate and sign a subdomain zone file record ' +
+    //     'with the given `GAIA_HUB` URL and send it to the given subdomain registrar (`REGISTRAR`).\n' +
+    //     '\n' +
+    //     'This command generates, signs, and uploads a profile to the `GAIA_HUB` url.  Note that the `GAIA_HUB` ' +
+    //     'argument must correspond to the *write* endpoint of your Gaia hub (i.e. you should be able ' +
+    //     "to run 'curl \"$GAIA_HUB/hub_info\"' successfully).  If you are using Blockstack PBC's default " +
+    //     'Gaia hub, this argument should be "https://hub.blockstack.org".\n' +
+    //     '\n' +
+    //     'WARNING: At this time, no validation will occur on the registrar URL.  Be sure that the URL ' +
+    //     'corresponds to the registrar for the on-chain name before running this command!\n' +
+    //     '\n' +
+    //     'Example:\n' +
+    //     '\n' +
+    //     '    $ export OWNER="6e50431b955fe73f079469b24f06480aee44e4519282686433195b3c4b5336ef01"\n' +
+    //     '    $ # NOTE: https://registrar.blockstack.org is the registrar for personal.id!\n' +
+    //     '    $ stx register_subdomain hello.personal.id "$OWNER" https://hub.blockstack.org https://registrar.blockstack.org\n',
+    //   group: 'Blockstack ID Management',
+    // },
     revoke: {
       type: 'array',
       items: [

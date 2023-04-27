@@ -9,9 +9,9 @@ interface ListCV<T extends ClarityValue = ClarityValue> {
 /**
  * Create list of clarity types
  *
- * @param {ClarityValue>values: T[]} list of  ClarityValues to be converted to ListCV clarity type
+ * @param {ClarityValue[]} list of ClarityValues to be converted to ListCV clarity type
  *
- * @returns {ListCV<T>} returns instance of type ListCV<T>
+ * @returns {ListCV<T>} instance of type ListCV<T> of the provided values
  *
  * @example
  * ```
@@ -21,8 +21,8 @@ interface ListCV<T extends ClarityValue = ClarityValue> {
  *  // { type: 11, list: [ { type: 0, value: 1n }, { type: 0, value: 2n }, { type: 0, value: 3n }, { type: 0, value: -4n } ] }
  * ```
  *
- * @visit
- * {@link https://github.com/hirosystems/stacks.js/blob/master/packages/transactions/tests/clarity.test.ts clarity test cases for more examples}
+ * @see
+ * {@link https://github.com/hirosystems/stacks.js/blob/master/packages/transactions/tests/clarity.test.ts | clarity test cases for more examples}
  */
 function listCV<T extends ClarityValue = ClarityValue>(values: T[]): ListCV<T> {
   return { type: ClarityType.List, list: values };

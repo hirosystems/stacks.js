@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.5.1](https://github.com/hirosystems/stacks.js/compare/v6.5.0...v6.5.1) (2023-04-19)
+
+
+### Bug Fixes
+
+* add StacksDevnet constructor, closes [#1470](https://github.com/hirosystems/stacks.js/issues/1470) ([5789937](https://github.com/hirosystems/stacks.js/commit/5789937655f351bc07c26086f851653e20ab9c8c))
+* migrate explorer domains from stacks.co to hiro.so ([0370bf6](https://github.com/hirosystems/stacks.js/commit/0370bf69950fd333a7e5e0251485668191b1bfa8))
+* update cli url ([fcd6065](https://github.com/hirosystems/stacks.js/commit/fcd606539a426d2d7bd0581aa20f10ef3ce78e61))
+
+
+
 ## [6.5.0](https://github.com/hirosystems/stacks.js/compare/v6.4.0...v6.5.0) (2023-03-26)
 
 

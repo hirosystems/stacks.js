@@ -1,3 +1,12 @@
+import { utf8ToBytes } from '@stacks/common';
+import {
+  contractPrincipalCV,
+  falseCV,
+  principalToString,
+  standardPrincipalCV,
+  trueCV,
+} from '../src/clarity';
+import { ClarityVersion, StacksMessageType } from '../src/constants';
 import {
   CoinbasePayload,
   CoinbasePayloadToAltRecipient,
@@ -10,14 +19,7 @@ import {
   TokenTransferPayload,
   VersionedSmartContractPayload,
 } from '../src/payload';
-
 import { serializeDeserialize } from './macros';
-
-import { contractPrincipalCV, falseCV, standardPrincipalCV, trueCV } from '../src/clarity';
-
-import { utf8ToBytes } from '@stacks/common';
-import { principalToString } from '../src/clarity/types/principalCV';
-import { ClarityVersion, StacksMessageType } from '../src/constants';
 
 test('STX token transfer payload serialization and deserialization', () => {
   const recipient = standardPrincipalCV('SP3FGQ8Z7JY9BWYZ5WM53E0M9NK7WHJF0691NZ159');

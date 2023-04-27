@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.5.1](https://github.com/blockstack/stacks.js/compare/v6.5.0...v6.5.1) (2023-04-19)
+
+
+### Bug Fixes
+
+* migrate explorer domains from stacks.co to hiro.so ([0370bf6](https://github.com/blockstack/stacks.js/commit/0370bf69950fd333a7e5e0251485668191b1bfa8))
+
+
+
 ## [6.5.0](https://github.com/blockstack/stacks.js/compare/v6.4.0...v6.5.0) (2023-03-26)
 
 **Note:** Version bump only for package @stacks/bns
