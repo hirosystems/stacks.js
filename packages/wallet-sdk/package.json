@@ -47,6 +47,7 @@
     "@types/node": "^18.0.4",
     "assert": "^2.0.0",
     "crypto-browserify": "^3.12.0",
+    "jest-fetch-mock": "^3.0.3",
     "process": "^0.11.10",
     "yalc": "1.0.0-pre.49"
   },

@@ -28,9 +28,7 @@ export const fetchProfileFromUrl = async (
       const { decodedToken } = json[0];
       return decodedToken.payload?.claim as PublicProfileBase;
     }
-    if (res.status === 404) {
-      return null;
-    }
+    if (res.status === 404) return null;
     throw new Error('Network error when fetching profile');
   } catch (error) {
     return null;

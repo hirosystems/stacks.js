@@ -1,5 +1,7 @@
 import { Wallet, WalletConfig } from '../src';
 
+// todo: clean up unused mock values
+
 export const mockWallet: Wallet = {
   salt: 'c15619adafe7e75a195a1a2b5788ca42e585a3fd181ae2ff009c6089de54ed9e',
   rootKey:
@@ -44,7 +46,7 @@ export const mockGaiaHubInfo = JSON.stringify({
   latest_auth_version: 'v1',
 });
 
-export const mockProfileResponse = JSON.stringify([
+export const MOCK_PROFILE_RESPONSE = [
   {
     token:
       'eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NksifQ.eyJqdGkiOiJmYmY1YjU4OC03NjA1LTQ4YWEtOWZkZi1iMTI2ODhhMGQwNDciLCJpYXQiOiIyMDIwLTA1LTE5VDEyOjQwOjA5LjQ4OVoiLCJleHAiOiIyMDIxLTA1LTE5VDEyOjQwOjA5LjQ4OVoiLCJzdWJqZWN0Ijp7InB1YmxpY0tleSI6IjAzZTkzYWU2NWQ2Njc1MDYxYTE2N2MzNGI4MzIxYmVmODc1OTQ0NjhlOWIyZGQxOWMwNWE2N2E3YjRjYWVmYTAxNyJ9LCJpc3N1ZXIiOnsicHVibGljS2V5IjoiMDNlOTNhZTY1ZDY2NzUwNjFhMTY3YzM0YjgzMjFiZWY4NzU5NDQ2OGU5YjJkZDE5YzA1YTY3YTdiNGNhZWZhMDE3In0sImNsYWltIjp7IkB0eXBlIjoiUGVyc29uIiwiQGNvbnRleHQiOiJodHRwOi8vc2NoZW1hLm9yZyIsImFwcHMiOnsiaHR0cHM6Ly9iYW50ZXIucHViIjoiaHR0cHM6Ly9nYWlhLmJsb2Nrc3RhY2sub3JnL2h1Yi8xRGt1QUNodWZZalRrVENlakpnU3p0dXFwNUtkeWtwV2FwLyIsImh0dHA6Ly8xMjcuMC4wLjE6MzAwMCI6Imh0dHBzOi8vZ2FpYS5ibG9ja3N0YWNrLm9yZy9odWIvMTVoQUxuRUo4ZnZYTmdSeXptVnNwRHlaY0dFeExHSE5TZi8iLCJodHRwczovL2Jsb2Nrc3RhY2suZ2l0aHViLmlvIjoiaHR0cHM6Ly9nYWlhLmJsb2Nrc3RhY2sub3JnL2h1Yi8xRUR1dktmenVOUlVlbnR6MXQ1amZ4VDlmVzFIUDJOSkdXLyJ9LCJhcGkiOnsiZ2FpYUh1YkNvbmZpZyI6eyJ1cmxfcHJlZml4IjoiaHR0cHM6Ly9nYWlhLmJsb2Nrc3RhY2sub3JnL2h1Yi8ifSwiZ2FpYUh1YlVybCI6Imh0dHBzOi8vaHViLmJsb2Nrc3RhY2sub3JnIn0sImFwcHNNZXRhIjp7Imh0dHBzOi8vYmFudGVyLnB1YiI6eyJzdG9yYWdlIjoiaHR0cHM6Ly9nYWlhLmJsb2Nrc3RhY2sub3JnL2h1Yi8xRGt1QUNodWZZalRrVENlakpnU3p0dXFwNUtkeWtwV2FwLyIsInB1YmxpY0tleSI6IjAyMDIxZWZkMGVjM2E0Y2ZkZGQ5ZjA1OTg4NGE4MzRiYjMzMmM4N2ZkYWRhMDUzODA3NzBiZmY1M2Q1ODQ2ZThhYSJ9fX19.GyFt9EZXwr8_jbunvrA38Rv80oBsgjokEPz4SXmZ724I8FCn22g7PK5tWBmpLCZAqVaaYgls9oJcX0vYN-BVsA',
@@ -92,4 +94,4 @@ export const mockProfileResponse = JSON.stringify([
         'GyFt9EZXwr8_jbunvrA38Rv80oBsgjokEPz4SXmZ724I8FCn22g7PK5tWBmpLCZAqVaaYgls9oJcX0vYN-BVsA',
     },
   },
-]);
+];
