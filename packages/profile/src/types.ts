@@ -23,6 +23,7 @@ export interface PublicProfileBase {
       storage: string;
     };
   };
+  [k: string]: unknown;
 }
 
 export interface PublicPersonProfile extends PublicProfileBase {
