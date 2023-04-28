@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.5.2](https://github.com/hirosystems/stacks.js/compare/v6.5.1...v6.5.2) (2023-04-28)
+
+
+### Bug Fixes
+
+* **stacking:** return full principal instead of only address ([7e92f7f](https://github.com/hirosystems/stacks.js/commit/7e92f7fbdae14483b1ebcbaefd774202cb215d54))
+
+
+
 ## [6.5.1](https://github.com/hirosystems/stacks.js/compare/v6.5.0...v6.5.1) (2023-04-19)
 
 **Note:** Version bump only for package @stacks/stacking
