@@ -299,10 +299,11 @@ export function unwrapMap<T extends ClarityValue, U>(optional: OptionalCV<T>, ma
   throw new Error("Object is not an 'Optional'");
 }
 
-export function ensurePox2IsLive(operationInfo: PoxOperationInfo) {
+/** @internal */
+export function ensurePox2Activated(operationInfo: PoxOperationInfo) {
   if (operationInfo.period === PoxOperationPeriod.Period1)
     throw new Error(
-      `PoX-2 is not live yet (currently in period ${operationInfo.period} of PoX-2 operation)`
+      `PoX-2 has not activated yet (currently in period ${operationInfo.period} of PoX-2 operation)`
     );
 }
 

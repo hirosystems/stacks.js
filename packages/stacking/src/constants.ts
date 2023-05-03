@@ -77,6 +77,10 @@ export const SEGWIT_V1 = 1;
 //   mainnet P2TR: bc1p5d7rjq7g6rdk2yhzks9smlaqtedr4dekq08ge8ztwac72sfr9rusxg3297
 //   testnet P2TR: tb1p6h5fuzmnvpdthf5shf0qqjzwy7wsqc5rhmgq2ks9xrak4ry6mtrscsqvzp
 
+/**
+ * Transitional periods from the 2.1 launch
+ * @see SIP-015
+ */
 export enum PoxOperationPeriod {
   /** Period 1: This is before the 2.1 fork. */
   Period1 = 'Period1',
