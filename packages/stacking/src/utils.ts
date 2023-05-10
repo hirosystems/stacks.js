@@ -207,6 +207,10 @@ export function getErrorString(error: StackingErrors): string {
       return 'Invalid reward-cycle and reward-cycle-index';
     case StackingErrors.ERR_DELEGATION_WRONG_REWARD_SLOT:
       return 'PoX address must match the one on record';
+    case StackingErrors.ERR_STACKING_IS_DELEGATED:
+      return 'Stacker must be directly stacking and not delegating';
+    case StackingErrors.ERR_STACKING_NOT_DELEGATED:
+      return 'Stacker must be delegating and not be directly stacking';
   }
 }
 
