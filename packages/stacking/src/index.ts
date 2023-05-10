@@ -1399,11 +1399,7 @@ export class StackingClient {
   parseContractId(contract: string): string[] {
     const parts = contract.split('.');
 
-    if (
-      parts.length === 2 &&
-      validateStacksAddress(parts[0]) &&
-      (parts[1] === 'pox' || parts[1] === 'pox-2')
-    ) {
+    if (parts.length === 2 && validateStacksAddress(parts[0]) && parts[1].startsWith('pox')) {
       return parts;
     }
 

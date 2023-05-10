@@ -22,7 +22,7 @@ import {
 import fetchMock from 'jest-fetch-mock';
 import { PoXAddressVersion, StackingErrors } from '../src/constants';
 import { decodeBtcAddress, poxAddressToBtcAddress } from '../src/utils';
-import { V2_POX_REGTEST } from './apiMockingHelpers';
+import { V2_POX_REGTEST_POX_3 } from './apiMockingHelpers';
 
 const poxInfo = {
   contract_id: 'ST000000000000000000002AMW42H.pox',
@@ -1070,7 +1070,7 @@ test('pox address to btc address', () => {
 });
 
 test('client operations with contract principal stacker', () => {
-  fetchMock.mockOnce(V2_POX_REGTEST);
+  fetchMock.mockOnce(V2_POX_REGTEST_POX_3);
   fetchMock.mockOnce(
     `{"balance":"0x0000000000000000000000001e22f616","locked":"0x00000000000000000000000000000000","unlock_height":0,"nonce":0}`
   );
