@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.5.3](https://github.com/hirosystems/stacks.js/compare/v6.5.2...v6.5.3) (2023-05-11)
+
+
+### Bug Fixes
+
+* add missing fields from `PoxInfo` ([acb7d78](https://github.com/hirosystems/stacks.js/commit/acb7d78881515949b48352b4c0a55b4de91178ee))
+* **pox-3:** include pox-3 error codes ([c72d82a](https://github.com/hirosystems/stacks.js/commit/c72d82ab0b0de30bb54541064c97bcd44171f5de))
+* **pox-3:** update stacking lib to always use the latest activated / current pox contract ([a2aac09](https://github.com/hirosystems/stacks.js/commit/a2aac09e5be07238b4af36af4fdd7deb09afdb11))
+
+
+
 ## [6.5.2](https://github.com/hirosystems/stacks.js/compare/v6.5.1...v6.5.2) (2023-04-28)
 
 
