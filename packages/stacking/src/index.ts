@@ -83,10 +83,12 @@ export interface PoxInfo {
   reward_slots: number;
   current_cycle: CycleInfo;
   next_cycle: CycleInfo & {
+    min_increment_ustx: number;
     prepare_phase_start_block_height: number;
     blocks_until_prepare_phase: number;
     reward_phase_start_block_height: number;
     blocks_until_reward_phase: number;
+    ustx_until_pox_rejection: number;
   };
 }
 
