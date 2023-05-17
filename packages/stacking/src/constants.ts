@@ -26,7 +26,12 @@ export const BitcoinNetworkVersion = {
     P2PKH: 0x6f, // 111
     P2SH: 0xc4, // 196
   },
-  regtest: {
+  devnet: {
+    // equivalent to testnet for our purposes
+    P2PKH: 0x6f, // 111
+    P2SH: 0xc4, // 196
+  },
+  mocknet: {
     // equivalent to testnet for our purposes
     P2PKH: 0x6f, // 111
     P2SH: 0xc4, // 196
@@ -59,7 +64,8 @@ export const SEGWIT_V1_ADDR_PREFIX = /^(bc1p|tb1p|bcrt1p)/i;
 export const SegwitPrefix = {
   mainnet: 'bc',
   testnet: 'tb',
-  regtest: 'bcrt',
+  devnet: 'bcrt',
+  mocknet: 'bcrt',
 } as const;
 /** @ignore */
 export const SEGWIT_ADDR_PREFIXES = /^(bc|tb)/i;
