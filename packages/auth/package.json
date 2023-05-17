@@ -1,6 +1,6 @@
 {
   "name": "@stacks/auth",
-  "version": "6.5.2",
+  "version": "6.5.4",
   "description": "Authentication for Stacks apps.",
   "license": "MIT",
   "author": "Hiro Systems PBC (https://hiro.so)",
@@ -21,9 +21,9 @@
   },
   "dependencies": {
     "@stacks/common": "^6.5.2",
-    "@stacks/encryption": "^6.5.2",
-    "@stacks/network": "^6.5.2",
-    "@stacks/profile": "^6.5.2",
+    "@stacks/encryption": "^6.5.4",
+    "@stacks/network": "^6.5.4",
+    "@stacks/profile": "^6.5.4",
     "cross-fetch": "^3.1.5",
     "jsontokens": "^4.0.1"
   },
