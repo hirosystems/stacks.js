@@ -11,7 +11,7 @@ export interface NetworkConfig {
 }
 
 export const StacksNetworks = ['mainnet', 'testnet', 'devnet', 'mocknet'] as const;
-export type StacksNetworkName = (typeof StacksNetworks)[number];
+export type StacksNetworkName = typeof StacksNetworks[number];
 
 /**
  * @related {@link StacksMainnet}, {@link StacksTestnet}, {@link StacksDevnet}, {@link StacksMocknet}
@@ -125,7 +125,7 @@ export class StacksNetwork {
       })
       .then(nameInfo => {
         // the returned address _should_ be in the correct network ---
-        //  blockstackd gets into trouble because it tries to coerce back to mainnet
+        //  stacks node gets into trouble because it tries to coerce back to mainnet
         //  and the regtest transaction generation libraries want to use testnet addresses
         if (nameInfo.address) {
           return Object.assign({}, nameInfo, { address: nameInfo.address });

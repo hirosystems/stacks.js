@@ -24,6 +24,7 @@ import {
   SEGWIT_V1_ADDR_PREFIX,
   StackingErrors,
 } from './constants';
+import { StacksNetworkName, StacksNetworks } from '@stacks/network';
 
 export class InvalidAddressError extends Error {
   innerError?: Error;
@@ -226,7 +227,7 @@ export function poxAddressToTuple(poxAddress: string) {
 
 function legacyHashModeToBtcAddressVersion(
   hashMode: PoXAddressVersion,
-  network: 'mainnet' | 'testnet' | 'regtest'
+  network: StacksNetworkName
 ): number {
   switch (hashMode) {
     case PoXAddressVersion.P2PKH:
@@ -244,9 +245,9 @@ function legacyHashModeToBtcAddressVersion(
 function _poxAddressToBtcAddress_Values(
   version: number,
   hashBytes: Uint8Array,
-  network: 'mainnet' | 'testnet' | 'regtest'
+  network: StacksNetworkName
 ): string {
-  if (!['mainnet', 'testnet', 'regtest'].includes(network)) throw new Error('Invalid network.');
+  if (!StacksNetworks.includes(network)) throw new Error('Invalid network.');
 
   switch (version) {
     case PoXAddressVersion.P2PKH:
@@ -271,7 +272,7 @@ function _poxAddressToBtcAddress_Values(
 
 function _poxAddressToBtcAddress_ClarityValue(
   poxAddrClarityValue: ClarityValue,
-  network: 'mainnet' | 'testnet' | 'regtest'
+  network: StacksNetworkName
 ): string {
   const poxAddr = extractPoxAddressFromClarityValue(poxAddrClarityValue);
   return _poxAddressToBtcAddress_Values(poxAddr.version, poxAddr.hashBytes, network);
@@ -280,11 +281,11 @@ function _poxAddressToBtcAddress_ClarityValue(
 export function poxAddressToBtcAddress(
   version: number,
   hashBytes: Uint8Array,
-  network: 'mainnet' | 'testnet' | 'regtest'
+  network: StacksNetworkName
 ): string;
 export function poxAddressToBtcAddress(
   poxAddrClarityValue: ClarityValue,
-  network: 'mainnet' | 'testnet' | 'regtest'
+  network: StacksNetworkName
 ): string;
 export function poxAddressToBtcAddress(...args: any[]): string {
   if (typeof args[0] === 'number') return _poxAddressToBtcAddress_Values(args[0], args[1], args[2]);
