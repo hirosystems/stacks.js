@@ -30,6 +30,7 @@ export {
   isTokenTransferPayload,
   serializePayload,
 } from './payload';
+/** test documentation building */
 export * as Pc from './pc';
 export {
   createFungiblePostCondition,
