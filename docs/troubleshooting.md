@@ -10,6 +10,20 @@ If using @stacks/connect with vite, rollup, svelte, or vue, a package `regenerat
 
 
 ```jsx live
+import { StacksMainnet } from "@stacks/network";
+import { StackingClient } from "@stacks/stacking";
+console = {
+  log: (...args) => {
+    document.body.innerHTML += `<code>${args
+      .map(JSON.stringify)
+      .join(" ")}</code>`;
+  },
+};
+
+const network = new StacksMainnet();
+const client = new StackingClient("", network);
+const periodInfo = await client.getPoxOperationInfo();
+console.log("🦁", periodInfo);
 function Clock(props) {
   const [date, setDate] = useState(new Date());
   useEffect(() => {
