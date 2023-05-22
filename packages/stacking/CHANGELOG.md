@@ -5,9 +5,10 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 ## [6.5.4](https://github.com/hirosystems/stacks.js/compare/v6.5.3...v6.5.4) (2023-05-17)
 
-**Note:** Version bump only for package @stacks/stacking
 
+### Bug Fixes
 
+* Use StacksNetworkName instead of union type ([#1500](https://github.com/hirosystems/stacks.js/pull/1500)) ([efd2255](https://github.com/hirosystems/stacks.js/commit/efd2255f979ed64b90ac33246d99cd4809620400))
 
 
 
