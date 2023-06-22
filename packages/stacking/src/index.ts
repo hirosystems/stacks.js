@@ -151,13 +151,11 @@ export type DelegationInfo =
       details: {
         amount_micro_stx: bigint;
         delegated_to: string;
-        pox_address:
-          | {
-              version: Uint8Array;
-              hashbytes: Uint8Array;
-            }
-          | undefined;
-        until_burn_ht: number | undefined;
+        pox_address?: {
+          version: number;
+          hashbytes: Uint8Array;
+        };
+        until_burn_ht?: number;
       };
     };
 
@@ -1338,7 +1336,7 @@ export class StackingClient {
         const delegatedTo = tupleCV.data['delegated-to'] as PrincipalCV;
 
         const poxAddress = unwrapMap(tupleCV.data['pox-addr'] as OptionalCV<TupleCV>, tuple => ({
-          version: (tuple.data['version'] as BufferCV).buffer,
+          version: (tuple.data['version'] as BufferCV).buffer[0],
           hashbytes: (tuple.data['hashbytes'] as BufferCV).buffer,
         }));
         const untilBurnBlockHeight = unwrap(tupleCV.data['until-burn-ht'] as OptionalCV<UIntCV>);
