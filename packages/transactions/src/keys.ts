@@ -142,7 +142,7 @@ export function compressPublicKey(publicKey: string | Uint8Array): StacksPublicK
 export function deserializePublicKey(bytesReader: BytesReader): StacksPublicKey {
   const fieldId = bytesReader.readUInt8();
   const keyLength =
-    fieldId !== 4 ? COMPRESSED_PUBKEY_LENGTH_BYTES : UNCOMPRESSED_PUBKEY_LENGTH_BYTES;
+    fieldId === 4 ? UNCOMPRESSED_PUBKEY_LENGTH_BYTES : COMPRESSED_PUBKEY_LENGTH_BYTES;
   return publicKeyFromBytes(concatArray([fieldId, bytesReader.readBytes(keyLength)]));
 }
 
