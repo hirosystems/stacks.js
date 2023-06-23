@@ -1349,7 +1349,7 @@ export class StackingClient {
             amount_micro_stx: BigInt(amountMicroStx.value),
             delegated_to: principalToString(delegatedTo),
             pox_address: poxAddress,
-            until_burn_ht: Number(untilBurnBlockHeight?.value),
+            until_burn_ht: untilBurnBlockHeight ? Number(untilBurnBlockHeight.value) : undefined,
           },
         };
       } else if (responseCV.type === ClarityType.OptionalNone) {

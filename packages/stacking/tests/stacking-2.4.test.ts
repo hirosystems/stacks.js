@@ -345,6 +345,45 @@ describe('delegated stacking', () => {
     expect(balanceLocked).toBe(0n); // no funds are locked yet, because the pool hasn't (partially) stacked yet
   });
 
+  test('delegate stx without until height', async () => {
+    const privateKey = 'cb3df38053d132895220b9ce471f6b676db5b9bf0b4adefb55f2118ece2478df01';
+    const address = 'STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6';
+    const poxAddress = '1Xik14zRm29UsyS6DjhYg4iZeZqsDa8D3';
+
+    const delegateTo = 'ST2MCYPWTFMD2MGR5YY695EJG0G1R4J2BTJPRGM7H';
+
+    const network = new StacksTestnet({ url: API_URL });
+    const client = new StackingClient(address, network);
+
+    setApiMocks({
+      ...MOCK_POX_3_REGTEST,
+      '/v2/contracts/call-read/ST000000000000000000002AMW42H/pox-3/get-delegation-info': `{"okay":true,"result":"0x09"}`,
+      '/v2/accounts/STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6?proof=0': `{"balance":"0x0000000000000000002386f26fc0fde0","locked":"0x00000000000000000000000000000000","unlock_height":0,"nonce":2}`,
+    });
+
+    let status = await client.getDelegationStatus();
+    expect(status.delegated).toBeFalsy();
+
+    const poxInfo = await client.getPoxInfo();
+    const delegationResult = await client.delegateStx({
+      delegateTo,
+      amountMicroStx: BigInt(poxInfo.min_amount_ustx),
+      poxAddress,
+      privateKey,
+    });
+    await waitForTx(delegationResult.txid);
+
+    setApiMocks({
+      ...MOCK_POX_3_REGTEST,
+      '/v2/contracts/call-read/ST000000000000000000002AMW42H/pox-3/get-delegation-info': `{"okay":true,"result":"0x0a0c000000040b616d6f756e742d757374780100000000000000000006a9775dca38000c64656c6567617465642d746f051aa8cf5b9a7d1a2a4305f78c92ba50040382484bd408706f782d616464720a0c0000000209686173686279746573020000001405cf52a44bf3e6829b4f8c221cc675355bf83b7d0776657273696f6e0200000001000d756e74696c2d6275726e2d687409"}`,
+      '/v2/accounts/STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6?proof=0': `{"balance":"0x0000000000000000002386f26fc0fcd0","locked":"0x00000000000000000000000000000000","unlock_height":0,"nonce":3}`,
+    });
+
+    status = await client.getDelegationStatus();
+    if (!status.delegated) throw Error;
+    expect(status.details.until_burn_ht).toBeUndefined();
+  });
+
   test('delegate stack, and delegator stack', async () => {
     const privateKey = 'cb3df38053d132895220b9ce471f6b676db5b9bf0b4adefb55f2118ece2478df01';
     const address = 'STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6';
