@@ -3,11 +3,11 @@ name: publish
 on:
   push:
     branches:
-      - master
+      - main
     tags-ignore:
-      - "**"
+      - '**'
     paths-ignore:
-      - "**.md"
+      - '**.md'
 
   workflow_dispatch:
 

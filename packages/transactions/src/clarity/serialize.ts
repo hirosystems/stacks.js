@@ -148,7 +148,7 @@ function serializeStringUtf8CV(cv: StringUtf8CV) {
  * ```
  *
  * @see
- * {@link https://github.com/hirosystems/stacks.js/blob/master/packages/transactions/tests/clarity.test.ts | clarity test cases for more examples}
+ * {@link https://github.com/hirosystems/stacks.js/blob/main/packages/transactions/tests/clarity.test.ts | clarity test cases for more examples}
  */
 export function serializeCV(value: ClarityValue): Uint8Array {
   switch (value.type) {
