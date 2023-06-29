@@ -19,26 +19,23 @@
       "packages/keychain",
       "packages/profile",
       "packages/storage",
-      "packages/wallet-sdk",
+      "packages/wallet-sdk"
     ],
     "json": "docs/docs.json",
     "out": "docs",
     "excludePrivate": true,
     "excludeProtected": true,
-    "categoryOrder": [
-      "*",
-      "Other"
-    ],
+    "categoryOrder": ["*", "Other"],
     "gaID": "GTM-M8P6G7Z",
     "theme": "stacks",
     "replaceText": {
       "replacements": [
         {
-          "pattern": "https://github.com/hirosystems/stacks.js/tree/master/packages/wallet-sdk",
+          "pattern": "https://github.com/hirosystems/stacks.js/tree/main/packages/wallet-sdk",
           "replace": "/modules/_stacks_wallet_sdk"
         },
         {
-          "pattern": "https://github.com/hirosystems/stacks.js/tree/master/packages/",
+          "pattern": "https://github.com/hirosystems/stacks.js/tree/main/packages/",
           "replace": "/modules/_stacks_"
         }
       ]

@@ -3,11 +3,11 @@ name: version
 on:
   push:
     branches:
-      - master
+      - main
     tags-ignore:
-      - "**"
+      - '**'
     paths-ignore:
-      - "**.md"
+      - '**.md'
 
   workflow_dispatch:
 
@@ -28,7 +28,7 @@ jobs:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
-          ref: master
+          ref: main
 
       - uses: actions/setup-node@v3
         with:
@@ -51,8 +51,8 @@ jobs:
       - name: Create Release Pull Request
         uses: janniks/changesets-action@main
         with:
-          title: "chore: version packages"
-          commit: "chore: version packages"
-          version: "npm run ci:version"
+          title: 'chore: version packages'
+          commit: 'chore: version packages'
+          version: 'npm run ci:version'
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN || secrets.GITHUB_TOKEN }}

@@ -27,7 +27,7 @@ interface StringUtf8CV {
  * ```
  *
  * @see
- * {@link https://github.com/hirosystems/stacks.js/blob/master/packages/transactions/tests/clarity.test.ts | clarity test cases for more examples}
+ * {@link https://github.com/hirosystems/stacks.js/blob/main/packages/transactions/tests/clarity.test.ts | clarity test cases for more examples}
  */
 const stringAsciiCV = (data: string): StringAsciiCV => {
   return { type: ClarityType.StringASCII, data };
@@ -50,7 +50,7 @@ const stringAsciiCV = (data: string): StringAsciiCV => {
  * ```
  *
  * @see
- * {@link https://github.com/hirosystems/stacks.js/blob/master/packages/transactions/tests/clarity.test.ts | clarity test cases for more examples}
+ * {@link https://github.com/hirosystems/stacks.js/blob/main/packages/transactions/tests/clarity.test.ts | clarity test cases for more examples}
  */
 const stringUtf8CV = (data: string): StringUtf8CV => {
   return { type: ClarityType.StringUTF8, data };
