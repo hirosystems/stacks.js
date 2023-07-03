@@ -37,7 +37,7 @@ const network = new StacksMainnet({ url: 'https://www.mystacksnode.com/' });
 For web apps you can request the users address via Stacks Connect. [Read more](https://connect.stacks.js.org/modules/_stacks_connect#quotconnectquot-aka-authentication-showconnect)
 :::
 
-Stacks.js uses the concept of an "account" to represent a user's identity on the blockchain. An account is identified by a unique address, which is a string of 34 characters. The address is derived from the account's public key, which is derived from the account's private key.
+Stacks.js uses the concept of an "account" to represent a user's identity on the blockchain. An account is identified by a unique address. The address is derived from the account's public key, which is derived from the account's private key.
 
 A normal mainnet address starts with `SP` and a testnet address starts with `ST`.
 e.g. `SP3FGQ8Z7JY9BWYZ5WM53E0M9NK7WHJF0691NZ159`, `ST2F4BK4GZH6YFBNHYDDGN4T1RKBA7DA1BJZPJEJJ`
