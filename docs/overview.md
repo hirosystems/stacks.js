@@ -53,7 +53,7 @@ Below is a list of all Stacks.js libraries and a few JS libraries and helpers ma
 ### Stacks Primitives
 
 - [`@stacks/transactions`](https://stacks.js.org/modules/_stacks_transactions) Construct, decode transactions and work with Clarity smart contracts on the Stacks blockchain. [Github](https://github.com/hirosystems/stacks.js/tree/master/packages/transactions)
-- [`@stacks/wallet-sdk](https://stacks.js.org/modules/_stacks_wallet_sdk)` Library for building wallets, managing accounts, and handling keys for the Stacks blockchain. [Github](https://github.com/hirosystems/stacks.js/tree/master/packages/wallet-sdk)
+- [`@stacks/wallet-sdk`](https://stacks.js.org/modules/_stacks_wallet_sdk) Library for building wallets, managing accounts, and handling keys for the Stacks blockchain. [Github](https://github.com/hirosystems/stacks.js/tree/master/packages/wallet-sdk)
 - [`@stacks/storage`](https://stacks.js.org/modules/_stacks_storage) Store and fetch files with Gaia, the decentralized storage system. [Github](https://github.com/hirosystems/stacks.js/tree/master/packages/storage)
 - [`@stacks/encryption`](https://stacks.js.org/modules/_stacks_encryption) Encryption functions used by stacks.js packages. [Github](https://github.com/hirosystems/stacks.js/tree/master/packages/encryption)
 - [`@stacks/auth`](https://stacks.js.org/modules/_stacks_auth) Construct and decode authentication requests for Stacks apps. [Github](https://github.com/hirosystems/stacks.js/tree/master/packages/auth)
