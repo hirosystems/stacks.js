@@ -2,9 +2,11 @@
 title: Sign Messages
 ---
 
-import StacksjsStartersNote from '../includes/stacks.js-starters-note.mdx';
+import StacksjsStartersNote from '../includes/\_stacks.js-starters-note.mdx';
 
 <StacksjsStartersNote/>
+
+---
 
 This guide explains how to prompt users to sign a message.
 
@@ -18,11 +20,7 @@ Internally the string will be hashed using `sha256` and signed with `secp256k1` 
 
 ## Install dependency
 
-:::tip
-In order to utilize the latest transaction signing with the Hiro Wallet, use a version >= 6.6.0 of the `@stacks/connect` NPM package.
-:::
-
-The following dependency must be installed:
+@stacks/connect should be installed as a dependency.
 
 ```
 npm install @stacks/connect
