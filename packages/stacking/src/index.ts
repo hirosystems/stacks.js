@@ -117,6 +117,7 @@ export interface AccountExtendedBalances {
     total_sent: IntegerType;
     total_received: IntegerType;
     locked: IntegerType;
+    lock_tx_id: string;
     lock_height: number;
     burnchain_lock_height: number;
     burnchain_unlock_height: number;
