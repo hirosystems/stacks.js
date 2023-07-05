@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.5.5](https://github.com/hirosystems/stacks.js/compare/v6.5.4...v6.5.5) (2023-07-05)
+
+
+### Bug Fixes
+
+* add missing none type for delegation without until_burn_ht ([b9cf9ef](https://github.com/hirosystems/stacks.js/commit/b9cf9efb1f89967bd2866e89f2d54e130b76a65e))
+* update AccountExtendedBalances interface ([89dc787](https://github.com/hirosystems/stacks.js/commit/89dc78791b5d1db00799917e858a76addc49f963))
+
+
+
 ## [6.5.4](https://github.com/hirosystems/stacks.js/compare/v6.5.3...v6.5.4) (2023-05-17)
 
 
