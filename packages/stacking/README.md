@@ -19,7 +19,7 @@ npm install @stacks/stacking
 - [Client helpers](#client-helpers)
   - [Will Stacking be executed in the next cycle?](#will-stacking-be-executed-in-the-next-cycle)
   - [How long (in seconds) is a Stacking cycle?](#how-long-in-seconds-is-a-stacking-cycle)
-  - [How much time is left (in seconds) until the next cycle begins?](#how-much-time-is-left-in-seconds-until-the-next-cycle-begins)
+  - [How much estimated time is left (in seconds) to submit a stacking transaction for the upcoming reward cycle?](#how-much-estimated-time-is-left-in-seconds-to-submit-a-stacking-transaction-for-the-upcoming-reward-cycle)
   - [Does account have sufficient STX to meet minimum threshold?](#does-account-have-sufficient-stx-to-meet-minimum-threshold)
   - [Get PoX info](#get-pox-info)
   - [Get Stacks node info](#get-stacks-node-info)
@@ -169,10 +169,10 @@ const cycleDuration = await client.getCycleDuration();
 // 120
 ```
 
-### How much time is left (in seconds) until the next cycle begins?
+### How much estimated time is left (in seconds) to submit a stacking transaction for the upcoming reward cycle?
 
 ```typescript
-const secondsUntilNextCycle = await client.getSecondsUntilNextCycle();
+const seconds = await client.getSecondsUntilStackingDeadline();
 
 // 600000
 ```

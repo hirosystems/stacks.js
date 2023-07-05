@@ -1,28 +1,29 @@
 import { bigIntToBytes, bytesToHex, hexToBytes } from '@stacks/common';
 import { base58CheckDecode } from '@stacks/encryption';
-import { StacksTestnet } from '@stacks/network';
+import { StacksMainnet, StacksTestnet } from '@stacks/network';
 import {
   AnchorMode,
-  bufferCV,
   ClarityType,
+  ReadOnlyFunctionOptions,
+  SignedContractCallOptions,
+  TupleCV,
+  bufferCV,
   intCV,
   noneCV,
-  ReadOnlyFunctionOptions,
   responseErrorCV,
   responseOkCV,
-  SignedContractCallOptions,
   someCV,
   standardPrincipalCV,
   trueCV,
   tupleCV,
-  TupleCV,
   uintCV,
   validateContractCall,
 } from '@stacks/transactions';
 import fetchMock from 'jest-fetch-mock';
+import { StackingClient } from '../src';
 import { PoXAddressVersion, StackingErrors } from '../src/constants';
 import { decodeBtcAddress, poxAddressToBtcAddress } from '../src/utils';
-import { V2_POX_REGTEST_POX_3 } from './apiMockingHelpers';
+import { V2_POX_REGTEST_POX_3, setApiMocks } from './apiMockingHelpers';
 
 const poxInfo = {
   contract_id: 'ST000000000000000000002AMW42H.pox',
@@ -1083,4 +1084,25 @@ test('client operations with contract principal stacker', () => {
     new StacksTestnet()
   );
   expect(async () => await client.getStatus()).not.toThrow();
+});
+
+test('getSecondsUntilStackingDeadline', async () => {
+  const network = new StacksMainnet({ url: 'http://localhost:3999' });
+  const client = new StackingClient('', network);
+
+  setApiMocks({
+    '/extended/v1/info/network_block_times': `{"testnet":{"target_block_time":120},"mainnet":{"target_block_time":600}}`,
+    '/v2/pox': `{"contract_id":"ST000000000000000000002AMW42H.pox-3","pox_activation_threshold_ustx":600058115845055,"first_burnchain_block_height":0,"current_burnchain_block_height":275,"prepare_phase_block_length":1,"reward_phase_block_length":4,"reward_slots":8,"rejection_fraction":3333333333333333,"total_liquid_supply_ustx":60005811584505576,"current_cycle":{"id":54,"min_threshold_ustx":1875190000000000,"stacked_ustx":0,"is_pox_active":false},"next_cycle":{"id":55,"min_threshold_ustx":1875190000000000,"min_increment_ustx":7500726448063,"stacked_ustx":0,"prepare_phase_start_block_height":279,"blocks_until_prepare_phase":4,"reward_phase_start_block_height":280,"blocks_until_reward_phase":5,"ustx_until_pox_rejection":14656114351294034000},"min_amount_ustx":1875190000000000,"prepare_cycle_length":1,"reward_cycle_id":54,"reward_cycle_length":5,"rejection_votes_left_required":14656114351294034000,"next_reward_cycle_in":5,"contract_versions":[{"contract_id":"ST000000000000000000002AMW42H.pox","activation_burnchain_block_height":0,"first_reward_cycle_id":0},{"contract_id":"ST000000000000000000002AMW42H.pox-2","activation_burnchain_block_height":107,"first_reward_cycle_id":22},{"contract_id":"ST000000000000000000002AMW42H.pox-3","activation_burnchain_block_height":111,"first_reward_cycle_id":23}]}`,
+  });
+
+  let seconds = await client.getSecondsUntilStackingDeadline();
+  expect(seconds).toBe(4 * 10 * 60); // four blocks until prepare phase
+
+  setApiMocks({
+    '/extended/v1/info/network_block_times': `{"testnet":{"target_block_time":120},"mainnet":{"target_block_time":600}}`,
+    '/v2/pox': `{"contract_id":"ST000000000000000000002AMW42H.pox-3","pox_activation_threshold_ustx":600058812952055,"first_burnchain_block_height":0,"current_burnchain_block_height":344,"prepare_phase_block_length":1,"reward_phase_block_length":4,"reward_slots":8,"rejection_fraction":3333333333333333,"total_liquid_supply_ustx":60005881295205576,"current_cycle":{"id":68,"min_threshold_ustx":1875190000000000,"stacked_ustx":0,"is_pox_active":false},"next_cycle":{"id":69,"min_threshold_ustx":1875190000000000,"min_increment_ustx":7500735161900,"stacked_ustx":0,"prepare_phase_start_block_height":344,"blocks_until_prepare_phase":0,"reward_phase_start_block_height":345,"blocks_until_reward_phase":1,"ustx_until_pox_rejection":5198637306263702000},"min_amount_ustx":1875190000000000,"prepare_cycle_length":1,"reward_cycle_id":68,"reward_cycle_length":5,"rejection_votes_left_required":5198637306263702000,"next_reward_cycle_in":1,"contract_versions":[{"contract_id":"ST000000000000000000002AMW42H.pox","activation_burnchain_block_height":0,"first_reward_cycle_id":0},{"contract_id":"ST000000000000000000002AMW42H.pox-2","activation_burnchain_block_height":107,"first_reward_cycle_id":22},{"contract_id":"ST000000000000000000002AMW42H.pox-3","activation_burnchain_block_height":111,"first_reward_cycle_id":23}]}`,
+  });
+
+  seconds = await client.getSecondsUntilStackingDeadline();
+  expect(seconds).toBe(0); // this time we are in the prepare phase
 });
