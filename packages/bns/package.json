@@ -1,6 +1,6 @@
 {
   "name": "@stacks/bns",
-  "version": "6.5.4",
+  "version": "6.5.5",
   "description": "Library for working with the Stacks Blockchain Naming System BNS.",
   "license": "MIT",
   "author": "Hiro Systems PBC (https://hiro.so)",
@@ -22,7 +22,7 @@
   "dependencies": {
     "@stacks/common": "^6.5.2",
     "@stacks/network": "^6.5.4",
-    "@stacks/transactions": "^6.5.4"
+    "@stacks/transactions": "^6.5.5"
   },
   "devDependencies": {
     "process": "^0.11.10",

@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.5.5](https://github.com/hirosystems/stacks.js/compare/v6.5.4...v6.5.5) (2023-07-05)
+
+
+### Bug Fixes
+
+* add missing none type for delegation without until_burn_ht ([b9cf9ef](https://github.com/hirosystems/stacks.js/commit/b9cf9efb1f89967bd2866e89f2d54e130b76a65e))
+* remove post-conditions from stx transfer ([679a93a](https://github.com/hirosystems/stacks.js/commit/679a93afd75253d21bec070c85b843c34aeb516b))
+
+
+
 ## [6.5.4](https://github.com/hirosystems/stacks.js/compare/v6.5.3...v6.5.4) (2023-05-17)
 
 **Note:** Version bump only for package root
