@@ -3,6 +3,30 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.5.4](https://github.com/hirosystems/stacks.js/compare/v6.5.3...v6.5.4) (2023-05-17)
+
+**Note:** Version bump only for package @stacks/wallet-sdk
+
+
+
+
+
+## [6.5.2](https://github.com/hirosystems/stacks.js/compare/v6.5.1...v6.5.2) (2023-04-28)
+
+**Note:** Version bump only for package @stacks/wallet-sdk
+
+
+
+
+
+## [6.5.1](https://github.com/hirosystems/stacks.js/compare/v6.5.0...v6.5.1) (2023-04-19)
+
+**Note:** Version bump only for package @stacks/wallet-sdk
+
+
+
+
+
 ## [6.5.0](https://github.com/hirosystems/stacks.js/compare/v6.4.0...v6.5.0) (2023-03-26)
 
 **Note:** Version bump only for package @stacks/wallet-sdk

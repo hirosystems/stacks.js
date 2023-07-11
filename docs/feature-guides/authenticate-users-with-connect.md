@@ -1,12 +1,25 @@
 ---
-title: Authenticate Users
+id: authenticate-users-with-connect
+title: Connecting Wallets & Authenticating
 ---
 
-import StacksjsStartersNote from '../includes/stacks.js-starters-note.mdx';
+import StacksjsStartersNote from '../includes/\_stacks.js-starters-note.mdx';
 
 <StacksjsStartersNote/>
 
-This guide explains how to authenticate users with the [`connect`](https://github.com/hirosystems/connect#readme) package of Stacks.js.
+---
+
+This guide explains how to connect to users' wallets and authenticate users with the [`@stacks/connect`](https://github.com/hirosystems/connect#readme) package of Stacks.js.
+
+## Installing Dependency
+
+To install the `@stacks/connect` package in your JavaScript/TypeScript project run:
+
+```
+npm install @stacks/connect
+```
+
+## Authentication
 
 Authentication provides a way for users to identify themselves to an app while retaining complete control over their credentials and personal details. It can be integrated alone or used in conjunction with [transaction signing](/build-apps/transaction-signing) and [data storage](/build-apps/data-storage), for which it is a prerequisite.
 
@@ -14,45 +27,7 @@ Users who register for your app can subsequently authenticate to any other app w
 
 See the [To-dos example app](/example-apps/to-dos) for a concrete example of this feature in practice.
 
-## How it works
-
-The authentication flow with Stacks is similar to the typical client-server flow used by centralized sign in services (for example, OAuth). However, with Stacks the authentication flow happens entirely client-side.
-
-An app and authenticator, such as [the Stacks Wallet](https://www.hiro.so/wallet/install-web), communicate during the authentication flow by passing back and forth two tokens. The requesting app sends the authenticator an `authRequest` token. Once a user approves authentication, the authenticator responds to the app with an `authResponse` token.
-
-These tokens are based on [a JSON Web Token (JWT) standard](https://tools.ietf.org/html/rfc7519) with additional support for the `secp256k1` curve used by Bitcoin and many other cryptocurrencies. They are passed via URL query strings.
-
-See the [`authRequest`](#authrequest-payload-schema) and [`authResponse`](#authresponse-payload-schema) payload schemas below for more details about what data they contain.
-
-When a user chooses to authenticate an app, it sends the `authRequest` token to the authenticator via a URL query string with an equally named parameter:
-
-`https://wallet.hiro.so/...?authRequest=j902120cn829n1jnvoa...`
-
-When the authenticator receives the request, it generates an `authResponse` token for the app using an _ephemeral transit key_ . The ephemeral transit key is just used for the particular instance of the app, in this case, to sign the `authRequest`.
-
-The app stores the ephemeral transit key during request generation. The public portion of the transit key is passed in the `authRequest` token. The authenticator uses the public portion of the key to encrypt an _app private key_ which is returned via the `authResponse`.
-
-The authenticator generates the app private key from the user's _identity address private key_ and the app's domain. The app private key serves three functions:
-
-1. It is used to create credentials that give the app access to a storage bucket in the user's Gaia hub
-2. It is used in the end-to-end encryption of files stored for the app in the user's Gaia storage.
-3. It serves as a cryptographic secret that apps can use to perform other cryptographic functions.
-
-Finally, the app private key is deterministic, meaning that the same private key will always be generated for a given Stacks address and domain.
-
-The first two of these functions are particularly relevant to [data storage with Stacks.js](/build-apps/data-storage).
-
-[Learn more about keypairs](#key-pairs) used by authentication.
-
-## Install dependency
-
-The following dependency must be installed:
-
-```
-npm install @stacks/connect
-```
-
-## Initiate userSession object
+### Initiate `userSession`
 
 Apps keep track of user authentication state with the `userSession` object, initiated with the `UserSession` and `AppConfig` classes:
 
@@ -76,7 +51,7 @@ The default scopes are `['store_write']` if no `scopes` array is provided when i
 
 We recommend you initiate the `userSession` object just once in your app then reference it using imports where needed.
 
-## Initiate authentication flow
+### Initiate Authentication Flow
 
 Apps prompt both new and existing users to authenticate with the `showConnect` function:
 
@@ -102,9 +77,11 @@ function authenticate() {
 }
 ```
 
-`showConnect` triggers the display of a modal that initiates the authentication process for users, one in which they'll authenticate with a _Secret Key_ that's used to encrypt their private data.
+`showConnect` triggers the display of a popup that initiates the authentication process for users, one in which they'll authenticate with a _Secret Key_ that's used to encrypt their private data.
 
-![Modal displayed by showConnect function](/img/todos-get-started.png)
+<!-- todo: use up-to-date image -->
+
+![Popup displayed by showConnect function](/img/todos-get-started.png)
 
 The `showConnect` function accepts a number of properties within a parameter object such as:
 
@@ -112,9 +89,9 @@ The `showConnect` function accepts a number of properties within a parameter obj
 - The `redirectTo` string: used to provide a URL to which the user should be redirected upon successful authentication. The `onFinish` callback serves a similar purpose by handling successful authentication within a context of a popup window.
 - The `userSession` object initiated above.
 
-Once the user selects the button presented in this modal, they are passed to the Stacks Wallet for authenticator with the `authRequest` token as a GET parameter. From there they can confirm authentication and generate a new _Secret Key_ or Stacks identity before doing so, as needed before coming back to the app.
+Once the user selects the button presented in this popup, they are passed to the Stacks Wallet for authenticator with the `authRequest` token as a GET parameter. From there they can confirm authentication and generate a new _Secret Key_ or Stacks identity before doing so, as needed before coming back to the app.
 
-## Handle pending authentication
+### Handle Pending Authentication
 
 Unless the user has confirmed authentication within the context of a popup window, they will get redirected back to the app via the `redirectTo` address provided above, at which point the app needs to handle the pending authentication state using the `authResponse` value provided as a GET parameter:
 
@@ -149,30 +126,45 @@ If the user has indeed confirmed authentication in the context of a popup window
 
 It will then trigger the `onFinish` function provided above, which can be used similarly to save the user's information into their session as retrieved with `userSession.loadUserData()`.
 
-## Usage in React Apps
+## Advanced
 
-Import the `useConnect` from the [`connect-react`](https://github.com/hirosystems/connect/) package to integrate authentication more seamlessly into React apps.
+### How It Works
 
-```
-npm install @stacks/connect-react
-```
+The authentication flow with Stacks is similar to the typical client-server flow used by centralized sign in services (for example, OAuth). However, with Stacks the authentication flow happens entirely client-side.
 
-```jsx
-import { useConnect } from '@stacks/connect-react';
+An app and authenticator, such as [the Stacks Wallet](https://www.hiro.so/wallet/install-web), communicate during the authentication flow by passing back and forth two tokens. The requesting app sends the authenticator an `authRequest` token. Once a user approves authentication, the authenticator responds to the app with an `authResponse` token.
 
-const AuthButton = () => {
-  const { doOpenAuth } = useConnect();
-  return <Button onClick={() => doOpenAuth()}>Authenticate</Button>;
-};
-```
+These tokens are are based on [a JSON Web Token (JWT) standard](https://tools.ietf.org/html/rfc7519) with additional support for the `secp256k1` curve used by Bitcoin and many other cryptocurrencies. They are passed via URL query strings.
 
-## Key pairs
+See the [`authRequest`](#authrequest-payload-schema) and [`authResponse`](#authresponse-payload-schema) payload schemas below for more details about what data they contain.
+
+When a user chooses to authenticate an app, it sends the `authRequest` token to the authenticator via a URL query string with an equally named parameter:
+
+`https://wallet.hiro.so/...?authRequest=j902120cn829n1jnvoa...`
+
+When the authenticator receives the request, it generates an `authResponse` token for the app using an _ephemeral transit key_ . The ephemeral transit key is just used for the particular instance of the app, in this case, to sign the `authRequest`.
+
+The app stores the ephemeral transit key during request generation. The public portion of the transit key is passed in the `authRequest` token. The authenticator uses the public portion of the key to encrypt an _app private key_ which is returned via the `authResponse`.
+
+The authenticator generates the app private key from the user's _identity address private key_ and the app's domain. The app private key serves three functions:
+
+1. It is used to create credentials that give the app access to a storage bucket in the user's Gaia hub
+2. It is used in the end-to-end encryption of files stored for the app in the user's Gaia storage.
+3. It serves as a cryptographic secret that apps can use to perform other cryptographic functions.
+
+Finally, the app private key is deterministic, meaning that the same private key will always be generated for a given Stacks address and domain.
+
+The first two of these functions are particularly relevant to [data storage with Stacks.js](/build-apps/data-storage).
+
+[Learn more about keypairs](#key-pairs) used by authentication.
+
+### Key Pairs
 
 Authentication with Stacks makes extensive use of public key cryptography generally and ECDSA with the `secp256k1` curve in particular.
 
 The following sections describe the three public-private key pairs used, including how they're generated, where they're used and to whom private keys are disclosed.
 
-### Transit private key
+#### Transit Private Key
 
 The transit private is an ephemeral key that is used to encrypt secrets that
 need to be passed from the authenticator to the app during the
@@ -185,7 +177,7 @@ authenticator encrypts secret data such as the app private key using this
 public key and sends it back to the app when the user signs in to the app. The
 transit private key signs the app authentication request.
 
-### Identity address private key
+#### Identity Address Private Key
 
 The identity address private key is derived from the user's keychain phrase and
 is the private key of the Stacks username that the user chooses to use to sign in
@@ -194,14 +186,14 @@ instance of the authenticator.
 
 This private key signs the authentication response token for an app to indicate that the user approves sign in to that app.
 
-### App private key
+#### App Private Key
 
 The app private key is an app-specific private key that is generated from the
 user's identity address private key using the `domain_name` as input.
 
 The app private key is securely shared with the app on each authentication, encrypted by the authenticator with the transit public key. Because the transit key is only stored on the client side, this prevents a man-in-the-middle attack where a server or internet provider could potentially snoop on the app private key.
 
-## authRequest Payload Schema
+### `authRequest` Payload Schema
 
 ```jsx
 const requestPayload = {
@@ -220,7 +212,7 @@ const requestPayload = {
 };
 ```
 
-## authResponse Payload Schema
+### `authResponse` Payload Schema
 
 ```jsx
 const responsePayload = {
@@ -240,7 +232,7 @@ const responsePayload = {
 };
 ```
 
-## Decode authRequest or authResponse
+### Decode `authRequest` or `authResponse`
 
 To decode a token and see what data it holds:
 

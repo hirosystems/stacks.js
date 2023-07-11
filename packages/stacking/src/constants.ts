@@ -26,7 +26,12 @@ export const BitcoinNetworkVersion = {
     P2PKH: 0x6f, // 111
     P2SH: 0xc4, // 196
   },
-  regtest: {
+  devnet: {
+    // equivalent to testnet for our purposes
+    P2PKH: 0x6f, // 111
+    P2SH: 0xc4, // 196
+  },
+  mocknet: {
     // equivalent to testnet for our purposes
     P2PKH: 0x6f, // 111
     P2SH: 0xc4, // 196
@@ -59,7 +64,8 @@ export const SEGWIT_V1_ADDR_PREFIX = /^(bc1p|tb1p|bcrt1p)/i;
 export const SegwitPrefix = {
   mainnet: 'bc',
   testnet: 'tb',
-  regtest: 'bcrt',
+  devnet: 'bcrt',
+  mocknet: 'bcrt',
 } as const;
 /** @ignore */
 export const SEGWIT_ADDR_PREFIXES = /^(bc|tb)/i;
@@ -77,6 +83,10 @@ export const SEGWIT_V1 = 1;
 //   mainnet P2TR: bc1p5d7rjq7g6rdk2yhzks9smlaqtedr4dekq08ge8ztwac72sfr9rusxg3297
 //   testnet P2TR: tb1p6h5fuzmnvpdthf5shf0qqjzwy7wsqc5rhmgq2ks9xrak4ry6mtrscsqvzp
 
+/**
+ * Transitional periods from the 2.1 launch
+ * @see SIP-015
+ */
 export enum PoxOperationPeriod {
   /** Period 1: This is before the 2.1 fork. */
   Period1 = 'Period1',
@@ -89,7 +99,7 @@ export enum PoxOperationPeriod {
 }
 
 export enum StackingErrors {
-  // taken from https://github.com/stacks-network/stacks-blockchain/blob/4f6d7d416f6af641f838f154dc54a3baa9cd8d48/src/chainstate/stacks/boot/pox-2.clar
+  // taken from https://github.com/stacks-network/stacks-blockchain/blob/088ff00761b27a12bfaf19dab5743e77e8ca4d0c/src/chainstate/stacks/boot/pox-3.clar
   ERR_STACKING_UNREACHABLE = 255,
   ERR_STACKING_CORRUPTED_STATE = 254,
   ERR_STACKING_INSUFFICIENT_FUNDS = 1,
@@ -115,4 +125,6 @@ export enum StackingErrors {
   ERR_STACK_INCREASE_NOT_LOCKED = 27,
   ERR_DELEGATION_NO_REWARD_SLOT = 28,
   ERR_DELEGATION_WRONG_REWARD_SLOT = 29,
+  ERR_STACKING_IS_DELEGATED = 30,
+  ERR_STACKING_NOT_DELEGATED = 31,
 }

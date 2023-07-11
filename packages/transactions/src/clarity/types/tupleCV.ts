@@ -28,8 +28,8 @@ interface TupleCV<T extends TupleData = TupleData> {
  *  // { type: 12, data: { c: { type: 3 }, b: { type: 4 }, a: { type: 3 } } }
  * ```
  *
- * @visit
- * {@link https://github.com/hirosystems/stacks.js/blob/master/packages/transactions/tests/clarity.test.ts clarity test cases for more examples}
+ * @see
+ * {@link https://github.com/hirosystems/stacks.js/blob/main/packages/transactions/tests/clarity.test.ts | clarity test cases for more examples}
  */
 function tupleCV<T extends ClarityValue = ClarityValue>(data: TupleData<T>): TupleCV<TupleData<T>> {
   for (const key in data) {

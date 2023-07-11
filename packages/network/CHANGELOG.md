@@ -3,6 +3,31 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.5.4](https://github.com/hirosystems/stacks.js/compare/v6.5.3...v6.5.4) (2023-05-17)
+
+**Note:** Version bump only for package @stacks/network
+
+
+
+
+
+## [6.5.2](https://github.com/hirosystems/stacks.js/compare/v6.5.1...v6.5.2) (2023-04-28)
+
+**Note:** Version bump only for package @stacks/network
+
+
+
+
+
+## [6.5.1](https://github.com/hirosystems/stacks.js/compare/v6.5.0...v6.5.1) (2023-04-19)
+
+
+### Bug Fixes
+
+* add StacksDevnet constructor, closes [#1470](https://github.com/hirosystems/stacks.js/issues/1470) ([5789937](https://github.com/hirosystems/stacks.js/commit/5789937655f351bc07c26086f851653e20ab9c8c))
+
+
+
 ## [6.3.0](https://github.com/hirosystems/stacks.js/compare/v6.2.1...v6.3.0) (2023-03-17)
 
 

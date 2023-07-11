@@ -1,11 +1,16 @@
-import { getProfileURLFromZoneFile } from '../utils';
-import { signProfileToken, wrapProfileToken } from '@stacks/profile';
-import { connectToGaiaHub, GaiaHubConfig, uploadToGaiaHub } from '@stacks/storage';
 import { getPublicKeyFromPrivate } from '@stacks/encryption';
-import { Account, Profile, getGaiaAddress } from './common';
-import { createFetchFn, FetchFn } from '@stacks/network';
+import { FetchFn, createFetchFn } from '@stacks/network';
+import {
+  PublicPersonProfile,
+  PublicProfileBase,
+  signProfileToken,
+  wrapProfileToken,
+} from '@stacks/profile';
+import { GaiaHubConfig, connectToGaiaHub, uploadToGaiaHub } from '@stacks/storage';
+import { getProfileURLFromZoneFile } from '../utils';
+import { Account, getGaiaAddress } from './common';
 
-export const DEFAULT_PROFILE: Profile = {
+export const DEFAULT_PROFILE: PublicPersonProfile = {
   '@type': 'Person',
   '@context': 'http://schema.org',
 };
@@ -21,11 +26,9 @@ export const fetchProfileFromUrl = async (
     if (res.ok) {
       const json = await res.json();
       const { decodedToken } = json[0];
-      return decodedToken.payload?.claim as Profile;
+      return decodedToken.payload?.claim as PublicProfileBase;
     }
-    if (res.status === 404) {
-      return null;
-    }
+    if (res.status === 404) return null;
     throw new Error('Network error when fetching profile');
   } catch (error) {
     return null;
@@ -52,7 +55,13 @@ export const fetchAccountProfileUrl = async ({
   return `${gaiaHubUrl}${getGaiaAddress(account)}/profile.json`;
 };
 
-export function signProfileForUpload({ profile, account }: { profile: Profile; account: Account }) {
+export function signProfileForUpload({
+  profile,
+  account,
+}: {
+  profile: PublicProfileBase;
+  account: Account;
+}) {
   // the profile is always signed with the stx private key
   // because a username (if any) is owned by the stx private key
   const privateKey = account.stxPrivateKey;
@@ -95,7 +104,7 @@ export const signAndUploadProfile = async ({
   account,
   gaiaHubConfig,
 }: {
-  profile: Profile;
+  profile: PublicProfileBase;
   gaiaHubUrl: string;
   account: Account;
   gaiaHubConfig?: GaiaHubConfig;

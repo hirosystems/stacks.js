@@ -5,6 +5,8 @@ import { IntCV, UIntCV, intCV, uintCV } from './types/intCV';
 import { BufferCV, bufferCV, bufferCVFromString } from './types/bufferCV';
 import { OptionalCV, NoneCV, SomeCV, noneCV, someCV, optionalCVOf } from './types/optionalCV';
 
+// todo: reduce manual re-exporting
+
 import {
   ResponseCV,
   ResponseOkCV,
@@ -23,6 +25,7 @@ import {
   PrincipalCV,
   contractPrincipalCVFromStandard,
   principalCV,
+  principalToString,
 } from './types/principalCV';
 
 import { ListCV, listCV } from './types/listCV';
@@ -94,4 +97,4 @@ export {
 export { serializeCV, deserializeCV };
 
 // toString
-export { cvToString, cvToJSON, cvToValue };
+export { cvToString, cvToJSON, cvToValue, principalToString };

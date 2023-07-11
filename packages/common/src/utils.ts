@@ -328,6 +328,11 @@ export function intToBigInt(value: IntegerType, signed: boolean): bigint {
     if (!Number.isInteger(parsedValue)) {
       throw new RangeError(`Invalid value. Values of type 'number' must be an integer.`);
     }
+    if (parsedValue > Number.MAX_SAFE_INTEGER) {
+      throw new RangeError(
+        `Invalid value. Values of type 'number' must be less than or equal to ${Number.MAX_SAFE_INTEGER}. For larger values, try using a BigInt instead.`
+      );
+    }
     return BigInt(parsedValue);
   }
   if (typeof parsedValue === 'string') {
@@ -614,12 +619,9 @@ export function concatArray(elements: (Uint8Array | number[] | number)[]) {
 }
 
 /**
- * Better `instanceof` check for ArrayBuffer types in different environments
+ * Better `instanceof` check for types in different environments
  * @ignore
  */
 export function isInstance(object: any, type: any) {
-  return (
-    object instanceof type ||
-    (object?.constructor?.name != null && object.constructor.name === type.name)
-  );
+  return object instanceof type || object?.constructor?.name?.toLowerCase() === type.name;
 }

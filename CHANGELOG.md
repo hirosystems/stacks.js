@@ -3,6 +3,47 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.5.4](https://github.com/hirosystems/stacks.js/compare/v6.5.3...v6.5.4) (2023-05-17)
+
+
+### Bug Fixes
+
+* Use StacksNetworkName instead of union type ([#1500](https://github.com/hirosystems/stacks.js/pull/1500)) ([efd2255](https://github.com/hirosystems/stacks.js/commit/efd2255f979ed64b90ac33246d99cd4809620400))
+
+
+
+## [6.5.3](https://github.com/hirosystems/stacks.js/compare/v6.5.2...v6.5.3) (2023-05-11)
+
+
+### Bug Fixes
+
+* add missing fields from `PoxInfo` ([acb7d78](https://github.com/hirosystems/stacks.js/commit/acb7d78881515949b48352b4c0a55b4de91178ee))
+* **pox-3:** include pox-3 error codes ([c72d82a](https://github.com/hirosystems/stacks.js/commit/c72d82ab0b0de30bb54541064c97bcd44171f5de))
+* **pox-3:** update stacking lib to always use the latest activated / current pox contract ([a2aac09](https://github.com/hirosystems/stacks.js/commit/a2aac09e5be07238b4af36af4fdd7deb09afdb11))
+
+
+
+## [6.5.2](https://github.com/hirosystems/stacks.js/compare/v6.5.1...v6.5.2) (2023-04-28)
+
+
+### Bug Fixes
+
+* add `Cl` helper ([#1479](https://github.com/hirosystems/stacks.js/issues/1479)) ([c116a85](https://github.com/hirosystems/stacks.js/commit/c116a851c499d26326f94c368d74d75d0bf76627))
+* **stacking:** return full principal instead of only address ([7e92f7f](https://github.com/hirosystems/stacks.js/commit/7e92f7fbdae14483b1ebcbaefd774202cb215d54))
+
+
+
+## [6.5.1](https://github.com/hirosystems/stacks.js/compare/v6.5.0...v6.5.1) (2023-04-19)
+
+
+### Bug Fixes
+
+* add StacksDevnet constructor, closes [#1470](https://github.com/hirosystems/stacks.js/issues/1470) ([5789937](https://github.com/hirosystems/stacks.js/commit/5789937655f351bc07c26086f851653e20ab9c8c))
+* migrate explorer domains from stacks.co to hiro.so ([0370bf6](https://github.com/hirosystems/stacks.js/commit/0370bf69950fd333a7e5e0251485668191b1bfa8))
+* update cli url ([fcd6065](https://github.com/hirosystems/stacks.js/commit/fcd606539a426d2d7bd0581aa20f10ef3ce78e61))
+
+
+
 ## [6.5.0](https://github.com/hirosystems/stacks.js/compare/v6.4.0...v6.5.0) (2023-03-26)
 
 

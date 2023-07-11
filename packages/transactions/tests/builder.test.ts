@@ -329,7 +329,7 @@ test('Throws making STX token transder with invalid network name', async () => {
   ).rejects.toThrow(Error);
 });
 
-test('Make STX token transfer with post conditions', async () => {
+test("STX token transfers don't take post conditions", async () => {
   const recipientAddress = 'SP3FGQ8Z7JY9BWYZ5WM53E0M9NK7WHJF0691NZ159';
   const amount = 12345;
   const fee = 0;
@@ -350,18 +350,15 @@ test('Make STX token transfer with post conditions', async () => {
     memo,
     postConditions,
     anchorMode: AnchorMode.Any,
-  });
+  } as SignedTokenTransferOptions);
 
-  const serialized = bytesToHex(transaction.serialize());
+  const serialized = transaction.serialize();
 
-  const tx =
-    '0000000001040015c31b8c1c11c515e244b75806bac48d1399c77500000000000000000000000000000000' +
-    '0001601ceb46ef6988c8b226c80fef4051de6acf344dc67a9421d3e734a72ae310104b061e69cee5d9ee7a' +
-    '6e1cef17f23b07d7fe4db5fcdb83de0d5f08043a06a36a030200000001000216df0ba3e79792be7be5e50a' +
-    '370289accfc8c9e03203000000000000d431000516df0ba3e79792be7be5e50a370289accfc8c9e0320000' +
-    '00000000303974657374206d656d6f00000000000000000000000000000000000000000000000000';
+  const bytesReader = new BytesReader(serialized);
+  const deserializedTx = deserializeTransaction(bytesReader);
 
-  expect(serialized).toBe(tx);
+  expect(deserializedTx.postConditions.values).toHaveLength(0);
+  expect(deserializedTx.postConditionMode).toBe(PostConditionMode.Deny);
 });
 
 test('Make Multi-Sig STX token transfer', async () => {

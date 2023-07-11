@@ -10,11 +10,11 @@ export interface NetworkConfig {
   fetchFn?: FetchFn;
 }
 
-export const StacksNetworks = ['mainnet', 'testnet'] as const;
+export const StacksNetworks = ['mainnet', 'testnet', 'devnet', 'mocknet'] as const;
 export type StacksNetworkName = (typeof StacksNetworks)[number];
 
 /**
- * @related {@link StacksMainnet}, {@link StacksTestnet}, {@link StacksMocknet}
+ * @related {@link StacksMainnet}, {@link StacksTestnet}, {@link StacksDevnet}, {@link StacksMocknet}
  */
 export class StacksNetwork {
   version = TransactionVersion.Mainnet;
@@ -42,6 +42,10 @@ export class StacksNetwork {
         return new StacksMainnet();
       case 'testnet':
         return new StacksTestnet();
+      case 'devnet':
+        return new StacksDevnet();
+      case 'mocknet':
+        return new StacksMocknet();
       default:
         throw new Error(
           `Invalid network name provided. Must be one of the following: ${StacksNetworks.join(
@@ -121,7 +125,7 @@ export class StacksNetwork {
       })
       .then(nameInfo => {
         // the returned address _should_ be in the correct network ---
-        //  blockstackd gets into trouble because it tries to coerce back to mainnet
+        //  stacks node gets into trouble because it tries to coerce back to mainnet
         //  and the regtest transaction generation libraries want to use testnet addresses
         if (nameInfo.address) {
           return Object.assign({}, nameInfo, { address: nameInfo.address });
@@ -133,7 +137,7 @@ export class StacksNetwork {
 }
 
 /**
- * A {@link StacksNetwork} with default values for the Stacks mainnet.
+ * A {@link StacksNetwork} with the parameters for the Stacks mainnet.
  * Pass a `url` option to override the default Hiro hosted Stacks node API.
  * Pass a `fetchFn` option to customize the default networking functions.
  * @example
@@ -157,7 +161,16 @@ export class StacksMainnet extends StacksNetwork {
 }
 
 /**
- * Same as {@link StacksMainnet} but defaults to values for the Stacks testnet.
+ * A {@link StacksNetwork} with the parameters for the Stacks testnet.
+ * Pass a `url` option to override the default Hiro hosted Stacks node API.
+ * Pass a `fetchFn` option to customize the default networking functions.
+ * @example
+ * ```
+ * const network = new StacksTestnet();
+ * const network = new StacksTestnet({ url: "https://stacks-node-api.testnet.stacks.co" });
+ * const network = new StacksTestnet({ fetch: createFetchFn() });
+ * ```
+ * @related {@link createFetchFn}, {@link createApiKeyMiddleware}
  */
 export class StacksTestnet extends StacksNetwork {
   version = TransactionVersion.Testnet;
@@ -171,6 +184,9 @@ export class StacksTestnet extends StacksNetwork {
   }
 }
 
+/**
+ * A {@link StacksNetwork} using the testnet parameters, but `localhost:3999` as the API URL.
+ */
 export class StacksMocknet extends StacksNetwork {
   version = TransactionVersion.Testnet;
   chainId = ChainID.Testnet;
@@ -182,3 +198,6 @@ export class StacksMocknet extends StacksNetwork {
     });
   }
 }
+
+/** Alias for {@link StacksMocknet} */
+export const StacksDevnet = StacksMocknet;

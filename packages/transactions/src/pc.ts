@@ -21,19 +21,16 @@ import { createAssetInfo, NonFungiblePostCondition } from './postcondition-types
 
 /**
  * An address string encoded as c32check
- * @internal
  */
 type AddressString = string;
 
 /**
  * A contract identifier string given as `<address>.<contract-name>`
- * @internal
  */
 type ContractIdString = `${string}.${string}`;
 
 /**
  * An asset identifier string given as `<contract-id>::<token-name>` aka `<contract-address>.<contract-name>::<token-name>`
- * @internal
  */
 type NftString = `${ContractIdString}::${string}`;
 

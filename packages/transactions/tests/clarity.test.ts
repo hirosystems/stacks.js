@@ -218,8 +218,9 @@ describe('Clarity Types', () => {
 
       expect(() => intCV(NaN)).toThrowError(RangeError);
       expect(() => intCV(Infinity)).toThrowError(RangeError);
-      expect(() => intCV(3.1415)).toThrowError(RangeError);
       expect(() => intCV('3.1415')).toThrowError(RangeError);
+      expect(() => intCV(3.1415)).toThrowError(RangeError);
+      expect(() => intCV(10000000000000000000000000000000)).toThrowError(RangeError);
     });
 
     test.each([
@@ -281,6 +282,7 @@ describe('Clarity Types', () => {
 
       // Out of bounds, too large
       expect(() => intCV(2n ** 127n)).toThrow(RangeError);
+      expect(() => intCV(Number.MAX_SAFE_INTEGER + 1)).toThrowError(RangeError);
 
       // Out of bounds, too small
       expect(() => intCV((-2n) ** 127n - 1n)).toThrow(RangeError);
@@ -298,6 +300,8 @@ describe('Clarity Types', () => {
       const serialized2 = serializeCV(uint2);
       expect('0x' + bytesToHex(serialized2.slice(1))).toBe('0x0000000000000000000000000000000a');
       expect(cvToString(serializeDeserialize(uint2))).toBe(cvToString(uint));
+
+      expect(() => uintCV(10000000000000000000000000000000)).toThrowError(RangeError);
     });
 
     test('UIntCV - bounds', () => {
@@ -319,6 +323,7 @@ describe('Clarity Types', () => {
 
       // Out of bounds, too large
       expect(() => uintCV(2n ** 128n)).toThrow(RangeError);
+      expect(() => uintCV(Number.MAX_SAFE_INTEGER + 1)).toThrowError(RangeError);
 
       // Out of bounds, too small
       expect(() => uintCV(-1)).toThrow(RangeError);

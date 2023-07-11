@@ -2,9 +2,9 @@ name: tests
 on:
   push:
     branches:
-      - master
+      - main
     tags-ignore:
-      - "**"
+      - '**'
 
   workflow_call:
   workflow_dispatch:

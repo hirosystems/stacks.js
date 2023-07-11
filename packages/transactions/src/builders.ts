@@ -532,11 +532,6 @@ export interface TokenTransferOptions {
   anchorMode: AnchorModeName | AnchorMode;
   /** an arbitrary string to include in the transaction, must be less than 34 bytes */
   memo?: string;
-  /** the post condition mode, specifying whether or not post-conditions must fully cover all
-   * transfered assets */
-  postConditionMode?: PostConditionMode;
-  /** a list of post conditions to add to the transaction */
-  postConditions?: PostCondition[];
   /** set to true if another account is sponsoring the transaction (covering the transaction fee) */
   sponsored?: boolean;
 }
@@ -576,7 +571,6 @@ export async function makeUnsignedSTXTokenTransfer(
     fee: BigInt(0),
     nonce: BigInt(0),
     network: new StacksMainnet(),
-    postConditionMode: PostConditionMode.Deny,
     memo: '',
     sponsored: false,
   };
@@ -615,20 +609,12 @@ export async function makeUnsignedSTXTokenTransfer(
 
   const network = StacksNetwork.fromNameOrNetwork(options.network);
 
-  const postConditions: PostCondition[] = [];
-  if (options.postConditions && options.postConditions.length > 0) {
-    options.postConditions.forEach(postCondition => {
-      postConditions.push(postCondition);
-    });
-  }
-  const lpPostConditions = createLPList(postConditions);
-
   const transaction = new StacksTransaction(
     network.version,
     authorization,
     payload,
-    lpPostConditions,
-    options.postConditionMode,
+    undefined, // no post conditions on STX transfers (see SIP-005)
+    undefined, // no post conditions on STX transfers (see SIP-005)
     options.anchorMode,
     network.chainId
   );
