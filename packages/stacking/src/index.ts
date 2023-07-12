@@ -43,7 +43,7 @@ import {
 
 export * from './utils';
 
-/** @internal */
+/** @ignore */
 interface BaseTxOptions {
   /** the fee for the transaction */
   fee?: IntegerType;

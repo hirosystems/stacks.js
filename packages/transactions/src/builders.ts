@@ -128,7 +128,7 @@ export async function estimateTransfer(
 
 /**
  * @deprecated Use the new {@link estimateTransaction} function instead.
- * @internal
+ * @ignore
  */
 export async function estimateTransferUnsafe(
   transaction: StacksTransaction,

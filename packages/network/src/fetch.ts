@@ -35,7 +35,7 @@ export const setFetchOptions = (ops: RequestInit): RequestInit => {
   return Object.assign(defaultFetchOpts, ops);
 };
 
-/** @internal */
+/** @ignore */
 export async function fetchWrapper(input: RequestInfo, init?: RequestInit): Promise<Response> {
   const fetchOpts = {};
   // Use the provided options in request options along with default or user provided values
@@ -78,7 +78,7 @@ export interface ApiKeyMiddlewareOpts {
   apiKey: string;
 }
 
-/** @internal */
+/** @ignore */
 export function hostMatches(host: string, pattern: string | RegExp) {
   if (typeof pattern === 'string') return pattern === host;
   return (pattern as RegExp).exec(host);

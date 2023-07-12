@@ -284,14 +284,14 @@ class PartialPcNftWithCode {
   }
 }
 
-/** @internal */
+/** @ignore */
 function parseContractId(contractId: ContractIdString) {
   const [address, name] = contractId.split('.');
   if (!address || !name) throw new Error(`Invalid contract identifier: ${contractId}`);
   return [address, name];
 }
 
-/** @internal */
+/** @ignore */
 function parseNft(nftAssetName: NftString) {
   const [principal, tokenName] = nftAssetName.split('::') as [ContractIdString, string];
   if (!principal || !tokenName)
@@ -300,14 +300,14 @@ function parseNft(nftAssetName: NftString) {
   return { contractAddress: address, contractName: name, tokenName };
 }
 
-/** @internal */
+/** @ignore */
 function isContractIdString(value: AddressString | ContractIdString): value is ContractIdString {
   return value.includes('.');
 }
 
 /**
  * Helper method for `PartialPcNftWithCode.nft` to parse the arguments.
- * @internal
+ * @ignore
  */
 function getNftArgs(
   assetName: NftString,
