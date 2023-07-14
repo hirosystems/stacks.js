@@ -1,6 +1,7 @@
 ---
 title: Update User Profile
 ---
+
 import StacksjsStartersNote from '../includes/\_stacks.js-starters-note.mdx';
 import StacksProviderSection from '../includes/\_stacks.js-provider-section.mdx';
 
@@ -8,7 +9,7 @@ import StacksProviderSection from '../includes/\_stacks.js-provider-section.mdx'
 
 This guide explains how to change the universal profile of an authenticated user.
 
-When a user creates a new account with Hiro Wallet a basic profile is created and stored on the user's own storage hub. The basic profile contains 
+When a user creates a new account with Hiro Wallet a basic profile is created and stored on the user's own storage hub. The basic profile contains
 only a public key. It can be extended to contain personal information like an avatar,name and description. It is always cryptographically signed by the user's key, the so-called owner key.
 
 :::info
@@ -20,9 +21,10 @@ like this:
 
 ![image](https://user-images.githubusercontent.com/1449049/215344771-455d3345-b890-49d0-9cfa-fd1f92bf5b1e.png)
 
-In order to update the public profile, apps can make request to the Stacks wallet. These requests are reviewed and confirmed by the user in the wallet similar to transaction signing. 
+In order to update the public profile, apps can make request to the Stacks wallet. These requests are reviewed and confirmed by the user in the wallet similar to transaction signing.
 
 ## Install dependency
+
 :::tip
 In order to utilize the latest profile updating with the Hiro Wallet, use a version >= 7.1.0 of the `@stacks/connect` NPM package.
 :::
@@ -33,7 +35,7 @@ The following dependency must be installed:
 npm install @stacks/connect
 ```
 
-This also installs the NPM package `@stacks/profile`. It contains the data type `PublicPersonProfile` used for the public profile. 
+This also installs the NPM package `@stacks/profile`. It contains the data type `PublicPersonProfile` used for the public profile.
 
 ## Initiate session
 
@@ -43,17 +45,20 @@ See the [authentication guide](https://docs.hiro.so/build-apps/authentication) b
 
 ## Prompt to update the profile
 
-After the user chose the content of the profile, create a `PublicPersonProfile` object from that data and call the `openProfileUpdateRequestPopup` function provided by the `connect`  package to trigger the display of the profile update prompt.
+After the user chose the content of the profile, create a `PublicPersonProfile` object from that data and call the `openProfileUpdateRequestPopup` function provided by the `connect` package to trigger the display of the profile update prompt.
 
 ```tsx
 import { openProfileUpdateRequestPopup } from '@stacks/connect';
 
-const profile = {"@type": "Person", "@context": "https://schema.org", 
- name: "Friedger", 
- image: [{"@type": "ImageObject", 
-  name: "avatar", 
-  contentUrl: "https://friedger.de/profile.png"}]};
-  
+const profile = {
+  '@type': 'Person',
+  '@context': 'https://schema.org',
+  name: 'Friedger',
+  image: [
+    { '@type': 'ImageObject', name: 'avatar', contentUrl: 'https://friedger.de/profile.png' },
+  ],
+};
+
 openProfileUpdateRequestPopup({
   profile,
   appDetails: {
@@ -67,6 +72,7 @@ openProfileUpdateRequestPopup({
 ```
 
 Several parameters are available for calling `openProfileUpdateRequestPopup`. Here is the exact interface for them:
+
 ```tsx
 interface ProfileUpdateRequestOptions {
   profile: PublicPersonProfile;
@@ -82,7 +88,7 @@ interface ProfileUpdateRequestOptions {
 }
 ```
 
-After the profile was updated, the user can share the profile with other users. 
+After the profile was updated, the user can share the profile with other users.
 
 ## Lookup a Public Profile
 
@@ -102,6 +108,7 @@ export interface ProfileLookupOptions {
 The function returns a promise with the data of the public profile if the data could be retrieved from the BNS name owner's storage and if the retrieved JSON token was sucessfully verified.
 
 The recommended schema for the profile is as follows:
+
 ```tsx
 export interface PublicPersonProfile extends PublicProfileBase {
   '@type': 'Person';
@@ -109,11 +116,7 @@ export interface PublicPersonProfile extends PublicProfileBase {
   givenName?: string;
   familyName?: string;
   description?: string;
-  image?: {'@type': 'ImageObject';
-    name?: string;
-    contentUrl?: string;
-    [k: string]: unknown;
-  }[];
+  image?: { '@type': 'ImageObject'; name?: string; contentUrl?: string; [k: string]: unknown }[];
   website?: {
     '@type'?: string;
     url?: string;
@@ -152,6 +155,7 @@ export interface PublicPersonProfile extends PublicProfileBase {
   [k: string]: unknown;
 }
 ```
+
 ## Usage in React Apps
 
 Import the `useConnect` helper from [`connect-react`](https://github.com/hirosystems/connect) package to update profiles more seamlessly with React apps.
@@ -209,6 +213,5 @@ interface ProfileUpdatePayload {
 ### Profile Update Response payload
 
 After the user confirms the update, a `profileUpdateResponse` payload of type `PublicProfile` is sent back to your app. It contains the updated profile as confirmed by the user. Note, that this profile can be different to the requested profile by the app because the user might have modified the profile in the wallet before confirming the changes.
-
 
 <StacksProviderSection/>
