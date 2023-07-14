@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.5.5](https://github.com/hirosystems/stacks.js/compare/v6.5.4...v6.5.5) (2023-07-14)
+
+
+### Bug Fixes
+
+* add missing none type for delegation without until_burn_ht ([b9cf9ef](https://github.com/hirosystems/stacks.js/commit/b9cf9efb1f89967bd2866e89f2d54e130b76a65e))
+* remove post-conditions from stx transfer ([679a93a](https://github.com/hirosystems/stacks.js/commit/679a93afd75253d21bec070c85b843c34aeb516b))
+* throw error if the number type used in the bigint constructor is not a safe integer value ([d6a6fcc](https://github.com/hirosystems/stacks.js/commit/d6a6fcc30e4306d90da091e2538a281968dc9ac4))
+* update AccountExtendedBalances interface ([89dc787](https://github.com/hirosystems/stacks.js/commit/89dc78791b5d1db00799917e858a76addc49f963))
+* update pc types to allow strict type checking ([#1494](https://github.com/hirosystems/stacks.js/issues/1494)) ([b916ef0](https://github.com/hirosystems/stacks.js/commit/b916ef06e8498f3b14403f850fc8a39881311ea7))
+
+
+
 ## [6.5.4](https://github.com/hirosystems/stacks.js/compare/v6.5.3...v6.5.4) (2023-05-17)
 
 

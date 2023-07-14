@@ -1,6 +1,6 @@
 {
   "name": "@stacks/network",
-  "version": "6.5.4",
+  "version": "6.5.5",
   "description": "Library for Stacks network operations",
   "license": "MIT",
   "author": "Hiro Systems PBC (https://hiro.so)",
@@ -20,7 +20,7 @@
     "typecheck:watch": "npm run typecheck -- --watch"
   },
   "dependencies": {
-    "@stacks/common": "^6.5.2",
+    "@stacks/common": "^6.5.5",
     "cross-fetch": "^3.1.5"
   },
   "devDependencies": {
