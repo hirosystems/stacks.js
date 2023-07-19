@@ -2,9 +2,9 @@
 title: Getting Started
 ---
 
-:::info Connect 🌐
-[Stacks.js starters](https://docs.hiro.so/stacksjs-starters) offer working templates with Stacks Connect pre-installed for a quick and easy way to get started with building Stacks enabled web apps.
-:::
+import StacksjsStartersNote from './includes/\_stacks.js-starters-note.mdx';
+
+<StacksjsStartersNote/>
 
 ---
 
@@ -16,7 +16,9 @@ Typically we speak of "mainnet" and "testnet" as the networks of Stacks. Most wa
 As the name suggests, "testnet" is a network for testing.
 It's a separate blockchain state that holds test tokens, which have no value.
 
-Developers are encouraged to use testnet for testing and development, before rolling out applications and contracts to mainnet. Stacks.js functions can be configured to use wichever network you want.
+Developers are encouraged to use testnet for testing, before rolling out applications and contracts to mainnet.
+For development, there is even Devnet/Mocknet for working in a local development environment.
+Stacks.js functions can be configured to use wichever network you want.
 
 ```js
 import { StacksMainnet, StacksTestnet } from '@stacks/network';
@@ -152,16 +154,18 @@ The mode can be either `Allow` or `Deny`.
 - `Deny` means the transaction will fail if any asset transfers (not specified in the post conditions) are attempted.
 
 :::note
-In either case, all post conditions will still be checked. By default, transactions are set to `Deny` mode, for additional security.
+In either case, all post conditions will still be checked.
+By default, transactions are set to `Deny` mode, for additional security.
 :::
 
 ## Broadcasting
 
 :::info Connect 🌐
-For web apps via Stacks Connect, the users' wallet will broadcast the transaction and return a txid. [Read more](https://connect.stacks.js.org/modules/_stacks_connect)
+For web apps via Stacks Connect, the users' wallet will broadcast the transaction and return a txid.
+[Read more](https://connect.stacks.js.org/modules/_stacks_connect)
 :::
 
-A finalized transaction can be broadcasted to the network or serialized (to bytes representation) using Stacks.js.
+A finalized transaction can be broadcasted to the network or serialized (to a byte representation) using Stacks.js.
 
 ```js
 import { bytesToHex } from '@stacks/common';
