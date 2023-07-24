@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.7.0](https://github.com/hirosystems/stacks.js/compare/v6.5.5...v6.7.0) (2023-07-24)
+
+
+### Features
+
+* **stacking:** add getSecondsUntilStackingDeadline helper method ([#1528](https://github.com/hirosystems/stacks.js/issues/1528)) ([3c819c2](https://github.com/hirosystems/stacks.js/commit/3c819c28ebda8b79aa7d0fcb3edf447f72324457))
+
+
+
 ## [6.6.0](https://github.com/hirosystems/stacks.js/compare/v6.5.5...v6.6.0) (2023-07-24)
 
 
