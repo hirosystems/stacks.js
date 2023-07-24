@@ -360,7 +360,7 @@ export class StackingClient {
   /**
    * Get stacks node target block time
    *
-   * @returns {Promise<number>} that resolves to a number if the operation succeeds
+   * @returns {Promise<number>} resolves to a number if the operation succeeds
    */
   async getTargetBlockTime(): Promise<number> {
     const url = this.network.getBlockTimeInfoUrl();
@@ -380,8 +380,7 @@ export class StackingClient {
 
   /**
    * Get account balance
-   *
-   * @returns promise resolves to a bigint if the operation succeeds
+   * @returns {Promise<bigint>} resolves to a bigint if the operation succeeds
    */
   async getAccountBalance(): Promise<bigint> {
     return this.getAccountStatus().then(res => {
@@ -391,8 +390,7 @@ export class StackingClient {
 
   /**
    * Get extended account balances
-   *
-   * @returns promise resolves to a bigint if the operation succeeds
+   * @returns {Promise<AccountExtendedBalances>} resolves to an AccountExtendedBalances response if the operation succeeds
    */
   async getAccountExtendedBalances(): Promise<AccountExtendedBalances> {
     const url = this.network.getAccountExtendedBalancesApiUrl(this.address);
@@ -401,8 +399,7 @@ export class StackingClient {
 
   /**
    * Get account balance of locked tokens
-   *
-   * @returns promise resolves to a bigint if the operation succeeds
+   * @returns {Promise<bigint>} resolves to a bigint if the operation succeeds
    */
   async getAccountBalanceLocked(): Promise<bigint> {
     return this.getAccountStatus().then(res => BigInt(res.locked));
@@ -410,8 +407,7 @@ export class StackingClient {
 
   /**
    * Get reward cycle duration in seconds
-   *
-   * @returns {Promise<number>} that resolves to a number if the operation succeeds
+   * @returns {Promise<number>} resolves to a number if the operation succeeds
    */
   async getCycleDuration(): Promise<number> {
     const poxInfoPromise = this.getPoxInfo();
@@ -426,7 +422,6 @@ export class StackingClient {
 
   /**
    * Get the total burnchain rewards total for the set address
-   *
    * @returns {Promise<TotalRewardsResponse | RewardsError>} that resolves to TotalRewardsResponse or RewardsError
    */
   async getRewardsTotalForBtcAddress(): Promise<BurnchainRewardsTotal | RewardsError> {
@@ -436,7 +431,6 @@ export class StackingClient {
 
   /**
    * Get burnchain rewards for the set address
-   *
    * @returns {Promise<RewardsResponse | RewardsError>} that resolves to RewardsResponse or RewardsError
    */
   async getRewardsForBtcAddress(
@@ -448,7 +442,6 @@ export class StackingClient {
 
   /**
    * Get burnchain rewards holders for the set address
-   *
    * @returns {Promise<RewardHoldersResponse | RewardsError>} that resolves to RewardHoldersResponse or RewardsError
    */
   async getRewardHoldersForBtcAddress(
@@ -460,7 +453,6 @@ export class StackingClient {
 
   /**
    * Get PoX address from reward set by index
-   *
    * @returns {Promise<RewardSetInfo | undefined>} that resolves to RewardSetInfo if the entry exists
    */
   async getRewardSet(options: RewardSetOptions): Promise<RewardSetInfo | undefined> {
@@ -485,8 +477,10 @@ export class StackingClient {
 
   /**
    * Get number of seconds until next reward cycle
+   * @returns {Promise<number>} resolves to a number if the operation succeeds
    *
-   * @returns {Promise<number>} that resolves to a number if the operation succeeds
+   * See also:
+   * - {@link getSecondsUntilStackingDeadline}
    */
   async getSecondsUntilNextCycle(): Promise<number> {
     const poxInfoPromise = this.getPoxInfo();
@@ -501,6 +495,26 @@ export class StackingClient {
             poxInfo.reward_cycle_length);
         return blocksToNextCycle * targetBlockTime;
       }
+    );
+  }
+
+  /**
+   * Get number of seconds until the end of the stacking deadline.
+   * This is the estimated time stackers have to submit their stacking
+   * transactions to be included in the upcoming reward cycle.
+   * @returns {Promise<number>} resolves to a number of seconds if the operation succeeds.
+   * **⚠️ Attention**: The returned number of seconds can be negative if the deadline has passed and the prepare phase has started.
+   *
+   * See also:
+   * - {@link getSecondsUntilNextCycle}
+   */
+  async getSecondsUntilStackingDeadline(): Promise<number> {
+    const poxInfoPromise = this.getPoxInfo();
+    const targetBlockTimePromise = this.getTargetBlockTime();
+
+    return Promise.all([poxInfoPromise, targetBlockTimePromise]).then(
+      ([poxInfo, targetBlockTime]) =>
+        poxInfo.next_cycle.blocks_until_prepare_phase * targetBlockTime
     );
   }
 
@@ -592,7 +606,6 @@ export class StackingClient {
 
   /**
    * Check if account has minimum require amount of Stacks for stacking
-   *
    * @returns {Promise<boolean>} that resolves to a bool if the operation succeeds
    */
   async hasMinimumStx(): Promise<boolean> {
@@ -603,9 +616,7 @@ export class StackingClient {
 
   /**
    * Check if account can lock stx
-   *
    * @param {CanLockStxOptions} options - a required lock STX options object
-   *
    * @returns {Promise<StackingEligibility>} that resolves to a StackingEligibility object if the operation succeeds
    */
   async canStack({ poxAddress, cycles }: CanLockStxOptions): Promise<StackingEligibility> {
@@ -648,9 +659,7 @@ export class StackingClient {
 
   /**
    * Generate and broadcast a stacking transaction to lock STX
-   *
    * @param {LockStxOptions} options - a required lock STX options object
-   *
    * @returns {Promise<string>} that resolves to a broadcasted txid if the operation succeeds
    */
   async stack({
@@ -737,9 +746,7 @@ export class StackingClient {
 
   /**
    * As a delegatee, generate and broadcast a transaction to create a delegation relationship
-   *
    * @param {DelegateStxOptions} options - a required delegate STX options object
-   *
    * @returns {Promise<string>} that resolves to a broadcasted txid if the operation succeeds
    */
   async delegateStx({
@@ -774,9 +781,7 @@ export class StackingClient {
 
   /**
    * As a delegator, generate and broadcast transactions to stack for multiple delegatees. This will lock up tokens owned by the delegatees.
-   *
    * @param {DelegateStackStxOptions} options - a required delegate stack STX options object
-   *
    * @returns {Promise<string>} that resolves to a broadcasted txid if the operation succeeds
    */
   async delegateStackStx({
@@ -870,9 +875,7 @@ export class StackingClient {
 
   /**
    * As a delegator, generate and broadcast a transaction to commit partially committed delegatee tokens
-   *
    * @param {StackAggregationCommitOptions} options - a required stack aggregation commit options object
-   *
    * @returns {Promise<string>} that resolves to a broadcasted txid if the operation succeeds
    */
   async stackAggregationCommit({
@@ -938,7 +941,6 @@ export class StackingClient {
 
   /**
    * As a delegator, generate and broadcast a transaction to increase partial commitment committed delegatee tokens
-   *
    * @param {StackAggregationIncreaseOptions} options - a required stack aggregation increase options object
    * @category PoX-2
    * @returns {Promise<string>} that resolves to a broadcasted txid if the operation succeeds

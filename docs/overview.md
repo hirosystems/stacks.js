@@ -11,7 +11,7 @@ It's a collection of various JavaScript libraries allowing developers to interac
 
 There are two main ways developers build applications on the Stacks blockchain:
 
-- 🔒 **Without Direct Private Key Access**: For example a web app that allows users to interact with the Stacks blockchain using their Stacks wallet (browser extension or mobile). Read More in the Connect Guide
+- 🔒 **Without Direct Private Key Access**: For example, a web app that allows users to interact with the Stacks blockchain using their Stacks wallet (browser extension or mobile). Read More in the Connect Guide
 - 🔑 **With Private Key Access**: For example, managing funds with the Stacks.js CLI, building a backend (which can sign transactions directly).
 
 Most users interact via their favorite Stacks wallet.
@@ -28,7 +28,7 @@ In these cases, developers can use the same libraries used by Stacks wallets for
 
 There are three main integrations used by Stacks enabled applications:
 
-<!-- todo: add a card and better how-to-guid for each, (eg add message signing backend checking) -->
+<!-- todo: add a card and better how-to-guide for each, (eg add message signing backend checking) -->
 
 - **Authentication**: Register and sign users in with identities on the Stacks blockchain
 - **Transaction signing**: Prompt users to sign and broadcast transactions to the Stacks blockchain

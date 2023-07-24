@@ -294,7 +294,7 @@ const result = await callReadOnlyFunction(options);
 
 ## Constructing Clarity Values
 
-Building transactions that call functions in deployed clarity contracts requires you to construct valid Clarity Values to pass to the function as arguments. The [Clarity type system](https://github.com/blockstack/stacks-blockchain/blob/master/sip/sip-002-smart-contract-language.md#clarity-type-system) contains the following types:
+Building transactions that call functions in deployed clarity contracts requires you to construct valid Clarity Values to pass to the function as arguments. The [Clarity type system](https://github.com/stacksgov/sips/blob/master/sip/sip-002-smart-contract-language.md#clarity-type-system) contains the following types:
 
 - `(tuple (key-name-0 key-type-0) (key-name-1 key-type-1) ...)`
   - a typed tuple with named fields.
@@ -386,7 +386,7 @@ Three types of post conditions can be added to transactions:
 2. Fungible token post condition
 3. Non-Fungible token post condition
 
-For details see: https://github.com/blockstack/stacks-blockchain/blob/master/sip/sip-005-blocks-and-transactions.md#transaction-post-conditions
+For details see: https://github.com/stacksgov/sips/blob/main/sips/sip-005/sip-005-blocks-and-transactions.md#transaction-post-conditions
 
 ### STX post condition
 

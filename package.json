@@ -4,6 +4,7 @@
   "workspaces": [
     "packages/**"
   ],
+  "license": "MIT",
   "prettier": "@stacks/prettier-config",
   "scripts": {
     "bootstrap": "lerna bootstrap",
