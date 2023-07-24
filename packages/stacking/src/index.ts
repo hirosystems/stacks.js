@@ -360,7 +360,7 @@ export class StackingClient {
   /**
    * Get stacks node target block time
    *
-   * @returns {Promise<number>} that resolves to a number if the operation succeeds
+   * @returns {Promise<number>} resolves to a number if the operation succeeds
    */
   async getTargetBlockTime(): Promise<number> {
     const url = this.network.getBlockTimeInfoUrl();
@@ -407,7 +407,7 @@ export class StackingClient {
 
   /**
    * Get reward cycle duration in seconds
-   * @returns {Promise<number>} that resolves to a number if the operation succeeds
+   * @returns {Promise<number>} resolves to a number if the operation succeeds
    */
   async getCycleDuration(): Promise<number> {
     const poxInfoPromise = this.getPoxInfo();
@@ -477,7 +477,7 @@ export class StackingClient {
 
   /**
    * Get number of seconds until next reward cycle
-   * @returns {Promise<number>} that resolves to a number if the operation succeeds
+   * @returns {Promise<number>} resolves to a number if the operation succeeds
    *
    * See also:
    * - {@link getSecondsUntilStackingDeadline}
@@ -502,7 +502,8 @@ export class StackingClient {
    * Get number of seconds until the end of the stacking deadline.
    * This is the estimated time stackers have to submit their stacking
    * transactions to be included in the upcoming reward cycle.
-   * @returns {Promise<number>} that resolves to a number if the operation succeeds
+   * @returns {Promise<number>} resolves to a number of seconds if the operation succeeds.
+   * **⚠️ Attention**: The returned number of seconds can be negative if the deadline has passed and the prepare phase has started.
    *
    * See also:
    * - {@link getSecondsUntilNextCycle}

@@ -1105,4 +1105,14 @@ test('getSecondsUntilStackingDeadline', async () => {
 
   seconds = await client.getSecondsUntilStackingDeadline();
   expect(seconds).toBe(0); // this time we are in the prepare phase
+
+  // warning: manually changed response to negative value
+  setApiMocks({
+    '/extended/v1/info/network_block_times': `{"testnet":{"target_block_time":120},"mainnet":{"target_block_time":600}}`,
+    '/v2/pox': `{"contract_id":"ST000000000000000000002AMW42H.pox-3","pox_activation_threshold_ustx":600058812952055,"first_burnchain_block_height":0,"current_burnchain_block_height":344,"prepare_phase_block_length":1,"reward_phase_block_length":4,"reward_slots":8,"rejection_fraction":3333333333333333,"total_liquid_supply_ustx":60005881295205576,"current_cycle":{"id":68,"min_threshold_ustx":1875190000000000,"stacked_ustx":0,"is_pox_active":false},"next_cycle":{"id":69,"min_threshold_ustx":1875190000000000,"min_increment_ustx":7500735161900,"stacked_ustx":0,"prepare_phase_start_block_height":344,"blocks_until_prepare_phase":-50,"reward_phase_start_block_height":345,"blocks_until_reward_phase":1,"ustx_until_pox_rejection":5198637306263702000},"min_amount_ustx":1875190000000000,"prepare_cycle_length":1,"reward_cycle_id":68,"reward_cycle_length":5,"rejection_votes_left_required":5198637306263702000,"next_reward_cycle_in":1,"contract_versions":[{"contract_id":"ST000000000000000000002AMW42H.pox","activation_burnchain_block_height":0,"first_reward_cycle_id":0},{"contract_id":"ST000000000000000000002AMW42H.pox-2","activation_burnchain_block_height":107,"first_reward_cycle_id":22},{"contract_id":"ST000000000000000000002AMW42H.pox-3","activation_burnchain_block_height":111,"first_reward_cycle_id":23}]}`,
+  });
+
+  seconds = await client.getSecondsUntilStackingDeadline();
+  expect(seconds).toBeLessThan(0); // negative (deadline passed)
+  expect(seconds).toBe(-50 * 10 * 60); // this time we are in the prepare phase
 });
