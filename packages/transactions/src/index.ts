@@ -30,6 +30,22 @@ export {
   isTokenTransferPayload,
   serializePayload,
 } from './payload';
+/**
+ * ### `Pc.` Post Condition Builder
+ * @beta Interface may be subject to change in future releases.
+ *
+ * The Pc namespace is provided as a convenience to build post conditions.
+ * The pattern chains methods together to build a post condition.
+ * `PRINCIPAL -> [AMOUNT] -> CODE -> ASSET`
+ *
+ * The builder starts with the {@link Pc.principal} method.
+ *
+ * @example
+ * ```
+ * import { Pc } from '@stacks/transactions';
+ * Pc.principal('STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6').willSendEq(10000).ustx();
+ * ```
+ */
 export * as Pc from './pc';
 export {
   createFungiblePostCondition,

@@ -42,7 +42,7 @@ type NftString = `${ContractIdString}::${string}`;
  * @example
  * ```
  * import { Pc } from '@stacks/transactions';
- * Pc.principal('STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6').willSendEq(100).stx();
+ * Pc.principal('STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6').willSendEq(10000).ustx();
  * ```
  */
 export function principal(principal: AddressString | ContractIdString) {
@@ -55,6 +55,9 @@ export function principal(principal: AddressString | ContractIdString) {
   return new PartialPcWithPrincipal(principal, undefined);
 }
 
+/**
+ * Not meant to be used directly. Start from `Pc.principal(…)` instead.
+ */
 class PartialPcWithPrincipal {
   constructor(private address: string, private contractName?: string) {}
 
@@ -192,6 +195,9 @@ class PartialPcWithPrincipal {
   }
 }
 
+/**
+ * Not meant to be used directly. Start from `Pc.principal(…)` instead.
+ */
 class PartialPcFtWithCode {
   constructor(
     private address: string,
@@ -236,6 +242,9 @@ class PartialPcFtWithCode {
   }
 }
 
+/**
+ * Not meant to be used directly. Start from `Pc.principal(…)` instead.
+ */
 class PartialPcNftWithCode {
   constructor(
     private principal: string,
