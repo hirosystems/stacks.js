@@ -706,11 +706,6 @@ export interface BaseContractDeployOptions {
   sponsored?: boolean;
 }
 
-export interface ContractDeployOptions extends BaseContractDeployOptions {
-  /** a hex string of the private key of the transaction sender */
-  senderKey: string;
-}
-
 export interface UnsignedContractDeployOptions extends BaseContractDeployOptions {
   /** a hex string of the public key of the transaction sender */
   publicKey: string;
