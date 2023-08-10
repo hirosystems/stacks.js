@@ -5,12 +5,5 @@
     "access": "public"
   },
   "changelogPreset": "conventionalcommits",
-  "packages": ["packages/*"],
-  "command": {
-    "bootstrap": {
-      "forceLocal": true,
-      "hoist": true,
-      "npmClientArgs": ["--ci"]
-    }
-  }
+  "packages": ["packages/*"]
 }

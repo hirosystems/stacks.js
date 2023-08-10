@@ -7,10 +7,9 @@
   "license": "MIT",
   "prettier": "@stacks/prettier-config",
   "scripts": {
-    "bootstrap": "lerna bootstrap",
     "build": "lerna run build",
     "build:docs": "rimraf docs && typedoc",
-    "ci:version": "npx lerna version --conventional-commits --no-push --no-git-tag-version --yes && npx lerna bootstrap",
+    "ci:version": "npx lerna version --conventional-commits --no-push --no-git-tag-version --yes",
     "clean": "lerna clean",
     "lerna": "lerna",
     "lint": "npm run lint:eslint && npm run lint:prettier",
