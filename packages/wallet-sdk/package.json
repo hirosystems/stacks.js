@@ -66,8 +66,5 @@
   "files": [
     "dist",
     "src"
-  ],
-  "typedoc": {
-    "entryPoint": "./src/index.ts"
-  }
+  ]
 }

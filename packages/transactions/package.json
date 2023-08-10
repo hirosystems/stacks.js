@@ -61,8 +61,5 @@
   },
   "bugs": {
     "url": "https://github.com/hirosystems/stacks.js/issues"
-  },
-  "typedoc": {
-    "entryPoint": "./src/index.ts"
   }
 }

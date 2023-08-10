@@ -205,7 +205,12 @@ test('Public keys to address hash', () => {
       else hashMode = AddressHashMode.SerializeP2WSH;
     }
 
-    const address = addressFromPublicKeys(0, hashMode, fixture.numRequired, fixture.keys);
+    const address = addressFromPublicKeys(
+      0 as any, // only used for hash, so version doesn't matter
+      hashMode,
+      fixture.numRequired,
+      fixture.keys
+    );
     expect(address.hash160).toBe(fixture.result);
   }
 });
