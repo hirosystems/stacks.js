@@ -28,7 +28,7 @@
     "@changesets/cli": "^2.26.2",
     "@commitlint/cli": "^17.7.1",
     "@commitlint/config-conventional": "^17.7.0",
-    "@stacks/eslint-config": "^1.2.0",
+    "@stacks/eslint-config": "^2.0.0",
     "@stacks/prettier-config": "^0.0.10",
     "@types/bs58check": "^2.1.0",
     "@types/jest": "^29.5.3",
