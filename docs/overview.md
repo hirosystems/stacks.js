@@ -5,7 +5,7 @@ title: Overview
 # Stacks.js Overview
 
 Stacks.js is an SDK for building on the Stacks blockchain.
-It's a collection of various JavaScript libraries allowing developers to interact with the Stacks blockchain or allowing their users to.
+It's a collection of various JavaScript libraries allowing developers to interact with the Stacks blockchain or allow their users to.
 
 <!-- todo: add better UI, e.g. grid of cards -->
 
@@ -15,8 +15,8 @@ There are two main ways developers build applications on the Stacks blockchain:
 - 🔑 **With Private Key Access**: For example, managing funds with the Stacks.js CLI, building a backend (which can sign transactions directly).
 
 Most users interact via their favorite Stacks wallet.
-Developers can build web apps, which prompt the user for an action (e.g. sign a transaction) and then the wallet will handle the rest.
-The wallet will act in the security and best interest of the user, and the user will be able to review the transaction before signing.
+Developers can build web apps, which prompt the user for an action (e.g. sign a transaction), and then the wallet will handle the rest.
+The wallet will act in the security, and best interest of the user, and the user will be able to review the transaction before signing.
 
 Nevertheless, direct private key access is needed for some use cases.
 Developers can build simple scripts and tools intended for "offline" use.
@@ -34,7 +34,7 @@ There are three main integrations used by Stacks enabled applications:
 - **Transaction signing**: Prompt users to sign and broadcast transactions to the Stacks blockchain
 - **Data storage**: Save and retrieve data for users with [Gaia](https://docs.stacks.co/build-apps/references/gaia)
 
-All three of these integrations can be used together to create powerful new user experiences that rival or exceed those of traditional apps—all while protecting your users' digital rights.
+All three of these integrations can be used together to create powerful new user experiences that rival or exceed those of traditional apps while protecting your users' digital rights.
 
 import StacksjsStartersNote from './includes/\_stacks.js-starters-note.mdx';
 
@@ -68,7 +68,7 @@ Below is a list of all Stacks.js libraries and a few JS libraries and helpers ma
 
 ### Others
 
-- [`@stacks/cli`](/references/stacks-cli) Command line interface to interact with auth, storage and Stacks transactions. [Github](https://github.com/hirosystems/stacks.js/tree/master/packages/cli)
+- [`@stacks/cli`](/references/stacks-cli) Command line interface to interact with auth, storage, and Stacks transactions. [Github](https://github.com/hirosystems/stacks.js/tree/master/packages/cli)
 - [`@stacks/blockchain-api-client`](https://hirosystems.github.io/stacks-blockchain-api/client/) Auto-generated REST and websocket API for all endpoints provided by the Stacks Blockchain API. [Github](https://github.com/hirosystems/stacks-blockchain-api/tree/master/client)
 - `@stacks/keychain` _DEPRECATED: replaced by `@stacks/wallet-sdk`._
 
