@@ -13,11 +13,9 @@ To introduce the different functionality offered by Stacks.js, we'll walk throug
 ## Networks
 
 Typically we speak of "mainnet" and "testnet" as the networks of Stacks. Most wallets will be configured to "mainnet" by default, this is the actual blockchain that holds real STX tokens.
-As the name suggests, "testnet" is a network for testing.
-It's a separate blockchain state that holds test tokens, which have no value.
+As the name suggests, "testnet" is a network for testing. It's a separate blockchain state that holds test tokens, which have no value.
 
-Developers are encouraged to use testnet for testing, before rolling out applications and contracts to mainnet.
-For development, there is even Devnet/Mocknet for working in a local development environment.
+Developers are encouraged to use testnet for testing, before rolling out applications and contracts to mainnet. For development, there is even Devnet/Mocknet for working in a local development environment.
 Stacks.js functions can be configured to use wichever network you want.
 
 ```js
@@ -35,9 +33,11 @@ const network = new StacksMainnet({ url: 'https://www.mystacksnode.com/' });
 
 ## Accounts and Addresses
 
-:::info Connect 🌐
-For web apps you can request the users address via Stacks Connect. [Read more](https://connect.stacks.js.org/modules/_stacks_connect#quotconnectquot-aka-authentication-showconnect)
-:::
+> _**INFO**_
+> 
+> Connect 🌐 For web apps you can request the users address via Stacks Connect.
+> [Read more](https://connect.stacks.js.org/modules/_stacks_connect#quotconnectquot-aka-authentication-showconnect)
+
 
 Stacks.js uses the concept of an "account" to represent a user's identity on the blockchain. An account is identified by a unique address. The address is derived from the account's public key, which is derived from the account's private key.
 
@@ -126,9 +126,10 @@ More precisely, post conditions can verify that:
 - STX tokens were transferred from an address
 - FTs/NFTs we transferred from an address
 
-:::caution
-Post conditions aren't perfect and can't always guarantee the receival of FTs/NFTs, since they only check senders.
-:::
+> _**INFO**_
+
+> Post conditions aren't perfect and can't always guarantee the receival of FTs/NFTs, since they only check senders.
+
 
 An example adding a post condition (of an address sending 1000 uSTX).
 
@@ -153,17 +154,18 @@ The mode can be either `Allow` or `Deny`.
 - `Allow` means that the transaction can transfer any asset, (assuming no conflicting post conditions).
 - `Deny` means the transaction will fail if any asset transfers (not specified in the post conditions) are attempted.
 
-:::note
-In either case, all post conditions will still be checked.
+> _**NOTE**_
+
+> In either case, all post conditions will still be checked.
 By default, transactions are set to `Deny` mode, for additional security.
-:::
+
 
 ## Broadcasting
 
-:::info Connect 🌐
-For web apps via Stacks Connect, the users' wallet will broadcast the transaction and return a txid.
+> _**INFO**_
+>
+> Connect 🌐 For web apps via Stacks Connect, the users' wallet will broadcast the transaction and return a txid.
 [Read more](https://connect.stacks.js.org/modules/_stacks_connect)
-:::
 
 A finalized transaction can be broadcasted to the network or serialized (to a byte representation) using Stacks.js.
 
