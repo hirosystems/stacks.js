@@ -1,6 +1,5 @@
 import { asciiToBytes, hexToBytes, utf8ToBytes } from '@stacks/common';
 import {
-  BufferCV,
   boolCV,
   bufferCV,
   contractPrincipalCV,

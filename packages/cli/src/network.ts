@@ -213,7 +213,6 @@ export class CLINetworkAdapter {
             receiveFeesPeriod = this.receiveFeesPeriod!;
           }
 
-          // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
           if (namespaceInfo.reveal_block + receiveFeesPeriod > blockHeight) {
             address = namespaceInfo.address;
           }

@@ -248,7 +248,7 @@ export async function getBucketUrl(
 
 async function getGaiaErrorResponse(response: Response): Promise<GaiaHubErrorResponse> {
   let responseMsg = '';
-  let responseJson: any | undefined;
+  let responseJson: any;
   try {
     responseMsg = await response.text();
     try {
