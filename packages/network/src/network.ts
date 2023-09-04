@@ -17,8 +17,8 @@ export type StacksNetworkName = (typeof StacksNetworks)[number];
  * @related {@link StacksMainnet}, {@link StacksTestnet}, {@link StacksDevnet}, {@link StacksMocknet}
  */
 export class StacksNetwork {
-  version = TransactionVersion.Mainnet;
-  chainId = ChainID.Mainnet;
+  version: TransactionVersion = TransactionVersion.Mainnet;
+  chainId: ChainID = ChainID.Mainnet;
   bnsLookupUrl = 'https://stacks-node-api.mainnet.stacks.co';
   broadcastEndpoint = '/v2/transactions';
   transferFeeEstimateEndpoint = '/v2/fees/transfer';

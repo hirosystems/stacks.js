@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unsafe-declaration-merging */
+// todo: fix eslint rule, rename UserSession?
 import { AppConfig } from './appConfig';
 import { SessionOptions } from './sessionData';
 import { InstanceDataStore, LocalStorageStore, SessionDataStore } from './sessionStore';

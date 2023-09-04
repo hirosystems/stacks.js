@@ -37,7 +37,6 @@ jobs:
 
       - run: npm install -g npm@latest
       - run: npm ci
-      - run: npm run bootstrap
 
       # workaround for changesets/action to allow not using changesets
       # todo: add `force` option on fork to allow removing this workaround
