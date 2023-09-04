@@ -18,7 +18,7 @@ import {
   ClarityAbi,
   ClarityValue,
   ContractCallPayload,
-  ContractDeployOptions,
+  SignedContractDeployOptions,
   createStacksPrivateKey,
   cvToString,
   estimateContractDeploy,
@@ -766,7 +766,7 @@ async function contractDeploy(network: CLINetworkAdapter, args: string[]): Promi
     ? new StacksMainnet({ url: network.legacyNetwork.blockstackAPIUrl })
     : new StacksTestnet({ url: network.legacyNetwork.blockstackAPIUrl });
 
-  const options: ContractDeployOptions = {
+  const options: SignedContractDeployOptions = {
     contractName,
     codeBody: source,
     senderKey: privateKey,

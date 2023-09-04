@@ -38,7 +38,6 @@ import { ClarityAbi, validateContractCall } from './contract-abi';
 import { NoEstimateAvailableError } from './errors';
 import {
   createStacksPrivateKey,
-  createStacksPublicKey,
   getPublicKey,
   pubKeyfromPrivKey,
   publicKeyFromBytes,
@@ -707,14 +706,27 @@ export interface BaseContractDeployOptions {
   sponsored?: boolean;
 }
 
-export interface ContractDeployOptions extends BaseContractDeployOptions {
-  /** a hex string of the private key of the transaction sender */
-  senderKey: string;
-}
-
 export interface UnsignedContractDeployOptions extends BaseContractDeployOptions {
   /** a hex string of the public key of the transaction sender */
   publicKey: string;
+}
+
+export interface SignedContractDeployOptions extends BaseContractDeployOptions {
+  senderKey: string;
+}
+
+/** @deprecated Use {@link SignedContractDeployOptions} or {@link UnsignedContractDeployOptions} instead. */
+export interface ContractDeployOptions extends SignedContractDeployOptions {}
+
+export interface UnsignedMultiSigContractDeployOptions extends BaseContractDeployOptions {
+  numSignatures: number;
+  publicKeys: string[];
+}
+
+export interface SignedMultiSigContractDeployOptions extends BaseContractDeployOptions {
+  numSignatures: number;
+  publicKeys: string[];
+  signerKeys: string[];
 }
 
 /**
@@ -772,31 +784,49 @@ export async function estimateContractDeploy(
 /**
  * Generates a Clarity smart contract deploy transaction
  *
- * @param {ContractDeployOptions} txOptions - an options object for the contract deploy
+ * @param {SignedContractDeployOptions | SignedMultiSigContractDeployOptions} txOptions - an options object for the contract deploy
  *
  * Returns a signed Stacks smart contract deploy transaction.
  *
  * @return {StacksTransaction}
  */
 export async function makeContractDeploy(
-  txOptions: ContractDeployOptions
+  txOptions: SignedContractDeployOptions | SignedMultiSigContractDeployOptions
 ): Promise<StacksTransaction> {
-  const privKey = createStacksPrivateKey(txOptions.senderKey);
-  const stacksPublicKey = getPublicKey(privKey);
-  const publicKey = publicKeyToString(stacksPublicKey);
-  const unsignedTxOptions: UnsignedContractDeployOptions = { ...txOptions, publicKey };
-  const transaction: StacksTransaction = await makeUnsignedContractDeploy(unsignedTxOptions);
+  if ('senderKey' in txOptions) {
+    // txOptions is SignedContractDeployOptions
+    const publicKey = publicKeyToString(getPublicKey(createStacksPrivateKey(txOptions.senderKey)));
+    const options = omit(txOptions, 'senderKey');
+    const transaction = await makeUnsignedContractDeploy({ publicKey, ...options });
 
-  if (txOptions.senderKey) {
+    const privKey = createStacksPrivateKey(txOptions.senderKey);
     const signer = new TransactionSigner(transaction);
     signer.signOrigin(privKey);
-  }
 
-  return transaction;
+    return transaction;
+  } else {
+    // txOptions is SignedMultiSigContractDeployOptions
+    const options = omit(txOptions, 'signerKeys');
+    const transaction = await makeUnsignedContractDeploy(options);
+
+    const signer = new TransactionSigner(transaction);
+    let pubKeys = txOptions.publicKeys;
+    for (const key of txOptions.signerKeys) {
+      const pubKey = pubKeyfromPrivKey(key);
+      pubKeys = pubKeys.filter(pk => pk !== bytesToHex(pubKey.data));
+      signer.signOrigin(createStacksPrivateKey(key));
+    }
+
+    for (const key of pubKeys) {
+      signer.appendOrigin(publicKeyFromBytes(hexToBytes(key)));
+    }
+
+    return transaction;
+  }
 }
 
 export async function makeUnsignedContractDeploy(
-  txOptions: UnsignedContractDeployOptions
+  txOptions: UnsignedContractDeployOptions | UnsignedMultiSigContractDeployOptions
 ): Promise<StacksTransaction> {
   const defaultOptions = {
     fee: BigInt(0),
@@ -815,17 +845,28 @@ export async function makeUnsignedContractDeploy(
     options.clarityVersion
   );
 
-  const addressHashMode = AddressHashMode.SerializeP2PKH;
-  const pubKey = createStacksPublicKey(options.publicKey);
-
   let authorization: Authorization | null = null;
 
-  const spendingCondition = createSingleSigSpendingCondition(
-    addressHashMode,
-    publicKeyToString(pubKey),
-    options.nonce,
-    options.fee
-  );
+  let spendingCondition: SpendingCondition | null = null;
+
+  if ('publicKey' in options) {
+    // single-sig
+    spendingCondition = createSingleSigSpendingCondition(
+      AddressHashMode.SerializeP2PKH,
+      options.publicKey,
+      options.nonce,
+      options.fee
+    );
+  } else {
+    // multi-sig
+    spendingCondition = createMultiSigSpendingCondition(
+      AddressHashMode.SerializeP2SH,
+      options.numSignatures,
+      options.publicKeys,
+      options.nonce,
+      options.fee
+    );
+  }
 
   if (options.sponsored) {
     authorization = createSponsoredAuth(spendingCondition);
@@ -863,7 +904,7 @@ export async function makeUnsignedContractDeploy(
       options.network.version === TransactionVersion.Mainnet
         ? AddressVersion.MainnetSingleSig
         : AddressVersion.TestnetSingleSig;
-    const senderAddress = publicKeyToAddress(addressVersion, pubKey);
+    const senderAddress = c32address(addressVersion, transaction.auth.spendingCondition!.signer);
     const txNonce = await getNonce(senderAddress, options.network);
     transaction.setNonce(txNonce);
   }
