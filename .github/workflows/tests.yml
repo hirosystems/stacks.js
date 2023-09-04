@@ -22,15 +22,12 @@ jobs:
       - run: npm install -g npm@latest
       - run: npm ci
 
-      - name: Bootstrap lerna
-        run: npm run bootstrap
-
-      - name: Check bootstrap
+      - name: Check package.json
         run: |
           if [[ -n $(git status -s) ]]; then
             git status
-            echo "Error: file tree is not clean; Likely needs bootstraping"
-            echo "Run `npm run bootstrap` and commit to resolve"
+            echo "Error: file tree is not clean; Likely needs npm install"
+            echo "Run `npm install` and commit to resolve"
             exit 1
           fi
 

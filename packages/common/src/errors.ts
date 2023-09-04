@@ -210,7 +210,7 @@ export class NoSessionDataError extends BlockstackError {
 export interface GaiaHubErrorResponse {
   status: number;
   statusText: string;
-  body?: string | any;
+  body?: any; // todo: should this be string?
 }
 
 export interface HubErrorDetails {

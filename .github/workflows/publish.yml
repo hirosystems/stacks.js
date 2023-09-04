@@ -31,7 +31,6 @@ jobs:
 
       - run: npm install -g npm@latest
       - run: npm ci
-      - run: npm run bootstrap
       - run: npm run build
 
       - run: git config --local user.email 'action@github.com'

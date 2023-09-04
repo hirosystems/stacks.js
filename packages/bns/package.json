@@ -52,8 +52,5 @@
   },
   "bugs": {
     "url": "https://github.com/blockstack/stacks.js/issues"
-  },
-  "typedoc": {
-    "entryPoint": "./src/index.ts"
   }
 }

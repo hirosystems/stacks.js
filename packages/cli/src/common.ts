@@ -29,7 +29,6 @@ export class CLITransactionSigner implements TransactionSigner {
   }
 
   signTransaction(_txIn: bitcoinjs.TransactionBuilder, _signingIndex: number): Promise<void> {
-    // eslint-disable-next-line @typescript-eslint/no-empty-function
     return Promise.resolve().then(() => {});
   }
 

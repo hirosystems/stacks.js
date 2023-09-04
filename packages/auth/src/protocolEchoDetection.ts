@@ -15,11 +15,14 @@ function getQueryStringParams(query: string): Record<string, string> {
   }
   // Trim a starting `?` character if exists
   const trimmed = /^[?#]/.test(query) ? query.slice(1) : query;
-  return trimmed.split('&').reduce((params, param) => {
-    const [key, value] = param.split('=');
-    params[key] = value ? decodeURIComponent(value.replace(/\+/g, ' ')) : '';
-    return params;
-  }, {} as Record<string, string>);
+  return trimmed.split('&').reduce(
+    (params, param) => {
+      const [key, value] = param.split('=');
+      params[key] = value ? decodeURIComponent(value.replace(/\+/g, ' ')) : '';
+      return params;
+    },
+    {} as Record<string, string>
+  );
 }
 
 /**

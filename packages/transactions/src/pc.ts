@@ -45,6 +45,7 @@ type NftString = `${ContractIdString}::${string}`;
  * Pc.principal('STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6').willSendEq(10000).ustx();
  * ```
  */
+// eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
 export function principal(principal: AddressString | ContractIdString) {
   if (isContractIdString(principal)) {
     // `principal` is a ContractIdString here
@@ -59,7 +60,10 @@ export function principal(principal: AddressString | ContractIdString) {
  * Not meant to be used directly. Start from `Pc.principal(…)` instead.
  */
 class PartialPcWithPrincipal {
-  constructor(private address: string, private contractName?: string) {}
+  constructor(
+    private address: string,
+    private contractName?: string
+  ) {}
 
   // todo: split FT and STX into separate methods? e.g. `willSendSTXEq` and `willSendFtEq`
 
@@ -310,6 +314,7 @@ function parseNft(nftAssetName: NftString) {
 }
 
 /** @internal */
+// eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
 function isContractIdString(value: AddressString | ContractIdString): value is ContractIdString {
   return value.includes('.');
 }

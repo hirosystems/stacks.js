@@ -2,7 +2,7 @@ name: pull-request
 on:
   pull_request:
     paths-ignore:
-      - "**.md"
+      - '**.md'
 
   workflow_dispatch:
 
@@ -41,7 +41,6 @@ jobs:
           cache: npm
       - run: npm install -g npm@latest
       - run: npm ci
-      - run: npm run bootstrap
       - id: git-commit
         run: echo "::set-output name=sha::$(git rev-parse --short HEAD)"
       - run: echo $SHA

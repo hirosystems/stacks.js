@@ -43,9 +43,8 @@ module.exports = {
           {
             loader: 'esbuild-loader',
             options: {
-              loader: 'tsx',
               target: 'es2017',
-              tsconfigRaw: require(path.resolve(process.cwd(), 'tsconfig.build.json')),
+              tsconfig: 'tsconfig.build.json',
             },
           },
         ],
