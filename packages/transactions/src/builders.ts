@@ -715,6 +715,9 @@ export interface SignedContractDeployOptions extends BaseContractDeployOptions {
   senderKey: string;
 }
 
+/** @deprecated Use {@link SignedContractDeployOptions} or {@link UnsignedContractDeployOptions} instead. */
+export interface ContractDeployOptions extends SignedContractDeployOptions {}
+
 export interface UnsignedMultiSigContractDeployOptions extends BaseContractDeployOptions {
   numSignatures: number;
   publicKeys: string[];
