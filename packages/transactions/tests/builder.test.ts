@@ -183,6 +183,7 @@ test('Make STX token transfer with set tx fee', async () => {
     memo,
     anchorMode: AnchorMode.Any,
   });
+  expect(() => transaction.verifyOrigin()).not.toThrow();
 
   const serialized = bytesToHex(transaction.serialize());
 
@@ -241,10 +242,10 @@ test('Make STX token transfer with fee estimate', async () => {
     anchorMode: AnchorMode.Any,
   });
 
+  expect(() => transaction.verifyOrigin()).not.toThrow();
   expect(transaction.auth.spendingCondition?.fee?.toString()).toEqual('180');
 
   const serialized = bytesToHex(transaction.serialize());
-
   const tx =
     '0000000001040015c31b8c1c11c515e244b75806bac48d1399c775000000000000000000000000000000b4' +
     '0001e5ac1152f6018fbfded102268b22086666150823d0ae57f4023bde058a7ff0b279076db25b358b8833' +
@@ -275,9 +276,9 @@ test('Make STX token transfer with testnet', async () => {
     memo: memo,
     anchorMode: AnchorMode.Any,
   });
+  expect(() => transaction.verifyOrigin()).not.toThrow();
 
   const serialized = bytesToHex(transaction.serialize());
-
   const tx =
     '8080000000040015c31b8c1c11c515e244b75806bac48d1399c77500000000000000000000000000000000' +
     '00014199f63f7e010141a36a4624d032758f54e08ff03b24ed2667463eb405b4d81505631b32a1f13b5737' +
@@ -299,9 +300,9 @@ test('Make STX token transfer with testnet string name', async () => {
     memo: 'test memo',
     anchorMode: AnchorMode.Any,
   });
+  expect(() => transaction.verifyOrigin()).not.toThrow();
 
   const serialized = bytesToHex(transaction.serialize());
-
   const tx =
     '8080000000040015c31b8c1c11c515e244b75806bac48d1399c77500000000000000000000000000000000' +
     '00014199f63f7e010141a36a4624d032758f54e08ff03b24ed2667463eb405b4d81505631b32a1f13b5737' +
@@ -395,6 +396,7 @@ test('Make Multi-Sig STX token transfer', async () => {
   signer.signOrigin(privKeys[0]);
   signer.signOrigin(privKeys[1]);
   signer.appendOrigin(pubKeys[2]);
+  expect(() => transaction.verifyOrigin()).not.toThrow();
 
   const serializedTx = transaction.serialize();
   const tx =
@@ -644,6 +646,7 @@ test('Make Multi-Sig STX token transfer with two transaction signers', async () 
 
   const bytesReader = new BytesReader(serializedTx);
   const deserializedTx = deserializeTransaction(bytesReader);
+  expect(() => deserializedTx.verifyOrigin()).not.toThrow();
 
   expect(deserializedTx.auth.authType).toBe(authType);
 
@@ -723,6 +726,7 @@ test('Make versioned smart contract deploy', async () => {
     anchorMode: AnchorMode.Any,
     clarityVersion: ClarityVersion.Clarity2,
   });
+  expect(() => transaction.verifyOrigin()).not.toThrow();
 
   const serialized = bytesToHex(transaction.serialize());
 
@@ -748,6 +752,7 @@ test('Make smart contract deploy (defaults to versioned smart contract, as of 2.
     network: new StacksTestnet(),
     anchorMode: AnchorMode.Any,
   });
+  expect(() => transaction.verifyOrigin()).not.toThrow();
 
   const serialized = bytesToHex(transaction.serialize());
 
@@ -767,6 +772,7 @@ test('Make smart contract deploy with network string name (defaults to versioned
     network: 'testnet',
     anchorMode: AnchorMode.Any,
   });
+  expect(() => transaction.verifyOrigin()).not.toThrow();
 
   const serialized = bytesToHex(transaction.serialize());
 
@@ -817,12 +823,11 @@ test('make a multi-sig contract deploy', async () => {
     '2a584d899fed1d24e26b524f202763c8ab30260167429f157f1c119f550fa6af01',
     'd5200dee706ee53ae98a03fba6cf4fdcc5084c30cfa9e1b3462dcdeaa3e0f1d201',
   ];
-  // const privKeys = privKeyStrings.map(createStacksPrivateKey);
 
   const pubKeys = privKeyStrings.map(pubKeyfromPrivKey);
   const pubKeyStrings = pubKeys.map(publicKeyToString);
 
-  const tx = await makeContractDeploy({
+  const transaction = await makeContractDeploy({
     codeBody,
     contractName,
     publicKeys: pubKeyStrings,
@@ -833,8 +838,10 @@ test('make a multi-sig contract deploy', async () => {
     network: new StacksTestnet(),
     anchorMode: AnchorMode.Any,
   });
-
-  expect(tx.auth.spendingCondition!.signer).toEqual('04128cacf0764f69b1e291f62d1dcdd8f65be5ab');
+  expect(() => transaction.verifyOrigin()).not.toThrow();
+  expect(transaction.auth.spendingCondition!.signer).toEqual(
+    '04128cacf0764f69b1e291f62d1dcdd8f65be5ab'
+  );
 });
 
 test('Make smart contract deploy signed', async () => {
@@ -855,6 +862,7 @@ test('Make smart contract deploy signed', async () => {
     network: new StacksTestnet(),
     anchorMode: AnchorMode.Any,
   });
+  expect(() => transaction.verifyOrigin()).not.toThrow();
 
   const serializedTx = transaction.serialize();
 
@@ -887,6 +895,7 @@ test('Make contract-call', async () => {
     network: new StacksTestnet(),
     anchorMode: AnchorMode.Any,
   });
+  expect(() => transaction.verifyOrigin()).not.toThrow();
 
   const serialized = bytesToHex(transaction.serialize());
 
@@ -911,6 +920,7 @@ test('Make contract-call with network string', async () => {
     network: 'testnet',
     anchorMode: AnchorMode.Any,
   });
+  expect(() => transaction.verifyOrigin()).not.toThrow();
 
   const serialized = bytesToHex(transaction.serialize());
 
@@ -982,6 +992,7 @@ test('Make contract-call with post conditions', async () => {
     postConditionMode: PostConditionMode.Deny,
     anchorMode: AnchorMode.Any,
   });
+  expect(() => transaction.verifyOrigin()).not.toThrow();
 
   const serialized = bytesToHex(transaction.serialize());
 
@@ -1026,6 +1037,7 @@ test('Make contract-call with post condition allow mode', async () => {
     postConditionMode: PostConditionMode.Allow,
     anchorMode: AnchorMode.Any,
   });
+  expect(() => transaction.verifyOrigin()).not.toThrow();
 
   const serialized = bytesToHex(transaction.serialize());
 
@@ -1085,12 +1097,11 @@ test('make a multi-sig contract call', async () => {
     '2a584d899fed1d24e26b524f202763c8ab30260167429f157f1c119f550fa6af01',
     'd5200dee706ee53ae98a03fba6cf4fdcc5084c30cfa9e1b3462dcdeaa3e0f1d201',
   ];
-  // const privKeys = privKeyStrings.map(createStacksPrivateKey);
 
   const pubKeys = privKeyStrings.map(pubKeyfromPrivKey);
   const pubKeyStrings = pubKeys.map(publicKeyToString);
 
-  const tx = await makeContractCall({
+  const transaction = await makeContractCall({
     contractAddress,
     contractName,
     functionName,
@@ -1104,8 +1115,11 @@ test('make a multi-sig contract call', async () => {
     postConditionMode: PostConditionMode.Allow,
     anchorMode: AnchorMode.Any,
   });
+  expect(() => transaction.verifyOrigin()).not.toThrow();
 
-  expect(tx.auth.spendingCondition!.signer).toEqual('04128cacf0764f69b1e291f62d1dcdd8f65be5ab');
+  expect(transaction.auth.spendingCondition!.signer).toEqual(
+    '04128cacf0764f69b1e291f62d1dcdd8f65be5ab'
+  );
 });
 
 test('Estimate transaction transfer fee', async () => {

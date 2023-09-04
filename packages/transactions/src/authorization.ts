@@ -93,7 +93,9 @@ export function createSingleSigSpendingCondition(
   fee: IntegerType
 ): SingleSigSpendingCondition {
   // address version arg doesn't matter for signer hash generation
-  const signer = addressFromPublicKeys(0, hashMode, 1, [createStacksPublicKey(pubKey)]).hash160;
+  const signer = addressFromPublicKeys(0 as any, hashMode, 1, [
+    createStacksPublicKey(pubKey),
+  ]).hash160;
   const keyEncoding = isCompressed(createStacksPublicKey(pubKey))
     ? PubKeyEncoding.Compressed
     : PubKeyEncoding.Uncompressed;
@@ -118,7 +120,7 @@ export function createMultiSigSpendingCondition(
   const stacksPublicKeys = pubKeys.map(createStacksPublicKey);
 
   // address version arg doesn't matter for signer hash generation
-  const signer = addressFromPublicKeys(0, hashMode, numSigs, stacksPublicKeys).hash160;
+  const signer = addressFromPublicKeys(0 as any, hashMode, numSigs, stacksPublicKeys).hash160;
 
   return {
     hashMode,
@@ -417,7 +419,7 @@ function verifySingleSig(
   );
 
   // address version arg doesn't matter for signer hash generation
-  const addrBytes = addressFromPublicKeys(0, condition.hashMode, 1, [pubKey]).hash160;
+  const addrBytes = addressFromPublicKeys(0 as any, condition.hashMode, 1, [pubKey]).hash160;
 
   if (addrBytes !== condition.signer)
     throw new VerificationError(
@@ -473,7 +475,7 @@ function verifyMultiSig(
     throw new VerificationError('Uncompressed keys are not allowed in this hash mode');
 
   const addrBytes = addressFromPublicKeys(
-    0,
+    0 as any,
     condition.hashMode,
     condition.signaturesRequired,
     publicKeys
