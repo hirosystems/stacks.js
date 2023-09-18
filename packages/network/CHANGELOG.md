@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.8.1](https://github.com/hirosystems/stacks.js/compare/v6.8.0...v6.8.1) (2023-09-18)
+
+
+### Bug Fixes
+
+* add hiro product header to default network fetch function ([58eb3af](https://github.com/hirosystems/stacks.js/commit/58eb3af347c05c32065358ea66bfb372d7658e59))
+
+
+
 ## [6.8.0](https://github.com/hirosystems/stacks.js/compare/v6.7.0...v6.8.0) (2023-09-04)
 
 **Note:** Version bump only for package @stacks/network
