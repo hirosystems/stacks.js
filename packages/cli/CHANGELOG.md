@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.8.0](https://github.com/hirosystems/stacks.js/compare/v6.7.0...v6.8.0) (2023-09-04)
+
+
+### Features
+
+* add multisig support to contract deploys ([#1539](https://github.com/hirosystems/stacks.js/issues/1539)) ([260f2d5](https://github.com/hirosystems/stacks.js/commit/260f2d58577c92ef37d0f1d276e1e0fc0fd267b3))
+
+
+
 ## [6.7.0](https://github.com/hirosystems/stacks.js/compare/v6.5.5...v6.7.0) (2023-07-24)
 
 **Note:** Version bump only for package @stacks/cli
