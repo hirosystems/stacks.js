@@ -4,13 +4,21 @@ import { fetchWrapper, getFetchOptions, setFetchOptions } from '../src/fetch';
 test('Verify fetch private options', async () => {
   const defaultOptioins = getFetchOptions();
 
-  expect(defaultOptioins).toEqual({ referrerPolicy: 'origin' });
+  expect(defaultOptioins).toEqual({
+    referrerPolicy: 'origin',
+    headers: {
+      'x-hiro-product': 'stacksjs',
+    },
+  });
 
   // Override default options when fetchPrivate is called internally by other stacks.js libraries like transactions or from server side
   // This is for developers as they cannot directly pass options directly in fetchPrivate
   const modifiedOptions: RequestInit = {
     referrer: 'http://test.com',
     referrerPolicy: 'same-origin',
+    headers: {
+      'x-hiro-product': 'stacksjs',
+    },
   };
 
   // Developers can set fetch options globally one time specifically when fetchPrivate is used internally by stacks.js libraries

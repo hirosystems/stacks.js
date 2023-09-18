@@ -20,7 +20,7 @@ test('createApiKeyMiddleware adds x-api-key header to correct host request', asy
   const fetchFn = createFetchFn(middleware);
 
   await fetchFn('https://example.com');
-  expect(fetchMock.mock.calls[0][1]?.headers).toBe(undefined);
+  expect(fetchMock.mock.calls[0][1]?.headers).toStrictEqual({ 'x-hiro-product': 'stacksjs' });
 
   await fetchFn('https://api.stacks.co');
   expect((fetchMock.mock.calls[1][1]?.headers as Headers)?.get('x-api-key')).toContain(apiKey);

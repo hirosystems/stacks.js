@@ -4,8 +4,11 @@ import 'cross-fetch/polyfill';
 // Reference: https://developer.mozilla.org/en-US/docs/Web/API/Request/Request
 const defaultFetchOpts: RequestInit = {
   // By default referrer value will be client:origin: above reference link
-  referrerPolicy: 'origin', // Use origin value for referrer policy
   // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Referrer-Policy
+  referrerPolicy: 'origin', // Use origin value for referrer policy
+  headers: {
+    'x-hiro-product': 'stacksjs',
+  },
 };
 
 /**
@@ -39,7 +42,7 @@ export const setFetchOptions = (ops: RequestInit): RequestInit => {
 export async function fetchWrapper(input: RequestInfo, init?: RequestInit): Promise<Response> {
   const fetchOpts = {};
   // Use the provided options in request options along with default or user provided values
-  Object.assign(fetchOpts, init, defaultFetchOpts);
+  Object.assign(fetchOpts, defaultFetchOpts, init);
 
   const fetchResult = await fetch(input, fetchOpts);
   return fetchResult;
@@ -81,7 +84,7 @@ export interface ApiKeyMiddlewareOpts {
 /** @internal */
 export function hostMatches(host: string, pattern: string | RegExp) {
   if (typeof pattern === 'string') return pattern === host;
-  return (pattern as RegExp).exec(host);
+  return pattern.exec(host);
 }
 
 /**
