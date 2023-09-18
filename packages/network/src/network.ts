@@ -5,15 +5,24 @@ export const HIRO_MAINNET_DEFAULT = 'https://stacks-node-api.mainnet.stacks.co';
 export const HIRO_TESTNET_DEFAULT = 'https://stacks-node-api.testnet.stacks.co';
 export const HIRO_MOCKNET_DEFAULT = 'http://localhost:3999';
 
+/**
+ * Used for constructing Network instances
+ * @related {@link StacksNetwork}, {@link StacksMainnet}, {@link StacksTestnet}, {@link StacksDevnet}, {@link StacksMocknet}
+ */
 export interface NetworkConfig {
+  /** The base API/node URL for the network fetch calls */
   url: string;
+  /** An optional custom fetch function to override default behaviors */
   fetchFn?: FetchFn;
 }
 
+/** @ignore internal */
 export const StacksNetworks = ['mainnet', 'testnet', 'devnet', 'mocknet'] as const;
+/** The enum-style names of different common Stacks networks */
 export type StacksNetworkName = (typeof StacksNetworks)[number];
 
 /**
+ * The base class for Stacks networks. Typically used via its subclasses.
  * @related {@link StacksMainnet}, {@link StacksTestnet}, {@link StacksDevnet}, {@link StacksMocknet}
  */
 export class StacksNetwork {
@@ -36,6 +45,7 @@ export class StacksNetwork {
     this.fetchFn = networkConfig.fetchFn ?? createFetchFn();
   }
 
+  /** A static network constructor from a network name */
   static fromName = (networkName: StacksNetworkName): StacksNetwork => {
     switch (networkName) {
       case 'mainnet':
@@ -55,6 +65,7 @@ export class StacksNetwork {
     }
   };
 
+  /** @ignore internal */
   static fromNameOrNetwork = (network: StacksNetworkName | StacksNetwork) => {
     if (typeof network !== 'string' && 'version' in network) {
       return network;
@@ -63,6 +74,7 @@ export class StacksNetwork {
     return StacksNetwork.fromName(network);
   };
 
+  /** Returns `true` if the network is configured to 'mainnet', based on the TransactionVersion */
   isMainnet = () => this.version === TransactionVersion.Mainnet;
   getBroadcastApiUrl = () => `${this.coreApiUrl}${this.broadcastEndpoint}`;
   getTransferFeeEstimateApiUrl = () => `${this.coreApiUrl}${this.transferFeeEstimateEndpoint}`;
