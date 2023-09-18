@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.8.1](https://github.com/hirosystems/stacks.js/compare/v6.8.0...v6.8.1) (2023-09-18)
+
+
+### Bug Fixes
+
+* add peer network id ([db5a596](https://github.com/hirosystems/stacks.js/commit/db5a5965a4b1941217b56c93dab92191e2b80913))
+
+
+
 ## [6.8.0](https://github.com/hirosystems/stacks.js/compare/v6.7.0...v6.8.0) (2023-09-04)
 
 **Note:** Version bump only for package @stacks/common
