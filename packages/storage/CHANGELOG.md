@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.9.0](https://github.com/hirosystems/stacks.js/compare/v6.8.1...v6.9.0) (2023-09-20)
+
+**Note:** Version bump only for package @stacks/storage
+
+
+
+
+
 ## [6.8.1](https://github.com/hirosystems/stacks.js/compare/v6.8.0...v6.8.1) (2023-09-18)
 
 **Note:** Version bump only for package @stacks/storage
