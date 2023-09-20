@@ -18,6 +18,8 @@ import {
   uintCV,
 } from './clarity';
 
+export { prettyPrint } from './clarity/prettyPrint';
+
 // todo: https://github.com/hirosystems/clarinet/issues/786
 
 // Primitives //////////////////////////////////////////////////////////////////
