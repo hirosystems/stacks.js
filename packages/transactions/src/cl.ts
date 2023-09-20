@@ -16,6 +16,7 @@ import {
   stringUtf8CV,
   tupleCV,
   uintCV,
+  prettyPrint,
 } from './clarity';
 
 // todo: https://github.com/hirosystems/clarinet/issues/786
@@ -158,5 +159,7 @@ export const serialize = serializeCV;
  * @see {@link serialize}
  */
 export const deserialize = deserializeCV;
+
+export { prettyPrint };
 
 // todo: add `deserializeReadable` methods that translates enums into name strings
