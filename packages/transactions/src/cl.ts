@@ -16,8 +16,9 @@ import {
   stringUtf8CV,
   tupleCV,
   uintCV,
-  prettyPrint,
 } from './clarity';
+
+import { prettyPrint } from './clarity/prettyPrint';
 
 // todo: https://github.com/hirosystems/clarinet/issues/786
 

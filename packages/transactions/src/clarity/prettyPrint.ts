@@ -120,6 +120,8 @@ function prettyPrintWithDepth(cv: ClarityValue, space = 0, depth: number): strin
 /**
  * @description format clarity values in clarity style strings
  * with the ability to prettify the result with line break end space indentation
+ * @param cv The Clarity Value to format
+ * @param space The indentation size of the output string. There's no indentation and no line breaks if space = 0
  * @exemple
  * ```ts
  * prettyPrint(Cl.tuple({ id: Cl.some(Cl.uint(1)) }))

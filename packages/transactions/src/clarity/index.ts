@@ -98,5 +98,3 @@ export { serializeCV, deserializeCV };
 
 // toString
 export { cvToString, cvToJSON, cvToValue, principalToString };
-
-export { prettyPrint } from './prettyPrint';
