@@ -6,28 +6,18 @@
   `Cl.tuple({ id: u1 })` => { id: u1 }
 */
 
-import { BufferCV, ClarityType, ClarityValue, ListCV, TupleCV, principalToString } from '.';
-
-const byteToHex: string[] = [];
-for (let n = 0; n <= 0xff; ++n) {
-  const hexOctet = n.toString(16).padStart(2, '0');
-  byteToHex.push(hexOctet);
-}
+import { bytesToHex } from '@stacks/common';
+import { ClarityType, ClarityValue, ListCV, TupleCV, principalToString } from '.';
 
 function formatSpace(space: number, depth: number, end = false) {
   if (!space) return ' ';
   return `\n${' '.repeat(space * (depth - (end ? 1 : 0)))}`;
 }
 
-function formatBuffer(cv: BufferCV): string {
-  const hex = Array.from(cv.buffer).map(n => byteToHex[n]);
-  return `0x${hex.join('')}`;
-}
-
 /**
  * @description format List clarity values in clarity style strings
  * with the ability to prettify the result with line break end space indentation
- * @exemple
+ * @example
  * ```ts
  * formatList(Cl.list([Cl.uint(1)]))
  * // (list u1)
@@ -52,7 +42,7 @@ function formatList(cv: ListCV, space: number, depth = 1): string {
 /**
  * @description format Tuple clarity values in clarity style strings
  * with the ability to prettify the result with line break end space indentation
- * @exemple
+ * @example
  * ```ts
  * formatTuple(Cl.tuple({ id: Cl.uint(1) }))
  * // { id: u1 }
@@ -95,7 +85,7 @@ function prettyPrintWithDepth(cv: ClarityValue, space = 0, depth: number): strin
   if (cv.type === ClarityType.PrincipalContract) return `'${principalToString(cv)}`;
   if (cv.type === ClarityType.PrincipalStandard) return `'${principalToString(cv)}`;
 
-  if (cv.type === ClarityType.Buffer) return formatBuffer(cv);
+  if (cv.type === ClarityType.Buffer) return `0x${bytesToHex(cv.buffer)}`;
 
   if (cv.type === ClarityType.OptionalNone) return 'none';
   if (cv.type === ClarityType.OptionalSome)
@@ -122,7 +112,7 @@ function prettyPrintWithDepth(cv: ClarityValue, space = 0, depth: number): strin
  * with the ability to prettify the result with line break end space indentation
  * @param cv The Clarity Value to format
  * @param space The indentation size of the output string. There's no indentation and no line breaks if space = 0
- * @exemple
+ * @example
  * ```ts
  * prettyPrint(Cl.tuple({ id: Cl.some(Cl.uint(1)) }))
  * // { id: (some u1) }
