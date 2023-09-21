@@ -1,3 +1,5 @@
+// PLACEHOLDER FILE
+
 interface MintOptions {
   amount: number; // (amount uint)
   destination: string; // (destination principal)
