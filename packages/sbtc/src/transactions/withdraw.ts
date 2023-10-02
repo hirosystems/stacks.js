@@ -2,16 +2,9 @@ import * as btc from '@scure/btc-signer';
 import { hexToBytes } from '@stacks/common';
 import * as P from 'micro-packed';
 import { BlockstreamUtxo, BlockstreamUtxoWithTxHex } from './api';
-import {
-  BitcoinNetwork,
-  MagicBytes,
-  OpCode,
-  SBTC_PEG_ADDRESS,
-  TEST_NETWORK,
-  VSIZE_INPUT_P2WPKH,
-} from './constants';
+import { BitcoinNetwork, MagicBytes, OpCode, TEST_NETWORK, VSIZE_INPUT_P2WPKH } from './constants';
 
-import { dustMinimum, paymentInfo, stacksAddressBytes } from './utils';
+import { dustMinimum, paymentInfo } from './utils';
 
 const concat = P.concatBytes;
 
@@ -19,23 +12,27 @@ export async function sbtcWithdrawHelper({
   network = TEST_NETWORK, // default to testnet for developer release
   amountSats,
   signature,
-  stacksAddress,
+  bitcoinAddress,
   bitcoinChangeAddress,
   utxos,
   feeRate,
-  pegAddress = SBTC_PEG_ADDRESS,
 }: {
   network?: BitcoinNetwork;
   amountSats: number;
   signature: string;
-  stacksAddress: string;
-  bitcoinChangeAddress: string;
+  bitcoinAddress: string;
+  bitcoinChangeAddress?: string;
   utxos: (BlockstreamUtxo | BlockstreamUtxoWithTxHex)[];
   feeRate: number;
-  pegAddress?: string;
 }) {
-  const tx = buildSbtcWithdrawTxOpReturn({ network, amountSats, stacksAddress, pegAddress });
-  console.log(signature);
+  bitcoinChangeAddress ??= bitcoinAddress;
+
+  const tx = buildSbtcWithdrawTxOpReturn({
+    network,
+    amountSats,
+    signature,
+    bitcoinAddress,
+  });
 
   // we separate this part, since wallets could handle it themselves
   const pay = await paymentInfo({ tx, utxos, feeRate });
@@ -51,18 +48,20 @@ export async function sbtcWithdrawHelper({
   return tx;
 }
 
+const DUST = 500;
+
 export function buildSbtcWithdrawTxOpReturn({
   network = TEST_NETWORK, // default to testnet for developer release
   amountSats,
-  stacksAddress,
-  pegAddress = SBTC_PEG_ADDRESS,
+  signature,
+  bitcoinAddress,
 }: {
   network?: BitcoinNetwork;
   amountSats: number;
-  stacksAddress: string;
-  pegAddress?: string;
+  signature: string;
+  bitcoinAddress: string;
 }) {
-  const data = buildSBtcWithdrawBtcPayload({ network, address: stacksAddress });
+  const data = buildSBtcWithdrawBtcPayload({ network, amountSats, signature });
 
   const tx = new btc.Transaction({
     // todo: disbale unknown
@@ -70,20 +69,24 @@ export function buildSbtcWithdrawTxOpReturn({
     allowUnknownOutputs: true,
   });
   tx.addOutput({ script: btc.Script.encode(['RETURN', data]), amount: BigInt(0) });
-  tx.addOutputAddress(pegAddress, BigInt(amountSats), network);
+  tx.addOutputAddress(bitcoinAddress, BigInt(DUST), network);
 
   return tx;
 }
 
 export function buildSBtcWithdrawBtcPayload({
   network: net,
-  address,
+  amountSats,
+  signature,
 }: {
   network: BitcoinNetwork;
-  address: string;
+  amountSats: number;
+  signature: string;
 }): Uint8Array {
   const magicBytes =
     net.bech32 === 'tb' ? hexToBytes(MagicBytes.Testnet) : hexToBytes(MagicBytes.Mainnet);
   const opCodeBytes = hexToBytes(OpCode.PegOut);
-  return concat(magicBytes, opCodeBytes, stacksAddressBytes(address));
+  const amountBytes = P.U64BE.encode(BigInt(amountSats));
+  const signatureBytes = hexToBytes(signature);
+  return concat(magicBytes, opCodeBytes, amountBytes, signatureBytes);
 }
