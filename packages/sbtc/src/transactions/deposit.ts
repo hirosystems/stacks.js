@@ -1,15 +1,20 @@
 import * as btc from '@scure/btc-signer';
-import * as secp from '@noble/secp256k1';
-import * as P from 'micro-packed';
-import { hex } from '@scure/base';
-import type { BridgeTransactionType, UTXO } from './types/sbtc_types.js';
-import { toStorable, buildDepositPayload, buildDepositPayloadOpReturn } from './payload_utils.js';
-import { addInputs, inputAmt } from './wallet_utils.js';
-import { MagicBytes as MagicBytes, MagicBytes, OPCodes, OpCode } from './constants.js';
+import { hexToBytes, intToHex, utf8ToBytes } from '@stacks/common';
 import { c32addressDecode } from 'c32check';
+import * as P from 'micro-packed';
+import * as api from './api';
+import { BlockstreamUtxo, BlockstreamUtxoWithTxHex } from './api';
+import { MagicBytes, OpCode } from './constants';
 
-export const REVEAL_PAYMENT = 10001; // todo: is this const?
-export const DUST = 500; // todo: double-check what this has to be set to
+// todo: move to constants?
+
+// Estimates based on https://bitcoinops.org/en/tools/calc-size/
+const OVERHEAD_TX = 4 + 1 + 1 + 4; // new btc.Transaction().vsize
+// const OVERHEAD_INPUT = 36 + 1 + 4 + 0.25;
+// const OVERHEAD_OUTPUT = 8 + 1;
+// const OVERHEAD_INPUT_P2PKH = 107;
+const VSIZE_INPUT_P2WPKH = 68;
+// const OVERHEAD_OUTPUT_P2PKH = 25;
 
 const concat = P.concatBytes;
 
@@ -23,17 +28,6 @@ interface BitcoinNetwork {
 export const NETWORK: BitcoinNetwork = btc.NETWORK;
 export const TEST_NETWORK: BitcoinNetwork = btc.TEST_NETWORK;
 
-interface DepositOpts {
-  network?: BitcoinNetwork;
-  amount: number;
-  btcFeeRates: any;
-  addressInfo: any;
-  stacksAddress: string;
-  sbtcWalletAddress: string;
-  cardinal: string;
-  userPaymentPubKey: string;
-}
-
 export function buildSBtcDepositBtcPayload({
   network: net,
   address,
@@ -42,269 +36,267 @@ export function buildSBtcDepositBtcPayload({
   address: string;
 }): Uint8Array {
   const magicBytes =
-    net.bech32 === 'tb' ? hex.decode(MagicBytes.Testnet) : hex.decode(MagicBytes.Mainnet);
-  const opCodeBytes = hex.decode(OpCode.PegIn);
+    net.bech32 === 'tb' ? hexToBytes(MagicBytes.Testnet) : hexToBytes(MagicBytes.Mainnet);
+  const opCodeBytes = hexToBytes(OpCode.PegIn);
   return concat(magicBytes, opCodeBytes, stacksAddressBytes(address));
 }
 
 function stacksAddressBytes(address: string): Uint8Array {
   const [addr, contractName] = address.split('.');
   const [version, hash] = c32addressDecode(addr);
-  const versionBytes = hex.decode(version.toString(16));
-  const hashBytes = hex.decode(hash);
+  const versionBytes = hexToBytes(version.toString(16));
+  const hashBytes = hexToBytes(hash);
+  const contractNameBytes = lengthPrefixedString(contractName, utf8ToBytes);
 
-  return concat(versionBytes, hashBytes, lpContractNameBytes(contractName));
+  return concat(versionBytes, hashBytes, contractNameBytes);
 }
 
-function lpContractNameBytes(contractName?: string): Uint8Array {
-  if (!contractName) return Uint8Array.from([0]); // empty
-
-  const cnameBuf = new TextEncoder().encode(contractName);
-  const cnameLen = cnameBuf.byteLength;
-  if (cnameBuf.length > 40) throw new Error('Contract name is too long - max 40 characters');
-  return concat(cnameLen, cnameBuf);
-}
-
-function optionalLengthPrefixed<T>(
-  something: T | null | undefined,
-  fn: (something: T) => Uint8Array,
-  maxLength?: number = -1
+// todo: move to utils somewhere
+function lengthPrefixedString(
+  something: string | null | undefined,
+  map: (something: string) => Uint8Array = utf8ToBytes,
+  maxByteLength: number = 40,
+  prefixByteLength: number = 1
 ): Uint8Array {
-  if (!something) return Uint8Array.from([0]); // empty
+  if (!something) return Uint8Array.from([0]); // empty or nullish (optional)
 
-  const bytes = fn(something);
-  const length = bytes.byteLength;
-  if (maxLength >= 0 && bytes.length > maxLength) {
-    throw new Error(`ByteLength exceeds maximum length of ${maxLength}`);
-  }
-  return concat(hex.length, bytes);
+  const bytes = map(something);
+  if (maxByteLength >= 0 && bytes.byteLength > maxByteLength)
+    throw new RangeError(`Content byteLength exceeds maximum length of ${maxByteLength}`);
+
+  const prefixBytes = hexToBytes(intToHex(bytes.byteLength, prefixByteLength));
+  if (prefixBytes.byteLength > prefixByteLength)
+    throw new RangeError(`Prefix byteLength exceeds maximum length of ${prefixByteLength}`);
+
+  return concat(prefixBytes, bytes);
 }
 
+// todo: add p2sh for xverse
+async function defaultUtxoToSpendable(
+  utxo: BlockstreamUtxo | BlockstreamUtxoWithTxHex
+): Promise<{ input: btc.TransactionInput; vsize?: number }> {
+  const utxoWithTx: BlockstreamUtxoWithTxHex =
+    'hex' in utxo ? utxo : { ...utxo, hex: await api.fetchTxHex(utxo.txid) };
+
+  const tx = btc.Transaction.fromRaw(hexToBytes(utxoWithTx.hex), {
+    allowUnknownOutputs: true,
+    allowUnknownInputs: true,
+  });
+
+  const outputToSpend = tx.getOutput(utxo.vout);
+  if (!outputToSpend?.script) throw new Error('No script found on utxo tx');
+  const spendScript = btc.OutScript.decode(outputToSpend.script);
+
+  try {
+    if (spendScript.type !== 'wpkh') throw new Error('Non-p2wpkh utxo found');
+
+    const spendableInput: btc.TransactionInput = {
+      txid: hexToBytes(utxo.txid),
+      index: utxo.vout,
+      ...outputToSpend,
+      witnessUtxo: {
+        script: outputToSpend.script,
+        amount: BigInt(utxo.value),
+      },
+    };
+    new btc.Transaction().addInput(spendableInput); // validate, throws if invalid
+    return { input: spendableInput, vsize: VSIZE_INPUT_P2WPKH };
+  } catch (e) {
+    throw new Error(`Utxo doesn't match spendable type, ${JSON.stringify(utxo)}`);
+  }
+}
+
+// todo: after DR?
+// async function tryAllToSpendable(
+//   utxo: BlockstreamUtxo | BlockstreamUtxoWithTxHex
+// ): Promise<btc.TransactionInput> {
+//   const utxoWithTx: BlockstreamUtxoWithTxHex =
+//     'hex' in utxo ? utxo : { ...utxo, hex: await fetchTxHex(utxo.txid) };
+
+//   const tx = btc.Transaction.fromRaw(hexToBytes(utxoWithTx.hex), {
+//     allowUnknownOutputs: true,
+//     allowUnknownInputs: true,
+//   });
+
+//   const outputToSpend = tx.getOutput(utxo.vout);
+//   if (!outputToSpend?.script) throw new Error('No script found on utxo tx');
+//   const spendScript = btc.OutScript.decode(outputToSpend.script);
+
+//   try {
+//     switch (spendScript.type) {
+//       case 'wpkh':
+//       //
+//     }
+//   } catch (e) {
+//     throw new Error(`Utxo doesn't match spendable type, ${JSON.stringify(utxo)}`);
+//   }
+// }
+
+type UtxoToSpendableFn = (
+  utxo: BlockstreamUtxo | BlockstreamUtxoWithTxHex
+) => Promise<{ input: btc.TransactionInput; vsize?: number }>;
+
+export async function utxoSelect({
+  utxos,
+  utxoToSpendable = defaultUtxoToSpendable,
+  outputs,
+  feeRate,
+}: {
+  utxos: (BlockstreamUtxo | BlockstreamUtxoWithTxHex)[];
+  utxoToSpendable?: UtxoToSpendableFn;
+  outputs: btc.TransactionOutput[];
+  feeRate: number;
+}): Promise<{
+  inputs: btc.TransactionInput[];
+  outputs: btc.TransactionOutput[];
+  totalSats: bigint;
+  changeSats: bigint;
+}> {
+  const outputsValue = outputs.reduce(
+    (acc: bigint, o: btc.TransactionOutput) => acc + (o.amount ?? 0n),
+    0n
+  );
+
+  const inputs: btc.TransactionInput[] = []; // collect inputs
+  let inputRunning = 0n;
+
+  let vsizeRunning = txBytes([], outputs);
+
+  for (const utxo of utxos) {
+    try {
+      const { input, vsize } = await utxoToSpendable(utxo);
+      const inputVsize = vsize ?? inputBytes(input);
+      const utxoFee = feeRate * inputVsize;
+
+      if (utxoFee > utxo.value) continue; // skip if utxo is too small to pay fee
+
+      // add input
+      inputs.push(input);
+      inputRunning += BigInt(utxo.value);
+      vsizeRunning += inputVsize;
+
+      // check if we have enough inputs
+      const fee = feeRate * vsizeRunning;
+      if (inputRunning >= outputsValue + BigInt(fee)) {
+        const changeSats = inputRunning - (outputsValue + BigInt(fee));
+        return { inputs, outputs, totalSats: inputRunning, changeSats };
+      }
+    } catch (e) {
+      continue; // skip if utxo is not spendable
+    }
+  }
+
+  throw new Error('Not enough funds');
+}
+
+/**  */
+export const buildSbtcDepositTx = buildSbtcDepositTxOpReturn; // default to OP RETURN for developer release
+
+const SBTC_PEG_ADDRESS = 'tb1q3tj2fr9scwmcw3rq5m6jslva65f2rqjxt2t0zh'; // todo: auto-fetch or hardcode if final
 /**
  *
  */
-export function buildOpReturnDepositTransaction({
-  network = NETWORK,
-  amount,
-  btcFeeRates,
-  addressInfo,
+export function buildSbtcDepositTxOpReturn({
+  network = TEST_NETWORK, // default to testnet for developer release
+  amountSats,
   stacksAddress,
-  sbtcWalletAddress,
-  cardinal,
-  userPaymentPubKey,
-}: DepositOpts) {
-  opts.network = opts.network ?? NETWORK; // mainnet by default
-  const data = buildDepositPayloadOpReturn(network, stacksAddress);
-  const txFees = calculateDepositFees(
-    network,
-    false,
-    amount,
-    btcFeeRates.feeInfo,
-    addressInfo,
-    sbtcWalletAddress,
-    data
-  );
+  pegAddress = SBTC_PEG_ADDRESS,
+}: {
+  network?: BitcoinNetwork;
+  amountSats: number;
+  stacksAddress: string;
+  pegAddress?: string;
+}) {
+  const data = buildSBtcDepositBtcPayload({ network, address: stacksAddress });
+
   const tx = new btc.Transaction({
-    allowUnknowInput: true,
-    allowUnknowOutput: true,
+    // todo: disbale unknown
     allowUnknownInputs: true,
     allowUnknownOutputs: true,
   });
-  // no reveal fee for op_return
-  addInputs(network, amount, 0, tx, false, addressInfo.utxos, userPaymentPubKey);
   tx.addOutput({ script: btc.Script.encode(['RETURN', data]), amount: BigInt(0) });
-  tx.addOutputAddress(sbtcWalletAddress, BigInt(amount), net);
-  const changeAmount = inputAmt(tx) - (amount + txFees[1]);
-  if (changeAmount > 0) tx.addOutputAddress(cardinal, BigInt(changeAmount), net);
+  tx.addOutputAddress(pegAddress, BigInt(amountSats), network);
+
   return tx;
 }
 
-/**
- * @param network
- * @param amount the amount to deposit plus the reveal transaction gas fee
- * @param btcFeeRates current rates
- * @param addressInfo the utxos to spend from
- * @param commitTxAddress the commitment address - contains the taproot data and the payload
- * @param cardinal the change address
- * @param userPaymentPubKey pubkey needed to spend script hash inputs
- * @returns transaction object
- */
-export function buildOpDropDepositTransaction(
-  network: string,
-  amount: number,
-  btcFeeRates: any,
-  addressInfo: any,
-  commitTxAddress: string,
-  cardinal: string,
-  userPaymentPubKey: string
-) {
-  const net = network === 'testnet' ? btc.TEST_NETWORK : btc.NETWORK;
-  const txFees = calculateDepositFees(
-    network,
-    true,
-    amount,
-    btcFeeRates.feeInfo,
-    addressInfo,
-    commitTxAddress,
-    undefined
+export async function sbtcDepositHelper({
+  network = TEST_NETWORK, // default to testnet for developer release
+  amountSats,
+  stacksAddress,
+  bitcoinChangeAddress,
+  utxos,
+  feeRate,
+  pegAddress = SBTC_PEG_ADDRESS,
+}: {
+  network?: BitcoinNetwork;
+  amountSats: number;
+  stacksAddress: string;
+  bitcoinChangeAddress: string;
+  utxos: (BlockstreamUtxo | BlockstreamUtxoWithTxHex)[];
+  feeRate: number;
+  pegAddress?: string;
+}) {
+  const tx = buildSbtcDepositTxOpReturn({ network, amountSats, stacksAddress, pegAddress });
+
+  // we separate this part, since wallets could handle it themselves
+  const pay = await paymentInfo({ tx, utxos, feeRate });
+  for (const input of pay.inputs) tx.addInput(input);
+  // for (const output of pay.outputs) tx.addOutput(output); // outputs are already on tx; todo: refactor?
+
+  const changeAfterAdditionalOutput = BigInt(VSIZE_INPUT_P2WPKH * feeRate) - pay.changeSats;
+  if (changeAfterAdditionalOutput > dustMinimum(VSIZE_INPUT_P2WPKH, feeRate)) {
+    tx.addOutputAddress(bitcoinChangeAddress, changeAfterAdditionalOutput, network);
+  }
+
+  return tx;
+}
+
+export async function paymentInfo({
+  tx,
+  feeRate,
+  utxos,
+  utxoToSpendable = defaultUtxoToSpendable,
+}: {
+  tx: btc.Transaction;
+  feeRate: number;
+  utxos: (BlockstreamUtxo | BlockstreamUtxoWithTxHex)[];
+  utxoToSpendable?: UtxoToSpendableFn;
+}) {
+  const outputs = [];
+  for (let i = 0; i < tx.outputsLength; i++) {
+    outputs.push(tx.getOutput(i));
+  }
+
+  return await utxoSelect({ utxos, utxoToSpendable, outputs, feeRate });
+}
+
+const plus = (a: number, b: number) => a + b;
+
+function txBytes(inputs: btc.TransactionInput[], outputs: btc.TransactionOutput[]) {
+  return (
+    OVERHEAD_TX + inputs.map(inputBytes).reduce(plus, 0) + outputs.map(outputBytes).reduce(plus, 0)
   );
-  const tx = new btc.Transaction({
-    allowUnknowInput: true,
-    allowUnknowOutput: true,
-    allowUnknownInputs: true,
-    allowUnknownOutputs: true,
-  });
-  addInputs(network, amount, REVEAL_PAYMENT, tx, false, addressInfo.utxos, userPaymentPubKey);
-  tx.addOutputAddress(commitTxAddress, BigInt(amount), net);
-  const changeAmount = inputAmt(tx) - (amount + txFees[1]);
-  if (changeAmount > 0) tx.addOutputAddress(cardinal, BigInt(changeAmount), net);
-  return tx;
 }
 
-export function getOpReturnDepositRequest(
-  network: string,
-  amount: number,
-  commitKeys: any,
-  stacksAddress: string,
-  sbtcWalletAddress: string,
-  cardinal: string
-): BridgeTransactionType {
-  if (!stacksAddress) throw new Error('Stacks address missing');
-  const data = buildDepositPayloadOpReturn(network, stacksAddress);
-  //console.log('reclaimAddr.pubkey: ' + commitKeys.reclaimPubKey)
-  //console.log('revealAddr.pubkey: ' + commitKeys.revealPubKey)
+// todo: switch to estimating?
 
-  const req: BridgeTransactionType = {
-    originator: stacksAddress,
-    fromBtcAddress: cardinal,
-    revealPub: commitKeys.revealPubKey,
-    reclaimPub: commitKeys.reclaimPubKey,
-    status: 1,
-    tries: 0,
-    mode: 'op_return',
-    amount: amount,
-    requestType: 'deposit',
-    wallet: hex.encode(data),
-    stacksAddress: stacksAddress,
-    sbtcWalletAddress: sbtcWalletAddress,
-  };
-  return req;
+function inputBytes(input: btc.TransactionInput) {
+  const tmpTx = new btc.Transaction({ allowUnknownInputs: true });
+  const originalSize = tmpTx.vsize;
+  tmpTx.addInput(input);
+  return tmpTx.vsize - originalSize;
+  // return OVERHEAD_INPUT + (input.finalScriptWitness ? input.finalScriptWitness.byteLength : OVERHEAD_INPUT_P2PKH);
 }
 
-export function getOpDropDepositRequest(
-  network: string,
-  revealFee: number,
-  commitKeys: any,
-  stacksAddress: string,
-  sbtcWalletAddress: string,
-  cardinal: string
-): BridgeTransactionType {
-  const net = network === 'testnet' ? btc.TEST_NETWORK : btc.NETWORK;
-  if (!stacksAddress) throw new Error('Address needed');
-  //console.log('reclaimAddr.pubkey: ' + commitKeys.reclaimPubKey)
-  //console.log('revealAddr.pubkey: ' + commitKeys.revealPubKey)
-
-  const data = buildData(network, stacksAddress, revealFee, true);
-  const scripts = [
-    { script: btc.Script.encode([data, 'DROP', hex.decode(commitKeys.revealPubKey), 'CHECKSIG']) },
-    {
-      script: btc.Script.encode([
-        'IF',
-        144,
-        'CHECKSEQUENCEVERIFY',
-        'DROP',
-        hex.decode(commitKeys.reclaimPubKey),
-        'CHECKSIG',
-        'ENDIF',
-      ]),
-    },
-  ];
-  const script = btc.p2tr(btc.TAPROOT_UNSPENDABLE_KEY, scripts, net, true);
-  const req: BridgeTransactionType = {
-    originator: stacksAddress,
-    fromBtcAddress: cardinal,
-    revealPub: commitKeys.revealPubKey,
-    reclaimPub: commitKeys.reclaimPubKey,
-    status: 1,
-    tries: 0,
-    mode: 'op_drop',
-    amount: revealFee,
-    requestType: 'deposit',
-    wallet:
-      "p2tr(TAPROOT_UNSPENDABLE_KEY, [{ script: Script.encode([data, 'DROP', revealPubK, 'CHECKSIG']) }, { script: Script.encode([reclaimPubKey, 'CHECKSIG']) }], net, true)",
-    stacksAddress: stacksAddress,
-    sbtcWalletAddress: sbtcWalletAddress,
-  };
-  req.commitTxScript = toStorable(script);
-  return req;
+function outputBytes(output: btc.TransactionOutput) {
+  const tmpTx = new btc.Transaction({ allowUnknownOutputs: true });
+  const originalSize = tmpTx.vsize;
+  tmpTx.addOutput(output);
+  return tmpTx.vsize - originalSize;
+  // return OVERHEAD_OUTPUT + (output.script ? output.script.byteLength : OVERHEAD_OUTPUT_P2PKH);
 }
 
-function buildData(
-  network: string,
-  sigOrPrin: string,
-  revealFee: number,
-  opDrop: boolean
-): Uint8Array {
-  const net = network === 'testnet' ? btc.TEST_NETWORK : btc.NETWORK;
-  if (opDrop) {
-    return buildDepositPayload(net, revealFee, sigOrPrin, opDrop, undefined);
-  }
-  return buildDepositPayloadOpReturn(net, sigOrPrin);
-}
-
-export function maxCommit(addressInfo: any) {
-  if (!addressInfo || !addressInfo.utxos || addressInfo.utxos.length === 0) return 0;
-  const summ = addressInfo?.utxos
-    ?.map((item: { value: number }) => item.value)
-    .reduce((prev: number, curr: number) => prev + curr, 0);
-  return summ || 0;
-}
-
-export function calculateDepositFees(
-  network: string,
-  opDrop: boolean,
-  amount: number,
-  feeInfo: any,
-  addressInfo: any,
-  commitTxScriptAddress: string,
-  data: Uint8Array | undefined
-) {
-  try {
-    const net = network === 'testnet' ? btc.TEST_NETWORK : btc.NETWORK;
-    let vsize = 0;
-    const tx = new btc.Transaction({
-      allowUnknowInput: true,
-      allowUnknowOutput: true,
-      allowUnknownInputs: true,
-      allowUnknownOutputs: true,
-    });
-    addInputs(
-      network,
-      amount,
-      REVEAL_PAYMENT,
-      tx,
-      true,
-      addressInfo.utxos,
-      hex.encode(secp.getPublicKey(privKey, true))
-    );
-    if (!opDrop) {
-      if (data) tx.addOutput({ script: btc.Script.encode(['RETURN', data]), amount: BigInt(0) });
-      tx.addOutputAddress(commitTxScriptAddress, BigInt(amount), net);
-    } else {
-      tx.addOutputAddress(commitTxScriptAddress, BigInt(amount), net);
-    }
-    const changeAmount = inputAmt(tx) - amount;
-    if (changeAmount > 0) tx.addOutputAddress(addressInfo.address, BigInt(changeAmount), net);
-    //tx.sign(privKey);
-    //tx.finalize();
-    vsize = tx.vsize;
-    const fees = [
-      Math.floor((vsize * feeInfo['low_fee_per_kb']) / 1024),
-      Math.floor((vsize * feeInfo['medium_fee_per_kb']) / 1024),
-      Math.floor((vsize * feeInfo['high_fee_per_kb']) / 1024),
-    ];
-    return fees;
-  } catch (err: any) {
-    return [850, 1000, 1150];
-  }
+function dustMinimum(inputVsize: number, feeRate: number) {
+  return inputVsize * feeRate;
 }

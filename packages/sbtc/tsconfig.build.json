@@ -12,16 +12,11 @@
       "path": "../common/tsconfig.build.json"
     },
     {
-      "path": "../encryption/tsconfig.build.json"
-    },
-    {
       "path": "../network/tsconfig.build.json"
     },
     {
       "path": "../transactions/tsconfig.build.json"
     }
   ],
-  "include": [
-    "src/**/*"
-  ]
+  "include": ["src/**/*"]
 }

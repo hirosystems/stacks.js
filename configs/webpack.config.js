@@ -43,7 +43,7 @@ module.exports = {
           {
             loader: 'esbuild-loader',
             options: {
-              target: 'es2017',
+              target: 'es2020',
               tsconfig: 'tsconfig.build.json',
             },
           },
