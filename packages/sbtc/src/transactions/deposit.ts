@@ -148,7 +148,6 @@ export async function utxoSelect({
   feeRate: number;
 }): Promise<{
   inputs: btc.TransactionInput[];
-  outputs: btc.TransactionOutput[];
   totalSats: bigint;
   changeSats: bigint;
 }> {
@@ -177,9 +176,9 @@ export async function utxoSelect({
 
       // check if we have enough inputs
       const fee = feeRate * vsizeRunning;
-      if (inputRunning >= outputsValue + BigInt(fee)) {
-        const changeSats = inputRunning - (outputsValue + BigInt(fee));
-        return { inputs, outputs, totalSats: inputRunning, changeSats };
+      if (inputRunning >= outputsValue + BigInt(Math.ceil(fee))) {
+        const changeSats = inputRunning - (outputsValue + BigInt(Math.ceil(fee)));
+        return { inputs, totalSats: inputRunning, changeSats };
       }
     } catch (e) {
       continue; // skip if utxo is not spendable
@@ -242,9 +241,10 @@ export async function sbtcDepositHelper({
   // we separate this part, since wallets could handle it themselves
   const pay = await paymentInfo({ tx, utxos, feeRate });
   for (const input of pay.inputs) tx.addInput(input);
-  // for (const output of pay.outputs) tx.addOutput(output); // outputs are already on tx; todo: refactor?
+  // outputs are already on tx
 
-  const changeAfterAdditionalOutput = BigInt(VSIZE_INPUT_P2WPKH * feeRate) - pay.changeSats;
+  const changeAfterAdditionalOutput =
+    BigInt(Math.ceil(VSIZE_INPUT_P2WPKH * feeRate)) - pay.changeSats;
   if (changeAfterAdditionalOutput > dustMinimum(VSIZE_INPUT_P2WPKH, feeRate)) {
     tx.addOutputAddress(bitcoinChangeAddress, changeAfterAdditionalOutput, network);
   }
@@ -298,5 +298,5 @@ function outputBytes(output: btc.TransactionOutput) {
 }
 
 function dustMinimum(inputVsize: number, feeRate: number) {
-  return inputVsize * feeRate;
+  return Math.ceil(inputVsize * feeRate);
 }

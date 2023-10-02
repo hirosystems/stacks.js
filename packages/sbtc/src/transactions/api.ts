@@ -128,3 +128,25 @@ export async function stacksCallReadOnly({
 //   // todo
 //   return 'txid';
 // }
+
+interface SbtcDevEnvApiUrls {
+  bitcoinExplorerApiUrl: string;
+  bitcoinNodeUrl: string;
+  bitcoinApiUrl: string; // electrs
+
+  stacksExplorerApiUrl: string;
+  stacksNodeUrl: string;
+  stacksApiUrl: string;
+
+  sbtcBridgeApiUrl: string;
+}
+
+export class sbtcDevEnvApi {
+  urls: SbtcDevEnvApiUrls;
+
+  constructor(urls: SbtcDevEnvApiUrls) {
+    this.urls = urls;
+
+    this.urls.sbtcBridgeApiUrl ??= 'http://127.0.0.1:3010/';
+  }
+}
