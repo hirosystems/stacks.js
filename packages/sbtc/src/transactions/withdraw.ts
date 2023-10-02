@@ -35,6 +35,7 @@ export async function sbtcWithdrawHelper({
   pegAddress?: string;
 }) {
   const tx = buildSbtcWithdrawTxOpReturn({ network, amountSats, stacksAddress, pegAddress });
+  console.log(signature);
 
   // we separate this part, since wallets could handle it themselves
   const pay = await paymentInfo({ tx, utxos, feeRate });

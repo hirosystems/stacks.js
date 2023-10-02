@@ -1,13 +1,10 @@
 import * as btc from '@scure/btc-signer';
-import { hexToBytes, intToHex, utf8ToBytes } from '@stacks/common';
-import { c32addressDecode } from 'c32check';
+import { hexToBytes } from '@stacks/common';
 import * as P from 'micro-packed';
-import * as api from './api';
 import { BlockstreamUtxo, BlockstreamUtxoWithTxHex } from './api';
 import {
   BitcoinNetwork,
   MagicBytes,
-  OVERHEAD_TX,
   OpCode,
   SBTC_PEG_ADDRESS,
   TEST_NETWORK,
