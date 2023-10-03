@@ -11,7 +11,7 @@ import StacksProviderSection from '../includes/\_stacks.js-provider-section.mdx'
 
 This guide explains how to prompt users to sign [transactions](https://docs.stacks.co/understand-stacks/transactions) and broadcast them to the Stacks blockchain by implementing the [`connect`](https://github.com/hirosystems/connect) package of Stacks.js.
 
-Transaction signing allows users execute Clarity smart contracts that are relevant to your app and then handle the result as appropriate.
+Transaction signing allows users to execute Clarity smart contracts that are relevant to your app and then handle the result as appropriate.
 
 Users can sign transactions that exchange fungible or non-fungible tokens with upfront guarantees that help them retain control over their digital assets.
 
