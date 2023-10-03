@@ -1,3 +1,5 @@
+import RpcClient from '@btc-helpers/rpc';
+import { RpcCallSpec } from '@btc-helpers/rpc/dist/callspec';
 import * as btc from '@scure/btc-signer';
 import { Cl } from '@stacks/transactions';
 
@@ -23,19 +25,78 @@ export type BlockstreamUtxoWithTxHex = BlockstreamUtxo & {
   hex: string;
 };
 
-export async function fetchUtxos(address: string): Promise<BlockstreamUtxo[]> {
-  // todo: error handling?
-  return (await fetch(`https://blockstream.info/testnet/api/address/${address}/utxo`).then(res =>
-    res.json()
-  )) as BlockstreamUtxo[];
+export class TestnetApi {
+  async fetchUtxos(address: string): Promise<BlockstreamUtxo[]> {
+    // todo: error handling?
+    return fetch(`https://blockstream.info/testnet/api/address/${address}/utxo`).then(res =>
+      res.json()
+    );
+  }
+
+  async fetchTxHex(txid: string): Promise<string> {
+    // todo: error handling?
+    return fetch(`https://blockstream.info/testnet/api/tx/${txid}/hex`).then(res => res.text());
+  }
+
+  async estimateFeeRates(): Promise<BlockstreamFeeEstimates> {
+    return fetch(`https://blockstream.info/testnet/api/fee-estimates`).then(res => res.json());
+  }
+
+  async estimateFeeRate(target: 'low' | 'medium' | 'high' | number): Promise<number> {
+    const feeEstimates = await this.estimateFeeRates();
+    const t =
+      typeof target === 'number'
+        ? target.toString()
+        : target === 'high'
+        ? '1'
+        : target === 'medium'
+        ? '2'
+        : '3';
+    if (t in feeEstimates) {
+      return feeEstimates[t as keyof BlockstreamFeeEstimates];
+    }
+
+    throw new Error(`Invalid fee target: ${target}`);
+  }
+
+  async broadcastTx(tx: btc.Transaction): Promise<string> {
+    return await fetch(`https://blockstream.info/testnet/api/tx`, {
+      method: 'POST',
+      body: tx.hex,
+    }).then(res => res.text());
+  }
+
+  async stacksCallReadOnly({
+    contractAddress,
+    functionName,
+    sender = 'ST000000000000000000002AMW42H',
+    args = [],
+  }: {
+    contractAddress: string;
+    functionName: string;
+    sender?: string;
+    args?: string[];
+  }) {
+    contractAddress = contractAddress.replace('.', '/');
+    return await fetch(
+      `https://api.testnet.hiro.so/v2/contracts/call-read/${contractAddress}/${encodeURIComponent(
+        functionName
+      )}`,
+      {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ sender, arguments: args }),
+      }
+    )
+      .then(res => res.json())
+      .then(res => Cl.deserialize(res.result));
+  }
 }
 
-export async function fetchTxHex(txid: string): Promise<string> {
-  // todo: error handling?
-  return await fetch(`https://blockstream.info/testnet/api/tx/${txid}/hex`).then(res => res.text());
-}
-
-type BlockstreamFeeEstimates = {
+export type BlockstreamFeeEstimates = {
   [K in
     | '1'
     | '2'
@@ -67,86 +128,83 @@ type BlockstreamFeeEstimates = {
     | '1008']: number;
 };
 
-export async function estimateFeeRates(): Promise<BlockstreamFeeEstimates> {
-  return await fetch(`https://blockstream.info/testnet/api/fee-estimates`).then(res => res.json());
-}
-
-export async function estimateFeeRate(target: 'low' | 'medium' | 'high' | number): Promise<number> {
-  const feeEstimates = await estimateFeeRates();
-  const t =
-    typeof target === 'number'
-      ? target.toString()
-      : target === 'high'
-      ? '1'
-      : target === 'medium'
-      ? '2'
-      : '3';
-  if (t in feeEstimates) {
-    return feeEstimates[t as keyof BlockstreamFeeEstimates];
-  }
-
-  throw new Error(`Invalid fee target: ${target}`);
-}
-
-export async function broadcastTx(tx: btc.Transaction): Promise<string> {
-  return await fetch(`https://blockstream.info/testnet/api/tx`, {
-    method: 'POST',
-    body: tx.hex,
-  }).then(res => res.text());
-}
-
-export async function stacksCallReadOnly({
-  contractAddress,
-  functionName,
-  sender = 'ST000000000000000000002AMW42H',
-  args = [],
-}: {
-  contractAddress: string;
-  functionName: string;
-  sender?: string;
-  args?: string[];
-}) {
-  contractAddress = contractAddress.replace('.', '/');
-  return await fetch(
-    `https://api.testnet.hiro.so/v2/contracts/call-read/${contractAddress}/${encodeURIComponent(
-      functionName
-    )}`,
-    {
-      method: 'POST',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ sender, arguments: args }),
-    }
-  )
-    .then(res => res.json())
-    .then(res => Cl.deserialize(res.result));
-}
-
-// export async function informBridgeApi(txid: string) {
-//   // todo
-//   return 'txid';
-// }
-
-interface SbtcDevEnvApiUrls {
-  bitcoinExplorerApiUrl: string;
-  bitcoinNodeUrl: string;
-  bitcoinApiUrl: string; // electrs
-
-  stacksExplorerApiUrl: string;
-  stacksNodeUrl: string;
+export interface DevEnvApiUrls {
+  bitcoinCoreRpcUrl: string;
+  bitcoinElectrumApiUrl: string; // electrs
   stacksApiUrl: string;
-
   sbtcBridgeApiUrl: string;
 }
 
-export class sbtcDevEnvApi {
-  urls: SbtcDevEnvApiUrls;
+export class DevEnvApi {
+  urls: DevEnvApiUrls;
+  btcRpc: RpcClient & RpcCallSpec;
 
-  constructor(urls: SbtcDevEnvApiUrls) {
-    this.urls = urls;
+  constructor(urls?: Partial<DevEnvApiUrls>) {
+    this.urls = Object.assign(
+      {
+        bitcoinCoreRpcUrl: 'http://127.0.0.1:18443/',
+        bitcoinElectrumApiUrl: 'http://127.0.0.1:60401/',
+        stacksApiUrl: 'http://127.0.0.1:3999/',
+        sbtcBridgeApiUrl: 'http://127.0.0.1:3010/',
+      },
+      urls
+    );
 
-    this.urls.sbtcBridgeApiUrl ??= 'http://127.0.0.1:3010/';
+    this.btcRpc = new RpcClient('http://devnet:devnet@127.0.0.1:18443').Typed;
   }
+
+  /**
+   * Fetches utxos for a given address.
+   * If no utxos are found, imports the address, rescans, and tries again.
+   * @param address address or script hash of wallet to fetch utxos for
+   */
+  async fetchUtxos(address: string): Promise<BlockstreamUtxoWithTxHex[]> {
+    let unspent = await this.btcRpc.listunspent({
+      addresses: [address],
+    });
+
+    if (unspent?.length === 0) {
+      await this.btcRpc.importaddress({ address, rescan: true });
+      await sleep(500);
+      unspent = await this.btcRpc.listunspent({
+        addresses: [address],
+      });
+    }
+
+    const utxos = unspent.map((u: any) => ({
+      txid: u.txid,
+      vout: u.vout,
+      value: u.amount,
+      confirmed: u.confirmations > 0,
+    }));
+
+    for (const u of utxos) {
+      u.hex = await this.fetchTxHex(u.txid); // sequential, to soften the load on the work queue
+    }
+
+    return utxos;
+  }
+
+  async fetchTxHex(txid: string): Promise<string> {
+    return this.btcRpc.gettransaction({ txid }).then((tx: any) => tx.hex);
+  }
+
+  // Fake impl for devenv
+  // eslint-disable-next-line @typescript-eslint/require-await
+  async estimateFeeRate(target: 'low' | 'medium' | 'high' | number): Promise<number> {
+    switch (target) {
+      case 'high':
+        return 1;
+      case 'medium':
+        return 2;
+      case 'low':
+        return 3;
+      default:
+        return target;
+    }
+  }
+}
+
+export function sleep(ms: number) {
+  return new Promise(resolve => setTimeout(resolve, ms));
 }
