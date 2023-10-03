@@ -1,5 +1,5 @@
 ---
-title: FAQ's
+title: FAQs
 ---
 
 #### **What are Post Conditions?**
