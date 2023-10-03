@@ -48,7 +48,7 @@ Below is a list of all Stacks.js libraries and a few JS libraries and helpers ma
 
 ### Connecting Wallets
 
-- [`@stacks/connect`](https://stacks.js.org/modules/_stacks_connect) Connect web application to Stacks wallet browser extensions. [Github](https://github.com/hirosystems/connect)
+- [`@stacks/connect`](https://connect.stacks.js.org/) Connect web application to Stacks wallet browser extensions. [Github](https://github.com/hirosystems/connect)
 
 ### Stacks Primitives
 
