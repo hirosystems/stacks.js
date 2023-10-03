@@ -37,7 +37,7 @@ npm install @stacks/connect
 
 ## Initiate session
 
-Users must authenticate to an app before the `connect` package will work to prompt them to sign and broadcast transactions to the Stacks blockchain with an authenticator such as [the Stacks Wallet](https://www.hiro.so/wallet/install-web).
+Users must authenticate to an app before the `connect` package works to prompt them to sign and broadcast transactions to the Stacks blockchain with an authenticator such as [the Leather Wallet](https://leather.io/install-extension).
 
 See the authentication guide before integrating the following transaction signing capabilities in cases where `userSession.isUserSignedIn()` returns `true`.
 
