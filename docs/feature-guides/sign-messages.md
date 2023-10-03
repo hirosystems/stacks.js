@@ -11,9 +11,9 @@ import StacksProviderSection from '../includes/\_stacks.js-provider-section.mdx'
 
 This guide explains how to prompt users to sign a message.
 
-The user will be prompted a popup from the Hiro Wallet showing the message you would like them to sign.
+The user will be prompted a popup from the Hiro Wallet showing the message you want them to sign.
 
-The user can then click on the ‘Sign’ button which will return the signature data and the user's publicKey to your app. You can then verify the signature by passing the signature data and the public key to the [`stacks.js`](https://github.com/hirosystems/stacks.js) `verifySignature` method.
+The user can then click on the 'Sign' button, which will return the signature data and the user's publicKey to your app. You can then verify the signature by passing the signature data and the public key to the [`stacks.js`](https://github.com/hirosystems/stacks.js) `verifySignature` method.
 
 The message can be any utf-8 string.
 
@@ -29,7 +29,7 @@ npm install @stacks/connect
 
 ## Initiate session
 
-Users must authenticate to an app before you request message signing. Users can install an authenticator like [the Hiro Wallet](https://www.hiro.so/wallet/install-web).
+Users must authenticate to an app before they request message signing. Users can install an authenticator like [the Hiro Wallet](https://www.hiro.so/wallet/install-web).
 
 See the [authentication guide](https://docs.hiro.so/build-apps/authentication) before proceeding to integrate the following message signing capabilities.
 
@@ -79,7 +79,7 @@ interface SignatureRequestOptions {
 The `openSignatureRequestPopup` signing method from `@stacks/connect` allows you to specify an `onFinish` callback.
 This callback will be triggered after the user has successfully signed the message.
 
-You can get the signature of the message via the arguments passed to `onFinish`. Your callback will be fired with a single argument, which is an object with the following properties:
+You can get the message's signature via the arguments passed to `onFinish`. Your callback will be fired with a single argument, which is an object with the following properties:
 
 ```ts
 export interface SignatureData {
@@ -127,7 +127,7 @@ import { StacksTestnet, StacksMainnet } from '@stacks/network';
 const testnet = new StacksTestnet();
 const mainnet = new StacksMainnet();
 
-// use this in your messe signing method:
+// use this in your message signing method:
 
 openSignatureRequestPopup({
   network: mainnet,
