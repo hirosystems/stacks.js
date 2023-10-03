@@ -53,14 +53,14 @@ import StacksjsStartersNote from './includes/\_stacks.js-starters-note.mdx';
 
 ## References
 
-<!-- todo: add github icon component -->
-
 Below is a list of all Stacks.js libraries and a few JS libraries and helpers maintained by Hiro:
 
 ### Connecting Wallets
 
 
-- [`@stacks/connect`](https://connect.stacks.js.org/) Connect web application to Stacks wallet browser extensions. [Get started here.](https://github.com/hirosystems/connect/tree/main/packages/connect)
+- [`@stacks/connect`](https://github.com/hirosystems/connect/tree/main/packages/connect) Connect web application to Stacks wallet browser extensions. [Get started here.](https://connect.stacks.js.org/)
+<!-- todo: add github icon component as part of link to package on github -->
+
 
 ```console
 npm install @stacks/connect
