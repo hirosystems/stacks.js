@@ -12,13 +12,13 @@ To introduce the different functionality offered by Stacks.js, we'll walk throug
 
 ## Networks
 
-Typically we speak of "mainnet" and "testnet" as the networks of Stacks. Most wallets will be configured to "mainnet" by default, this is the actual blockchain that holds real STX tokens.
+Typically, we speak of "mainnet" and "testnet" as the networks of Stacks. Most wallets will be configured to "mainnet" by default, this is the actual blockchain that holds real STX tokens.
 As the name suggests, "testnet" is a network for testing.
 It's a separate blockchain state that holds test tokens, which have no value.
 
-Developers are encouraged to use testnet for testing, before rolling out applications and contracts to mainnet.
-For development, there is even Devnet/Mocknet for working in a local development environment.
-Stacks.js functions can be configured to use wichever network you want.
+Developers are encouraged to use testnet for testing before rolling out applications and contracts to mainnet.
+There is even Devnet/Mocknet for working in a local development environment for development.
+Stacks.js functions can be configured to use whichever network you want.
 
 ```js
 import { StacksMainnet, StacksTestnet } from '@stacks/network';
@@ -36,12 +36,12 @@ const network = new StacksMainnet({ url: 'https://www.mystacksnode.com/' });
 ## Accounts and Addresses
 
 :::info Connect 🌐
-For web apps you can request the users address via Stacks Connect. [Read more](https://connect.stacks.js.org/modules/_stacks_connect#quotconnectquot-aka-authentication-showconnect)
+For web apps, you can request the user's address via Stacks Connect. [Read more](https://connect.stacks.js.org/modules/_stacks_connect#quotconnectquot-aka-authentication-showconnect)
 :::
 
 Stacks.js uses the concept of an "account" to represent a user's identity on the blockchain. An account is identified by a unique address. The address is derived from the account's public key, which is derived from the account's private key.
 
-A normal mainnet address starts with `SP` and a testnet address starts with `ST`.
+A normal mainnet address starts with `SP`, and a testnet address starts with `ST`.
 e.g. `SP3FGQ8Z7JY9BWYZ5WM53E0M9NK7WHJF0691NZ159`, `ST2F4BK4GZH6YFBNHYDDGN4T1RKBA7DA1BJZPJEJJ`
 
 ```js
@@ -62,7 +62,7 @@ const testnetAddress = getStxAddress({ account, transactionVersion: TransactionV
 
 ## Transactions
 
-The following shows how to create a simple transaction (STX tranfer) using Stacks.js in different environments.
+The following shows how to create a simple transaction (STX transfer) using Stacks.js in different environments.
 
 ### Using Connect 🌐
 
@@ -85,7 +85,7 @@ openSTXTransfer({
 
 ### Using a private key 🔑
 
-Note that if we're not using another wallet, we need to provide the private key of the sender for signing.
+Note that if we're not using another wallet, we need to provide the sender's private key for signing.
 Treat the private key as a secret and never expose it to the public!
 
 ```js
@@ -101,13 +101,13 @@ const tx = await makeSTXTokenTransfer({
 
 ## Anchor Mode / Block Type
 
-In the examples above we used `AnchorMode.Any` to indicate that the transaction can be "mined" in different ways.
-In Stacks there are two types of blocks: microblocks and (anchor) blocks.
+In the examples above, we used `AnchorMode.Any` to indicate that the transaction can be "mined" in different ways.
+Stacks has two types of blocks: microblocks and (anchor) blocks.
 
-- **Microblocks** (off chain) are faster, but less reliable. Microblocks can be confirmed quickly but are not final until the microblock is included in an anchor block.
-- **Anchor Blocks** (on chain) are the normal Stacks block. They are slower, but more reliable. Anchor blocks are final and cannot be reverted.
+- **Microblocks** (off-chain) are faster, but less reliable. Microblocks can be confirmed quickly but are not final until the microblock is included in an anchor block.
+- **Anchor Blocks** (on-chain) are the normal Stacks block. They are slower, but more reliable. Anchor blocks are final and cannot be reverted.
 
-<!-- todo: Read more about how decentralized blocks works -->
+<!-- todo: Read more about how decentralized blocks work -->
 
 ```js
 // AnchorMode options
@@ -117,7 +117,7 @@ anchorMode: "offChainOnly" | "onChainOnly" | "any",
 ## Post Conditions
 
 In Stacks, transactions can have "post conditions".
-These are an additional security to ensure that the transaction was executed as expected.
+These are additional security to ensure the transaction was executed as expected.
 
 Post conditions can't say anything about the end-state after a transaction, but they can verify that certain things happened during the transaction.
 
@@ -150,12 +150,12 @@ _...aka "allow transfer of unspecified assets?"_
 In addition to the post conditions itself, we can also specify a "mode" for the transaction to verify asset transfers.
 The mode can be either `Allow` or `Deny`.
 
-- `Allow` means that the transaction can transfer any asset, (assuming no conflicting post conditions).
+- `Allow` means that the transaction can transfer any asset (assuming no conflicting post conditions).
 - `Deny` means the transaction will fail if any asset transfers (not specified in the post conditions) are attempted.
 
 :::note
 In either case, all post conditions will still be checked.
-By default, transactions are set to `Deny` mode, for additional security.
+By default, transactions are set to `Deny` mode for additional security.
 :::
 
 ## Broadcasting
