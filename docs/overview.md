@@ -39,7 +39,7 @@ While there are many Stacks.js use cases, we find that there are three main inte
 
 - **Authentication**: Register and sign in users with identities on the Stacks blockchain
 - **Transaction signing**: Prompt users to sign and broadcast transactions to the Stacks blockchain
-- **Interact with Clarity contracts**: Interact with the Stacks blockchain directly
+- **Interact with Clarity contracts**: Interact with Clarity contracts on the Stacks blockchain directly
 
 You can take a look at this example application that uses these Stacks.js primitives to create new user experiences below!
 
@@ -59,7 +59,8 @@ Below is a list of all Stacks.js libraries and a few JS libraries and helpers ma
 
 ### Connecting Wallets
 
-- [`@stacks/connect`](https://github.com/hirosystems/connect) Connect web application to Stacks wallet browser extensions. [Get started here.](https://github.com/hirosystems/connect/tree/main/packages/connect)
+
+- [`@stacks/connect`](https://connect.stacks.js.org/) Connect web application to Stacks wallet browser extensions. [Get started here.](https://github.com/hirosystems/connect/tree/main/packages/connect)
 
 ```console
 npm install @stacks/connect
