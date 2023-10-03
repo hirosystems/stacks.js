@@ -2,35 +2,42 @@ import RpcClient from '@btc-helpers/rpc';
 import { RpcCallSpec } from '@btc-helpers/rpc/dist/callspec';
 import * as btc from '@scure/btc-signer';
 import { Cl } from '@stacks/transactions';
+import { wrapLazyProxy } from './utils';
 
+/** todo */
 // https://blockstream.info/api/address/1KFHE7w8BhaENAswwryaoccDb6qcT6DbYY/utxo
 // [{"txid":"033e44b535c5709d30234921608219ee5ca1e320fa9def44715eaeb2b7ad52d3","vout":0,"status":{"confirmed":false},"value":42200}]
 export type BlockstreamUtxo = {
   txid: string;
   vout: number;
   value: number;
-  status:
-    | {
-        confirmed: false;
-      }
-    | {
-        confirmed: true;
-        block_height: number;
-        block_hash: string;
-        block_time: number;
-      };
+  status: {
+    confirmed: boolean;
+  };
 };
 
-export type BlockstreamUtxoWithTxHex = BlockstreamUtxo & {
-  hex: string;
+/** todo */
+export type BlockstreamUtxoWithTx = BlockstreamUtxo & {
+  tx: string | Promise<string>;
 };
 
-export class TestnetApi {
-  async fetchUtxos(address: string): Promise<BlockstreamUtxo[]> {
+export type UtxoSpend = BlockstreamUtxo & {
+  input: btc.TransactionInput;
+};
+
+/** todo */
+export type BlockstreamFeeEstimates =
+  // prettier-ignore
+  { [K in | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | '10' | '11' | '12' | '13' | '14' | '15' | '16' | '17' | '18' | '19' | '20' | '21' | '22' | '23' | '24' | '25' | '144' | '504' | '1008']: number; };
+
+export class TestnetHelper {
+  async fetchUtxos(address: string): Promise<BlockstreamUtxoWithTx[]> {
     // todo: error handling?
-    return fetch(`https://blockstream.info/testnet/api/address/${address}/utxo`).then(res =>
-      res.json()
-    );
+    return fetch(`https://blockstream.info/testnet/api/address/${address}/utxo`)
+      .then(res => res.json())
+      .then((utxos: BlockstreamUtxo[]) =>
+        utxos.map(u => wrapLazyProxy(u, 'tx', () => this.fetchTxHex(u.txid)))
+      );
   }
 
   async fetchTxHex(txid: string): Promise<string> {
@@ -96,56 +103,28 @@ export class TestnetApi {
   }
 }
 
-export type BlockstreamFeeEstimates = {
-  [K in
-    | '1'
-    | '2'
-    | '3'
-    | '4'
-    | '5'
-    | '6'
-    | '7'
-    | '8'
-    | '9'
-    | '10'
-    | '11'
-    | '12'
-    | '13'
-    | '14'
-    | '15'
-    | '16'
-    | '17'
-    | '18'
-    | '19'
-    | '20'
-    | '21'
-    | '22'
-    | '23'
-    | '24'
-    | '25'
-    | '144'
-    | '504'
-    | '1008']: number;
-};
-
-export interface DevEnvApiUrls {
+/** todo */
+export interface DevEnvUrls {
   bitcoinCoreRpcUrl: string;
   bitcoinElectrumApiUrl: string; // electrs
+  bitcoinExplorerUrl: string; // explorer can access electrum
   stacksApiUrl: string;
   sbtcBridgeApiUrl: string;
 }
 
-export class DevEnvApi {
-  urls: DevEnvApiUrls;
+// todo: rename to helper, and add wallets etc.
+export class DevEnvHelper {
+  urls: DevEnvUrls;
   btcRpc: RpcClient & RpcCallSpec;
 
-  constructor(urls?: Partial<DevEnvApiUrls>) {
+  constructor(urls?: Partial<DevEnvUrls>) {
     this.urls = Object.assign(
       {
-        bitcoinCoreRpcUrl: 'http://127.0.0.1:18443/',
-        bitcoinElectrumApiUrl: 'http://127.0.0.1:60401/',
-        stacksApiUrl: 'http://127.0.0.1:3999/',
-        sbtcBridgeApiUrl: 'http://127.0.0.1:3010/',
+        bitcoinCoreRpcUrl: 'http://127.0.0.1:18443',
+        bitcoinElectrumApiUrl: 'http://127.0.0.1:60401',
+        bitcoinExplorerUrl: 'http://127.0.0.1:3002',
+        stacksApiUrl: 'http://127.0.0.1:3999',
+        sbtcBridgeApiUrl: 'http://127.0.0.1:3010',
       },
       urls
     );
@@ -158,7 +137,7 @@ export class DevEnvApi {
    * If no utxos are found, imports the address, rescans, and tries again.
    * @param address address or script hash of wallet to fetch utxos for
    */
-  async fetchUtxos(address: string): Promise<BlockstreamUtxoWithTxHex[]> {
+  async fetchUtxos(address: string): Promise<BlockstreamUtxoWithTx[]> {
     let unspent = await this.btcRpc.listunspent({
       addresses: [address],
     });
@@ -179,7 +158,7 @@ export class DevEnvApi {
     }));
 
     for (const u of utxos) {
-      u.hex = await this.fetchTxHex(u.txid); // sequential, to soften the load on the work queue
+      u.tx = await this.fetchTxHex(u.txid); // sequential, to soften the load on the work queue
     }
 
     return utxos;
@@ -187,6 +166,16 @@ export class DevEnvApi {
 
   async fetchTxHex(txid: string): Promise<string> {
     return this.btcRpc.gettransaction({ txid }).then((tx: any) => tx.hex);
+  }
+
+  /**
+   */
+  async getBalance(address: string): Promise<number> {
+    const addressInfo = await fetch(`${this.urls.bitcoinExplorerUrl}/api/address/${address}`).then(
+      r => r.json()
+    );
+
+    return addressInfo.txHistory.balanceSat;
   }
 
   // Fake impl for devenv

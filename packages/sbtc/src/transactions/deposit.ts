@@ -1,7 +1,7 @@
 import * as btc from '@scure/btc-signer';
 import { hexToBytes } from '@stacks/common';
 import * as P from 'micro-packed';
-import { BlockstreamUtxo, BlockstreamUtxoWithTxHex } from './api';
+import { BlockstreamUtxo, BlockstreamUtxoWithTx } from './api';
 import {
   BitcoinNetwork,
   MagicBytes,
@@ -72,7 +72,7 @@ export async function sbtcDepositHelper({
   amountSats: number;
   stacksAddress: string;
   bitcoinChangeAddress: string;
-  utxos: (BlockstreamUtxo | BlockstreamUtxoWithTxHex)[];
+  utxos: BlockstreamUtxoWithTx[];
   feeRate: number;
   pegAddress?: string;
 }) {

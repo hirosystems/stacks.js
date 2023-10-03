@@ -1,15 +1,15 @@
 import * as btc from '@scure/btc-signer';
 import { hexToBytes } from '@stacks/common';
 import * as P from 'micro-packed';
-import { BlockstreamUtxo, BlockstreamUtxoWithTxHex } from './api';
-import { BitcoinNetwork, MagicBytes, OpCode, TEST_NETWORK, VSIZE_INPUT_P2WPKH } from './constants';
+import { BlockstreamUtxoWithTx } from './api';
+import { BitcoinNetwork, MagicBytes, OpCode, TESTNET, VSIZE_INPUT_P2WPKH } from './constants';
 
 import { dustMinimum, paymentInfo } from './utils';
 
 const concat = P.concatBytes;
 
 export async function sbtcWithdrawHelper({
-  network = TEST_NETWORK, // default to testnet for developer release
+  network = TESTNET, // default to testnet for developer release
   amountSats,
   signature,
   bitcoinAddress,
@@ -22,7 +22,7 @@ export async function sbtcWithdrawHelper({
   signature: string;
   bitcoinAddress: string;
   bitcoinChangeAddress?: string;
-  utxos: (BlockstreamUtxo | BlockstreamUtxoWithTxHex)[];
+  utxos: BlockstreamUtxoWithTx[];
   feeRate: number;
 }) {
   bitcoinChangeAddress ??= bitcoinAddress;
@@ -51,7 +51,7 @@ export async function sbtcWithdrawHelper({
 const DUST = 500;
 
 export function buildSbtcWithdrawTxOpReturn({
-  network = TEST_NETWORK, // default to testnet for developer release
+  network = TESTNET, // default to testnet for developer release
   amountSats,
   signature,
   bitcoinAddress,

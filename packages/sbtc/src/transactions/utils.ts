@@ -2,8 +2,8 @@ import * as btc from '@scure/btc-signer';
 import { hexToBytes, intToHex, utf8ToBytes } from '@stacks/common';
 import { c32addressDecode } from 'c32check';
 import * as P from 'micro-packed';
-import * as api from './api';
-import { BlockstreamUtxo, BlockstreamUtxoWithTxHex } from './api';
+
+import { BlockstreamUtxo, BlockstreamUtxoWithTx } from './api';
 
 import { OVERHEAD_TX, VSIZE_INPUT_P2WPKH } from './constants';
 
@@ -48,7 +48,7 @@ export async function paymentInfo({
 }: {
   tx: btc.Transaction;
   feeRate: number;
-  utxos: (BlockstreamUtxo | BlockstreamUtxoWithTxHex)[];
+  utxos: BlockstreamUtxoWithTx[];
   utxoToSpendable?: UtxoToSpendableFn;
 }) {
   const outputs = [];
@@ -90,7 +90,7 @@ export function dustMinimum(inputVsize: number, feeRate: number) {
 }
 
 export type UtxoToSpendableFn = (
-  utxo: BlockstreamUtxo | BlockstreamUtxoWithTxHex
+  utxo: BlockstreamUtxoWithTx
 ) => Promise<{ input: btc.TransactionInput; vsize?: number }>;
 
 export async function utxoSelect({
@@ -99,7 +99,7 @@ export async function utxoSelect({
   outputs,
   feeRate,
 }: {
-  utxos: (BlockstreamUtxo | BlockstreamUtxoWithTxHex)[];
+  utxos: BlockstreamUtxoWithTx[];
   utxoToSpendable?: UtxoToSpendableFn;
   outputs: btc.TransactionOutput[];
   feeRate: number;
@@ -147,12 +147,10 @@ export async function utxoSelect({
 
 // todo: add p2sh for xverse
 async function defaultUtxoToSpendable(
-  utxo: BlockstreamUtxo | BlockstreamUtxoWithTxHex
+  utxo: BlockstreamUtxoWithTx
 ): Promise<{ input: btc.TransactionInput; vsize?: number }> {
-  const utxoWithTx: BlockstreamUtxoWithTxHex =
-    'hex' in utxo ? utxo : { ...utxo, hex: await api.fetchTxHex(utxo.txid) };
-
-  const tx = btc.Transaction.fromRaw(hexToBytes(utxoWithTx.hex), {
+  const hex = await utxo.tx;
+  const tx = btc.Transaction.fromRaw(hexToBytes(hex), {
     allowUnknownOutputs: true,
     allowUnknownInputs: true,
   });
@@ -162,23 +160,72 @@ async function defaultUtxoToSpendable(
   const spendScript = btc.OutScript.decode(outputToSpend.script);
 
   try {
-    if (spendScript.type !== 'wpkh') throw new Error('Non-p2wpkh utxo found');
+    switch (spendScript.type) {
+      case 'sh':
+        // todo: refactor!!!
+        let p2ret;
+				for (let i = 0; i < 10; i++) {
+					try {
+						if (i === 0) {
+							p2ret = btc.p2sh(btc.p2wpkh(hexToBytes(paymentPublicKey)), net)
+						} else if (i === 1) {
+							p2ret = btc.p2sh(btc.p2wsh(btc.p2wpkh(hexToBytes(paymentPublicKey))), net)
+						} else if (i === 2) {
+							p2ret = btc.p2sh(btc.p2wsh(btc.p2pkh(hexToBytes(paymentPublicKey)), net))
+						} else if (i === 3) {
+							p2ret = btc.p2sh(btc.p2ms(1, [hexToBytes(paymentPublicKey)]), net)
+						} else if (i === 4) {
+							p2ret = btc.p2sh(btc.p2pkh(hexToBytes(paymentPublicKey)), net)
+						} else if (i === 5) {
+							p2ret = btc.p2sh(btc.p2sh(btc.p2pkh(hexToBytes(paymentPublicKey)), net))
+						} else if (i === 6) {
+							p2ret = btc.p2sh(btc.p2sh(btc.p2wpkh(hexToBytes(paymentPublicKey)), net))
+						}
+						if (i < 3) {
+							const nextI = {
+                txid: hexToBytes(utxo.txid),
+                index: utxo.vout,
+                witnessUtxo: {
+                  script: p2ret.script,
+                  amount: BigInt(utxo.value),
+                },
+                redeemScript: p2ret.redeemScript,
+              }
+              new btc.Transaction().addInput(spendableInput); // validate, throws if invalid
+							transaction.addInput(nextI);
+						} else {
+							const nextI = redeemScriptAddInput(utxo, p2ret, hexy)
+              new btc.Transaction().addInput(spendableInput); // validate, throws if invalid
+							transaction.addInput(nextI);
+						}
+						//('Tx type: ' + i + ' --> input added')
+						break;
+					} catch (err:any) {
+						console.log('Error: not tx type: ' + i);
+					}
+      case 'wpkh':
+        const spendableInput: btc.TransactionInput = {
+          txid: hexToBytes(utxo.txid),
+          index: utxo.vout,
+          ...outputToSpend,
+          witnessUtxo: {
+            script: outputToSpend.script,
+            amount: BigInt(utxo.value),
+          },
+        };
+        new btc.Transaction().addInput(spendableInput); // validate, throws if invalid
+        return { input: spendableInput, vsize: VSIZE_INPUT_P2WPKH };
 
-    const spendableInput: btc.TransactionInput = {
-      txid: hexToBytes(utxo.txid),
-      index: utxo.vout,
-      ...outputToSpend,
-      witnessUtxo: {
-        script: outputToSpend.script,
-        amount: BigInt(utxo.value),
-      },
-    };
-    new btc.Transaction().addInput(spendableInput); // validate, throws if invalid
-    return { input: spendableInput, vsize: VSIZE_INPUT_P2WPKH };
+      default:
+        throw new Error('Unsupported script type. Currently, only p2sh and p2wpkh are supported.');
+    }
   } catch (e) {
-    throw new Error(`Utxo doesn't match spendable type, ${JSON.stringify(utxo)}`);
+    throw new Error(`Utxo doesn't match spendable type, ${JSON.stringify(utxo)}`, { cause: e });
   }
 }
+
+const x : btc.TransactionInput | btc.TransactionOutput = {} as any;
+if ('index' in x) x
 
 // todo: after DR?
 // async function tryAllToSpendable(
@@ -205,3 +252,29 @@ async function defaultUtxoToSpendable(
 //     throw new Error(`Utxo doesn't match spendable type, ${JSON.stringify(utxo)}`);
 //   }
 // }
+
+type LazyLoadable<T extends object, K extends string> = T & Record<K, any>;
+
+export function wrapLazyProxy<
+  T extends {
+    [key: string]: any;
+  },
+  K extends string,
+  R,
+>(target: T, key: K, resolution: () => R | Promise<R>): LazyLoadable<T, K> {
+  return new Proxy(target, {
+    get(obj, prop: string) {
+      if (prop === key && obj[prop] === undefined) {
+        (obj as any)[prop] = Promise.resolve(resolution).catch(error => {
+          delete obj[prop];
+          throw error;
+        });
+      }
+      return obj[prop];
+    },
+    has(obj, prop) {
+      if (prop === key) return true;
+      return prop in obj;
+    },
+  });
+}
