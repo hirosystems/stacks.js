@@ -2,7 +2,11 @@
 title: FAQs
 ---
 
-#### **What are Post Conditions?**
+<Details open>
+
+<summary> What are Post Conditions?</summary>
+
+#### **What are Post Conditions?** 
 
 - Any supplied post-conditions are always verified, regardless of "mode" (and abort the tx if any supplied PC evaluates to false).
 - The "mode" (allow/deny) only applies to any asset (stx/ft/nft) transfer that is not mentioned in the post-conditions (can be thought of as "ALLOW-additional-asset-transfer" or "DENY-additional-asset-transfer")
@@ -12,6 +16,8 @@ Example: In deny mode, an additional asset transfer (not covered by PCs) will ab
 Post-conditions are less a part of clarity (the language), but more a part of transactions.
 Users could send the otherwise-identical transaction (Example: contract-call, executing a function on the blockchain) with OR without different post-conditions, in allow OR deny mode.
 The PCs are managed by the user/wallet/app that's creating the tx; so they are a bit different from the other "safety" features of clarity (Example: asserts, try, https://book.clarity-lang.org/ch06-00-control-flow.html) 
+
+</Details>
 
 #### **How to fix the regenerator-runtime?**
 
