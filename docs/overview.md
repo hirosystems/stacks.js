@@ -37,9 +37,9 @@ While there are many Stacks.js use cases, we find that there are three main inte
 
 <!-- todo: add a card and better how-to-guide for each, (eg add message signing backend checking) -->
 
-- **Authentication**: Register and sign users in with identities on the Stacks blockchain
+- **Authentication**: Register and sign in users with identities on the Stacks blockchain
 - **Transaction signing**: Prompt users to sign and broadcast transactions to the Stacks blockchain
-- **Data storage**: Save and retrieve data for users with [Gaia](https://docs.stacks.co/build-apps/references/gaia)
+- **Interact with Clarity contracts**: Interact with the Stacks blockchain directly
 
 You can take a look at this example application that uses these Stacks.js primitives to create new user experiences below!
 
