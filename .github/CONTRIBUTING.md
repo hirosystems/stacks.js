@@ -1,6 +1,6 @@
-# Contributing to the Stacks.js
+# Contributing to Stacks.js
 
-Thank you for considering contributing to the Stacks.js! We welcome any contributions, whether it's bug fixes, new features, or improvements to the existing codebase.
+Thank you for considering contributing to Stacks.js! We welcome any contributions, whether it's bug fixes, new features, or improvements to the existing codebase.
 
 
 ## Your First Pull Request
