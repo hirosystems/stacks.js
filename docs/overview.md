@@ -4,12 +4,18 @@ title: Overview
 
 # Stacks.js Overview
 
-Stacks.js is an SDK for building on the Stacks blockchain.
-It's a collection of various JavaScript libraries allowing developers to interact with the Stacks blockchain or allow their users to.
+Stacks.js is the Stacks SDK for building on the Stacks blockchain with JavaScript.
+It's a collection of various JavaScript libraries allowing developers to build interactive user experiences for their users.
+From [authenticating users](https://docs.hiro.so/stacks.js/feature-guides/authenticate-users-with-connect) to [creating post-conditions](https://dev.to/stacks/understanding-stacks-post-conditions-e65), Stacks.js is an indispensible part of the developer's toolkit.
 
+<!-- todo: Ensure these examples are the most commonly asked questions in Discord. -->
+<!-- todo: We need to have a post-conditions guide within our docs.... No? -->
+<!-- todo: Create links for these two examples—signing transactions and creating post-conditions. -->
 <!-- todo: add better UI, e.g. grid of cards -->
 
-There are two main ways developers build applications on the Stacks blockchain:
+
+<!-- LEAVING OUT -->
+<!-- There are two main ways developers build applications on the Stacks blockchain:
 
 - 🔒 **Without Direct Private Key Access**: For example, a web app that allows users to interact with the Stacks blockchain using their Stacks wallet (browser extension or mobile). Read More in the Connect Guide
 - 🔑 **With Private Key Access**: For example, managing funds with the Stacks.js CLI, building a backend (which can sign transactions directly).
@@ -24,9 +30,10 @@ Users may use the Stacks.js CLI directly to send a transaction.
 Backends may need to automate signing without direct user interaction.
 In these cases, developers can use the same libraries used by Stacks wallets for account handling and transaction signing.
 
----
+-->
+--- 
 
-There are three main integrations used by Stacks enabled applications:
+While there are many Stacks.js use cases, we find that there are three main integrations used by Stacks-enabled applications:
 
 <!-- todo: add a card and better how-to-guide for each, (eg add message signing backend checking) -->
 
@@ -34,11 +41,15 @@ There are three main integrations used by Stacks enabled applications:
 - **Transaction signing**: Prompt users to sign and broadcast transactions to the Stacks blockchain
 - **Data storage**: Save and retrieve data for users with [Gaia](https://docs.stacks.co/build-apps/references/gaia)
 
-All three of these integrations can be used together to create powerful new user experiences that rival or exceed those of traditional apps while protecting your users' digital rights.
+You can take a look at this example application that uses these Stacks.js primitives to create new user experiences below!
 
 import StacksjsStartersNote from './includes/\_stacks.js-starters-note.mdx';
 
 <StacksjsStartersNote/>
+
+<!-- todo: add another quick win -->
+
+
 
 ## References
 
@@ -48,7 +59,13 @@ Below is a list of all Stacks.js libraries and a few JS libraries and helpers ma
 
 ### Connecting Wallets
 
-- [`@stacks/connect`](https://stacks.js.org/modules/_stacks_connect) Connect web application to Stacks wallet browser extensions. [Github](https://github.com/hirosystems/connect)
+- [`@stacks/connect`](https://github.com/hirosystems/connect) Connect web application to Stacks wallet browser extensions. [Get started here.](https://github.com/hirosystems/connect/tree/main/packages/connect)
+
+```console
+npm install @stacks/connect
+pnpm install @stacks/connect
+yarn add @stacks/connect
+```
 
 ### Stacks Primitives
 
@@ -74,7 +91,8 @@ Below is a list of all Stacks.js libraries and a few JS libraries and helpers ma
 
 ## Development
 
-There is a main [Stacks.js monorepo](https://github.com/hirosystems/stacks.js) containing most of the packages, but there are a few others often als considered as a part of "Stacks.js".
+There is a main [Stacks.js monorepo](https://github.com/hirosystems/stacks.js) containing most of the packages, but there are a few others often also considered a part of "Stacks.js".
+<!-- Can we add these? Not sure how helpful this sentence is without explicit links -->
 
 Are we missing anything?
 Feel free to open issues in the Github repositories.
