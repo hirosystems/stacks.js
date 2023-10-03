@@ -21,7 +21,7 @@ npm install @stacks/connect
 
 ## Authentication
 
-Authentication allows users to identify themselves in an app while retaining complete control over their credentials and personal details. It can be integrated alone or used in conjunction with [transaction signing](/build-apps/transaction-signing) and [data storage](/build-apps/data-storage), which is a prerequisite.
+Authentication allows users to identify themselves in an app while retaining complete control over their credentials and personal details. This package can be integrated alone or used in conjunction with [transaction signing](/build-apps/transaction-signing) and [data storage](/build-apps/data-storage). The authentication package is a prerequisite for using these latter two packages.
 
 Users who register for your app can subsequently authenticate to any other app with support for the [Blockchain Naming System](https://docs.stacks.co/build-apps/references/bns) and vice versa.
 
@@ -85,8 +85,8 @@ function authenticate() {
 
 The `showConnect` function accepts a several properties within a parameter object, such as:
 
-- The app's `name` and `icon`: are provided as strings comprising the `appDetails` object property.
-- The `redirectTo` string: is used to provide a URL to which the user should be redirected upon successful authentication. The `onFinish` callback serves a similar purpose by handling successful authentication within the context of a popup window.
+- The app's `name` and `icon` are provided as strings comprising the `appDetails` object property.
+- The `redirectTo` string is used to provide a URL to which the user should be redirected upon successful authentication. The `onFinish` callback serves a similar purpose by handling successful authentication within the context of a popup window.
 - The `userSession` object initiated above.
 
 Once the user selects the button in this popup, they are passed to the Stacks Wallet for authenticator with the `authRequest` token as a GET parameter. From there, they can confirm authentication and generate a new _Secret Key_ or Stacks identity before doing so, as needed, before coming back to the app.
