@@ -9,9 +9,9 @@ import StacksProviderSection from '../includes/\_stacks.js-provider-section.mdx'
 
 ---
 
-This guide explains how to prompt users to sign a message.
+This guide explains how to prompt users to sign a message. Messaging signing can be used to have a user prove they control a particular address or to have a user authorize a particular action in your app.
 
-The user will be prompted a popup from the Hiro Wallet showing the message you want them to sign.
+When signing a message, a user will be prompted via a popup from their wallet of choice, showing the message you want them to sign.
 
 The user can then click on the 'Sign' button, which will return the signature data and the user's publicKey to your app. You can then verify the signature by passing the signature data and the public key to the [`stacks.js`](https://github.com/hirosystems/stacks.js) `verifySignature` method.
 
@@ -29,9 +29,9 @@ npm install @stacks/connect
 
 ## Initiate session
 
-Users must authenticate to an app before they request message signing. Users can install an authenticator like [the Hiro Wallet](https://www.hiro.so/wallet/install-web).
+Users must be authenticated before they can sign a message from your app. Users can install an authenticator (e.g. a wallet) like [Leather](https://leather.io/) for that purpose.
 
-See the [authentication guide](https://docs.hiro.so/build-apps/authentication) before proceeding to integrate the following message signing capabilities.
+See the [authentication guide](https://docs.hiro.so/build-apps/authentication) before integrating the following message signing capabilities.
 
 ## Prompt to sign a message
 
