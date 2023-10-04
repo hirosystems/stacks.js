@@ -1,8 +1,9 @@
 import RpcClient from '@btc-helpers/rpc';
 import { RpcCallSpec } from '@btc-helpers/rpc/dist/callspec';
 import * as btc from '@scure/btc-signer';
-import { COINBASE_BYTES_LENGTH, Cl } from '@stacks/transactions';
+import { BufferCV, COINBASE_BYTES_LENGTH, Cl, SomeCV } from '@stacks/transactions';
 import { wrapLazyProxy } from './utils';
+import { REGTEST } from './constants';
 
 /** todo */
 // https://blockstream.info/api/address/1KFHE7w8BhaENAswwryaoccDb6qcT6DbYY/utxo
@@ -199,6 +200,56 @@ export class DevEnvHelper {
 
   async broadcastTx(tx: btc.Transaction): Promise<string> {
     return await this.btcRpc.sendrawtransaction({ hexstring: tx.hex, maxfeerate: 1000 });
+  }
+
+  // todo abstract for both testnet and devenv classes
+  async stacksCallReadOnly({
+    contractAddress,
+    functionName,
+    sender = 'ST000000000000000000002AMW42H',
+    args = [],
+  }: {
+    contractAddress: string;
+    functionName: string;
+    sender?: string;
+    args?: string[];
+  }) {
+    contractAddress = contractAddress.replace('.', '/');
+
+    return await fetch(
+      `${this.config.stacksApiUrl}/v2/contracts/call-read/${contractAddress}/${encodeURIComponent(
+        functionName
+      )}`,
+      {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ sender, arguments: args }),
+      }
+    )
+      .then(res => {
+        return res.json();
+      })
+      .then(res => {
+        return Cl.deserialize(res.result);
+      });
+  }
+
+  async getSbtcPegAddress(contractAddress: string): Promise<string> {
+    const publicKey = (
+      (await this.stacksCallReadOnly({
+        contractAddress,
+        functionName: 'get-bitcoin-wallet-public-key',
+      })) as SomeCV<BufferCV>
+    ).value.buffer;
+
+    return btc.Address(REGTEST).encode({
+      type: 'tr',
+      // strip y byte
+      pubkey: publicKey.length === 33 ? publicKey.subarray(1) : publicKey,
+    });
   }
 }
 

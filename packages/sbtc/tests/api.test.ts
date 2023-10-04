@@ -1,5 +1,3 @@
-import * as btc from '@scure/btc-signer';
-import { hexToBytes } from '@stacks/common';
 import { expect, test } from 'vitest';
 import { DevEnvHelper } from '../src';
 import { WALLET_01, getBitcoinAccount } from './testHelpers';
@@ -17,11 +15,10 @@ test('minting bitcoin increases balance', async () => {
   });
 
   const balanceAfter = await dev.getBalance(wallet.address);
-
   expect(balanceAfter).toBeGreaterThan(balance);
 });
 
-test('fetch utxos bitcoin rpc', async () => {
+test('fetch utxos', async () => {
   const wallet = await getBitcoinAccount(WALLET_01);
 
   const unspent = await dev.fetchUtxos(wallet.address);
@@ -30,4 +27,13 @@ test('fetch utxos bitcoin rpc', async () => {
   expect(unspent[0]).toMatchObject(
     expect.objectContaining({ txid: expect.any(String), tx: expect.any(String) })
   );
+});
+
+test('get balance', async () => {
+  const wallet = await getBitcoinAccount(WALLET_01);
+
+  const balance = await dev.getBalance(wallet.address);
+  console.log('balance', balance);
+
+  expect(balance).toBeGreaterThan(0);
 });

@@ -4,6 +4,12 @@ import { WALLET_01, getBitcoinAccount, getStacksAccount } from './testHelpers';
 
 const dev = new DevEnvHelper();
 
+test('get address', async () => {
+  const str = await dev.getSbtcPegAddress('ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.asset');
+
+  console.log('str', str);
+});
+
 test('deposit', async () => {
   const bitcoinAccount = await getBitcoinAccount(WALLET_01);
   const stacksAccount = await getStacksAccount(WALLET_01);
