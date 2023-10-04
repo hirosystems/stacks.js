@@ -1,31 +1,30 @@
+import * as btc from '@scure/btc-signer';
+import { hexToBytes } from '@stacks/common';
 import { expect, test } from 'vitest';
 import { DevEnvHelper } from '../src';
-import { WALLET_00, getBitcoinAccount, sleep } from './testHelpers';
+import { WALLET_01, getBitcoinAccount } from './testHelpers';
+
+const dev = new DevEnvHelper();
 
 test('minting bitcoin increases balance', async () => {
-  const wallet01 = await getBitcoinAccount(WALLET_00);
+  const wallet = await getBitcoinAccount(WALLET_01);
 
-  const devEnv = new DevEnvHelper();
-  const balance = await devEnv.getBalance(wallet01.address);
-  console.log('balance', balance);
+  const balance = await dev.getBalance(wallet.address);
 
-  await devEnv.btcRpc.generatetoaddress({
-    nblocks: 1,
-    address: wallet01.address,
+  await dev.btcRpc.generatetoaddress({
+    nblocks: 101, // more than 100 blocks, because coinbase txs mature after 100 blocks
+    address: wallet.address,
   });
-  await sleep(1000);
 
-  const balanceAfter = await devEnv.getBalance(wallet01.address);
+  const balanceAfter = await dev.getBalance(wallet.address);
 
   expect(balanceAfter).toBeGreaterThan(balance);
-  console.log('balanceAfter', balanceAfter);
 });
 
 test('fetch utxos bitcoin rpc', async () => {
-  const wallet01 = await getBitcoinAccount(WALLET_00);
+  const wallet = await getBitcoinAccount(WALLET_01);
 
-  const devEnv = new DevEnvHelper();
-  const unspent = await devEnv.fetchUtxos(wallet01.address);
+  const unspent = await dev.fetchUtxos(wallet.address);
 
   expect(unspent.length).toBeGreaterThan(0);
   expect(unspent[0]).toMatchObject(

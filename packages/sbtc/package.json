@@ -27,6 +27,7 @@
     "@stacks/common": "^6.7.0",
     "@stacks/encryption": "^6.7.0",
     "@stacks/transactions": "^6.7.0",
+    "@stacks/wallet-sdk": "^6.7.0",
     "c32check": "^2.0.0",
     "micro-packed": "^0.3.2"
   },

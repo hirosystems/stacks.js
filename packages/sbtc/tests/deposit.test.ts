@@ -1,40 +1,39 @@
-import { describe, expect, test } from 'vitest';
+import { expect, test } from 'vitest';
 import { DevEnvHelper, sbtcDepositHelper } from '../src';
-import { WALLET_00, getBitcoinAccount } from './testHelpers';
+import { WALLET_01, getBitcoinAccount, getStacksAccount } from './testHelpers';
 
-describe('mock integration test', () => {
-  const dev = new DevEnvHelper();
+const dev = new DevEnvHelper();
 
-  test('deposit', async () => {
-    const wallet01 = await getBitcoinAccount(WALLET_00);
-    const targetStacksAddress = 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM';
+test('deposit', async () => {
+  const bitcoinAccount = await getBitcoinAccount(WALLET_01);
+  const stacksAccount = await getStacksAccount(WALLET_01);
+  console.log('stacksAccount.address', stacksAccount.address);
 
-    const balance = await dev.getBalance(wallet01.address);
-    expect(balance).toBeGreaterThan(0);
+  const balance = await dev.getBalance(bitcoinAccount.address);
+  expect(balance).toBeGreaterThan(0);
 
-    const utxos = await dev.fetchUtxos(wallet01.address);
-    expect(utxos.length).toBeGreaterThan(0);
+  const utxos = await dev.fetchUtxos(bitcoinAccount.address);
+  expect(utxos.length).toBeGreaterThan(0);
 
-    // Tx building (most simple interface) OR more simple: remove duplicate args and assume defaults
-    const tx = await sbtcDepositHelper({
-      stacksAddress: targetStacksAddress,
-      amountSats: 1_000,
+  // Tx building (most simple interface) OR more simple: remove duplicate args and assume defaults
+  const tx = await sbtcDepositHelper({
+    stacksAddress: stacksAccount.address,
+    amountSats: 1_000,
 
-      feeRate: await dev.estimateFeeRate('low'),
-      utxos,
+    feeRate: await dev.estimateFeeRate('low'),
+    utxos,
 
-      bitcoinChangeAddress: wallet01.address,
-    });
-
-    tx.sign(wallet01.privateKey);
-    tx.finalize();
-
-    expect(tx).toBeDefined(); // yay, it didn't throw
-
-    // Tx broadcasting
-    const txid = await dev.broadcastTx(tx);
-    expect(txid).toBeDefined();
+    bitcoinChangeAddress: bitcoinAccount.address,
   });
+
+  tx.sign(bitcoinAccount.privateKey);
+  tx.finalize();
+
+  expect(tx).toBeDefined(); // yay, it didn't throw
+
+  // Tx broadcasting
+  const txid = await dev.broadcastTx(tx);
+  expect(txid).toBeDefined();
 });
 
 // api.broadcastTx(tx);

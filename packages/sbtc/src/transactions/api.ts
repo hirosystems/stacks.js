@@ -1,7 +1,7 @@
 import RpcClient from '@btc-helpers/rpc';
 import { RpcCallSpec } from '@btc-helpers/rpc/dist/callspec';
 import * as btc from '@scure/btc-signer';
-import { Cl } from '@stacks/transactions';
+import { COINBASE_BYTES_LENGTH, Cl } from '@stacks/transactions';
 import { wrapLazyProxy } from './utils';
 
 /** todo */
@@ -105,7 +105,7 @@ export class TestnetHelper {
 }
 
 /** todo */
-export interface DevEnvUrls {
+export interface DevEnvConfig {
   bitcoinCoreRpcUrl: string;
   bitcoinElectrumApiUrl: string; // electrs
   bitcoinExplorerUrl: string; // explorer can access electrum
@@ -115,11 +115,11 @@ export interface DevEnvUrls {
 
 // todo: rename to helper, and add wallets etc.
 export class DevEnvHelper {
-  urls: DevEnvUrls;
+  config: DevEnvConfig;
   btcRpc: RpcClient & RpcCallSpec;
 
-  constructor(urls?: Partial<DevEnvUrls>) {
-    this.urls = Object.assign(
+  constructor(config?: Partial<DevEnvConfig>) {
+    this.config = Object.assign(
       {
         bitcoinCoreRpcUrl: 'http://devnet:devnet@127.0.0.1:18443',
         bitcoinElectrumApiUrl: 'http://127.0.0.1:60401',
@@ -127,10 +127,10 @@ export class DevEnvHelper {
         stacksApiUrl: 'http://127.0.0.1:3999',
         sbtcBridgeApiUrl: 'http://127.0.0.1:3010',
       },
-      urls
+      config
     );
 
-    this.btcRpc = new RpcClient(this.urls.bitcoinCoreRpcUrl).Typed;
+    this.btcRpc = new RpcClient(this.config.bitcoinCoreRpcUrl).Typed;
   }
 
   /**
@@ -144,11 +144,14 @@ export class DevEnvHelper {
     });
 
     if (unspent?.length === 0) {
-      await this.btcRpc.importaddress({ address, rescan: true });
-      await sleep(500);
-      unspent = await this.btcRpc.listunspent({
-        addresses: [address],
-      });
+      const addressInfo = await this.btcRpc.getaddressinfo({ address });
+      if (!addressInfo.iswatchonly) {
+        // only import if not already imported
+        await this.btcRpc.importaddress({ address, rescan: true });
+        unspent = await this.btcRpc.listunspent({
+          addresses: [address],
+        });
+      }
     }
 
     const utxos = unspent.map((u: any) => ({
@@ -172,9 +175,9 @@ export class DevEnvHelper {
   /**
    */
   async getBalance(address: string): Promise<number> {
-    const addressInfo = await fetch(`${this.urls.bitcoinExplorerUrl}/api/address/${address}`).then(
-      r => r.json()
-    );
+    const addressInfo = await fetch(
+      `${this.config.bitcoinExplorerUrl}/api/address/${address}`
+    ).then(r => r.json());
 
     return addressInfo.txHistory.balanceSat;
   }
