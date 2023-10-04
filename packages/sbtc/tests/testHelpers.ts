@@ -1,6 +1,6 @@
 import { HDKey } from '@scure/bip32';
+import * as bip39 from '@scure/bip39';
 import * as btc from '@scure/btc-signer';
-import { hexToBytes } from '@stacks/common';
 import { REGTEST } from '../src';
 
 export const WALLET_00 =
@@ -8,8 +8,9 @@ export const WALLET_00 =
 export const WALLET_01 =
   'sell invite acquire kitten bamboo drastic jelly vivid peace spawn twice guilt pave pen trash pretty park cube fragile unaware remain midnight betray rebuild';
 
-export function getBitcoinAccount(mnemonic: string, idx: number = 0) {
-  const hdkey = HDKey.fromMasterSeed(hexToBytes(mnemonic), REGTEST.bip32);
+export async function getBitcoinAccount(mnemonic: string, idx: number = 0) {
+  const seed = await bip39.mnemonicToSeed(mnemonic);
+  const hdkey = HDKey.fromMasterSeed(seed, REGTEST.bip32);
 
   const path = `m/84'/${REGTEST.bip84.coin}'/${idx}'/0/0`;
 
@@ -17,4 +18,8 @@ export function getBitcoinAccount(mnemonic: string, idx: number = 0) {
   const address = btc.getAddress('wpkh', privateKey, REGTEST)!;
 
   return { privateKey, address };
+}
+
+export function sleep(ms: number) {
+  return new Promise(resolve => setTimeout(resolve, ms));
 }

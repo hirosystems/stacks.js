@@ -1,18 +1,23 @@
 import * as btc from '@scure/btc-signer';
 import { hexToBytes } from '@stacks/common';
 import * as P from 'micro-packed';
-import { BlockstreamUtxo, BlockstreamUtxoWithTx } from './api';
+import { UtxoWithTx } from './api';
 import {
   BitcoinNetwork,
   MagicBytes,
   OpCode,
   SBTC_PEG_ADDRESS,
-  TEST_NETWORK,
+  TESTNET,
   VSIZE_INPUT_P2WPKH,
 } from './constants';
-import { dustMinimum, paymentInfo, stacksAddressBytes } from './utils';
-
-// todo: move to constants?
+import {
+  DEFAULT_UTXO_TO_SPENDABLE,
+  SpendableByScriptTypes,
+  dustMinimum,
+  paymentInfo,
+  shUtxoToSpendable,
+  stacksAddressBytes,
+} from './utils';
 
 const concat = P.concatBytes;
 
@@ -36,7 +41,7 @@ export const buildSbtcDepositTx = buildSbtcDepositTxOpReturn; // default to OP R
  *
  */
 export function buildSbtcDepositTxOpReturn({
-  network = TEST_NETWORK, // default to testnet for developer release
+  network = TESTNET, // default to testnet for developer release
   amountSats,
   stacksAddress,
   pegAddress = SBTC_PEG_ADDRESS,
@@ -60,28 +65,40 @@ export function buildSbtcDepositTxOpReturn({
 }
 
 export async function sbtcDepositHelper({
-  network = TEST_NETWORK, // default to testnet for developer release
+  network = TESTNET, // default to testnet for developer release
   amountSats,
   stacksAddress,
   bitcoinChangeAddress,
-  utxos,
   feeRate,
+  utxos,
+  utxoToSpendable = DEFAULT_UTXO_TO_SPENDABLE,
   pegAddress = SBTC_PEG_ADDRESS,
+  paymentPublicKey,
 }: {
   network?: BitcoinNetwork;
   amountSats: number;
   stacksAddress: string;
   bitcoinChangeAddress: string;
-  utxos: BlockstreamUtxoWithTx[];
   feeRate: number;
+  utxos: UtxoWithTx[];
+  /**
+   * Tries to convert p2wpk and p2sh utxos to spendable inputs by default.
+   * To extend, add your own function that takes a {@link UtxoToSpendableOpts}
+   * and returns a {@link Spendable}.
+   */
+  utxoToSpendable?: Partial<SpendableByScriptTypes>;
   pegAddress?: string;
+  paymentPublicKey?: string;
 }) {
+  if (paymentPublicKey) {
+    utxoToSpendable.sh = shUtxoToSpendable.bind(null, network, paymentPublicKey);
+  }
+
   const tx = buildSbtcDepositTxOpReturn({ network, amountSats, stacksAddress, pegAddress });
 
   // we separate this part, since wallets could handle it themselves
-  const pay = await paymentInfo({ tx, utxos, feeRate });
+  const pay = await paymentInfo({ tx, feeRate, utxos, utxoToSpendable });
   for (const input of pay.inputs) tx.addInput(input);
-  // outputs are already on tx
 
   const changeAfterAdditionalOutput =
     BigInt(Math.ceil(VSIZE_INPUT_P2WPKH * feeRate)) - pay.changeSats;

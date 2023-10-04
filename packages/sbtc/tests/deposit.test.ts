@@ -1,49 +1,39 @@
-import { HDKey } from '@scure/bip32';
-import * as bip39 from '@scure/bip39';
-import * as btc from '@scure/btc-signer';
 import { describe, expect, test } from 'vitest';
-import { sbtcDepositHelper } from '../src';
-import * as api from '../src/transactions/api';
+import { DevEnvHelper, sbtcDepositHelper } from '../src';
+import { WALLET_00, getBitcoinAccount } from './testHelpers';
 
 describe('mock integration test', () => {
+  const dev = new DevEnvHelper();
+
   test('deposit', async () => {
-    // == Wallet ===================================================================
-    const seed = await bip39.mnemonicToSeed(
-      'twice kind fence tip hidden tilt action fragile skin nothing glory cousin green tomorrow spring wrist shed math olympic multiply hip blue scout claw'
-    );
+    const wallet01 = await getBitcoinAccount(WALLET_00);
+    const targetStacksAddress = 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM';
 
-    const TESTNET_VERSION = {
-      private: 0x00000000,
-      public: 0x043587cf,
-    };
-    const hdkey = HDKey.fromMasterSeed(seed, TESTNET_VERSION);
+    const balance = await dev.getBalance(wallet01.address);
+    expect(balance).toBeGreaterThan(0);
 
-    const chainCode = 1; // testnet = 1, mainnet = 0
-    const accountIndex = 0;
-    const path = `m/84'/${chainCode}'/${accountIndex}'/0/0`;
+    const utxos = await dev.fetchUtxos(wallet01.address);
+    expect(utxos.length).toBeGreaterThan(0);
 
-    const privKey = hdkey.derive(path).privateKey!;
-    const address = btc.getAddress('wpkh', privKey, btc.TEST_NETWORK)!;
-
-    // == sBTC =====================================================================
-
-    const TARGET_STACKS_ADDRESS = 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM';
-
-    // Tx building (most simple interface)
+    // Tx building (most simple interface) OR more simple: remove duplicate args and assume defaults
     const tx = await sbtcDepositHelper({
-      stacksAddress: TARGET_STACKS_ADDRESS,
+      stacksAddress: targetStacksAddress,
       amountSats: 1_000,
 
-      feeRate: await api.estimateFeeRate('low'),
-      utxos: await api.fetchUtxos(address),
+      feeRate: await dev.estimateFeeRate('low'),
+      utxos,
 
-      bitcoinChangeAddress: address,
+      bitcoinChangeAddress: wallet01.address,
     });
 
-    tx.sign(privKey);
+    tx.sign(wallet01.privateKey);
     tx.finalize();
 
     expect(tx).toBeDefined(); // yay, it didn't throw
+
+    // Tx broadcasting
+    const txid = await dev.broadcastTx(tx);
+    expect(txid).toBeDefined();
   });
 });
 

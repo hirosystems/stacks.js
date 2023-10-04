@@ -17,12 +17,13 @@ export type BlockstreamUtxo = {
 };
 
 /** todo */
-export type BlockstreamUtxoWithTx = BlockstreamUtxo & {
+export type UtxoWithTx = BlockstreamUtxo & {
   tx: string | Promise<string>;
 };
 
-export type UtxoSpend = BlockstreamUtxo & {
-  input: btc.TransactionInput;
+export type SpendableUtxo = BlockstreamUtxo & {
+  input: btc.TransactionInput | Promise<btc.TransactionInput>;
+  vsize?: number | Promise<number>;
 };
 
 /** todo */
@@ -31,7 +32,7 @@ export type BlockstreamFeeEstimates =
   { [K in | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | '10' | '11' | '12' | '13' | '14' | '15' | '16' | '17' | '18' | '19' | '20' | '21' | '22' | '23' | '24' | '25' | '144' | '504' | '1008']: number; };
 
 export class TestnetHelper {
-  async fetchUtxos(address: string): Promise<BlockstreamUtxoWithTx[]> {
+  async fetchUtxos(address: string): Promise<UtxoWithTx[]> {
     // todo: error handling?
     return fetch(`https://blockstream.info/testnet/api/address/${address}/utxo`)
       .then(res => res.json())
@@ -120,7 +121,7 @@ export class DevEnvHelper {
   constructor(urls?: Partial<DevEnvUrls>) {
     this.urls = Object.assign(
       {
-        bitcoinCoreRpcUrl: 'http://127.0.0.1:18443',
+        bitcoinCoreRpcUrl: 'http://devnet:devnet@127.0.0.1:18443',
         bitcoinElectrumApiUrl: 'http://127.0.0.1:60401',
         bitcoinExplorerUrl: 'http://127.0.0.1:3002',
         stacksApiUrl: 'http://127.0.0.1:3999',
@@ -129,7 +130,7 @@ export class DevEnvHelper {
       urls
     );
 
-    this.btcRpc = new RpcClient('http://devnet:devnet@127.0.0.1:18443').Typed;
+    this.btcRpc = new RpcClient(this.urls.bitcoinCoreRpcUrl).Typed;
   }
 
   /**
@@ -137,7 +138,7 @@ export class DevEnvHelper {
    * If no utxos are found, imports the address, rescans, and tries again.
    * @param address address or script hash of wallet to fetch utxos for
    */
-  async fetchUtxos(address: string): Promise<BlockstreamUtxoWithTx[]> {
+  async fetchUtxos(address: string): Promise<UtxoWithTx[]> {
     let unspent = await this.btcRpc.listunspent({
       addresses: [address],
     });
@@ -153,7 +154,7 @@ export class DevEnvHelper {
     const utxos = unspent.map((u: any) => ({
       txid: u.txid,
       vout: u.vout,
-      value: u.amount,
+      value: Math.round(u.amount * 1e8), // Bitcoin to satoshis
       confirmed: u.confirmations > 0,
     }));
 
@@ -191,6 +192,10 @@ export class DevEnvHelper {
       default:
         return target;
     }
+  }
+
+  async broadcastTx(tx: btc.Transaction): Promise<string> {
+    return await this.btcRpc.sendrawtransaction({ hexstring: tx.hex, maxfeerate: 1000 });
   }
 }
 

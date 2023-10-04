@@ -1,12 +1,14 @@
 import * as btc from '@scure/btc-signer';
 import { hexToBytes } from '@stacks/common';
 import * as P from 'micro-packed';
-import { BlockstreamUtxoWithTx } from './api';
+import { UtxoWithTx } from './api';
 import { BitcoinNetwork, MagicBytes, OpCode, TESTNET, VSIZE_INPUT_P2WPKH } from './constants';
 
-import { dustMinimum, paymentInfo } from './utils';
+import { SpendableByScriptTypes, dustMinimum, paymentInfo } from './utils';
 
 const concat = P.concatBytes;
+
+const DUST = 500; // todo: double-check
 
 export async function sbtcWithdrawHelper({
   network = TESTNET, // default to testnet for developer release
@@ -14,16 +16,18 @@ export async function sbtcWithdrawHelper({
   signature,
   bitcoinAddress,
   bitcoinChangeAddress,
-  utxos,
   feeRate,
+  utxos,
+  utxoToSpendable,
 }: {
   network?: BitcoinNetwork;
   amountSats: number;
   signature: string;
   bitcoinAddress: string;
   bitcoinChangeAddress?: string;
-  utxos: BlockstreamUtxoWithTx[];
   feeRate: number;
+  utxos: UtxoWithTx[];
+  utxoToSpendable: Partial<SpendableByScriptTypes>;
 }) {
   bitcoinChangeAddress ??= bitcoinAddress;
 
@@ -35,9 +39,8 @@ export async function sbtcWithdrawHelper({
   });
 
   // we separate this part, since wallets could handle it themselves
-  const pay = await paymentInfo({ tx, utxos, feeRate });
+  const pay = await paymentInfo({ tx, feeRate, utxos, utxoToSpendable });
   for (const input of pay.inputs) tx.addInput(input);
-  // outputs are already on tx
 
   const changeAfterAdditionalOutput =
     BigInt(Math.ceil(VSIZE_INPUT_P2WPKH * feeRate)) - pay.changeSats;
@@ -48,7 +51,7 @@ export async function sbtcWithdrawHelper({
   return tx;
 }
 
-const DUST = 500;
+export const buildSbtcWithdrawTx = buildSbtcWithdrawTxOpReturn; // default to OP RETURN for developer release
 
 export function buildSbtcWithdrawTxOpReturn({
   network = TESTNET, // default to testnet for developer release
