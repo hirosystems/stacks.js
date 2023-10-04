@@ -15,13 +15,13 @@ It's a collection of various JavaScript libraries allowing developers to interac
 
 <!-- todo: add color -->
 
-<div class="subSections_src-components-landing-landing-module my-8">
+<div class="subSections my-8">
   <a href="/stacks.js/connect">
-    <div class="subSectionTitle_src-components-landing-landing-module"><h3>Stacks Connect 🌐</h3><span>→</span></div>
+    <div class="subSectionTitle"><h3>Stacks Connect 🌐</h3><span>→</span></div>
     <p>Build Stacks-ready web applications</p>
   </a>
   <a href="/stacks.js/getting-started">
-    <div class="subSectionTitle_src-components-landing-landing-module"><h3>Getting Started</h3><span>→</span></div>
+    <div class="subSectionTitle"><h3>Getting Started</h3><span>→</span></div>
     <p>Explore all that Stacks.js has to offer</p>
   </a>
 </div>
