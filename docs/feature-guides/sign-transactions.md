@@ -2,7 +2,7 @@
 title: Sign Transactions
 ---
 
-import StacksjsStartersNote from '.../../includes/\_stacks.js-starters-note.mdx';
+import StacksjsStartersNote from '../../includes/\_stacks.js-starters-note.mdx';
 import StacksProviderSection from '../includes/\_stacks.js-provider-section.mdx';
 
 <StacksjsStartersNote/>
