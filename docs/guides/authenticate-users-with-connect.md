@@ -7,8 +7,6 @@ import StacksjsStartersNote from '../../includes/\_stacks.js-starters-note.mdx';
 
 <StacksjsStartersNote/>
 
----
-
 This guide explains how to connect to users' wallets and authenticate users with the [`@stacks/connect`](https://github.com/hirosystems/connect#readme) package of Stacks.js.
 
 ## Installing Dependency

@@ -1,13 +1,11 @@
 ---
 id: authenticate-users-with-connect
-title: Connecting Wallets & Authenticating
+title: Connecting Wallets
 ---
 
 import StacksjsStartersNote from '../../includes/\_stacks.js-starters-note.mdx';
 
 <StacksjsStartersNote/>
-
----
 
 This guide explains how to connect to users' wallets and authenticate users with the [`@stacks/connect`](https://github.com/hirosystems/connect#readme) package of Stacks.js.
 
@@ -42,10 +40,10 @@ The main thing to decide here is what permission scopes your app needs from the 
 
 Apps may request any of the following scopes:
 
-| Scope          | Definition                                                                      |
-| -------------- | ------------------------------------------------------------------------------- |
-| `store_write`  | Read and write data to the user's Gaia hub in an app-specific storage bucket.   |
-| `publish_data` | Publish data so other app users can discover and interact with the user. |
+| Scope          | Definition                                                                    |
+| -------------- | ----------------------------------------------------------------------------- |
+| `store_write`  | Read and write data to the user's Gaia hub in an app-specific storage bucket. |
+| `publish_data` | Publish data so other app users can discover and interact with the user.      |
 
 The default scopes are `['store_write']` if no `scopes` array is provided when initializing the `appConfig` object.
 
@@ -144,7 +142,7 @@ When a user chooses to authenticate an app, it sends the `authRequest` token to 
 
 When the authenticator receives the request, it generates an `authResponse` token for the app using an _ephemeral transit key_ . The ephemeral transit key is just used for the particular instance of the app, to sign the `authRequest`.
 
-The app stores the ephemeral transit key during request generation. The public portion of the transit key is passed in the `authRequest` token. The authenticator uses the public portion of the key to encrypt an _app private key_ ,  which is returned via the `authResponse`.
+The app stores the ephemeral transit key during request generation. The public portion of the transit key is passed in the `authRequest` token. The authenticator uses the public portion of the key to encrypt an _app private key_ , which is returned via the `authResponse`.
 
 The authenticator generates the app private key from the user's _identity address private key_ , and the app's domain. The app's private key serves three functions:
 

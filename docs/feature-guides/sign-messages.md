@@ -7,8 +7,6 @@ import StacksProviderSection from '../../includes/\_stacks.js-provider-section.m
 
 <StacksjsStartersNote/>
 
----
-
 This guide explains how to prompt users to sign a message. Messaging signing can be used to have a user prove they control a particular address or to have a user authorize a particular action in your app.
 
 When signing a message, a user will be prompted via a popup from their wallet of choice, showing the message you want them to sign.

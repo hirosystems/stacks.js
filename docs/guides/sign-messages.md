@@ -7,8 +7,6 @@ import StacksProviderSection from '../../includes/\_stacks.js-provider-section.m
 
 <StacksjsStartersNote/>
 
----
-
 This guide explains how to prompt users to sign a message.
 
 The user will be prompted a popup from the Hiro Wallet showing the message you would like them to sign.
