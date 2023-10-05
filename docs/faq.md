@@ -4,14 +4,11 @@ title: FAQs
 
 #### **What are Post Conditions?**
 
-- Any supplied post-conditions are always verified, regardless of "mode" (and abort the tx if any supplied PC evaluates to false).
-- The "mode" (allow/deny) only applies to any asset (stx/ft/nft) transfer that is not mentioned in the post-conditions (can be thought of as "ALLOW-additional-asset-transfer" or "DENY-additional-asset-transfer")
+In computer programming, a post-condition is a condition (or a predicate) that must always be true just after the execution of some section of code or after an operation. And on Stacks, transactions are secured by post-conditions. Thus, if a post-condition check fails on a Clarity smart contract then the entire transaction is reverted.
 
-Example: In deny mode, an additional asset transfer (not covered by PCs) will abort the tx. In deny mode without PCs a tx will only fail due to PCs if an asset is transferred.
+In addition, the Stacks blockchain supports an "allow" or "deny" mode for evaluating post-conditions: in "allow" mode, other asset transfers not covered by the post-conditions are permitted, but in "deny" mode, no other asset transfers are permitted besides those named in the post-conditions.
 
-Post-conditions are less a part of clarity (the language), but more a part of transactions.
-Users could send the otherwise-identical transaction (Example: contract-call, executing a function on the blockchain) with OR without different post-conditions, in allow OR deny mode.
-The PCs are managed by the user/wallet/app that's creating the tx; so they are a bit different from the other "safety" features of clarity (Example: asserts, try, https://book.clarity-lang.org/ch06-00-control-flow.html) 
+Post-conditions are defined by the user being different from others safety features available in the Clarity Programming Language like __asserts__ and __try__.
 
 #### **How to fix the regenerator-runtime?**
 
@@ -23,3 +20,4 @@ If using @stacks/connect with vite, rollup, svelte, or vue a package `regenerato
 
 BigInt’s work in all modern browsers, but some bundlers try to optimize them incorrectly. If you are targeting browsers that are too outdated, BigInts might fail.
 To solve this set your project `browserslist` to the following [package.json](https://github.com/hirosystems/stacks.js-starters/blob/efb93261b59494f4eb34a7cb5db5d82a84bd3b7c/templates/template-react/package.json#L34-L40)
+
