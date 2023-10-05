@@ -1,3 +1,7 @@
+---
+sidebar_label: Installing
+---
+
 # Installing Stacks.js Packages
 
 Stacks.js is separated into many smaller packages, which can be installed individually.

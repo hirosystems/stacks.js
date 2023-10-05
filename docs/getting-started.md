@@ -1,6 +1,8 @@
 ---
-title: Getting Started
+sidebar_label: Getting Started
 ---
+
+# Getting Started with Stacks.js
 
 import StacksjsStartersNote from '../includes/\_stacks.js-starters-note.mdx';
 

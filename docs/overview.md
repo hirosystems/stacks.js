@@ -1,5 +1,5 @@
 ---
-title: Overview
+sidebar_label: Overview
 ---
 
 # Stacks.js Overview

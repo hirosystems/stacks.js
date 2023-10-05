@@ -1,6 +1,8 @@
 ---
-title: FAQs
+sidebar_label: FAQs
 ---
+
+# Stacks.js FAQs
 
 #### What are Post Conditions? How do Post Conditions work?
 
