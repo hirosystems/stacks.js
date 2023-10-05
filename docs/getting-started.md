@@ -2,7 +2,7 @@
 title: Getting Started
 ---
 
-import StacksjsStartersNote from './includes/\_stacks.js-starters-note.mdx';
+import StacksjsStartersNote from '../includes/\_stacks.js-starters-note.mdx';
 
 <StacksjsStartersNote/>
 

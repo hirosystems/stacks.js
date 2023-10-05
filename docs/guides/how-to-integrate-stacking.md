@@ -2,7 +2,7 @@
 title: Integrating Stacking
 ---
 
-import StacksjsStartersNote from '../includes/\_stacks.js-starters-note.mdx';
+import StacksjsStartersNote from '.../../includes/\_stacks.js-starters-note.mdx';
 
 <StacksjsStartersNote/>
 

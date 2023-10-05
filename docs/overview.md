@@ -46,4 +46,4 @@ Developers can build simple scripts and tools intended for "offline" use.
 Users may use the Stacks.js CLI directly to send a transaction.
 Backends may need to automate signing without direct user interaction.
 In these cases, developers can use the same libraries used by Stacks wallets for account handling and transaction signing.
-[Read more](./packages.md)
+[Read more](./installing.md)
