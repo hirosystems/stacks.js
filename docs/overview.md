@@ -74,7 +74,7 @@ Below is a list of all Stacks.js libraries and a few JS libraries and helpers ma
 
 ## Development
 
-There is a main [Stacks.js monorepo](https://github.com/hirosystems/stacks.js) containing most of the packages, but there are a few others often als considered as a part of "Stacks.js".
+There is a main [Stacks.js monorepo](https://github.com/hirosystems/stacks.js) containing most of the packages, but a few others often also considered as a part of "Stacks.js".
 
 Are we missing anything?
 Feel free to open issues in the Github repositories.
