@@ -6,8 +6,8 @@ import {
   BitcoinNetwork,
   MagicBytes,
   OpCode,
+  REGTEST,
   SBTC_PEG_ADDRESS,
-  TESTNET,
   VSIZE_INPUT_P2WPKH,
 } from './constants';
 import {
@@ -41,7 +41,7 @@ export const buildSbtcDepositTx = buildSbtcDepositTxOpReturn; // default to OP R
  *
  */
 export function buildSbtcDepositTxOpReturn({
-  network = TESTNET, // default to testnet for developer release
+  network = REGTEST,
   amountSats,
   stacksAddress,
   pegAddress = SBTC_PEG_ADDRESS,
@@ -65,7 +65,7 @@ export function buildSbtcDepositTxOpReturn({
 }
 
 export async function sbtcDepositHelper({
-  network = TESTNET, // default to testnet for developer release
+  network = REGTEST,
   amountSats,
   stacksAddress,
   bitcoinChangeAddress,

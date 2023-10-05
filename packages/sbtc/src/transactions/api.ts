@@ -1,9 +1,9 @@
 import RpcClient from '@btc-helpers/rpc';
 import { RpcCallSpec } from '@btc-helpers/rpc/dist/callspec';
 import * as btc from '@scure/btc-signer';
-import { BufferCV, COINBASE_BYTES_LENGTH, Cl, SomeCV } from '@stacks/transactions';
-import { wrapLazyProxy } from './utils';
+import { BufferCV, Cl, SomeCV } from '@stacks/transactions';
 import { REGTEST } from './constants';
+import { wrapLazyProxy } from './utils';
 
 /** todo */
 // https://blockstream.info/api/address/1KFHE7w8BhaENAswwryaoccDb6qcT6DbYY/utxo

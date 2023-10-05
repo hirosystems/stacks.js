@@ -4,12 +4,6 @@ import { WALLET_01, getBitcoinAccount, getStacksAccount } from './testHelpers';
 
 const dev = new DevEnvHelper();
 
-test('get address', async () => {
-  const str = await dev.getSbtcPegAddress('ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.asset');
-
-  console.log('str', str);
-});
-
 test('deposit', async () => {
   const bitcoinAccount = await getBitcoinAccount(WALLET_01);
   const stacksAccount = await getStacksAccount(WALLET_01);
@@ -21,8 +15,12 @@ test('deposit', async () => {
   const utxos = await dev.fetchUtxos(bitcoinAccount.address);
   expect(utxos.length).toBeGreaterThan(0);
 
+  const pegAddress = await dev.getSbtcPegAddress('ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.asset');
+
   // Tx building (most simple interface) OR more simple: remove duplicate args and assume defaults
   const tx = await sbtcDepositHelper({
+    pegAddress, // sBTC contract emitted public key => tr btc address
+
     stacksAddress: stacksAccount.address,
     amountSats: 1_000,
 
