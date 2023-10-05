@@ -2,6 +2,8 @@
 sidebar_label: Installing
 ---
 
+import GithubLink from '../../src/components/GithubLink.tsx';
+
 # Installing Stacks.js Packages
 
 Stacks.js is separated into many smaller packages, which can be installed individually.
@@ -15,18 +17,49 @@ npm install @stacks/network
 
 ## Packages
 
-The most used packages are:
+<details>
+  <summary>Full list of available packages</summary>
 
-- [`@stacks/connect`](https://github.com/hirosystems/connect/tree/main/packages/connect) - Stacks Connect, for building Stacks-ready web applications
-- [`@stacks/network`](https://github.com/hirosystems/stacks.js/tree/main/packages/network) - Network configuration (used together with other packages)
-- [`@stacks/transactions`](https://github.com/hirosystems/stacks.js/tree/main/packages/transactions) - Transaction construction, serialization, Clarity helpers, and more
+### Connecting Wallets
+
+- [`@stacks/connect`](https://stacks.js.org/modules/_stacks_connect) <GithubLink href="https://github.com/hirosystems/connect/tree/main/packages/connect" title=""/> Connect web application to Stacks wallet browser extensions.
+
+### Stacks Primitives
+
+- [`@stacks/transactions`](https://stacks.js.org/modules/_stacks_transactions) <GithubLink href="https://github.com/hirosystems/stacks.js/tree/main/packages/transactions" title=""/> Construct, decode transactions and work with Clarity smart contracts on the Stacks blockchain.
+- [`@stacks/wallet-sdk`](https://stacks.js.org/modules/_stacks_wallet_sdk) <GithubLink href="https://github.com/hirosystems/stacks.js/tree/main/packages/wallet-sdk" title=""/> Library for building wallets, managing accounts, and handling keys for the Stacks blockchain.
+- [`@stacks/storage`](https://stacks.js.org/modules/_stacks_storage) <GithubLink href="https://github.com/hirosystems/stacks.js/tree/main/packages/storage" title=""/> Store and fetch files with Gaia, the decentralized storage system.
+- [`@stacks/encryption`](https://stacks.js.org/modules/_stacks_encryption) <GithubLink href="https://github.com/hirosystems/stacks.js/tree/main/packages/encryption" title=""/> Encryption functions used by stacks.js packages.
+- [`@stacks/auth`](https://stacks.js.org/modules/_stacks_auth) <GithubLink href="https://github.com/hirosystems/stacks.js/tree/main/packages/auth" title=""/> Construct and decode authentication requests for Stacks apps.
+- [`@stacks/profile`](https://stacks.js.org/modules/_stacks_profile) <GithubLink href="https://github.com/hirosystems/stacks.js/tree/main/packages/profile" title=""/> Functions for manipulating user profiles.
+- [`@stacks/network`](https://stacks.js.org/modules/_stacks_network) <GithubLink href="https://github.com/hirosystems/stacks.js/tree/main/packages/network" title=""/> Network and API library for working with Stacks blockchain nodes.
+- [`@stacks/common`](https://stacks.js.org/modules/_stacks_common) <GithubLink href="https://github.com/hirosystems/stacks.js/tree/main/packages/common" title=""/> Common utilities used by stacks.js packages.
+
+### Native Smart Contract Interaction
+
+- [`@stacks/bns`](https://stacks.js.org/modules/_stacks_bns) <GithubLink href="https://github.com/hirosystems/stacks.js/tree/main/packages/bns" title=""/> Library for interacting with the BNS contract.
+- [`@stacks/stacking`](https://stacks.js.org/modules/_stacks_stacking) <GithubLink href="https://github.com/hirosystems/stacks.js/tree/main/packages/stacking" title=""/> Library for PoX stacking.
+
+### Others
+
+- [`@stacks/cli`](/references/stacks-cli) Command line interface to interact with auth, storage, and Stacks transactions. <GithubLink href="https://github.com/hirosystems/stacks.js/tree/main/packages/cli" title=""/>
+- [`@stacks/blockchain-api-client`](https://hirosystems.github.io/stacks-blockchain-api/client/) Auto-generated REST and websocket API for all endpoints provided by the Stacks Blockchain API. [Github](https://github.com/hirosystems/stacks-blockchain-api/tree/master/client)
+- `@stacks/keychain` **DEPRECATED**: replaced by `@stacks/wallet-sdk`
+
+</details>
+
+The most commonly used packages are:
+
+- [`@stacks/connect`](https://connect.stacks.js.org/modules/_stacks_connect) — Stacks Connect, for building Stacks-ready web applications
+- [`@stacks/network`](https://stacks.js.org/modules/_stacks_network) — Network configuration (used together with other packages)
+- [`@stacks/transactions`](https://stacks.js.org/modules/_stacks_transactions) — Transaction construction, serialization, Clarity helpers, and more
 
 <div class="space-x-3 mb-4">
   <a class="bg-neutral-200 rounded-md text-sm text-neutral-700 px-2 py-1" href="https://stacks.js.org">Stacks.js Reference →</a>
   <a class="bg-neutral-200 rounded-md text-sm text-neutral-700 px-2 py-1" href="https://connst.stacks.js.org">Stacks Connect Reference →</a>
 </div>
 
-Visit the [Stacks.js monorepo](https://https://github.com/hirosystems/stacks.js) and the [Stacks Connect repo](https://github.com/hirosystems/connect) for a list of all available functionality.
+Most packages live in the [Stacks.js monorepo](https://https://github.com/hirosystems/stacks.js) or the [Stacks Connect monorepo](https://github.com/hirosystems/connect) on GitHub.
 
 <!-- todo: add github icon component -->
 
@@ -35,31 +68,6 @@ Visit the [Stacks.js monorepo](https://https://github.com/hirosystems/stacks.js)
 
 Below is a list of all Stacks.js libraries and a few JS libraries and helpers maintained by Hiro:
 
-### Connecting Wallets
-
-- [`@stacks/connect`](https://stacks.js.org/modules/_stacks_connect) Connect web application to Stacks wallet browser extensions. [Github](https://github.com/hirosystems/connect)
-
-### Stacks Primitives
-
-- [`@stacks/transactions`](https://stacks.js.org/modules/_stacks_transactions) Construct, decode transactions and work with Clarity smart contracts on the Stacks blockchain. [Github](https://github.com/hirosystems/stacks.js/tree/master/packages/transactions)
-- [`@stacks/wallet-sdk`](https://stacks.js.org/modules/_stacks_wallet_sdk) Library for building wallets, managing accounts, and handling keys for the Stacks blockchain. [Github](https://github.com/hirosystems/stacks.js/tree/master/packages/wallet-sdk)
-- [`@stacks/storage`](https://stacks.js.org/modules/_stacks_storage) Store and fetch files with Gaia, the decentralized storage system. [Github](https://github.com/hirosystems/stacks.js/tree/master/packages/storage)
-- [`@stacks/encryption`](https://stacks.js.org/modules/_stacks_encryption) Encryption functions used by stacks.js packages. [Github](https://github.com/hirosystems/stacks.js/tree/master/packages/encryption)
-- [`@stacks/auth`](https://stacks.js.org/modules/_stacks_auth) Construct and decode authentication requests for Stacks apps. [Github](https://github.com/hirosystems/stacks.js/tree/master/packages/auth)
-- [`@stacks/profile`](https://stacks.js.org/modules/_stacks_profile) Functions for manipulating user profiles. [Github](https://github.com/hirosystems/stacks.js/tree/master/packages/profile)
-- [`@stacks/network`](https://stacks.js.org/modules/_stacks_network) Network and API library for working with Stacks blockchain nodes. [Github](https://github.com/hirosystems/stacks.js/tree/master/packages/network)
-- [`@stacks/common`](https://stacks.js.org/modules/_stacks_common) Common utilities used by stacks.js packages. [Github](https://github.com/hirosystems/stacks.js/tree/master/packages/common)
-
-### Native Smart Contract Interaction
-
-- [`@stacks/bns`](https://stacks.js.org/modules/_stacks_bns) Library for interacting with the BNS contract. [Github](https://github.com/hirosystems/stacks.js/tree/master/packages/bns)
-- [`@stacks/stacking`](https://stacks.js.org/modules/_stacks_stacking) Library for PoX stacking. [Github](https://github.com/hirosystems/stacks.js/tree/master/packages/stacking)
-
-### Others
-
-- [`@stacks/cli`](/references/stacks-cli) Command line interface to interact with auth, storage, and Stacks transactions. [Github](https://github.com/hirosystems/stacks.js/tree/master/packages/cli)
-- [`@stacks/blockchain-api-client`](https://hirosystems.github.io/stacks-blockchain-api/client/) Auto-generated REST and websocket API for all endpoints provided by the Stacks Blockchain API. [Github](https://github.com/hirosystems/stacks-blockchain-api/tree/master/client)
-- `@stacks/keychain` _DEPRECATED: replaced by `@stacks/wallet-sdk`._
 
 ## Development
 

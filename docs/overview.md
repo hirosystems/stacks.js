@@ -5,9 +5,11 @@ sidebar_label: Overview
 # Stacks.js Overview
 
 <div class="space-x-3 mb-6">
-  <a class="bg-neutral-200 rounded-md text-sm text-neutral-700 px-2 py-1" href="https://stacks.js.org">Stacks.js Reference →</a>
-  <a class="bg-neutral-200 rounded-md text-sm text-neutral-700 px-2 py-1" href="https://connst.stacks.js.org">Stacks Connect Reference →</a>
-  <a class="bg-violet-300 rounded-md text-sm text-violet-800 px-2 py-1" href="https://discord.com/channels/621759717756370964/1022879438515486791">Discord channel #</a>
+  <a class="bg-neutral-200 hover:bg-neutral-100 rounded-md text-sm text-neutral-700 px-2 py-1 hover:text-neutral-700 hover:no-underline" href="https://stacks.js.org">Stacks.js Reference <span class="i-radix-icons-link-2 align-text-bottom text-lg"></span></a>
+  <a class="bg-neutral-200 hover:bg-neutral-100 rounded-md text-sm text-neutral-700 px-2 py-1" href="https://connst.stacks.js.org">Stacks Connect Reference <span class="i-radix-icons-link-2 align-text-bottom text-lg"></span></a>
+  <a class="bg-violet-300 rounded-md text-sm text-violet-800 px-2 py-1" href="https://discord.com/channels/621759717756370964/1022879438515486791">Discord Support <span class="i-bi-discord align-text-bottom text-lg"></span></a>
+  <a class="bg-cyan-300 rounded-md text-sm text-cyan-800 px-2 py-1" href="https://www.hiro.so/search?query=Stacks.js">Blogposts <span class="i-radix-icons-file-text align-text-bottom text-lg"></span></a>
+  <a class="bg-blue-300 rounded-md text-sm text-blue-800 px-2 py-1" href="https://www.youtube.com/watch?v=SGrbeoCSHs0">Videos <span class="i-bi-person-video align-text-bottom text-lg"></span></a>
 </div>
 
 Stacks.js is an SDK for building on the Stacks blockchain.
