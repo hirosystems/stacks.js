@@ -103,7 +103,7 @@ const tx = await makeSTXTokenTransfer({
 ```
 
 <!-- todo -->
-<!-- [Read more](./packages.md) about transaction signing with Stacks.js. -->
+<!-- [Read more](./installing.md) about transaction signing with Stacks.js. -->
 
 ## Anchor Mode / Block Type
 
