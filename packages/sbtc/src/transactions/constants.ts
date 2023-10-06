@@ -5,8 +5,9 @@ import * as btc from '@scure/btc-signer';
 export const SBTC_PEG_ADDRESS = 'bcrt1pjzju437r8ldynactcxcgvmaqhfafgsxemej8lm9czvkwka4ffhaqxpc5d2';
 
 export enum MagicBytes {
-  Mainnet = '5832',
-  Testnet = '5432',
+  Mainnet = 'X2',
+  Testnet = 'T2',
+  Regtest = 'id',
 }
 
 export enum OpCode {
@@ -26,6 +27,7 @@ export type BitcoinNetwork = {
   bip84: {
     coin: number;
   };
+  magicBytes: string;
 };
 
 export const MAINNET: BitcoinNetwork = {
@@ -37,6 +39,7 @@ export const MAINNET: BitcoinNetwork = {
   bip84: {
     coin: 0,
   },
+  magicBytes: MagicBytes.Mainnet,
 };
 
 export const TESTNET: BitcoinNetwork = {
@@ -48,9 +51,14 @@ export const TESTNET: BitcoinNetwork = {
   bip84: {
     coin: 1,
   },
+  magicBytes: MagicBytes.Testnet,
 };
 
-export const REGTEST: BitcoinNetwork = { ...TESTNET, bech32: 'bcrt' };
+export const REGTEST: BitcoinNetwork = {
+  ...TESTNET,
+  bech32: 'bcrt',
+  magicBytes: MagicBytes.Regtest,
+};
 
 // Estimates based on https://bitcoinops.org/en/tools/calc-size/
 export const OVERHEAD_TX = 4 + 1 + 1 + 4; // new btc.Transaction().vsize

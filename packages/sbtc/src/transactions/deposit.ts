@@ -1,5 +1,5 @@
 import * as btc from '@scure/btc-signer';
-import { hexToBytes } from '@stacks/common';
+import { asciiToBytes, hexToBytes } from '@stacks/common';
 import * as P from 'micro-packed';
 import { UtxoWithTx } from './api';
 import {
@@ -28,10 +28,10 @@ export function buildSBtcDepositBtcPayload({
   network: BitcoinNetwork;
   address: string;
 }): Uint8Array {
-  const magicBytes =
-    net.bech32 === 'tb' ? hexToBytes(MagicBytes.Testnet) : hexToBytes(MagicBytes.Mainnet);
+  const magicBytes = asciiToBytes(net.magicBytes);
   const opCodeBytes = hexToBytes(OpCode.PegIn);
-  return concat(magicBytes, opCodeBytes, stacksAddressBytes(address));
+  const principalTypeBytes = address.includes('.') ? hexToBytes('06') : hexToBytes('05');
+  return concat(magicBytes, opCodeBytes, principalTypeBytes, stacksAddressBytes(address));
 }
 
 /**  */

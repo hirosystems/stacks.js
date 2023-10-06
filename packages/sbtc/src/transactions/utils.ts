@@ -25,7 +25,7 @@ export function lengthPrefixedString(
   maxByteLength: number = 40,
   prefixByteLength: number = 1
 ): Uint8Array {
-  if (!something) return Uint8Array.from([0]); // empty or nullish (optional)
+  if (!something) return new Uint8Array(0); // empty or nullish (optional)
 
   const bytes = map(something);
   if (maxByteLength >= 0 && bytes.byteLength > maxByteLength)

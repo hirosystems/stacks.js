@@ -4,6 +4,7 @@ import * as btc from '@scure/btc-signer';
 import { BufferCV, Cl, SomeCV } from '@stacks/transactions';
 import { REGTEST } from './constants';
 import { wrapLazyProxy } from './utils';
+import { bytesToHex } from '@stacks/common';
 
 /** todo */
 // https://blockstream.info/api/address/1KFHE7w8BhaENAswwryaoccDb6qcT6DbYY/utxo
@@ -155,12 +156,15 @@ export class DevEnvHelper {
       }
     }
 
-    const utxos = unspent.map((u: any) => ({
-      txid: u.txid,
-      vout: u.vout,
-      value: Math.round(u.amount * 1e8), // Bitcoin to satoshis
-      confirmed: u.confirmations > 0,
-    }));
+    const utxos = unspent.map(
+      (u: any) =>
+        ({
+          txid: u.txid,
+          vout: u.vout,
+          value: Math.round(u.amount * 1e8), // Bitcoin to satoshis
+          status: { confirmed: u.confirmations > 0 },
+        }) as UtxoWithTx
+    );
 
     for (const u of utxos) {
       u.tx = await this.fetchTxHex(u.txid); // sequential, to soften the load on the work queue
@@ -170,7 +174,7 @@ export class DevEnvHelper {
   }
 
   async fetchTxHex(txid: string): Promise<string> {
-    return this.btcRpc.gettransaction({ txid }).then((tx: any) => tx.hex);
+    return await this.btcRpc.gettransaction({ txid }).then((tx: any) => tx.hex);
   }
 
   /**
@@ -188,11 +192,11 @@ export class DevEnvHelper {
   async estimateFeeRate(target: 'low' | 'medium' | 'high' | number): Promise<number> {
     switch (target) {
       case 'high':
-        return 1;
+        return 3;
       case 'medium':
         return 2;
       case 'low':
-        return 3;
+        return 1;
       default:
         return target;
     }
