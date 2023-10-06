@@ -42,9 +42,9 @@ npm install @stacks/network
 
 ### Others
 
-- [`@stacks/cli`](/references/stacks-cli) Command line interface to interact with auth, storage, and Stacks transactions. <GithubLink href="https://github.com/hirosystems/stacks.js/tree/main/packages/cli" title=""/>
-- [`@stacks/blockchain-api-client`](https://hirosystems.github.io/stacks-blockchain-api/client/) Auto-generated REST and websocket API for all endpoints provided by the Stacks Blockchain API. [Github](https://github.com/hirosystems/stacks-blockchain-api/tree/master/client)
-- `@stacks/keychain` **DEPRECATED**: replaced by `@stacks/wallet-sdk`
+- [`@stacks/cli`](/references/stacks-cli) <GithubLink href="https://github.com/hirosystems/stacks.js/tree/main/packages/cli" title=""/> Command line interface to interact with auth, storage, and Stacks transactions.
+- [`@stacks/blockchain-api-client`](https://hirosystems.github.io/stacks-blockchain-api/client/) <GithubLink href="https://github.com/hirosystems/stacks-blockchain-api/tree/master/client" title=""/> Auto-generated REST and websocket API for all endpoints provided by the Stacks Blockchain API.
+- `@stacks/keychain` **DEPRECATED**, replaced by `@stacks/wallet-sdk`
 
 </details>
 
@@ -53,13 +53,14 @@ The most commonly used packages are:
 - [`@stacks/connect`](https://connect.stacks.js.org/modules/_stacks_connect) — Stacks Connect, for building Stacks-ready web applications
 - [`@stacks/network`](https://stacks.js.org/modules/_stacks_network) — Network configuration (used together with other packages)
 - [`@stacks/transactions`](https://stacks.js.org/modules/_stacks_transactions) — Transaction construction, serialization, Clarity helpers, and more
+- [`@stacks/blockchain-api-client`](https://hirosystems.github.io/stacks-blockchain-api/client/) — Auto-generated API client (with websocket support) for all Stacks Blockchain API endpoints.
 
 <div class="space-x-3 mb-4">
   <a class="bg-neutral-200 rounded-md text-sm text-neutral-700 px-2 py-1" href="https://stacks.js.org">Stacks.js Reference →</a>
   <a class="bg-neutral-200 rounded-md text-sm text-neutral-700 px-2 py-1" href="https://connst.stacks.js.org">Stacks Connect Reference →</a>
 </div>
 
-Most packages live in the [Stacks.js monorepo](https://https://github.com/hirosystems/stacks.js) or the [Stacks Connect monorepo](https://github.com/hirosystems/connect) on GitHub.
+The source-code for most packages live in the [Stacks.js monorepo](https://https://github.com/hirosystems/stacks.js) or the [Stacks Connect monorepo](https://github.com/hirosystems/connect) on GitHub.
 
 <!-- todo: add github icon component -->
 
