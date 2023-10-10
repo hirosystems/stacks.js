@@ -305,7 +305,7 @@ export function wrapLazyProxy<
   return new Proxy(target, {
     get(obj, prop: string) {
       if (prop === key && obj[prop] === undefined) {
-        (obj as any)[prop] = Promise.resolve(resolution).catch(error => {
+        (obj as any)[prop] = Promise.resolve(resolution()).catch(error => {
           delete obj[prop];
           throw error;
         });
