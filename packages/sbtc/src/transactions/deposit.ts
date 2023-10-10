@@ -2,14 +2,7 @@ import * as btc from '@scure/btc-signer';
 import { asciiToBytes, hexToBytes } from '@stacks/common';
 import * as P from 'micro-packed';
 import { UtxoWithTx } from './api';
-import {
-  BitcoinNetwork,
-  MagicBytes,
-  OpCode,
-  REGTEST,
-  SBTC_PEG_ADDRESS,
-  VSIZE_INPUT_P2WPKH,
-} from './constants';
+import { BitcoinNetwork, OpCode, REGTEST, SBTC_PEG_ADDRESS, VSIZE_INPUT_P2WPKH } from './constants';
 import {
   DEFAULT_UTXO_TO_SPENDABLE,
   SpendableByScriptTypes,
@@ -22,13 +15,13 @@ import {
 const concat = P.concatBytes;
 
 export function buildSBtcDepositBtcPayload({
-  network: net,
+  network,
   address,
 }: {
   network: BitcoinNetwork;
   address: string;
 }): Uint8Array {
-  const magicBytes = asciiToBytes(net.magicBytes);
+  const magicBytes = asciiToBytes(network.magicBytes);
   const opCodeBytes = hexToBytes(OpCode.PegIn);
   const principalTypeBytes = address.includes('.') ? hexToBytes('06') : hexToBytes('05');
   return concat(magicBytes, opCodeBytes, principalTypeBytes, stacksAddressBytes(address));
@@ -54,7 +47,6 @@ export function buildSbtcDepositTxOpReturn({
   const data = buildSBtcDepositBtcPayload({ network, address: stacksAddress });
 
   const tx = new btc.Transaction({
-    // todo: disbale unknown
     allowUnknownInputs: true,
     allowUnknownOutputs: true,
   });
@@ -101,7 +93,7 @@ export async function sbtcDepositHelper({
   for (const input of pay.inputs) tx.addInput(input);
 
   const changeAfterAdditionalOutput =
-    BigInt(Math.ceil(VSIZE_INPUT_P2WPKH * feeRate)) - pay.changeSats;
+    pay.changeSats - BigInt(Math.ceil(VSIZE_INPUT_P2WPKH * feeRate));
   if (changeAfterAdditionalOutput > dustMinimum(VSIZE_INPUT_P2WPKH, feeRate)) {
     tx.addOutputAddress(bitcoinChangeAddress, changeAfterAdditionalOutput, network);
   }

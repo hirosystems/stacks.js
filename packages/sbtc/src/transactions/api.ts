@@ -1,10 +1,13 @@
 import RpcClient from '@btc-helpers/rpc';
 import { RpcCallSpec } from '@btc-helpers/rpc/dist/callspec';
 import * as btc from '@scure/btc-signer';
-import { BufferCV, Cl, SomeCV } from '@stacks/transactions';
+import { BufferCV, Cl, SomeCV, UIntCV, serializeCV } from '@stacks/transactions';
 import { REGTEST } from './constants';
 import { wrapLazyProxy } from './utils';
 import { bytesToHex } from '@stacks/common';
+import { c } from 'vitest/dist/reporters-5f784f42';
+import { ClarityType } from '@stacks/transactions';
+import { ClarityValue } from '@stacks/transactions';
 
 /** todo */
 // https://blockstream.info/api/address/1KFHE7w8BhaENAswwryaoccDb6qcT6DbYY/utxo
@@ -109,8 +112,8 @@ export class TestnetHelper {
 /** todo */
 export interface DevEnvConfig {
   bitcoinCoreRpcUrl: string;
-  bitcoinElectrumApiUrl: string; // electrs
-  bitcoinExplorerUrl: string; // explorer can access electrum
+  bitcoinElectrumApiUrl: string; // electrs? todo: do we need this?
+  mempoolExplorerUrl: string;
   stacksApiUrl: string;
   sbtcBridgeApiUrl: string;
 }
@@ -125,7 +128,7 @@ export class DevEnvHelper {
       {
         bitcoinCoreRpcUrl: 'http://devnet:devnet@127.0.0.1:18443',
         bitcoinElectrumApiUrl: 'http://127.0.0.1:60401',
-        bitcoinExplorerUrl: 'http://127.0.0.1:3002',
+        mempoolExplorerUrl: 'http://127.0.0.1:8083',
         stacksApiUrl: 'http://127.0.0.1:3999',
         sbtcBridgeApiUrl: 'http://127.0.0.1:3010',
       },
@@ -174,27 +177,28 @@ export class DevEnvHelper {
   }
 
   async fetchTxHex(txid: string): Promise<string> {
-    return await this.btcRpc.gettransaction({ txid }).then((tx: any) => tx.hex);
+    // todo: error handling?
+    return fetch(`${this.config.mempoolExplorerUrl}/api/tx/${txid}/hex`).then(res => res.text());
   }
 
   /**
    */
   async getBalance(address: string): Promise<number> {
     const addressInfo = await fetch(
-      `${this.config.bitcoinExplorerUrl}/api/address/${address}`
+      `${this.config.mempoolExplorerUrl}/api/address/${address}`
     ).then(r => r.json());
 
-    return addressInfo.txHistory.balanceSat;
+    return addressInfo.chain_stats.funded_txo_sum - addressInfo.chain_stats.spent_txo_sum;
   }
 
   // Fake impl for devenv
   // eslint-disable-next-line @typescript-eslint/require-await
-  async estimateFeeRate(target: 'low' | 'medium' | 'high' | number): Promise<number> {
+  async estimateFeeRate(target: 'low' | 'medium' | 'high' | number = 'medium'): Promise<number> {
     switch (target) {
       case 'high':
-        return 3;
+        return 1.4;
       case 'medium':
-        return 2;
+        return 1.2;
       case 'low':
         return 1;
       default:
@@ -216,9 +220,11 @@ export class DevEnvHelper {
     contractAddress: string;
     functionName: string;
     sender?: string;
-    args?: string[];
+    args?: ClarityValue[];
   }) {
     contractAddress = contractAddress.replace('.', '/');
+
+    const argsSerialized = args.map(serializeCV).map(bytesToHex);
 
     return await fetch(
       `${this.config.stacksApiUrl}/v2/contracts/call-read/${contractAddress}/${encodeURIComponent(
@@ -230,7 +236,7 @@ export class DevEnvHelper {
           Accept: 'application/json',
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ sender, arguments: args }),
+        body: JSON.stringify({ sender, arguments: argsSerialized }),
       }
     )
       .then(res => {
@@ -254,6 +260,24 @@ export class DevEnvHelper {
       // strip y byte
       pubkey: publicKey.length === 33 ? publicKey.subarray(1) : publicKey,
     });
+  }
+
+  async getSbtcBalance({
+    holderAddress,
+    sbtcContract,
+  }: {
+    holderAddress: string;
+    sbtcContract: string;
+  }) {
+    const [address, name] = holderAddress.split('.');
+
+    const balance = (await this.stacksCallReadOnly({
+      contractAddress: sbtcContract,
+      functionName: 'get-balance',
+      args: [name ? Cl.contractPrincipal(address, name) : Cl.standardPrincipal(address)],
+    })) as SomeCV<UIntCV>;
+
+    return balance?.value?.value ?? 0;
   }
 }
 

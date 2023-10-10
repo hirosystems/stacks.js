@@ -1,11 +1,13 @@
+import { bytesToHex } from '@stacks/common';
+import { BufferCV, SomeCV } from '@stacks/transactions';
 import { expect, test } from 'vitest';
-import { DevEnvHelper } from '../src';
-import { WALLET_01, getBitcoinAccount } from './testHelpers';
+import { DevEnvHelper, SBTC_FT_ADDRESS } from '../src';
+import { WALLET_00, WALLET_02, getBitcoinAccount, getStacksAccount } from './helpers/wallet';
 
 const dev = new DevEnvHelper();
 
 test('minting bitcoin increases balance', async () => {
-  const wallet = await getBitcoinAccount(WALLET_01);
+  const wallet = await getBitcoinAccount(WALLET_00, 1);
 
   const balance = await dev.getBalance(wallet.wpkh.address);
   console.log('balance', balance);
@@ -21,7 +23,7 @@ test('minting bitcoin increases balance', async () => {
 });
 
 test('fetch utxos', async () => {
-  const wallet = await getBitcoinAccount(WALLET_01);
+  const wallet = await getBitcoinAccount(WALLET_00);
 
   const unspent = await dev.fetchUtxos(wallet.wpkh.address);
 
@@ -31,10 +33,22 @@ test('fetch utxos', async () => {
   );
 });
 
-test('get balance', async () => {
-  const wallet = await getBitcoinAccount(WALLET_01);
+test('get btc balance', async () => {
+  const wallet = await getBitcoinAccount(WALLET_02, 2);
 
   const balance = await dev.getBalance(wallet.wpkh.address);
+  console.log('balance', balance);
+
+  expect(balance).toBeGreaterThan(0);
+});
+
+test('get sbtc balance', async () => {
+  const wallet = await getStacksAccount(WALLET_00, 1);
+
+  const balance = await dev.getSbtcBalance({
+    holderAddress: wallet.address,
+    sbtcContract: SBTC_FT_ADDRESS,
+  });
   console.log('balance', balance);
 
   expect(balance).toBeGreaterThan(0);
@@ -45,4 +59,23 @@ test('fee estimate', async () => {
   console.log('feeRate', feeRate);
 
   expect(feeRate).toBeGreaterThan(0);
+});
+
+test('peg address compare', async () => {
+  const pegAccount = await getBitcoinAccount(WALLET_00);
+  const pegPublicKeyA = bytesToHex(pegAccount.tr.publicKey);
+  const pegAddressA = pegAccount.tr.address;
+
+  const pegPublicKeyB = bytesToHex(
+    (
+      (await dev.stacksCallReadOnly({
+        contractAddress: `${SBTC_FT_ADDRESS}.asset`,
+        functionName: 'get-bitcoin-wallet-public-key',
+      })) as SomeCV<BufferCV>
+    ).value.buffer
+  );
+  const pegAddressB = await dev.getSbtcPegAddress(`${SBTC_FT_ADDRESS}.asset`);
+
+  expect(pegPublicKeyA).toEqual(pegPublicKeyB);
+  expect(pegAddressA).toEqual(pegAddressB);
 });

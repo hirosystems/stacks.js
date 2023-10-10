@@ -1,10 +1,16 @@
 import * as btc from '@scure/btc-signer';
-import { hexToBytes } from '@stacks/common';
+import { asciiToBytes, hexToBytes } from '@stacks/common';
 import * as P from 'micro-packed';
 import { UtxoWithTx } from './api';
-import { BitcoinNetwork, MagicBytes, OpCode, REGTEST, VSIZE_INPUT_P2WPKH } from './constants';
+import { BitcoinNetwork, OpCode, REGTEST, SBTC_PEG_ADDRESS, VSIZE_INPUT_P2WPKH } from './constants';
 
-import { SpendableByScriptTypes, dustMinimum, paymentInfo } from './utils';
+import {
+  DEFAULT_UTXO_TO_SPENDABLE,
+  SpendableByScriptTypes,
+  dustMinimum,
+  paymentInfo,
+  shUtxoToSpendable,
+} from './utils';
 
 const concat = P.concatBytes;
 
@@ -14,22 +20,41 @@ export async function sbtcWithdrawHelper({
   network = REGTEST,
   amountSats,
   signature,
+  fulfillmentFeeSats,
   bitcoinAddress,
   bitcoinChangeAddress,
+  pegAddress = SBTC_PEG_ADDRESS,
   feeRate,
   utxos,
-  utxoToSpendable,
+  utxoToSpendable = DEFAULT_UTXO_TO_SPENDABLE,
+  paymentPublicKey,
 }: {
   network?: BitcoinNetwork;
   amountSats: number;
   signature: string;
+  fulfillmentFeeSats: number;
+  /**
+   * Recipient address.
+   * ~(Will also be used as change address if `bitcoinChangeAddress` is not specified)~ todo
+   */
   bitcoinAddress: string;
-  bitcoinChangeAddress?: string;
+  bitcoinChangeAddress: string;
+  pegAddress?: string;
   feeRate: number;
   utxos: UtxoWithTx[];
-  utxoToSpendable: Partial<SpendableByScriptTypes>;
+  /**
+   * Tries to convert p2wpk and p2sh utxos to spendable inputs by default.
+   * To extend, add your own function that takes a {@link UtxoToSpendableOpts}
+   * and returns a {@link Spendable}.
+   */
+  utxoToSpendable?: Partial<SpendableByScriptTypes>;
+  paymentPublicKey?: string;
 }) {
-  bitcoinChangeAddress ??= bitcoinAddress;
+  // bitcoinChangeAddress ??= bitcoinAddress; // todo: maybe not expected
+
+  if (paymentPublicKey) {
+    utxoToSpendable.sh = shUtxoToSpendable.bind(null, network, paymentPublicKey);
+  }
 
   const tx = buildSbtcWithdrawTxOpReturn({
     network,
@@ -37,13 +62,14 @@ export async function sbtcWithdrawHelper({
     signature,
     bitcoinAddress,
   });
+  tx.addOutputAddress(pegAddress, BigInt(fulfillmentFeeSats), network);
 
   // we separate this part, since wallets could handle it themselves
   const pay = await paymentInfo({ tx, feeRate, utxos, utxoToSpendable });
   for (const input of pay.inputs) tx.addInput(input);
 
   const changeAfterAdditionalOutput =
-    BigInt(Math.ceil(VSIZE_INPUT_P2WPKH * feeRate)) - pay.changeSats;
+    pay.changeSats - BigInt(Math.ceil(VSIZE_INPUT_P2WPKH * feeRate));
   if (changeAfterAdditionalOutput > dustMinimum(VSIZE_INPUT_P2WPKH, feeRate)) {
     tx.addOutputAddress(bitcoinChangeAddress, changeAfterAdditionalOutput, network);
   }
@@ -67,7 +93,6 @@ export function buildSbtcWithdrawTxOpReturn({
   const data = buildSBtcWithdrawBtcPayload({ network, amountSats, signature });
 
   const tx = new btc.Transaction({
-    // todo: disbale unknown
     allowUnknownInputs: true,
     allowUnknownOutputs: true,
   });
@@ -78,18 +103,37 @@ export function buildSbtcWithdrawTxOpReturn({
 }
 
 export function buildSBtcWithdrawBtcPayload({
-  network: net,
+  network = REGTEST,
   amountSats,
   signature,
 }: {
-  network: BitcoinNetwork;
+  network?: BitcoinNetwork;
   amountSats: number;
   signature: string;
 }): Uint8Array {
-  const magicBytes =
-    net.bech32 === 'tb' ? hexToBytes(MagicBytes.Testnet) : hexToBytes(MagicBytes.Mainnet);
+  const magicBytes = asciiToBytes(network.magicBytes);
   const opCodeBytes = hexToBytes(OpCode.PegOut);
   const amountBytes = P.U64BE.encode(BigInt(amountSats));
-  const signatureBytes = hexToBytes(signature);
+  const signatureBytes = hexToBytes(signature.slice(signature.length - 2) + signature.slice(0, -2));
   return concat(magicBytes, opCodeBytes, amountBytes, signatureBytes);
+}
+
+export function sbtcWithdrawMessage({
+  network = REGTEST,
+  amountSats,
+  bitcoinAddress,
+}: {
+  network?: BitcoinNetwork;
+  amountSats: number;
+  bitcoinAddress: string;
+}): Uint8Array {
+  const amountBytes = P.U64BE.encode(BigInt(amountSats));
+  const scriptPub = btc.OutScript.encode(btc.Address(network).decode(bitcoinAddress));
+  const data = concat(amountBytes, scriptPub);
+  return data;
+
+  // length prefix is added by `encodeMessage`
+  // const lengthPrefixBytes = hexToBytes(data.byteLength.toString(8));
+  // // const lengthPrefixBytes = hexToBytes(intToHex(data.byteLength, 1)); // todo: why?! (compare lib)
+  // return concat(lengthPrefixBytes, data); // todo: refactor to length-prefix abstraction (combine with other existing helpers)
 }

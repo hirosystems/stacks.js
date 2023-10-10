@@ -4,49 +4,12 @@ import { UTXO, buildDepositTransaction } from 'sbtc-bridge-lib';
 import { expect, test } from 'vitest';
 import { bytesToHex } from '../../common/src';
 import { DevEnvHelper, sbtcDepositHelper } from '../src';
-import { WALLET_00, WALLET_01, getBitcoinAccount, getStacksAccount } from './testHelpers';
+import { WALLET_00, WALLET_01, getBitcoinAccount, getStacksAccount } from './helpers/wallet';
 
 const dev = new DevEnvHelper();
 
-test('deposit', async () => {
-  const bitcoinAccount = await getBitcoinAccount(WALLET_01);
-  const stacksAccount = await getStacksAccount(WALLET_01);
-  console.log('stacksAccount.address', stacksAccount.address);
-
-  const balance = await dev.getBalance(bitcoinAccount.wpkh.address);
-  expect(balance).toBeGreaterThan(0);
-
-  const utxos = await dev.fetchUtxos(bitcoinAccount.wpkh.address);
-  expect(utxos.length).toBeGreaterThan(0);
-
-  const pegAddress = await dev.getSbtcPegAddress('ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.asset');
-
-  // Tx building (most simple interface) OR more simple: remove duplicate args and assume defaults
-  const tx = await sbtcDepositHelper({
-    pegAddress, // sBTC contract emitted public key => tr btc address
-
-    stacksAddress: stacksAccount.address,
-    amountSats: 1_000,
-
-    feeRate: await dev.estimateFeeRate('low'),
-    utxos,
-
-    bitcoinChangeAddress: bitcoinAccount.wpkh.address,
-  });
-
-  tx.sign(bitcoinAccount.privateKey);
-  tx.finalize();
-
-  expect(tx).toBeDefined(); // yay, it didn't throw
-
-  // Tx broadcasting
-  const txid = await dev.broadcastTx(tx);
-  expect(txid).toBeDefined();
-  console.log('txid', txid);
-});
-
-test('deposit, tx compare, broadcast', async () => {
-  const bitcoinAccount = await getBitcoinAccount(WALLET_01);
+test('deposit, tx compare', async () => {
+  const bitcoinAccount = await getBitcoinAccount(WALLET_00);
   const stacksAccount = await getStacksAccount(WALLET_00, 1);
 
   const utxos = await dev.fetchUtxos(bitcoinAccount.wpkh.address);
@@ -93,6 +56,7 @@ test('deposit, tx compare, broadcast', async () => {
     utxos as UTXO[]
   );
 
+  // todo: fails right now (0 suffix)
   // expect(txStacksjs.getOutput(0)).toEqual(txLib.getOutput(0));
   // expect(txStacksjs.getOutput(1)).toEqual(txLib.getOutput(1));
 
@@ -105,6 +69,27 @@ test('deposit, tx compare, broadcast', async () => {
 
   expect(txStacksjs.getOutput(0)).toEqual(txCli.getOutput(0));
   expect(txStacksjs.getOutput(1)).toEqual(txCli.getOutput(1));
+});
+
+test('deposit, broadcast', async () => {
+  const bitcoinAccount = await getBitcoinAccount(WALLET_00);
+  const stacksAccount = await getStacksAccount(WALLET_00, 1);
+
+  const pegAccount = await getBitcoinAccount(WALLET_00);
+  const pegAddress = pegAccount.tr.address;
+
+  // Tx building
+  const txStacksjs = await sbtcDepositHelper({
+    pegAddress, // sBTC contract emitted public key => tr btc address
+
+    stacksAddress: stacksAccount.address,
+    amountSats: 1_000,
+
+    feeRate: await dev.estimateFeeRate('low'),
+    utxos: await dev.fetchUtxos(bitcoinAccount.wpkh.address),
+
+    bitcoinChangeAddress: bitcoinAccount.wpkh.address,
+  });
 
   txStacksjs.sign(bitcoinAccount.privateKey);
   txStacksjs.finalize();
@@ -112,16 +97,3 @@ test('deposit, tx compare, broadcast', async () => {
   const txid = await dev.broadcastTx(txStacksjs);
   console.log('txid', txid);
 });
-
-// api.broadcastTx(tx);
-
-// == Advanced =================================================================
-
-// const PEG_PUB_KEY = (
-//   await api.stacksCallReadOnly({
-//     contractAddress: "ST1R1061ZT6KPJXQ7PAXPFB6ZAZ6ZWW28G8HXK9G5.romeo-bridge",
-//     functionName: "get-bitcoin-wallet-public-key",
-//     sender: TARGET_STACKS_ADDRESS, // not actually used in call
-//   })
-// ).value.buffer;
-// const PEG_ADDRESS = btc.p2tr(PEG_PUB_KEY, undefined, btc.TEST_NETWORK).address;
