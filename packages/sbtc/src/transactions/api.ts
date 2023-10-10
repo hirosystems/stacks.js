@@ -1,4 +1,3 @@
-import { ProjectivePoint } from '@noble/secp256k1';
 import { HDKey } from '@scure/bip32';
 import * as bip39 from '@scure/bip39';
 import * as btc from '@scure/btc-signer';
@@ -13,7 +12,6 @@ import {
 
 import RpcClient from '@btc-helpers/rpc';
 import { RpcCallSpec } from '@btc-helpers/rpc/dist/callspec';
-import * as btc from '@scure/btc-signer';
 import { bytesToHex } from '@stacks/common';
 import { BufferCV, Cl, ClarityValue, SomeCV, UIntCV, serializeCV } from '@stacks/transactions';
 import { BitcoinNetwork, REGTEST, TESTNET } from './constants';

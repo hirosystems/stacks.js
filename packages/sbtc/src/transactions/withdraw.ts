@@ -14,8 +14,6 @@ import {
 
 const concat = P.concatBytes;
 
-const DUST = 500; // todo: double-check
-
 export async function sbtcWithdrawHelper({
   network = REGTEST,
   amountSats,
