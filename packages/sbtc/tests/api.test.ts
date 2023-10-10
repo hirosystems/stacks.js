@@ -1,13 +1,23 @@
 import { bytesToHex } from '@stacks/common';
 import { BufferCV, SomeCV } from '@stacks/transactions';
 import { expect, test } from 'vitest';
-import { DevEnvHelper, SBTC_FT_ADDRESS } from '../src';
-import { WALLET_00, WALLET_02, getBitcoinAccount, getStacksAccount } from './helpers/wallet';
+import {
+  DEFAULT_UTXO_TO_SPENDABLE,
+  DevEnvHelper,
+  SBTC_FT_ADDRESS,
+  TestnetHelper,
+  WALLET_00,
+  WALLET_01,
+  WALLET_02,
+  sleep,
+  utxoSelect,
+} from '../src';
 
 const dev = new DevEnvHelper();
+const tnet = new TestnetHelper();
 
 test('minting bitcoin increases balance', async () => {
-  const wallet = await getBitcoinAccount(WALLET_00);
+  const wallet = await dev.getBitcoinAccount(WALLET_01);
 
   const balance = await dev.getBalance(wallet.wpkh.address);
   console.log('balance', balance);
@@ -16,25 +26,47 @@ test('minting bitcoin increases balance', async () => {
     nblocks: 101, // more than 100 blocks, because coinbase txs mature after 100 blocks
     address: wallet.wpkh.address,
   });
+  await sleep(500);
 
   const balanceAfter = await dev.getBalance(wallet.wpkh.address);
-  expect(balanceAfter).toBeGreaterThan(balance);
   console.log('balanceAfter', balanceAfter);
+  expect(balanceAfter).toBeGreaterThan(balance);
 });
 
 test('fetch utxos', async () => {
-  const wallet = await getBitcoinAccount(WALLET_00);
+  const wallet = await dev.getBitcoinAccount(WALLET_00);
 
   const unspent = await dev.fetchUtxos(wallet.wpkh.address);
 
   expect(unspent.length).toBeGreaterThan(0);
-  expect(unspent[0]).toMatchObject(
-    expect.objectContaining({ txid: expect.any(String), tx: expect.any(String) })
-  );
+});
+
+test('testnet, fetch utxos', async () => {
+  const wallet = await tnet.getBitcoinAccount(WALLET_00);
+
+  const unspent = await tnet.fetchUtxos(wallet.wpkh.address);
+
+  expect(unspent.length).toBeGreaterThan(0);
+});
+
+test('reproduce, not enough funds', async () => {
+  const utxos = await tnet.fetchUtxos('tb1q3zl64vadtuh3vnsuhdgv6pm93n82ye8qc36c07');
+
+  const hex = await utxos[0].tx;
+  console.log('hex', hex);
+
+  const select = await utxoSelect({
+    feeRate: await tnet.estimateFeeRate('high'),
+    outputs: [],
+    utxos,
+    utxoToSpendable: DEFAULT_UTXO_TO_SPENDABLE,
+  });
+
+  expect(select).toBeDefined(); // did not throw
 });
 
 test('get btc balance', async () => {
-  const wallet = await getBitcoinAccount(WALLET_02, 2);
+  const wallet = await dev.getBitcoinAccount(WALLET_02);
 
   const balance = await dev.getBalance(wallet.wpkh.address);
   console.log('balance', balance);
@@ -43,7 +75,7 @@ test('get btc balance', async () => {
 });
 
 test('get sbtc balance', async () => {
-  const wallet = await getStacksAccount(WALLET_00, 1);
+  const wallet = await dev.getStacksAccount(WALLET_00, 1);
 
   const balance = await dev.getSbtcBalance({
     holderAddress: wallet.address,
@@ -62,7 +94,7 @@ test('fee estimate', async () => {
 });
 
 test('peg address compare', async () => {
-  const pegAccount = await getBitcoinAccount(WALLET_00);
+  const pegAccount = await dev.getBitcoinAccount(WALLET_00);
   const pegPublicKeyA = bytesToHex(pegAccount.tr.publicKey);
   const pegAddressA = pegAccount.tr.address;
 

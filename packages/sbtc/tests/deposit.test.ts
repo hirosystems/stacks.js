@@ -3,18 +3,17 @@ import { hexToBytes } from '@stacks/common';
 import { UTXO, buildDepositTransaction } from 'sbtc-bridge-lib';
 import { expect, test } from 'vitest';
 import { bytesToHex } from '../../common/src';
-import { DevEnvHelper, sbtcDepositHelper } from '../src';
-import { WALLET_00, WALLET_01, getBitcoinAccount, getStacksAccount } from './helpers/wallet';
+import { DevEnvHelper, WALLET_00, sbtcDepositHelper } from '../src';
 
 const dev = new DevEnvHelper();
 
 test('deposit, tx compare', async () => {
-  const bitcoinAccount = await getBitcoinAccount(WALLET_00);
-  const stacksAccount = await getStacksAccount(WALLET_00, 1);
+  const bitcoinAccount = await dev.getBitcoinAccount(WALLET_00);
+  const stacksAccount = await dev.getStacksAccount(WALLET_00, 1);
 
   const utxos = await dev.fetchUtxos(bitcoinAccount.wpkh.address);
 
-  const pegAccount = await getBitcoinAccount(WALLET_00);
+  const pegAccount = await dev.getBitcoinAccount(WALLET_00);
   const pegPublicKey = bytesToHex(pegAccount.tr.publicKey);
   const pegAddress = pegAccount.tr.address;
   // TODO: SHOULD THIS WORK INSTEAD? public key / address should be fetchable with little knowledge
@@ -72,10 +71,10 @@ test('deposit, tx compare', async () => {
 });
 
 test('deposit, broadcast', async () => {
-  const bitcoinAccount = await getBitcoinAccount(WALLET_00);
-  const stacksAccount = await getStacksAccount(WALLET_00, 1);
+  const bitcoinAccount = await dev.getBitcoinAccount(WALLET_00);
+  const stacksAccount = await dev.getStacksAccount(WALLET_00, 1);
 
-  const pegAccount = await getBitcoinAccount(WALLET_00);
+  const pegAccount = await dev.getBitcoinAccount(WALLET_00);
   const pegAddress = pegAccount.tr.address;
 
   // Tx building

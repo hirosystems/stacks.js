@@ -1,9 +1,22 @@
+import { ProjectivePoint } from '@noble/secp256k1';
+import { HDKey } from '@scure/bip32';
+import * as bip39 from '@scure/bip39';
+import * as btc from '@scure/btc-signer';
+import { TransactionVersion } from '@stacks/transactions';
+import {
+  DerivationType,
+  deriveAccount,
+  generateWallet,
+  getRootNode,
+  getStxAddress,
+} from '@stacks/wallet-sdk';
+
 import RpcClient from '@btc-helpers/rpc';
 import { RpcCallSpec } from '@btc-helpers/rpc/dist/callspec';
 import * as btc from '@scure/btc-signer';
 import { bytesToHex } from '@stacks/common';
 import { BufferCV, Cl, ClarityValue, SomeCV, UIntCV, serializeCV } from '@stacks/transactions';
-import { REGTEST } from './constants';
+import { BitcoinNetwork, REGTEST, TESTNET } from './constants';
 import { wrapLazyProxy } from './utils';
 
 /** todo */
@@ -15,6 +28,7 @@ export type BlockstreamUtxo = {
   value: number;
   status: {
     confirmed: boolean;
+    block_height: number;
   };
 };
 
@@ -34,10 +48,26 @@ export type BlockstreamFeeEstimates =
   { [K in | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | '10' | '11' | '12' | '13' | '14' | '15' | '16' | '17' | '18' | '19' | '20' | '21' | '22' | '23' | '24' | '25' | '144' | '504' | '1008']: number; };
 
 export class TestnetHelper {
+  config: Omit<Omit<UrlConfig, 'mempoolExplorerUrl'>, 'bitcoinCoreRpcUrl'>;
+
+  constructor(config?: Partial<UrlConfig>) {
+    this.config = Object.assign(
+      {
+        bitcoinElectrumApiUrl: 'https://blockstream.info/testnet/api',
+        stacksApiUrl: 'https://stacks-node-api.testnet.stacks.co',
+        sbtcBridgeApiUrl: 'http://127.0.0.1:3010', // todo
+      },
+      config
+    );
+  }
+
   async fetchUtxos(address: string): Promise<UtxoWithTx[]> {
     // todo: error handling?
-    return fetch(`https://blockstream.info/testnet/api/address/${address}/utxo`)
+    return fetch(`${this.config.bitcoinElectrumApiUrl}/address/${address}/utxo`)
       .then(res => res.json())
+      .then((utxos: BlockstreamUtxo[]) =>
+        utxos.sort((a, b) => a.status.block_height - b.status.block_height)
+      )
       .then((utxos: BlockstreamUtxo[]) =>
         utxos.map(u => wrapLazyProxy(u, 'tx', () => this.fetchTxHex(u.txid)))
       );
@@ -45,11 +75,11 @@ export class TestnetHelper {
 
   async fetchTxHex(txid: string): Promise<string> {
     // todo: error handling?
-    return fetch(`https://blockstream.info/testnet/api/tx/${txid}/hex`).then(res => res.text());
+    return fetch(`${this.config.bitcoinElectrumApiUrl}/tx/${txid}/hex`).then(res => res.text());
   }
 
   async estimateFeeRates(): Promise<BlockstreamFeeEstimates> {
-    return fetch(`https://blockstream.info/testnet/api/fee-estimates`).then(res => res.json());
+    return fetch(`${this.config.bitcoinElectrumApiUrl}/fee-estimates`).then(res => res.json());
   }
 
   async estimateFeeRate(target: 'low' | 'medium' | 'high' | number): Promise<number> {
@@ -70,7 +100,7 @@ export class TestnetHelper {
   }
 
   async broadcastTx(tx: btc.Transaction): Promise<string> {
-    return await fetch(`https://blockstream.info/testnet/api/tx`, {
+    return await fetch(`${this.config.bitcoinElectrumApiUrl}/tx`, {
       method: 'POST',
       body: tx.hex,
     }).then(res => res.text());
@@ -104,10 +134,18 @@ export class TestnetHelper {
       .then(res => res.json())
       .then(res => Cl.deserialize(res.result));
   }
+
+  async getBitcoinAccount(mnemonic: string, idx: number = 0) {
+    return await getBitcoinAccount(TESTNET, mnemonic, idx);
+  }
+
+  async getStacksAccount(mnemonic: string, idx: number = 0) {
+    return await getStacksAccount(TransactionVersion.Testnet, mnemonic, idx);
+  }
 }
 
 /** todo */
-export interface DevEnvConfig {
+export interface UrlConfig {
   bitcoinCoreRpcUrl: string;
   bitcoinElectrumApiUrl: string; // electrs? todo: do we need this?
   mempoolExplorerUrl: string;
@@ -117,14 +155,14 @@ export interface DevEnvConfig {
 
 // todo: rename to helper, and add wallets etc.
 export class DevEnvHelper {
-  config: DevEnvConfig;
+  config: UrlConfig;
   btcRpc: RpcClient & RpcCallSpec;
 
-  constructor(config?: Partial<DevEnvConfig>) {
+  constructor(config?: Partial<UrlConfig>) {
     this.config = Object.assign(
       {
         bitcoinCoreRpcUrl: 'http://devnet:devnet@127.0.0.1:18445',
-        bitcoinElectrumApiUrl: 'http://127.0.0.1:60401',
+        bitcoinElectrumApiUrl: 'http://127.0.0.1:3002',
         mempoolExplorerUrl: 'http://127.0.0.1:8083',
         stacksApiUrl: 'http://127.0.0.1:3999',
         sbtcBridgeApiUrl: 'http://127.0.0.1:3010',
@@ -141,36 +179,15 @@ export class DevEnvHelper {
    * @param address address or script hash of wallet to fetch utxos for
    */
   async fetchUtxos(address: string): Promise<UtxoWithTx[]> {
-    let unspent = await this.btcRpc.listunspent({
-      addresses: [address],
-    });
-
-    if (unspent?.length === 0) {
-      const addressInfo = await this.btcRpc.getaddressinfo({ address });
-      if (!addressInfo.iswatchonly) {
-        // only import if not already imported
-        await this.btcRpc.importaddress({ address, rescan: true });
-        unspent = await this.btcRpc.listunspent({
-          addresses: [address],
-        });
-      }
-    }
-
-    const utxos = unspent.map(
-      (u: any) =>
-        ({
-          txid: u.txid,
-          vout: u.vout,
-          value: Math.round(u.amount * 1e8), // Bitcoin to satoshis
-          status: { confirmed: u.confirmations > 0 },
-        }) as UtxoWithTx
-    );
-
-    for (const u of utxos) {
-      u.tx = await this.fetchTxHex(u.txid); // sequential, to soften the load on the work queue
-    }
-
-    return utxos;
+    // todo: error handling?
+    return fetch(`${this.config.bitcoinElectrumApiUrl}/address/${address}/utxo`)
+      .then(res => res.json())
+      .then((utxos: BlockstreamUtxo[]) =>
+        utxos.sort((a, b) => a.status.block_height - b.status.block_height)
+      )
+      .then((utxos: BlockstreamUtxo[]) =>
+        utxos.map(u => wrapLazyProxy(u, 'tx', () => this.fetchTxHex(u.txid)))
+      );
   }
 
   async fetchTxHex(txid: string): Promise<string> {
@@ -276,8 +293,75 @@ export class DevEnvHelper {
 
     return balance?.value?.value ?? 0;
   }
+
+  async getBitcoinAccount(mnemonic: string, idx: number = 0) {
+    return await getBitcoinAccount(REGTEST, mnemonic, idx);
+  }
+
+  async getStacksAccount(mnemonic: string, idx: number = 0) {
+    return await getStacksAccount(TransactionVersion.Testnet, mnemonic, idx);
+  }
 }
 
 export function sleep(ms: number) {
   return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+// == WALLET ===================================================================
+
+export const WALLET_00 =
+  'twice kind fence tip hidden tilt action fragile skin nothing glory cousin green tomorrow spring wrist shed math olympic multiply hip blue scout claw';
+export const WALLET_01 =
+  'sell invite acquire kitten bamboo drastic jelly vivid peace spawn twice guilt pave pen trash pretty park cube fragile unaware remain midnight betray rebuild';
+export const WALLET_02 =
+  'hold excess usual excess ring elephant install account glad dry fragile donkey gaze humble truck breeze nation gasp vacuum limb head keep delay hospital';
+
+export async function getBitcoinAccount(
+  network: BitcoinNetwork,
+  mnemonic: string,
+  idx: number = 0
+) {
+  const seed = await bip39.mnemonicToSeed(mnemonic);
+  const hdkey = HDKey.fromMasterSeed(seed, network.bip32);
+
+  const path = `m/84'/${network.bip84.coin}'/${idx}'/0/0`;
+  const privateKey = hdkey.derive(path).privateKey!;
+  const publicKey = hdkey.derive(path).publicKey!;
+
+  const trPath = `m/86'/${network.bip84.coin}'/${idx}'/0/0`;
+  const trPrivateKey = hdkey.derive(trPath).privateKey!;
+  const trPublicKey = hdkey.derive(trPath).publicKey!; // not sure if this should be used, but this is what the CLI returns
+
+  return {
+    privateKey,
+    publicKey,
+    wpkh: { address: btc.getAddress('wpkh', privateKey, network)! },
+    tr: {
+      address: btc.getAddress('tr', trPrivateKey, network)!,
+      publicKey: trPublicKey,
+    },
+  };
+}
+
+export async function getStacksAccount(
+  transactionVersion: TransactionVersion,
+  mnemonic: string,
+  idx: number = 0
+) {
+  const wallet = await generateWallet({
+    secretKey: mnemonic,
+    password: '',
+  });
+
+  const account = deriveAccount({
+    rootNode: getRootNode(wallet),
+    index: idx,
+    salt: wallet.salt,
+    stxDerivationType: DerivationType.Wallet,
+  });
+
+  return {
+    ...account,
+    address: getStxAddress({ account, transactionVersion }),
+  };
 }

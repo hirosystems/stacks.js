@@ -97,7 +97,7 @@ export function buildSbtcWithdrawTxOpReturn({
     allowUnknownOutputs: true,
   });
   tx.addOutput({ script: btc.Script.encode(['RETURN', data]), amount: BigInt(0) });
-  tx.addOutputAddress(bitcoinAddress, BigInt(DUST), network);
+  tx.addOutputAddress(bitcoinAddress, BigInt(amountSats), network);
 
   return tx;
 }
