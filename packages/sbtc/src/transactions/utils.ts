@@ -226,7 +226,7 @@ export async function utxoSelect({
         return { inputs, totalSats: inputRunning, changeSats };
       }
     } catch (e) {
-      console.warn(`Failed to make UTXO spendable; txid: ${utxo.txid}\n${e}`);
+      console.warn(`Failed to make UTXO spendable; txid: ${utxo.txid}\n`, e);
       continue; // skip if utxo is not spendable
     }
   }
