@@ -155,7 +155,7 @@ export function shUtxoToSpendable(
 
       // wrapped witness script
       if (i < 3) {
-        const input = {
+        const input: btc.TransactionInput = {
           txid: hexToBytes(opts.utxo.txid),
           index: opts.utxo.vout,
           witnessUtxo: {
@@ -173,7 +173,7 @@ export function shUtxoToSpendable(
         index: opts.utxo.vout,
         nonWitnessUtxo: opts.txHex,
         redeemScript: p2shRet.redeemScript,
-      };
+      } as unknown as btc.TransactionInput; // todo: something wrong with types here?
       new btc.Transaction().addInput(input);
       return { input, vsize: p2shRet.script?.byteLength ?? 0 };
     } catch (e) {}
@@ -254,6 +254,7 @@ export async function switchUtxoToSpendable(
 
     return await fn({
       tx,
+      txHex: hex,
       utxo,
       output: outputToSpend,
       spendScript,

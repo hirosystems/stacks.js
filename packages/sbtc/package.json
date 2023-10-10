@@ -1,5 +1,5 @@
 {
-  "name": "@stacks/sbtc-developer-release",
+  "name": "sbtc",
   "version": "0.1.0",
   "description": "Library for sBTC.",
   "license": "MIT",

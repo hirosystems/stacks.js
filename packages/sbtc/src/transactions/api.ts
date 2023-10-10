@@ -1,13 +1,10 @@
 import RpcClient from '@btc-helpers/rpc';
 import { RpcCallSpec } from '@btc-helpers/rpc/dist/callspec';
 import * as btc from '@scure/btc-signer';
-import { BufferCV, Cl, SomeCV, UIntCV, serializeCV } from '@stacks/transactions';
+import { bytesToHex } from '@stacks/common';
+import { BufferCV, Cl, ClarityValue, SomeCV, UIntCV, serializeCV } from '@stacks/transactions';
 import { REGTEST } from './constants';
 import { wrapLazyProxy } from './utils';
-import { bytesToHex } from '@stacks/common';
-import { c } from 'vitest/dist/reporters-5f784f42';
-import { ClarityType } from '@stacks/transactions';
-import { ClarityValue } from '@stacks/transactions';
 
 /** todo */
 // https://blockstream.info/api/address/1KFHE7w8BhaENAswwryaoccDb6qcT6DbYY/utxo
