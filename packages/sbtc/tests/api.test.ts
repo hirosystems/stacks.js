@@ -7,7 +7,7 @@ import { WALLET_00, WALLET_02, getBitcoinAccount, getStacksAccount } from './hel
 const dev = new DevEnvHelper();
 
 test('minting bitcoin increases balance', async () => {
-  const wallet = await getBitcoinAccount(WALLET_00, 1);
+  const wallet = await getBitcoinAccount(WALLET_00);
 
   const balance = await dev.getBalance(wallet.wpkh.address);
   console.log('balance', balance);

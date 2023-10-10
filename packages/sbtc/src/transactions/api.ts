@@ -123,7 +123,7 @@ export class DevEnvHelper {
   constructor(config?: Partial<DevEnvConfig>) {
     this.config = Object.assign(
       {
-        bitcoinCoreRpcUrl: 'http://devnet:devnet@127.0.0.1:18443',
+        bitcoinCoreRpcUrl: 'http://devnet:devnet@127.0.0.1:18445',
         bitcoinElectrumApiUrl: 'http://127.0.0.1:60401',
         mempoolExplorerUrl: 'http://127.0.0.1:8083',
         stacksApiUrl: 'http://127.0.0.1:3999',
