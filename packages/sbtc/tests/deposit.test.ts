@@ -70,7 +70,7 @@ test('deposit, tx compare', async () => {
   expect(txStacksjs.getOutput(1)).toEqual(txCli.getOutput(1));
 });
 
-test('deposit, broadcast', async () => {
+test('btc tx, deposit to sbtc, broadcast', async () => {
   const bitcoinAccount = await dev.getBitcoinAccount(WALLET_00);
   const stacksAccount = await dev.getStacksAccount(WALLET_00, 1);
 
@@ -90,6 +90,7 @@ test('deposit, broadcast', async () => {
     bitcoinChangeAddress: bitcoinAccount.wpkh.address,
   });
 
+  // Instead we could PSBT and sign via extension wallet
   txStacksjs.sign(bitcoinAccount.privateKey);
   txStacksjs.finalize();
 

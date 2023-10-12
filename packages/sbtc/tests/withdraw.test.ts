@@ -1,4 +1,4 @@
-import { bytesToHex } from '@stacks/common';
+import { bytesToHex, hexToBytes } from '@stacks/common';
 import { hashMessage } from '@stacks/encryption';
 import { createStacksPrivateKey, signMessageHashRsv } from '@stacks/transactions';
 import { test } from 'vitest';
@@ -14,9 +14,9 @@ import {
 
 const dev = new DevEnvHelper();
 
-test('withdraw, tx compare', async () => {
-  const bitcoinAccountA = await dev.getBitcoinAccount(WALLET_01);
-  // const bitcoinAccountB = await dev.getBitcoinAccount(WALLET_02);
+test('btc tx, withdraw from sbtc, tx compare, broadcast', async () => {
+  const bitcoinAccountA = await dev.getBitcoinAccount(WALLET_00);
+  const bitcoinAccountB = await dev.getBitcoinAccount(WALLET_00, 1); // recipient can be anybody
   const stacksAccount = await dev.getStacksAccount(WALLET_00, 1);
 
   const pegAccount = await dev.getBitcoinAccount(WALLET_00);
@@ -25,12 +25,12 @@ test('withdraw, tx compare', async () => {
   // Tx prerequisites
   const message = sbtcWithdrawMessage({
     amountSats: 1_000,
-    bitcoinAddress: bitcoinAccountA.wpkh.address,
+    bitcoinAddress: bitcoinAccountB.wpkh.address, // payout recipient
   });
 
   // - A browser extension could do this step
   const signature = signMessageHashRsv({
-    messageHash: bytesToHex(hashMessage(message)),
+    messageHash: bytesToHex(hashMessage(hexToBytes(message))),
     privateKey: createStacksPrivateKey(stacksAccount.stxPrivateKey),
   }).data;
 
@@ -39,21 +39,21 @@ test('withdraw, tx compare', async () => {
   // Tx building
   const txStacksjs = await sbtcWithdrawHelper({
     network: { ...REGTEST, magicBytes: MagicBytes.Testnet }, // CLI uses TESTNET for some reason
+    pegAddress,
 
     amountSats: 1_000,
-    bitcoinAddress: bitcoinAccountA.wpkh.address, // payout recipient
-    bitcoinChangeAddress: bitcoinAccountA.wpkh.address, // tx sender
-
+    bitcoinAddress: bitcoinAccountB.wpkh.address, // payout recipient
     signature,
 
-    pegAddress,
-    fulfillmentFeeSats: 2_000,
+    fulfillmentFeeSats: 2_000, // fee for signers?
 
     feeRate: await dev.estimateFeeRate('low'),
     utxos: await dev.fetchUtxos(bitcoinAccountA.wpkh.address),
+
+    bitcoinChangeAddress: bitcoinAccountA.wpkh.address, // tx sender
   });
 
-  txStacksjs.sign(bitcoinAccountA.privateKey);
+  txStacksjs.sign(bitcoinAccountA.privateKey); // same account as utxo (which are funding the tx)
   txStacksjs.finalize();
 
   // // CLI uses TESTNET magic bytes for some reason

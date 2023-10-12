@@ -45,6 +45,14 @@ export type BlockstreamFeeEstimates =
   // prettier-ignore
   { [K in | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | '10' | '11' | '12' | '13' | '14' | '15' | '16' | '17' | '18' | '19' | '20' | '21' | '22' | '23' | '24' | '25' | '144' | '504' | '1008']: number; };
 
+export interface UrlConfig {
+  bitcoinCoreRpcUrl: string;
+  bitcoinElectrumApiUrl: string;
+  mempoolExplorerUrl: string;
+  stacksApiUrl: string;
+  sbtcBridgeApiUrl: string;
+}
+
 export class TestnetHelper {
   config: Omit<Omit<UrlConfig, 'mempoolExplorerUrl'>, 'bitcoinCoreRpcUrl'>;
 
@@ -117,6 +125,7 @@ export class TestnetHelper {
   }) {
     contractAddress = contractAddress.replace('.', '/');
     return await fetch(
+      // todo abstract url
       `https://api.testnet.hiro.so/v2/contracts/call-read/${contractAddress}/${encodeURIComponent(
         functionName
       )}`,
@@ -142,15 +151,6 @@ export class TestnetHelper {
   }
 }
 
-/** todo */
-export interface UrlConfig {
-  bitcoinCoreRpcUrl: string;
-  bitcoinElectrumApiUrl: string; // electrs? todo: do we need this?
-  mempoolExplorerUrl: string;
-  stacksApiUrl: string;
-  sbtcBridgeApiUrl: string;
-}
-
 // todo: rename to helper, and add wallets etc.
 export class DevEnvHelper {
   config: UrlConfig;
@@ -159,7 +159,7 @@ export class DevEnvHelper {
   constructor(config?: Partial<UrlConfig>) {
     this.config = Object.assign(
       {
-        bitcoinCoreRpcUrl: 'http://devnet:devnet@127.0.0.1:18445',
+        bitcoinCoreRpcUrl: 'http://devnet:devnet@127.0.0.1:18433',
         bitcoinElectrumApiUrl: 'http://127.0.0.1:3002',
         mempoolExplorerUrl: 'http://127.0.0.1:8083',
         stacksApiUrl: 'http://127.0.0.1:3999',
@@ -219,7 +219,10 @@ export class DevEnvHelper {
   }
 
   async broadcastTx(tx: btc.Transaction): Promise<string> {
-    return await this.btcRpc.sendrawtransaction({ hexstring: tx.hex, maxfeerate: 1000 });
+    return await fetch(`${this.config.bitcoinElectrumApiUrl}/tx`, {
+      method: 'POST',
+      body: tx.hex,
+    }).then(res => res.text());
   }
 
   // todo abstract for both testnet and devenv classes
@@ -301,10 +304,6 @@ export class DevEnvHelper {
   }
 }
 
-export function sleep(ms: number) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
-
 // == WALLET ===================================================================
 
 export const WALLET_00 =
@@ -362,4 +361,8 @@ export async function getStacksAccount(
     ...account,
     address: getStxAddress({ account, transactionVersion }),
   };
+}
+
+export function sleep(ms: number) {
+  return new Promise(resolve => setTimeout(resolve, ms));
 }

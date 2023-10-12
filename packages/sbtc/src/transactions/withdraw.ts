@@ -1,5 +1,5 @@
 import * as btc from '@scure/btc-signer';
-import { asciiToBytes, hexToBytes } from '@stacks/common';
+import { asciiToBytes, bytesToHex, hexToBytes } from '@stacks/common';
 import * as P from 'micro-packed';
 import { UtxoWithTx } from './api';
 import { BitcoinNetwork, OpCode, REGTEST, SBTC_PEG_ADDRESS, VSIZE_INPUT_P2WPKH } from './constants';
@@ -124,11 +124,11 @@ export function sbtcWithdrawMessage({
   network?: BitcoinNetwork;
   amountSats: number;
   bitcoinAddress: string;
-}): Uint8Array {
+}): string {
   const amountBytes = P.U64BE.encode(BigInt(amountSats));
   const scriptPub = btc.OutScript.encode(btc.Address(network).decode(bitcoinAddress));
   const data = concat(amountBytes, scriptPub);
-  return data;
+  return bytesToHex(data);
 
   // length prefix is added by `encodeMessage`
   // const lengthPrefixBytes = hexToBytes(data.byteLength.toString(8));

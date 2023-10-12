@@ -17,7 +17,7 @@ const dev = new DevEnvHelper();
 const tnet = new TestnetHelper();
 
 test('minting bitcoin increases balance', async () => {
-  const wallet = await dev.getBitcoinAccount(WALLET_01);
+  const wallet = await dev.getBitcoinAccount(WALLET_00);
 
   const balance = await dev.getBalance(wallet.wpkh.address);
   console.log('balance', balance);
@@ -66,7 +66,7 @@ test('reproduce, not enough funds', async () => {
 });
 
 test('get btc balance', async () => {
-  const wallet = await dev.getBitcoinAccount(WALLET_02);
+  const wallet = await dev.getBitcoinAccount(WALLET_00, 1);
 
   const balance = await dev.getBalance(wallet.wpkh.address);
   console.log('balance', balance);
