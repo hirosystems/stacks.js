@@ -7,7 +7,6 @@ import {
   MagicBytes,
   REGTEST,
   WALLET_00,
-  WALLET_01,
   sbtcWithdrawHelper,
   sbtcWithdrawMessage,
 } from '../src';

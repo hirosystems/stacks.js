@@ -66,7 +66,7 @@ test('reproduce, not enough funds', async () => {
 });
 
 test('get btc balance', async () => {
-  const wallet = await dev.getBitcoinAccount(WALLET_00, 1);
+  const wallet = await dev.getBitcoinAccount(WALLET_00);
 
   const balance = await dev.getBalance(wallet.wpkh.address);
   console.log('balance', balance);

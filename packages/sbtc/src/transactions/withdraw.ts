@@ -112,7 +112,7 @@ export function buildSBtcWithdrawBtcPayload({
   const magicBytes = asciiToBytes(network.magicBytes);
   const opCodeBytes = hexToBytes(OpCode.PegOut);
   const amountBytes = P.U64BE.encode(BigInt(amountSats));
-  const signatureBytes = hexToBytes(signature.slice(signature.length - 2) + signature.slice(0, -2));
+  const signatureBytes = hexToBytes(signature.slice(signature.length - 2) + signature.slice(0, -2)); // todo: maybe auto-detectable?
   return concat(magicBytes, opCodeBytes, amountBytes, signatureBytes);
 }
 
@@ -126,12 +126,9 @@ export function sbtcWithdrawMessage({
   bitcoinAddress: string;
 }): string {
   const amountBytes = P.U64BE.encode(BigInt(amountSats));
-  const scriptPub = btc.OutScript.encode(btc.Address(network).decode(bitcoinAddress));
-  const data = concat(amountBytes, scriptPub);
-  return bytesToHex(data);
+  const scriptOut = btc.OutScript.encode(btc.Address(network).decode(bitcoinAddress));
+  const data = concat(amountBytes, scriptOut);
 
-  // length prefix is added by `encodeMessage`
-  // const lengthPrefixBytes = hexToBytes(data.byteLength.toString(8));
-  // // const lengthPrefixBytes = hexToBytes(intToHex(data.byteLength, 1)); // todo: why?! (compare lib)
-  // return concat(lengthPrefixBytes, data); // todo: refactor to length-prefix abstraction (combine with other existing helpers)
+  // prettier-ignore
+  return `Withdraw request for ${amountSats} satoshis to the bitcoin address ${bitcoinAddress} (${bytesToHex(data)})`;
 }
