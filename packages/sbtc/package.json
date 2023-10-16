@@ -36,7 +36,7 @@
     "@scure/bip39": "^1.2.1",
     "jest-fetch-mock": "^3.0.3",
     "rimraf": "^3.0.2",
-    "sbtc-bridge-lib": "^1.1.2",
+    "sbtc-bridge-lib": "latest",
     "vitest": "^0.34.6"
   },
   "sideEffects": false,

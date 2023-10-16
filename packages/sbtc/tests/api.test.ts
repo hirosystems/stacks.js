@@ -1,23 +1,14 @@
+import { base58 } from '@scure/base';
 import { bytesToHex } from '@stacks/common';
 import { BufferCV, SomeCV } from '@stacks/transactions';
 import { expect, test } from 'vitest';
-import {
-  DEFAULT_UTXO_TO_SPENDABLE,
-  DevEnvHelper,
-  SBTC_FT_ADDRESS,
-  TestnetHelper,
-  WALLET_00,
-  WALLET_01,
-  WALLET_02,
-  sleep,
-  utxoSelect,
-} from '../src';
+import { DevEnvHelper, SBTC_FT_ADDRESS, TestnetHelper, WALLET_00, sleep } from '../src';
 
 const dev = new DevEnvHelper();
 const tnet = new TestnetHelper();
 
 test('minting bitcoin increases balance', async () => {
-  const wallet = await dev.getBitcoinAccount(WALLET_00);
+  const wallet = await dev.getBitcoinAccount(WALLET_00, 1);
 
   const balance = await dev.getBalance(wallet.wpkh.address);
   console.log('balance', balance);
@@ -33,8 +24,8 @@ test('minting bitcoin increases balance', async () => {
   expect(balanceAfter).toBeGreaterThan(balance);
 });
 
-test('fetch utxos', async () => {
-  const wallet = await dev.getBitcoinAccount(WALLET_00);
+test('devenv, fetch utxos', async () => {
+  const wallet = await dev.getBitcoinAccount(WALLET_00, 1);
 
   const unspent = await dev.fetchUtxos(wallet.wpkh.address);
 
@@ -49,24 +40,8 @@ test('testnet, fetch utxos', async () => {
   expect(unspent.length).toBeGreaterThan(0);
 });
 
-test('reproduce, not enough funds', async () => {
-  const utxos = await tnet.fetchUtxos('tb1q3zl64vadtuh3vnsuhdgv6pm93n82ye8qc36c07');
-
-  const hex = await utxos[0].tx;
-  console.log('hex', hex);
-
-  const select = await utxoSelect({
-    feeRate: await tnet.estimateFeeRate('high'),
-    outputs: [],
-    utxos,
-    utxoToSpendable: DEFAULT_UTXO_TO_SPENDABLE,
-  });
-
-  expect(select).toBeDefined(); // did not throw
-});
-
 test('get btc balance', async () => {
-  const wallet = await dev.getBitcoinAccount(WALLET_00);
+  const wallet = await dev.getBitcoinAccount(WALLET_00, 1);
 
   const balance = await dev.getBalance(wallet.wpkh.address);
   console.log('balance', balance);
@@ -110,4 +85,14 @@ test('peg address compare', async () => {
 
   expect(pegPublicKeyA).toEqual(pegPublicKeyB);
   expect(pegAddressA).toEqual(pegAddressB);
+});
+
+test('bitcoin core rpc returns regtest privatekey wif in testnet format', async () => {
+  const address = await dev.btcRpc.getnewaddress();
+  expect(address.slice(0, 4)).toBe('bcrt'); // is regtest address
+
+  // 80 = mainnet
+  // ef = testnet
+  const wif = await dev.btcRpc.dumpprivkey({ address });
+  expect(bytesToHex(base58.decode(wif).slice(0, 1))).toBe('ef'); // regtest wif uses testnet prefix
 });
