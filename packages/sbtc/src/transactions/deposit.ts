@@ -1,8 +1,14 @@
 import * as btc from '@scure/btc-signer';
 import { asciiToBytes, hexToBytes } from '@stacks/common';
 import * as P from 'micro-packed';
-import { UtxoWithTx } from './api';
-import { BitcoinNetwork, OpCode, REGTEST, SBTC_PEG_ADDRESS, VSIZE_INPUT_P2WPKH } from './constants';
+import { UtxoWithTx } from '../api';
+import {
+  BitcoinNetwork,
+  OpCode,
+  REGTEST,
+  SBTC_PEG_ADDRESS_DEVENV,
+  VSIZE_INPUT_P2WPKH,
+} from '../constants';
 import {
   DEFAULT_UTXO_TO_SPENDABLE,
   SpendableByScriptTypes,
@@ -10,7 +16,7 @@ import {
   paymentInfo,
   shUtxoToSpendable,
   stacksAddressBytes,
-} from './utils';
+} from '../utils';
 
 const concat = P.concatBytes;
 
@@ -37,7 +43,7 @@ export function buildSbtcDepositTxOpReturn({
   network = REGTEST,
   amountSats,
   stacksAddress,
-  pegAddress = SBTC_PEG_ADDRESS,
+  pegAddress = SBTC_PEG_ADDRESS_DEVENV,
 }: {
   network?: BitcoinNetwork;
   amountSats: number;
@@ -64,7 +70,7 @@ export async function sbtcDepositHelper({
   feeRate,
   utxos,
   utxoToSpendable = DEFAULT_UTXO_TO_SPENDABLE,
-  pegAddress = SBTC_PEG_ADDRESS,
+  pegAddress = SBTC_PEG_ADDRESS_DEVENV,
   paymentPublicKey,
 }: {
   network?: BitcoinNetwork;

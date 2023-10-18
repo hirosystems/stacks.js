@@ -2,9 +2,12 @@ import * as btc from '@scure/btc-signer';
 
 // todo: auto-fetch or hardcode if final
 // or replace with testnet final address
-export const SBTC_PEG_ADDRESS = 'bcrt1pjzju437r8ldynactcxcgvmaqhfafgsxemej8lm9czvkwka4ffhaqxpc5d2';
+export const SBTC_PEG_ADDRESS_TESTNET = '--TODO--';
+export const SBTC_PEG_ADDRESS_DEVENV =
+  'bcrt1pte5zmd7qzj4hdu45lh9mmdm0nwq3z35pwnxmzkwld6y0a8g83nnqhj6vc0';
 
-export const SBTC_FT_ADDRESS = 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.asset';
+export const SBTC_FT_ADDRESS_TESTNET = 'ST3ACFZ2XKFPKAFD9YY92ZP0Y4QN6MTX3H20C27NY.asset';
+export const SBTC_FT_ADDRESS_DEVENV = 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.asset';
 
 export enum MagicBytes {
   Mainnet = 'X2',

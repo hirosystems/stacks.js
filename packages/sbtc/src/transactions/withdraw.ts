@@ -1,8 +1,14 @@
 import * as btc from '@scure/btc-signer';
 import { asciiToBytes, bytesToHex, hexToBytes } from '@stacks/common';
 import * as P from 'micro-packed';
-import { UtxoWithTx } from './api';
-import { BitcoinNetwork, OpCode, REGTEST, SBTC_PEG_ADDRESS, VSIZE_INPUT_P2WPKH } from './constants';
+import { UtxoWithTx } from '../api';
+import {
+  BitcoinNetwork,
+  OpCode,
+  REGTEST,
+  SBTC_PEG_ADDRESS_DEVENV,
+  VSIZE_INPUT_P2WPKH,
+} from '../constants';
 
 import {
   DEFAULT_UTXO_TO_SPENDABLE,
@@ -10,7 +16,7 @@ import {
   dustMinimum,
   paymentInfo,
   shUtxoToSpendable,
-} from './utils';
+} from '../utils';
 
 const concat = P.concatBytes;
 
@@ -21,7 +27,7 @@ export async function sbtcWithdrawHelper({
   fulfillmentFeeSats,
   bitcoinAddress,
   bitcoinChangeAddress,
-  pegAddress = SBTC_PEG_ADDRESS,
+  pegAddress = SBTC_PEG_ADDRESS_DEVENV,
   feeRate,
   utxos,
   utxoToSpendable = DEFAULT_UTXO_TO_SPENDABLE,
