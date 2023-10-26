@@ -84,12 +84,19 @@ import {
   pubKeyfromPrivKey,
   publicKeyToString,
 } from '../src/keys';
-import { TokenTransferPayload, createTokenTransferPayload, serializePayload } from '../src/payload';
+import {
+  TenureChangeCause,
+  TokenTransferPayload,
+  createTenureChangePayload,
+  createTokenTransferPayload,
+  deserializePayload,
+  serializePayload,
+} from '../src/payload';
 import { createAssetInfo } from '../src/postcondition-types';
 import { createTransactionAuthField } from '../src/signature';
 import { TransactionSigner } from '../src/signer';
 import { StacksTransaction, deserializeTransaction } from '../src/transaction';
-import { cloneDeep } from '../src/utils';
+import { cloneDeep, randomBytes } from '../src/utils';
 
 function setSignature(
   unsignedTransaction: StacksTransaction,
@@ -2283,4 +2290,39 @@ test('StacksTransaction serialize/deserialize equality with an invalid utf-8 byt
 
   expect(txDecoded.payload.memo.content).toContain('memo');
   expect(bytesToHex(utf8ToBytes(txDecoded.payload.memo.content))).toContain('efbfbd'); // javascript may replace invalid utf-8 with `efbfbd` (�) twice
+});
+
+describe('serialize/deserialize tenure change', () => {
+  test('transaction', () => {
+    // test vector generated with mockamoto node
+    const txBytes =
+      '808000000004000f873150e9790e305b701aa8c7b3bcff9e31a5f9000000000000000000000000000000000001d367da530b92f4984f537f0b903c330eb5158262afa08d67cbbdea6c8e2ecae06008248ac147fc34101d3cc207b1b3e386e0f53732b5548bd5abe1570c2271340302000000000755c9861be5cff984a20ce6d99d4aa65941412889bdc665094136429b84f8c2ee00000001000000000000000000000000000000000000000000000000000279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f817980000000000000000000000000000000000000000000000000000000000000000';
+    const transaction = deserializeTransaction(txBytes);
+
+    expect(transaction).toBeDefined();
+    expect(bytesToHex(transaction.serialize())).toEqual(txBytes);
+  });
+
+  test('payload', () => {
+    const previousTenureEnd = bytesToHex(randomBytes(32));
+    const previousTenureBlocks = 100;
+    const cause = TenureChangeCause.NullMiner;
+    const publicKeyHash = bytesToHex(randomBytes(20));
+    const signers = bytesToHex(randomBytes(21));
+    const signature = bytesToHex(randomBytes(65));
+
+    const payload = createTenureChangePayload(
+      previousTenureEnd,
+      previousTenureBlocks,
+      cause,
+      publicKeyHash,
+      signers,
+      signature
+    );
+
+    const serialized = serializePayload(payload);
+    const reader = new BytesReader(serialized);
+
+    expect(deserializePayload(reader)).toEqual(payload);
+  });
 });
