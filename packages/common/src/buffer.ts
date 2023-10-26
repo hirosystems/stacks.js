@@ -25,9 +25,10 @@ export function readUInt16BE(source: Uint8Array, offset: number): number {
 }
 
 /** @ignore */
-export function writeUInt16BE(source: Uint8Array, value: number, offset: number): void {
-  source[offset + 0] = value >>> 8;
-  source[offset + 1] = value >>> 0;
+export function writeUInt16BE(destination: Uint8Array, value: number, offset = 0): Uint8Array {
+  destination[offset + 0] = value >>> 8;
+  destination[offset + 1] = value >>> 0;
+  return destination;
 }
 
 // The following methods are based on `microsoft/vscode` implementation
@@ -49,8 +50,9 @@ export function readUInt8(source: Uint8Array, offset: number): number {
 }
 
 /** @ignore */
-export function writeUInt8(destination: Uint8Array, value: number, offset: number): void {
+export function writeUInt8(destination: Uint8Array, value: number, offset = 0): Uint8Array {
   destination[offset] = value;
+  return destination;
 }
 
 /** @ignore */
@@ -59,10 +61,11 @@ export function readUInt16LE(source: Uint8Array, offset: number): number {
 }
 
 /** @ignore */
-export function writeUInt16LE(destination: Uint8Array, value: number, offset: number): void {
+export function writeUInt16LE(destination: Uint8Array, value: number, offset = 0): Uint8Array {
   destination[offset + 0] = value & 0b1111_1111;
   value >>>= 8;
   destination[offset + 1] = value & 0b1111_1111;
+  return destination;
 }
 
 /** @ignore */
@@ -76,7 +79,7 @@ export function readUInt32BE(source: Uint8Array, offset: number): number {
 }
 
 /** @ignore */
-export function writeUInt32BE(destination: Uint8Array, value: number, offset: number): void {
+export function writeUInt32BE(destination: Uint8Array, value: number, offset = 0): Uint8Array {
   destination[offset + 3] = value;
   value >>>= 8;
   destination[offset + 2] = value;
@@ -84,6 +87,7 @@ export function writeUInt32BE(destination: Uint8Array, value: number, offset: nu
   destination[offset + 1] = value;
   value >>>= 8;
   destination[offset] = value;
+  return destination;
 }
 
 /** @ignore */
@@ -97,7 +101,7 @@ export function readUInt32LE(source: Uint8Array, offset: number): number {
 }
 
 /** @ignore */
-export function writeUInt32LE(destination: Uint8Array, value: number, offset: number): void {
+export function writeUInt32LE(destination: Uint8Array, value: number, offset = 0): Uint8Array {
   destination[offset + 0] = value & 0b1111_1111;
   value >>>= 8;
   destination[offset + 1] = value & 0b1111_1111;
@@ -105,4 +109,5 @@ export function writeUInt32LE(destination: Uint8Array, value: number, offset: nu
   destination[offset + 2] = value & 0b1111_1111;
   value >>>= 8;
   destination[offset + 3] = value & 0b1111_1111;
+  return destination;
 }
