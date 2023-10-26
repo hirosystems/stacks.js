@@ -39,11 +39,12 @@ const decodedToken = verifyProfileToken(token, publicKey);
 ```typescript
 import { makeProfileZoneFile } from '@stacks/profile';
 
-const fileUrl = 'https://mq9.s3.amazonaws.com/naval.id/profile.json';
+const fileUrl = 'https://_example_.s3.amazonaws.com/naval.id/profile.json';
 const origin = 'naval.id';
 const zoneFile = makeProfileZoneFile(origin, fileUrl);
 // zoneFile contents
 ```
+
 ### Profile to token
 
 ```typescript
@@ -52,7 +53,7 @@ import { signProfileToken, verifyProfileToken, extractProfile } from '@stacks/pr
 // Token received after signin in browser using auth or connect
 const token = '<insert profile token here>';
 const profile = extractProfile(token);
-// warning: Do not expose your private key by hard coding in code. Use env variables to load private keys.  
+// warning: Do not expose your private key by hard coding in code. Use env variables to load private keys.
 const privateKey = '<private key>'; // process.env.privateKey
 const publicKey = '<public key>';
 

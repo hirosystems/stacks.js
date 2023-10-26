@@ -48,7 +48,7 @@ Below is a list of all Stacks.js libraries and a few JS libraries and helpers ma
 
 ### Connecting Wallets
 
-- [`@stacks/connect`](https://stacks.js.org/modules/_stacks_connect) Connect web application to Stacks wallet browser extensions. [Github](https://github.com/hirosystems/connect)
+- [`@stacks/connect`](https://connect.stacks.js.org/) Connect web application to Stacks wallet browser extensions. [Github](https://github.com/hirosystems/connect)
 
 ### Stacks Primitives
 
@@ -74,7 +74,7 @@ Below is a list of all Stacks.js libraries and a few JS libraries and helpers ma
 
 ## Development
 
-There is a main [Stacks.js monorepo](https://github.com/hirosystems/stacks.js) containing most of the packages, but there are a few others often als considered as a part of "Stacks.js".
+There is a main [Stacks.js monorepo](https://github.com/hirosystems/stacks.js) containing most of the packages, but a few others often also considered as a part of "Stacks.js".
 
 Are we missing anything?
 Feel free to open issues in the Github repositories.

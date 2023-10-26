@@ -19,7 +19,7 @@
   }, 
   "website": "https://angel.co/naval", 
   "pgp": {
-    "url": "https://s3.amazonaws.com/pk9/naval", 
+    "url": "https://s3.amazonaws.com/_example_/naval", 
     "fingerprint": "07354EDF5C6CF2572847840D8FA3F960B62B7C41"
   }, 
   "v": "0.2", 
@@ -28,7 +28,7 @@
   }, 
   "twitterUsername": "naval", 
   "graph": {
-    "url": "https://s3.amazonaws.com/grph/naval"
+    "url": "https://s3.amazonaws.com/_example_/naval"
   }, 
   "cover": {
     "url": "https://pbs.twimg.com/profile_banners/745273/1355705777/web_retina"
