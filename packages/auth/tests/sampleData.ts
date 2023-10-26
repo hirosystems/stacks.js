@@ -1,10 +1,10 @@
-import * as fs from 'fs'
+import * as fs from 'fs';
 
-const TEST_DATA_DIR = './tests/testData'
+const TEST_DATA_DIR = './tests/testData';
 
 export const sampleNameRecords = {
-  ryan: JSON.parse(fs.readFileSync(`${TEST_DATA_DIR}/name-records/ryan.json`, 'utf8'))
-}
+  ryan: JSON.parse(fs.readFileSync(`${TEST_DATA_DIR}/name-records/ryan.json`, 'utf8')),
+};
 
 export const sampleProfiles = {
   balloonDog: JSON.parse(fs.readFileSync(`${TEST_DATA_DIR}/profiles/balloonDog.json`, 'utf8')),
@@ -15,16 +15,16 @@ export const sampleProfiles = {
   navalLegacy: JSON.parse(fs.readFileSync(`${TEST_DATA_DIR}/profiles/naval-legacy.json`, 'utf8')),
   navalLegacyConvert: JSON.parse(
     fs.readFileSync(`${TEST_DATA_DIR}/profiles/naval-legacy-convert.json`, 'utf8')
-  )
-}
+  ),
+};
 
 export const sampleTokenFiles = {
   ryan_apr20: {
-    url: 'https://blockstack.s3.amazonaws.com/ryan_apr20.id',
-    body: JSON.parse(fs.readFileSync(`${TEST_DATA_DIR}/token-files/ryan_apr20.json`, 'utf8'))
+    url: 'https://_example_.s3.amazonaws.com/ryan_apr20.id',
+    body: JSON.parse(fs.readFileSync(`${TEST_DATA_DIR}/token-files/ryan_apr20.json`, 'utf8')),
   },
   ryan: {
-    url: 'https://blockstack.s3.amazonaws.com/ryan.id',
-    body: JSON.parse(fs.readFileSync(`${TEST_DATA_DIR}/token-files/ryan.json`, 'utf8'))
-  }
-}
+    url: 'https://_example_.s3.amazonaws.com/ryan.id',
+    body: JSON.parse(fs.readFileSync(`${TEST_DATA_DIR}/token-files/ryan.json`, 'utf8')),
+  },
+};
