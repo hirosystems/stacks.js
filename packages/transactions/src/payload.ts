@@ -1,4 +1,13 @@
-import { concatArray, IntegerType, intToBigInt, intToBytes, writeUInt32BE } from '@stacks/common';
+import {
+  bytesToHex,
+  concatArray,
+  hexToBytes,
+  IntegerType,
+  intToBigInt,
+  intToBytes,
+  writeUInt32BE,
+  writeUInt8,
+} from '@stacks/common';
 import { ClarityVersion, COINBASE_BYTES_LENGTH, PayloadType, StacksMessageType } from './constants';
 
 import { BytesReader } from './bytesReader';
@@ -23,7 +32,8 @@ export type Payload =
   | VersionedSmartContractPayload
   | PoisonPayload
   | CoinbasePayload
-  | CoinbasePayloadToAltRecipient;
+  | CoinbasePayloadToAltRecipient
+  | TenureChangePayload;
 
 export function isTokenTransferPayload(p: Payload): p is TokenTransferPayload {
   return p.payloadType === PayloadType.TokenTransfer;
@@ -56,7 +66,8 @@ export type PayloadInput =
   | VersionedSmartContractPayload
   | PoisonPayload
   | CoinbasePayload
-  | CoinbasePayloadToAltRecipient;
+  | CoinbasePayloadToAltRecipient
+  | TenureChangePayload;
 
 export function createTokenTransferPayload(
   recipient: string | PrincipalCV,
@@ -203,6 +214,52 @@ export function createCoinbasePayload(
   };
 }
 
+export enum TenureChangeCause {
+  /** A valid winning block-commit */
+  BlockFound = 0,
+  /** No winning block-commits */
+  NoBlockFound = 1,
+  /** A "null miner" won the block-commit */
+  NullMiner = 2,
+}
+
+export interface TenureChangePayload {
+  readonly type: StacksMessageType.Payload;
+  readonly payloadType: PayloadType.TenureChange;
+  /** Stacks block hash (hex string) */
+  readonly previousTenureEnd: string;
+  /** Number of blocks produced in the previous tenure */
+  readonly previousTenureBlocks: number;
+  /** Cause of change in mining tenure */
+  readonly cause: TenureChangeCause;
+  /** The public key hash of the current tenure (hex string) */
+  readonly publicKeyHash: string;
+  /** The bitmap of which Stackers signed (hex string) */
+  readonly signers: string;
+  /** The Schnorr signature from at least 70% of the Stackers (hex string) */
+  readonly signature: string;
+}
+
+export function createTenureChangePayload(
+  previousTenureEnd: string,
+  previousTenureBlocks: number,
+  cause: TenureChangeCause,
+  publicKeyHash: string,
+  signers: string,
+  signature: string
+): TenureChangePayload {
+  return {
+    type: StacksMessageType.Payload,
+    payloadType: PayloadType.TenureChange,
+    previousTenureEnd,
+    previousTenureBlocks,
+    cause,
+    publicKeyHash,
+    signers,
+    signature,
+  };
+}
+
 export function serializePayload(payload: PayloadInput): Uint8Array {
   const bytesArray = [];
   bytesArray.push(payload.payloadType);
@@ -242,6 +299,17 @@ export function serializePayload(payload: PayloadInput): Uint8Array {
     case PayloadType.CoinbaseToAltRecipient:
       bytesArray.push(payload.coinbaseBytes);
       bytesArray.push(serializeCV(payload.recipient));
+      break;
+    case PayloadType.TenureChange:
+      bytesArray.push(hexToBytes(payload.previousTenureEnd));
+      bytesArray.push(writeUInt32BE(new Uint8Array(4), payload.previousTenureBlocks));
+      bytesArray.push(writeUInt8(new Uint8Array(1), payload.cause));
+      bytesArray.push(hexToBytes(payload.publicKeyHash));
+      const signers = hexToBytes(payload.signers);
+      bytesArray.push(writeUInt32BE(new Uint8Array(4), signers.byteLength)); // signers length
+      bytesArray.push(signers);
+
+      bytesArray.push(hexToBytes(payload.signature));
       break;
   }
 
@@ -298,5 +366,23 @@ export function deserializePayload(bytesReader: BytesReader): Payload {
       const coinbaseToAltRecipientBuffer = bytesReader.readBytes(COINBASE_BYTES_LENGTH);
       const altRecipient = deserializeCV(bytesReader) as PrincipalCV;
       return createCoinbasePayload(coinbaseToAltRecipientBuffer, altRecipient);
+    case PayloadType.TenureChange:
+      const previousTenureEnd = bytesToHex(bytesReader.readBytes(32));
+      const previousTenureBlocks = bytesReader.readUInt32BE();
+      const cause = bytesReader.readUInt8Enum(TenureChangeCause, n => {
+        throw new Error(`Cannot recognize TenureChangeCause: ${n}`);
+      });
+      const publicKeyHash = bytesToHex(bytesReader.readBytes(20));
+      const signersLength = bytesReader.readUInt32BE();
+      const signers = bytesToHex(bytesReader.readBytes(signersLength));
+      const signature = bytesToHex(bytesReader.readBytes(65));
+      return createTenureChangePayload(
+        previousTenureEnd,
+        previousTenureBlocks,
+        cause,
+        publicKeyHash,
+        signers,
+        signature
+      );
   }
 }
