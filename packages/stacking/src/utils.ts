@@ -278,6 +278,7 @@ function _poxAddressToBtcAddress_ClarityValue(
   return _poxAddressToBtcAddress_Values(poxAddr.version, poxAddr.hashBytes, network);
 }
 
+// todo: docs for overloads
 export function poxAddressToBtcAddress(
   version: number,
   hashBytes: Uint8Array,

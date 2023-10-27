@@ -55,6 +55,7 @@ test('Length prefixed list serialization and deserialization', () => {
   expect(deserialized.values.length).toBe(addressList.length);
 
   for (let index = 0; index < addressList.length; index++) {
+    // todo: toString() doesn't make sense FIX
     expect(deserialized.values[index].toString()).toBe(addressList[index].toString());
   }
 });

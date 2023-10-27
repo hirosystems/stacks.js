@@ -32,6 +32,7 @@
       "packages/common",
       "packages/keychain",
       "packages/profile",
+      "packages/sbtc",
       "packages/storage",
       "packages/wallet-sdk"
     ],
