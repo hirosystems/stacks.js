@@ -67,7 +67,7 @@ Join our community and stay connected with the latest updates and discussions:
 
 - [Join our Discord community chat](https://discord.gg/ZQR6cyZC) to engage with other users, ask questions, and participate in discussions.
 
-- [Visit hiro.so](https://www.hiro.so/) for updates and subscribing to the mailing list.
+- [Visit hiro.so](https://www.hiro.so/) to stay updated and to join our mailing list.
 
 - Follow [Hiro on Twitter.](https://twitter.com/hirosystems)
 
