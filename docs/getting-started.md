@@ -8,7 +8,7 @@ import StacksjsStartersNote from './includes/\_stacks.js-starters-note.mdx';
 
 ---
 
-To introduce the different functionality offered by Stacks.js, we'll walk through a few examples and concepts important to building on the Stacks blockchain.
+To introduce the different functionalities offered by Stacks.js, we'll walk through a few examples and concepts important to building on the Stacks blockchain.
 
 ## Networks
 
