@@ -10,7 +10,7 @@ For installation instructions and usage guidelines, refer to the respective `REA
 
 ### Connecting Wallets
 
-- [`@stacks/connect`](https://github.com/hirosystems/connect) Connect web application to Stacks wallet browser extensions _(separate repo)_.
+- [`@stacks/connect`](https://github.com/hirosystems/connect) Connect web applications to Stacks wallet browser extensions _(separate repo)_.
 
 ### Stacks Primitives
 
@@ -49,7 +49,7 @@ If you encounter a bug or have a feature request, we encourage you to follow the
 1.  **Open a new issue:** If it hasn't been addressed, please [open a new issue](../../issues/new/choose). Choose the appropriate issue template and provide as much detail as possible, including steps to reproduce the bug or a clear description of the requested feature.
 1.  **Evaluation SLA:** Our team reads and evaluates all the issues and pull requests. We are available Monday to Friday and we make a best effort to respond within 7 business days.
 
-Please **do not** use the issue tracker for personal support requests or to ask for the status of a transaction. You'll find help at the [#support Discord channel](https://discord.gg/SK3DxdsP).
+Please **do not** use the issue tracker for personal support requests or to ask for the status of a transaction. You'll find help on the [#support Discord channel](https://discord.gg/SK3DxdsP).
 
 ## Contributing & Development
 
