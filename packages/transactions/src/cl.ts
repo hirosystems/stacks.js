@@ -59,6 +59,23 @@ export const int = intCV;
  * @see {@link serialize}, {@link deserialize}
  */
 export const uint = uintCV;
+
+/**
+ * `Cl.principal` — Creates a Clarity principal type, represented as a JS object
+ * @param address - A Stacks address (optionally with a contract name in the string)
+ *
+ * @example
+ * ```
+ * import { Cl } from '@stacks/transactions';
+ * Cl.principal('ST000000000000000000002AMW42H');
+ * Cl.principal('ST000000000000000000002AMW42H.asset');
+ * ```
+ * @see {@link serialize}, {@link deserialize}
+ */
+export function principal(address: string) {
+  const [addr, name] = address.split('.');
+  return name ? contractPrincipalCV(addr, name) : standardPrincipalCV(addr);
+}
 /**
  * `Cl.contractPrincipal` — Creates a Clarity contract `principal` type, represented as a JS object
  *
