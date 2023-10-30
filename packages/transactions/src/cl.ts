@@ -77,6 +77,21 @@ export function principal(address: string) {
   return name ? contractPrincipalCV(addr, name) : standardPrincipalCV(addr);
 }
 /**
+ * `Cl.address` — Creates a Clarity principal type, represented as a JS object
+ * @param address - A Stacks address (optionally with a contract name in the string)
+ *
+ * Alias for {@link principal | `Cl.principal`}
+ *
+ * @example
+ * ```
+ * import { Cl } from '@stacks/transactions';
+ * Cl.address('ST000000000000000000002AMW42H');
+ * Cl.address('ST000000000000000000002AMW42H.asset');
+ * ```
+ * @see {@link serialize}, {@link deserialize}
+ */
+export const address = principal;
+/**
  * `Cl.contractPrincipal` — Creates a Clarity contract `principal` type, represented as a JS object
  *
  * Alias for {@link contractPrincipalCV}
