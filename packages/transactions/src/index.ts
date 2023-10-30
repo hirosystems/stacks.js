@@ -22,7 +22,7 @@ export { BytesReader as BytesReader } from './bytesReader';
  * Cl.int(-100);
  *
  * Cl.standardPrincipal('STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6');
- * Cl.contractPrincipal('ST000000000000000000002AMW42H');
+ * Cl.contractPrincipal('ST000000000000000000002AMW42H', 'asset');
  *
  * Cl.list([Cl.int(100), Cl.int(200)]);
  *
