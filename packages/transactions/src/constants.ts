@@ -234,6 +234,7 @@ export enum AssetType {
 }
 
 // todo: refactor this, if only used in one place, just use a string
+/** @ignore */
 export enum TxRejectedReason {
   Serialization = 'Serialization',
   Deserialization = 'Deserialization',
