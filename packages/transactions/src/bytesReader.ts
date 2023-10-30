@@ -12,6 +12,7 @@ function createEnumChecker<T extends string, TEnumValue extends number>(enumVari
 const enumCheckFunctions = new Map<object, (value: number) => boolean>();
 
 /**
+ * @ignore
  * Type guard to check if a given value is a valid enum value.
  * @param enumVariable - Literal `enum` type.
  * @param value - A value to check against the enum's values.
@@ -41,6 +42,7 @@ export function isEnum<T extends string, TEnumValue extends number>(
   return isEnum(enumVariable, value);
 }
 
+/** @ignore */
 export class BytesReader {
   source: Uint8Array;
   consumed: number = 0;
