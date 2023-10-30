@@ -214,7 +214,12 @@ export function getErrorString(error: StackingErrors): string {
       return 'Stacker must be delegating and not be directly stacking';
   }
 }
-
+/**
+ * Converts a PoX address to a tuple (e.g. to be used in a Clarity contract call).
+ *
+ * @param poxAddress - The PoX bitcoin address to be converted.
+ * @returns The converted PoX address as a tuple of version and hashbytes.
+ */
 export function poxAddressToTuple(poxAddress: string) {
   const { version, data } = decodeBtcAddress(poxAddress);
   const versionBuff = bufferCV(bigIntToBytes(BigInt(version), 1));
@@ -278,11 +283,26 @@ function _poxAddressToBtcAddress_ClarityValue(
   return _poxAddressToBtcAddress_Values(poxAddr.version, poxAddr.hashBytes, network);
 }
 
+/**
+ * Converts a PoX address to a Bitcoin address.
+ *
+ * @param version - The version of the PoX address (as a single number, not a Uint8array).
+ * @param hashBytes - The hash bytes of the PoX address.
+ * @param network - The network the PoX address is on.
+ * @returns The corresponding Bitcoin address.
+ */
 export function poxAddressToBtcAddress(
   version: number,
   hashBytes: Uint8Array,
   network: StacksNetworkName
 ): string;
+/**
+ * Converts a PoX address to a Bitcoin address.
+ *
+ * @param poxAddrClarityValue - The clarity tuple of the PoX address (version and hashbytes).
+ * @param network - The network the PoX address is on.
+ * @returns The corresponding Bitcoin address.
+ */
 export function poxAddressToBtcAddress(
   poxAddrClarityValue: ClarityValue,
   network: StacksNetworkName
@@ -292,6 +312,7 @@ export function poxAddressToBtcAddress(...args: any[]): string {
   return _poxAddressToBtcAddress_ClarityValue(args[0], args[1]);
 }
 
+// todo: move unwrap to tx package and document
 export function unwrap<T extends ClarityValue>(optional: OptionalCV<T>) {
   if (optional.type === ClarityType.OptionalSome) return optional.value;
   if (optional.type === ClarityType.OptionalNone) return undefined;
@@ -312,6 +333,10 @@ export function ensurePox2Activated(operationInfo: PoxOperationInfo) {
     );
 }
 
+/**
+ * @internal
+ * Throws unless the given PoX address is a legacy address.
+ */
 export function ensureLegacyBtcAddressForPox1({
   contract,
   poxAddress,
