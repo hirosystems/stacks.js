@@ -1,5 +1,6 @@
 /**
- * Unsigned 32-bit integer
+ * The chain ID (unsigned 32-bit integer), used so transactions can't be replayed on other chains.
+ * Similar to the {@link TransactionVersion}.
  */
 export enum ChainID {
   Testnet = 0x80000000,
@@ -43,6 +44,10 @@ export function whenMessageType(messageType: StacksMessageType) {
   return <T>(messageTypeMap: WhenMessageTypeMap<T>): T => messageTypeMap[messageType];
 }
 
+/**
+ * The type of transaction (payload) that is being serialized.
+ * Used internally for serializing and deserializing transactions.
+ */
 export enum PayloadType {
   TokenTransfer = 0x00,
   SmartContract = 0x01,
@@ -53,6 +58,10 @@ export enum PayloadType {
   CoinbaseToAltRecipient = 0x05,
 }
 
+/**
+ * The version of Clarity used to deploy a smart contract.
+ * Most methods will default to the latest available version of Clarity.
+ */
 export enum ClarityVersion {
   Clarity1 = 1,
   Clarity2 = 2,
@@ -90,13 +99,17 @@ const AnchorModeMap = {
   [AnchorMode.Any]: AnchorMode.Any,
 };
 
+/** @ignore */
 export function anchorModeFromNameOrValue(mode: AnchorModeName | AnchorMode): AnchorMode {
-  if (mode in AnchorModeMap) {
-    return AnchorModeMap[mode];
-  }
+  if (mode in AnchorModeMap) return AnchorModeMap[mode];
   throw new Error(`Invalid anchor mode "${mode}", must be one of: ${AnchorModeNames.join(', ')}`);
 }
 
+/**
+ * The transaction version, used so transactions can't be replayed on other networks.
+ * Similar to the {@link ChainID}.
+ * Used internally for serializing and deserializing transactions.
+ */
 export enum TransactionVersion {
   Mainnet = 0x00,
   Testnet = 0x80,
@@ -104,19 +117,39 @@ export enum TransactionVersion {
 
 export const DEFAULT_TRANSACTION_VERSION = TransactionVersion.Mainnet;
 
+/**
+ * How to treat unspecified transfers of a transaction.
+ * Used for creating transactions.
+ *
+ * Post-conditions are **always** be validated by nodes, regardless of the {@link PostConditionMode}.
+ * `PostConditionMode.Allow` will allow additional (aka unspecified) transfers, while `PostConditionMode.Deny` will not.
+ */
 export enum PostConditionMode {
+  /** `Allow` — Allow unspecified transfers */
   Allow = 0x01,
+  /** `Deny` — Do not allow unspecified transfers */
   Deny = 0x02,
 }
 
+/**
+ * The type of asset a post-condition is referring to.
+ * Used for serializing post-conditions.
+ */
 export enum PostConditionType {
   STX = 0x00,
   Fungible = 0x01,
   NonFungible = 0x02,
 }
 
+/**
+ * The sponsorship mode of a transaction.
+ *
+ * Specifies whether a transaction is sponsored or not.
+ */
 export enum AuthType {
+  /** `Standard` (not sponsored) — The transaction is not sponsored. The sender will need to spend fees. */
   Standard = 0x04,
+  /** `Sponsored` — The transaction is sponsored. The sponsor will spend fees on behalf of the sender. */
   Sponsored = 0x05,
 }
 

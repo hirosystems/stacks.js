@@ -21,10 +21,10 @@ export enum TransactionVersion {
  * Typically not used in signing, but used for broadcasting to the P2P network.
  * It can also be used to determine the parent of a subnet.
  *
- * Attention:
- * For mainnet/testnet the v2/info response `.network_id` refers to the chain ID
- * For subnets the v2/info response `.network_id` refers to the peer network ID and the chain ID (they are the same for subnets)
- * The `.parent_network_id` refers to the actual peer network ID (of the parent) in both cases
+ * **Attention:**
+ * For mainnet/testnet the v2/info response `.network_id` refers to the chain ID.
+ * For subnets the v2/info response `.network_id` refers to the peer network ID and the chain ID (they are the same for subnets).
+ * The `.parent_network_id` refers to the actual peer network ID (of the parent) in both cases.
  */
 export enum PeerNetworkID {
   Mainnet = 0x17000000,
