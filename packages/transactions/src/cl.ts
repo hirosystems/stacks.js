@@ -83,7 +83,7 @@ export function principal(address: string) {
  * @example
  * ```
  * import { Cl } from '@stacks/transactions';
- * Cl.contractPrincipal('ST000000000000000000002AMW42H');
+ * Cl.contractPrincipal('ST000000000000000000002AMW42H', 'asset');
  * ```
  * @see {@link serialize}, {@link deserialize}
  */
