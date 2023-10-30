@@ -386,6 +386,9 @@ export function intToBigInt(value: IntegerType, signed: boolean): bigint {
   );
 }
 
+/**
+ * Adds a `0x` prefix to a string if it does not already have one.
+ */
 export function with0x(value: string): string {
   return value.startsWith('0x') ? value : `0x${value}`;
 }
