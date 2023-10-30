@@ -582,13 +582,6 @@ export function octetsToBytes(numbers: number[]) {
   return new Uint8Array(numbers);
 }
 
-/** @ignore */
-export function toBytes(data: Uint8Array | string): Uint8Array {
-  if (typeof data === 'string') return utf8ToBytes(data);
-  if (data instanceof Uint8Array) return data;
-  throw new TypeError(`Expected input type is (Uint8Array | string) but got (${typeof data})`);
-}
-
 /**
  * Concats Uint8Array-s into one; like `Buffer.concat([buf1, buf2])`
  * @example concatBytes(buf1, buf2)
