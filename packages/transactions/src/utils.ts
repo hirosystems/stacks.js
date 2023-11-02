@@ -29,6 +29,7 @@ export const rightPadHexToLength = (hexString: string, length: number): string =
 export const exceedsMaxLengthBytes = (string: string, maxLengthBytes: number): boolean =>
   string ? utf8ToBytes(string).length > maxLengthBytes : false;
 
+/** @ignore */
 export function cloneDeep<T>(obj: T): T {
   return lodashCloneDeep(obj);
 }
@@ -40,22 +41,30 @@ export function omit<T, K extends keyof any>(obj: T, prop: K): Omit<T, K> {
   return clone;
 }
 
-export const txidFromData = (data: Uint8Array): string => {
-  return bytesToHex(sha512_256(data));
-};
-
 export const hash160 = (input: Uint8Array): Uint8Array => {
   return ripemd160(sha256(input));
 };
 
+/** @deprecated renamed to {@link txidFromBytes} */
+export const txidFromData = (data: Uint8Array): string => {
+  return bytesToHex(sha512_256(data));
+};
+
+/**
+ * Computes the transaction ID of the bytes from a serialized transaction (or any other bytes using the same hash function).
+ */
+export const txidFromBytes = txidFromData;
+
 // Internally, the Stacks blockchain encodes address the same as Bitcoin
 // single-sig address (p2pkh)
+/** @ignore */
 export const hashP2PKH = (input: Uint8Array): string => {
   return bytesToHex(hash160(input));
 };
 
 // Internally, the Stacks blockchain encodes address the same as Bitcoin
 // single-sig address over p2sh (p2h-p2wpkh)
+/** @ignore */
 export const hashP2WPKH = (input: Uint8Array): string => {
   const keyHash = hash160(input);
   const redeemScript = concatBytes(new Uint8Array([0]), new Uint8Array([keyHash.length]), keyHash);
@@ -65,6 +74,7 @@ export const hashP2WPKH = (input: Uint8Array): string => {
 
 // Internally, the Stacks blockchain encodes address the same as Bitcoin
 // multi-sig address (p2sh)
+/** @ignore */
 export const hashP2SH = (numSigs: number, pubKeys: Uint8Array[]): string => {
   if (numSigs > 15 || pubKeys.length > 15) {
     throw Error('P2SH multisig address can only contain up to 15 public keys');
@@ -91,6 +101,7 @@ export const hashP2SH = (numSigs: number, pubKeys: Uint8Array[]): string => {
 
 // Internally, the Stacks blockchain encodes address the same as Bitcoin
 // multisig address over p2sh (p2sh-p2wsh)
+/** @ignore */
 export const hashP2WSH = (numSigs: number, pubKeys: Uint8Array[]): string => {
   if (numSigs > 15 || pubKeys.length > 15) {
     throw Error('P2WSH multisig address can only contain up to 15 public keys');

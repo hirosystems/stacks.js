@@ -386,6 +386,9 @@ export function intToBigInt(value: IntegerType, signed: boolean): bigint {
   );
 }
 
+/**
+ * Adds a `0x` prefix to a string if it does not already have one.
+ */
 export function with0x(value: string): string {
   return value.startsWith('0x') ? value : `0x${value}`;
 }
@@ -580,13 +583,6 @@ function isNotOctet(octet: number) {
 export function octetsToBytes(numbers: number[]) {
   if (numbers.some(isNotOctet)) throw new Error('Some values are invalid bytes.');
   return new Uint8Array(numbers);
-}
-
-/** @ignore */
-export function toBytes(data: Uint8Array | string): Uint8Array {
-  if (typeof data === 'string') return utf8ToBytes(data);
-  if (data instanceof Uint8Array) return data;
-  throw new TypeError(`Expected input type is (Uint8Array | string) but got (${typeof data})`);
 }
 
 /**

@@ -261,20 +261,20 @@ export class StacksTransaction {
 }
 
 /**
- * @param data Uint8Array or hex string
+ * @param tx hex string or bytes of serialized transaction
  */
-export function deserializeTransaction(data: BytesReader | Uint8Array | string) {
+export function deserializeTransaction(tx: string | Uint8Array | BytesReader) {
   let bytesReader: BytesReader;
-  if (typeof data === 'string') {
-    if (data.slice(0, 2).toLowerCase() === '0x') {
-      bytesReader = new BytesReader(hexToBytes(data.slice(2)));
+  if (typeof tx === 'string') {
+    if (tx.slice(0, 2).toLowerCase() === '0x') {
+      bytesReader = new BytesReader(hexToBytes(tx.slice(2)));
     } else {
-      bytesReader = new BytesReader(hexToBytes(data));
+      bytesReader = new BytesReader(hexToBytes(tx));
     }
-  } else if (data instanceof Uint8Array) {
-    bytesReader = new BytesReader(data);
+  } else if (tx instanceof Uint8Array) {
+    bytesReader = new BytesReader(tx);
   } else {
-    bytesReader = data;
+    bytesReader = tx;
   }
   const version = bytesReader.readUInt8Enum(TransactionVersion, n => {
     throw new Error(`Could not parse ${n} as TransactionVersion`);
