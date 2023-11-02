@@ -14,7 +14,7 @@ For installation instructions and usage guidelines, refer to the respective `REA
 
 ### Stacks Primitives
 
-- [`@stacks/transactions`](https://github.com/hirosystems/stacks.js/tree/main/packages/transactions) Construct, decode transactions and work with Clarity smart contracts on the Stacks blockchain.
+- [`@stacks/transactions`](https://github.com/hirosystems/stacks.js/tree/main/packages/transactions) Construct, decode transactions, and work with Clarity smart contracts on the Stacks blockchain.
 - [`@stacks/wallet-sdk`](https://github.com/hirosystems/stacks.js/tree/main/packages/wallet-sdk) Library for building wallets, managing accounts, and handling keys for the Stacks blockchain.
 - [`@stacks/storage`](https://github.com/hirosystems/stacks.js/tree/main/packages/storage) Store and fetch files with Gaia, the decentralized storage system.
 - [`@stacks/encryption`](https://github.com/hirosystems/stacks.js/tree/main/packages/encryption) Encryption functions used by stacks.js packages.
@@ -30,7 +30,7 @@ For installation instructions and usage guidelines, refer to the respective `REA
 
 ### Others
 
-- [`@stacks/cli`](https://github.com/hirosystems/stacks.js/tree/main/packages/cli) Command line interface to interact with auth, storage and Stacks transactions.
+- [`@stacks/cli`](https://github.com/hirosystems/stacks.js/tree/main/packages/cli) Command line interface to interact with auth, storage, and Stacks transactions.
 - `@stacks/keychain` _**DEPRECATED:** replaced by [`@stacks/wallet-sdk`](https://github.com/hirosystems/stacks.js/tree/main/packages/wallet-sdk)_
 
 ## Documentation
@@ -56,10 +56,10 @@ Please **do not** use the issue tracker for personal support requests or to ask 
 Development of Stacks.js happens in the open on GitHub, and we are grateful to the community for contributing bug fixes and improvements. Read below to learn how you can take part in improving the Stacks.js.
 
 ### Code of Conduct
-Please read Stacks.js' [Code of conduct](https://github.com/hirosystems/stacks.js/blob/main/CODE_OF_CONDUCT.md) since we expect project participants to adhere to it. 
+Please read Stacks.js' [Code of Conduct](https://github.com/hirosystems/stacks.js/blob/main/CODE_OF_CONDUCT.md) since we expect project participants to adhere to it. 
 
 ### Contributing Guide
-Read our [contributing guide](https://github.com/hirosystems/stacks.js/blob/main/.github/CONTRIBUTING.md) to learn about our development process, how to propose bugfixes and improvements, and how to build and test your changes.
+Read our [contributing guide](https://github.com/hirosystems/stacks.js/blob/main/.github/CONTRIBUTING.md) to learn about our development process, how to propose bug fixes and improvements, and how to build and test your changes.
 
 ## Community
 
@@ -67,7 +67,7 @@ Join our community and stay connected with the latest updates and discussions:
 
 - [Join our Discord community chat](https://discord.gg/ZQR6cyZC) to engage with other users, ask questions, and participate in discussions.
 
-- [Visit hiro.so](https://www.hiro.so/) for updates and subscribing to the mailing list.
+- [Visit hiro.so](https://www.hiro.so/) for updates and subscribe to the mailing list.
 
 - Follow [Hiro on Twitter.](https://twitter.com/hirosystems)
 
