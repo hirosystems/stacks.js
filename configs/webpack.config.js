@@ -54,12 +54,12 @@ module.exports = {
   resolve: {
     extensions: ['.ts', '.js'],
     alias: {
+      '@stacks/api': '@stacks/api/dist/esm',
       '@stacks/auth': '@stacks/auth/dist/esm',
       '@stacks/bns': '@stacks/bns/dist/esm',
       '@stacks/common': '@stacks/common/dist/esm',
       '@stacks/encryption': '@stacks/encryption/dist/esm',
       '@stacks/keychain': '@stacks/keychain/dist/esm',
-      '@stacks/network': '@stacks/network/dist/esm',
       '@stacks/profile': '@stacks/profile/dist/esm',
       '@stacks/stacking': '@stacks/stacking/dist/esm',
       '@stacks/storage': '@stacks/storage/dist/esm',

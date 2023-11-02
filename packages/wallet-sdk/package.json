@@ -33,7 +33,7 @@
     "@stacks/auth": "^6.9.0",
     "@stacks/common": "^6.8.1",
     "@stacks/encryption": "^6.9.0",
-    "@stacks/network": "^6.8.1",
+    "@stacks/api": "^6.8.1",
     "@stacks/profile": "^6.9.0",
     "@stacks/storage": "^6.9.0",
     "@stacks/transactions": "^6.9.0",

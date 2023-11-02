@@ -22,7 +22,7 @@
   "dependencies": {
     "@stacks/common": "^6.8.1",
     "@stacks/encryption": "^6.9.0",
-    "@stacks/network": "^6.8.1",
+    "@stacks/api": "^6.8.1",
     "@stacks/profile": "^6.9.0",
     "cross-fetch": "^3.1.5",
     "jsontokens": "^4.0.1"

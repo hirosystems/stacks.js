@@ -23,7 +23,7 @@
     "@stacks/auth": "^6.9.0",
     "@stacks/common": "^6.8.1",
     "@stacks/encryption": "^6.9.0",
-    "@stacks/network": "^6.8.1",
+    "@stacks/api": "^6.8.1",
     "base64-js": "^1.5.1",
     "jsontokens": "^4.0.1"
   },

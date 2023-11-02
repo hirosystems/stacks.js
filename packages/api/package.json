@@ -1,7 +1,7 @@
 {
-  "name": "@stacks/network",
+  "name": "@stacks/api",
   "version": "6.8.1",
-  "description": "Library for Stacks network operations",
+  "description": "Library for operations via Stacks nodes and APIs",
   "license": "MIT",
   "author": "Hiro Systems PBC (https://hiro.so)",
   "homepage": "https://hiro.so/stacks-js",
@@ -41,9 +41,10 @@
     "src"
   ],
   "keywords": [
-    "blockstack",
+    "stacks",
     "network",
-    "stacks"
+    "api",
+    "blockstack"
   ],
   "repository": {
     "type": "git",

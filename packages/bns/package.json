@@ -21,7 +21,7 @@
   },
   "dependencies": {
     "@stacks/common": "^6.8.1",
-    "@stacks/network": "^6.8.1",
+    "@stacks/api": "^6.8.1",
     "@stacks/transactions": "^6.9.0"
   },
   "devDependencies": {

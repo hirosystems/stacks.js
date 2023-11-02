@@ -1,53 +1,16 @@
-# @stacks/network
+# @stacks/api
 
 Network and API library for working with Stacks blockchain nodes.
 
 ## Installation
 
 ```
-npm install @stacks/network
+npm install @stacks/api
 ```
 
 ## Usage
 
-### Create a Stacks mainnet, testnet or mocknet network
-
-```typescript
-import { StacksMainnet, StacksTestnet, StacksMocknet } from '@stacks/network';
-
-const network = new StacksMainnet();
-
-const testnet = new StacksTestnet();
-
-const mocknet = new StacksMocknet();
-```
-
-### Set a custom node URL
-
-```typescript
-const network = new StacksMainnet({ url: 'https://www.mystacksnode.com/' });
-```
-
-### Check if network is mainnet
-
-```typescript
-const isMainnet = network.isMainnet();
-```
-
-### Network usage in transaction building
-
-```typescript
-import { makeSTXTokenTransfer } from '@stacks/transactions';
-
-const txOptions = {
-  network,
-  recipient: 'SP2BS6HD7TN34V8Z5BNF8Q2AW3K8K2DPV4264CF26',
-  amount: new BigNum(12345),
-  senderKey: 'b244296d5907de9864c0b0d51f98a13c52890be0404e83f273144cd5b9960eed01',
-};
-
-const transaction = await makeSTXTokenTransfer(txOptions);
-```
+`todo`
 
 ### Use the built-in API key middleware
 
@@ -98,31 +61,4 @@ const network = new StacksTestnet({ fetchFn });
 
 // stacks.js functions, which take a StacksNetwork object will use the custom fetchFn
 const nonce = await getNonce('SP3FGQ8Z7JY9BWYZ5WM53E0M9NK7WHJF0691NZ159', network);
-```
-
-### Get various API URLs
-
-```typescript
-const txBroadcastUrl = network.getBroadcastApiUrl();
-
-const feeEstimateUrl = network.getTransferFeeEstimateApiUrl();
-
-const address = 'SP2BS6HD7TN34V8Z5BNF8Q2AW3K8K2DPV4264CF26';
-const accountInfoUrl = network.getAccountApiUrl(address);
-
-const contractName = 'hello_world';
-const abiUrl = network.getAbiApiUrl(address, contractName);
-
-const functionName = 'hello';
-const readOnlyFunctionCallUrl = network.getReadOnlyFunctionCallApiUrl(
-  address,
-  contractName,
-  functionName
-);
-
-const nodeInfoUrl = network.getInfoUrl();
-
-const blockTimeUrl = network.getBlockTimeInfoUrl();
-
-const poxInfoUrl = network.getPoxInfoUrl();
 ```
