@@ -390,7 +390,18 @@ export function intToBigInt(value: IntegerType, signed: boolean): bigint {
  * Adds a `0x` prefix to a string if it does not already have one.
  */
 export function with0x(value: string): string {
-  return value.startsWith('0x') ? value : `0x${value}`;
+  return /^0x/i.test(value) // startsWith('0x') case insensitive
+    ? value
+    : `0x${value}`;
+}
+
+/**
+ * Removes the `0x` prefix of a string if it has one.
+ */
+export function without0x(value: string): string {
+  return /^0x/i.test(value) // startsWith('0x') case insensitive
+    ? value.slice(2)
+    : value;
 }
 
 /**
@@ -621,3 +632,15 @@ export function concatArray(elements: (Uint8Array | number[] | number)[]) {
 export function isInstance(object: any, type: any) {
   return object instanceof type || object?.constructor?.name?.toLowerCase() === type.name;
 }
+
+/**
+ * Checks whether a string is a valid hex string, and has a length of 64 characters.
+ */
+export function validateHash256(hex: string): boolean {
+  if (hex.length !== 64) return false;
+  return /^[0-9a-fA-F]+$/.test(hex);
+}
+
+// generate a random 32-byte hex string without crypto
+// @ts-ignore
+const randomBytes = (size: number) => [...Array(size)].map(() => Math.floor(Math.random() * 256));

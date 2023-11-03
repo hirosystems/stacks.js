@@ -1,25 +1,25 @@
 import {
-  HIRO_MAINNET_DEFAULT,
-  HIRO_MOCKNET_DEFAULT,
-  HIRO_TESTNET_DEFAULT,
+  HIRO_MAINNET_URL,
+  HIRO_DEVNET_URL,
+  HIRO_TESTNET_URL,
   StacksMainnet,
   StacksMocknet,
   StacksNetwork,
   StacksTestnet,
-} from '../src/network';
+} from '../src/api';
 
 describe('Setting coreApiUrl', () => {
   it('sets mainnet default url', () => {
     const mainnet = new StacksMainnet();
-    expect(mainnet.coreApiUrl).toEqual(HIRO_MAINNET_DEFAULT);
+    expect(mainnet.coreApiUrl).toEqual(HIRO_MAINNET_URL);
   });
   it('sets testnet url', () => {
     const testnet = new StacksTestnet();
-    expect(testnet.coreApiUrl).toEqual(HIRO_TESTNET_DEFAULT);
+    expect(testnet.coreApiUrl).toEqual(HIRO_TESTNET_URL);
   });
   it('sets mocknet url', () => {
     const mocknet = new StacksMocknet();
-    expect(mocknet.coreApiUrl).toEqual(HIRO_MOCKNET_DEFAULT);
+    expect(mocknet.coreApiUrl).toEqual(HIRO_DEVNET_URL);
   });
   it('sets custom url', () => {
     const customURL = 'https://customurl.com';

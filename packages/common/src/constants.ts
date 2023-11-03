@@ -31,6 +31,32 @@ export enum PeerNetworkID {
   Testnet = 0xff000000,
 }
 
+export type StacksNetwork = {
+  chainId: number;
+  transactionVersion: number; // todo: transactionVersion better?
+  peerNetworkId: number;
+  magicBytes: string;
+};
+
+export const STACKS_MAINNET: StacksNetwork = {
+  chainId: ChainID.Mainnet,
+  transactionVersion: TransactionVersion.Mainnet,
+  peerNetworkId: PeerNetworkID.Mainnet,
+  magicBytes: 'X2', // todo: comment bytes version of magic bytes
+};
+
+export const STACKS_TESTNET: StacksNetwork = {
+  chainId: ChainID.Testnet,
+  transactionVersion: TransactionVersion.Testnet,
+  peerNetworkId: PeerNetworkID.Testnet,
+  magicBytes: 'T2', // todo: comment bytes version of magic bytes
+};
+
+export const STACKS_DEVNET: StacksNetwork = {
+  ...STACKS_TESTNET,
+  magicBytes: 'id', // todo: comment bytes version of magic bytes
+};
+
 /** @ignore internal */
 export const PRIVATE_KEY_COMPRESSED_LENGTH = 33;
 

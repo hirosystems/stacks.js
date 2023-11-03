@@ -19,13 +19,11 @@ import { BytesReader as BytesReader } from '../bytesReader';
 import { deserializeAddress, deserializeLPString } from '../types';
 import { DeserializationError } from '../errors';
 import { stringAsciiCV, stringUtf8CV } from './types/stringCV';
-import { bytesToAscii, bytesToUtf8, hexToBytes } from '@stacks/common';
+import { bytesToAscii, bytesToUtf8, hexToBytes, without0x } from '@stacks/common';
 
 /**
  * Deserializes clarity value to clarity type
- *
  * @param {value} Uint8Array | string value to be converted to clarity type
- **
  * @returns {ClarityType} returns the clarity type instance
  *
  * @example
@@ -46,19 +44,15 @@ import { bytesToAscii, bytesToUtf8, hexToBytes } from '@stacks/common';
 export default function deserializeCV<T extends ClarityValue = ClarityValue>(
   serializedClarityValue: BytesReader | Uint8Array | string
 ): T {
-  let bytesReader: BytesReader;
-  if (typeof serializedClarityValue === 'string') {
-    const hasHexPrefix = serializedClarityValue.slice(0, 2).toLowerCase() === '0x';
-    bytesReader = new BytesReader(
-      hexToBytes(hasHexPrefix ? serializedClarityValue.slice(2) : serializedClarityValue)
-    );
-  } else if (serializedClarityValue instanceof Uint8Array) {
-    bytesReader = new BytesReader(serializedClarityValue);
-  } else {
-    bytesReader = serializedClarityValue;
-  }
+  const bytesReader: BytesReader =
+    typeof serializedClarityValue === 'string'
+      ? new BytesReader(hexToBytes(without0x(serializedClarityValue)))
+      : serializedClarityValue instanceof Uint8Array
+      ? new BytesReader(serializedClarityValue)
+      : serializedClarityValue;
+
   const type = bytesReader.readUInt8Enum(ClarityType, n => {
-    throw new DeserializationError(`Cannot recognize Clarity Type: ${n}`);
+    throw new DeserializationError(`Invalid Clarity type: ${n}`);
   });
 
   switch (type) {
@@ -113,7 +107,7 @@ export default function deserializeCV<T extends ClarityValue = ClarityValue>(
       for (let i = 0; i < tupleLength; i++) {
         const clarityName = deserializeLPString(bytesReader).content;
         if (clarityName === undefined) {
-          throw new DeserializationError('"content" is undefined');
+          throw new DeserializationError('Tuple name is undefined');
         }
         tupleContents[clarityName] = deserializeCV(bytesReader);
       }
@@ -131,7 +125,7 @@ export default function deserializeCV<T extends ClarityValue = ClarityValue>(
 
     default:
       throw new DeserializationError(
-        'Unable to deserialize Clarity Value from Uint8Array. Could not find valid Clarity Type.'
+        `Failed to deserialize Clarity value from Uint8Array. Invalid Clarity type: ${type}`
       );
   }
 }

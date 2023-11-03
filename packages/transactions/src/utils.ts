@@ -155,13 +155,13 @@ export function cvToHex(cv: ClarityValue) {
 export function hexToCV(hex: string) {
   return deserializeCV(hex);
 }
+
 /**
  * Read only function response object
  *
  * @param {Boolean} okay - the status of the response
  * @param {string} result - serialized hex clarity value
  */
-
 export interface ReadOnlyFunctionSuccessResponse {
   okay: true;
   result: string;
@@ -192,11 +192,4 @@ export const validateStacksAddress = (stacksAddress: string): boolean => {
   } catch (e) {
     return false;
   }
-};
-
-export const validateTxId = (txid: string): boolean => {
-  if (txid === 'success') return true; // Bypass fetchMock tests // todo: move this line into mocks in test files
-  const value = with0x(txid).toLowerCase();
-  if (value.length !== 66) return false;
-  return with0x(BigInt(value).toString(16).padStart(64, '0')) === value;
 };
