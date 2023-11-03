@@ -225,67 +225,6 @@ export async function estimateTransaction(
 }
 
 /**
- * Broadcast the signed transaction to a core node
- *
- * @param {StacksTransaction} transaction - the token transfer transaction to broadcast
- * @param {StacksNetworkName | StacksNetwork} network - the Stacks network to broadcast transaction to
- *
- * @returns {Promise} that resolves to a response if the operation succeeds
- */
-export async function broadcastTransaction(
-  transaction: StacksTransaction,
-  network?: StacksNetworkName | StacksNetwork,
-  attachment?: Uint8Array
-): Promise<TxBroadcastResult> {
-  const rawTx = transaction.serialize();
-  const derivedNetwork = StacksNetwork.fromNameOrNetwork(network ?? deriveNetwork(transaction));
-  const url = derivedNetwork.getBroadcastApiUrl();
-
-  return broadcastRawTransaction(rawTx, url, attachment, derivedNetwork.fetchFn);
-}
-
-/**
- * Broadcast the signed transaction to a core node
- *
- * @param {Uint8Array} rawTx - the raw serialized transaction bytes to broadcast
- * @param {string} url - the broadcast endpoint URL
- *
- * @returns {Promise} that resolves to a response if the operation succeeds
- */
-export async function broadcastRawTransaction(
-  rawTx: Uint8Array,
-  url: string,
-  attachment?: Uint8Array,
-  fetchFn: FetchFn = createFetchFn()
-): Promise<TxBroadcastResult> {
-  const options = {
-    method: 'POST',
-    headers: { 'Content-Type': attachment ? 'application/json' : 'application/octet-stream' },
-    body: attachment
-      ? JSON.stringify({
-          tx: bytesToHex(rawTx),
-          attachment: bytesToHex(attachment),
-        })
-      : rawTx,
-  };
-
-  const response = await fetchFn(url, options);
-  if (!response.ok) {
-    try {
-      return (await response.json()) as TxBroadcastResult;
-    } catch (e) {
-      throw Error(`Failed to broadcast transaction: ${(e as Error).message}`);
-    }
-  }
-
-  const text = await response.text();
-  // Replace extra quotes around txid string
-  const txid = text.replace(/["]+/g, '');
-  if (!validateTxId(txid)) throw new Error(text);
-  return { txid } as TxBroadcastResult;
-}
-
-/**
  * Fetch a contract's ABI
  *
  * @param {string} address - the contracts address

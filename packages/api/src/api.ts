@@ -81,7 +81,6 @@ export class StacksApi {
     return broadcastTransaction({ tx, attachment, url: this.url });
   };
 
-  getBroadcastApiUrl = () => `${this.url}${this.broadcastEndpoint}`;
   getTransferFeeEstimateApiUrl = () => `${this.url}${this.transferFeeEstimateEndpoint}`;
   getTransactionFeeEstimateApiUrl = () => `${this.url}${this.transactionFeeEstimateEndpoint}`;
   getAccountApiUrl = (address: string) => `${this.url}${this.accountEndpoint}/${address}?proof=0`;
