@@ -30,7 +30,7 @@ type AddressString = string;
 type ContractIdString = `${string}.${string}`;
 
 /**
- * An asset identifier string given as `<contract-id>::<token-name>` aka `<contract-address>.<contract-name>::<token-name>`
+ * An asset name string given as `<contract-id>::<token-name>` aka `<contract-address>.<contract-name>::<token-name>`
  */
 type NftString = `${ContractIdString}::${string}`;
 
