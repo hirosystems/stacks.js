@@ -21,18 +21,6 @@ export class DeserializationError extends TransactionError {
   }
 }
 
-/**
- * Thrown when `NoEstimateAvailable` is received as an error reason from a
- * Stacks node. The Stacks node has not seen this kind of contract-call before,
- * and it cannot provide an estimate yet.
- * @see https://docs.hiro.so/api#tag/Fees/operation/post_fee_transaction
- */
-export class NoEstimateAvailableError extends TransactionError {
-  constructor(message: string) {
-    super(message);
-  }
-}
-
 export class NotImplementedError extends TransactionError {
   constructor(message: string) {
     super(message);

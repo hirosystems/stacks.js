@@ -31,11 +31,17 @@ export enum PeerNetworkID {
   Testnet = 0xff000000,
 }
 
+/** @ignore internal */
+export const StacksNetworks = ['mainnet', 'testnet', 'devnet', 'mocknet'] as const;
+/** The enum-style names of different common Stacks networks */
+export type StacksNetworkName = (typeof StacksNetworks)[number];
+
 export type StacksNetwork = {
   chainId: number;
-  transactionVersion: number; // todo: transactionVersion better?
+  transactionVersion: number; // todo: txVersion better?
   peerNetworkId: number;
   magicBytes: string;
+  // todo: add check32 character bytes string
 };
 
 export const STACKS_MAINNET: StacksNetwork = {

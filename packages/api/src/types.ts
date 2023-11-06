@@ -136,3 +136,46 @@ export type TxBroadcastResultRejected =
   | ServerFailureOtherRejection;
 
 export type TxBroadcastResult = TxBroadcastResultOk | TxBroadcastResultRejected;
+
+export interface FeeEstimation {
+  fee: number;
+  fee_rate: number;
+}
+
+export interface FeeEstimateResponse {
+  cost_scalar_change_by_byte: bigint;
+  estimated_cost: {
+    read_count: bigint;
+    read_length: bigint;
+    runtime: bigint;
+    write_count: bigint;
+    write_length: bigint;
+  };
+  estimated_cost_scalar: bigint;
+  estimations: [FeeEstimation, FeeEstimation, FeeEstimation];
+}
+
+// todo: add better api error model (and other packages as well)
+
+class ApiError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.message = message;
+    this.name = this.constructor.name;
+    if (Error.captureStackTrace) {
+      Error.captureStackTrace(this, this.constructor);
+    }
+  }
+}
+
+/**
+ * Thrown when `NoEstimateAvailable` is received as an error reason from a
+ * Stacks node. The Stacks node has not seen this kind of contract-call before,
+ * and it cannot provide an estimate yet.
+ * @see https://docs.hiro.so/api#tag/Fees/operation/post_fee_transaction
+ */
+export class NoEstimateAvailableError extends ApiError {
+  constructor(message: string) {
+    super(message);
+  }
+}
