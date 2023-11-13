@@ -1,7 +1,10 @@
 # Migration Guides
 
-- [Stacks.js (\<=4.x.x) → (5.x.x)](#stacksjs-4xx--5xx)
+- [Stacks.js (\>=5.x.x) → (7.x.x)](#stacksjs-5xx--7xx)
   - [Breaking Changes](#breaking-changes)
+  - [StacksNetwork \& the `@stacks/api` package](#stacksnetwork--the-stacksapi-package)
+- [Stacks.js (\<=4.x.x) → (5.x.x)](#stacksjs-4xx--5xx)
+  - [Breaking Changes](#breaking-changes-1)
     - [Buffer to Uint8Array](#buffer-to-uint8array)
     - [Message Signing Prefix](#message-signing-prefix)
 - [blockstack.js → Stacks.js (1.x.x)](#blockstackjs--stacksjs-1xx)
@@ -13,6 +16,32 @@
   - [Encryption](#encryption)
     - [Using blockstack.js](#using-blockstackjs-2)
     - [Using @stacks/encryption or @stacks/auth](#using-stacksencryption-or-stacksauth)
+
+## Stacks.js (&gt;=5.x.x) → (7.x.x)
+
+### Breaking Changes
+
+- The `@stacks/network` package was removed. Similar functionality is now available in `@stacks/api` and `@stacks/common`. [Read more...](#stacksapi-package)
+-
+- Clarity ABI helpers were moved to the `@stacks/common` package.
+
+### StacksNetwork & the `@stacks/api` package
+
+Stacks network objects are now exported by the `@stacks/common` package.
+They are used to specify network settings for other functions and don't require instantiation (like the `@stacks/network` approach did).
+
+```ts
+import { STACKS_MAINNET } from '@stacks/common';
+```
+
+The new `@stacks/api` package lets you interact with a Stacks node or API.
+
+```ts
+import { StacksApi } from '@stacks/api';
+
+const api = new StacksApi();
+await api.broadcastTx(txHex);
+```
 
 ## Stacks.js (&lt;=4.x.x) → (5.x.x)
 

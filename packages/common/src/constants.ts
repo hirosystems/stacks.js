@@ -16,6 +16,11 @@ export enum TransactionVersion {
   Testnet = 0x80,
 }
 
+/** @ignore */
+export function whenTransactionVersion(transactionVersion: TransactionVersion) {
+  return <T>(map: Record<TransactionVersion, T>): T => map[transactionVersion];
+}
+
 /**
  * The **peer** network ID.
  * Typically not used in signing, but used for broadcasting to the P2P network.
@@ -31,10 +36,7 @@ export enum PeerNetworkID {
   Testnet = 0xff000000,
 }
 
-/** @ignore internal */
-export const StacksNetworks = ['mainnet', 'testnet', 'devnet', 'mocknet'] as const;
-/** The enum-style names of different common Stacks networks */
-export type StacksNetworkName = (typeof StacksNetworks)[number];
+// todo: magic bytes
 
 export type StacksNetwork = {
   chainId: number;
@@ -62,6 +64,13 @@ export const STACKS_DEVNET: StacksNetwork = {
   ...STACKS_TESTNET,
   magicBytes: 'id', // todo: comment bytes version of magic bytes
 };
+
+/** @ignore internal */
+export const StacksNetworks = ['mainnet', 'testnet', 'devnet', 'mocknet'] as const;
+/** The enum-style names of different common Stacks networks */
+export type StacksNetworkName = (typeof StacksNetworks)[number];
+
+// todo: do we want mocknet as well?
 
 /** @ignore internal */
 export const PRIVATE_KEY_COMPRESSED_LENGTH = 33;

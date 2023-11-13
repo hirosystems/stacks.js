@@ -1,32 +1,31 @@
 import {
+  asciiToBytes,
+  bigIntToBytes,
   concatArray,
   concatBytes,
-  bigIntToBytes,
   toTwos,
-  writeUInt32BE,
   utf8ToBytes,
-  asciiToBytes,
+  writeUInt32BE,
 } from '@stacks/common';
-import { serializeAddress, serializeLPString } from '../types';
-import { createLPString } from '../postcondition-types';
 import {
   BooleanCV,
-  OptionalCV,
   BufferCV,
-  IntCV,
-  UIntCV,
-  StandardPrincipalCV,
-  ContractPrincipalCV,
-  ResponseCV,
-  ListCV,
-  TupleCV,
   ClarityValue,
+  ContractPrincipalCV,
+  IntCV,
+  ListCV,
+  OptionalCV,
+  ResponseCV,
+  StandardPrincipalCV,
+  TupleCV,
+  UIntCV,
 } from '.';
-import { ClarityType } from './constants';
-
-import { SerializationError } from '../errors';
-import { StringAsciiCV, StringUtf8CV } from './types/stringCV';
 import { CLARITY_INT_BYTE_SIZE, CLARITY_INT_SIZE } from '../constants';
+import { SerializationError } from '../errors';
+import { createLPString } from '../postcondition-types';
+import { serializeAddress, serializeLPString } from '../types';
+import { ClarityType } from './constants';
+import { StringAsciiCV, StringUtf8CV } from './types/stringCV';
 
 function bytesWithTypeID(typeId: ClarityType, bytes: Uint8Array): Uint8Array {
   return concatArray([typeId, bytes]);
@@ -133,17 +132,13 @@ function serializeStringUtf8CV(cv: StringUtf8CV) {
 
 /**
  * Serializes clarity value to Uint8Array
- *
  * @param {ClarityValue} value to be converted to bytes
- **
  * @returns {Uint8Array} returns the bytes
- *
  * @example
  * ```
  *  import { intCV, serializeCV } from '@stacks/transactions';
  *
  *  const serialized = serializeCV(intCV(100)); // Similarly works for other clarity types as well like listCV, booleanCV ...
- *
  *  // <Uint8Array 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 64>
  * ```
  *

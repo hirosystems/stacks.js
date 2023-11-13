@@ -4,11 +4,14 @@ import {
   hexToBytes,
   IntegerType,
   intToBigInt,
+  STACKS_MAINNET,
+  STACKS_TESTNET,
+  whenTransactionVersion,
   writeUInt32BE,
 } from '@stacks/common';
 import {
   AnchorMode,
-  anchorModeFromNameOrValue,
+  anchorModeFrom,
   AnchorModeName,
   AuthType,
   ChainID,
@@ -81,7 +84,7 @@ export class StacksTransaction {
     this.postConditions = postConditions ?? createLPList([]);
 
     if (anchorMode) {
-      this.anchorMode = anchorModeFromNameOrValue(anchorMode);
+      this.anchorMode = anchorModeFrom(anchorMode);
     } else {
       switch (payload.payloadType) {
         case PayloadType.Coinbase:
@@ -299,4 +302,12 @@ export function deserializeTransaction(tx: string | Uint8Array | BytesReader) {
     anchorMode,
     chainId
   );
+}
+
+/** @ignore */
+export function deriveNetwork(transaction: StacksTransaction) {
+  return whenTransactionVersion(transaction.version)({
+    [TransactionVersion.Mainnet]: STACKS_MAINNET,
+    [TransactionVersion.Testnet]: STACKS_TESTNET,
+  });
 }

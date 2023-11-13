@@ -1,13 +1,14 @@
-import { createApiKeyMiddleware, createFetchFn, StacksTestnet } from '@stacks/network';
 import fetchMock from 'jest-fetch-mock';
-import { broadcastTransaction, makeSTXTokenTransfer } from '../src/builders';
+import { broadcastTransaction, createApiKeyMiddleware, createFetchFn } from '../src';
+import { StacksApi } from '../src/api';
+import { makeSTXTokenTransfer } from '../src/builders';
 import { AnchorMode } from '../src/constants';
 
 test('fetchFn is used in network requests', async () => {
   const apiKey = 'MY_KEY';
   const middleware = createApiKeyMiddleware({ apiKey });
   const fetchFn = createFetchFn(middleware);
-  const network = new StacksTestnet({ fetchFn });
+  const api = new StacksApi({ fetch: fetchFn });
 
   const transaction = await makeSTXTokenTransfer({
     recipient: 'SP3FGQ8Z7JY9BWYZ5WM53E0M9NK7WHJF0691NZ159',
@@ -19,8 +20,10 @@ test('fetchFn is used in network requests', async () => {
     anchorMode: AnchorMode.Any,
   });
 
-  fetchMock.mockOnce('success');
-  await broadcastTransaction(transaction, network);
+  const txid = transaction.txid();
+  fetchMock.mockOnce(`"${txid}"`);
+
+  await broadcastTransaction({ transaction, api });
 
   expect((fetchMock.mock.calls[0][1]?.headers as Headers)?.get('x-api-key')).toContain(apiKey);
 });

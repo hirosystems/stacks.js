@@ -1,3 +1,10 @@
+import {
+  STACKS_DEVNET,
+  STACKS_MAINNET,
+  STACKS_TESTNET,
+  StacksNetwork,
+  StacksNetworkName,
+} from './constants';
 import { Logger } from './logger';
 
 /**
@@ -637,6 +644,7 @@ export function isInstance(object: any, type: any) {
  * Checks whether a string is a valid hex string, and has a length of 64 characters.
  */
 export function validateHash256(hex: string): boolean {
+  hex = without0x(hex);
   if (hex.length !== 64) return false;
   return /^[0-9a-fA-F]+$/.test(hex);
 }
@@ -644,3 +652,21 @@ export function validateHash256(hex: string): boolean {
 // generate a random 32-byte hex string without crypto
 // @ts-ignore
 const randomBytes = (size: number) => [...Array(size)].map(() => Math.floor(Math.random() * 256));
+
+export function networkFromName(name: StacksNetworkName) {
+  switch (name) {
+    case 'mainnet':
+      return STACKS_MAINNET;
+    case 'testnet':
+      return STACKS_TESTNET;
+    case 'devnet':
+      return STACKS_DEVNET;
+    default:
+      throw new Error(`Unknown network name: ${name}`);
+  }
+}
+
+export function networkFrom(network: StacksNetworkName | StacksNetwork) {
+  if (typeof network === 'string') return networkFromName(network);
+  return network;
+}

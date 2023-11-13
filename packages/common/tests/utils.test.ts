@@ -8,6 +8,7 @@ import {
   toTwos,
   bigIntToBytes,
   intToBigInt,
+  validateHash256,
 } from '../src';
 import BN from 'bn.js';
 
@@ -92,7 +93,7 @@ test('fromTwos', () => {
   expect(
     Number(
       fromTwos(
-        BigInt('0xffffffffffffffffffffffffffffffff' + 'fffffffffffffffffffffffffffffffe'),
+        BigInt('0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe'),
         BigInt(256)
       )
     )
@@ -100,29 +101,29 @@ test('fromTwos', () => {
   expect(
     Number(
       fromTwos(
-        BigInt('0xffffffffffffffffffffffffffffffff' + 'ffffffffffffffffffffffffffffffff'),
+        BigInt('0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'),
         BigInt(256)
       )
     )
   ).toBe(-1);
   expect(
     fromTwos(
-      BigInt('0x7fffffffffffffffffffffffffffffff' + 'ffffffffffffffffffffffffffffffff'),
+      BigInt('0x7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'),
       BigInt(256)
     ).toString(10)
   ).toEqual(
     BigInt(
-      '5789604461865809771178549250434395392663499' + '2332820282019728792003956564819967'
+      '57896044618658097711785492504343953926634992332820282019728792003956564819967'
     ).toString(10)
   );
   expect(
     fromTwos(
-      BigInt('0x80000000000000000000000000000000' + '00000000000000000000000000000000'),
+      BigInt('0x8000000000000000000000000000000000000000000000000000000000000000'),
       BigInt(256)
     ).toString(10)
   ).toEqual(
     BigInt(
-      '-578960446186580977117854925043439539266349' + '92332820282019728792003956564819968'
+      '-57896044618658097711785492504343953926634992332820282019728792003956564819968'
     ).toString(10)
   );
 });
@@ -145,13 +146,13 @@ test('toTwos', () => {
   );
   expect(
     toTwos(
-      BigInt('5789604461865809771178549250434395392663' + '4992332820282019728792003956564819967'),
+      BigInt('57896044618658097711785492504343953926634992332820282019728792003956564819967'),
       BigInt(256)
     ).toString(16)
   ).toEqual('7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff');
   expect(
     toTwos(
-      BigInt('-578960446186580977117854925043439539266' + '34992332820282019728792003956564819968'),
+      BigInt('-57896044618658097711785492504343953926634992332820282019728792003956564819968'),
       BigInt(256)
     ).toString(16)
   ).toEqual('8000000000000000000000000000000000000000000000000000000000000000');
@@ -165,4 +166,24 @@ test('Should accept bn.js instance', () => {
   const nativeBigInt = intToBigInt(bn, false);
 
   expect(nativeBigInt.toString()).toEqual(value);
+});
+
+describe(validateHash256, () => {
+  const TXID = '117a6522b4e9ec27ff10bbe3940a4a07fd58e5352010b4143992edb05a7130c7';
+
+  test.each([
+    { txid: TXID, expected: true }, // without 0x
+    { txid: `0x${TXID}`, expected: true }, // with 0x
+    { txid: TXID.split('30c7')[0], expected: false }, // too short
+    {
+      txid: 'Failed to deserialize posted transaction: Invalid Stacks string: non-printable or non-ASCII string',
+      expected: false, // string without txid
+    },
+    {
+      txid: `Failed to deserialize posted transaction: Invalid Stacks string: non-printable or non-ASCII string. ${TXID}`,
+      expected: false, // string with txid
+    },
+  ])('txid is validated as hash 256', ({ txid, expected }) => {
+    expect(validateHash256(txid)).toEqual(expected);
+  });
 });

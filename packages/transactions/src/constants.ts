@@ -6,6 +6,7 @@ export enum ChainID {
   Testnet = 0x80000000,
   Mainnet = 0x00000001,
 }
+// todo: deduplicate chain id
 
 export const DEFAULT_CHAIN_ID = ChainID.Mainnet;
 export const MAX_STRING_LENGTH_BYTES = 128;
@@ -100,7 +101,7 @@ const AnchorModeMap = {
 };
 
 /** @ignore */
-export function anchorModeFromNameOrValue(mode: AnchorModeName | AnchorMode): AnchorMode {
+export function anchorModeFrom(mode: AnchorModeName | AnchorMode): AnchorMode {
   if (mode in AnchorModeMap) return AnchorModeMap[mode];
   throw new Error(`Invalid anchor mode "${mode}", must be one of: ${AnchorModeNames.join(', ')}`);
 }

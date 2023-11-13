@@ -2,7 +2,7 @@ import { ripemd160 } from '@noble/hashes/ripemd160';
 import { sha256 } from '@noble/hashes/sha256';
 import { sha512_256 } from '@noble/hashes/sha512';
 import { utils } from '@noble/secp256k1';
-import { bytesToHex, concatArray, concatBytes, utf8ToBytes, with0x } from '@stacks/common';
+import { bytesToHex, concatArray, concatBytes, utf8ToBytes } from '@stacks/common';
 import { c32addressDecode } from 'c32check';
 import lodashCloneDeep from 'lodash.clonedeep';
 import { ClarityValue, deserializeCV, serializeCV } from './clarity';
@@ -185,9 +185,9 @@ export const parseReadOnlyResponse = (response: ReadOnlyFunctionResponse): Clari
   throw new Error(response.cause);
 };
 
-export const validateStacksAddress = (stacksAddress: string): boolean => {
+export const validateStacksAddress = (address: string): boolean => {
   try {
-    c32addressDecode(stacksAddress);
+    c32addressDecode(address);
     return true;
   } catch (e) {
     return false;

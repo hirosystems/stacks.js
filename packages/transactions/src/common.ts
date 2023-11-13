@@ -9,6 +9,8 @@ import {
 import { c32address } from 'c32check';
 import { hexToBytes } from '@stacks/common';
 
+// todo: rename file to 'address'
+
 export interface Address {
   readonly type: StacksMessageType.Address;
   readonly version: AddressVersion;

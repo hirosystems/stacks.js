@@ -102,3 +102,4 @@ export * from './structuredDataSignature';
 export { StacksTransaction, deserializeTransaction } from './transaction';
 export * from './types';
 export * from './utils';
+export * from './fetch';

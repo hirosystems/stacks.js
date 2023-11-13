@@ -1,18 +1,15 @@
 import { utf8ToBytes } from '@stacks/common';
 import { ClarityType } from '../constants';
 
-interface BufferCV {
+export interface BufferCV {
   readonly type: ClarityType.Buffer;
   readonly buffer: Uint8Array;
 }
 
 /**
  * Converts a Uint8Array to a BufferCV clarity type
- *
- * @param {Uint8Array} buffer value to be converted to clarity type
- *
- * @returns {BufferCV} returns instance of type BufferCV
- *
+ * @param buffer value to be converted to clarity type
+ * @returns returns instance of type BufferCV
  * @example
  * ```
  *  import { bufferCV } from '@stacks/transactions';
@@ -27,7 +24,7 @@ interface BufferCV {
  * @see
  * {@link https://github.com/hirosystems/stacks.js/blob/main/packages/transactions/tests/clarity.test.ts | clarity test cases for more examples}
  */
-const bufferCV = (buffer: Uint8Array): BufferCV => {
+export const bufferCV = (buffer: Uint8Array): BufferCV => {
   if (buffer.length > 1_000_000) {
     throw new Error('Cannot construct clarity buffer that is greater than 1MB');
   }
@@ -37,11 +34,8 @@ const bufferCV = (buffer: Uint8Array): BufferCV => {
 
 /**
  * Converts a string to BufferCV clarity type
- *
- * @param {str} string input to be converted to bufferCV clarity type
- *
- * @returns {BufferCV} returns instance of type BufferCV
- *
+ * @param string input to be converted to bufferCV clarity type
+ * @returns returns instance of type BufferCV
  * @example
  * ```
  *  import { bufferCVFromString } from '@stacks/transactions';
@@ -56,6 +50,4 @@ const bufferCV = (buffer: Uint8Array): BufferCV => {
  * @see
  * {@link https://github.com/hirosystems/stacks.js/blob/main/packages/transactions/tests/clarity.test.ts | clarity test cases for more examples}
  */
-const bufferCVFromString = (str: string): BufferCV => bufferCV(utf8ToBytes(str));
-
-export { BufferCV, bufferCV, bufferCVFromString };
+export const bufferCVFromString = (str: string): BufferCV => bufferCV(utf8ToBytes(str));

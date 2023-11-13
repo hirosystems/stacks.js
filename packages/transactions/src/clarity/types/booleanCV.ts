@@ -1,20 +1,18 @@
 import { ClarityType } from '../constants';
 
-type BooleanCV = TrueCV | FalseCV;
+export type BooleanCV = TrueCV | FalseCV;
 
-interface TrueCV {
+export interface TrueCV {
   type: ClarityType.BoolTrue;
 }
 
-interface FalseCV {
+export interface FalseCV {
   type: ClarityType.BoolFalse;
 }
 
 /**
  * Converts true to BooleanCV clarity type
- *
- * @returns {BooleanCV} returns instance of type BooleanCV
- *
+ * @returns returns instance of type BooleanCV
  * @example
  * ```
  *  import { trueCV } from '@stacks/transactions';
@@ -26,13 +24,11 @@ interface FalseCV {
  * @see
  * {@link https://github.com/hirosystems/stacks.js/blob/main/packages/transactions/tests/clarity.test.ts | clarity test cases for more examples}
  */
-const trueCV = (): BooleanCV => ({ type: ClarityType.BoolTrue });
+export const trueCV = (): BooleanCV => ({ type: ClarityType.BoolTrue });
 
 /**
  * Converts false to BooleanCV clarity type
- *
- * @returns {BooleanCV} returns instance of type BooleanCV
- *
+ * @returns returns instance of type BooleanCV
  * @example
  * ```
  *  import { falseCV } from '@stacks/transactions';
@@ -44,13 +40,11 @@ const trueCV = (): BooleanCV => ({ type: ClarityType.BoolTrue });
  * @see
  * {@link https://github.com/hirosystems/stacks.js/blob/main/packages/transactions/tests/clarity.test.ts | clarity test cases for more examples}
  */
-const falseCV = (): BooleanCV => ({ type: ClarityType.BoolFalse });
+export const falseCV = (): BooleanCV => ({ type: ClarityType.BoolFalse });
 
 /**
  * Converts a boolean to BooleanCV clarity type
- *
- * @returns {BooleanCV} returns instance of type BooleanCV
- *
+ * @returns returns instance of type BooleanCV
  * @example
  * ```
  *  import { boolCV } from '@stacks/transactions';
@@ -62,6 +56,4 @@ const falseCV = (): BooleanCV => ({ type: ClarityType.BoolFalse });
  * @see
  * {@link https://github.com/hirosystems/stacks.js/blob/main/packages/transactions/tests/clarity.test.ts | clarity test cases for more examples}
  */
-const boolCV = (bool: boolean) => (bool ? trueCV() : falseCV());
-
-export { BooleanCV, TrueCV, FalseCV, boolCV, trueCV, falseCV };
+export const boolCV = (bool: boolean) => (bool ? trueCV() : falseCV());
