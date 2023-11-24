@@ -10,6 +10,7 @@ import { BytesReader } from '../src/bytesReader';
 import {
   bufferCV,
   BufferCV,
+  ClarityType,
   ClarityValue,
   contractPrincipalCV,
   contractPrincipalCVFromStandard,
@@ -38,7 +39,14 @@ import {
   uintCV,
   UIntCV,
 } from '../src/clarity';
-import { cvToJSON, cvToString, cvToValue, getCVTypeString } from '../src/clarity/clarityValue';
+import { Cl } from '../src';
+import {
+  cvToJSON,
+  cvToString,
+  cvToValue,
+  getCVTypeString,
+  isClarityType,
+} from '../src/clarity/clarityValue';
 import { addressToString } from '../src/common';
 import { deserializeAddress } from '../src/types';
 
@@ -423,9 +431,8 @@ describe('Clarity Types', () => {
 
       // Test lexicographic ordering of tuple keys (to match Node Buffer compare)
       const lexicographic = Object.keys(tuple.data).sort((a, b) => {
-        // eslint-disable-next-line node/prefer-global/buffer
         const bufA = Buffer.from(a);
-        // eslint-disable-next-line node/prefer-global/buffer
+
         const bufB = Buffer.from(b);
         return bufA.compare(bufB);
       });
@@ -676,6 +683,18 @@ describe('Clarity Types', () => {
       expect(typeString).toEqual(
         '(tuple (a int) (b uint) (c (buff 4)) (d bool) (e (optional bool)) (f (optional none)) (g principal) (h principal) (i (response bool UnknownType)) (j (response UnknownType bool)) (k (list 2 bool)) (l (tuple (a bool) (b bool))) (m (string-ascii 11)) (n (string-utf8 9)) (o (list 0 UnknownType)))'
       );
+    });
+  });
+
+  describe('Clarity type narrowing', () => {
+    it('can narrow strings', () => {
+      const vUint = Cl.uint(1) as ClarityValue;
+      expect(isClarityType(vUint, ClarityType.UInt)).toBeTruthy();
+      expect(isClarityType(vUint, ClarityType.Int)).toBeFalsy();
+
+      const vInt = Cl.int(1) as ClarityValue;
+      expect(isClarityType(vInt, ClarityType.Int)).toBeTruthy();
+      expect(isClarityType(vInt, ClarityType.UInt)).toBeFalsy();
     });
   });
 });

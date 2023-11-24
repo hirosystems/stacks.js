@@ -13,6 +13,8 @@ import {
   StringUtf8CV,
   NoneCV,
   SomeCV,
+  TrueCV,
+  FalseCV,
 } from '.';
 
 import { principalToString } from './types/principalCV';
@@ -168,4 +170,42 @@ export function getCVTypeString(val: ClarityValue): string {
     case ClarityType.StringUTF8:
       return `(string-utf8 ${utf8ToBytes(val.data).length})`;
   }
+}
+
+type ClarityTypetoValue = {
+  [ClarityType.OptionalNone]: NoneCV;
+  [ClarityType.OptionalSome]: SomeCV;
+  [ClarityType.ResponseOk]: ResponseOkCV;
+  [ClarityType.ResponseErr]: ResponseErrorCV;
+  [ClarityType.BoolTrue]: TrueCV;
+  [ClarityType.BoolFalse]: FalseCV;
+  [ClarityType.Int]: IntCV;
+  [ClarityType.UInt]: UIntCV;
+  [ClarityType.StringASCII]: StringAsciiCV;
+  [ClarityType.StringUTF8]: StringUtf8CV;
+  [ClarityType.PrincipalStandard]: StandardPrincipalCV;
+  [ClarityType.PrincipalContract]: ContractPrincipalCV;
+  [ClarityType.List]: ListCV;
+  [ClarityType.Tuple]: TupleCV;
+  [ClarityType.Buffer]: BufferCV;
+};
+
+/**
+ * @description narrow down the type of a generic ClarityValue
+ * @example
+ * ```ts
+ * // some functions can return a generic `ClarityValue` type
+ * let value = callReadOnlyFunction();
+ * //  ^ ClarityValue
+ * // use `isClarityType` to narrow down the type
+ * assert(isClarityType(value, ClarityType.Int))
+ * console.log(value)
+ * //          ^ IntCV
+ * ```
+ */
+export function isClarityType<T extends ClarityType>(
+  input: ClarityValue,
+  withType: T
+): input is ClarityTypetoValue[T] {
+  return input.type === withType;
 }
