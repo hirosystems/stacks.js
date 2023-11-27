@@ -1,5 +1,6 @@
-import { deserializeTransaction, StacksTransaction } from '../src/transaction';
-
+import { bytesToHex, hexToBytes } from '@stacks/common';
+import { DEFAULT_CHAIN_ID, TransactionVersion } from '@stacks/network';
+import fetchMock from 'jest-fetch-mock';
 import {
   createMultiSigSpendingCondition,
   createSingleSigSpendingCondition,
@@ -9,18 +10,8 @@ import {
   SingleSigSpendingCondition,
   SponsoredAuthorization,
 } from '../src/authorization';
-
-import {
-  CoinbasePayloadToAltRecipient,
-  createTokenTransferPayload,
-  TokenTransferPayload,
-} from '../src/payload';
-
-import { createSTXPostCondition } from '../src/postcondition';
-
-import { createStandardPrincipal, STXPostCondition } from '../src/postcondition-types';
-import { createLPList } from '../src/types';
-
+import { BytesReader } from '../src/bytesReader';
+import { contractPrincipalCV, standardPrincipalCV } from '../src/clarity';
 import {
   AddressHashMode,
   AnchorMode,
@@ -28,16 +19,22 @@ import {
   FungibleConditionCode,
   PostConditionMode,
 } from '../src/constants';
-
-import { createStacksPrivateKey, pubKeyfromPrivKey, publicKeyToString } from '../src/keys';
-
+import {
+  createStacksPublicKey,
+  privateKeyToPublic,
+  publicKeyToHex,
+  serializePublicKey,
+} from '../src/keys';
+import {
+  CoinbasePayloadToAltRecipient,
+  createTokenTransferPayload,
+  TokenTransferPayload,
+} from '../src/payload';
+import { createSTXPostCondition } from '../src/postcondition';
+import { createStandardPrincipal, STXPostCondition } from '../src/postcondition-types';
 import { TransactionSigner } from '../src/signer';
-
-import { bytesToHex, hexToBytes } from '@stacks/common';
-import fetchMock from 'jest-fetch-mock';
-import { BytesReader } from '../src/bytesReader';
-import { contractPrincipalCV, standardPrincipalCV } from '../src/clarity';
-import { DEFAULT_CHAIN_ID, TransactionVersion } from '@stacks/network';
+import { deserializeTransaction, StacksTransaction } from '../src/transaction';
+import { createLPList } from '../src/types';
 
 beforeEach(() => {
   fetchMock.resetMocks();
@@ -78,7 +75,7 @@ test('STX token transfer transaction serialization and deserialization', () => {
   );
 
   const signer = new TransactionSigner(transaction);
-  signer.signOrigin(createStacksPrivateKey(secretKey));
+  signer.signOrigin(secretKey);
   // const signature =
   //   '01051521ac2ac6e6123dcaf9dba000e0005d9855bcc1bc6b96aaf8b6a385238a2317' +
   //   'ab21e489aca47af3288cdaebd358b0458a9159cadc314cecb7dd08043c0a6d';
@@ -156,7 +153,7 @@ test('STX token transfer transaction fee setting', () => {
   );
 
   const signer = new TransactionSigner(transaction);
-  signer.signOrigin(createStacksPrivateKey(secretKey));
+  signer.signOrigin(secretKey);
   // const signature =
   //   '01051521ac2ac6e6123dcaf9dba000e0005d9855bcc1bc6b96aaf8b6a385238a2317' +
   //   'ab21e489aca47af3288cdaebd358b0458a9159cadc314cecb7dd08043c0a6d';
@@ -200,15 +197,14 @@ test('STX token transfer transaction multi-sig serialization and deserialization
   const nonce = 0;
   const fee = 0;
 
-  const privKeyStrings = [
+  const privKeys = [
     '6d430bb91222408e7706c9001cfaeb91b08c2be6d5ac95779ab52c6b431950e001',
     '2a584d899fed1d24e26b524f202763c8ab30260167429f157f1c119f550fa6af01',
     'd5200dee706ee53ae98a03fba6cf4fdcc5084c30cfa9e1b3462dcdeaa3e0f1d201',
   ];
-  const privKeys = privKeyStrings.map(createStacksPrivateKey);
 
-  const pubKeys = privKeyStrings.map(pubKeyfromPrivKey);
-  const pubKeyStrings = pubKeys.map(publicKeyToString);
+  const pubKeys = privKeys.map(privateKeyToPublic).map(createStacksPublicKey);
+  const pubKeyStrings = pubKeys.map(serializePublicKey).map(publicKeyToHex);
 
   const spendingCondition = createMultiSigSpendingCondition(
     addressHashMode,
@@ -270,15 +266,14 @@ test('STX token transfer transaction multi-sig uncompressed keys serialization a
   const nonce = 0;
   const fee = 0;
 
-  const privKeyStrings = [
+  const privKeys = [
     '6d430bb91222408e7706c9001cfaeb91b08c2be6d5ac95779ab52c6b431950e0',
     '2a584d899fed1d24e26b524f202763c8ab30260167429f157f1c119f550fa6af',
     'd5200dee706ee53ae98a03fba6cf4fdcc5084c30cfa9e1b3462dcdeaa3e0f1d2',
   ];
-  const privKeys = privKeyStrings.map(createStacksPrivateKey);
 
-  const pubKeys = privKeyStrings.map(pubKeyfromPrivKey);
-  const pubKeyStrings = pubKeys.map(publicKeyToString);
+  const pubKeys = privKeys.map(privateKeyToPublic).map(createStacksPublicKey);
+  const pubKeyStrings = pubKeys.map(serializePublicKey).map(publicKeyToHex);
 
   const spendingCondition = createMultiSigSpendingCondition(
     addressHashMode,
@@ -361,8 +356,8 @@ test('Sponsored STX token transfer transaction serialization and deserialization
   const transaction = new StacksTransaction(transactionVersion, authorization, payload);
 
   const signer = new TransactionSigner(transaction);
-  signer.signOrigin(createStacksPrivateKey(secretKey));
-  signer.signSponsor(createStacksPrivateKey(sponsorSecretKey));
+  signer.signOrigin(secretKey);
+  signer.signSponsor(sponsorSecretKey);
 
   transaction.verifyOrigin();
 

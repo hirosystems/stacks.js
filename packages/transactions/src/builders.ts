@@ -1,4 +1,13 @@
-import { ApiOpts, ApiParam, bytesToHex, hexToBytes, IntegerType } from '@stacks/common';
+import { ApiOpts, ApiParam, IntegerType } from '@stacks/common';
+import {
+  STACKS_MAINNET,
+  STACKS_TESTNET,
+  StacksNetwork,
+  StacksNetworkName,
+  TransactionVersion,
+  networkFrom,
+  whenTransactionVersion,
+} from '@stacks/network';
 import { c32address } from 'c32check';
 import {
   createSingleSigSpendingCondition,
@@ -21,14 +30,7 @@ import {
 } from './constants';
 import { ClarityAbi, validateContractCall } from './contract-abi';
 import { estimateFee, getAbi, getNonce } from './fetch';
-import {
-  createStacksPrivateKey,
-  getPublicKey,
-  pubKeyfromPrivKey,
-  publicKeyFromBytes,
-  publicKeyToAddress,
-  publicKeyToString,
-} from './keys';
+import { createStacksPublicKey, privateKeyToPublic, publicKeyToAddress } from './keys';
 import {
   createContractCallPayload,
   createSmartContractPayload,
@@ -41,26 +43,17 @@ import {
 } from './postcondition';
 import {
   AssetInfo,
-  createContractPrincipal,
-  createStandardPrincipal,
   FungiblePostCondition,
   NonFungiblePostCondition,
   PostCondition,
   STXPostCondition,
+  createContractPrincipal,
+  createStandardPrincipal,
 } from './postcondition-types';
 import { TransactionSigner } from './signer';
 import { StacksTransaction } from './transaction';
 import { createLPList } from './types';
 import { defaultApiFromNetwork, omit } from './utils';
-import {
-  networkFrom,
-  STACKS_MAINNET,
-  STACKS_TESTNET,
-  StacksNetworkName,
-  TransactionVersion,
-  whenTransactionVersion,
-} from '@stacks/network';
-import { StacksNetwork } from '@stacks/network';
 
 export interface MultiSigOptions {
   numSignatures: number;
@@ -185,11 +178,11 @@ export async function makeSTXTokenTransfer(
 ): Promise<StacksTransaction> {
   if ('senderKey' in txOptions) {
     // txOptions is SignedTokenTransferOptions
-    const publicKey = publicKeyToString(getPublicKey(createStacksPrivateKey(txOptions.senderKey)));
+    const publicKey = privateKeyToPublic(txOptions.senderKey);
     const options = omit(txOptions, 'senderKey');
     const transaction = await makeUnsignedSTXTokenTransfer({ publicKey, ...options });
 
-    const privKey = createStacksPrivateKey(txOptions.senderKey);
+    const privKey = txOptions.senderKey;
     const signer = new TransactionSigner(transaction);
     signer.signOrigin(privKey);
 
@@ -202,13 +195,13 @@ export async function makeSTXTokenTransfer(
     const signer = new TransactionSigner(transaction);
     let pubKeys = txOptions.publicKeys;
     for (const key of txOptions.signerKeys) {
-      const pubKey = pubKeyfromPrivKey(key);
-      pubKeys = pubKeys.filter(pk => pk !== bytesToHex(pubKey.data));
-      signer.signOrigin(createStacksPrivateKey(key));
+      const pubKey = privateKeyToPublic(key);
+      pubKeys = pubKeys.filter(pk => pk !== pubKey);
+      signer.signOrigin(key);
     }
 
     for (const key of pubKeys) {
-      signer.appendOrigin(publicKeyFromBytes(hexToBytes(key)));
+      signer.appendOrigin(createStacksPublicKey(key));
     }
 
     return transaction;
@@ -280,11 +273,12 @@ export async function makeContractDeploy(
 ): Promise<StacksTransaction> {
   if ('senderKey' in txOptions) {
     // txOptions is SignedContractDeployOptions
-    const publicKey = publicKeyToString(getPublicKey(createStacksPrivateKey(txOptions.senderKey)));
+
+    const publicKey = privateKeyToPublic(txOptions.senderKey);
     const options = omit(txOptions, 'senderKey');
     const transaction = await makeUnsignedContractDeploy({ publicKey, ...options });
 
-    const privKey = createStacksPrivateKey(txOptions.senderKey);
+    const privKey = txOptions.senderKey;
     const signer = new TransactionSigner(transaction);
     signer.signOrigin(privKey);
 
@@ -297,13 +291,13 @@ export async function makeContractDeploy(
     const signer = new TransactionSigner(transaction);
     let pubKeys = txOptions.publicKeys;
     for (const key of txOptions.signerKeys) {
-      const pubKey = pubKeyfromPrivKey(key);
-      pubKeys = pubKeys.filter(pk => pk !== bytesToHex(pubKey.data));
-      signer.signOrigin(createStacksPrivateKey(key));
+      const pubKey = privateKeyToPublic(key);
+      pubKeys = pubKeys.filter(pk => pk !== pubKey);
+      signer.signOrigin(key);
     }
 
     for (const key of pubKeys) {
-      signer.appendOrigin(publicKeyFromBytes(hexToBytes(key)));
+      signer.appendOrigin(createStacksPublicKey(key));
     }
 
     return transaction;
@@ -522,11 +516,11 @@ export async function makeContractCall(
   txOptions: SignedContractCallOptions | SignedMultiSigContractCallOptions
 ): Promise<StacksTransaction> {
   if ('senderKey' in txOptions) {
-    const publicKey = publicKeyToString(getPublicKey(createStacksPrivateKey(txOptions.senderKey)));
+    const publicKey = privateKeyToPublic(txOptions.senderKey);
     const options = omit(txOptions, 'senderKey');
     const transaction = await makeUnsignedContractCall({ publicKey, ...options });
 
-    const privKey = createStacksPrivateKey(txOptions.senderKey);
+    const privKey = txOptions.senderKey;
     const signer = new TransactionSigner(transaction);
     signer.signOrigin(privKey);
 
@@ -538,13 +532,13 @@ export async function makeContractCall(
     const signer = new TransactionSigner(transaction);
     let pubKeys = txOptions.publicKeys;
     for (const key of txOptions.signerKeys) {
-      const pubKey = pubKeyfromPrivKey(key);
-      pubKeys = pubKeys.filter(pk => pk !== bytesToHex(pubKey.data));
-      signer.signOrigin(createStacksPrivateKey(key));
+      const pubKey = privateKeyToPublic(key);
+      pubKeys = pubKeys.filter(pk => pk !== pubKey);
+      signer.signOrigin(key);
     }
 
     for (const key of pubKeys) {
-      signer.appendOrigin(publicKeyFromBytes(hexToBytes(key)));
+      signer.appendOrigin(createStacksPublicKey(key));
     }
 
     return transaction;
@@ -744,7 +738,7 @@ export async function sponsorTransaction(
   const options = Object.assign(defaultOptions, sponsorOptions);
   options.api = defaultApiFromNetwork(options.network, sponsorOptions.api);
 
-  const sponsorPubKey = pubKeyfromPrivKey(options.sponsorPrivateKey);
+  const sponsorPubKey = privateKeyToPublic(options.sponsorPrivateKey);
 
   if (sponsorOptions.fee == null) {
     let txFee: bigint | number = 0;
@@ -778,14 +772,14 @@ export async function sponsorTransaction(
 
   const sponsorSpendingCondition = createSingleSigSpendingCondition(
     options.sponsorAddressHashmode,
-    publicKeyToString(sponsorPubKey),
+    sponsorPubKey,
     options.sponsorNonce,
     options.fee
   );
 
   options.transaction.setSponsor(sponsorSpendingCondition);
 
-  const privKey = createStacksPrivateKey(options.sponsorPrivateKey);
+  const privKey = options.sponsorPrivateKey;
   const signer = TransactionSigner.createSponsorSigner(
     options.transaction,
     sponsorSpendingCondition

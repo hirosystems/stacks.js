@@ -12,6 +12,7 @@ import {
 import base58 from 'bs58';
 import { hashRipemd160 } from './hashRipemd160';
 import { hashSha256Sync } from './sha2Hash';
+import { PrivateKey } from '../../transactions/src';
 
 const BITCOIN_PUBKEYHASH = 0x00;
 
@@ -96,7 +97,7 @@ export function publicKeyToBtcAddress(
  * @ignore
  * @returns a compressed public key
  */
-export function getPublicKeyFromPrivate(privateKey: string | Uint8Array): string {
+export function getPublicKeyFromPrivate(privateKey: PrivateKey): string {
   const privateKeyBytes = privateKeyToBytes(privateKey);
   // for backwards compatibility we always return a compressed public key, regardless of private key mode
   return bytesToHex(nobleGetPublicKey(privateKeyBytes.slice(0, 32), true));
@@ -105,8 +106,8 @@ export function getPublicKeyFromPrivate(privateKey: string | Uint8Array): string
 /**
  * @ignore
  */
-export function ecSign(messageHash: Uint8Array, hexPrivateKey: string | Uint8Array) {
-  return signSync(messageHash, privateKeyToBytes(hexPrivateKey).slice(0, 32), {
+export function ecSign(messageHash: Uint8Array, privateKey: PrivateKey) {
+  return signSync(messageHash, privateKeyToBytes(privateKey).slice(0, 32), {
     der: false,
   });
 }
@@ -114,14 +115,14 @@ export function ecSign(messageHash: Uint8Array, hexPrivateKey: string | Uint8Arr
 /**
  * @ignore
  */
-export function isValidPrivateKey(privateKey: string | Uint8Array): boolean {
+export function isValidPrivateKey(privateKey: PrivateKey): boolean {
   return utils.isValidPrivateKey(privateKeyToBytes(privateKey));
 }
 
 /**
  * @ignore
  */
-export function compressPrivateKey(privateKey: string | Uint8Array): Uint8Array {
+export function compressPrivateKey(privateKey: PrivateKey): Uint8Array {
   const privateKeyBytes = privateKeyToBytes(privateKey);
 
   return privateKeyBytes.length == PRIVATE_KEY_COMPRESSED_LENGTH
