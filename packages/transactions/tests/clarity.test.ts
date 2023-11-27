@@ -49,6 +49,7 @@ import {
 } from '../src/clarity/clarityValue';
 import { addressToString } from '../src/common';
 import { deserializeAddress } from '../src/types';
+import assert from 'assert';
 
 const ADDRESS = 'SP2JXKMSH007NPYAQHKJPQMAQYAD90NQGTVJVQ02B';
 
@@ -695,6 +696,16 @@ describe('Clarity Types', () => {
       const vInt = Cl.int(1) as ClarityValue;
       expect(isClarityType(vInt, ClarityType.Int)).toBeTruthy();
       expect(isClarityType(vInt, ClarityType.UInt)).toBeFalsy();
+
+      // test the type assertion
+
+      assert(isClarityType(vUint, ClarityType.UInt));
+      const uintTest: UIntCV = vUint;
+      uintTest; // avoid the "value is never read warning"
+
+      assert(isClarityType(vInt, ClarityType.Int));
+      const intTest: IntCV = vInt;
+      intTest; // avoid the "value is never read warning"
     });
   });
 });
