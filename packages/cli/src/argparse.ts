@@ -395,6 +395,37 @@ export const CLI_ARGS = {
         '\n',
       group: 'Account Management',
     },
+    decode_cv: {
+      type: 'array',
+      items: [
+        {
+          name: 'clarity_value',
+          type: 'string',
+          realtype: 'string',
+          pattern: '-|^(0x|0X)?[a-fA-F0-9]+$',
+        },
+        {
+          name: 'format',
+          type: 'string',
+          realtype: 'format',
+          pattern: '^(repr|pretty|json)$',
+        },
+      ],
+      minItems: 1,
+      maxItems: 4,
+      help:
+        'Decode a serialized Clarity value.\n' +
+        '\n' +
+        'Example:\n' +
+        '\n' +
+        '    $ stx decode_cv 0x050011deadbeef11ababffff11deadbeef11ababffff\n' +
+        '    S08XXBDYXW8TQAZZZW8XXBDYXW8TQAZZZZ88551S\n' +
+        '    $ stx decode_cv --format json SPA2MZWV9N67TBYVWTE0PSSKMJ2F6YXW7CBE6YPW\n' +
+        '    {"type":"principal","value":"S08XXBDYXW8TQAZZZW8XXBDYXW8TQAZZZZ88551S"}\n' +
+        '    $ echo SPA2MZWV9N67TBYVWTE0PSSKMJ2F6YXW7CBE6YPW | stx decode_cv -\n' +
+        '    S08XXBDYXW8TQAZZZW8XXBDYXW8TQAZZZZ88551S\n',
+      group: 'Account Management',
+    },
     convert_address: {
       type: 'array',
       items: [
