@@ -424,7 +424,7 @@ export const CLI_ARGS = {
         '    {"type":"principal","value":"S08XXBDYXW8TQAZZZW8XXBDYXW8TQAZZZZ88551S"}\n' +
         '    $ echo 0x050011deadbeef11ababffff11deadbeef11ababffff | stx decode_cv -\n' +
         '    S08XXBDYXW8TQAZZZW8XXBDYXW8TQAZZZZ88551S\n',
-      group: 'Account Management',
+      group: 'Utilities',
     },
     convert_address: {
       type: 'array',
