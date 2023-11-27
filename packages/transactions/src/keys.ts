@@ -14,8 +14,8 @@ import {
   hexToBytes,
   intToHex,
   parseRecoverableSignatureVrs,
-  privateKeyToBytes,
   PRIVATE_KEY_COMPRESSED_LENGTH,
+  privateKeyToBytes,
   signatureRsvToVrs,
   signatureVrsToRsv,
 } from '@stacks/common';
@@ -61,30 +61,32 @@ export interface StacksPublicKey {
 /** Creates a P2PKH address string from the given private key and tx version. */
 export function getAddressFromPrivateKey(
   /** Private key bytes or hex string */
-  privateKey: string | Uint8Array,
+  privateKey: PrivateKey,
   transactionVersion = TransactionVersion.Mainnet
 ): string {
-  const pubKey = pubKeyfromPrivKey(privateKey);
-  return getAddressFromPublicKey(pubKey.data, transactionVersion);
+  const publicKey = privateKeyToPublic(privateKey);
+  return getAddressFromPublicKey(publicKey, transactionVersion);
 }
 
+// todo: use network as last parameter instead of txversion param. next refactor
 /** Creates a P2PKH address string from the given public key and tx version. */
 export function getAddressFromPublicKey(
   /** Public key bytes or hex string */
-  publicKey: string | Uint8Array,
+  publicKey: PublicKey,
   transactionVersion = TransactionVersion.Mainnet
 ): string {
-  publicKey = typeof publicKey === 'string' ? publicKey : bytesToHex(publicKey);
+  publicKey = typeof publicKey === 'string' ? hexToBytes(publicKey) : publicKey;
   const addrVer = addressHashModeToVersion(AddressHashMode.SerializeP2PKH, transactionVersion);
-  const addr = addressFromVersionHash(addrVer, hashP2PKH(hexToBytes(publicKey)));
+  const addr = addressFromVersionHash(addrVer, hashP2PKH(publicKey));
   const addrString = addressToString(addr);
   return addrString;
 }
 
-export function createStacksPublicKey(key: string): StacksPublicKey {
+export function createStacksPublicKey(publicKey: PublicKey): StacksPublicKey {
+  publicKey = typeof publicKey === 'string' ? hexToBytes(publicKey) : publicKey;
   return {
     type: StacksMessageType.PublicKey,
-    data: hexToBytes(key),
+    data: publicKey,
   };
 }
 
@@ -112,64 +114,62 @@ export function publicKeyFromSignatureRsv(
   );
 }
 
-export function publicKeyFromBytes(data: Uint8Array): StacksPublicKey {
-  return { type: StacksMessageType.PublicKey, data };
+export function privateKeyToHex(publicKey: PublicKey): string {
+  return typeof publicKey === 'string' ? publicKey : bytesToHex(publicKey);
+}
+export const publicKeyToHex = privateKeyToHex;
+
+export function privateKeyIsCompressed(privateKey: PrivateKey): boolean {
+  const length = typeof privateKey === 'string' ? privateKey.length / 2 : privateKey.byteLength;
+  return length === PRIVATE_KEY_COMPRESSED_LENGTH;
 }
 
-export function isCompressed(key: StacksPublicKey): boolean {
-  return !bytesToHex(key.data).startsWith('04');
-}
-
-export function publicKeyToString(key: StacksPublicKey): string {
-  return bytesToHex(key.data);
+export function publicKeyIsCompressed(publicKey: PublicKey): boolean {
+  return !publicKeyToHex(publicKey).startsWith('04');
 }
 
 export function serializePublicKey(key: StacksPublicKey): Uint8Array {
   return key.data.slice();
 }
 
-export function pubKeyfromPrivKey(privateKey: string | Uint8Array): StacksPublicKey {
-  const privKey = createStacksPrivateKey(privateKey);
-  const publicKey = nobleGetPublicKey(privKey.data.slice(0, 32), privKey.compressed);
-  return createStacksPublicKey(bytesToHex(publicKey));
+/**
+ * Get the public key from a private key.
+ * Allows for "compressed" and "uncompressed" private keys.
+ * > Matches legacy `pubKeyfromPrivKey`, `getPublic` function behavior
+ */
+export function privateKeyToPublic(privateKey: PrivateKey): string {
+  privateKey = privateKeyToBytes(privateKey);
+  const isCompressed = privateKeyIsCompressed(privateKey);
+  return bytesToHex(nobleGetPublicKey(privateKey.slice(0, 32), isCompressed));
 }
 
-export function compressPublicKey(publicKey: string | Uint8Array): StacksPublicKey {
-  const hex = typeof publicKey === 'string' ? publicKey : bytesToHex(publicKey);
-  const compressed = Point.fromHex(hex).toHex(true);
-  return createStacksPublicKey(compressed);
+export function compressPublicKey(publicKey: PublicKey): string {
+  return Point.fromHex(publicKeyToHex(publicKey)).toHex(true);
 }
 
 export function deserializePublicKey(bytesReader: BytesReader): StacksPublicKey {
   const fieldId = bytesReader.readUInt8();
   const keyLength =
     fieldId === 4 ? UNCOMPRESSED_PUBKEY_LENGTH_BYTES : COMPRESSED_PUBKEY_LENGTH_BYTES;
-  return publicKeyFromBytes(concatArray([fieldId, bytesReader.readBytes(keyLength)]));
+  return createStacksPublicKey(concatArray([fieldId, bytesReader.readBytes(keyLength)]));
 }
 
-export interface StacksPrivateKey {
-  // "compressed" private key is a misnomer: https://web.archive.org/web/20220131144208/https://www.oreilly.com/library/view/mastering-bitcoin/9781491902639/ch04.html#comp_priv
-  // it actually means: should public keys be generated as "compressed" or "uncompressed" from this private key
-  compressed: boolean;
-  data: Uint8Array;
+// todo: double-check for deduplication, rename!
+export function makeRandomPrivKey(): string {
+  return bytesToHex(utils.randomPrivateKey());
 }
 
-export function createStacksPrivateKey(key: string | Uint8Array): StacksPrivateKey {
-  const data = privateKeyToBytes(key);
-  const compressed = data.length == PRIVATE_KEY_COMPRESSED_LENGTH;
-  return { data, compressed };
-}
-
-export function makeRandomPrivKey(): StacksPrivateKey {
-  return createStacksPrivateKey(utils.randomPrivateKey());
-}
+// todo: complete refactor
+export type PrivateKey = string | Uint8Array;
+export type PublicKey = string | Uint8Array;
 
 /**
  * @deprecated The Clarity compatible {@link signMessageHashRsv} is preferred, but differs in signature format
  * @returns A recoverable signature (in VRS order)
  */
-export function signWithKey(privateKey: StacksPrivateKey, messageHash: string): MessageSignature {
-  const [rawSignature, recoveryId] = signSync(messageHash, privateKey.data.slice(0, 32), {
+export function signWithKey(privateKey: PrivateKey, messageHash: string): MessageSignature {
+  privateKey = privateKeyToBytes(privateKey);
+  const [rawSignature, recoveryId] = signSync(messageHash, privateKey.slice(0, 32), {
     canonical: true,
     recovered: true,
   });
@@ -191,20 +191,14 @@ export function signMessageHashRsv({
   privateKey,
 }: {
   messageHash: string;
-  privateKey: StacksPrivateKey;
+  privateKey: PrivateKey;
 }): MessageSignature {
   const messageSignature = signWithKey(privateKey, messageHash);
   return { ...messageSignature, data: signatureVrsToRsv(messageSignature.data) };
 }
 
-export function getPublicKey(privateKey: StacksPrivateKey): StacksPublicKey {
-  return pubKeyfromPrivKey(privateKey.data);
-}
-
-export function privateKeyToString(privateKey: StacksPrivateKey): string {
-  return bytesToHex(privateKey.data);
-}
-
-export function publicKeyToAddress(version: AddressVersion, publicKey: StacksPublicKey): string {
-  return c32address(version, bytesToHex(hash160(publicKey.data)));
+// todo: use network as last parameter instead of addressversion param. next refactor
+export function publicKeyToAddress(version: AddressVersion, publicKey: PublicKey): string {
+  publicKey = typeof publicKey === 'string' ? hexToBytes(publicKey) : publicKey;
+  return c32address(version, bytesToHex(hash160(publicKey)));
 }

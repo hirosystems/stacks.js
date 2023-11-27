@@ -2,8 +2,8 @@ import { sha256 } from '@noble/hashes/sha256';
 import {
   getPublicKey as nobleGetPublicKey,
   signSync as nobleSecp256k1Sign,
-  utils,
   verify as nobleSecp256k1Verify,
+  utils,
 } from '@noble/secp256k1';
 import {
   bytesToHex,
@@ -15,24 +15,22 @@ import {
 } from '@stacks/common';
 import { ec as EC } from 'elliptic';
 import {
+  PubKeyEncoding,
+  StacksMessageType,
   compressPublicKey,
-  createStacksPrivateKey,
   encodeStructuredData,
+  createStacksPublicKey,
   getAddressFromPrivateKey,
   getAddressFromPublicKey,
-  getPublicKey,
   makeRandomPrivKey,
-  privateKeyToString,
-  PubKeyEncoding,
-  pubKeyfromPrivKey,
+  privateKeyToHex,
+  privateKeyToPublic,
   publicKeyFromSignatureRsv,
   publicKeyFromSignatureVrs,
-  publicKeyToString,
+  publicKeyToHex,
   signMessageHashRsv,
   signStructuredData,
   signWithKey,
-  StacksMessageType,
-  StacksPublicKey,
   stringAsciiCV,
   tupleCV,
   uintCV,
@@ -45,43 +43,40 @@ import { TransactionVersion } from '@stacks/network';
 // Better do it once and reuse it
 const ec = new EC('secp256k1');
 
-test('pubKeyfromPrivKey', () => {
+test(privateKeyToPublic.name, () => {
   expect(
-    pubKeyfromPrivKey('edf9aee84d9b7abc145504dde6726c64f369d37ee34ded868fabd876c26570bc01').data
-      .byteLength
-  ).toBe(33);
+    privateKeyToPublic('edf9aee84d9b7abc145504dde6726c64f369d37ee34ded868fabd876c26570bc01').length
+  ).toBe(33 * 2);
   expect(
-    pubKeyfromPrivKey('edf9aee84d9b7abc145504dde6726c64f369d37ee34ded868fabd876c26570bc').data
-      .byteLength
-  ).toBe(65);
+    privateKeyToPublic('edf9aee84d9b7abc145504dde6726c64f369d37ee34ded868fabd876c26570bc').length
+  ).toBe(65 * 2);
 });
 
 test('Stacks public key and private keys', () => {
-  const privKeyString = 'edf9aee84d9b7abc145504dde6726c64f369d37ee34ded868fabd876c26570bc';
+  const privKey = 'edf9aee84d9b7abc145504dde6726c64f369d37ee34ded868fabd876c26570bc';
   const pubKeyString =
     '04ef788b3830c00abe8f64f62dc32fc863bc0b2cafeb073b6c8e1c7657d9c2c3ab' +
     '5b435d20ea91337cdd8c30dd7427bb098a5355e9c9bfad43797899b8137237cf';
-  const pubKey = pubKeyfromPrivKey(privKeyString);
-  expect(publicKeyToString(pubKey)).toBe(pubKeyString);
+  const pubKey = createStacksPublicKey(privateKeyToPublic(privKey));
+  expect(publicKeyToHex(pubKey.data)).toBe(pubKeyString);
 
-  const deserialized = serializeDeserialize(pubKey, StacksMessageType.PublicKey) as StacksPublicKey;
-  expect(publicKeyToString(deserialized)).toBe(pubKeyString);
+  const deserialized = serializeDeserialize(pubKey, StacksMessageType.PublicKey);
+  expect(bytesToHex(deserialized.data)).toBe(pubKeyString);
 
-  const privKey = createStacksPrivateKey(privKeyString);
-  expect(publicKeyToString(getPublicKey(privKey))).toBe(pubKeyString);
+  expect(privateKeyToPublic(privKey)).toBe(pubKeyString);
 
-  const randomKey = makeRandomPrivKey();
-  expect(privateKeyToString(randomKey).length).toEqual(64);
+  const randomKey = makeRandomPrivKey(); // defaults to uncompressed (i.e. no 01 suffix)
+  expect(privateKeyToHex(randomKey).length).toEqual(64);
 
-  expect(getAddressFromPrivateKey(privKeyString)).toBe('SPZG6BAY4JVR9RNAB1HY92B7Q208ZYY4HZEA9PX5');
-  expect(getAddressFromPrivateKey(hexToBytes(privKeyString))).toBe(
+  expect(getAddressFromPrivateKey(privKey)).toBe('SPZG6BAY4JVR9RNAB1HY92B7Q208ZYY4HZEA9PX5');
+  expect(getAddressFromPrivateKey(hexToBytes(privKey))).toBe(
     'SPZG6BAY4JVR9RNAB1HY92B7Q208ZYY4HZEA9PX5'
   );
 
-  expect(getAddressFromPrivateKey(privKeyString, TransactionVersion.Testnet)).toBe(
+  expect(getAddressFromPrivateKey(privKey, TransactionVersion.Testnet)).toBe(
     'STZG6BAY4JVR9RNAB1HY92B7Q208ZYY4HZG8ZXFM'
   );
-  expect(getAddressFromPrivateKey(hexToBytes(privKeyString), TransactionVersion.Testnet)).toBe(
+  expect(getAddressFromPrivateKey(hexToBytes(privKey), TransactionVersion.Testnet)).toBe(
     'STZG6BAY4JVR9RNAB1HY92B7Q208ZYY4HZG8ZXFM'
   );
 
@@ -97,7 +92,7 @@ test('Stacks public key and private keys', () => {
     'STZG6BAY4JVR9RNAB1HY92B7Q208ZYY4HZG8ZXFM'
   );
 
-  const compressedPubKey = bytesToHex(compressPublicKey(pubKey.data).data);
+  const compressedPubKey = compressPublicKey(pubKey.data);
   expect(compressedPubKey).toBe(
     '03ef788b3830c00abe8f64f62dc32fc863bc0b2cafeb073b6c8e1c7657d9c2c3ab'
   );
@@ -112,9 +107,7 @@ test('signWithKey', () => {
   //   )
   // >> true
 
-  const privateKey = createStacksPrivateKey(
-    'bcf62fdd286f9b30b2c289cce3189dbf3b502dcd955b2dc4f67d18d77f3e73c7'
-  );
+  const privateKey = 'bcf62fdd286f9b30b2c289cce3189dbf3b502dcd955b2dc4f67d18d77f3e73c7';
   const expectedMessageHash = 'a591a6d40bf420404a011733cfb7b190d62c65bf0bcda32b57b277d9ad9f146e';
   const expectedSignatureVrs =
     '00f540e429fc6e8a4c27f2782479e739cae99aa21e8cb25d4436f333577bc791cd1d9672055dd1604dd5194b88076e4f859dd93c834785ed589ec38291698d4142';
@@ -135,9 +128,7 @@ test('signMessageHashRsv', () => {
   //   )
   // >> true
 
-  const privateKey = createStacksPrivateKey(
-    'bcf62fdd286f9b30b2c289cce3189dbf3b502dcd955b2dc4f67d18d77f3e73c7'
-  );
+  const privateKey = 'bcf62fdd286f9b30b2c289cce3189dbf3b502dcd955b2dc4f67d18d77f3e73c7';
   const expectedMessageHash = 'a591a6d40bf420404a011733cfb7b190d62c65bf0bcda32b57b277d9ad9f146e';
   const expectedSignatureRsv =
     'f540e429fc6e8a4c27f2782479e739cae99aa21e8cb25d4436f333577bc791cd1d9672055dd1604dd5194b88076e4f859dd93c834785ed589ec38291698d414200';
@@ -151,9 +142,7 @@ test('signMessageHashRsv', () => {
 
 test('noble sign message', () => {
   // example from https://paulmillr.com/noble/
-  const privateKey = createStacksPrivateKey(
-    '0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef'
-  );
+  const privateKey = '0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef';
   const expectedMessageHash = '011a775441ecb14943130a16f00cdd41818a83dd04372f3259e3ca7237e3cdaa';
   const expectedR = 114926983411733245831514739773229123958640458736536797227773647312126690926912n;
   const expectedS = 3148023981578716756961627923124903910422344826113324160219886779423594190576n;
@@ -170,9 +159,7 @@ test('noble sign message', () => {
 });
 
 test('Retrieve public key from rsv signature', () => {
-  const privKey = createStacksPrivateKey(
-    'edf9aee84d9b7abc145504dde6726c64f369d37ee34ded868fabd876c26570bc'
-  );
+  const privKey = 'edf9aee84d9b7abc145504dde6726c64f369d37ee34ded868fabd876c26570bc';
   const uncompressedPubKey =
     '04ef788b3830c00abe8f64f62dc32fc863bc0b2cafeb073b6c8e1c7657d9c2c3ab5b435d20ea91337cdd8c30dd7427bb098a5355e9c9bfad43797899b8137237cf';
   const compressedPubKey = '03ef788b3830c00abe8f64f62dc32fc863bc0b2cafeb073b6c8e1c7657d9c2c3ab';
@@ -197,9 +184,7 @@ test('Retrieve public key from rsv signature', () => {
 });
 
 test('Retrieve public key from vrs signature', () => {
-  const privateKey = createStacksPrivateKey(
-    'edf9aee84d9b7abc145504dde6726c64f369d37ee34ded868fabd876c26570bc'
-  );
+  const privateKey = 'edf9aee84d9b7abc145504dde6726c64f369d37ee34ded868fabd876c26570bc';
   const uncompressedPubKey =
     '04ef788b3830c00abe8f64f62dc32fc863bc0b2cafeb073b6c8e1c7657d9c2c3ab5b435d20ea91337cdd8c30dd7427bb098a5355e9c9bfad43797899b8137237cf';
   const compressedPubKey = '03ef788b3830c00abe8f64f62dc32fc863bc0b2cafeb073b6c8e1c7657d9c2c3ab';
@@ -223,9 +208,7 @@ test('Retrieve public key from vrs signature', () => {
 });
 
 test('Retrieve public key from SIP-018 signature', () => {
-  const privKey = createStacksPrivateKey(
-    'edf9aee84d9b7abc145504dde6726c64f369d37ee34ded868fabd876c26570bc'
-  );
+  const privKey = 'edf9aee84d9b7abc145504dde6726c64f369d37ee34ded868fabd876c26570bc';
   const uncompressedPubKey =
     '04ef788b3830c00abe8f64f62dc32fc863bc0b2cafeb073b6c8e1c7657d9c2c3ab5b435d20ea91337cdd8c30dd7427bb098a5355e9c9bfad43797899b8137237cf';
   const compressedPubKey = '03ef788b3830c00abe8f64f62dc32fc863bc0b2cafeb073b6c8e1c7657d9c2c3ab';

@@ -56,10 +56,10 @@ import assert from 'assert';
 
 const ADDRESS = 'SP2JXKMSH007NPYAQHKJPQMAQYAD90NQGTVJVQ02B';
 
-function serializeDeserialize<T extends ClarityValue>(value: T): ClarityValue {
+function serializeDeserialize<T extends ClarityValue>(value: T): T {
   const serializedDeserialized: Uint8Array = serializeCV(value);
   const bytesReader = new BytesReader(serializedDeserialized);
-  return deserializeCV(bytesReader);
+  return deserializeCV(bytesReader) as T;
 }
 
 describe('Clarity Types', () => {
@@ -322,7 +322,7 @@ describe('Clarity Types', () => {
       expect(max128.value.toString()).toBe('340282366920938463463374607431768211455');
       const serializedMax = serializeCV(max128);
       expect('0x' + bytesToHex(serializedMax.slice(1))).toBe('0xffffffffffffffffffffffffffffffff');
-      const serializedDeserializedMax = serializeDeserialize(max128) as IntCV;
+      const serializedDeserializedMax = serializeDeserialize(max128);
       expect(cvToString(serializedDeserializedMax)).toBe(cvToString(max128));
 
       // Min 128-bit integer
@@ -330,7 +330,7 @@ describe('Clarity Types', () => {
       expect(min128.value.toString()).toBe('0');
       const serializedMin = serializeCV(min128);
       expect('0x' + bytesToHex(serializedMin.slice(1))).toBe('0x00000000000000000000000000000000');
-      const serializedDeserializedMin = serializeDeserialize(min128) as IntCV;
+      const serializedDeserializedMin = serializeDeserialize(min128);
       expect(cvToString(serializedDeserializedMin)).toBe(cvToString(min128));
 
       // Out of bounds, too large
@@ -436,7 +436,6 @@ describe('Clarity Types', () => {
       // Test lexicographic ordering of tuple keys (to match Node Buffer compare)
       const lexicographic = Object.keys(tuple.data).sort((a, b) => {
         const bufA = Buffer.from(a);
-
         const bufB = Buffer.from(b);
         return bufA.compare(bufB);
       });
