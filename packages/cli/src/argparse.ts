@@ -422,7 +422,7 @@ export const CLI_ARGS = {
         '    S08XXBDYXW8TQAZZZW8XXBDYXW8TQAZZZZ88551S\n' +
         '    $ stx decode_cv --format json SPA2MZWV9N67TBYVWTE0PSSKMJ2F6YXW7CBE6YPW\n' +
         '    {"type":"principal","value":"S08XXBDYXW8TQAZZZW8XXBDYXW8TQAZZZZ88551S"}\n' +
-        '    $ echo SPA2MZWV9N67TBYVWTE0PSSKMJ2F6YXW7CBE6YPW | stx decode_cv -\n' +
+        '    $ echo 0x050011deadbeef11ababffff11deadbeef11ababffff | stx decode_cv -\n' +
         '    S08XXBDYXW8TQAZZZW8XXBDYXW8TQAZZZZ88551S\n',
       group: 'Account Management',
     },
