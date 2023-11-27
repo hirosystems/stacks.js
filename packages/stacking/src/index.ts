@@ -21,8 +21,8 @@ import {
   ContractCallPayload,
   OptionalCV,
   PrincipalCV,
+  PrivateKey,
   ResponseErrorCV,
-  StacksPrivateKey,
   StacksTransaction,
   TupleCV,
   TxBroadcastResult,
@@ -1431,8 +1431,8 @@ export class StackingClient {
       contractAddress,
       contractName,
       functionName,
-      senderAddress: this.address,
       functionArgs: [principalCV(this.address)],
+      senderAddress: this.address,
       api: this.api,
     }).then((responseCV: ClarityValue) => {
       if (responseCV.type === ClarityType.OptionalSome) {
@@ -1512,8 +1512,8 @@ export class StackingClient {
       contractName,
       functionName,
       functionArgs,
-      network: this.network,
       senderAddress: this.address,
+      api: this.api,
     }).then(responseCV => responseCV.type === ClarityType.ResponseOk);
   }
 
@@ -1580,7 +1580,7 @@ export class StackingClient {
     poxAddress: string;
     rewardCycle: number;
     period: number;
-    signerPrivateKey: StacksPrivateKey;
+    signerPrivateKey: PrivateKey;
     maxAmount: IntegerType;
     authId: IntegerType;
   }) {

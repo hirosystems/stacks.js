@@ -12,7 +12,7 @@ import {
   ClarityType,
   ClarityValue,
   OptionalCV,
-  StacksPrivateKey,
+  PrivateKey,
   TupleCV,
   bufferCV,
   encodeStructuredData,
@@ -431,7 +431,7 @@ export function signPox4SignatureHash({
   privateKey,
   maxAmount,
   authId,
-}: Pox4SignatureOptions & { privateKey: StacksPrivateKey }) {
+}: Pox4SignatureOptions & { privateKey: PrivateKey }) {
   return signStructuredData({
     ...pox4SignatureMessage({ topic, poxAddress, rewardCycle, period, network, maxAmount, authId }),
     privateKey,

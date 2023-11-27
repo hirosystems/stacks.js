@@ -10,7 +10,6 @@ import {
   SignedContractCallOptions,
   TupleCV,
   bufferCV,
-  createStacksPrivateKey,
   encodeStructuredData,
   intCV,
   noneCV,
@@ -1189,10 +1188,8 @@ test('correctly signs pox-4 signer signature', () => {
   const network = STACKS_TESTNET;
   const poxAddress = 'msiYwJCvXEzjgq6hDwD9ueBka6MTfN962Z';
 
-  const privateKey = createStacksPrivateKey(
-    '002bc479cae71c410cf10113de8fe1611b148231eccdfb19ca779ba365cc511601'
-  );
-  const publicKey = getPublicKeyFromPrivate(privateKey.data);
+  const privateKey = '002bc479cae71c410cf10113de8fe1611b148231eccdfb19ca779ba365cc511601';
+  const publicKey = getPublicKeyFromPrivate(privateKey);
   const maxAmount = 1000n;
   const authId = 0;
 

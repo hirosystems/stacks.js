@@ -8,55 +8,57 @@ import {
   intToHex,
   utf8ToBytes,
 } from '@stacks/common';
+import { StacksNetwork, StacksNetworkName, TransactionVersion } from '@stacks/network';
+import { BytesReader } from './bytesReader';
+import { ClarityValue, deserializeCV, serializeCV } from './clarity';
 import {
-  MEMO_MAX_LENGTH_BYTES,
+  Address,
+  MessageSignature,
+  addressFromVersionHash,
+  addressHashModeToVersion,
+} from './common';
+import {
   AddressHashMode,
   AddressVersion,
-  StacksMessageType,
+  FungibleConditionCode,
+  MEMO_MAX_LENGTH_BYTES,
+  NonFungibleConditionCode,
   PostConditionPrincipalId,
   PostConditionType,
-  FungibleConditionCode,
-  NonFungibleConditionCode,
+  StacksMessageType,
 } from './constants';
-
-import { StacksPublicKey, serializePublicKey, deserializePublicKey, isCompressed } from './keys';
-
+import { DeserializationError, SerializationError } from './errors';
+import {
+  StacksPublicKey,
+  deserializePublicKey,
+  publicKeyIsCompressed,
+  serializePublicKey,
+} from './keys';
+import { Payload, deserializePayload, serializePayload } from './payload';
+import {
+  AssetInfo,
+  ContractPrincipal,
+  LengthPrefixedString,
+  PostCondition,
+  PostConditionPrincipal,
+  StandardPrincipal,
+  createLPString,
+} from './postcondition-types';
+import {
+  TransactionAuthField,
+  deserializeMessageSignature,
+  deserializeTransactionAuthField,
+  serializeMessageSignature,
+  serializeTransactionAuthField,
+} from './signature';
 import {
   exceedsMaxLengthBytes,
   hashP2PKH,
-  rightPadHexToLength,
   hashP2SH,
-  hashP2WSH,
   hashP2WPKH,
+  hashP2WSH,
+  rightPadHexToLength,
 } from './utils';
-
-import { BytesReader } from './bytesReader';
-import {
-  PostCondition,
-  StandardPrincipal,
-  ContractPrincipal,
-  PostConditionPrincipal,
-  LengthPrefixedString,
-  AssetInfo,
-  createLPString,
-} from './postcondition-types';
-import { Payload, deserializePayload, serializePayload } from './payload';
-import { DeserializationError, SerializationError } from './errors';
-import {
-  deserializeTransactionAuthField,
-  deserializeMessageSignature,
-  serializeMessageSignature,
-  serializeTransactionAuthField,
-  TransactionAuthField,
-} from './signature';
-import {
-  MessageSignature,
-  Address,
-  addressHashModeToVersion,
-  addressFromVersionHash,
-} from './common';
-import { ClarityValue, deserializeCV, serializeCV } from './clarity';
-import { StacksNetwork, StacksNetworkName, TransactionVersion } from '@stacks/network';
 
 export type StacksMessage =
   | Address
@@ -166,8 +168,8 @@ export function addressFromPublicKeys(
   }
 
   if (hashMode === AddressHashMode.SerializeP2WPKH || hashMode === AddressHashMode.SerializeP2WSH) {
-    for (let i = 0; i < publicKeys.length; i++) {
-      if (!isCompressed(publicKeys[i])) {
+    for (const publicKey of publicKeys) {
+      if (!publicKeyIsCompressed(publicKey.data)) {
         throw Error('Public keys must be compressed for segwit');
       }
     }

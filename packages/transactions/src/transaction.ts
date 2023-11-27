@@ -1,11 +1,4 @@
-import {
-  bytesToHex,
-  concatArray,
-  hexToBytes,
-  IntegerType,
-  intToBigInt,
-  writeUInt32BE,
-} from '@stacks/common';
+import { concatArray, hexToBytes, IntegerType, intToBigInt, writeUInt32BE } from '@stacks/common';
 import {
   ChainId,
   DEFAULT_CHAIN_ID,
@@ -43,7 +36,7 @@ import {
   StacksMessageType,
 } from './constants';
 import { SerializationError, SigningError } from './errors';
-import { isCompressed, StacksPrivateKey, StacksPublicKey } from './keys';
+import { PrivateKey, privateKeyIsCompressed, publicKeyIsCompressed, StacksPublicKey } from './keys';
 import { deserializePayload, Payload, PayloadInput, serializePayload } from './payload';
 import { createTransactionAuthField } from './signature';
 import { createLPList, deserializeLPList, LengthPrefixedList, serializeLPList } from './types';
@@ -118,7 +111,7 @@ export class StacksTransaction {
     return verifyOrigin(this.auth, this.verifyBegin());
   }
 
-  signNextOrigin(sigHash: string, privateKey: StacksPrivateKey): string {
+  signNextOrigin(sigHash: string, privateKey: PrivateKey): string {
     if (this.auth.spendingCondition === undefined) {
       throw new Error('"auth.spendingCondition" is undefined');
     }
@@ -128,7 +121,7 @@ export class StacksTransaction {
     return this.signAndAppend(this.auth.spendingCondition, sigHash, AuthType.Standard, privateKey);
   }
 
-  signNextSponsor(sigHash: string, privateKey: StacksPrivateKey): string {
+  signNextSponsor(sigHash: string, privateKey: PrivateKey): string {
     if (this.auth.authType === AuthType.Sponsored) {
       return this.signAndAppend(
         this.auth.sponsorSpendingCondition,
@@ -144,7 +137,7 @@ export class StacksTransaction {
   appendPubkey(publicKey: StacksPublicKey) {
     const cond = this.auth.spendingCondition;
     if (cond && !isSingleSig(cond)) {
-      const compressed = isCompressed(publicKey);
+      const compressed = publicKeyIsCompressed(publicKey.data);
       cond.fields.push(
         createTransactionAuthField(
           compressed ? PubKeyEncoding.Compressed : PubKeyEncoding.Uncompressed,
@@ -160,7 +153,7 @@ export class StacksTransaction {
     condition: SpendingConditionOpts,
     curSigHash: string,
     authType: AuthType,
-    privateKey: StacksPrivateKey
+    privateKey: PrivateKey
   ): string {
     const { nextSig, nextSigHash } = nextSignature(
       curSigHash,
@@ -172,7 +165,7 @@ export class StacksTransaction {
     if (isSingleSig(condition)) {
       condition.signature = nextSig;
     } else {
-      const compressed = bytesToHex(privateKey.data).endsWith('01');
+      const compressed = privateKeyIsCompressed(privateKey);
       condition.fields.push(
         createTransactionAuthField(
           compressed ? PubKeyEncoding.Compressed : PubKeyEncoding.Uncompressed,

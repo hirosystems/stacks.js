@@ -62,6 +62,6 @@ export function deriveDefaultUrl(network: StacksNetwork | StacksNetworkName | un
   return !network || network.transactionVersion === TransactionVersion.Mainnet
     ? HIRO_MAINNET_URL // default to mainnet if txVersion is mainnet
     : network.magicBytes === 'id'
-    ? DEVNET_URL // default to devnet if magicBytes are devnet
-    : HIRO_TESTNET_URL;
+      ? DEVNET_URL // default to devnet if magicBytes are devnet
+      : HIRO_TESTNET_URL;
 }
