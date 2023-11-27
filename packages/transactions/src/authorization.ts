@@ -17,11 +17,22 @@ import {
   StacksMessageType,
 } from './constants';
 
-import { cloneDeep, leftPadHex, txidFromData } from './utils';
+import { BytesReader } from './bytesReader';
+import { MessageSignature } from './common';
+import { DeserializationError, SigningError, VerificationError } from './errors';
 import {
-  TransactionAuthField,
-  serializeMessageSignature,
+  createStacksPublicKey,
+  PrivateKey,
+  privateKeyToPublic,
+  publicKeyFromSignatureVrs,
+  publicKeyIsCompressed,
+  signWithKey,
+  StacksPublicKey,
+} from './keys';
+import {
   deserializeMessageSignature,
+  serializeMessageSignature,
+  TransactionAuthField,
 } from './signature';
 import {
   addressFromPublicKeys,
@@ -30,20 +41,7 @@ import {
   deserializeLPList,
   serializeLPList,
 } from './types';
-
-import {
-  createStacksPublicKey,
-  getPublicKey,
-  isCompressed,
-  publicKeyFromSignatureVrs,
-  signWithKey,
-  StacksPrivateKey,
-  StacksPublicKey,
-} from './keys';
-
-import { MessageSignature } from './common';
-import { DeserializationError, SigningError, VerificationError } from './errors';
-import { BytesReader } from './bytesReader';
+import { cloneDeep, leftPadHex, txidFromData } from './utils';
 
 export function emptyMessageSignature(): MessageSignature {
   return {
@@ -133,7 +131,7 @@ export function createSingleSigSpendingCondition(
     1,
     [createStacksPublicKey(pubKey)]
   ).hash160;
-  const keyEncoding = isCompressed(createStacksPublicKey(pubKey))
+  const keyEncoding = publicKeyIsCompressed(pubKey)
     ? PubKeyEncoding.Compressed
     : PubKeyEncoding.Uncompressed;
 
@@ -276,7 +274,7 @@ export function deserializeMultiSigSpendingCondition(
   for (const field of fields) {
     switch (field.contents.type) {
       case StacksMessageType.PublicKey:
-        if (!isCompressed(field.contents)) haveUncompressed = true;
+        if (!publicKeyIsCompressed(field.contents.data)) haveUncompressed = true;
         break;
       case StacksMessageType.MessageSignature:
         if (field.pubKeyEncoding === PubKeyEncoding.Uncompressed) haveUncompressed = true;
@@ -363,7 +361,7 @@ function makeSigHashPostSign(
   // * the signature
   const hashLength = 32 + 1 + RECOVERABLE_ECDSA_SIG_LENGTH_BYTES;
 
-  const pubKeyEncoding = isCompressed(pubKey)
+  const pubKeyEncoding = publicKeyIsCompressed(pubKey.data)
     ? PubKeyEncoding.Compressed
     : PubKeyEncoding.Uncompressed;
 
@@ -382,7 +380,7 @@ export function nextSignature(
   authType: AuthType,
   fee: IntegerType,
   nonce: IntegerType,
-  privateKey: StacksPrivateKey
+  privateKey: PrivateKey
 ): {
   nextSig: MessageSignature;
   nextSigHash: string;
@@ -390,7 +388,7 @@ export function nextSignature(
   const sigHashPreSign = makeSigHashPreSign(curSigHash, authType, fee, nonce);
 
   const signature = signWithKey(privateKey, sigHashPreSign);
-  const publicKey = getPublicKey(privateKey);
+  const publicKey = createStacksPublicKey(privateKeyToPublic(privateKey));
   const nextSigHash = makeSigHashPostSign(sigHashPreSign, publicKey, signature);
 
   return {
@@ -491,7 +489,7 @@ function verifyMultiSig(
 
     switch (field.contents.type) {
       case StacksMessageType.PublicKey:
-        if (!isCompressed(field.contents)) haveUncompressed = true;
+        if (!publicKeyIsCompressed(field.contents.data)) haveUncompressed = true;
         foundPubKey = field.contents;
         break;
       case StacksMessageType.MessageSignature:

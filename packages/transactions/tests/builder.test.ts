@@ -26,11 +26,16 @@ import {
   callReadOnlyFunction,
   createFungiblePostCondition,
   createSTXPostCondition,
+  createStacksPublicKey,
   estimateFee,
   estimateTransaction,
   getContractMapEntry,
   getNonce,
+  privateKeyToPublic,
+  publicKeyIsCompressed,
+  publicKeyToHex,
   serializePostCondition,
+  serializePublicKey,
 } from '../src';
 import {
   MultiSigSpendingCondition,
@@ -85,12 +90,6 @@ import {
   PubKeyEncoding,
   TxRejectedReason,
 } from '../src/constants';
-import {
-  createStacksPrivateKey,
-  isCompressed,
-  pubKeyfromPrivKey,
-  publicKeyToString,
-} from '../src/keys';
 import { TokenTransferPayload, createTokenTransferPayload, serializePayload } from '../src/payload';
 import { createAssetInfo } from '../src/postcondition-types';
 import { createTransactionAuthField } from '../src/signature';
@@ -389,15 +388,14 @@ test('Make Multi-Sig STX token transfer', async () => {
   const authType = AuthType.Standard;
   const addressHashMode = AddressHashMode.SerializeP2SH;
 
-  const privKeyStrings = [
+  const privKeys = [
     '6d430bb91222408e7706c9001cfaeb91b08c2be6d5ac95779ab52c6b431950e001',
     '2a584d899fed1d24e26b524f202763c8ab30260167429f157f1c119f550fa6af01',
     'd5200dee706ee53ae98a03fba6cf4fdcc5084c30cfa9e1b3462dcdeaa3e0f1d201',
   ];
-  const privKeys = privKeyStrings.map(createStacksPrivateKey);
 
-  const pubKeys = privKeyStrings.map(pubKeyfromPrivKey);
-  const pubKeyStrings = pubKeys.map(publicKeyToString);
+  const pubKeys = privKeys.map(privateKeyToPublic).map(createStacksPublicKey);
+  const pubKeyStrings = pubKeys.map(serializePublicKey).map(publicKeyToHex);
 
   const transaction = await makeUnsignedSTXTokenTransfer({
     recipient,
@@ -465,15 +463,14 @@ test('Should deserialize partially signed multi-Sig STX token transfer', async (
   const authType = AuthType.Standard;
   const addressHashMode = AddressHashMode.SerializeP2SH;
 
-  const privKeyStrings = [
+  const privKeys = [
     '6d430bb91222408e7706c9001cfaeb91b08c2be6d5ac95779ab52c6b431950e001',
     '2a584d899fed1d24e26b524f202763c8ab30260167429f157f1c119f550fa6af01',
     'd5200dee706ee53ae98a03fba6cf4fdcc5084c30cfa9e1b3462dcdeaa3e0f1d201',
   ];
-  const privKeys = privKeyStrings.map(createStacksPrivateKey);
 
-  const pubKeys = privKeyStrings.map(pubKeyfromPrivKey);
-  const pubKeyStrings = pubKeys.map(publicKeyToString);
+  const pubKeys = privKeys.map(privateKeyToPublic).map(createStacksPublicKey);
+  const pubKeyStrings = pubKeys.map(serializePublicKey).map(publicKeyToHex);
 
   const transaction = await makeUnsignedSTXTokenTransfer({
     recipient,
@@ -543,15 +540,14 @@ test('Should throw error if multisig transaction is oversigned', async () => {
   const nonce = 0;
   const memo = 'test memo';
 
-  const privKeyStrings = [
+  const privKeys = [
     '6d430bb91222408e7706c9001cfaeb91b08c2be6d5ac95779ab52c6b431950e001',
     '2a584d899fed1d24e26b524f202763c8ab30260167429f157f1c119f550fa6af01',
     'd5200dee706ee53ae98a03fba6cf4fdcc5084c30cfa9e1b3462dcdeaa3e0f1d201',
   ];
-  const privKeys = privKeyStrings.map(createStacksPrivateKey);
 
-  const pubKeys = privKeyStrings.map(pubKeyfromPrivKey);
-  const pubKeyStrings = pubKeys.map(publicKeyToString);
+  const pubKeys = privKeys.map(privateKeyToPublic).map(createStacksPublicKey);
+  const pubKeyStrings = pubKeys.map(serializePublicKey).map(publicKeyToHex);
 
   const transaction = await makeUnsignedSTXTokenTransfer({
     recipient,
@@ -588,15 +584,14 @@ test('Make Multi-Sig STX token transfer with two transaction signers', async () 
   const authType = AuthType.Standard;
   const addressHashMode = AddressHashMode.SerializeP2SH;
 
-  const privKeyStrings = [
+  const privKeys = [
     '6d430bb91222408e7706c9001cfaeb91b08c2be6d5ac95779ab52c6b431950e001',
     '2a584d899fed1d24e26b524f202763c8ab30260167429f157f1c119f550fa6af01',
     'd5200dee706ee53ae98a03fba6cf4fdcc5084c30cfa9e1b3462dcdeaa3e0f1d201',
   ];
-  const privKeys = privKeyStrings.map(createStacksPrivateKey);
 
-  const pubKeys = privKeyStrings.map(pubKeyfromPrivKey);
-  const pubKeyStrings = pubKeys.map(publicKeyToString);
+  const pubKeys = privKeys.map(privateKeyToPublic).map(createStacksPublicKey);
+  const pubKeyStrings = pubKeys.map(serializePublicKey).map(publicKeyToHex);
 
   const transaction = await makeUnsignedSTXTokenTransfer({
     recipient,
@@ -623,7 +618,7 @@ test('Make Multi-Sig STX token transfer with two transaction signers', async () 
 
   const sig1 = nextSignature(signer.sigHash, authType, fee, nonce, privKeys[0]).nextSig;
 
-  const compressed1 = bytesToHex(privKeys[0].data).endsWith('01');
+  const compressed1 = privKeys[0].endsWith('01');
   const field1 = createTransactionAuthField(
     compressed1 ? PubKeyEncoding.Compressed : PubKeyEncoding.Uncompressed,
     sig1
@@ -644,13 +639,13 @@ test('Make Multi-Sig STX token transfer with two transaction signers', async () 
 
   const sig2 = nextSignature(signer2.sigHash, authType, fee, nonce, privKeys[1]).nextSig;
 
-  const compressed2 = bytesToHex(privKeys[1].data).endsWith('01');
+  const compressed2 = privKeys[1].endsWith('01');
   const field2 = createTransactionAuthField(
     compressed2 ? PubKeyEncoding.Compressed : PubKeyEncoding.Uncompressed,
     sig2
   );
 
-  const compressedPub = isCompressed(pubKeys[2]);
+  const compressedPub = publicKeyIsCompressed(pubKeys[2].data);
   const field3 = createTransactionAuthField(
     compressedPub ? PubKeyEncoding.Compressed : PubKeyEncoding.Uncompressed,
     pubKeys[2]
@@ -835,21 +830,21 @@ test('make a multi-sig contract deploy', async () => {
   const codeBody = fs.readFileSync('./tests/contracts/kv-store.clar').toString();
   const fee = 0;
   const nonce = 0;
-  const privKeyStrings = [
+  const privKeys = [
     '6d430bb91222408e7706c9001cfaeb91b08c2be6d5ac95779ab52c6b431950e001',
     '2a584d899fed1d24e26b524f202763c8ab30260167429f157f1c119f550fa6af01',
     'd5200dee706ee53ae98a03fba6cf4fdcc5084c30cfa9e1b3462dcdeaa3e0f1d201',
   ];
 
-  const pubKeys = privKeyStrings.map(pubKeyfromPrivKey);
-  const pubKeyStrings = pubKeys.map(publicKeyToString);
+  const pubKeys = privKeys.map(privateKeyToPublic).map(createStacksPublicKey);
+  const pubKeyStrings = pubKeys.map(serializePublicKey).map(publicKeyToHex);
 
   const transaction = await makeContractDeploy({
     codeBody,
     contractName,
     publicKeys: pubKeyStrings,
     numSignatures: 3,
-    signerKeys: privKeyStrings,
+    signerKeys: privKeys,
     fee,
     nonce,
     network: STACKS_TESTNET,
@@ -1109,14 +1104,14 @@ test('make a multi-sig contract call', async () => {
   const functionName = 'get-value';
   const buffer = bufferCV(utf8ToBytes('foo'));
   const fee = 0;
-  const privKeyStrings = [
+  const privKeys = [
     '6d430bb91222408e7706c9001cfaeb91b08c2be6d5ac95779ab52c6b431950e001',
     '2a584d899fed1d24e26b524f202763c8ab30260167429f157f1c119f550fa6af01',
     'd5200dee706ee53ae98a03fba6cf4fdcc5084c30cfa9e1b3462dcdeaa3e0f1d201',
   ];
 
-  const pubKeys = privKeyStrings.map(pubKeyfromPrivKey);
-  const pubKeyStrings = pubKeys.map(publicKeyToString);
+  const pubKeys = privKeys.map(privateKeyToPublic).map(createStacksPublicKey);
+  const pubKeyStrings = pubKeys.map(serializePublicKey).map(publicKeyToHex);
 
   const transaction = await makeContractCall({
     contractAddress,
@@ -1125,7 +1120,7 @@ test('make a multi-sig contract call', async () => {
     functionArgs: [buffer],
     publicKeys: pubKeyStrings,
     numSignatures: 3,
-    signerKeys: privKeyStrings,
+    signerKeys: privKeys,
     fee,
     nonce: 1,
     network: STACKS_TESTNET,
@@ -1145,7 +1140,7 @@ test('Estimate transaction transfer fee', async () => {
   const fee = 0;
   const nonce = 0;
   const senderKey = 'edf9aee84d9b7abc145504dde6726c64f369d37ee34ded868fabd876c26570bc01';
-  const publicKey = publicKeyToString(pubKeyfromPrivKey(senderKey));
+  const publicKey = privateKeyToPublic(senderKey);
   const memo = 'test memo';
 
   const transaction = await makeUnsignedSTXTokenTransfer({
@@ -1312,7 +1307,7 @@ test('Single-sig transaction byte length must include signature', async () => {
 
   const signer = new TransactionSigner(unsignedTransaction);
   // Now sign the transaction and verify the byteLength after adding signature
-  signer.signOrigin(createStacksPrivateKey(privateKey));
+  signer.signOrigin(privateKey);
 
   const finalSerializedTx = signer.transaction.serialize();
 
@@ -1334,15 +1329,14 @@ test('Multi-sig transaction byte length must include the required signatures', a
   const nonce = 10;
   const memo = 'test memo...';
 
-  const privKeyStrings = [
+  const privKeys = [
     '6d430bb91222408e7706c9001cfaeb91b08c2be6d5ac95779ab52c6b431950e001',
     '2a584d899fed1d24e26b524f202763c8ab30260167429f157f1c119f550fa6af01',
     'd5200dee706ee53ae98a03fba6cf4fdcc5084c30cfa9e1b3462dcdeaa3e0f1d201',
   ];
-  const privKeys = privKeyStrings.map(createStacksPrivateKey);
 
-  const pubKeys = privKeyStrings.map(pubKeyfromPrivKey);
-  const pubKeyStrings = pubKeys.map(publicKeyToString);
+  const pubKeys = privKeys.map(privateKeyToPublic).map(createStacksPublicKey);
+  const pubKeyStrings = pubKeys.map(serializePublicKey).map(publicKeyToHex);
 
   // Create a unsigned multi-sig transaction
   const transaction = await makeUnsignedSTXTokenTransfer({
@@ -1480,13 +1474,13 @@ test('Make sponsored STX token transfer', async () => {
   const payload = createTokenTransferPayload(recipient, amount, memo);
   const baseSpendingCondition = createSingleSigSpendingCondition(
     addressHashMode,
-    publicKeyToString(pubKeyfromPrivKey(senderKey)),
+    privateKeyToPublic(senderKey),
     nonce,
     fee
   );
   const sponsorSpendingCondition = createSingleSigSpendingCondition(
     addressHashMode,
-    publicKeyToString(pubKeyfromPrivKey(sponsorKey)),
+    privateKeyToPublic(sponsorKey),
     sponsorNonce,
     sponsorFee
   );
@@ -1495,8 +1489,8 @@ test('Make sponsored STX token transfer', async () => {
   const sponsoredTransaction = new StacksTransaction(transactionVersion, authorization, payload);
 
   const signer = new TransactionSigner(sponsoredTransaction);
-  signer.signOrigin(createStacksPrivateKey(senderKey));
-  signer.signSponsor(createStacksPrivateKey(sponsorKey));
+  signer.signOrigin(senderKey);
+  signer.signSponsor(sponsorKey);
 
   // Sponsored spending condition
   const sponsoredTransactionClone = signer.transaction;

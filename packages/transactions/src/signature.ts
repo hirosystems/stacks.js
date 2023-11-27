@@ -96,7 +96,7 @@ export function serializeTransactionAuthField(field: TransactionAuthField): Uint
         bytesArray.push(serializePublicKey(field.contents));
       } else {
         bytesArray.push(AuthFieldType.PublicKeyUncompressed);
-        bytesArray.push(serializePublicKey(compressPublicKey(field.contents.data)));
+        bytesArray.push(hexToBytes(compressPublicKey(field.contents.data)));
       }
       break;
     case StacksMessageType.MessageSignature:

@@ -1,10 +1,10 @@
 import { StacksTransaction } from './transaction';
 
-import { StacksPrivateKey, StacksPublicKey } from './keys';
-import { isSingleSig, nextVerification, SpendingConditionOpts } from './authorization';
-import { cloneDeep } from './utils';
+import { SpendingConditionOpts, isSingleSig, nextVerification } from './authorization';
 import { AuthType, PubKeyEncoding, StacksMessageType } from './constants';
 import { SigningError } from './errors';
+import { PrivateKey, StacksPublicKey } from './keys';
+import { cloneDeep } from './utils';
 
 export class TransactionSigner {
   transaction: StacksTransaction;
@@ -68,7 +68,7 @@ export class TransactionSigner {
     return signer;
   }
 
-  signOrigin(privateKey: StacksPrivateKey) {
+  signOrigin(privateKey: PrivateKey) {
     if (this.checkOverlap && this.originDone) {
       throw new SigningError('Cannot sign origin after sponsor key');
     }
@@ -111,7 +111,7 @@ export class TransactionSigner {
     this.transaction.appendPubkey(publicKey);
   }
 
-  signSponsor(privateKey: StacksPrivateKey) {
+  signSponsor(privateKey: PrivateKey) {
     if (this.transaction.auth === undefined) {
       throw new SigningError('"transaction.auth" is undefined');
     }

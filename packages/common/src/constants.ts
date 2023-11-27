@@ -4,6 +4,8 @@ export const DEVNET_URL = 'http://localhost:3999';
 
 export const GAIA_URL = 'https://hub.blockstack.org';
 
+// todo: deduplicate magic variables
+
 /** @ignore internal */
 export const PRIVATE_KEY_COMPRESSED_LENGTH = 33;
 
