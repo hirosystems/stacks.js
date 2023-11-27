@@ -191,7 +191,7 @@ type ClarityTypetoValue = {
 };
 
 /**
- * @description narrow down the type of a generic ClarityValue
+ * Narrow down the type of a generic ClarityValue
  * @example
  * ```ts
  * // some functions can return a generic `ClarityValue` type
