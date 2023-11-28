@@ -3,6 +3,7 @@ import { CLIMain, testables } from '../src/cli';
 import { CLINetworkAdapter, CLI_NETWORK_OPTS, getNetwork } from '../src/network';
 
 import {
+  Cl,
   ClarityAbi,
   createStacksPrivateKey,
   publicKeyFromSignatureVrs,
@@ -23,6 +24,7 @@ import {
   WalletKeyInfoResult,
 } from './derivation-path/keychain';
 import * as fixtures from './fixtures/cli.fixture';
+import { bytesToHex } from '@stacks/common';
 
 const TEST_ABI: ClarityAbi = JSON.parse(
   readFileSync(path.join(__dirname, './abi/test-abi.json')).toString()
@@ -34,6 +36,7 @@ jest.mock('inquirer');
 
 const {
   addressConvert,
+  decodeCV,
   canStack,
   contractFunctionCall,
   getStacksWalletKey,
@@ -52,6 +55,39 @@ const testnetNetwork = new CLINetworkAdapter(
   getNetwork({} as CLI_CONFIG_TYPE, true),
   {} as CLI_NETWORK_OPTS
 );
+
+describe('decode_cv', () => {
+  test('Should decode from hex arg', async () => {
+    const result = await decodeCV(mainnetNetwork, [
+      '0x050011deadbeef11ababffff11deadbeef11ababffff',
+    ]);
+    expect(result).toEqual('S08XXBDYXW8TQAZZZW8XXBDYXW8TQAZZZZ88551S');
+  });
+
+  test('Should decode from hex to json', async () => {
+    const result = await decodeCV(mainnetNetwork, [
+      '0x050011deadbeef11ababffff11deadbeef11ababffff',
+      'json',
+    ]);
+    expect(result).toEqual(
+      '{"type":"principal","value":"S08XXBDYXW8TQAZZZW8XXBDYXW8TQAZZZZ88551S"}'
+    );
+  });
+
+  test('Should decode from hex to repr', async () => {
+    const list = Cl.list([1, 2, 3].map(Cl.int));
+    const serialized = bytesToHex(Cl.serialize(list));
+    const result = await decodeCV(mainnetNetwork, [serialized, 'repr']);
+    expect(result).toEqual('(list 1 2 3)');
+  });
+
+  test('Should decode from hex to pretty print', async () => {
+    const list = Cl.list([1, 2, 3].map(Cl.int));
+    const serialized = bytesToHex(Cl.serialize(list));
+    const result = await decodeCV(mainnetNetwork, [serialized, 'pretty']);
+    expect(result).toEqual('(list\n  1\n  2\n  3\n)');
+  });
+});
 
 describe('convert_address', () => {
   test.each(fixtures.convertAddress)('%p - testnet: %p', async (input, testnet, expectedResult) => {

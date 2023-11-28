@@ -41,6 +41,8 @@ import {
   TransactionVersion,
   TxBroadcastResult,
   validateContractCall,
+  Cl,
+  cvToJSON,
 } from '@stacks/transactions';
 import express from 'express';
 import { prompt } from 'inquirer';
@@ -950,6 +952,37 @@ async function readOnlyContractFunctionCall(
     .catch(error => {
       return error.toString();
     });
+}
+
+/*
+ * Decode a serialized Clarity value
+ * args:
+ * @value (string) the hex string of the serialized value, or '-' to read from stdin
+ * @format (string) the format to output the value in; one of 'pretty', 'json', or 'repr'
+ */
+function decodeCV(_network: CLINetworkAdapter, args: string[]): Promise<string> {
+  const inputArg = args[0];
+  const format = args[1];
+
+  let inputValue: string;
+  if (inputArg === '-') {
+    inputValue = fs.readFileSync(process.stdin.fd, 'utf-8').trim();
+  } else {
+    inputValue = inputArg;
+  }
+
+  const cv = Cl.deserialize(inputValue);
+  let cvString: string;
+  if (format === 'pretty') {
+    cvString = Cl.prettyPrint(cv, 2);
+  } else if (format === 'json') {
+    cvString = JSON.stringify(cvToJSON(cv));
+  } else if (format === 'repr' || !format) {
+    cvString = cvToString(cv);
+  } else {
+    throw new Error('Invalid format option');
+  }
+  return Promise.resolve(cvString);
 }
 
 // /*
@@ -1959,6 +1992,7 @@ const COMMANDS: Record<string, CommandFunction> = {
   can_stack: canStack,
   call_contract_func: contractFunctionCall,
   call_read_only_contract_func: readOnlyContractFunctionCall,
+  decode_cv: decodeCV,
   convert_address: addressConvert,
   decrypt_keychain: decryptMnemonic,
   deploy_contract: contractDeploy,
@@ -2159,6 +2193,7 @@ export const testables =
   process.env.NODE_ENV === 'test'
     ? {
         addressConvert,
+        decodeCV,
         canStack,
         contractFunctionCall,
         getStacksWalletKey,
