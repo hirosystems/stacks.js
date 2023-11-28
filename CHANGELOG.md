@@ -3,6 +3,21 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.10.0](https://github.com/hirosystems/stacks.js/compare/v6.9.0...v6.10.0) (2023-11-28)
+
+
+### Features
+
+* cli option to decode serialized Clarity values ([#1599](https://github.com/hirosystems/stacks.js/issues/1599)) ([25c821b](https://github.com/hirosystems/stacks.js/commit/25c821b58fa45896e10881b920df781a14a86c83))
+
+
+### Bug Fixes
+
+* add address alias for principal ([bd96bb5](https://github.com/hirosystems/stacks.js/commit/bd96bb502dc50dc86e6dbc94da43c5b2bbc35d61))
+* add generic principal helper ([25176ce](https://github.com/hirosystems/stacks.js/commit/25176ce595d5eef0dab564c1a3a214403a9e280d))
+
+
+
 ## [6.9.0](https://github.com/hirosystems/stacks.js/compare/v6.8.1...v6.9.0) (2023-09-20)
 
 
