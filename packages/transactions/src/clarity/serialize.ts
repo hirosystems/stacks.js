@@ -135,7 +135,7 @@ function serializeStringUtf8CV(cv: StringUtf8CV) {
  * Serializes clarity value to Uint8Array
  *
  * @param {ClarityValue} value to be converted to bytes
- **
+ *
  * @returns {Uint8Array} returns the bytes
  *
  * @example

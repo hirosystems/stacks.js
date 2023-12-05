@@ -8,12 +8,25 @@ import {
   writeUInt32BE,
   writeUInt8,
 } from '@stacks/common';
-import { ClarityVersion, COINBASE_BYTES_LENGTH, PayloadType, StacksMessageType } from './constants';
-
 import { BytesReader } from './bytesReader';
-import { ClarityValue, deserializeCV, serializeCV } from './clarity/';
+import {
+  ClarityType,
+  ClarityValue,
+  deserializeCV,
+  noneCV,
+  OptionalCV,
+  serializeCV,
+  someCV,
+} from './clarity/';
 import { PrincipalCV, principalCV } from './clarity/types/principalCV';
 import { Address } from './common';
+import {
+  ClarityVersion,
+  COINBASE_BYTES_LENGTH,
+  PayloadType,
+  StacksMessageType,
+  VRF_PROOF_BYTES_LENGTH,
+} from './constants';
 import { createAddress, createLPString, LengthPrefixedString } from './postcondition-types';
 import {
   codeBodyString,
@@ -33,6 +46,7 @@ export type Payload =
   | PoisonPayload
   | CoinbasePayload
   | CoinbasePayloadToAltRecipient
+  | NakamotoCoinbasePayload
   | TenureChangePayload;
 
 export function isTokenTransferPayload(p: Payload): p is TokenTransferPayload {
@@ -67,6 +81,7 @@ export type PayloadInput =
   | PoisonPayload
   | CoinbasePayload
   | CoinbasePayloadToAltRecipient
+  | NakamotoCoinbasePayload
   | TenureChangePayload;
 
 export function createTokenTransferPayload(
@@ -214,6 +229,36 @@ export function createCoinbasePayload(
   };
 }
 
+export interface NakamotoCoinbasePayload {
+  readonly type: StacksMessageType.Payload;
+  readonly payloadType: PayloadType.NakamotoCoinbase;
+  readonly coinbaseBytes: Uint8Array;
+  readonly recipient?: PrincipalCV;
+  readonly vrfProof: Uint8Array;
+}
+
+export function createNakamotoCoinbasePayload(
+  coinbaseBytes: Uint8Array,
+  recipient: OptionalCV<PrincipalCV>,
+  vrfProof: Uint8Array
+): NakamotoCoinbasePayload {
+  if (coinbaseBytes.byteLength != COINBASE_BYTES_LENGTH) {
+    throw Error(`Coinbase buffer size must be ${COINBASE_BYTES_LENGTH} bytes`);
+  }
+
+  if (vrfProof.byteLength != VRF_PROOF_BYTES_LENGTH) {
+    throw Error(`VRF proof buffer size must be ${VRF_PROOF_BYTES_LENGTH} bytes`);
+  }
+
+  return {
+    type: StacksMessageType.Payload,
+    payloadType: PayloadType.NakamotoCoinbase,
+    coinbaseBytes,
+    recipient: recipient.type === ClarityType.OptionalSome ? recipient.value : undefined,
+    vrfProof,
+  };
+}
+
 export enum TenureChangeCause {
   /** A valid winning block-commit */
   BlockFound = 0,
@@ -300,6 +345,11 @@ export function serializePayload(payload: PayloadInput): Uint8Array {
       bytesArray.push(payload.coinbaseBytes);
       bytesArray.push(serializeCV(payload.recipient));
       break;
+    case PayloadType.NakamotoCoinbase:
+      bytesArray.push(payload.coinbaseBytes);
+      bytesArray.push(serializeCV(payload.recipient ? someCV(payload.recipient) : noneCV()));
+      bytesArray.push(payload.vrfProof);
+      break;
     case PayloadType.TenureChange:
       bytesArray.push(hexToBytes(payload.previousTenureEnd));
       bytesArray.push(writeUInt32BE(new Uint8Array(4), payload.previousTenureBlocks));
@@ -359,13 +409,21 @@ export function deserializePayload(bytesReader: BytesReader): Payload {
     case PayloadType.PoisonMicroblock:
       // TODO: implement
       return createPoisonPayload();
-    case PayloadType.Coinbase:
+    case PayloadType.Coinbase: {
       const coinbaseBytes = bytesReader.readBytes(COINBASE_BYTES_LENGTH);
       return createCoinbasePayload(coinbaseBytes);
-    case PayloadType.CoinbaseToAltRecipient:
-      const coinbaseToAltRecipientBuffer = bytesReader.readBytes(COINBASE_BYTES_LENGTH);
+    }
+    case PayloadType.CoinbaseToAltRecipient: {
+      const coinbaseBytes = bytesReader.readBytes(COINBASE_BYTES_LENGTH);
       const altRecipient = deserializeCV(bytesReader) as PrincipalCV;
-      return createCoinbasePayload(coinbaseToAltRecipientBuffer, altRecipient);
+      return createCoinbasePayload(coinbaseBytes, altRecipient);
+    }
+    case PayloadType.NakamotoCoinbase: {
+      const coinbaseBytes = bytesReader.readBytes(COINBASE_BYTES_LENGTH);
+      const recipient = deserializeCV(bytesReader) as OptionalCV<PrincipalCV>;
+      const vrfProof = bytesReader.readBytes(VRF_PROOF_BYTES_LENGTH);
+      return createNakamotoCoinbasePayload(coinbaseBytes, recipient, vrfProof);
+    }
     case PayloadType.TenureChange:
       const previousTenureEnd = bytesToHex(bytesReader.readBytes(32));
       const previousTenureBlocks = bytesReader.readUInt32BE();

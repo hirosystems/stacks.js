@@ -2326,3 +2326,13 @@ describe('serialize/deserialize tenure change', () => {
     expect(deserializePayload(reader)).toEqual(payload);
   });
 });
+
+test('serialize/deserialize nakamoto coinbase transaction', () => {
+  // test vector generated based on https://github.com/stacks-network/stacks-core/tree/396b34ba414220834de7ff96a890d55458ded51b
+  const txBytes =
+    '00000000000400143e543243dfcd8c02a12ad7ea371bd07bc91df900000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010200000000081212121212121212121212121212121212121212121212121212121212121212099275df67a68c8745c0ff97b48201ee6db447f7c93b23ae24cdc2400f52fdb08a1a6ac7ec71bf9c9c76e96ee4675ebff60625af28718501047bfd87b810c2d2139b73c23bd69de66360953a642c2a330a';
+  const transaction = deserializeTransaction(txBytes);
+
+  expect(transaction).toBeDefined();
+  expect(bytesToHex(transaction.serialize())).toEqual(txBytes);
+});

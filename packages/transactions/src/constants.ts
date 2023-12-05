@@ -12,6 +12,7 @@ export const MAX_STRING_LENGTH_BYTES = 128;
 export const CLARITY_INT_SIZE = 128;
 export const CLARITY_INT_BYTE_SIZE = 16;
 export const COINBASE_BYTES_LENGTH = 32;
+export const VRF_PROOF_BYTES_LENGTH = 80;
 export const RECOVERABLE_ECDSA_SIG_LENGTH_BYTES = 65;
 export const COMPRESSED_PUBKEY_LENGTH_BYTES = 32;
 export const UNCOMPRESSED_PUBKEY_LENGTH_BYTES = 64;
@@ -57,6 +58,7 @@ export enum PayloadType {
   Coinbase = 0x04,
   CoinbaseToAltRecipient = 0x05,
   TenureChange = 0x7,
+  NakamotoCoinbase = 0x08,
 }
 
 /**
