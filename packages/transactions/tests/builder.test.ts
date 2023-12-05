@@ -1,24 +1,28 @@
 import { bytesToHex, utf8ToBytes } from '@stacks/common';
 import {
-  createApiKeyMiddleware,
-  createFetchFn,
   StacksMainnet,
   StacksTestnet,
+  createApiKeyMiddleware,
+  createFetchFn,
 } from '@stacks/network';
 import * as fs from 'fs';
 import fetchMock from 'jest-fetch-mock';
 import {
+  MultiSigSpendingCondition,
+  SingleSigSpendingCondition,
+  SponsoredAuthorization,
+  StandardAuthorization,
   createSingleSigSpendingCondition,
   createSponsoredAuth,
   emptyMessageSignature,
   isSingleSig,
-  MultiSigSpendingCondition,
   nextSignature,
-  SingleSigSpendingCondition,
-  SponsoredAuthorization,
-  StandardAuthorization,
 } from '../src/authorization';
 import {
+  SignedTokenTransferOptions,
+  TxBroadcastResult,
+  TxBroadcastResultOk,
+  TxBroadcastResultRejected,
   broadcastTransaction,
   callReadOnlyFunction,
   estimateTransaction,
@@ -31,28 +35,24 @@ import {
   makeContractFungiblePostCondition,
   makeContractNonFungiblePostCondition,
   makeContractSTXPostCondition,
+  makeSTXTokenTransfer,
   makeStandardFungiblePostCondition,
   makeStandardNonFungiblePostCondition,
   makeStandardSTXPostCondition,
-  makeSTXTokenTransfer,
   makeUnsignedContractCall,
   makeUnsignedContractDeploy,
   makeUnsignedSTXTokenTransfer,
-  SignedTokenTransferOptions,
   sponsorTransaction,
-  TxBroadcastResult,
-  TxBroadcastResultOk,
-  TxBroadcastResultRejected,
 } from '../src/builders';
 import { BytesReader } from '../src/bytesReader';
 import {
+  ClarityType,
+  UIntCV,
   bufferCV,
   bufferCVFromString,
-  ClarityType,
   noneCV,
   serializeCV,
   standardPrincipalCV,
-  UIntCV,
   uintCV,
 } from '../src/clarity';
 import { principalCV } from '../src/clarity/types/principalCV';
@@ -79,17 +79,17 @@ import {
   publicKeyToString,
 } from '../src/keys';
 import {
+  TenureChangeCause,
+  TokenTransferPayload,
   createTenureChangePayload,
   createTokenTransferPayload,
   deserializePayload,
   serializePayload,
-  TenureChangeCause,
-  TokenTransferPayload,
 } from '../src/payload';
 import { createAssetInfo } from '../src/postcondition-types';
 import { createTransactionAuthField } from '../src/signature';
 import { TransactionSigner } from '../src/signer';
-import { deserializeTransaction, StacksTransaction } from '../src/transaction';
+import { StacksTransaction, deserializeTransaction } from '../src/transaction';
 import { cloneDeep, randomBytes } from '../src/utils';
 
 function setSignature(
@@ -2185,4 +2185,14 @@ describe('serialize/deserialize tenure change', () => {
 
     expect(deserializePayload(reader)).toEqual(payload);
   });
+});
+
+test('serialize/deserialize nakamoto coinbase transaction', () => {
+  // test vector generated based on https://github.com/stacks-network/stacks-core/tree/396b34ba414220834de7ff96a890d55458ded51b
+  const txBytes =
+    '00000000000400143e543243dfcd8c02a12ad7ea371bd07bc91df900000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010200000000081212121212121212121212121212121212121212121212121212121212121212099275df67a68c8745c0ff97b48201ee6db447f7c93b23ae24cdc2400f52fdb08a1a6ac7ec71bf9c9c76e96ee4675ebff60625af28718501047bfd87b810c2d2139b73c23bd69de66360953a642c2a330a';
+  const transaction = deserializeTransaction(txBytes);
+
+  expect(transaction).toBeDefined();
+  expect(bytesToHex(transaction.serialize())).toEqual(txBytes);
 });
