@@ -1,4 +1,5 @@
-import { utf8ToBytes } from '@stacks/common';
+import { bytesToHex, hexToBytes, utf8ToBytes } from '@stacks/common';
+import { BytesReader, randomBytes } from '../src';
 import {
   contractPrincipalCV,
   falseCV,
@@ -11,13 +12,18 @@ import {
   CoinbasePayload,
   CoinbasePayloadToAltRecipient,
   ContractCallPayload,
+  SmartContractPayload,
+  TenureChangeCause,
+  TenureChangePayload,
+  TokenTransferPayload,
+  VersionedSmartContractPayload,
   createCoinbasePayload,
   createContractCallPayload,
   createSmartContractPayload,
+  createTenureChangePayload,
   createTokenTransferPayload,
-  SmartContractPayload,
-  TokenTransferPayload,
-  VersionedSmartContractPayload,
+  deserializePayload,
+  serializePayload,
 } from '../src/payload';
 import { serializeDeserialize } from './macros';
 
@@ -184,4 +190,42 @@ test('Coinbase to contract principal recipient payload serialization and deseria
   ) as CoinbasePayloadToAltRecipient;
   expect(deserialized.coinbaseBytes).toEqual(coinbaseBuffer);
   expect(deserialized.recipient).toEqual(contractRecipient);
+});
+
+test('serialize/deserialize tenure change payload', () => {
+  const tenureHash = bytesToHex(randomBytes(20));
+  const previousTenureHash = bytesToHex(randomBytes(20));
+  const burnViewHash = bytesToHex(randomBytes(20));
+  const previousTenureEnd = bytesToHex(randomBytes(32));
+  const previousTenureBlocks = 100;
+  const cause = TenureChangeCause.Extended;
+  const publicKeyHash = bytesToHex(randomBytes(20));
+
+  const payload = createTenureChangePayload(
+    tenureHash,
+    previousTenureHash,
+    burnViewHash,
+    previousTenureEnd,
+    previousTenureBlocks,
+    cause,
+    publicKeyHash
+  );
+
+  const deserialized = serializeDeserialize(
+    payload,
+    StacksMessageType.Payload
+  ) as TenureChangePayload;
+  expect(deserialized).toEqual(payload);
+});
+
+test.each([
+  // test vector taken from https://github.com/stacks-network/stacks-core/blob/396b34ba414220834de7ff96a890d55458ded51b/stackslib/src/chainstate/stacks/transaction.rs#L2003-L2122
+  '081212121212121212121212121212121212121212121212121212121212121212099275df67a68c8745c0ff97b48201ee6db447f7c93b23ae24cdc2400f52fdb08a1a6ac7ec71bf9c9c76e96ee4675ebff60625af28718501047bfd87b810c2d2139b73c23bd69de66360953a642c2a330a',
+  // test vector taken from https://github.com/stacks-network/stacks-core/blob/396b34ba414220834de7ff96a890d55458ded51b/stackslib/src/chainstate/stacks/transaction.rs#L2143-L2301
+  '0812121212121212121212121212121212121212121212121212121212121212120a0601ffffffffffffffffffffffffffffffffffffffff0c666f6f2d636f6e74726163749275df67a68c8745c0ff97b48201ee6db447f7c93b23ae24cdc2400f52fdb08a1a6ac7ec71bf9c9c76e96ee4675ebff60625af28718501047bfd87b810c2d2139b73c23bd69de66360953a642c2a330a',
+])('deserialize/serialize nakamoto coinbase payload', payloadBytes => {
+  const payload = deserializePayload(new BytesReader(hexToBytes(payloadBytes)));
+
+  expect(payload).toBeDefined();
+  expect(bytesToHex(serializePayload(payload))).toEqual(payloadBytes);
 });

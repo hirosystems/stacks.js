@@ -84,19 +84,12 @@ import {
   pubKeyfromPrivKey,
   publicKeyToString,
 } from '../src/keys';
-import {
-  TenureChangeCause,
-  TokenTransferPayload,
-  createTenureChangePayload,
-  createTokenTransferPayload,
-  deserializePayload,
-  serializePayload,
-} from '../src/payload';
+import { TokenTransferPayload, createTokenTransferPayload, serializePayload } from '../src/payload';
 import { createAssetInfo } from '../src/postcondition-types';
 import { createTransactionAuthField } from '../src/signature';
 import { TransactionSigner } from '../src/signer';
 import { StacksTransaction, deserializeTransaction } from '../src/transaction';
-import { cloneDeep, randomBytes } from '../src/utils';
+import { cloneDeep } from '../src/utils';
 
 function setSignature(
   unsignedTransaction: StacksTransaction,
@@ -2293,36 +2286,36 @@ test('StacksTransaction serialize/deserialize equality with an invalid utf-8 byt
 });
 
 describe('serialize/deserialize tenure change', () => {
-  test('transaction', () => {
+  test.skip('transaction', () => {
     // test vector generated with mockamoto node
     const txBytes =
       '808000000004000f873150e9790e305b701aa8c7b3bcff9e31a5f9000000000000000000000000000000000001d367da530b92f4984f537f0b903c330eb5158262afa08d67cbbdea6c8e2ecae06008248ac147fc34101d3cc207b1b3e386e0f53732b5548bd5abe1570c2271340302000000000755c9861be5cff984a20ce6d99d4aa65941412889bdc665094136429b84f8c2ee00000001000000000000000000000000000000000000000000000000000279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f817980000000000000000000000000000000000000000000000000000000000000000';
     const transaction = deserializeTransaction(txBytes);
 
-    expect(transaction).toBeDefined();
     expect(bytesToHex(transaction.serialize())).toEqual(txBytes);
   });
 
-  test('payload', () => {
-    const previousTenureEnd = bytesToHex(randomBytes(32));
-    const previousTenureBlocks = 100;
-    const cause = TenureChangeCause.NullMiner;
-    const publicKeyHash = bytesToHex(randomBytes(20));
-    const signers = bytesToHex(randomBytes(21));
-    const signature = bytesToHex(randomBytes(65));
+  test('deserialize/serialize tenure change transaction', () => {
+    // test vector taken from https://github.com/hirosystems/stacks-encoding-native-js/blob/9e2aa260cd88ffa217b338daea4a09c22e3bccdc/tests/tx-decode-3.0.test.ts#L15
+    const txBytes =
+      '808000000004001dc27eba0247f8cc9575e7d45e50a0bc7e72427d000000000000001d000000000000000000011dc72b6dfd9b36e414a2709e3b01eb5bbdd158f9bc77cd2ca6c3c8b0c803613e2189f6dacf709b34e8182e99d3a1af15812b75e59357d9c255c772695998665f010200000000076f2ff2c4517ab683bf2d588727f09603cc3e9328b9c500e21a939ead57c0560af8a3a132bd7d56566f2ff2c4517ab683bf2d588727f09603cc3e932828dcefb98f6b221eef731cabec7538314441c1e0ff06b44c22085d41aae447c1000000010014ff3cb19986645fd7e71282ad9fea07d540a60e';
+    const transaction = deserializeTransaction(txBytes);
 
-    const payload = createTenureChangePayload(
-      previousTenureEnd,
-      previousTenureBlocks,
-      cause,
-      publicKeyHash,
-      signers,
-      signature
-    );
-
-    const serialized = serializePayload(payload);
-    const reader = new BytesReader(serialized);
-
-    expect(deserializePayload(reader)).toEqual(payload);
+    expect(bytesToHex(transaction.serialize())).toEqual(txBytes);
   });
+});
+
+test.each([
+  // test vector generated based on https://github.com/stacks-network/stacks-core/tree/396b34ba414220834de7ff96a890d55458ded51b
+  '00000000000400143e543243dfcd8c02a12ad7ea371bd07bc91df900000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010200000000081212121212121212121212121212121212121212121212121212121212121212099275df67a68c8745c0ff97b48201ee6db447f7c93b23ae24cdc2400f52fdb08a1a6ac7ec71bf9c9c76e96ee4675ebff60625af28718501047bfd87b810c2d2139b73c23bd69de66360953a642c2a330a',
+  // test vector taken from https://github.com/hirosystems/stacks-encoding-native-js/blob/bba3528685912e30a86f1e35ed62573e43a2aa88/tests/tx-decode-3.0.test.ts#L53
+  '80800000000400b40723ab4d7781cf1b45083aa043ce4563006c6100000000000000010000000000000000000158be820619a4838f74e63099bb113fcf7ee13ef3b2bb56728cd19470f9379f05288d4accc987d8dd85de5101776c2ad000784d118e35deb4f02852540bf6dd5f01020000000008010101010101010101010101010101010101010101010101010101010101010109119054d8cfba5f6aebaac75b0f6671a6917211729fa7bafa35ab0ad68fe243cf4169eb339d8a26ee8e036c8380e3afd63da8aca1f9673d19a59ef00bf13e1ba2e540257d0b471fc591a877a90e04e00b',
+  // test vector taken from https://github.com/hirosystems/stacks-encoding-native-js/blob/bba3528685912e30a86f1e35ed62573e43a2aa88/tests/tx-decode-3.0.test.ts#L93
+  '80800000000400b40723ab4d7781cf1b45083aa043ce4563006c6100000000000000010000000000000000000158be820619a4838f74e63099bb113fcf7ee13ef3b2bb56728cd19470f9379f05288d4accc987d8dd85de5101776c2ad000784d118e35deb4f02852540bf6dd5f010200000000081212121212121212121212121212121212121212121212121212121212121212099275df67a68c8745c0ff97b48201ee6db447f7c93b23ae24cdc2400f52fdb08a1a6ac7ec71bf9c9c76e96ee4675ebff60625af28718501047bfd87b810c2d2139b73c23bd69de66360953a642c2a330a',
+  // test vector taken from https://github.com/hirosystems/stacks-encoding-native-js/blob/bba3528685912e30a86f1e35ed62573e43a2aa88/tests/tx-decode-3.0.test.ts#L133
+  '80800000000400b40723ab4d7781cf1b45083aa043ce4563006c6100000000000000010000000000000000000158be820619a4838f74e63099bb113fcf7ee13ef3b2bb56728cd19470f9379f05288d4accc987d8dd85de5101776c2ad000784d118e35deb4f02852540bf6dd5f0102000000000812121212121212121212121212121212121212121212121212121212121212120a0601ffffffffffffffffffffffffffffffffffffffff0c666f6f2d636f6e74726163749275df67a68c8745c0ff97b48201ee6db447f7c93b23ae24cdc2400f52fdb08a1a6ac7ec71bf9c9c76e96ee4675ebff60625af28718501047bfd87b810c2d2139b73c23bd69de66360953a642c2a330a',
+])('deserialize/serialize nakamoto coinbase transaction', txBytes => {
+  const transaction = deserializeTransaction(txBytes);
+
+  expect(bytesToHex(transaction.serialize())).toEqual(txBytes);
 });
