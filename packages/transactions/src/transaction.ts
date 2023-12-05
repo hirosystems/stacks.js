@@ -7,20 +7,6 @@ import {
   writeUInt32BE,
 } from '@stacks/common';
 import {
-  AnchorMode,
-  anchorModeFromNameOrValue,
-  AnchorModeName,
-  AuthType,
-  ChainID,
-  DEFAULT_CHAIN_ID,
-  PayloadType,
-  PostConditionMode,
-  PubKeyEncoding,
-  StacksMessageType,
-  TransactionVersion,
-} from './constants';
-
-import {
   Authorization,
   deserializeAuthorization,
   intoInitialSighashAuth,
@@ -34,19 +20,26 @@ import {
   SpendingConditionOpts,
   verifyOrigin,
 } from './authorization';
-import { createTransactionAuthField } from './signature';
-
-import { cloneDeep, txidFromData } from './utils';
-
-import { deserializePayload, Payload, PayloadInput, serializePayload } from './payload';
-
-import { createLPList, deserializeLPList, LengthPrefixedList, serializeLPList } from './types';
-
-import { isCompressed, StacksPrivateKey, StacksPublicKey } from './keys';
-
 import { BytesReader } from './bytesReader';
-
+import {
+  AnchorMode,
+  anchorModeFromNameOrValue,
+  AnchorModeName,
+  AuthType,
+  ChainID,
+  DEFAULT_CHAIN_ID,
+  PayloadType,
+  PostConditionMode,
+  PubKeyEncoding,
+  StacksMessageType,
+  TransactionVersion,
+} from './constants';
 import { SerializationError, SigningError } from './errors';
+import { isCompressed, StacksPrivateKey, StacksPublicKey } from './keys';
+import { deserializePayload, Payload, PayloadInput, serializePayload } from './payload';
+import { createTransactionAuthField } from './signature';
+import { createLPList, deserializeLPList, LengthPrefixedList, serializeLPList } from './types';
+import { cloneDeep, txidFromData } from './utils';
 
 export class StacksTransaction {
   version: TransactionVersion;
@@ -86,6 +79,7 @@ export class StacksTransaction {
       switch (payload.payloadType) {
         case PayloadType.Coinbase:
         case PayloadType.CoinbaseToAltRecipient:
+        case PayloadType.NakamotoCoinbase:
         case PayloadType.PoisonMicroblock:
         case PayloadType.TenureChange:
           this.anchorMode = AnchorMode.OnChainOnly;

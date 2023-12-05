@@ -8,12 +8,25 @@ import {
   writeUInt32BE,
   writeUInt8,
 } from '@stacks/common';
-import { ClarityVersion, COINBASE_BYTES_LENGTH, PayloadType, StacksMessageType } from './constants';
-
 import { BytesReader } from './bytesReader';
-import { ClarityValue, deserializeCV, serializeCV } from './clarity/';
+import {
+  ClarityType,
+  ClarityValue,
+  deserializeCV,
+  noneCV,
+  OptionalCV,
+  serializeCV,
+  someCV,
+} from './clarity/';
 import { PrincipalCV, principalCV } from './clarity/types/principalCV';
 import { Address } from './common';
+import {
+  ClarityVersion,
+  COINBASE_BYTES_LENGTH,
+  PayloadType,
+  StacksMessageType,
+  VRF_PROOF_BYTES_LENGTH,
+} from './constants';
 import { createAddress, createLPString, LengthPrefixedString } from './postcondition-types';
 import {
   codeBodyString,
@@ -33,6 +46,7 @@ export type Payload =
   | PoisonPayload
   | CoinbasePayload
   | CoinbasePayloadToAltRecipient
+  | NakamotoCoinbasePayload
   | TenureChangePayload;
 
 export function isTokenTransferPayload(p: Payload): p is TokenTransferPayload {
@@ -67,6 +81,7 @@ export type PayloadInput =
   | PoisonPayload
   | CoinbasePayload
   | CoinbasePayloadToAltRecipient
+  | NakamotoCoinbasePayload
   | TenureChangePayload;
 
 export function createTokenTransferPayload(
@@ -214,49 +229,93 @@ export function createCoinbasePayload(
   };
 }
 
+export interface NakamotoCoinbasePayload {
+  readonly type: StacksMessageType.Payload;
+  readonly payloadType: PayloadType.NakamotoCoinbase;
+  readonly coinbaseBytes: Uint8Array;
+  readonly recipient?: PrincipalCV;
+  readonly vrfProof: Uint8Array;
+}
+
+export function createNakamotoCoinbasePayload(
+  coinbaseBytes: Uint8Array,
+  recipient: OptionalCV<PrincipalCV>,
+  vrfProof: Uint8Array
+): NakamotoCoinbasePayload {
+  if (coinbaseBytes.byteLength != COINBASE_BYTES_LENGTH) {
+    throw Error(`Coinbase buffer size must be ${COINBASE_BYTES_LENGTH} bytes`);
+  }
+
+  if (vrfProof.byteLength != VRF_PROOF_BYTES_LENGTH) {
+    throw Error(`VRF proof buffer size must be ${VRF_PROOF_BYTES_LENGTH} bytes`);
+  }
+
+  return {
+    type: StacksMessageType.Payload,
+    payloadType: PayloadType.NakamotoCoinbase,
+    coinbaseBytes,
+    recipient: recipient.type === ClarityType.OptionalSome ? recipient.value : undefined,
+    vrfProof,
+  };
+}
+
 export enum TenureChangeCause {
   /** A valid winning block-commit */
   BlockFound = 0,
-  /** No winning block-commits */
-  NoBlockFound = 1,
-  /** A "null miner" won the block-commit */
-  NullMiner = 2,
+  /** The next burnchain block is taking too long, so extend the runtime budget */
+  Extended = 1,
 }
 
 export interface TenureChangePayload {
   readonly type: StacksMessageType.Payload;
   readonly payloadType: PayloadType.TenureChange;
+  /**
+   * The consensus hash of this tenure (hex string). Corresponds to the
+   * sortition in which the miner of this block was chosen. It may be the case
+   * that this miner's tenure gets _extended_ acrosssubsequent sortitions; if
+   * this happens, then this `consensus_hash` value _remains the same _as the
+   * sortition in which the winning block-commit was mined.
+   */
+  readonly tenureHash: string;
+  /**
+   * The consensus hash (hex string) of the previous tenure.  Corresponds to the
+   * sortition of the previous winning block-commit.
+   */
+  readonly previousTenureHash: string;
+  /**
+   * Current consensus hash (hex string) on the underlying burnchain.
+   * Corresponds to the last-seen sortition.
+   */
+  readonly burnViewHash: string;
   /** Stacks block hash (hex string) */
   readonly previousTenureEnd: string;
-  /** Number of blocks produced in the previous tenure */
+  /** The number of blocks produced since the last sortition-linked tenure */
   readonly previousTenureBlocks: number;
-  /** Cause of change in mining tenure */
+  /** The cause of change in mining tenure */
   readonly cause: TenureChangeCause;
   /** The public key hash of the current tenure (hex string) */
   readonly publicKeyHash: string;
-  /** The bitmap of which Stackers signed (hex string) */
-  readonly signers: string;
-  /** The Schnorr signature from at least 70% of the Stackers (hex string) */
-  readonly signature: string;
 }
 
 export function createTenureChangePayload(
+  tenureHash: string,
+  previousTenureHash: string,
+  burnViewHash: string,
   previousTenureEnd: string,
   previousTenureBlocks: number,
   cause: TenureChangeCause,
-  publicKeyHash: string,
-  signers: string,
-  signature: string
+  publicKeyHash: string
 ): TenureChangePayload {
   return {
     type: StacksMessageType.Payload,
     payloadType: PayloadType.TenureChange,
+    tenureHash,
+    previousTenureHash,
+    burnViewHash,
     previousTenureEnd,
     previousTenureBlocks,
     cause,
     publicKeyHash,
-    signers,
-    signature,
   };
 }
 
@@ -300,16 +359,19 @@ export function serializePayload(payload: PayloadInput): Uint8Array {
       bytesArray.push(payload.coinbaseBytes);
       bytesArray.push(serializeCV(payload.recipient));
       break;
+    case PayloadType.NakamotoCoinbase:
+      bytesArray.push(payload.coinbaseBytes);
+      bytesArray.push(serializeCV(payload.recipient ? someCV(payload.recipient) : noneCV()));
+      bytesArray.push(payload.vrfProof);
+      break;
     case PayloadType.TenureChange:
+      bytesArray.push(hexToBytes(payload.tenureHash));
+      bytesArray.push(hexToBytes(payload.previousTenureHash));
+      bytesArray.push(hexToBytes(payload.burnViewHash));
       bytesArray.push(hexToBytes(payload.previousTenureEnd));
       bytesArray.push(writeUInt32BE(new Uint8Array(4), payload.previousTenureBlocks));
       bytesArray.push(writeUInt8(new Uint8Array(1), payload.cause));
       bytesArray.push(hexToBytes(payload.publicKeyHash));
-      const signers = hexToBytes(payload.signers);
-      bytesArray.push(writeUInt32BE(new Uint8Array(4), signers.byteLength)); // signers length
-      bytesArray.push(signers);
-
-      bytesArray.push(hexToBytes(payload.signature));
       break;
   }
 
@@ -359,30 +421,39 @@ export function deserializePayload(bytesReader: BytesReader): Payload {
     case PayloadType.PoisonMicroblock:
       // TODO: implement
       return createPoisonPayload();
-    case PayloadType.Coinbase:
+    case PayloadType.Coinbase: {
       const coinbaseBytes = bytesReader.readBytes(COINBASE_BYTES_LENGTH);
       return createCoinbasePayload(coinbaseBytes);
-    case PayloadType.CoinbaseToAltRecipient:
-      const coinbaseToAltRecipientBuffer = bytesReader.readBytes(COINBASE_BYTES_LENGTH);
+    }
+    case PayloadType.CoinbaseToAltRecipient: {
+      const coinbaseBytes = bytesReader.readBytes(COINBASE_BYTES_LENGTH);
       const altRecipient = deserializeCV(bytesReader) as PrincipalCV;
-      return createCoinbasePayload(coinbaseToAltRecipientBuffer, altRecipient);
+      return createCoinbasePayload(coinbaseBytes, altRecipient);
+    }
+    case PayloadType.NakamotoCoinbase: {
+      const coinbaseBytes = bytesReader.readBytes(COINBASE_BYTES_LENGTH);
+      const recipient = deserializeCV(bytesReader) as OptionalCV<PrincipalCV>;
+      const vrfProof = bytesReader.readBytes(VRF_PROOF_BYTES_LENGTH);
+      return createNakamotoCoinbasePayload(coinbaseBytes, recipient, vrfProof);
+    }
     case PayloadType.TenureChange:
+      const tenureHash = bytesToHex(bytesReader.readBytes(20));
+      const previousTenureHash = bytesToHex(bytesReader.readBytes(20));
+      const burnViewHash = bytesToHex(bytesReader.readBytes(20));
       const previousTenureEnd = bytesToHex(bytesReader.readBytes(32));
       const previousTenureBlocks = bytesReader.readUInt32BE();
       const cause = bytesReader.readUInt8Enum(TenureChangeCause, n => {
         throw new Error(`Cannot recognize TenureChangeCause: ${n}`);
       });
       const publicKeyHash = bytesToHex(bytesReader.readBytes(20));
-      const signersLength = bytesReader.readUInt32BE();
-      const signers = bytesToHex(bytesReader.readBytes(signersLength));
-      const signature = bytesToHex(bytesReader.readBytes(65));
       return createTenureChangePayload(
+        tenureHash,
+        previousTenureHash,
+        burnViewHash,
         previousTenureEnd,
         previousTenureBlocks,
         cause,
-        publicKeyHash,
-        signers,
-        signature
+        publicKeyHash
       );
   }
 }
