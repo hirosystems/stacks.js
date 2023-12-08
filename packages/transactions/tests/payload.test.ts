@@ -1,5 +1,5 @@
 import { bytesToHex, hexToBytes, utf8ToBytes } from '@stacks/common';
-import { BytesReader } from '../src';
+import { BytesReader, randomBytes } from '../src';
 import {
   contractPrincipalCV,
   falseCV,
@@ -13,11 +13,14 @@ import {
   CoinbasePayloadToAltRecipient,
   ContractCallPayload,
   SmartContractPayload,
+  TenureChangeCause,
+  TenureChangePayload,
   TokenTransferPayload,
   VersionedSmartContractPayload,
   createCoinbasePayload,
   createContractCallPayload,
   createSmartContractPayload,
+  createTenureChangePayload,
   createTokenTransferPayload,
   deserializePayload,
   serializePayload,
@@ -187,6 +190,30 @@ test('Coinbase to contract principal recipient payload serialization and deseria
   ) as CoinbasePayloadToAltRecipient;
   expect(deserialized.coinbaseBytes).toEqual(coinbaseBuffer);
   expect(deserialized.recipient).toEqual(contractRecipient);
+});
+
+test('serialize/deserialize tenure change payload', () => {
+  const previousTenureEnd = bytesToHex(randomBytes(32));
+  const previousTenureBlocks = 100;
+  const cause = TenureChangeCause.NullMiner;
+  const publicKeyHash = bytesToHex(randomBytes(20));
+  const signers = bytesToHex(randomBytes(21));
+  const signature = bytesToHex(randomBytes(65));
+
+  const payload = createTenureChangePayload(
+    previousTenureEnd,
+    previousTenureBlocks,
+    cause,
+    publicKeyHash,
+    signers,
+    signature
+  );
+
+  const deserialized = serializeDeserialize(
+    payload,
+    StacksMessageType.Payload
+  ) as TenureChangePayload;
+  expect(deserialized).toEqual(payload);
 });
 
 test.each([
