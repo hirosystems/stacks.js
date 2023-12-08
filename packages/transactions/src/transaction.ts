@@ -28,7 +28,6 @@ import {
   AuthType,
   ChainID,
   DEFAULT_CHAIN_ID,
-  PayloadType,
   PostConditionMode,
   PubKeyEncoding,
   StacksMessageType,
@@ -41,6 +40,10 @@ import { createTransactionAuthField } from './signature';
 import { createLPList, deserializeLPList, LengthPrefixedList, serializeLPList } from './types';
 import { cloneDeep, txidFromData } from './utils';
 
+/**
+ * The StacksTransactions instance, typically reated using `make...` or `makeUnsigned...` methods.
+ * @see {@link makeSTXTokenTransfer}, {@link makeContractCall}, {@link makeContractDeploy}, {@link makeContractDeploy}, {@link makeUnsignedSTXTokenTransfer}, {@link makeUnsignedContractCall}, {@link makeUnsignedContractDeploy}
+ */
 export class StacksTransaction {
   version: TransactionVersion;
   chainId: ChainID;
@@ -73,25 +76,7 @@ export class StacksTransaction {
     this.postConditionMode = postConditionMode ?? PostConditionMode.Deny;
     this.postConditions = postConditions ?? createLPList([]);
 
-    if (anchorMode) {
-      this.anchorMode = anchorModeFromNameOrValue(anchorMode);
-    } else {
-      switch (payload.payloadType) {
-        case PayloadType.Coinbase:
-        case PayloadType.CoinbaseToAltRecipient:
-        case PayloadType.NakamotoCoinbase:
-        case PayloadType.PoisonMicroblock:
-        case PayloadType.TenureChange:
-          this.anchorMode = AnchorMode.OnChainOnly;
-          break;
-        case PayloadType.ContractCall:
-        case PayloadType.SmartContract:
-        case PayloadType.VersionedSmartContract:
-        case PayloadType.TokenTransfer:
-          this.anchorMode = AnchorMode.Any;
-          break;
-      }
-    }
+    this.anchorMode = anchorModeFromNameOrValue(anchorMode ?? AnchorMode.OnChainOnly);
   }
 
   signBegin() {
