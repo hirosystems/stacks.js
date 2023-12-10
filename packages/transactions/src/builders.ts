@@ -209,9 +209,18 @@ export async function estimateTransaction(
   const response = await derivedNetwork.fetchFn(url, options);
 
   if (!response.ok) {
-    const body = await response.json().catch(() => ({}));
+    const body = await response.text().then(str => {
+      try {
+        return JSON.parse(str);
+      } catch (error) {
+        return str;
+      }
+    });
 
-    if (body?.reason === 'NoEstimateAvailable') {
+    if (
+      body?.reason === 'NoEstimateAvailable' ||
+      (typeof body === 'string' && body.includes('NoEstimateAvailable'))
+    ) {
       throw new NoEstimateAvailableError(body?.reason_data?.message ?? '');
     }
 

@@ -1245,6 +1245,19 @@ test('Estimate transaction fee fallback', async () => {
   const resultEstimateFee = await estimateTransactionFeeWithFallback(tx, testnet);
   expect(resultEstimateFee).toBe(201n);
 
+  // Test with plain-text response
+  // http://localhost:3999/v2/fees/transaction
+  fetchMock.once(
+    `Estimator RPC endpoint failed to estimate tx TokenTransfer: NoEstimateAvailable`,
+    { status: 400 }
+  );
+
+  // http://localhost:3999/v2/fees/transfer
+  fetchMock.once('1');
+
+  const resultEstimateFee2 = await estimateTransactionFeeWithFallback(tx, testnet);
+  expect(resultEstimateFee2).toBe(201n);
+
   // http://localhost:3999/v2/fees/transaction
   fetchMock.once(
     `{"error":"Estimation could not be performed","reason":"NoEstimateAvailable","reason_data":{"message":"No estimate available for the provided payload."}}`,
@@ -1257,7 +1270,7 @@ test('Estimate transaction fee fallback', async () => {
   const doubleRate = await estimateTransactionFeeWithFallback(tx, testnet);
   expect(doubleRate).toBe(402n);
 
-  expect(fetchMock.mock.calls.length).toEqual(6);
+  expect(fetchMock.mock.calls.length).toEqual(8);
 });
 
 test('Single-sig transaction byte length must include signature', async () => {
