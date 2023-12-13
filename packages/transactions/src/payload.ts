@@ -262,20 +262,36 @@ export function createNakamotoCoinbasePayload(
 export enum TenureChangeCause {
   /** A valid winning block-commit */
   BlockFound = 0,
-  /** No winning block-commits */
-  NoBlockFound = 1,
-  /** A "null miner" won the block-commit */
-  NullMiner = 2,
+  /** The next burnchain block is taking too long, so extend the runtime budget */
+  Extended = 1,
 }
 
 export interface TenureChangePayload {
   readonly type: StacksMessageType.Payload;
   readonly payloadType: PayloadType.TenureChange;
+  /**
+   * The consensus hash of this tenure (hex string). Corresponds to the
+   * sortition in which the miner of this block was chosen. It may be the case
+   * that this miner's tenure gets _extended_ acrosssubsequent sortitions; if
+   * this happens, then this `consensus_hash` value _remains the same _as the
+   * sortition in which the winning block-commit was mined.
+   */
+  readonly tenureHash: string;
+  /**
+   * The consensus hash (hex string) of the previous tenure.  Corresponds to the
+   * sortition of the previous winning block-commit.
+   */
+  readonly previousTenureHash: string;
+  /**
+   * Current consensus hash (hex string) on the underlying burnchain.
+   * Corresponds to the last-seen sortition.
+   */
+  readonly burnViewHash: string;
   /** Stacks block hash (hex string) */
   readonly previousTenureEnd: string;
-  /** Number of blocks produced in the previous tenure */
+  /** The number of blocks produced since the last sortition-linked tenure */
   readonly previousTenureBlocks: number;
-  /** Cause of change in mining tenure */
+  /** The cause of change in mining tenure */
   readonly cause: TenureChangeCause;
   /** The public key hash of the current tenure (hex string) */
   readonly publicKeyHash: string;
@@ -286,6 +302,9 @@ export interface TenureChangePayload {
 }
 
 export function createTenureChangePayload(
+  tenureHash: string,
+  previousTenureHash: string,
+  burnViewHash: string,
   previousTenureEnd: string,
   previousTenureBlocks: number,
   cause: TenureChangeCause,
@@ -296,6 +315,9 @@ export function createTenureChangePayload(
   return {
     type: StacksMessageType.Payload,
     payloadType: PayloadType.TenureChange,
+    tenureHash,
+    previousTenureHash,
+    burnViewHash,
     previousTenureEnd,
     previousTenureBlocks,
     cause,
@@ -351,15 +373,17 @@ export function serializePayload(payload: PayloadInput): Uint8Array {
       bytesArray.push(payload.vrfProof);
       break;
     case PayloadType.TenureChange:
+      bytesArray.push(hexToBytes(payload.tenureHash));
+      bytesArray.push(hexToBytes(payload.previousTenureHash));
+      bytesArray.push(hexToBytes(payload.burnViewHash));
       bytesArray.push(hexToBytes(payload.previousTenureEnd));
       bytesArray.push(writeUInt32BE(new Uint8Array(4), payload.previousTenureBlocks));
       bytesArray.push(writeUInt8(new Uint8Array(1), payload.cause));
       bytesArray.push(hexToBytes(payload.publicKeyHash));
+      bytesArray.push(hexToBytes(payload.signature));
       const signers = hexToBytes(payload.signers);
       bytesArray.push(writeUInt32BE(new Uint8Array(4), signers.byteLength)); // signers length
       bytesArray.push(signers);
-
-      bytesArray.push(hexToBytes(payload.signature));
       break;
   }
 
@@ -425,16 +449,22 @@ export function deserializePayload(bytesReader: BytesReader): Payload {
       return createNakamotoCoinbasePayload(coinbaseBytes, recipient, vrfProof);
     }
     case PayloadType.TenureChange:
+      const tenureHash = bytesToHex(bytesReader.readBytes(20));
+      const previousTenureHash = bytesToHex(bytesReader.readBytes(20));
+      const burnViewHash = bytesToHex(bytesReader.readBytes(20));
       const previousTenureEnd = bytesToHex(bytesReader.readBytes(32));
       const previousTenureBlocks = bytesReader.readUInt32BE();
       const cause = bytesReader.readUInt8Enum(TenureChangeCause, n => {
         throw new Error(`Cannot recognize TenureChangeCause: ${n}`);
       });
       const publicKeyHash = bytesToHex(bytesReader.readBytes(20));
+      const signature = bytesToHex(bytesReader.readBytes(65));
       const signersLength = bytesReader.readUInt32BE();
       const signers = bytesToHex(bytesReader.readBytes(signersLength));
-      const signature = bytesToHex(bytesReader.readBytes(65));
       return createTenureChangePayload(
+        tenureHash,
+        previousTenureHash,
+        burnViewHash,
         previousTenureEnd,
         previousTenureBlocks,
         cause,
