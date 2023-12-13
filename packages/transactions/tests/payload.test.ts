@@ -193,14 +193,20 @@ test('Coinbase to contract principal recipient payload serialization and deseria
 });
 
 test('serialize/deserialize tenure change payload', () => {
+  const tenureHash = bytesToHex(randomBytes(20));
+  const previousTenureHash = bytesToHex(randomBytes(20));
+  const burnViewHash = bytesToHex(randomBytes(20));
   const previousTenureEnd = bytesToHex(randomBytes(32));
   const previousTenureBlocks = 100;
-  const cause = TenureChangeCause.NullMiner;
+  const cause = TenureChangeCause.Extended;
   const publicKeyHash = bytesToHex(randomBytes(20));
   const signers = bytesToHex(randomBytes(21));
   const signature = bytesToHex(randomBytes(65));
 
   const payload = createTenureChangePayload(
+    tenureHash,
+    previousTenureHash,
+    burnViewHash,
     previousTenureEnd,
     previousTenureBlocks,
     cause,
