@@ -220,7 +220,7 @@ export const CLI_ARGS = {
         '    Press Ctrl+C to exit\n' +
         '    Authentication server started on 8888\n' +
         '```\n',
-        group: 'Authentication',
+      group: 'Authentication',
     },
     balance: {
       type: 'array',
@@ -252,7 +252,7 @@ export const CLI_ARGS = {
         '      "STACKS": "123456"\n' +
         '    }' +
         '```\n',
-        group: 'Account Management',
+      group: 'Account Management',
     },
     can_stack: {
       type: 'array',
@@ -522,7 +522,7 @@ export const CLI_ARGS = {
         '    $ stx decrypt_keychain "bfMDtOucUGcJXjZo6vkrZWgEzue9fzPsZ7A6Pl4LQuxLI1xsVF0VPgBkMsnSLCmYS5YHh7R3mNtMmX45Bq9sNGPfPsseQMR0fD9XaHi+tBg=\n' +
         '    Enter password:\n' +
         '    section amount spend resemble spray verify night immune tattoo best emotion parrot\n' +
-        '```\n' +
+        '```\n',
       group: 'Key Management',
     },
     deploy_contract: {
