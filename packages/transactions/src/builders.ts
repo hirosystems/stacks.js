@@ -11,7 +11,7 @@ import {
   whenTransactionVersion,
 } from '@stacks/common';
 import { c32address } from 'c32check';
-import { StacksApi } from './api';
+import { StacksNodeApi } from './api';
 import {
   createSingleSigSpendingCondition,
   createSpendingCondition,
@@ -92,7 +92,7 @@ export interface TokenTransferOptions {
   /** the network that the transaction will ultimately be broadcast to */
   network?: StacksNetworkName | StacksNetwork;
   /** the node/API used for estimating fee & nonce (using the `api.fetchFn` */
-  api?: StacksApi;
+  api?: StacksNodeApi;
   /** the transaction anchorMode, which specifies whether it should be
    * included in an anchor block or a microblock */
   anchorMode: AnchorModeName | AnchorMode;
@@ -137,7 +137,7 @@ export async function makeUnsignedSTXTokenTransfer(
     fee: BigInt(0),
     nonce: BigInt(0),
     network: STACKS_MAINNET,
-    api: new StacksApi({ network: txOptions.network }),
+    api: new StacksNodeApi({ network: txOptions.network }),
     memo: '',
     sponsored: false,
   };
@@ -239,7 +239,7 @@ export interface BaseContractDeployOptions {
   /** the network that the transaction will ultimately be broadcast to */
   network?: StacksNetworkName | StacksNetwork;
   /** the node/API used for estimating fee & nonce (using the `api.fetchFn` */
-  api?: StacksApi;
+  api?: StacksNodeApi;
   /** the transaction anchorMode, which specifies whether it should be
    * included in an anchor block or a microblock */
   anchorMode: AnchorModeName | AnchorMode;
@@ -326,7 +326,7 @@ export async function makeUnsignedContractDeploy(
     fee: BigInt(0),
     nonce: BigInt(0),
     network: STACKS_MAINNET,
-    api: new StacksApi({ network: txOptions.network }),
+    api: new StacksNodeApi({ network: txOptions.network }),
     postConditionMode: PostConditionMode.Deny,
     sponsored: false,
     clarityVersion: ClarityVersion.Clarity2,
@@ -398,7 +398,7 @@ export interface ContractCallOptions {
   /** the Stacks blockchain network that will ultimately be used to broadcast this transaction */
   network?: StacksNetworkName | StacksNetwork;
   /** the node/API used for estimating fee & nonce (using the `api.fetchFn` */
-  api?: StacksApi;
+  api?: StacksNodeApi;
   /** the transaction anchorMode, which specifies whether it should be
    * included in an anchor block or a microblock */
   anchorMode: AnchorModeName | AnchorMode;
@@ -447,7 +447,7 @@ export async function makeUnsignedContractCall(
     fee: BigInt(0),
     nonce: BigInt(0),
     network: STACKS_MAINNET,
-    api: new StacksApi({ network: txOptions.network }),
+    api: new StacksNodeApi({ network: txOptions.network }),
     postConditionMode: PostConditionMode.Deny,
     sponsored: false,
   };
@@ -723,7 +723,7 @@ export interface SponsorOptionsOpts {
   /** the Stacks blockchain network that this transaction will ultimately be broadcast to */
   network?: StacksNetworkName | StacksNetwork;
   /** the node/API used for estimating fee & nonce (using the `api.fetchFn` */
-  api?: StacksApi;
+  api?: StacksNodeApi;
 }
 
 /**
@@ -748,7 +748,7 @@ export async function sponsorTransaction(
     sponsorNonce: 0 as IntegerType,
     sponsorAddressHashmode: AddressHashMode.SerializeP2PKH as SingleSigHashMode,
     network: defaultNetwork,
-    api: new StacksApi({ network: defaultNetwork }),
+    api: new StacksNodeApi({ network: defaultNetwork }),
   };
 
   const options = Object.assign(defaultOptions, sponsorOptions);

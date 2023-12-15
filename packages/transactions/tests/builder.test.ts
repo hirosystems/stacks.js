@@ -78,7 +78,7 @@ import {
   getContractMapEntry,
   getNonce,
 } from '../src';
-import { StacksApi } from '../src/api';
+import { StacksNodeApi } from '../src/api';
 import {
   createStacksPrivateKey,
   isCompressed,
@@ -119,7 +119,7 @@ test('API key middleware - get nonce', async () => {
 
   const apiKey = '1234-my-api-key-example';
   const fetch = createFetchFn(createApiKeyMiddleware({ apiKey }));
-  const api = new StacksApi({ fetch });
+  const api = new StacksNodeApi({ fetch });
 
   fetchMock.mockOnce(`{"balance": "0", "nonce": "123"}`);
 
@@ -1179,7 +1179,7 @@ test('Estimate transaction transfer fee', async () => {
 
   fetchMock.mockOnce(mockedResponse);
 
-  const mainnet = new StacksApi();
+  const mainnet = new StacksNodeApi();
   const resultEstimateFee = await estimateTransaction({
     payload: bytesToHex(serializePayload(transaction.payload)),
     estimatedLength: transactionByteLength,
@@ -1188,7 +1188,7 @@ test('Estimate transaction transfer fee', async () => {
 
   fetchMock.mockOnce(mockedResponse);
 
-  const testnet = new StacksApi({ network: STACKS_TESTNET });
+  const testnet = new StacksNodeApi({ network: STACKS_TESTNET });
   const resultEstimateFee2 = await estimateTransaction({
     payload: bytesToHex(serializePayload(transaction.payload)),
     estimatedLength: transactionByteLength,
@@ -1217,7 +1217,7 @@ test('Estimate transaction transfer fee', async () => {
 test('Estimate transaction fee fallback', async () => {
   const privateKey = 'cb3df38053d132895220b9ce471f6b676db5b9bf0b4adefb55f2118ece2478df01';
   const poolAddress = 'ST11NJTTKGVT6D1HY4NJRVQWMQM7TVAR091EJ8P2Y';
-  const api = new StacksApi({ url: 'http://localhost:3999' });
+  const api = new StacksNodeApi({ url: 'http://localhost:3999' });
 
   // http://localhost:3999/v2/fees/transaction
   fetchMock.once(
@@ -1249,7 +1249,7 @@ test('Estimate transaction fee fallback', async () => {
   // http://localhost:3999/v2/fees/transfer
   fetchMock.once('1');
 
-  const testnet = new StacksApi({ network: STACKS_TESTNET });
+  const testnet = new StacksNodeApi({ network: STACKS_TESTNET });
   const resultEstimateFee = await estimateFee({ transaction, api: testnet });
   expect(resultEstimateFee).toBe(201n);
 
@@ -1392,7 +1392,10 @@ test('Make STX token transfer with fetch account nonce', async () => {
   const memo = 'test memo';
 
   fetchMock.mockOnce(`{"balance":"0", "nonce":${nonce}}`);
-  const fetchNonce = await getNonce({ address, api: new StacksApi({ network: STACKS_TESTNET }) });
+  const fetchNonce = await getNonce({
+    address,
+    api: new StacksNodeApi({ network: STACKS_TESTNET }),
+  });
 
   fetchMock.mockOnce(`{"balance":"0", "nonce":${nonce}}`);
   const transaction = await makeSTXTokenTransfer({
@@ -1545,7 +1548,7 @@ test('Make sponsored STX token transfer with sponsor fee estimate', async () => 
   const nonce = 2;
   const senderKey = 'edf9aee84d9b7abc145504dde6726c64f369d37ee34ded868fabd876c26570bc01';
   const memo = 'test memo';
-  const api = new StacksApi();
+  const api = new StacksNodeApi();
 
   const sponsorKey = '9888d734e6e80a943a6544159e31d6c7e342f695ec867d549c569fa0028892d401';
   const sponsorNonce = 55;
@@ -1632,7 +1635,7 @@ test('Make sponsored STX token transfer with set tx fee', async () => {
   const nonce = 0;
   const senderKey = '8ca861519c4fa4a08de4beaa41688f60a24b575a976cf84099f38dc099a6d74401';
   // const senderAddress = 'ST2HTEQF50SW4X8077F8RSR8WCT57QG166TVG0GCE';
-  const api = new StacksApi({ network: STACKS_TESTNET });
+  const api = new StacksNodeApi({ network: STACKS_TESTNET });
 
   const sponsorKey = '9888d734e6e80a943a6544159e31d6c7e342f695ec867d549c569fa0028892d401';
   // const sponsorAddress = 'ST2TPJ3NEZ63MMJ8AY9S45HZ10QSH51YF93GE89GQ';
@@ -1684,7 +1687,7 @@ test('Make sponsored contract deploy with sponsor fee estimate', async () => {
   const senderKey = '8ca861519c4fa4a08de4beaa41688f60a24b575a976cf84099f38dc099a6d74401';
   const fee = 0;
   const nonce = 0;
-  const api = new StacksApi({ network: STACKS_TESTNET });
+  const api = new StacksNodeApi({ network: STACKS_TESTNET });
 
   const sponsorKey = '9888d734e6e80a943a6544159e31d6c7e342f695ec867d549c569fa0028892d401';
   // const sponsorAddress = 'ST2TPJ3NEZ63MMJ8AY9S45HZ10QSH51YF93GE89GQ';
@@ -1807,7 +1810,7 @@ test('Transaction broadcast success', async () => {
   const senderKey = 'edf9aee84d9b7abc145504dde6726c64f369d37ee34ded868fabd876c26570bc01';
   const memo = 'test memo';
 
-  const api = new StacksApi();
+  const api = new StacksNodeApi();
 
   const transaction = await makeSTXTokenTransfer({
     recipient,
@@ -2077,7 +2080,7 @@ test('Call read-only function', async () => {
   const contractName = 'kv-store';
   const functionName = 'get-value?';
   const buffer = bufferCVFromString('foo');
-  const api = new StacksApi({ network: STACKS_TESTNET });
+  const api = new StacksNodeApi({ network: STACKS_TESTNET });
   const senderAddress = 'ST2F4BK4GZH6YFBNHYDDGN4T1RKBA7DA1BJZPJEJJ';
   const mockResult = bufferCVFromString('test');
 
@@ -2110,7 +2113,7 @@ test('Call read-only function with network string', async () => {
     functionName: 'get-value?',
     functionArgs: [bufferCVFromString('foo')],
     senderAddress: 'ST2F4BK4GZH6YFBNHYDDGN4T1RKBA7DA1BJZPJEJJ',
-    api: new StacksApi({ network: 'testnet' }),
+    api: new StacksNodeApi({ network: 'testnet' }),
   });
 
   expect(fetchMock.mock.calls.length).toEqual(1);

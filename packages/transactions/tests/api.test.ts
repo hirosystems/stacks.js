@@ -1,5 +1,5 @@
 import { STACKS_DEVNET, STACKS_MAINNET, STACKS_TESTNET } from '@stacks/common';
-import { StacksApi } from '../src/api';
+import { StacksNodeApi } from '../src/api';
 import { DEVNET_URL, HIRO_MAINNET_URL, HIRO_TESTNET_URL } from '../src';
 
 describe('setting StacksApi URL', () => {
@@ -8,7 +8,7 @@ describe('setting StacksApi URL', () => {
     { network: STACKS_TESTNET, url: HIRO_TESTNET_URL },
     { network: STACKS_DEVNET, url: DEVNET_URL },
   ])('the api class determines the correct url for each network object', ({ network, url }) => {
-    const api = new StacksApi({ network });
+    const api = new StacksNodeApi({ network });
     expect(api.url).toEqual(url);
   });
 });

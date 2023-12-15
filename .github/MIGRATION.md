@@ -2,7 +2,7 @@
 
 - [Stacks.js (\>=5.x.x) → (7.x.x)](#stacksjs-5xx--7xx)
   - [Breaking Changes](#breaking-changes)
-  - [StacksNetwork \& the `@stacks/api` package](#stacksnetwork--the-stacksapi-package)
+  - [StacksNetwork to StacksNodeApi](#stacksnetwork-to-stacksnodeapi)
 - [Stacks.js (\<=4.x.x) → (5.x.x)](#stacksjs-4xx--5xx)
   - [Breaking Changes](#breaking-changes-1)
     - [Buffer to Uint8Array](#buffer-to-uint8array)
@@ -21,26 +21,60 @@
 
 ### Breaking Changes
 
-- The `@stacks/network` package was removed. Similar functionality is now available in `@stacks/api` and `@stacks/common`. [Read more...](#stacksapi-package)
--
-- Clarity ABI helpers were moved to the `@stacks/common` package.
+- The `@stacks/network` package was removed. Similar functionality is now available in `@stacks/transactions`. [Read more...](#stacksnetwork-to-stacksnodeapi)
 
-### StacksNetwork & the `@stacks/api` package
+### StacksNetwork to StacksNodeApi
 
 Stacks network objects are now exported by the `@stacks/common` package.
 They are used to specify network settings for other functions and don't require instantiation (like the `@stacks/network` approach did).
 
 ```ts
-import { STACKS_MAINNET } from '@stacks/common';
+import { STACKS_MAINNET } from '@stacks/transactions';
 ```
 
-The new `@stacks/api` package lets you interact with a Stacks node or API.
+After importing the network object (e.g. `STACKS_MAINNET` here), you can use it in other functions like so:
 
 ```ts
-import { StacksApi } from '@stacks/api';
+// todo: update more functions, show example
+```
 
-const api = new StacksApi();
+The new `StacksNodeApi` class lets you interact with a Stacks node or API.
+
+```ts
+import { StacksNodeApi } from '@stacks/transactions';
+
+const api = new StacksNodeApi();
 await api.broadcastTx(txHex);
+```
+
+For easing the transition, the functions which depended on the networking aspect of `@stacks/network` now accept an `api` parameter.
+The `api` parameter can be an instance of `StacksNodeApi` or any object containing a `url` and `fetch` property.
+
+- The `url` property should be a string containing the base URL of the Stacks node you want to use.
+- The `fetch` property can be any (fetch)[https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API] compatible function.
+
+The following diffs show examples of how to migrate to the new pattern.
+
+```diff
+import { makeSTXTokenTransfer } from '@stacks/transactions';
+
+- import { StacksTestnet } from '@stacks/network';
++ import { STACKS_TESTNET } from '@stacks/transactions';
+
+const transaction = await makeSTXTokenTransfer({
+  // ...
+- network: new StacksTestnet(),
++ network: STACKS_TESTNET,
+});
+```
+
+```diff
+const transaction = await makeSTXTokenTransfer({
+  // ...
+- network: new StacksTestnet({ url: "mynode-optional.com", fetchFn: myFetch }), // optional options
++ network: STACKS_TESTNET,
++ api: { url: "mynode-optional.com", fetch: myFetch } // optional params
+});
 ```
 
 ## Stacks.js (&lt;=4.x.x) → (5.x.x)

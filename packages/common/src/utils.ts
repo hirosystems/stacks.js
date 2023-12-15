@@ -649,10 +649,6 @@ export function validateHash256(hex: string): boolean {
   return /^[0-9a-fA-F]+$/.test(hex);
 }
 
-// generate a random 32-byte hex string without crypto
-// @ts-ignore
-const randomBytes = (size: number) => [...Array(size)].map(() => Math.floor(Math.random() * 256));
-
 export function networkFromName(name: StacksNetworkName) {
   switch (name) {
     case 'mainnet':

@@ -21,15 +21,14 @@ import {
 import { StacksTransaction } from './transaction';
 import { FeeEstimation, TxBroadcastResult } from './types';
 
-// todo: rename to StacksNodeApi?
-export class StacksApi {
+export class StacksNodeApi {
   // TODO
   bnsLookupUrl = 'https://stacks-node-api.mainnet.stacks.co';
 
   public url: string;
-  public network: StacksNetwork;
-
   public fetch: FetchFn;
+
+  public network: StacksNetwork;
 
   constructor({
     url,

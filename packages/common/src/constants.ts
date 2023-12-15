@@ -38,13 +38,13 @@ export enum PeerNetworkID {
 
 // todo: magic bytes
 
-export type StacksNetwork = {
+export interface StacksNetwork {
   chainId: number;
   transactionVersion: number; // todo: txVersion better?
   peerNetworkId: number;
   magicBytes: string;
   // todo: add check32 character bytes string
-};
+}
 
 export const STACKS_MAINNET: StacksNetwork = {
   chainId: ChainID.Mainnet,
