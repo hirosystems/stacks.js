@@ -81,9 +81,9 @@ const LOG_CONFIG_DEFAULTS: CLI_LOG_CONFIG_TYPE = {
 };
 
 const CONFIG_DEFAULTS: CLI_CONFIG_TYPE = {
-  blockstackAPIUrl: 'https://stacks-node-api.stacks.co',
-  blockstackNodeUrl: 'https://stacks-node-api.stacks.co',
-  broadcastServiceUrl: 'https://stacks-node-api.stacks.co/v2/transactions',
+  blockstackAPIUrl: 'https://api.hiro.so',
+  blockstackNodeUrl: 'https://api.hiro.so',
+  broadcastServiceUrl: 'https://api.hiro.so/v2/transactions',
   utxoServiceUrl: 'https://blockchain.info',
   logConfig: LOG_CONFIG_DEFAULTS,
 };
@@ -97,9 +97,9 @@ const CONFIG_LOCALNET_DEFAULTS = {
 };
 
 const CONFIG_TESTNET_DEFAULTS = {
-  blockstackAPIUrl: `https://stacks-node-api.testnet.stacks.co`,
-  blockstackNodeUrl: `https://stacks-node-api.testnet.stacks.co`,
-  broadcastServiceUrl: `https://stacks-node-api.testnet.stacks.co/v2/transactions`,
+  blockstackAPIUrl: `https://api.testnet.hiro.so`,
+  blockstackNodeUrl: `https://api.testnet.hiro.so`,
+  broadcastServiceUrl: `https://api.testnet.hiro.so/v2/transactions`,
   utxoServiceUrl: `https://blockchain.info`, // todo: this likely doesn't work anymore
   logConfig: Object.assign({}, LOG_CONFIG_DEFAULTS, { level: 'debug' }),
 };
@@ -2116,9 +2116,9 @@ export const CLI_ARGS = {
         '      "blockHeight": 567890,\n' +
         '      "confirmations": 7,\n' +
         '    }\n' +
-        '    $ stx -H https://stacks-node-api.stacks.co zonefile_push "$ZONEFILE_PATH"\n' +
+        '    $ stx -H https://api.hiro.so zonefile_push "$ZONEFILE_PATH"\n' +
         '    [\n' +
-        '      "https://stacks-node-api.stacks.co"\n' +
+        '      "https://api.hiro.so"\n' +
         '    ]\n' +
         '```\n' +
         '\n',
@@ -2787,9 +2787,9 @@ export const CLI_ARGS = {
         '    }\n' +
         '    \n' +
         '    $ # send out the new zone file to a Blockstack peer\n' +
-        '    $ stx -H https://stacks-node-api.stacks.co zonefile_push /tmp/zonefile.txt\n' +
+        '    $ stx -H https://api.hiro.so zonefile_push /tmp/zonefile.txt\n' +
         '    [\n' +
-        '      "https://stacks-node-api.stacks.co"\n' +
+        '      "https://api.hiro.so"\n' +
         '    ]\n' +
         '```\n' +
         '\n',
@@ -2852,9 +2852,9 @@ export const CLI_ARGS = {
         'Example:\n' +
         '\n' +
         '```\n' +
-        '    $ stx -H https://stacks-node-api.stacks.co zonefile_push /path/to/zonefile.txt\n' +
+        '    $ stx -H https://api.hiro.so zonefile_push /path/to/zonefile.txt\n' +
         '    [\n' +
-        '      "https://stacks-node-api.stacks.co"\n' +
+        '      "https://api.hiro.so"\n' +
         '    ]\n' +
         '```\n' +
         '\n',
