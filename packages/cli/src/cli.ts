@@ -1303,7 +1303,8 @@ function gaiaDumpBucket(network: CLINetworkAdapter, args: string[]): Promise<str
       }
       const fileBatches: string[][] = batchify(fileNames, batchSize);
       for (const [index, batch] of fileBatches.entries()) {
-        await Promise.all(batch.map(fileName => downloadFile(gaiaHubConfig, fileName)));
+        const filePromises = batch.map(fileName => downloadFile(gaiaHubConfig, fileName));
+        await Promise.all(filePromises);
         if (index < fileBatches.length - 1) {
           console.log(
             `${
@@ -1359,24 +1360,30 @@ function gaiaRestoreBucket(network: CLINetworkAdapter, args: string[]): Promise<
       ownerPrivateKey = keyInfo.ownerPrivateKey;
       return gaiaAuth(network, appPrivateKey, hubUrl, ownerPrivateKey);
     })
-    .then((_userData: UserData) => {
-      let uploadPromise: Promise<any> = Promise.resolve();
-      for (let i = 0; i < fileBatches.length; i++) {
-        const uploadBatchPromises = fileBatches[i].map((fileName: string) => {
+    .then(async (_userData: UserData) => {
+      const batchSize = 99;
+      const sleepTime = 120;
+
+      for (const [index, batch] of fileBatches.entries()) {
+        const uploadBatchPromises = batch.map(async (fileName: string) => {
           const filePath = path.join(dumpDir, fileName);
           const dataBuf = fs.readFileSync(filePath);
           const gaiaPath = fileName.replace(/\\x2f/g, '/');
-          return blockstack
-            .putFile(gaiaPath, dataBuf, { encrypt: false, sign: false })
-            .then((url: string) => {
-              console.log(`Uploaded ${fileName} to ${url}`);
-            });
+          const url = await blockstack.putFile(gaiaPath, dataBuf, { encrypt: false, sign: false });
+          console.log(`Uploaded ${fileName} to ${url}`);
         });
-        uploadPromise = uploadPromise.then(() => Promise.all(uploadBatchPromises));
+        await Promise.all(uploadBatchPromises);
+        if (index < fileBatches.length - 1) {
+          console.log(
+            `${(index + 1) * batchSize}/${
+              fileList.length
+            } uploaded, waiting ${sleepTime} seconds before next batch...`
+          );
+          await sleep(sleepTime * 1000);
+        }
       }
-      return uploadPromise;
-    })
-    .then(() => JSONStringify(fileList.length));
+      return JSONStringify(fileList.length);
+    });
 }
 
 /*
