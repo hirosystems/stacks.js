@@ -1196,6 +1196,13 @@ function batchify<T>(input: T[], batchSize: number = 50): T[][] {
   return output;
 }
 
+/**
+ * Sleep for a number of milliseconds.
+ */
+function sleep(ms: number) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 /*
  * Dump all files from a Gaia hub bucket to a directory on disk.
  * args:
@@ -1284,17 +1291,30 @@ function gaiaDumpBucket(network: CLINetworkAdapter, args: string[]): Promise<str
         return true;
       });
     })
-    .then((fileCount: number) => {
+    .then(async (fileCount: number) => {
+      // rate limit is 100rpm
+      const batchSize = 99;
+      const sleepTime = 120;
       console.log(`Download ${fileCount} files...`);
-      const fileBatches: string[][] = batchify(fileNames);
-      let filePromiseChain: Promise<any> = Promise.resolve();
-      for (let i = 0; i < fileBatches.length; i++) {
-        const filePromises = fileBatches[i].map(fileName => downloadFile(gaiaHubConfig, fileName));
-        const batchPromise = Promise.all(filePromises);
-        filePromiseChain = filePromiseChain.then(() => batchPromise);
+      if (fileCount > batchSize) {
+        console.log(
+          `This may take a while, downloading around ${batchSize} files per 2 minutes...`
+        );
+      }
+      const fileBatches: string[][] = batchify(fileNames, batchSize);
+      for (const [index, batch] of fileBatches.entries()) {
+        await Promise.all(batch.map(fileName => downloadFile(gaiaHubConfig, fileName)));
+        if (index < fileBatches.length - 1) {
+          console.log(
+            `${
+              (index + 1) * batchSize
+            }/${fileCount} downloaded, waiting ${sleepTime} seconds before next batch...`
+          );
+          await sleep(sleepTime * 1000);
+        }
       }
 
-      return filePromiseChain.then(() => JSONStringify(fileCount));
+      return JSONStringify(fileCount);
     });
 }
 
