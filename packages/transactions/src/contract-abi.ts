@@ -245,14 +245,8 @@ export interface ClarityAbiVariable {
 
 export interface ClarityAbiMap {
   name: string;
-  key: {
-    name: string;
-    type: ClarityAbiType;
-  }[];
-  value: {
-    name: string;
-    type: ClarityAbiType;
-  }[];
+  key: ClarityAbiType;
+  value: ClarityAbiType;
 }
 
 export interface ClarityAbiTypeFungibleToken {
