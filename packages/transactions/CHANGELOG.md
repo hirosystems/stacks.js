@@ -3,6 +3,21 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.11.0](https://github.com/hirosystems/stacks.js/compare/v6.10.0...v6.11.0) (2023-12-18)
+
+
+### Features
+
+* implement isClarityType ([6eb1319](https://github.com/hirosystems/stacks.js/commit/6eb13197ad6b0cc11717ab6d819709e4e4c736d9))
+
+
+### Bug Fixes
+
+* handle `NoEstimateAvailable` text error body ([802487d](https://github.com/hirosystems/stacks.js/commit/802487d1a787f621692a28da5fabc02e53ffb2f9))
+* type definition for map abi ([#1608](https://github.com/hirosystems/stacks.js/issues/1608)) ([39a30f2](https://github.com/hirosystems/stacks.js/commit/39a30f2e04e9e474216bbf81f27a7546d0f0792b))
+
+
+
 ## [6.10.0](https://github.com/hirosystems/stacks.js/compare/v6.9.0...v6.10.0) (2023-11-28)
 
 
