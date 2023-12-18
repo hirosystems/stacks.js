@@ -1,4 +1,4 @@
-import { ClarityAbi, ClarityAbiType, utf8ToBytes } from '@stacks/common';
+import { utf8ToBytes } from '@stacks/common';
 import { readFileSync } from 'fs';
 import path from 'path';
 import {
@@ -18,7 +18,13 @@ import {
   tupleCV,
   uintCV,
 } from '../src/clarity';
-import { abiFunctionToString, parseToCV, validateContractCall } from '../src/contract-abi';
+import {
+  ClarityAbi,
+  ClarityAbiType,
+  abiFunctionToString,
+  parseToCV,
+  validateContractCall,
+} from '../src/contract-abi';
 import { createContractCallPayload } from '../src/payload';
 
 const TEST_ABI: ClarityAbi = JSON.parse(

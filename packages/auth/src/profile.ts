@@ -1,5 +1,5 @@
 import { resolveZoneFileToProfile } from '@stacks/profile';
-import { StacksMainnet, StacksNetwork, StacksNetworkName } from '@stacks/network';
+import { ApiParam } from '@stacks/transactions';
 
 export interface ProfileLookupOptions {
   username: string;
@@ -16,7 +16,9 @@ export interface ProfileLookupOptions {
  * blockstack.js [[getNameInfo]] function.
  * @returns {Promise} that resolves to a profile object
  */
-export function lookupProfile(lookupOptions: ProfileLookupOptions): Promise<Record<string, any>> {
+export function lookupProfile(
+  lookupOptions: ProfileLookupOptions & ApiParam
+): Promise<Record<string, any>> {
   if (!lookupOptions.username) {
     return Promise.reject(new Error('No username provided'));
   }

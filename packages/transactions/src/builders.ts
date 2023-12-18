@@ -1,15 +1,4 @@
-import {
-  bytesToHex,
-  ClarityAbi,
-  hexToBytes,
-  IntegerType,
-  networkFrom,
-  STACKS_MAINNET,
-  STACKS_TESTNET,
-  StacksNetwork,
-  StacksNetworkName,
-  whenTransactionVersion,
-} from '@stacks/common';
+import { bytesToHex, hexToBytes, IntegerType } from '@stacks/common';
 import { c32address } from 'c32check';
 import { StacksNodeApi } from './api';
 import {
@@ -34,8 +23,9 @@ import {
   SingleSigHashMode,
   StacksMessageType,
   TransactionVersion,
+  whenTransactionVersion,
 } from './constants';
-import { validateContractCall } from './contract-abi';
+import { ClarityAbi, validateContractCall } from './contract-abi';
 import { estimateFee, getAbi, getNonce } from './fetch';
 import {
   createStacksPrivateKey,
@@ -45,6 +35,13 @@ import {
   publicKeyToAddress,
   publicKeyToString,
 } from './keys';
+import {
+  networkFrom,
+  STACKS_MAINNET,
+  STACKS_TESTNET,
+  StacksNetwork,
+  StacksNetworkName,
+} from './network';
 import {
   createContractCallPayload,
   createSmartContractPayload,

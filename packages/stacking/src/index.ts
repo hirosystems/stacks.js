@@ -1,6 +1,5 @@
 // @ts-ignore
 import { IntegerType, intToBigInt } from '@stacks/common';
-import { StacksNetwork } from '@stacks/network';
 import {
   BurnchainRewardListResponse,
   BurnchainRewardSlotHolderListResponse,
@@ -8,14 +7,17 @@ import {
 } from '@stacks/stacks-blockchain-api-types';
 import {
   AnchorMode,
+  ApiParam,
   BufferCV,
   ClarityType,
   ClarityValue,
   ContractCallOptions,
   ContractCallPayload,
+  FetchFn,
   OptionalCV,
   PrincipalCV,
   ResponseErrorCV,
+  StacksNetwork,
   StacksTransaction,
   TupleCV,
   TxBroadcastResult,
@@ -335,7 +337,8 @@ export interface StackAggregationIncreaseOptions {
 export class StackingClient {
   constructor(
     public address: string,
-    public network: StacksNetwork
+    public network: StacksNetwork,
+    public api: { url: string; fetch: FetchFn }
   ) {}
 
   /**
@@ -345,7 +348,7 @@ export class StackingClient {
    */
   async getCoreInfo(): Promise<CoreInfo> {
     const url = this.network.getInfoUrl();
-    return this.network.fetchFn(url).then(res => res.json());
+    return this.api.fetch(url).then(res => res.json());
   }
 
   /**
@@ -355,7 +358,7 @@ export class StackingClient {
    */
   async getPoxInfo(): Promise<PoxInfo> {
     const url = this.network.getPoxInfoUrl();
-    return this.network.fetchFn(url).then(res => res.json());
+    return this.api.fetch(url).then(res => res.json());
   }
 
   /**
@@ -365,7 +368,7 @@ export class StackingClient {
    */
   async getTargetBlockTime(): Promise<number> {
     const url = this.network.getBlockTimeInfoUrl();
-    const res = await this.network.fetchFn(url).then(res => res.json());
+    const res = await this.api.fetch(url).then(res => res.json());
 
     if (this.network.isMainnet()) {
       return res.mainnet.target_block_time;
@@ -376,7 +379,7 @@ export class StackingClient {
 
   async getAccountStatus(): Promise<any> {
     const url = this.network.getAccountApiUrl(this.address);
-    return this.network.fetchFn(url).then(res => res.json());
+    return this.api.fetch(url).then(res => res.json());
   }
 
   /**
@@ -395,7 +398,7 @@ export class StackingClient {
    */
   async getAccountExtendedBalances(): Promise<AccountExtendedBalances> {
     const url = this.network.getAccountExtendedBalancesApiUrl(this.address);
-    return this.network.fetchFn(url).then(res => res.json());
+    return this.api.fetch(url).then(res => res.json());
   }
 
   /**
@@ -427,7 +430,7 @@ export class StackingClient {
    */
   async getRewardsTotalForBtcAddress(): Promise<BurnchainRewardsTotal | RewardsError> {
     const url = this.network.getRewardsTotalUrl(this.address);
-    return this.network.fetchFn(url).then(res => res.json());
+    return this.api.fetch(url).then(res => res.json());
   }
 
   /**
@@ -438,7 +441,7 @@ export class StackingClient {
     options?: PaginationOptions
   ): Promise<BurnchainRewardListResponse | RewardsError> {
     const url = `${this.network.getRewardsUrl(this.address, options)}`;
-    return this.network.fetchFn(url).then(res => res.json());
+    return this.api.fetch(url).then(res => res.json());
   }
 
   /**
@@ -449,7 +452,7 @@ export class StackingClient {
     options?: PaginationOptions
   ): Promise<BurnchainRewardSlotHolderListResponse | RewardsError> {
     const url = `${this.network.getRewardHoldersUrl(this.address, options)}`;
-    return this.network.fetchFn(url).then(res => res.json());
+    return this.api.fetch(url).then(res => res.json());
   }
 
   /**
@@ -558,7 +561,7 @@ export class StackingClient {
       const [address, name] = pox2.contract_id.split('.');
       const pox2ConfiguredUrl = this.network.getDataVarUrl(address, name, 'configured');
       const isPox2NotYetConfigured =
-        (await this.network.fetchFn(pox2ConfiguredUrl).then(r => r.text())) !== '{"data":"0x03"}'; // PoX-2 is configured on fork if data is 0x03
+        (await this.api.fetch(pox2ConfiguredUrl).then(r => r.text())) !== '{"data":"0x03"}'; // PoX-2 is configured on fork if data is 0x03
 
       // => Period 1
       if (isPox2NotYetConfigured) {

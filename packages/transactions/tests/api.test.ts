@@ -1,6 +1,6 @@
-import { STACKS_DEVNET, STACKS_MAINNET, STACKS_TESTNET } from '@stacks/common';
+import { DEVNET_URL, HIRO_MAINNET_URL, HIRO_TESTNET_URL } from '@stacks/common';
 import { StacksNodeApi } from '../src/api';
-import { DEVNET_URL, HIRO_MAINNET_URL, HIRO_TESTNET_URL } from '../src';
+import { STACKS_DEVNET, STACKS_MAINNET, STACKS_TESTNET } from '../src';
 
 describe('setting StacksApi URL', () => {
   test.each([
@@ -13,6 +13,7 @@ describe('setting StacksApi URL', () => {
   });
 });
 
+// todo: still needed?
 // it('uses the correct constructor for stacks network from name strings', () => {
 //   expect(StacksNetwork.fromName('mainnet').constructor.toString()).toContain('StacksMainnet');
 //   expect(StacksNetwork.fromName('testnet').constructor.toString()).toContain('StacksTestnet');

@@ -14,8 +14,8 @@ import {
   hexToBytes,
   intToHex,
   parseRecoverableSignatureVrs,
-  privateKeyToBytes,
   PRIVATE_KEY_COMPRESSED_LENGTH,
+  privateKeyToBytes,
   signatureRsvToVrs,
   signatureVrsToRsv,
 } from '@stacks/common';

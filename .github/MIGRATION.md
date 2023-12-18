@@ -2,6 +2,7 @@
 
 - [Stacks.js (\>=5.x.x) → (7.x.x)](#stacksjs-5xx--7xx)
   - [Breaking Changes](#breaking-changes)
+  - [StacksNodeApi](#stacksnodeapi)
   - [StacksNetwork to StacksNodeApi](#stacksnetwork-to-stacksnodeapi)
 - [Stacks.js (\<=4.x.x) → (5.x.x)](#stacksjs-4xx--5xx)
   - [Breaking Changes](#breaking-changes-1)
@@ -23,6 +24,19 @@
 
 - The `@stacks/network` package was removed. Similar functionality is now available in `@stacks/transactions`. [Read more...](#stacksnetwork-to-stacksnodeapi)
 
+### StacksNodeApi
+
+The new `StacksNodeApi` class lets you interact with a Stacks node or API.
+
+<!-- todo: move to separate package (which nothing depends on, now that there is an ApiParam, ie not circular deps) -->
+
+```ts
+import { StacksNodeApi } from '@stacks/transactions';
+
+const api = new StacksNodeApi();
+await api.broadcastTx(txHex);
+```
+
 ### StacksNetwork to StacksNodeApi
 
 Stacks network objects are now exported by the `@stacks/common` package.
@@ -36,15 +50,6 @@ After importing the network object (e.g. `STACKS_MAINNET` here), you can use it 
 
 ```ts
 // todo: update more functions, show example
-```
-
-The new `StacksNodeApi` class lets you interact with a Stacks node or API.
-
-```ts
-import { StacksNodeApi } from '@stacks/transactions';
-
-const api = new StacksNodeApi();
-await api.broadcastTx(txHex);
 ```
 
 For easing the transition, the functions which depended on the networking aspect of `@stacks/network` now accept an `api` parameter.
@@ -67,6 +72,20 @@ const transaction = await makeSTXTokenTransfer({
 + network: STACKS_TESTNET,
 });
 ```
+
+> [!NOTE]
+> String literal network names are still supported.
+
+```diff
+const transaction = await makeSTXTokenTransfer({
+  // ...
+- network: new StacksTestnet(),
++ network: 'testnet',
+});
+```
+
+> [!NOTE]
+> Custom URLs and fetch functions are still supported via the `api` parameter.
 
 ```diff
 const transaction = await makeSTXTokenTransfer({

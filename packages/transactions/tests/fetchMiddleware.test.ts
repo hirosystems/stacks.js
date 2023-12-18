@@ -1,11 +1,11 @@
-import fetchMock from 'jest-fetch-mock';
 import {
-  createApiKeyMiddleware,
-  createFetchFn,
   FetchMiddleware,
   RequestContext,
   ResponseContext,
-} from '../src';
+  createApiKeyMiddleware,
+  createFetchFn,
+} from '@stacks/common';
+import fetchMock from 'jest-fetch-mock';
 
 beforeEach(() => {
   fetchMock.resetMocks();

@@ -2,11 +2,11 @@ import { hmac } from '@noble/hashes/hmac';
 import { sha256 } from '@noble/hashes/sha256';
 import { getPublicKey as nobleGetPublicKey, signSync, utils } from '@noble/secp256k1';
 import {
+  PRIVATE_KEY_COMPRESSED_LENGTH,
   bytesToHex,
   concatBytes,
   hexToBytes,
   privateKeyToBytes,
-  PRIVATE_KEY_COMPRESSED_LENGTH,
   readUInt8,
 } from '@stacks/common';
 import base58 from 'bs58';

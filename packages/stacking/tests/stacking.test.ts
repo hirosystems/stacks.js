@@ -1,10 +1,10 @@
 import { bigIntToBytes, bytesToHex, hexToBytes } from '@stacks/common';
 import { base58CheckDecode } from '@stacks/encryption';
-import { StacksMainnet, StacksTestnet } from '@stacks/network';
 import {
   AnchorMode,
   ClarityType,
   ReadOnlyFunctionOptions,
+  STACKS_TESTNET,
   SignedContractCallOptions,
   TupleCV,
   bufferCV,
@@ -188,7 +188,6 @@ test('check stacking eligibility true', async () => {
 test('check stacking eligibility false bad cycles', async () => {
   const address = 'ST3XKKN4RPV69NN1PHFDNX3TYKXT7XPC4N8KC1ARH';
   const poxAddress = '1Xik14zRm29UsyS6DjhYg4iZeZqsDa8D3';
-  const network = new StacksTestnet();
 
   const expectedErrorString = StackingErrors[StackingErrors.ERR_STACKING_INVALID_LOCK_PERIOD];
   const functionCallResponse = responseErrorCV(intCV(2));
@@ -200,7 +199,7 @@ test('check stacking eligibility false bad cycles', async () => {
   }));
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const { StackingClient } = require('../src'); // needed for jest.mock module
-  const client = new StackingClient(address, network);
+  const client = new StackingClient(address, STACKS_TESTNET);
 
   fetchMock.mockResponse(request => {
     const url = request.url;

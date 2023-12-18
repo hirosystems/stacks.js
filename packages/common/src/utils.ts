@@ -1,10 +1,3 @@
-import {
-  STACKS_DEVNET,
-  STACKS_MAINNET,
-  STACKS_TESTNET,
-  StacksNetwork,
-  StacksNetworkName,
-} from './constants';
 import { Logger } from './logger';
 
 /**
@@ -647,22 +640,4 @@ export function validateHash256(hex: string): boolean {
   hex = without0x(hex);
   if (hex.length !== 64) return false;
   return /^[0-9a-fA-F]+$/.test(hex);
-}
-
-export function networkFromName(name: StacksNetworkName) {
-  switch (name) {
-    case 'mainnet':
-      return STACKS_MAINNET;
-    case 'testnet':
-      return STACKS_TESTNET;
-    case 'devnet':
-      return STACKS_DEVNET;
-    default:
-      throw new Error(`Unknown network name: ${name}`);
-  }
-}
-
-export function networkFrom(network: StacksNetworkName | StacksNetwork) {
-  if (typeof network === 'string') return networkFromName(network);
-  return network;
 }

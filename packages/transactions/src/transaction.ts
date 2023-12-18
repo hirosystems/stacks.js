@@ -4,9 +4,6 @@ import {
   hexToBytes,
   IntegerType,
   intToBigInt,
-  STACKS_MAINNET,
-  STACKS_TESTNET,
-  whenTransactionVersion,
   writeUInt32BE,
 } from '@stacks/common';
 import {
@@ -14,13 +11,14 @@ import {
   anchorModeFrom,
   AnchorModeName,
   AuthType,
-  ChainID,
+  ChainId,
   DEFAULT_CHAIN_ID,
   PayloadType,
   PostConditionMode,
   PubKeyEncoding,
   StacksMessageType,
   TransactionVersion,
+  whenTransactionVersion,
 } from './constants';
 
 import {
@@ -50,10 +48,11 @@ import { isCompressed, StacksPrivateKey, StacksPublicKey } from './keys';
 import { BytesReader } from './bytesReader';
 
 import { SerializationError, SigningError } from './errors';
+import { STACKS_MAINNET, STACKS_TESTNET } from './network';
 
 export class StacksTransaction {
   version: TransactionVersion;
-  chainId: ChainID;
+  chainId: ChainId;
   auth: Authorization;
   anchorMode: AnchorMode;
   payload: Payload;
@@ -67,7 +66,7 @@ export class StacksTransaction {
     postConditions?: LengthPrefixedList,
     postConditionMode?: PostConditionMode,
     anchorMode?: AnchorModeName | AnchorMode,
-    chainId?: ChainID
+    chainId?: ChainId
   ) {
     this.version = version;
     this.auth = auth;

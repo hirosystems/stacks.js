@@ -27,7 +27,7 @@ import { serializeAddress, serializeLPString } from '../types';
 import { ClarityType } from './constants';
 import { StringAsciiCV, StringUtf8CV } from './types/stringCV';
 
-function bytesWithTypeID(typeId: ClarityType, bytes: Uint8Array): Uint8Array {
+function bytesWithTypeId(typeId: ClarityType, bytes: Uint8Array): Uint8Array {
   return concatArray([typeId, bytes]);
 }
 
@@ -39,39 +39,39 @@ function serializeOptionalCV(cv: OptionalCV): Uint8Array {
   if (cv.type === ClarityType.OptionalNone) {
     return new Uint8Array([cv.type]);
   } else {
-    return bytesWithTypeID(cv.type, serializeCV(cv.value));
+    return bytesWithTypeId(cv.type, serializeCV(cv.value));
   }
 }
 
 function serializeBufferCV(cv: BufferCV): Uint8Array {
   const length = new Uint8Array(4);
   writeUInt32BE(length, cv.buffer.length, 0);
-  return bytesWithTypeID(cv.type, concatBytes(length, cv.buffer));
+  return bytesWithTypeId(cv.type, concatBytes(length, cv.buffer));
 }
 
 function serializeIntCV(cv: IntCV): Uint8Array {
   const bytes = bigIntToBytes(toTwos(cv.value, BigInt(CLARITY_INT_SIZE)), CLARITY_INT_BYTE_SIZE);
-  return bytesWithTypeID(cv.type, bytes);
+  return bytesWithTypeId(cv.type, bytes);
 }
 
 function serializeUIntCV(cv: UIntCV): Uint8Array {
   const bytes = bigIntToBytes(cv.value, CLARITY_INT_BYTE_SIZE);
-  return bytesWithTypeID(cv.type, bytes);
+  return bytesWithTypeId(cv.type, bytes);
 }
 
 function serializeStandardPrincipalCV(cv: StandardPrincipalCV): Uint8Array {
-  return bytesWithTypeID(cv.type, serializeAddress(cv.address));
+  return bytesWithTypeId(cv.type, serializeAddress(cv.address));
 }
 
 function serializeContractPrincipalCV(cv: ContractPrincipalCV): Uint8Array {
-  return bytesWithTypeID(
+  return bytesWithTypeId(
     cv.type,
     concatBytes(serializeAddress(cv.address), serializeLPString(cv.contractName))
   );
 }
 
 function serializeResponseCV(cv: ResponseCV) {
-  return bytesWithTypeID(cv.type, serializeCV(cv.value));
+  return bytesWithTypeId(cv.type, serializeCV(cv.value));
 }
 
 function serializeListCV(cv: ListCV) {
@@ -86,7 +86,7 @@ function serializeListCV(cv: ListCV) {
     bytesArray.push(serializedValue);
   }
 
-  return bytesWithTypeID(cv.type, concatArray(bytesArray));
+  return bytesWithTypeId(cv.type, concatArray(bytesArray));
 }
 
 function serializeTupleCV(cv: TupleCV) {
@@ -106,7 +106,7 @@ function serializeTupleCV(cv: TupleCV) {
     bytesArray.push(serializedValue);
   }
 
-  return bytesWithTypeID(cv.type, concatArray(bytesArray));
+  return bytesWithTypeId(cv.type, concatArray(bytesArray));
 }
 
 function serializeStringCV(cv: StringAsciiCV | StringUtf8CV, encoding: 'ascii' | 'utf8') {
@@ -119,7 +119,7 @@ function serializeStringCV(cv: StringAsciiCV | StringUtf8CV, encoding: 'ascii' |
   bytesArray.push(len);
   bytesArray.push(str);
 
-  return bytesWithTypeID(cv.type, concatArray(bytesArray));
+  return bytesWithTypeId(cv.type, concatArray(bytesArray));
 }
 
 function serializeStringAsciiCV(cv: StringAsciiCV) {

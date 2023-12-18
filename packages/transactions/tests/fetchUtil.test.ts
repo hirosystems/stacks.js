@@ -1,8 +1,9 @@
 import fetchMock from 'jest-fetch-mock';
-import { broadcastTransaction, createApiKeyMiddleware, createFetchFn } from '../src';
+import { broadcastTransaction } from '../src';
 import { StacksNodeApi } from '../src/api';
 import { makeSTXTokenTransfer } from '../src/builders';
 import { AnchorMode } from '../src/constants';
+import { createApiKeyMiddleware, createFetchFn } from '@stacks/common';
 
 test('fetchFn is used in network requests', async () => {
   const apiKey = 'MY_KEY';

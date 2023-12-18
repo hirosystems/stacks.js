@@ -14,7 +14,7 @@ import {
   AddressVersion,
   TransactionVersion,
   StacksMessageType,
-  PostConditionPrincipalID,
+  PostConditionPrincipalId,
   PostConditionType,
   FungibleConditionCode,
   NonFungibleConditionCode,
@@ -205,18 +205,18 @@ export function serializePrincipal(principal: PostConditionPrincipal): Uint8Arra
   const bytesArray = [];
   bytesArray.push(principal.prefix);
   bytesArray.push(serializeAddress(principal.address));
-  if (principal.prefix === PostConditionPrincipalID.Contract) {
+  if (principal.prefix === PostConditionPrincipalId.Contract) {
     bytesArray.push(serializeLPString(principal.contractName));
   }
   return concatArray(bytesArray);
 }
 
 export function deserializePrincipal(bytesReader: BytesReader): PostConditionPrincipal {
-  const prefix = bytesReader.readUInt8Enum(PostConditionPrincipalID, n => {
+  const prefix = bytesReader.readUInt8Enum(PostConditionPrincipalId, n => {
     throw new DeserializationError(`Unexpected Principal payload type: ${n}`);
   });
   const address = deserializeAddress(bytesReader);
-  if (prefix === PostConditionPrincipalID.Standard) {
+  if (prefix === PostConditionPrincipalId.Standard) {
     return { type: StacksMessageType.Principal, prefix, address } as StandardPrincipal;
   }
   const contractName = deserializeLPString(bytesReader);
