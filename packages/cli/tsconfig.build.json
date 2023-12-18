@@ -15,9 +15,6 @@
       "path": "../common/tsconfig.build.json"
     },
     {
-      "path": "../network/tsconfig.build.json"
-    },
-    {
       "path": "../stacking/tsconfig.build.json"
     },
     {

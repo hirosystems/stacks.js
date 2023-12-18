@@ -15,9 +15,6 @@
       "path": "../encryption/tsconfig.build.json"
     },
     {
-      "path": "../network/tsconfig.build.json"
-    },
-    {
       "path": "../profile/tsconfig.build.json"
     }
   ],

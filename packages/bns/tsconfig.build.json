@@ -12,9 +12,6 @@
       "path": "../common/tsconfig.build.json"
     },
     {
-      "path": "../network/tsconfig.build.json"
-    },
-    {
       "path": "../transactions/tsconfig.build.json"
     }
   ],
