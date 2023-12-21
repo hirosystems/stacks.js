@@ -160,7 +160,7 @@ export const CLI_ARGS = {
         'network will process it once the transaction reaches 7 confirmations.\n' +
         '\n' +
         'Examples:\n' +
-        '```\n' +
+        '```console\n' +
         '    $ # Tip: You can obtain the owner key with the get_owner_keys command\n' +
         '    $ export OWNER_KEY="136ff26efa5db6f06b28f9c8c7a0216a1a52598045162abfe435d13036154a1b01"\n' +
         '    $ stx announce 737c631c7c5d911c6617993c21fba731363f1cfe "$OWNER_KEY"\n' +
@@ -212,7 +212,7 @@ export const CLI_ARGS = {
         'then you will be prompted for your password before any authentication takes place.\n' +
         '\n' +
         'Example:\n' +
-        '```\n' +
+        '```console\n' +
         '    $ export BACKUP_PHRASE="oak indicate inside poet please share dinner monitor glow hire source perfect"\n' +
         '    $ export APP_GAIA_HUB="https://1.2.3.4"\n' +
         '    $ export PROFILE_GAIA_HUB="https://hub.blockstack.org"\n' +
@@ -240,7 +240,7 @@ export const CLI_ARGS = {
         'token (i.e. satoshis for BTC, microStacks for Stacks, etc.).\n' +
         '\n' +
         'Example:\n' +
-        '```\n' +
+        '```console\n' +
         '    $ stx balance 16pm276FpJYpm7Dv3GEaRqTVvGPTdceoY4\n' +
         '    {\n' +
         '      "BTC": "123456"\n' +
@@ -288,7 +288,7 @@ export const CLI_ARGS = {
         'Check if specified account can stack a number of Stacks tokens for given number of cycles.\n' +
         '\n' +
         'Example:\n' +
-        '```\n' +
+        '```console\n' +
         '    $ stx can_stack 10000000 20 16pm276FpJYpm7Dv3GEaRqTVvGPTdceoY4 SPZY1V53Z4TVRHHW9Z7SFG8CZNRAG7BD8WJ6SXD0\n' +
         '    {\n' +
         '      "eligible": true\n' +
@@ -344,7 +344,7 @@ export const CLI_ARGS = {
         'If the command succeeds, it prints out a transaction ID.' +
         '\n' +
         'Example:\n' +
-        '```\n' +
+        '```console\n' +
         '    $ export PAYMENT="bfeffdf57f29b0cc1fab9ea197bb1413da2561fe4b83e962c7f02fbbe2b1cd5401"\n' +
         '    $ stx call_contract_func SPBMRFRPPGCDE3F384WCJPK8PQJGZ8K9QKK7F59X contract_name' +
         '      contract_function 1 0 "$PAYMENT"\n' +
@@ -392,7 +392,7 @@ export const CLI_ARGS = {
         'If the command succeeds, it prints out a Clarity value.' +
         '\n' +
         'Example:\n' +
-        '```\n' +
+        '```console\n' +
         '    $ stx call_read_only_contract_func SPBMRFRPPGCDE3F384WCJPK8PQJGZ8K9QKK7F59X contract_name' +
         '     contract_function SPBMRFRPPGCDE3F384WCJPK8PQJGZ8K9QKK7F59X\n' +
         '     {\n' +
@@ -426,7 +426,7 @@ export const CLI_ARGS = {
         '\n' +
         'Example:\n' +
         '\n' +
-        '```\n' +
+        '```console\n' +
         '    $ stx decode_cv 0x050011deadbeef11ababffff11deadbeef11ababffff\n' +
         '    S08XXBDYXW8TQAZZZW8XXBDYXW8TQAZZZZ88551S\n' +
         '    $ stx decode_cv --format json SPA2MZWV9N67TBYVWTE0PSSKMJ2F6YXW7CBE6YPW\n' +
@@ -453,7 +453,7 @@ export const CLI_ARGS = {
         '\n' +
         'Example:\n' +
         '\n' +
-        '```\n' +
+        '```console\n' +
         '    $ stx convert_address 12qdRgXxgNBNPnDeEChy3fYTbSHQ8nfZfD\n' +
         '    {\n' +
         '      "mainnet": {\n' +
@@ -517,7 +517,7 @@ export const CLI_ARGS = {
         '\n' +
         'Example:\n' +
         '\n' +
-        '```\n' +
+        '```console\n' +
         '    $ # password is "asdf"\n' +
         '    $ stx decrypt_keychain "bfMDtOucUGcJXjZo6vkrZWgEzue9fzPsZ7A6Pl4LQuxLI1xsVF0VPgBkMsnSLCmYS5YHh7R3mNtMmX45Bq9sNGPfPsseQMR0fD9XaHi+tBg=\n' +
         '    Enter password:\n' +
@@ -567,7 +567,7 @@ export const CLI_ARGS = {
         'If the command succeeds, it prints out a transaction ID.' +
         '\n' +
         'Example:\n' +
-        '```\n' +
+        '```console\n' +
         '    $ export PAYMENT="bfeffdf57f29b0cc1fab9ea197bb1413da2561fe4b83e962c7f02fbbe2b1cd5401"\n' +
         '    $ stx deploy_contract ./my_contract.clar my_contract 1 0 "$PAYMENT"\n' +
         '     {\n' +
@@ -617,7 +617,7 @@ export const CLI_ARGS = {
         '\n' +
         'Example:\n' +
         '\n' +
-        '```\n' +
+        '```console\n' +
         '     $ # password is "asdf"\n' +
         '     $ stx encrypt_keychain "section amount spend resemble spray verify night immune tattoo best emotion parrot"\n' +
         '     Enter password:\n' +
@@ -644,7 +644,7 @@ export const CLI_ARGS = {
         '\n' +
         'Example:\n' +
         '\n' +
-        '```\n' +
+        '```console\n' +
         '     $ # password is "asdf"\n' +
         '     $ blockstack-cli encrypt_keychain "section amount spend resemble spray verify night immune tattoo best emotion parrot"\n' +
         '     Enter password:\n' +
@@ -695,7 +695,7 @@ export const CLI_ARGS = {
         '\n' +
         'Example:\n' +
         '\n' +
-        '```\n' +
+        '```console\n' +
         '    $ export BACKUP_PHRASE="section amount spend resemble spray verify night immune tattoo best emotion parrot\n' +
         '    $ stx gaia_dump_bucket hello.id.blockstack https://sample.app https://hub.blockstack.org "$BACKUP_PHRASE" ./backups\n' +
         '    Download 3 files...\n' +
@@ -764,7 +764,7 @@ export const CLI_ARGS = {
         '\n' +
         'Example without encryption:\n' +
         '\n' +
-        '```\n' +
+        '```console\n' +
         '    $ # Get an unencrypted, unsigned file\n' +
         '    $ stx gaia_getfile ryan.id http://public.ykliao.com statuses.json\n' +
         '    [{"id":0,"text":"Hello, Blockstack!","created_at":1515786983492}]\n' +
@@ -836,7 +836,7 @@ export const CLI_ARGS = {
         '\n' +
         'Example:\n' +
         '\n' +
-        '```\n' +
+        '```console\n' +
         '    $ # Store 4 versions of a file: plaintext, encrypted, signed, and encrypted+signed\n' +
         '    $ # Tip: You can obtain the app key with the get_app_keys command.\n' +
         '    $ export APP_KEY="3ac770e8c3d88b1003bf4a0a148ceb920a6172bdade8e0325a1ed1480ab4fb19"\n' +
@@ -894,7 +894,7 @@ export const CLI_ARGS = {
         '\n' +
         'Example:\n' +
         '\n' +
-        '```\n' +
+        '```console\n' +
         '    $ # Tip: You can obtain the app key with the get_app_keys command.\n' +
         '    $ export APP_KEY="3ac770e8c3d88b1003bf4a0a148ceb920a6172bdade8e0325a1ed1480ab4fb19"\n' +
         '    $ stx gaia_deletefile https://hub.blockstack.org "$APP_KEY" file.txt false\n' +
@@ -927,7 +927,7 @@ export const CLI_ARGS = {
         '\n' +
         'Example:\n' +
         '\n' +
-        '```\n' +
+        '```console\n' +
         '    $ # Tip: You can obtain the app key with the get_app_keys command.\n' +
         '    $ export APP_KEY="3ac770e8c3d88b1003bf4a0a148ceb920a6172bdade8e0325a1ed1480ab4fb19"\n' +
         '    $ stx gaia_listfiles "https://hub.blockstack.org" "$APP_KEY"\n' +
@@ -981,7 +981,7 @@ export const CLI_ARGS = {
         '\n' +
         'Example:\n' +
         '\n' +
-        '```\n' +
+        '```console\n' +
         '    $ export BACKUP_PHRASE="section amount spend resemble spray verify night immune tattoo best emotion parrot"\n' +
         '    $ stx gaia_restore_bucket hello.id.blockstack https://sample.app https://new.gaia.hub "$BACKUP_PHRASE" ./backups\n' +
         '    Uploaded ./backups/hello_world to https://new.gaia.hub/hub/1Lr8ggSgdmfcb4764woYutUfFqQMjEoKHc/hello_world\n' +
@@ -1038,7 +1038,7 @@ export const CLI_ARGS = {
         '\n' +
         'Example:\n' +
         '\n' +
-        '```\n' +
+        '```console\n' +
         '    $ export BACKUP_PHRASE="soap fog wealth upon actual blossom neither timber phone exile monkey vocal"\n' +
         '    $ stx gaia_sethub hello_world.id https://hub.blockstack.org https://my.cool.app https://my.app.gaia.hub "$BACKUP_PHRASE"\n' +
         '    {\n' +
@@ -1084,7 +1084,7 @@ export const CLI_ARGS = {
         '\n' +
         'Example:\n' +
         '\n' +
-        '```\n' +
+        '```console\n' +
         '    $ stx get_account_history SP2H7VMY13ESQDAD5808QEY1EMGESMHZWBJRTN2YA 0\n' +
         '    [\n' +
         '      {\n' +
@@ -1156,7 +1156,7 @@ export const CLI_ARGS = {
         '\n' +
         'Example\n' +
         '\n' +
-        '```\n' +
+        '```console\n' +
         '    $ stx -t get_account_at SP2NTAQFECYGSTE1W47P71FG21H8F00KZZWFGEVKQ 56789\n' +
         '    [\n' +
         '      {\n' +
@@ -1191,7 +1191,7 @@ export const CLI_ARGS = {
         '\n' +
         'Example:\n' +
         '\n' +
-        '```\n' +
+        '```console\n' +
         '    $ stx get_address f5185b9ca93bdcb5753fded3b097dab8547a8b47d2be578412d0687a9a0184cb01\n' +
         '    {\n' +
         '      "BTC": "1JFhWyVPpZQjbPcXFtpGtTmU22u4fhBVmq",\n' +
@@ -1263,7 +1263,7 @@ export const CLI_ARGS = {
         '\n' +
         'Example:\n' +
         '\n' +
-        '```\n' +
+        '```console\n' +
         '    $ stx get_confirmations e41ce043ab64fd5a5fd382fba21acba8c1f46cbb1d7c08771ada858ce7d29eea\n' +
         '    {\n' +
         '      "blockHeight": 567890,\n' +
@@ -1321,7 +1321,7 @@ export const CLI_ARGS = {
         '\n' +
         'Example:\n' +
         '\n' +
-        '```\n' +
+        '```console\n' +
         '    $ export BACKUP_PHRASE="one race buffalo dynamic icon drip width lake extra forest fee kit"\n' +
         '    $ stx get_app_keys "$BACKUP_PHRASE" 1 https://my.cool.dapp\n' +
         '    {\n' +
@@ -1358,7 +1358,7 @@ export const CLI_ARGS = {
         '\n' +
         'Example:\n' +
         '\n' +
-        '```\n' +
+        '```console\n' +
         '    $ # get the first 3 owner keys and addresses for a backup phrase\n' +
         '    $ export BACKUP_PHRASE="soap fog wealth upon actual blossom neither timber phone exile monkey vocal"\n' +
         '    $ stx get_owner_keys "$BACKUP_PHRASE" 3\n' +
@@ -1404,7 +1404,7 @@ export const CLI_ARGS = {
         '\n' +
         'Example\n' +
         '\n' +
-        '```\n' +
+        '```console\n' +
         '    $ stx get_payment_key "soap fog wealth upon actual blossom neither timber phone exile monkey vocal"\n' +
         '    [\n' +
         '      {\n' +
@@ -1443,7 +1443,7 @@ export const CLI_ARGS = {
         '\n' +
         'Example\n' +
         '\n' +
-        '```\n' +
+        '```console\n' +
         '    $ stx get_stacks_wallet_key "toast canal educate tissue express melody produce later gospel victory meadow outdoor hollow catch liberty annual gasp hat hello april equip thank neck cruise"\n' +
         '    [\n' +
         '      {\n' +
@@ -1499,7 +1499,7 @@ export const CLI_ARGS = {
         '\n' +
         'Example\n' +
         '\n' +
-        '```\n' +
+        '```console\n' +
         '    $ stx migrate_subdomains "toast canal educate tissue express melody produce later gospel victory meadow outdoor hollow catch liberty annual gasp hat hello april equip thank neck cruise" https://registrar.stacks.co\n' +
         '```\n' +
         '\n',
@@ -1522,7 +1522,7 @@ export const CLI_ARGS = {
         '\n' +
         'Example:\n' +
         '\n' +
-        '```\n' +
+        '```console\n' +
         '    $ stx get_zonefile ee77ad484b7b229f09461e4c2b6d3bd3e152ba95\n' +
         '    $ORIGIN ryanshea.id\n' +
         '    $TTL 3600\n' +
@@ -1562,7 +1562,7 @@ export const CLI_ARGS = {
         '\n' +
         'Example:\n' +
         '\n' +
-        '```\n' +
+        '```console\n' +
         '    $ stx lookup example.id\n' +
         '```\n' +
         '\n',
@@ -1585,7 +1585,7 @@ export const CLI_ARGS = {
         '\n' +
         'Example:\n' +
         '\n' +
-        '```\n' +
+        '```console\n' +
         '    $ stx names ID-1FpBChfzHG3TdQQRKWAipbLragCUArueG9\n' +
         '```\n' +
         '\n',
@@ -1614,7 +1614,7 @@ export const CLI_ARGS = {
         '\n' +
         'Example:\n' +
         '\n' +
-        '```\n' +
+        '```console\n' +
         '    $ stx make_keychain\n' +
         '    {\n' +
         '      "mnemonic": "apart spin rich leader siren foil dish sausage fee pipe ethics bundle",\n' +
@@ -1671,7 +1671,7 @@ export const CLI_ARGS = {
         '\n' +
         'Example:\n' +
         '\n' +
-        '```\n' +
+        '```console\n' +
         '     $ stx make_zonefile example.id ID-1ArdkA2oLaKnbNbLccBaFhEV4pYju8hJ82 https://my.gaia.hub/hub\n' +
         '     $ORIGIN example.id\n' +
         '     $TTL 3600\n' +
@@ -1747,7 +1747,7 @@ export const CLI_ARGS = {
         '\n' +
         'Example:\n' +
         '\n' +
-        '```\n' +
+        '```console\n' +
         '    $ export REVEAL_KEY="bfeffdf57f29b0cc1fab9ea197bb1413da2561fe4b83e962c7f02fbbe2b1cd5401"\n' +
         '    $ export ID_ADDRESS="ID-18e1bqU7B5qUPY3zJgMLxDnexyStTeSnvV"\n' +
         '    $ stx name_import example.id "$ID_ADDRESS" https://gaia.blockstack.org/hub "$REVEAL_KEY"\n' +
@@ -1905,7 +1905,7 @@ export const CLI_ARGS = {
         '\n' +
         'Example:\n' +
         '\n' +
-        '```\n' +
+        '```console\n' +
         '    $ stx price example.id\n' +
         '    {\n' +
         '      "units": "BTC",\n' +
@@ -1932,7 +1932,7 @@ export const CLI_ARGS = {
         '\n' +
         'Example:\n' +
         '\n' +
-        '```\n' +
+        '```console\n' +
         '    $ # get the price of the .hello namespace\n' +
         '    $ stx price_namespace hello\n' +
         '    {\n' +
@@ -1965,7 +1965,7 @@ export const CLI_ARGS = {
         '\n' +
         'Example:\n' +
         '\n' +
-        '```\n' +
+        '```console\n' +
         '    $ # Tip: you can get the owner key from your 12-word backup phrase using the get_owner_keys command\n' +
         '    $ stx profile_sign /path/to/profile.json 0ffd299af9c257173be8486ef54a4dd1373407d0629ca25ca68ff24a76be09fb01\n' +
         '```\n' +
@@ -2029,7 +2029,7 @@ export const CLI_ARGS = {
         '\n' +
         'Example:\n' +
         '\n' +
-        '```\n' +
+        '```console\n' +
         '    $ # get the raw profile JWT\n' +
         '    $ curl -sL https://raw.githubusercontent.com/jcnelson/profile/master/judecn.id > /tmp/judecn.id.jwt\n' +
         '    $ # Tip: you can get the ID-address for a name with the "whois" command\n' +
@@ -2092,7 +2092,7 @@ export const CLI_ARGS = {
         '\n' +
         'Example:\n' +
         '\n' +
-        '```\n' +
+        '```console\n' +
         '    $ # Tip: you can get your owner key from your backup phrase with "get_owner_keys".\n' +
         '    $ # Tip: you can get your payment key from your backup phrase with "get_payment_key".\n' +
         '    $ export OWNER="136ff26efa5db6f06b28f9c8c7a0216a1a52598045162abfe435d13036154a1b01"\n' +
@@ -2179,7 +2179,7 @@ export const CLI_ARGS = {
         '\n' +
         'Example:\n' +
         '\n' +
-        '```\n' +
+        '```console\n' +
         '    $ export OWNER="136ff26efa5db6f06b28f9c8c7a0216a1a52598045162abfe435d13036154a1b01"\n' +
         '    $ stx register example.id "$OWNER" salt zonfile' +
         '```\n' +
@@ -2251,7 +2251,7 @@ export const CLI_ARGS = {
         '\n' +
         'Example:\n' +
         '\n' +
-        '```\n' +
+        '```console\n' +
         '    $ export ID_ADDRESS="ID-18e1bqU7B5qUPY3zJgMLxDnexyStTeSnvV"\n' +
         '    $ export PAYMENT="bfeffdf57f29b0cc1fab9ea197bb1413da2561fe4b83e962c7f02fbbe2b1cd5401"\n' +
         '    $ stx register_addr example.id "$ID_ADDRESS" "$PAYMENT" https://gaia.blockstack.org/hub\n' +
@@ -2343,7 +2343,7 @@ export const CLI_ARGS = {
         '\n' +
         'Example:\n' +
         '\n' +
-        '```\n' +
+        '```console\n' +
         '    $ # Tip: you can get your owner and payment keys from your 12-word backup phrase using the get_owner_keys and get_payment_key commands.\n' +
         '    $ export OWNER="6e50431b955fe73f079469b24f06480aee44e4519282686433195b3c4b5336ef01"\n' +
         '    $ export PAYMENT="bfeffdf57f29b0cc1fab9ea197bb1413da2561fe4b83e962c7f02fbbe2b1cd5401"\n' +
@@ -2391,7 +2391,7 @@ export const CLI_ARGS = {
         '\n' +
         'Example:\n' +
         '\n' +
-        '```\n' +
+        '```console\n' +
         '    $ export PAYMENT="bfeffdf57f29b0cc1fab9ea197bb1413da2561fe4b83e962c7f02fbbe2b1cd5401"\n' +
         '    $ stx send_btc 18qTSE5PPQmypwKKej7QX5Db2XAttgYeA1 123456 "$PAYMENT"\n' +
         '    c7e239fd24da30e36e011e6bc7db153574a5b40a3a8dc3b727adb54ad038acc5\n' +
@@ -2451,7 +2451,7 @@ export const CLI_ARGS = {
         '\n' +
         'Example:\n' +
         '\n' +
-        '```\n' +
+        '```console\n' +
         '    $ # check balances of sender and recipient before sending.\n' +
         '    $ # address of the key below is SP2SC16ASH76GX549PT7J5WQZA4GHMFBKYMBQFF9V\n' +
         '    $ export PAYMENT="bfeffdf57f29b0cc1fab9ea197bb1413da2561fe4b83e962c7f02fbbe2b1cd5401"\n' +
@@ -2533,7 +2533,7 @@ export const CLI_ARGS = {
         '\n' +
         'Example:\n' +
         '\n' +
-        '```\n' +
+        '```console\n' +
         '    $ stx stack 10000000 20 16pm276FpJYpm7Dv3GEaRqTVvGPTdceoY4 136ff26efa5db6f06b28f9c8c7a0216a1a52598045162abfe435d13036154a1b01\n' +
         '     {\n' +
         "       txid: '0x2e33ad647a9cedacb718ce247967dc705bc0c878db899fdba5eae2437c6fa1e1'," +
@@ -2559,7 +2559,7 @@ export const CLI_ARGS = {
         '\n' +
         'Example:\n' +
         '\n' +
-        '```\n' +
+        '```console\n' +
         '    $ stx stacking_status SPZY1V53Z4TVRHHW9Z7SFG8CZNRAG7BD8WJ6SXD0\n' +
         '```\n',
       group: 'Account Management',
@@ -2614,7 +2614,7 @@ export const CLI_ARGS = {
         '\n' +
         'Example:\n' +
         '\n' +
-        '```\n' +
+        '```console\n' +
         '    $ # Tip: you can get your owner key from your backup phrase with "get_owner_keys".\n' +
         '    $ # Tip: you can get your payment key from your backup phrase with "get_payment_key".\n' +
         '    $ export OWNER="136ff26efa5db6f06b28f9c8c7a0216a1a52598045162abfe435d13036154a1b01"\n' +
@@ -2664,9 +2664,9 @@ export const CLI_ARGS = {
         '\n' +
         'Example:\n' +
         '\n' +
-        '```\n' +
+        '```console\n' +
         '    $ export PAYMENT="136ff26efa5db6f06b28f9c8c7a0216a1a52598045162abfe435d13036154a1b01"\n' +
-        '    $ stx tx_preorder example.id "$PAYMENT" salt 1000' +
+        '    $ stx tx_preorder example.id "$PAYMENT" salt 100\n' +
         '```\n' +
         '\n',
       group: 'Blockstack ID Management',
@@ -2768,7 +2768,7 @@ export const CLI_ARGS = {
         '\n' +
         'Example:\n' +
         '\n' +
-        '```\n' +
+        '```console\n' +
         '    $ # Tip: you can get your owner and payment keys from your 12-word backup phrase using the get_owner_keys and get_payment_key commands.\n' +
         '    $ export OWNER="6e50431b955fe73f079469b24f06480aee44e4519282686433195b3c4b5336ef01"\n' +
         '    $ export PAYMENT="bfeffdf57f29b0cc1fab9ea197bb1413da2561fe4b83e962c7f02fbbe2b1cd5401"\n' +
@@ -2812,7 +2812,7 @@ export const CLI_ARGS = {
         '\n' +
         'Example:\n' +
         '\n' +
-        '```\n' +
+        '```console\n' +
         '    $ stx whois example.id\n' +
         '    {\n' +
         '      "address": "1ArdkA2oLaKnbNbLccBaFhEV4pYju8hJ82",\n' +
@@ -2851,7 +2851,7 @@ export const CLI_ARGS = {
         '\n' +
         'Example:\n' +
         '\n' +
-        '```\n' +
+        '```console\n' +
         '    $ stx -H https://api.hiro.so zonefile_push /path/to/zonefile.txt\n' +
         '    [\n' +
         '      "https://api.hiro.so"\n' +
@@ -2891,7 +2891,7 @@ export const CLI_ARGS = {
         '\n' +
         'Example:\n' +
         '\n' +
-        '```\n' +
+        '```console\n' +
         '    $ # Tip: you can get your owner keys from your 12-word backup phrase using the get_owner_keys command.\n' +
         '    $ export PRIVATE_OWNER_KEY="6e50431b955fe73f079469b24f06480aee44e4519282686433195b3c4b5336ef01"\n' +
         '    $ stx get_did_configuration public_profile_for_testing.id.blockstack helloblockstack.com PRIVATE_OWNER_KEY\n' +
