@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.11.1](https://github.com/hirosystems/stacks.js/compare/v6.11.0...v6.11.1) (2023-12-21)
+
+
+### Bug Fixes
+
+* update CLI docs code blocks ([#1609](https://github.com/hirosystems/stacks.js/issues/1609)) ([bbce7fa](https://github.com/hirosystems/stacks.js/commit/bbce7fa886f4b056e091bc1a3e90e9995c1d5432))
+
+
+
 ## [6.11.0](https://github.com/hirosystems/stacks.js/compare/v6.10.0...v6.11.0) (2023-12-18)
 
 
