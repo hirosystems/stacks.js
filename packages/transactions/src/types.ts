@@ -42,7 +42,7 @@ import {
   createLPString,
 } from './postcondition-types';
 import { Payload, deserializePayload, serializePayload } from './payload';
-import { DeserializationError } from './errors';
+import { DeserializationError, SerializationError } from './errors';
 import {
   deserializeTransactionAuthField,
   deserializeMessageSignature,
@@ -379,6 +379,9 @@ export function serializePostCondition(postCondition: PostCondition): Uint8Array
     postCondition.conditionType === PostConditionType.STX ||
     postCondition.conditionType === PostConditionType.Fungible
   ) {
+    // SIP-005: Maximal length of amount is 8 bytes
+    if (postCondition.amount > BigInt('0xffffffffffffffff'))
+      throw new SerializationError('The post-condition amount may not be larger than 8 bytes');
     bytesArray.push(intToBytes(postCondition.amount, false, 8));
   }
 

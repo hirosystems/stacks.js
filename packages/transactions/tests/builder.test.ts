@@ -84,6 +84,11 @@ import { createTransactionAuthField } from '../src/signature';
 import { TransactionSigner } from '../src/signer';
 import { deserializeTransaction, StacksTransaction } from '../src/transaction';
 import { cloneDeep } from '../src/utils';
+import {
+  createFungiblePostCondition,
+  createSTXPostCondition,
+  serializePostCondition,
+} from '../src';
 
 function setSignature(
   unsignedTransaction: StacksTransaction,
@@ -2156,4 +2161,29 @@ test('Get contract map entry - no match', async () => {
   expect(fetchMock.mock.calls.length).toEqual(1);
   expect(result).toEqual(mockResult);
   expect(result.type).toBe(ClarityType.OptionalNone);
+});
+
+test('Post-conditions with amount larger than 8 bytes throw an error', () => {
+  const amount = BigInt('0xffffffffffffffff') + 1n;
+
+  const stxPc = createSTXPostCondition(
+    'SP34EBMKMRR6SXX65GRKJ1FHEXV7AGHJ2D8ASQ5M3',
+    FungibleConditionCode.Equal,
+    amount
+  );
+
+  const fungiblePc = createFungiblePostCondition(
+    'SP34EBMKMRR6SXX65GRKJ1FHEXV7AGHJ2D8ASQ5M3',
+    FungibleConditionCode.Equal,
+    amount,
+    'SP34EBMKMRR6SXX65GRKJ1FHEXV7AGHJ2D8ASQ5M3.token::frank'
+  );
+
+  expect(() => {
+    serializePostCondition(stxPc);
+  }).toThrowError('The post-condition amount may not be larger than 8 bytes');
+
+  expect(() => {
+    serializePostCondition(fungiblePc);
+  }).toThrowError('The post-condition amount may not be larger than 8 bytes');
 });
