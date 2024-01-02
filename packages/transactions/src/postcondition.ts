@@ -1,22 +1,20 @@
 import { IntegerType, intToBigInt } from '@stacks/common';
+import { ClarityValue } from './clarity';
 import {
-  PostConditionType,
   FungibleConditionCode,
   NonFungibleConditionCode,
+  PostConditionType,
   StacksMessageType,
 } from './constants';
-
 import {
   AssetInfo,
-  PostConditionPrincipal,
-  parseAssetInfoString,
-  parsePrincipalString,
-  STXPostCondition,
   FungiblePostCondition,
   NonFungiblePostCondition,
+  PostConditionPrincipal,
+  STXPostCondition,
+  parseAssetInfoString,
+  parsePrincipalString,
 } from './postcondition-types';
-
-import { ClarityValue } from './clarity';
 
 export function createSTXPostCondition(
   principal: string | PostConditionPrincipal,
