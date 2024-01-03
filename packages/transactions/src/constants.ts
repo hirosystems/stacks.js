@@ -252,6 +252,13 @@ export enum TxRejectedReason {
   BadAddressVersionByte = 'BadAddressVersionByte',
   NoCoinbaseViaMempool = 'NoCoinbaseViaMempool',
   ServerFailureNoSuchChainTip = 'ServerFailureNoSuchChainTip',
+  TooMuchChaining = 'TooMuchChaining',
+  ConflictingNonceInMempool = 'ConflictingNonceInMempool',
+  BadTransactionVersion = 'BadTransactionVersion',
+  TransferRecipientCannotEqualSender = 'TransferRecipientCannotEqualSender',
+  TransferAmountMustBePositive = 'TransferAmountMustBePositive',
   ServerFailureDatabase = 'ServerFailureDatabase',
+  EstimatorError = 'EstimatorError',
+  TemporarilyBlacklisted = 'TemporarilyBlacklisted',
   ServerFailureOther = 'ServerFailureOther',
 }
