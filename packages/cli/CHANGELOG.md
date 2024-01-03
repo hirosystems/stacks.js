@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.11.2](https://github.com/hirosystems/stacks.js/compare/v6.11.1...v6.11.2) (2024-01-03)
+
+**Note:** Version bump only for package @stacks/cli
+
+
+
+
+
 ## [6.11.1](https://github.com/hirosystems/stacks.js/compare/v6.11.0...v6.11.1) (2023-12-21)
 
 
