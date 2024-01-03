@@ -349,3 +349,19 @@ export function ensureLegacyBtcAddressForPox1({
     throw new Error('PoX-1 requires P2PKH/P2SH/P2SH-P2WPKH/P2SH-P2WSH bitcoin addresses');
   }
 }
+
+/**
+ * @internal
+ * Throws unless a signerKey is given for >= PoX-4.
+ */
+export function ensureSignerKeyForGtePox4({
+  contract,
+  signerKey,
+}: {
+  contract: string;
+  signerKey?: string;
+}) {
+  if (signerKey) return;
+  if (/\.pox(-[2-3])?$/.test(contract)) return;
+  throw new Error('PoX-4 requires a signer-key (buff 33) to stack');
+}
