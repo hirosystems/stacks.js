@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.11.2](https://github.com/hirosystems/stacks.js/compare/v6.11.1...v6.11.2) (2024-01-03)
+
+
+### Bug Fixes
+
+* add error throwing on too large fungible post-condition ([d0a1a32](https://github.com/hirosystems/stacks.js/commit/d0a1a32bc64b9c9bc513abbe2ee67e7edb094b1d))
+
+
+
 ## [6.11.0](https://github.com/hirosystems/stacks.js/compare/v6.10.0...v6.11.0) (2023-12-18)
 
 
