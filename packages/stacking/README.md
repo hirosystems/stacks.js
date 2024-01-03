@@ -93,6 +93,8 @@ const amountMicroStx = 100000000000n;
 const privateKey = 'd48f215481c16cbe6426f8e557df9b78895661971d71735126545abddcd5377001';
 // block height at which to stack
 const burnBlockHeight = 2000;
+// signer key hex
+const signerKey = '03bae4a7...e2e2c6b7e';
 
 // Refer to initialization section to create client instance
 const stackingResults = await client.stack({
@@ -101,6 +103,7 @@ const stackingResults = await client.stack({
   cycles,
   privateKey,
   burnBlockHeight,
+  signerKey,
 });
 
 // {
