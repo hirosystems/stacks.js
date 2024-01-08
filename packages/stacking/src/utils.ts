@@ -352,16 +352,18 @@ export function ensureLegacyBtcAddressForPox1({
 
 /**
  * @internal
- * Throws unless a signerKey is given for >= PoX-4.
+ * Throws unless a signerKey is given for >= PoX-4 or missing before.
  */
-export function ensureSignerKeyForGtePox4({
+export function ensureSignerKeyReadiness({
   contract,
   signerKey,
 }: {
   contract: string;
   signerKey?: string;
 }) {
-  if (signerKey) return;
-  if (/\.pox(-[2-3])?$/.test(contract)) return;
+  if (/\.pox(-[2-3])?$/.test(contract)) {
+    if (!signerKey) return;
+    throw new Error('PoX-1, PoX-2 and PoX-3 do not accept a signer-key (buff 33)');
+  }
   throw new Error('PoX-4 requires a signer-key (buff 33) to stack');
 }
