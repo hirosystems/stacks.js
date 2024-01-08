@@ -37,7 +37,7 @@ import { PoxOperationPeriod, StackingErrors } from './constants';
 import {
   ensureLegacyBtcAddressForPox1,
   ensurePox2Activated,
-  ensureSignerKeyForGtePox4,
+  ensureSignerKeyReadiness,
   poxAddressToTuple,
   unwrap,
   unwrapMap,
@@ -684,7 +684,7 @@ export class StackingClient {
     const contract = await this.getStackingContract(poxOperationInfo);
 
     ensureLegacyBtcAddressForPox1({ contract, poxAddress });
-    ensureSignerKeyForGtePox4({ contract, signerKey });
+    ensureSignerKeyReadiness({ contract, signerKey });
 
     const callOptions = this.getStackOptions({
       contract,
@@ -720,7 +720,7 @@ export class StackingClient {
     const poxOperationInfo = await this.getPoxOperationInfo(poxInfo);
 
     ensurePox2Activated(poxOperationInfo);
-    ensureSignerKeyForGtePox4({ contract: poxInfo.contract_id, signerKey });
+    ensureSignerKeyReadiness({ contract: poxInfo.contract_id, signerKey });
 
     const callOptions = this.getStackExtendOptions({
       contract: poxInfo.contract_id,
@@ -821,7 +821,7 @@ export class StackingClient {
     const contract = await this.getStackingContract(poxOperationInfo);
 
     ensureLegacyBtcAddressForPox1({ contract, poxAddress });
-    ensureSignerKeyForGtePox4({ contract, signerKey });
+    ensureSignerKeyReadiness({ contract, signerKey });
 
     const callOptions = this.getDelegateStackOptions({
       contract,
@@ -858,7 +858,7 @@ export class StackingClient {
     const poxInfo = await this.getPoxInfo();
     const contract = poxInfo.contract_id;
 
-    ensureSignerKeyForGtePox4({ contract, signerKey });
+    ensureSignerKeyReadiness({ contract, signerKey });
 
     const callOptions = this.getDelegateStackExtendOptions({
       contract,
