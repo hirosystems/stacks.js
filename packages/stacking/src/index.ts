@@ -70,7 +70,7 @@ export interface ContractVersion {
 
 export interface PoxInfo {
   contract_id: string;
-  contract_versions?: ContractVersion[];
+  contract_versions: ContractVersion[];
   current_burnchain_block_height?: number;
   first_burnchain_block_height: number;
   min_amount_ustx: string;
@@ -92,24 +92,15 @@ export interface PoxInfo {
   };
 }
 
-export type PoxOperationInfo =
-  | {
-      period: PoxOperationPeriod.Period1;
-      pox1: { contract_id: string };
-    }
-  | {
-      period: PoxOperationPeriod;
-      pox1: { contract_id: string };
-      pox2: ContractVersion;
-      current: ContractVersion;
-    }
-  | {
-      period: PoxOperationPeriod.Period3;
-      pox1: { contract_id: string };
-      pox2: ContractVersion;
-      pox3: ContractVersion;
-      current: ContractVersion;
-    };
+export type PoxOperationInfo = {
+  /** @deprecated Period isn't needed anymore after 2.1 fork went live */
+  period: PoxOperationPeriod;
+  pox1: { contract_id: string };
+  pox2: ContractVersion;
+  pox3: ContractVersion;
+  pox4: ContractVersion;
+  current: ContractVersion;
+};
 
 export interface AccountExtendedBalances {
   stx: {
@@ -544,68 +535,18 @@ export class StackingClient {
   async getPoxOperationInfo(poxInfo?: PoxInfo): Promise<PoxOperationInfo> {
     poxInfo = poxInfo ?? (await this.getPoxInfo());
 
-    // ++ Before 2.1 Fork ++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    // => Period 1
-    if (
-      !poxInfo.current_burnchain_block_height ||
-      !poxInfo.contract_versions ||
-      poxInfo.contract_versions.length <= 1
-    ) {
-      // Node does not know about other pox versions yet
-      return { period: PoxOperationPeriod.Period1, pox1: { contract_id: poxInfo.contract_id } };
-    }
-
     const poxContractVersions = [...poxInfo.contract_versions].sort(
       (a, b) => a.activation_burnchain_block_height - b.activation_burnchain_block_height
     ); //  by activation height ASC (earliest first)
-    const [pox1, pox2, pox3] = poxContractVersions;
+    const [pox1, pox2, pox3, pox4] = poxContractVersions;
+
     const activatedPoxs = poxContractVersions.filter(
       (c: ContractVersion) =>
         (poxInfo?.current_burnchain_block_height as number) >= c.activation_burnchain_block_height
     );
-    // Named pox contracts but also a more future-proof current pointer to latest activated PoX contract
     const current = activatedPoxs[activatedPoxs.length - 1];
 
-    if (poxInfo.contract_versions.length == 2) {
-      const [address, name] = pox2.contract_id.split('.');
-      const pox2ConfiguredUrl = this.network.getDataVarUrl(address, name, 'configured');
-      const isPox2NotYetConfigured =
-        (await this.network.fetchFn(pox2ConfiguredUrl).then(r => r.text())) !== '{"data":"0x03"}'; // PoX-2 is configured on fork if data is 0x03
-
-      // => Period 1
-      if (isPox2NotYetConfigured) {
-        // Node hasn't forked yet (unclear if this case can happen on a non-mocknet/regtest node)
-        return { period: PoxOperationPeriod.Period1, pox1, pox2 };
-      }
-    }
-
-    // ++ >= 2.1 Fork ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    // => Period 2a
-    if (poxInfo.contract_id === pox1.contract_id) {
-      // In 2.1 fork, but PoX-2 hasn't been activated yet
-      return { period: PoxOperationPeriod.Period2a, pox1, pox2, current };
-    }
-
-    // ++ PoX-2 was activated ++++++++++++++++++++++++++++++++++++++++++++++++++
-    if (poxInfo.contract_id === pox2.contract_id) {
-      // => Period 2b
-      if (poxInfo.current_cycle.id < pox2.first_reward_cycle_id) {
-        // In 2.1 fork and PoX-2 is live
-        return { period: PoxOperationPeriod.Period2b, pox1, pox2, current };
-      }
-
-      // => Period 3
-      return { period: PoxOperationPeriod.Period3, pox1, pox2, current };
-    }
-
-    // ++ Post PoX-2 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    if (activatedPoxs.length > 2) {
-      // More than two PoX contracts have been activated
-      // => (Still) Period 3
-      return { period: PoxOperationPeriod.Period3, pox1, pox2, pox3, current };
-    }
-
-    throw new Error('Could not determine PoX Operation Period');
+    return { period: PoxOperationPeriod.Period3, pox1, pox2, pox3, pox4, current };
   }
 
   /**

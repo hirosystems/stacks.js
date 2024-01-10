@@ -26,7 +26,7 @@ import { decodeBtcAddress, poxAddressToBtcAddress } from '../src/utils';
 import { V2_POX_REGTEST_POX_3, setApiMocks } from './apiMockingHelpers';
 
 const poxInfo = {
-  contract_id: 'ST000000000000000000002AMW42H.pox',
+  contract_id: 'ST000000000000000000002AMW42H.pox-3',
   first_burnchain_block_height: 0,
   min_amount_ustx: 83333940625000,
   prepare_cycle_length: 30,
@@ -35,6 +35,47 @@ const poxInfo = {
   reward_cycle_length: 120,
   rejection_votes_left_required: 12,
   total_liquid_supply_ustx: 40000291500000000,
+  pox_activation_threshold_ustx: 71566102085843,
+  current_burnchain_block_height: 825166,
+  prepare_phase_block_length: 100,
+  reward_phase_block_length: 2000,
+  reward_slots: 4000,
+  current_cycle: {
+    id: 75,
+    min_threshold_ustx: 90000000000,
+    stacked_ustx: 340958364660109,
+    is_pox_active: true,
+  },
+  next_cycle: {
+    id: 76,
+    min_threshold_ustx: 90000000000,
+    min_increment_ustx: 71566102085,
+    stacked_ustx: 273136107683519,
+    prepare_phase_start_block_height: 825550,
+    blocks_until_prepare_phase: 384,
+    reward_phase_start_block_height: 825650,
+    blocks_until_reward_phase: 484,
+    ustx_until_pox_rejection: 357830510429200,
+  },
+
+  next_reward_cycle_in: 484,
+  contract_versions: [
+    {
+      contract_id: 'ST000000000000000000002AMW42H.pox',
+      activation_burnchain_block_height: 666050,
+      first_reward_cycle_id: 0,
+    },
+    {
+      contract_id: 'ST000000000000000000002AMW42H.pox-2',
+      activation_burnchain_block_height: 781552,
+      first_reward_cycle_id: 56,
+    },
+    {
+      contract_id: 'ST000000000000000000002AMW42H.pox-3',
+      activation_burnchain_block_height: 791551,
+      first_reward_cycle_id: 60,
+    },
+  ],
 };
 
 const balanceInfo = {
