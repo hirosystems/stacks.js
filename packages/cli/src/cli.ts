@@ -1937,7 +1937,7 @@ function faucetCall(_: CLINetworkAdapter, args: string[]): Promise<string> {
 
   const apiConfig = new Configuration({
     fetchApi: crossfetch,
-    basePath: 'https://stacks-node-api.testnet.stacks.co',
+    basePath: 'https://api.testnet.hiro.so',
   });
 
   const faucets = new FaucetsApi(apiConfig);

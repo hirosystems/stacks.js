@@ -125,7 +125,7 @@ test('API key middleware - get nonce', async () => {
   expect(fetchNonce).toBe(123n);
   expect(fetchMock.mock.calls.length).toEqual(1);
   expect(fetchMock.mock.calls[0][0]).toEqual(
-    'https://stacks-node-api.mainnet.stacks.co/v2/accounts/STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6?proof=0'
+    'https://api.mainnet.hiro.so/v2/accounts/STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6?proof=0'
   );
   const callHeaders = new Headers(fetchMock.mock.calls[0][1]?.headers);
   expect(callHeaders.has('x-api-key')).toBeTruthy();

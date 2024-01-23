@@ -1,8 +1,8 @@
 import { TransactionVersion, ChainID } from '@stacks/common';
 import { createFetchFn, FetchFn } from './fetch';
 
-export const HIRO_MAINNET_DEFAULT = 'https://stacks-node-api.mainnet.stacks.co';
-export const HIRO_TESTNET_DEFAULT = 'https://stacks-node-api.testnet.stacks.co';
+export const HIRO_MAINNET_DEFAULT = 'https://api.mainnet.hiro.so';
+export const HIRO_TESTNET_DEFAULT = 'https://api.testnet.hiro.so';
 export const HIRO_MOCKNET_DEFAULT = 'http://localhost:3999';
 
 /**
@@ -28,7 +28,7 @@ export type StacksNetworkName = (typeof StacksNetworks)[number];
 export class StacksNetwork {
   version: TransactionVersion = TransactionVersion.Mainnet;
   chainId: ChainID = ChainID.Mainnet;
-  bnsLookupUrl = 'https://stacks-node-api.mainnet.stacks.co';
+  bnsLookupUrl = 'https://api.mainnet.hiro.so';
   broadcastEndpoint = '/v2/transactions';
   transferFeeEstimateEndpoint = '/v2/fees/transfer';
   transactionFeeEstimateEndpoint = '/v2/fees/transaction';
@@ -155,7 +155,7 @@ export class StacksNetwork {
  * @example
  * ```
  * const network = new StacksMainnet();
- * const network = new StacksMainnet({ url: "https://stacks-node-api.mainnet.stacks.co" });
+ * const network = new StacksMainnet({ url: "https://api.mainnet.hiro.so" });
  * const network = new StacksMainnet({ fetch: createFetchFn() });
  * ```
  * @related {@link createFetchFn}, {@link createApiKeyMiddleware}
@@ -179,7 +179,7 @@ export class StacksMainnet extends StacksNetwork {
  * @example
  * ```
  * const network = new StacksTestnet();
- * const network = new StacksTestnet({ url: "https://stacks-node-api.testnet.stacks.co" });
+ * const network = new StacksTestnet({ url: "https://api.testnet.hiro.so" });
  * const network = new StacksTestnet({ fetch: createFetchFn() });
  * ```
  * @related {@link createFetchFn}, {@link createApiKeyMiddleware}

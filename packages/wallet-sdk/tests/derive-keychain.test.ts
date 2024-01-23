@@ -143,7 +143,7 @@ test('derive derivation path with new username owned by address of stx derivatio
   expect(username).toEqual('public_profile_for_testing.id.blockstack');
   expect(stxDerivationType).toEqual(DerivationType.Wallet);
   expect(fetchMock.mock.calls[0][0]).toEqual(
-    `https://stacks-node-api.mainnet.stacks.co/v1/addresses/stacks/${WALLET_ADDRESS}`
+    `https://api.mainnet.hiro.so/v1/addresses/stacks/${WALLET_ADDRESS}`
   );
 });
 
@@ -165,10 +165,10 @@ test('derive derivation path with new username owned by address of data derivati
   expect(username).toEqual('public_profile_for_testing.id.blockstack');
   expect(stxDerivationType).toEqual(DerivationType.Data);
   expect(fetchMock.mock.calls[0][0]).toEqual(
-    `https://stacks-node-api.mainnet.stacks.co/v1/addresses/stacks/${WALLET_ADDRESS}`
+    `https://api.mainnet.hiro.so/v1/addresses/stacks/${WALLET_ADDRESS}`
   );
   expect(fetchMock.mock.calls[1][0]).toEqual(
-    `https://stacks-node-api.mainnet.stacks.co/v1/addresses/stacks/${DATA_ADDRESS}`
+    `https://api.mainnet.hiro.so/v1/addresses/stacks/${DATA_ADDRESS}`
   );
 });
 
@@ -239,5 +239,5 @@ test('fetch username defaults to mainnet', async () => {
     index: 0,
     derivationType: DerivationType.Wallet,
   });
-  expect(fetchMock.mock.calls[0][0]).toContain('stacks-node-api.mainnet');
+  expect(fetchMock.mock.calls[0][0]).toContain('api.mainnet');
 });
