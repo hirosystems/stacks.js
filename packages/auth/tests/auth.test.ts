@@ -558,7 +558,7 @@ test('profileLookUp', async () => {
   expect(fetchMock.mock.calls[0][0]).toEqual('http://potato:6270/v1/names/ryan.id');
   expect(fetchMock.mock.calls[1][0]).toEqual(sampleTokenFiles.ryan.url);
   expect(fetchMock.mock.calls[2][0]).toEqual(
-    'https://stacks-node-api.mainnet.stacks.co/v1/names/ryan.id'
+    'https://api.mainnet.hiro.so/v1/names/ryan.id'
   );
   expect(fetchMock.mock.calls[3][0]).toEqual(sampleTokenFiles.ryan.url);
 });

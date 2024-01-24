@@ -34,7 +34,7 @@ stacks make_keychain -t > delegator.json
 You can use the faucet to obtain testnet STX tokens for the test account. Replace `<stxAddress>` below with your address:
 
 ```sh
-curl -XPOST "https://stacks-node-api.testnet.stacks.co/extended/v1/faucets/stx?address=<stxAddress>&stacking=true"
+curl -XPOST "https://api.testnet.hiro.so/extended/v1/faucets/stx?address=<stxAddress>&stacking=true"
 ```
 
 ## Step 1: Integrate libraries
