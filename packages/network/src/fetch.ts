@@ -100,7 +100,7 @@ export function hostMatches(host: string, pattern: string | RegExp) {
  */
 export function createApiKeyMiddleware({
   apiKey,
-  host = /(.*)api(.*)\.stacks\.co$/i,
+  host = /(.*)api(.*)(\.stacks\.co|\.hiro\.so)$/i,
   httpHeader = 'x-api-key',
 }: ApiKeyMiddlewareOpts): FetchMiddleware {
   return {
