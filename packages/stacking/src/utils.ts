@@ -335,7 +335,7 @@ export function ensurePox2Activated(operationInfo: PoxOperationInfo) {
 
 /**
  * @internal
- * Throws unless the given PoX address is a legacy address.
+ * Throws if the given PoX address is not a legacy address for PoX-1.
  */
 export function ensureLegacyBtcAddressForPox1({
   contract,
@@ -352,7 +352,7 @@ export function ensureLegacyBtcAddressForPox1({
 
 /**
  * @internal
- * Throws unless a signerKey is given for >= PoX-4 or missing before.
+ * Throws if a signerKey is given for <= PoX-3 or the signerKey is missing otherwise.
  */
 export function ensureSignerKeyReadiness({
   contract,
@@ -362,8 +362,10 @@ export function ensureSignerKeyReadiness({
   signerKey?: string;
 }) {
   if (/\.pox(-[2-3])?$/.test(contract)) {
-    if (!signerKey) return;
-    throw new Error('PoX-1, PoX-2 and PoX-3 do not accept a signer-key (buff 33)');
+    // .pox, .pox-2 or .pox-3
+    if (signerKey) throw new Error('PoX-1, PoX-2 and PoX-3 do not accept a signer-key (buff 33)');
+  } else {
+    // .pox-4 or later
+    if (!signerKey) throw new Error('PoX-4 or later requires a signer-key (buff 33) to stack');
   }
-  throw new Error('PoX-4 requires a signer-key (buff 33) to stack');
 }
