@@ -24,6 +24,9 @@ test('createApiKeyMiddleware adds x-api-key header to correct host request', asy
 
   await fetchFn('https://api.stacks.co');
   expect((fetchMock.mock.calls[1][1]?.headers as Headers)?.get('x-api-key')).toContain(apiKey);
+
+  await fetchFn('https://api.hiro.so');
+  expect((fetchMock.mock.calls[1][1]?.headers as Headers)?.get('x-api-key')).toContain(apiKey);
 });
 
 test('middleware calls pre and post', async () => {
