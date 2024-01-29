@@ -8,6 +8,7 @@ import {
   toTwos,
   bigIntToBytes,
   intToBigInt,
+  validateHash256,
 } from '../src';
 import BN from 'bn.js';
 
@@ -165,4 +166,24 @@ test('Should accept bn.js instance', () => {
   const nativeBigInt = intToBigInt(bn, false);
 
   expect(nativeBigInt.toString()).toEqual(value);
+});
+
+describe(validateHash256, () => {
+  const TXID = '117a6522b4e9ec27ff10bbe3940a4a07fd58e5352010b4143992edb05a7130c7';
+
+  test.each([
+    { txid: TXID, expected: true }, // without 0x
+    { txid: `0x${TXID}`, expected: true }, // with 0x
+    { txid: TXID.split('30c7')[0], expected: false }, // too short
+    {
+      txid: 'Failed to deserialize posted transaction: Invalid Stacks string: non-printable or non-ASCII string',
+      expected: false, // string without txid
+    },
+    {
+      txid: `Failed to deserialize posted transaction: Invalid Stacks string: non-printable or non-ASCII string. ${TXID}`,
+      expected: false, // string with txid
+    },
+  ])('txid is validated as hash 256', ({ txid, expected }) => {
+    expect(validateHash256(txid)).toEqual(expected);
+  });
 });
