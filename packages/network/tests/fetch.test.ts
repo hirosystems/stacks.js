@@ -1,5 +1,5 @@
 import fetchMock from 'jest-fetch-mock';
-import { fetchWrapper, getFetchOptions, setFetchOptions } from '../src/fetch';
+import { fetchWrapper, getFetchOptions, setFetchOptions } from '../../common/src/fetch';
 
 test('Verify fetch private options', async () => {
   const defaultOptioins = getFetchOptions();
