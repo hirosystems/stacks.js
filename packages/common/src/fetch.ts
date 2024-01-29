@@ -1,5 +1,3 @@
-import 'cross-fetch/polyfill';
-
 // Define a default request options and allow modification using getters, setters
 // Reference: https://developer.mozilla.org/en-US/docs/Web/API/Request/Request
 const defaultFetchOpts: RequestInit = {
@@ -49,6 +47,15 @@ export async function fetchWrapper(input: RequestInfo, init?: RequestInit): Prom
 }
 
 export type FetchFn = (url: string, init?: RequestInit) => Promise<Response>;
+
+/** @ignore Internally used for letting networking functions specify "API" options */
+export type ApiParam = {
+  /** Optional API object (for `.url` and `.fetch`) used for API/Node, defaults to use mainnet */
+  api?: {
+    url: string;
+    fetch: FetchFn;
+  };
+};
 
 export interface RequestContext {
   fetch: FetchFn;
