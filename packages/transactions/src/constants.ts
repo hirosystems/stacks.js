@@ -16,7 +16,7 @@ export const RECOVERABLE_ECDSA_SIG_LENGTH_BYTES = 65;
 export const COMPRESSED_PUBKEY_LENGTH_BYTES = 32;
 export const UNCOMPRESSED_PUBKEY_LENGTH_BYTES = 64;
 export const MEMO_MAX_LENGTH_BYTES = 34;
-export const DEFAULT_CORE_NODE_API_URL = 'https://stacks-node-api.mainnet.stacks.co';
+export const DEFAULT_CORE_NODE_API_URL = 'https://api.mainnet.hiro.so';
 
 // todo: add explicit enum values
 /**
@@ -252,6 +252,13 @@ export enum TxRejectedReason {
   BadAddressVersionByte = 'BadAddressVersionByte',
   NoCoinbaseViaMempool = 'NoCoinbaseViaMempool',
   ServerFailureNoSuchChainTip = 'ServerFailureNoSuchChainTip',
+  TooMuchChaining = 'TooMuchChaining',
+  ConflictingNonceInMempool = 'ConflictingNonceInMempool',
+  BadTransactionVersion = 'BadTransactionVersion',
+  TransferRecipientCannotEqualSender = 'TransferRecipientCannotEqualSender',
+  TransferAmountMustBePositive = 'TransferAmountMustBePositive',
   ServerFailureDatabase = 'ServerFailureDatabase',
+  EstimatorError = 'EstimatorError',
+  TemporarilyBlacklisted = 'TemporarilyBlacklisted',
   ServerFailureOther = 'ServerFailureOther',
 }

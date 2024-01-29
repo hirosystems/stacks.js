@@ -3,6 +3,32 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.11.3](https://github.com/hirosystems/stacks.js/compare/v6.11.2...v6.11.3) (2024-01-24)
+
+
+### Bug Fixes
+
+* update legacy API endpoints ([#1618](https://github.com/hirosystems/stacks.js/issues/1618)) ([36d10a3](https://github.com/hirosystems/stacks.js/commit/36d10a39a0915950430f8eb149d1fe29002d003d))
+
+
+
+## [6.11.2](https://github.com/hirosystems/stacks.js/compare/v6.11.1...v6.11.2) (2024-01-03)
+
+**Note:** Version bump only for package @stacks/cli
+
+
+
+
+
+## [6.11.1](https://github.com/hirosystems/stacks.js/compare/v6.11.0...v6.11.1) (2023-12-21)
+
+
+### Bug Fixes
+
+* update CLI docs code blocks ([#1609](https://github.com/hirosystems/stacks.js/issues/1609)) ([bbce7fa](https://github.com/hirosystems/stacks.js/commit/bbce7fa886f4b056e091bc1a3e90e9995c1d5432))
+
+
+
 ## [6.11.0](https://github.com/hirosystems/stacks.js/compare/v6.10.0...v6.11.0) (2023-12-18)
 
 

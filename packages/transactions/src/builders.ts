@@ -366,12 +366,71 @@ export type ServerFailureNoSuchChainTipRejection = {
   txid: string;
 };
 
+export type TooMuchChainingRejection = {
+  error: string;
+  reason: TxRejectedReason.TooMuchChaining;
+  reason_data: {
+    actual: number;
+    expected: number;
+    is_origin: boolean;
+    message: string;
+    principal: string;
+  };
+  txid: string;
+};
+
+export type ConflictingNonceInMempoolRejection = {
+  error: string;
+  reason: TxRejectedReason.ConflictingNonceInMempool;
+  reason_data?: undefined;
+  txid: string;
+};
+
+export type BadTransactionVersionRejection = {
+  error: string;
+  reason: TxRejectedReason.BadTransactionVersion;
+  reason_data?: undefined;
+  txid: string;
+};
+
+export type TransferRecipientCannotEqualSenderRejection = {
+  error: string;
+  reason: TxRejectedReason.TransferRecipientCannotEqualSender;
+  reason_data: {
+    recipient: string;
+  };
+  txid: string;
+};
+
+export type TransferAmountMustBePositiveRejection = {
+  error: string;
+  reason: TxRejectedReason.TransferAmountMustBePositive;
+  reason_data?: undefined;
+  txid: string;
+};
+
 export type ServerFailureDatabaseRejection = {
   error: string;
   reason: TxRejectedReason.ServerFailureDatabase;
   reason_data: {
     message: string;
   };
+  txid: string;
+};
+
+export type EstimatorErrorRejection = {
+  error: string;
+  reason: TxRejectedReason.EstimatorError;
+  reason_data: {
+    message: string;
+  };
+  txid: string;
+};
+
+export type TemporarilyBlacklistedRejection = {
+  error: string;
+  reason: TxRejectedReason.TemporarilyBlacklisted;
+  reason_data?: undefined;
   txid: string;
 };
 
@@ -408,7 +467,14 @@ export type TxBroadcastResultRejected =
   | BadAddressVersionByteRejection
   | NoCoinbaseViaMempoolRejection
   | ServerFailureNoSuchChainTipRejection
+  | TooMuchChainingRejection
+  | ConflictingNonceInMempoolRejection
+  | BadTransactionVersionRejection
+  | TransferRecipientCannotEqualSenderRejection
+  | TransferAmountMustBePositiveRejection
   | ServerFailureDatabaseRejection
+  | EstimatorErrorRejection
+  | TemporarilyBlacklistedRejection
   | ServerFailureOtherRejection;
 
 export type TxBroadcastResult = TxBroadcastResultOk | TxBroadcastResultRejected;

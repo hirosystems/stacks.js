@@ -84,6 +84,11 @@ import { createTransactionAuthField } from '../src/signature';
 import { TransactionSigner } from '../src/signer';
 import { deserializeTransaction, StacksTransaction } from '../src/transaction';
 import { cloneDeep } from '../src/utils';
+import {
+  createFungiblePostCondition,
+  createSTXPostCondition,
+  serializePostCondition,
+} from '../src';
 
 function setSignature(
   unsignedTransaction: StacksTransaction,
@@ -120,7 +125,7 @@ test('API key middleware - get nonce', async () => {
   expect(fetchNonce).toBe(123n);
   expect(fetchMock.mock.calls.length).toEqual(1);
   expect(fetchMock.mock.calls[0][0]).toEqual(
-    'https://stacks-node-api.mainnet.stacks.co/v2/accounts/STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6?proof=0'
+    'https://api.mainnet.hiro.so/v2/accounts/STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6?proof=0'
   );
   const callHeaders = new Headers(fetchMock.mock.calls[0][1]?.headers);
   expect(callHeaders.has('x-api-key')).toBeTruthy();
@@ -2156,4 +2161,29 @@ test('Get contract map entry - no match', async () => {
   expect(fetchMock.mock.calls.length).toEqual(1);
   expect(result).toEqual(mockResult);
   expect(result.type).toBe(ClarityType.OptionalNone);
+});
+
+test('Post-conditions with amount larger than 8 bytes throw an error', () => {
+  const amount = BigInt('0xffffffffffffffff') + 1n;
+
+  const stxPc = createSTXPostCondition(
+    'SP34EBMKMRR6SXX65GRKJ1FHEXV7AGHJ2D8ASQ5M3',
+    FungibleConditionCode.Equal,
+    amount
+  );
+
+  const fungiblePc = createFungiblePostCondition(
+    'SP34EBMKMRR6SXX65GRKJ1FHEXV7AGHJ2D8ASQ5M3',
+    FungibleConditionCode.Equal,
+    amount,
+    'SP34EBMKMRR6SXX65GRKJ1FHEXV7AGHJ2D8ASQ5M3.token::frank'
+  );
+
+  expect(() => {
+    serializePostCondition(stxPc);
+  }).toThrowError('The post-condition amount may not be larger than 8 bytes');
+
+  expect(() => {
+    serializePostCondition(fungiblePc);
+  }).toThrowError('The post-condition amount may not be larger than 8 bytes');
 });

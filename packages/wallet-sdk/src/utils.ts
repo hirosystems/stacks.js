@@ -20,7 +20,7 @@ export const getProfileURLFromZoneFile = async (
   name: string,
   fetchFn: FetchFn = createFetchFn()
 ) => {
-  const url = `https://stacks-node-api.stacks.co/v1/names/${name}`;
+  const url = `https://api.hiro.so/v1/names/${name}`;
   const res = await fetchFn(url);
   if (res.ok) {
     const nameInfo: NameInfoResponse = await res.json();

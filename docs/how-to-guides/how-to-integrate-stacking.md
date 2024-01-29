@@ -157,7 +157,7 @@ const hasMinStxAmount = await client.hasMinimumStx();
 For testing purposes, you can use the faucet to obtain testnet STX tokens. Replace `<stxAddress>` below with your address:
 
 ```shell
-curl -XPOST "https://stacks-node-api.testnet.stacks.co/extended/v1/faucets/stx?address=<stxAddress>&stacking=true"
+curl -XPOST "https://api.testnet.hiro.so/extended/v1/faucets/stx?address=<stxAddress>&stacking=true"
 ```
 
 You'll have to wait a few minutes for the transaction to complete.
@@ -274,7 +274,7 @@ More details on the lifecycle of transactions can be found in the [transactions 
 Alternatively to the polling, the Stacks Blockchain API client library offers WebSockets. WebSockets can be used to subscribe to specific updates, like transaction status changes. Here is an example:
 
 ```js
-const client = await connectWebSocketClient('ws://stacks-node-api.blockstack.org/');
+const client = await connectWebSocketClient('ws://api.hiro.so/');
 
 // note: txId should be defined previously
 const sub = await client.subscribeAddressTransactions(txId, event => {
@@ -332,5 +332,5 @@ As an example, if you want to get the rewards paid to `btcAddress`, you can make
 
 ```shell
 # for mainnet, replace `testnet` with `mainnet`
-curl 'https://stacks-node-api.testnet.stacks.co/extended/v1/burnchain/rewards/<btcAddress>'
+curl 'https://api.testnet.hiro.so/extended/v1/burnchain/rewards/<btcAddress>'
 ```
