@@ -1141,12 +1141,8 @@ export class StackingClient {
     const address = poxAddressToTuple(poxAddress);
     const [contractAddress, contractName] = this.parseContractId(contract);
 
-    const functionArgs = [
-      principalCV(stacker),
-      address,
-      signerKey && bufferCV(hexToBytes(signerKey)),
-      uintCV(extendCount),
-    ].filter(Boolean) as ClarityValue[];
+    const functionArgs = [principalCV(stacker), address, uintCV(extendCount)] as ClarityValue[];
+    if (signerKey) functionArgs.push(bufferCV(hexToBytes(signerKey)));
 
     const callOptions: ContractCallOptions = {
       contractAddress,
