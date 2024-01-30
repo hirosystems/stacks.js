@@ -200,8 +200,6 @@ test('serialize/deserialize tenure change payload', () => {
   const previousTenureBlocks = 100;
   const cause = TenureChangeCause.Extended;
   const publicKeyHash = bytesToHex(randomBytes(20));
-  const signers = bytesToHex(randomBytes(21));
-  const signature = bytesToHex(randomBytes(65));
 
   const payload = createTenureChangePayload(
     tenureHash,
@@ -210,9 +208,7 @@ test('serialize/deserialize tenure change payload', () => {
     previousTenureEnd,
     previousTenureBlocks,
     cause,
-    publicKeyHash,
-    signers,
-    signature
+    publicKeyHash
   );
 
   const deserialized = serializeDeserialize(
