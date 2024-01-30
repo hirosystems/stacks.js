@@ -295,10 +295,6 @@ export interface TenureChangePayload {
   readonly cause: TenureChangeCause;
   /** The public key hash of the current tenure (hex string) */
   readonly publicKeyHash: string;
-  /** The bitmap of which Stackers signed (hex string) */
-  readonly signers: string;
-  /** The Schnorr signature from at least 70% of the Stackers (hex string) */
-  readonly signature: string;
 }
 
 export function createTenureChangePayload(
@@ -308,9 +304,7 @@ export function createTenureChangePayload(
   previousTenureEnd: string,
   previousTenureBlocks: number,
   cause: TenureChangeCause,
-  publicKeyHash: string,
-  signers: string,
-  signature: string
+  publicKeyHash: string
 ): TenureChangePayload {
   return {
     type: StacksMessageType.Payload,
@@ -322,8 +316,6 @@ export function createTenureChangePayload(
     previousTenureBlocks,
     cause,
     publicKeyHash,
-    signers,
-    signature,
   };
 }
 
@@ -380,10 +372,6 @@ export function serializePayload(payload: PayloadInput): Uint8Array {
       bytesArray.push(writeUInt32BE(new Uint8Array(4), payload.previousTenureBlocks));
       bytesArray.push(writeUInt8(new Uint8Array(1), payload.cause));
       bytesArray.push(hexToBytes(payload.publicKeyHash));
-      bytesArray.push(hexToBytes(payload.signature));
-      const signers = hexToBytes(payload.signers);
-      bytesArray.push(writeUInt32BE(new Uint8Array(4), signers.byteLength)); // signers length
-      bytesArray.push(signers);
       break;
   }
 
@@ -458,9 +446,6 @@ export function deserializePayload(bytesReader: BytesReader): Payload {
         throw new Error(`Cannot recognize TenureChangeCause: ${n}`);
       });
       const publicKeyHash = bytesToHex(bytesReader.readBytes(20));
-      const signature = bytesToHex(bytesReader.readBytes(65));
-      const signersLength = bytesReader.readUInt32BE();
-      const signers = bytesToHex(bytesReader.readBytes(signersLength));
       return createTenureChangePayload(
         tenureHash,
         previousTenureHash,
@@ -468,9 +453,7 @@ export function deserializePayload(bytesReader: BytesReader): Payload {
         previousTenureEnd,
         previousTenureBlocks,
         cause,
-        publicKeyHash,
-        signers,
-        signature
+        publicKeyHash
       );
   }
 }
