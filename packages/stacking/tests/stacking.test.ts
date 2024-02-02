@@ -1,6 +1,5 @@
 import { bigIntToBytes, bytesToHex, hexToBytes } from '@stacks/common';
 import { base58CheckDecode } from '@stacks/encryption';
-import { StacksMainnet, StacksTestnet } from '@stacks/network';
 import {
   AnchorMode,
   ClarityType,
