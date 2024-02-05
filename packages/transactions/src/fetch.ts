@@ -6,11 +6,14 @@ import {
   validateHash256,
   with0x,
 } from '@stacks/common';
-import { estimateTransactionByteLength } from './builders';
 import { ClarityValue, NoneCV, deserializeCV, serializeCV } from './clarity';
 import { NoEstimateAvailableError } from './errors';
 import { serializePayload } from './payload';
-import { StacksTransaction, deriveNetworkFromTx } from './transaction';
+import {
+  StacksTransaction,
+  deriveNetworkFromTx,
+  estimateTransactionByteLength,
+} from './transaction';
 import { cvToHex, defaultApiFromNetwork, parseReadOnlyResponse } from './utils';
 import {
   FeeEstimateResponse,

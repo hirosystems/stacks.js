@@ -5,7 +5,6 @@ import {
   createSpendingCondition,
   createSponsoredAuth,
   createStandardAuth,
-  MultiSigSpendingCondition,
 } from './authorization';
 import { ClarityValue, PrincipalCV } from './clarity';
 import {
@@ -18,9 +17,7 @@ import {
   NonFungibleConditionCode,
   PayloadType,
   PostConditionMode,
-  RECOVERABLE_ECDSA_SIG_LENGTH_BYTES,
   SingleSigHashMode,
-  StacksMessageType,
 } from './constants';
 import { ClarityAbi, validateContractCall } from './contract-abi';
 import { estimateFee, getAbi, getNonce } from './fetch';
@@ -796,42 +793,4 @@ export async function sponsorTransaction(
   signer.signSponsor(privKey);
 
   return signer.transaction;
-}
-
-/**
- * Estimates transaction byte length
- * Context:
- * 1) Multi-sig transaction byte length increases by adding signatures
- *    which causes the incorrect fee estimation because the fee value is set while creating unsigned transaction
- * 2) Single-sig transaction byte length remain same due to empty message signature which allocates the space for signature
- * @param {transaction} - StacksTransaction object to be estimated
- * @return {number} Estimated transaction byte length
- */
-export function estimateTransactionByteLength(transaction: StacksTransaction): number {
-  const hashMode = transaction.auth.spendingCondition.hashMode;
-  // List of Multi-sig transaction hash modes
-  const multiSigHashModes = [AddressHashMode.SerializeP2SH, AddressHashMode.SerializeP2WSH];
-
-  // Check if its a Multi-sig transaction
-  if (multiSigHashModes.includes(hashMode)) {
-    const multiSigSpendingCondition: MultiSigSpendingCondition = transaction.auth
-      .spendingCondition as MultiSigSpendingCondition;
-
-    // Find number of existing signatures if the transaction is signed or partially signed
-    const existingSignatures = multiSigSpendingCondition.fields.filter(
-      field => field.contents.type === StacksMessageType.MessageSignature
-    ).length; // existingSignatures will be 0 if its a unsigned transaction
-
-    // Estimate total signature bytes size required for this multi-sig transaction
-    // Formula: totalSignatureLength = (signaturesRequired - existingSignatures) * (SIG_LEN_BYTES + 1 byte of type of signature)
-    const totalSignatureLength =
-      (multiSigSpendingCondition.signaturesRequired - existingSignatures) *
-      (RECOVERABLE_ECDSA_SIG_LENGTH_BYTES + 1);
-
-    return transaction.serialize().byteLength + totalSignatureLength;
-  } else {
-    // Single-sig transaction
-    // Signature space already allocated by empty message signature
-    return transaction.serialize().byteLength;
-  }
 }
