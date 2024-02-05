@@ -5,6 +5,7 @@ import {
   getAesCbcOutputLength,
   getBase64OutputLength,
   hexToBytes,
+  HIRO_MAINNET_URL,
   utf8ToBytes,
 } from '@stacks/common';
 import {
@@ -14,7 +15,7 @@ import {
   hashSha256Sync,
   verifySignature,
 } from '@stacks/encryption';
-import { createFetchFn, StacksMainnet } from '@stacks/network';
+import { createFetchFn } from '@stacks/common';
 import { toByteArray } from 'base64-js';
 import * as crypto from 'crypto';
 import fetchMock from 'jest-fetch-mock';
@@ -469,7 +470,6 @@ test('core node preferences respected for name lookups', async () => {
     gaiaHubConfig,
   };
 
-  const defaultCoreNode = new StacksMainnet().bnsLookupUrl;
   const appSpecifiedCoreNode = 'https://app-specified-core-node.local';
   const userSpecifiedCoreNode = 'https://user-specified-core-node.local';
 
@@ -487,7 +487,7 @@ test('core node preferences respected for name lookups', async () => {
   try {
     await storage.getFile(path, options);
   } catch {}
-  expect(fetchMock.mock.calls[0][0]).toEqual(defaultCoreNode + nameLookupPath);
+  expect(fetchMock.mock.calls[0][0]).toEqual(HIRO_MAINNET_URL + nameLookupPath);
   fetchMock.resetMocks();
 
   userSession.appConfig.coreNode = appSpecifiedCoreNode;
