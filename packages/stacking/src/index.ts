@@ -336,12 +336,12 @@ export class StackingClient {
 
   public api: StacksNodeApi;
 
-  constructor(opts: { address: string; network: StacksNetwork; api: StacksNodeApi | ApiOpts }) {
+  constructor(opts: { address: string; network: StacksNetwork; api?: StacksNodeApi | ApiOpts }) {
     this.address = opts.address;
     this.network = opts.network;
     this.api = isInstance(opts.api, StacksNodeApi)
       ? opts.api
-      : new StacksNodeApi({ url: opts.api.url, fetch: opts.api.fetch, network: opts.network });
+      : new StacksNodeApi({ url: opts.api?.url, fetch: opts.api?.fetch, network: opts.network });
   }
 
   /** @deprecated alias of StacksNodeApi.getCoreInfo, kept for backwards compatibility */

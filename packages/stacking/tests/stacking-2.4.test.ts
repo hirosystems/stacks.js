@@ -1,5 +1,5 @@
 import { hexToBytes } from '@stacks/common';
-import { StacksMainnet, StacksTestnet } from '@stacks/network';
+import { STACKS_MAINNET, STACKS_TESTNET } from '@stacks/network';
 import { ContractCallPayload, deserializeTransaction, getNonce } from '@stacks/transactions';
 
 import { decodeBtcAddress, StackingClient } from '../src';
@@ -17,6 +17,7 @@ import {
   waitForTx,
 } from './apiMockingHelpers';
 import { BTC_ADDRESS_CASES } from './utils.test';
+import { StacksNodeApi } from '@stacks/api';
 
 const API_URL = 'http://localhost:3999'; // default regtest url
 
@@ -36,8 +37,7 @@ describe('2.4 activation', () => {
       '/v2/data_var/SP000000000000000000002Q6VF78/pox-2/configured?proof=0': `{"data":"0x03"}`,
     });
 
-    const network = new StacksMainnet();
-    const client = new StackingClient('', network);
+    const client = new StackingClient({ address: '', network: STACKS_MAINNET });
 
     const periodInfo = await client.getPoxOperationInfo();
     if (periodInfo.period !== PoxOperationPeriod.Period3) throw 'expect period 3';
@@ -54,8 +54,8 @@ describe('2.4 activation', () => {
       '/v2/pox': `{"contract_id":"ST000000000000000000002AMW42H.pox-3","pox_activation_threshold_ustx":600057388429055,"first_burnchain_block_height":0,"current_burnchain_block_height":180,"prepare_phase_block_length":1,"reward_phase_block_length":4,"reward_slots":8,"rejection_fraction":3333333333333333,"total_liquid_supply_ustx":60005738842905576,"current_cycle":{"id":35,"min_threshold_ustx":1875180000000000,"stacked_ustx":1875180000000000,"is_pox_active":false},"next_cycle":{"id":36,"min_threshold_ustx":1875180000000000,"min_increment_ustx":7500717355363,"stacked_ustx":1875180000000000,"prepare_phase_start_block_height":184,"blocks_until_prepare_phase":4,"reward_phase_start_block_height":185,"blocks_until_reward_phase":5,"ustx_until_pox_rejection":8484139029839119000},"min_amount_ustx":1875180000000000,"prepare_cycle_length":1,"reward_cycle_id":35,"reward_cycle_length":5,"rejection_votes_left_required":8484139029839119000,"next_reward_cycle_in":5,"contract_versions":[{"contract_id":"ST000000000000000000002AMW42H.pox","activation_burnchain_block_height":0,"first_reward_cycle_id":0},{"contract_id":"ST000000000000000000002AMW42H.pox-2","activation_burnchain_block_height":107,"first_reward_cycle_id":22},{"contract_id":"ST000000000000000000002AMW42H.pox-3","activation_burnchain_block_height":111,"first_reward_cycle_id":23}]}`,
     });
 
-    const network = new StacksTestnet({ url: API_URL });
-    const client = new StackingClient('', network);
+    const api = new StacksNodeApi({ url: API_URL });
+    const client = new StackingClient({ address: '', network: STACKS_TESTNET, api });
 
     const poxInfo = await client.getPoxInfo();
     expect(poxInfo.contract_id).toBe('ST000000000000000000002AMW42H.pox-3');
@@ -78,8 +78,8 @@ test('in period 3, pox-3 stacking works', async () => {
   const address = 'STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6';
   const poxAddress = '1Xik14zRm29UsyS6DjhYg4iZeZqsDa8D3';
 
-  const network = new StacksTestnet({ url: API_URL });
-  const client = new StackingClient(address, network);
+  const api = new StacksNodeApi({ url: API_URL });
+  const client = new StackingClient({ address, network: STACKS_TESTNET, api });
 
   setApiMocks({
     '/v2/pox': `{"contract_id":"ST000000000000000000002AMW42H.pox-3","pox_activation_threshold_ustx":600057529871055,"first_burnchain_block_height":0,"current_burnchain_block_height":217,"prepare_phase_block_length":1,"reward_phase_block_length":4,"reward_slots":8,"rejection_fraction":3333333333333333,"total_liquid_supply_ustx":60005752987105576,"current_cycle":{"id":43,"min_threshold_ustx":1875180000000000,"stacked_ustx":0,"is_pox_active":false},"next_cycle":{"id":44,"min_threshold_ustx":1875180000000000,"min_increment_ustx":7500719123388,"stacked_ustx":0,"prepare_phase_start_block_height":219,"blocks_until_prepare_phase":2,"reward_phase_start_block_height":220,"blocks_until_reward_phase":3,"ustx_until_pox_rejection":1485692420695552500},"min_amount_ustx":1875180000000000,"prepare_cycle_length":1,"reward_cycle_id":43,"reward_cycle_length":5,"rejection_votes_left_required":1485692420695552500,"next_reward_cycle_in":3,"contract_versions":[{"contract_id":"ST000000000000000000002AMW42H.pox","activation_burnchain_block_height":0,"first_reward_cycle_id":0},{"contract_id":"ST000000000000000000002AMW42H.pox-2","activation_burnchain_block_height":107,"first_reward_cycle_id":22},{"contract_id":"ST000000000000000000002AMW42H.pox-3","activation_burnchain_block_height":111,"first_reward_cycle_id":23}]}`,
@@ -111,8 +111,8 @@ test('in period 3, pox-3 stacking works', async () => {
 
   const lastBroadcast = getFetchMockBroadcast();
   expect(
-    (deserializeTransaction(lastBroadcast.body as Uint8Array).payload as ContractCallPayload)
-      .contractName.content
+    (deserializeTransaction(lastBroadcast.tx as string).payload as ContractCallPayload).contractName
+      .content
   ).toBe('pox-3');
 });
 
@@ -123,16 +123,15 @@ describe('stacking eligibility', () => {
     const address = 'STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6';
     const poxAddress = '1Xik14zRm29UsyS6DjhYg4iZeZqsDa8D3';
 
-    const network = new StacksTestnet({ url: API_URL });
-
-    const client = new StackingClient(address, network);
+    const api = new StacksNodeApi({ url: API_URL });
+    const client = new StackingClient({ address, network: STACKS_TESTNET, api });
 
     const cycles = 1;
     const stackingEligibility = await client.canStack({ poxAddress, cycles });
 
     expect(fetchMock.mock.calls.length).toEqual(3);
-    expect(fetchMock.mock.calls[0][0]).toEqual(network.getAccountApiUrl(address));
-    expect(fetchMock.mock.calls[1][0]).toEqual(network.getPoxInfoUrl());
+    expect(fetchMock.mock.calls[0][0]).toEqual(`${API_URL}/v2/accounts/${address}?proof=0`);
+    expect(fetchMock.mock.calls[1][0]).toEqual(`${API_URL}/v2/pox`);
     expect(fetchMock.mock.calls[2][0]).toContain('/pox-3/can-stack-stx');
     expect(stackingEligibility.eligible).toBe(true);
   });
@@ -143,15 +142,15 @@ describe('stacking eligibility', () => {
     const address = 'ST162GBCTD9ESBF09XC2T63NCX6ZKS42ZPWGXZ6VH';
     const poxAddress = 'mnTdnFyjxRomWaSLp4fNGSa9Gyg9XJo4j4';
 
-    const network = new StacksTestnet({ url: API_URL });
-    const client = new StackingClient(address, network);
+    const api = new StacksNodeApi({ url: API_URL });
+    const client = new StackingClient({ address, network: STACKS_TESTNET, api });
 
     const cycles = 1;
     const stackingEligibility = await client.canStack({ poxAddress, cycles });
 
     expect(fetchMock.mock.calls.length).toEqual(3);
-    expect(fetchMock.mock.calls[0][0]).toEqual(network.getAccountApiUrl(address));
-    expect(fetchMock.mock.calls[1][0]).toEqual(network.getPoxInfoUrl());
+    expect(fetchMock.mock.calls[0][0]).toEqual(`${API_URL}/v2/accounts/${address}?proof=0`);
+    expect(fetchMock.mock.calls[1][0]).toEqual(`${API_URL}/v2/pox`);
     expect(fetchMock.mock.calls[2][0]).toContain('/pox-3/can-stack-stx');
     expect(stackingEligibility.eligible).toBe(false);
     expect(stackingEligibility.reason).toBe('ERR_STACKING_THRESHOLD_NOT_MET');
@@ -164,8 +163,8 @@ describe('normal stacking', () => {
     const address = 'STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6';
     const poxAddress = '1Xik14zRm29UsyS6DjhYg4iZeZqsDa8D3';
 
-    const network = new StacksTestnet({ url: API_URL });
-    const client = new StackingClient(address, network);
+    const api = new StacksNodeApi({ url: API_URL });
+    const client = new StackingClient({ address, network: STACKS_TESTNET, api });
 
     setApiMocks({
       ...MOCK_POX_3_REGTEST,
@@ -201,8 +200,8 @@ describe('normal stacking', () => {
     const address = 'STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6';
     const poxAddress = '1Xik14zRm29UsyS6DjhYg4iZeZqsDa8D3';
 
-    const network = new StacksTestnet({ url: API_URL });
-    const client = new StackingClient(address, network);
+    const api = new StacksNodeApi({ url: API_URL });
+    const client = new StackingClient({ address, network: STACKS_TESTNET, api });
 
     setApiMocks({
       ...MOCK_POX_3_REGTEST,
@@ -256,8 +255,8 @@ describe('normal stacking', () => {
     const address = 'STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6';
     const poxAddress = '1Xik14zRm29UsyS6DjhYg4iZeZqsDa8D3';
 
-    const network = new StacksTestnet({ url: API_URL });
-    const client = new StackingClient(address, network);
+    const api = new StacksNodeApi({ url: API_URL });
+    const client = new StackingClient({ address, network: STACKS_TESTNET, api });
 
     setApiMocks({
       ...MOCK_POX_3_REGTEST,
@@ -310,8 +309,8 @@ describe('delegated stacking', () => {
 
     const delegateTo = 'ST2MCYPWTFMD2MGR5YY695EJG0G1R4J2BTJPRGM7H';
 
-    const network = new StacksTestnet({ url: API_URL });
-    const client = new StackingClient(address, network);
+    const api = new StacksNodeApi({ url: API_URL });
+    const client = new StackingClient({ address, network: STACKS_TESTNET, api });
 
     setApiMocks({
       ...MOCK_POX_3_REGTEST,
@@ -352,8 +351,8 @@ describe('delegated stacking', () => {
 
     const delegateTo = 'ST2MCYPWTFMD2MGR5YY695EJG0G1R4J2BTJPRGM7H';
 
-    const network = new StacksTestnet({ url: API_URL });
-    const client = new StackingClient(address, network);
+    const api = new StacksNodeApi({ url: API_URL });
+    const client = new StackingClient({ address, network: STACKS_TESTNET, api });
 
     setApiMocks({
       ...MOCK_POX_3_REGTEST,
@@ -393,9 +392,12 @@ describe('delegated stacking', () => {
     const delegatorAddress = 'ST11NJTTKGVT6D1HY4NJRVQWMQM7TVAR091EJ8P2Y';
     const delegatorPoxAddress = '1797Pp1o8A7a8X8Qs7ejXtYyw8gbecFK2b';
 
-    const network = new StacksTestnet({ url: API_URL });
-    const client = new StackingClient(address, network);
-    const delegatorClient = new StackingClient(delegatorAddress, network);
+    const api = new StacksNodeApi({ url: API_URL });
+    const client = new StackingClient({ address, network: STACKS_TESTNET, api });
+    const delegatorClient = new StackingClient({
+      address: delegatorAddress,
+      network: STACKS_TESTNET,
+    });
 
     setApiMocks({
       ...MOCK_POX_3_REGTEST,
@@ -456,9 +458,12 @@ describe('delegated stacking', () => {
     const delegatorAddress = 'ST11NJTTKGVT6D1HY4NJRVQWMQM7TVAR091EJ8P2Y';
     const delegatorPoxAddress = '1797Pp1o8A7a8X8Qs7ejXtYyw8gbecFK2b';
 
-    const network = new StacksTestnet({ url: API_URL });
-    const client = new StackingClient(address, network);
-    const delegatorClient = new StackingClient(delegatorAddress, network);
+    const api = new StacksNodeApi({ url: API_URL });
+    const client = new StackingClient({ address, network: STACKS_TESTNET, api });
+    const delegatorClient = new StackingClient({
+      address: delegatorAddress,
+      network: STACKS_TESTNET,
+    });
 
     setApiMocks({
       ...MOCK_POX_3_REGTEST,
@@ -541,9 +546,12 @@ describe('delegated stacking', () => {
     const delegatorAddress = 'ST11NJTTKGVT6D1HY4NJRVQWMQM7TVAR091EJ8P2Y';
     const delegatorPoxAddress = '1797Pp1o8A7a8X8Qs7ejXtYyw8gbecFK2b';
 
-    const network = new StacksTestnet({ url: API_URL });
-    const client = new StackingClient(address, network);
-    const delegatorClient = new StackingClient(delegatorAddress, network);
+    const api = new StacksNodeApi({ url: API_URL });
+    const client = new StackingClient({ address, network: STACKS_TESTNET, api });
+    const delegatorClient = new StackingClient({
+      address: delegatorAddress,
+      network: STACKS_TESTNET,
+    });
 
     setApiMocks({
       ...MOCK_POX_3_REGTEST,
@@ -625,20 +633,20 @@ describe('delegated stacking', () => {
     // * The pool commits a total stacking amount (covering all of its stackers)
     //   * This is required for a pools pox-address to be "commited" into the reward-set
 
-    const network = new StacksTestnet({ url: API_URL });
+    const api = new StacksNodeApi({ url: API_URL });
 
     const stackerAKey = 'cb3df38053d132895220b9ce471f6b676db5b9bf0b4adefb55f2118ece2478df01';
     const stackerAAddress = 'STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6';
-    const clientA = new StackingClient(stackerAAddress, network);
+    const clientA = new StackingClient({ address: stackerAAddress, network: STACKS_TESTNET, api });
 
     const stackerBKey = 'c71700b07d520a8c9731e4d0f095aa6efb91e16e25fb27ce2b72e7b698f8127a01';
     const stackerBAddress = 'ST1HB1T8WRNBYB0Y3T7WXZS38NKKPTBR3EG9EPJKR';
-    const clientB = new StackingClient(stackerBAddress, network);
+    const clientB = new StackingClient({ address: stackerBAddress, network: STACKS_TESTNET, api });
 
     const poolPrivateKey = '21d43d2ae0da1d9d04cfcaac7d397a33733881081f0b2cd038062cf0ccbb752601';
     const poolAddress = 'ST11NJTTKGVT6D1HY4NJRVQWMQM7TVAR091EJ8P2Y';
     const poolPoxAddress = '1797Pp1o8A7a8X8Qs7ejXtYyw8gbecFK2b';
-    const clientPool = new StackingClient(poolAddress, network);
+    const clientPool = new StackingClient({ address: poolAddress, network: STACKS_TESTNET, api });
 
     setApiMocks({
       ...MOCK_POX_3_REGTEST,
@@ -690,7 +698,7 @@ describe('delegated stacking', () => {
     poxInfo = await clientPool.getPoxInfo();
 
     // Manual nonce setting is required for multiple transactions in the same block
-    let noncePool = await getNonce(poolAddress, network);
+    let noncePool = await getNonce({ address: poolAddress, api });
 
     // Pool stacks for stacker A
     const stackAPool = await clientPool.delegateStackStx({
@@ -778,20 +786,20 @@ describe('delegated stacking', () => {
     // * The pool realizes the mistake and increases the amount to all of its stackers' funds
     //   * This will only work if the reward cycle anchor block hasn't been reached yet!
 
-    const network = new StacksTestnet({ url: API_URL });
+    const api = new StacksNodeApi({ url: API_URL });
 
     const stackerAKey = 'cb3df38053d132895220b9ce471f6b676db5b9bf0b4adefb55f2118ece2478df01';
     const stackerAAddress = 'STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6';
-    const clientA = new StackingClient(stackerAAddress, network);
+    const clientA = new StackingClient({ address: stackerAAddress, network: STACKS_TESTNET, api });
 
     const stackerBKey = 'c71700b07d520a8c9731e4d0f095aa6efb91e16e25fb27ce2b72e7b698f8127a01';
     const stackerBAddress = 'ST1HB1T8WRNBYB0Y3T7WXZS38NKKPTBR3EG9EPJKR';
-    const clientB = new StackingClient(stackerBAddress, network);
+    const clientB = new StackingClient({ address: stackerBAddress, network: STACKS_TESTNET, api });
 
     const poolPrivateKey = '21d43d2ae0da1d9d04cfcaac7d397a33733881081f0b2cd038062cf0ccbb752601';
     const poolAddress = 'ST11NJTTKGVT6D1HY4NJRVQWMQM7TVAR091EJ8P2Y';
     const poolPoxAddress = '1797Pp1o8A7a8X8Qs7ejXtYyw8gbecFK2b';
-    const clientPool = new StackingClient(poolAddress, network);
+    const clientPool = new StackingClient({ address: poolAddress, network: STACKS_TESTNET, api });
 
     setApiMocks({
       ...MOCK_POX_3_REGTEST,
@@ -840,7 +848,7 @@ describe('delegated stacking', () => {
     poxInfo = await clientPool.getPoxInfo();
 
     // Manual nonce setting is required for multiple transactions in the same block
-    let noncePool = await getNonce(poolAddress, network);
+    let noncePool = await getNonce({ address: poolAddress, api });
 
     // Pool stacks for stacker A (stacks all 3/4)
     const stackAPool = await clientPool.delegateStackStx({
@@ -952,8 +960,8 @@ describe('btc addresses', () => {
       const privateKey = 'cb3df38053d132895220b9ce471f6b676db5b9bf0b4adefb55f2118ece2478df01';
       const address = 'STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6';
 
-      const network = new StacksTestnet({ url: API_URL });
-      const client = new StackingClient(address, network);
+      const api = new StacksNodeApi({ url: API_URL });
+      const client = new StackingClient({ address, network: STACKS_TESTNET, api });
 
       setApiMocks({
         ...MOCK_POX_3_REGTEST,
