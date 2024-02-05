@@ -33,9 +33,6 @@ import {
 } from './types';
 
 export class StacksNodeApi {
-  // TODO
-  bnsLookupUrl = 'https://stacks-node-api.mainnet.stacks.co';
-
   public url: string;
   public fetch: FetchFn;
 
