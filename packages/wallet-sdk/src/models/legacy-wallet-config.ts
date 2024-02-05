@@ -1,5 +1,5 @@
 import { decryptContent } from '@stacks/encryption';
-import { createFetchFn, FetchFn } from '@stacks/network';
+import { createFetchFn, FetchFn } from '@stacks/common';
 import { GaiaHubConfig } from '@stacks/storage';
 import { deriveLegacyConfigPrivateKey } from '../derive';
 import { Wallet, getRootNode } from './common';
@@ -25,6 +25,7 @@ export interface LegacyWalletConfig {
   hideWarningForReusingIdentity?: boolean;
 }
 
+/** @deprecated legacy */
 export async function fetchLegacyWalletConfig({
   wallet,
   gaiaHubConfig,

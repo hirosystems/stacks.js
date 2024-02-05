@@ -48,16 +48,16 @@ export function resolveZoneFileToPerson(
 
   if (tokenFileUrl) {
     fetchFn(tokenFileUrl)
-      .then(response => response.text())
-      .then(responseText => JSON.parse(responseText))
-      .then(responseJson => {
+      .then((response: any) => response.text())
+      .then((responseText: any) => JSON.parse(responseText))
+      .then((responseJson: any) => {
         const tokenRecords = responseJson;
         const token = tokenRecords[0].token;
         const profile = extractProfile(token, publicKeyOrAddress);
 
         callback(profile);
       })
-      .catch(error => {
+      .catch((error: any) => {
         console.warn(error);
       });
   } else {

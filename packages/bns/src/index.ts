@@ -1,4 +1,4 @@
-import { IntegerType, utf8ToBytes } from '@stacks/common';
+import { ApiParam, IntegerType, utf8ToBytes } from '@stacks/common';
 import {
   AnchorMode,
   bufferCV,
@@ -32,11 +32,9 @@ import {
   bufferCVFromString,
 } from '@stacks/transactions';
 
-import { StacksNetwork } from '@stacks/network';
+import { ChainId, StacksNetwork } from '@stacks/network';
 
 import { decodeFQN, getZonefileHash } from './utils';
-
-import { ChainID } from '@stacks/common';
 
 export const BNS_CONTRACT_NAME = 'bns';
 
@@ -46,13 +44,13 @@ export const enum BnsContractAddress {
 }
 
 function getBnsContractAddress(network: StacksNetwork) {
-  if (network.chainId === ChainID.Mainnet) return BnsContractAddress.mainnet;
-  else if (network.chainId == ChainID.Testnet) return BnsContractAddress.testnet;
+  if (network.chainId === ChainId.Mainnet) return BnsContractAddress.mainnet;
+  else if (network.chainId == ChainId.Testnet) return BnsContractAddress.testnet;
   else throw new Error(`Unexpected ChainID: ${network.chainId}`);
 }
 
 function getAddressVersion(network: StacksNetwork) {
-  return network.chainId === ChainID.Mainnet
+  return network.chainId === ChainId.Mainnet
     ? AddressVersion.MainnetSingleSig
     : AddressVersion.TestnetSingleSig;
 }
@@ -111,14 +109,16 @@ export interface BnsReadOnlyOptions {
   network: StacksNetwork;
 }
 
-async function callReadOnlyBnsFunction(options: BnsReadOnlyOptions): Promise<ClarityValue> {
+async function callReadOnlyBnsFunction(
+  options: BnsReadOnlyOptions & ApiParam
+): Promise<ClarityValue> {
   return callReadOnlyFunction({
     contractAddress: getBnsContractAddress(options.network),
     contractName: BNS_CONTRACT_NAME,
     functionName: options.functionName,
     senderAddress: options.senderAddress,
     functionArgs: options.functionArgs,
-    network: options.network,
+    api: options.api,
   });
 }
 

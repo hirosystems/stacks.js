@@ -54,11 +54,13 @@ export function networkFrom(network: StacksNetworkName | StacksNetwork) {
   return network;
 }
 
-export function deriveDefaultUrl(network: StacksNetwork | StacksNetworkName) {
+export function deriveDefaultUrl(network: StacksNetwork | StacksNetworkName | undefined) {
+  if (!network) return HIRO_MAINNET_URL; // default to mainnet if no network is given
+
   network = networkFrom(network);
 
   return !network || network.transactionVersion === TransactionVersion.Mainnet
-    ? HIRO_MAINNET_URL // default to mainnet if no network is given or txVersion is mainnet
+    ? HIRO_MAINNET_URL // default to mainnet if txVersion is mainnet
     : network.magicBytes === 'id'
     ? DEVNET_URL // default to devnet if magicBytes are devnet
     : HIRO_TESTNET_URL;
