@@ -860,6 +860,7 @@ async function contractFunctionCall(network: CLINetworkAdapter, args: string[]):
         network: api.network,
         postConditionMode: PostConditionMode.Allow,
         anchorMode: AnchorMode.Any,
+        api,
       };
 
       return makeContractCall(options);

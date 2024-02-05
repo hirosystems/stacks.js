@@ -7,6 +7,7 @@ import {
   ClarityAbi,
   createStacksPrivateKey,
   publicKeyFromSignatureVrs,
+  randomBytes,
   signWithKey,
   verifySignature,
 } from '@stacks/transactions';
@@ -111,9 +112,9 @@ describe('Contract function call', () => {
     // @ts-ignore
     inquirer.prompt = jest.fn().mockResolvedValue(contractInputArg);
 
-    fetchMock.once(JSON.stringify(TEST_ABI)).once('success');
-
     const txid = '0x6c764e276b500babdac6cec159667f4b68938d31eee82419473a418222af7d5d';
+    fetchMock.once(JSON.stringify(TEST_ABI)).once(txid);
+
     const result = await contractFunctionCall(testnetNetwork, args);
 
     expect(result.txid).toEqual(txid);
@@ -132,9 +133,9 @@ describe('Contract function call', () => {
     // @ts-ignore
     inquirer.prompt = jest.fn().mockResolvedValue(contractInputArg);
 
-    fetchMock.once(JSON.stringify(TEST_ABI)).once('success');
-
     const txid = '0x97f41dfa44a5833acd9ca30ffe31d7137623c0e31a5c6467daeed8e61a03f51c';
+    fetchMock.once(JSON.stringify(TEST_ABI)).once(txid);
+
     const result = await contractFunctionCall(testnetNetwork, args);
 
     expect(result.txid).toEqual(txid);
@@ -153,9 +154,9 @@ describe('Contract function call', () => {
     // @ts-ignore
     inquirer.prompt = jest.fn().mockResolvedValue(contractInputArg);
 
-    fetchMock.once(JSON.stringify(TEST_ABI)).once('success');
-
     const txid = '0x5fc468f21345c5ecaf1c007fce9630d9a79ec1945ed8652cc3c42fb542e35fe2';
+    fetchMock.once(JSON.stringify(TEST_ABI)).once(txid);
+
     const result = await contractFunctionCall(testnetNetwork, args);
 
     expect(result.txid).toEqual(txid);
@@ -178,9 +179,9 @@ describe('Contract function call', () => {
     // @ts-ignore
     inquirer.prompt = jest.fn().mockResolvedValue(contractInputArg);
 
-    fetchMock.once(JSON.stringify(TEST_ABI)).once('success');
-
     const txid = '0x94b1cfab79555b8c6725f19e4fcd6268934d905578a3e8ef7a1e542b931d3676';
+    fetchMock.once(JSON.stringify(TEST_ABI)).once(txid);
+
     const result = await contractFunctionCall(testnetNetwork, args);
 
     expect(result.txid).toEqual(txid);
@@ -201,9 +202,9 @@ describe('Contract function call', () => {
     // @ts-ignore
     inquirer.prompt = jest.fn().mockResolvedValue(contractInputArg);
 
-    fetchMock.once(JSON.stringify(TEST_ABI)).once('success');
-
     const txid = '0x6b6cd5bfb44c46a68090f0c5f659e9cc02518eafab67b0b740e1e77a55bbf284';
+    fetchMock.once(JSON.stringify(TEST_ABI)).once(txid);
+
     const result = await contractFunctionCall(testnetNetwork, args);
 
     expect(result.txid).toEqual(txid);
@@ -282,14 +283,15 @@ describe('BNS', () => {
     const args = [fullyQualifiedName, ownerKey, salt, zonefile];
 
     const mockedResponse = JSON.stringify(TEST_FEE_ESTIMATE);
+    const randomTxid = bytesToHex(randomBytes());
 
     fetchMock.mockOnce(mockedResponse);
     fetchMock.mockOnce(JSON.stringify({ nonce: 1000 }));
-    fetchMock.mockOnce(JSON.stringify('success'));
+    fetchMock.mockOnce(JSON.stringify(randomTxid));
 
     const txResult = await register(testnetNetwork, args);
 
-    expect(txResult.txid).toEqual('0xsuccess');
+    expect(txResult.txid).toEqual(`0x${randomTxid}`);
   });
 
   test('buildPreorderNameTx', async () => {
@@ -301,14 +303,15 @@ describe('BNS', () => {
     const args = [fullyQualifiedName, privateKey, salt, stxToBurn];
 
     const mockedResponse = JSON.stringify(TEST_FEE_ESTIMATE);
+    const randomTxid = bytesToHex(randomBytes());
 
     fetchMock.mockOnce(mockedResponse);
     fetchMock.mockOnce(JSON.stringify({ nonce: 1000 }));
-    fetchMock.mockOnce(JSON.stringify('success'));
+    fetchMock.mockOnce(JSON.stringify(randomTxid));
 
     const txResult = await preorder(testnetNetwork, args);
 
-    expect(txResult.txid).toEqual('0xsuccess');
+    expect(txResult.txid).toEqual(`0x${randomTxid}`);
   });
 });
 
@@ -323,7 +326,7 @@ describe('Subdomain Migration', () => {
     string,
     string,
     { txid: string; error: string | null; status: number } | string,
-    boolean
+    boolean,
   ][] = [
     [
       'sound idle panel often situate develop unit text design antenna vendor screen opinion balcony share trigger accuse scatter visa uniform brass update opinion media',

@@ -196,7 +196,7 @@ export class StacksNodeApi {
     return this.fetch(url)
       .then(res => res.json())
       .then(json => ({
-        value: Cl.deserialize(json.value),
+        value: Cl.deserialize(json.data),
         raw: json.data as string,
       }));
   }
