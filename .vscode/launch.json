@@ -4,6 +4,17 @@
     {
       "type": "node",
       "request": "launch",
+      "name": "Jest: api",
+      "cwd": "${workspaceFolder}/packages/api",
+      "program": "./node_modules/.bin/jest",
+      "args": [
+        "--runInBand"
+      ],
+      "console": "integratedTerminal"
+    },
+    {
+      "type": "node",
+      "request": "launch",
       "name": "Jest: auth",
       "cwd": "${workspaceFolder}/packages/auth",
       "program": "./node_modules/.bin/jest",
