@@ -21,7 +21,7 @@
   },
   "dependencies": {
     "@scure/base": "1.1.1",
-    "@stacks/api": "^6.11.3",
+    "@stacks/api": "file:../api",
     "@stacks/common": "^6.10.0",
     "@stacks/encryption": "^6.11.3",
     "@stacks/network": "^6.11.3",
