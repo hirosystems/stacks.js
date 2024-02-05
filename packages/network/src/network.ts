@@ -1,5 +1,5 @@
 import { TransactionVersion, ChainID } from '@stacks/common';
-import { createFetchFn, FetchFn } from '../../common/src/fetch';
+import { createFetchFn, FetchFn } from '@stacks/common';
 
 export const HIRO_MAINNET_DEFAULT = 'https://api.mainnet.hiro.so';
 export const HIRO_TESTNET_DEFAULT = 'https://api.testnet.hiro.so';
