@@ -1,5 +1,4 @@
-// @ts-ignore: Could not find a declaration file for module
-import { createFetchFn, FetchFn } from '@stacks/network';
+import { createFetchFn, FetchFn } from '@stacks/common';
 import { parseZoneFile } from 'zone-file';
 
 import { getTokenFileUrl, Person } from '../profile';

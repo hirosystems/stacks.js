@@ -261,7 +261,7 @@ export async function getAbi({
     );
   }
 
-  return (await response.json()) as ClarityAbi;
+  return JSON.parse(await response.text()) as ClarityAbi;
 }
 
 /**
