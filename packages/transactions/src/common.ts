@@ -3,11 +3,11 @@ import {
   AddressVersion,
   RECOVERABLE_ECDSA_SIG_LENGTH_BYTES,
   StacksMessageType,
-  TransactionVersion,
 } from './constants';
 
 import { c32address } from 'c32check';
 import { hexToBytes } from '@stacks/common';
+import { TransactionVersion } from '@stacks/network';
 
 export interface Address {
   readonly type: StacksMessageType.Address;
