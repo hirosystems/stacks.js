@@ -5,6 +5,7 @@ import { connectToGaiaHubWithConfig, getHubInfo } from '../utils';
 import { Wallet, getRootNode } from './common';
 import { fetchLegacyWalletConfig } from './legacy-wallet-config';
 import { fetchWalletConfig, updateWalletConfig, WalletConfig } from './wallet-config';
+import { ApiParam, defaultApiLike } from '@stacks/common';
 
 export interface LockedWallet {
   encryptedSecretKey: string;
@@ -21,12 +22,15 @@ export async function restoreWalletAccounts({
   wallet,
   gaiaHubUrl,
   network,
+  api: apiOpt,
 }: {
   wallet: Wallet;
   gaiaHubUrl: string;
   network: StacksNetwork;
-}): Promise<Wallet> {
-  const hubInfo = await getHubInfo(gaiaHubUrl, network.fetchFn);
+} & ApiParam): Promise<Wallet> {
+  const api = defaultApiLike(apiOpt);
+
+  const hubInfo = await getHubInfo(gaiaHubUrl, api.fetch);
   const rootNode = getRootNode(wallet);
   const legacyGaiaConfig = connectToGaiaHubWithConfig({
     hubInfo,
@@ -40,8 +44,8 @@ export async function restoreWalletAccounts({
   });
 
   const [walletConfig, legacyWalletConfig] = await Promise.all([
-    fetchWalletConfig({ wallet, gaiaHubConfig: currentGaiaConfig, fetchFn: network.fetchFn }),
-    fetchLegacyWalletConfig({ wallet, gaiaHubConfig: legacyGaiaConfig, fetchFn: network.fetchFn }),
+    fetchWalletConfig({ wallet, gaiaHubConfig: currentGaiaConfig, fetchFn: api.fetch }),
+    fetchLegacyWalletConfig({ wallet, gaiaHubConfig: legacyGaiaConfig, fetchFn: api.fetch }),
   ]);
   // Restore from existing config
   if (

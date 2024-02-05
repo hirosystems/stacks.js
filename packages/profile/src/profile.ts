@@ -1,17 +1,17 @@
-import { signProfileToken, extractProfile } from './profileTokens';
+import { extractProfile, signProfileToken } from './profileTokens';
 
 import { getPersonFromLegacyFormat } from './profileSchemas';
 import {
-  getName,
-  getFamilyName,
-  getGivenName,
-  getAvatarUrl,
-  getDescription,
-  getVerifiedAccounts,
   getAddress,
+  getAvatarUrl,
   getBirthDate,
   getConnections,
+  getDescription,
+  getFamilyName,
+  getGivenName,
+  getName,
   getOrganizations,
+  getVerifiedAccounts,
 } from './profileSchemas/personUtils';
 
 // TODO: bring into this monorepo/convert to ts
@@ -22,8 +22,7 @@ import { makeZoneFile, parseZoneFile } from 'zone-file';
 // @ts-ignore
 import * as inspector from 'schema-inspector';
 
-import { Logger } from '@stacks/common';
-import { createFetchFn, FetchFn } from '@stacks/network';
+import { ApiParam, Logger, defaultApiLike } from '@stacks/common';
 import { PublicPersonProfile } from './types';
 
 const schemaDefinition: { [key: string]: any } = {
@@ -338,14 +337,17 @@ export function getTokenFileUrl(zoneFileJson: any): string | null {
  * @ignore
  */
 export function resolveZoneFileToProfile(
-  zoneFile: any,
-  publicKeyOrAddress: string,
-  fetchFn: FetchFn = createFetchFn()
+  opts: {
+    zoneFile: any;
+    publicKeyOrAddress: string;
+  } & ApiParam
 ): Promise<Record<string, any>> {
+  const api = defaultApiLike(opts.api);
+
   return new Promise((resolve, reject) => {
     let zoneFileJson = null;
     try {
-      zoneFileJson = parseZoneFile(zoneFile);
+      zoneFileJson = parseZoneFile(opts.zoneFile);
       if (!zoneFileJson.hasOwnProperty('$origin')) {
         zoneFileJson = null;
       }
@@ -358,19 +360,20 @@ export function resolveZoneFileToProfile(
       tokenFileUrl = getTokenFileUrl(zoneFileJson);
     } else {
       try {
-        return resolve(Person.fromLegacyFormat(JSON.parse(zoneFile)).profile());
+        return resolve(Person.fromLegacyFormat(JSON.parse(opts.zoneFile)).profile());
       } catch (error) {
         return reject(error);
       }
     }
 
     if (tokenFileUrl) {
-      fetchFn(tokenFileUrl)
+      api
+        .fetch(tokenFileUrl)
         .then(response => response.text())
         .then(responseText => JSON.parse(responseText))
         .then(responseJson => {
           const tokenRecords = responseJson;
-          const profile = extractProfile(tokenRecords[0].token, publicKeyOrAddress);
+          const profile = extractProfile(tokenRecords[0].token, opts.publicKeyOrAddress);
           resolve(profile);
         })
         .catch(error => {
