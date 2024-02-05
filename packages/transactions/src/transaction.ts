@@ -8,16 +8,13 @@ import {
 } from '@stacks/common';
 import {
   AnchorMode,
-  anchorModeFromNameOrValue,
+  anchorModeFrom,
   AnchorModeName,
   AuthType,
-  ChainID,
-  DEFAULT_CHAIN_ID,
   PayloadType,
   PostConditionMode,
   PubKeyEncoding,
   StacksMessageType,
-  TransactionVersion,
 } from './constants';
 
 import {
@@ -47,10 +44,18 @@ import { isCompressed, StacksPrivateKey, StacksPublicKey } from './keys';
 import { BytesReader } from './bytesReader';
 
 import { SerializationError, SigningError } from './errors';
+import {
+  ChainId,
+  DEFAULT_CHAIN_ID,
+  STACKS_MAINNET,
+  STACKS_TESTNET,
+  TransactionVersion,
+  whenTransactionVersion,
+} from '@stacks/network';
 
 export class StacksTransaction {
   version: TransactionVersion;
-  chainId: ChainID;
+  chainId: ChainId;
   auth: Authorization;
   anchorMode: AnchorMode;
   payload: Payload;
@@ -64,7 +69,7 @@ export class StacksTransaction {
     postConditions?: LengthPrefixedList,
     postConditionMode?: PostConditionMode,
     anchorMode?: AnchorModeName | AnchorMode,
-    chainId?: ChainID
+    chainId?: ChainId
   ) {
     this.version = version;
     this.auth = auth;
@@ -81,7 +86,7 @@ export class StacksTransaction {
     this.postConditions = postConditions ?? createLPList([]);
 
     if (anchorMode) {
-      this.anchorMode = anchorModeFromNameOrValue(anchorMode);
+      this.anchorMode = anchorModeFrom(anchorMode);
     } else {
       switch (payload.payloadType) {
         case PayloadType.Coinbase:
@@ -299,4 +304,12 @@ export function deserializeTransaction(tx: string | Uint8Array | BytesReader) {
     anchorMode,
     chainId
   );
+}
+
+/** @ignore */
+export function deriveNetworkFromTx(transaction: StacksTransaction) {
+  return whenTransactionVersion(transaction.version)({
+    [TransactionVersion.Mainnet]: STACKS_MAINNET,
+    [TransactionVersion.Testnet]: STACKS_TESTNET,
+  });
 }
