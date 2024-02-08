@@ -1,5 +1,5 @@
 import { bech32, bech32m } from '@scure/base';
-import { bigIntToBytes } from '@stacks/common';
+import { ChainID, bigIntToBytes } from '@stacks/common';
 import { base58CheckDecode, base58CheckEncode } from '@stacks/encryption';
 import {
   bufferCV,
@@ -7,8 +7,12 @@ import {
   ClarityType,
   ClarityValue,
   OptionalCV,
+  signStructuredData,
+  StacksPrivateKey,
+  stringAsciiCV,
   tupleCV,
   TupleCV,
+  uintCV,
 } from '@stacks/transactions';
 import { PoxOperationInfo } from '.';
 import {
@@ -368,4 +372,32 @@ export function ensureSignerKeyReadiness({
     // .pox-4 or later
     if (!signerKey) throw new Error('PoX-4 or later requires a signer-key (buff 33) to stack');
   }
+}
+
+export enum Pox4SignatureTopics {
+  StackStx = 'stack-stx',
+  AggregateCommit = 'agg-commit',
+  StackExtend = 'stack-extend',
+}
+
+export function signPox4SignatureHash(
+  topic: Pox4SignatureTopics,
+  rewardCycle: number,
+  poxAddress: string,
+  period: number,
+  chainId: ChainID,
+  privateKey: StacksPrivateKey
+) {
+  const domain = tupleCV({
+    name: stringAsciiCV('pox-4-signer'),
+    version: stringAsciiCV('1.0.0'),
+    'chain-id': uintCV(chainId),
+  });
+  const message = tupleCV({
+    poxAddress: poxAddressToTuple(poxAddress),
+    rewardCycle: uintCV(rewardCycle),
+    period: uintCV(period),
+    topic: stringAsciiCV(topic),
+  });
+  return signStructuredData({ message, domain, privateKey });
 }
