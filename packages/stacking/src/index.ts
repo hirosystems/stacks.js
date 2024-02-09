@@ -1,4 +1,3 @@
-// @ts-ignore
 import { IntegerType, bytesToHex, hexToBytes, intToBigInt } from '@stacks/common';
 import { StacksNetwork } from '@stacks/network';
 import {
@@ -37,7 +36,7 @@ import { PoxOperationPeriod, StackingErrors } from './constants';
 import {
   ensureLegacyBtcAddressForPox1,
   ensurePox2Activated,
-  ensureSignerKeyReadiness,
+  ensureSignerArgsReadiness,
   poxAddressToTuple,
   unwrap,
   unwrapMap,
@@ -228,6 +227,8 @@ export interface LockStxOptions {
   burnBlockHeight: number;
   /** hex-encoded signer key `(buff 33)`, required for >= PoX-4 */
   signerKey?: string;
+  /** hex-encoded signature `(buff 65)`, required for >= PoX-4 */
+  signerSignature?: string;
 }
 
 /**
@@ -242,6 +243,8 @@ export interface StackExtendOptions {
   poxAddress: string;
   /** hex-encoded signer key `(buff 33)`, required for >= PoX-4 */
   signerKey?: string;
+  /** hex-encoded signature `(buff 65)`, required for >= PoX-4 */
+  signerSignature?: string;
 }
 
 /**
@@ -286,8 +289,6 @@ export interface DelegateStackStxOptions {
   burnBlockHeight: number;
   /** number of cycles to lock */
   cycles: number;
-  /** hex-encoded signer key `(buff 33)`, required for >= PoX-4 */
-  signerKey?: string;
 }
 
 /**
@@ -302,8 +303,6 @@ export interface DelegateStackExtendOptions {
   extendCount: number;
   /** private key to sign transaction */
   privateKey: string;
-  /** hex-encoded signer key `(buff 33)`, required for >= PoX-4 */
-  signerKey?: string;
 }
 
 /**
@@ -326,6 +325,10 @@ export interface StackAggregationCommitOptions {
   poxAddress: string;
   rewardCycle: number;
   privateKey: string;
+  /** hex-encoded signer key `(buff 33)`, required for >= PoX-4 */
+  signerKey?: string;
+  /** hex-encoded signature `(buff 65)`, required for >= PoX-4 */
+  signerSignature?: string;
 }
 
 export interface StackAggregationIncreaseOptions {
@@ -617,6 +620,7 @@ export class StackingClient {
     cycles,
     burnBlockHeight,
     signerKey,
+    signerSignature,
     ...txOptions
   }: LockStxOptions & BaseTxOptions): Promise<TxBroadcastResult> {
     const poxInfo = await this.getPoxInfo();
@@ -625,7 +629,7 @@ export class StackingClient {
     const contract = await this.getStackingContract(poxOperationInfo);
 
     ensureLegacyBtcAddressForPox1({ contract, poxAddress });
-    ensureSignerKeyReadiness({ contract, signerKey });
+    ensureSignerArgsReadiness({ contract, signerKey, signerSignature });
 
     const callOptions = this.getStackOptions({
       contract,
@@ -634,6 +638,7 @@ export class StackingClient {
       poxAddress,
       burnBlockHeight,
       signerKey,
+      signerSignature,
     });
     const tx = await makeContractCall({
       ...callOptions,
@@ -655,19 +660,21 @@ export class StackingClient {
     extendCycles,
     poxAddress,
     signerKey,
+    signerSignature,
     ...txOptions
   }: StackExtendOptions & BaseTxOptions): Promise<TxBroadcastResult> {
     const poxInfo = await this.getPoxInfo();
     const poxOperationInfo = await this.getPoxOperationInfo(poxInfo);
 
     ensurePox2Activated(poxOperationInfo);
-    ensureSignerKeyReadiness({ contract: poxInfo.contract_id, signerKey });
+    ensureSignerArgsReadiness({ contract: poxInfo.contract_id, signerKey, signerSignature });
 
     const callOptions = this.getStackExtendOptions({
       contract: poxInfo.contract_id,
       extendCycles,
       poxAddress,
       signerKey,
+      signerSignature,
     });
     const tx = await makeContractCall({
       ...callOptions,
@@ -753,7 +760,6 @@ export class StackingClient {
     poxAddress,
     burnBlockHeight,
     cycles,
-    signerKey,
     ...txOptions
   }: DelegateStackStxOptions & BaseTxOptions): Promise<TxBroadcastResult> {
     const poxInfo = await this.getPoxInfo();
@@ -762,7 +768,6 @@ export class StackingClient {
     const contract = await this.getStackingContract(poxOperationInfo);
 
     ensureLegacyBtcAddressForPox1({ contract, poxAddress });
-    ensureSignerKeyReadiness({ contract, signerKey });
 
     const callOptions = this.getDelegateStackOptions({
       contract,
@@ -771,7 +776,6 @@ export class StackingClient {
       poxAddress,
       burnBlockHeight,
       cycles,
-      signerKey,
     });
     const tx = await makeContractCall({
       ...callOptions,
@@ -793,20 +797,17 @@ export class StackingClient {
     stacker,
     poxAddress,
     extendCount,
-    signerKey,
+
     ...txOptions
   }: DelegateStackExtendOptions & BaseTxOptions): Promise<TxBroadcastResult> {
     const poxInfo = await this.getPoxInfo();
     const contract = poxInfo.contract_id;
-
-    ensureSignerKeyReadiness({ contract, signerKey });
 
     const callOptions = this.getDelegateStackExtendOptions({
       contract,
       stacker,
       poxAddress,
       extendCount,
-      signerKey,
     });
     const tx = await makeContractCall({
       ...callOptions,
@@ -848,33 +849,6 @@ export class StackingClient {
 
   /**
    * As a delegator, generate and broadcast a transaction to commit partially committed delegatee tokens
-   * @param {StackAggregationCommitOptions} options - a required stack aggregation commit options object
-   * @returns {Promise<string>} that resolves to a broadcasted txid if the operation succeeds
-   */
-  async stackAggregationCommit({
-    poxAddress,
-    rewardCycle,
-    ...txOptions
-  }: StackAggregationCommitOptions & BaseTxOptions): Promise<TxBroadcastResult> {
-    // todo: deprecate this method in favor of Indexed as soon as PoX-2 is live
-    const contract = await this.getStackingContract();
-    ensureLegacyBtcAddressForPox1({ contract, poxAddress });
-
-    const callOptions = this.getStackAggregationCommitOptions({
-      contract,
-      poxAddress,
-      rewardCycle,
-    });
-    const tx = await makeContractCall({
-      ...callOptions,
-      ...renamePrivateKey(txOptions),
-    });
-
-    return broadcastTransaction(tx, callOptions.network as StacksNetwork);
-  }
-
-  /**
-   * As a delegator, generate and broadcast a transaction to commit partially committed delegatee tokens
    *
    * Commit partially stacked STX and allocate a new PoX reward address slot.
    *   This allows a stacker/delegate to lock fewer STX than the minimal threshold in multiple transactions,
@@ -891,18 +865,49 @@ export class StackingClient {
    * @param {StackAggregationCommitOptions} options - a required stack aggregation commit options object
    * @returns {Promise<string>} that resolves to a broadcasted txid if the operation succeeds
    */
-  async stackAggregationCommitIndexed({
+  async stackAggregationCommit({
     poxAddress,
     rewardCycle,
+    signerKey,
+    signerSignature,
     ...txOptions
   }: StackAggregationCommitOptions & BaseTxOptions): Promise<TxBroadcastResult> {
     const contract = await this.getStackingContract();
     ensureLegacyBtcAddressForPox1({ contract, poxAddress });
+    ensureSignerArgsReadiness({ contract, signerKey, signerSignature });
+
+    const callOptions = this.getStackAggregationCommitOptions({
+      contract,
+      poxAddress,
+      rewardCycle,
+      signerKey,
+      signerSignature,
+    });
+    const tx = await makeContractCall({
+      ...callOptions,
+      ...renamePrivateKey(txOptions),
+    });
+
+    return broadcastTransaction(tx, callOptions.network as StacksNetwork);
+  }
+
+  async stackAggregationCommitIndexed({
+    poxAddress,
+    rewardCycle,
+    signerKey,
+    signerSignature,
+    ...txOptions
+  }: StackAggregationCommitOptions & BaseTxOptions): Promise<TxBroadcastResult> {
+    const contract = await this.getStackingContract();
+    ensureLegacyBtcAddressForPox1({ contract, poxAddress });
+    ensureSignerArgsReadiness({ contract, signerKey, signerSignature });
 
     const callOptions = this.getStackAggregationCommitOptionsIndexed({
       contract,
       poxAddress,
       rewardCycle,
+      signerKey,
+      signerSignature,
     });
     const tx = await makeContractCall({
       ...callOptions,
@@ -977,6 +982,7 @@ export class StackingClient {
     contract,
     burnBlockHeight,
     signerKey,
+    signerSignature,
   }: {
     cycles: number;
     poxAddress: string;
@@ -984,6 +990,7 @@ export class StackingClient {
     contract: string;
     burnBlockHeight: number;
     signerKey?: string;
+    signerSignature?: string;
   }) {
     const address = poxAddressToTuple(poxAddress);
     const [contractAddress, contractName] = this.parseContractId(contract);
@@ -994,6 +1001,8 @@ export class StackingClient {
       uintCV(burnBlockHeight),
       uintCV(cycles),
     ] as ClarityValue[];
+
+    if (signerSignature) functionArgs.push(bufferCV(hexToBytes(signerSignature)));
     if (signerKey) functionArgs.push(bufferCV(hexToBytes(signerKey)));
 
     const callOptions: ContractCallOptions = {
@@ -1013,16 +1022,20 @@ export class StackingClient {
     poxAddress,
     contract,
     signerKey,
+    signerSignature,
   }: {
     extendCycles: number;
     poxAddress: string;
     contract: string;
     signerKey?: string;
+    signerSignature?: string;
   }) {
     const address = poxAddressToTuple(poxAddress);
     const [contractAddress, contractName] = this.parseContractId(contract);
 
     const functionArgs = [uintCV(extendCycles), address] as ClarityValue[];
+
+    if (signerSignature) functionArgs.push(bufferCV(hexToBytes(signerSignature)));
     if (signerKey) functionArgs.push(bufferCV(hexToBytes(signerKey)));
 
     const callOptions: ContractCallOptions = {
@@ -1090,7 +1103,6 @@ export class StackingClient {
     poxAddress,
     burnBlockHeight,
     cycles,
-    signerKey,
   }: {
     contract: string;
     stacker: string;
@@ -1098,7 +1110,6 @@ export class StackingClient {
     poxAddress: string;
     burnBlockHeight: number;
     cycles: number;
-    signerKey?: string;
   }) {
     const address = poxAddressToTuple(poxAddress);
     const [contractAddress, contractName] = this.parseContractId(contract);
@@ -1110,7 +1121,6 @@ export class StackingClient {
       uintCV(burnBlockHeight),
       uintCV(cycles),
     ] as ClarityValue[];
-    if (signerKey) functionArgs.push(bufferCV(hexToBytes(signerKey)));
 
     const callOptions: ContractCallOptions = {
       contractAddress,
@@ -1130,19 +1140,16 @@ export class StackingClient {
     stacker,
     poxAddress,
     extendCount,
-    signerKey,
   }: {
     contract: string;
     stacker: string;
     poxAddress: string;
     extendCount: number;
-    signerKey?: string;
   }) {
     const address = poxAddressToTuple(poxAddress);
     const [contractAddress, contractName] = this.parseContractId(contract);
 
     const functionArgs = [principalCV(stacker), address, uintCV(extendCount)] as ClarityValue[];
-    if (signerKey) functionArgs.push(bufferCV(hexToBytes(signerKey)));
 
     const callOptions: ContractCallOptions = {
       contractAddress,
@@ -1187,18 +1194,28 @@ export class StackingClient {
     contract,
     poxAddress,
     rewardCycle,
+    signerKey,
+    signerSignature,
   }: {
     contract: string;
     poxAddress: string;
     rewardCycle: number;
+    signerKey?: string;
+    signerSignature?: string;
   }) {
     const address = poxAddressToTuple(poxAddress);
     const [contractAddress, contractName] = this.parseContractId(contract);
+
+    const functionArgs = [address, uintCV(rewardCycle)] as ClarityValue[];
+
+    if (signerSignature) functionArgs.push(bufferCV(hexToBytes(signerSignature)));
+    if (signerKey) functionArgs.push(bufferCV(hexToBytes(signerKey)));
+
     const callOptions: ContractCallOptions = {
       contractAddress,
       contractName,
       functionName: 'stack-aggregation-commit',
-      functionArgs: [address, uintCV(rewardCycle)],
+      functionArgs,
       validateWithAbi: true,
       network: this.network,
       anchorMode: AnchorMode.Any,
@@ -1235,18 +1252,28 @@ export class StackingClient {
     contract,
     poxAddress,
     rewardCycle,
+    signerKey,
+    signerSignature,
   }: {
     contract: string;
     poxAddress: string;
     rewardCycle: number;
+    signerKey?: string;
+    signerSignature?: string;
   }) {
     const address = poxAddressToTuple(poxAddress);
     const [contractAddress, contractName] = this.parseContractId(contract);
+
+    const functionArgs = [address, uintCV(rewardCycle)] as ClarityValue[];
+
+    if (signerSignature) functionArgs.push(bufferCV(hexToBytes(signerSignature)));
+    if (signerKey) functionArgs.push(bufferCV(hexToBytes(signerKey)));
+
     const callOptions: ContractCallOptions = {
       contractAddress,
       contractName,
       functionName: 'stack-aggregation-commit-indexed',
-      functionArgs: [address, uintCV(rewardCycle)],
+      functionArgs,
       validateWithAbi: true,
       network: this.network,
       anchorMode: AnchorMode.Any,
@@ -1348,7 +1375,7 @@ export class StackingClient {
           hashbytes: (tuple.data['hashbytes'] as BufferCV).buffer,
         }));
         const untilBurnBlockHeight = unwrap(tupleCV.data['until-burn-ht'] as OptionalCV<UIntCV>);
-        const signerKey = tupleCV.data['signer-key'] as BufferCV;
+        const signerKey = tupleCV.data['signer-key'] as BufferCV; // todo: double-check if this wasn't removed again
 
         return {
           delegated: true,
@@ -1407,6 +1434,7 @@ export class StackingClient {
    * @returns {Array<string>} a contract address and name
    */
   parseContractId(contract: string): string[] {
+    // todo: move this function to a standalone utility, and @ignore deprecate it here
     const parts = contract.split('.');
 
     if (parts.length === 2 && validateStacksAddress(parts[0]) && parts[1].startsWith('pox')) {
@@ -1417,7 +1445,7 @@ export class StackingClient {
   }
 }
 
-/** Rename `privateKey` to `senderKey`, for backwards compatibility */
+/** @ignore Rename `privateKey` to `senderKey`, for backwards compatibility */
 function renamePrivateKey(txOptions: BaseTxOptions) {
   // @ts-ignore
   txOptions.senderKey = txOptions.privateKey;
