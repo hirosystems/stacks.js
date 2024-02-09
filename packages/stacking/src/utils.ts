@@ -356,21 +356,29 @@ export function ensureLegacyBtcAddressForPox1({
 
 /**
  * @internal
- * Throws if a signerKey is given for <= PoX-3 or the signerKey is missing otherwise.
+ * Throws if signer args are given for <= PoX-3 or the signer args are missing otherwise.
  */
-export function ensureSignerKeyReadiness({
+export function ensureSignerArgsReadiness({
   contract,
   signerKey,
+  signerSignature,
 }: {
   contract: string;
   signerKey?: string;
+  signerSignature?: string;
 }) {
   if (/\.pox(-[2-3])?$/.test(contract)) {
     // .pox, .pox-2 or .pox-3
-    if (signerKey) throw new Error('PoX-1, PoX-2 and PoX-3 do not accept a signer-key (buff 33)');
+    if (signerKey || signerSignature) {
+      throw new Error('PoX-1, PoX-2 and PoX-3 do not accept a signer-key or signer-sig');
+    }
   } else {
     // .pox-4 or later
-    if (!signerKey) throw new Error('PoX-4 or later requires a signer-key (buff 33) to stack');
+    if (!signerKey || !signerSignature) {
+      throw new Error(
+        'PoX-4 or later requires a signer-key (buff 33) and signer-sig (todo) to stack'
+      );
+    }
   }
 }
 
@@ -384,7 +392,7 @@ export function signPox4SignatureHash(
   topic: Pox4SignatureTopics,
   rewardCycle: number,
   poxAddress: string,
-  period: number,
+  lockPeriod: number,
   chainId: ChainID,
   privateKey: StacksPrivateKey
 ) {
@@ -396,8 +404,8 @@ export function signPox4SignatureHash(
   const message = tupleCV({
     poxAddress: poxAddressToTuple(poxAddress),
     rewardCycle: uintCV(rewardCycle),
-    period: uintCV(period),
+    period: uintCV(lockPeriod),
     topic: stringAsciiCV(topic),
   });
-  return signStructuredData({ message, domain, privateKey });
+  return signStructuredData({ message, domain, privateKey }).data;
 }
