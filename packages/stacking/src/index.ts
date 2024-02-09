@@ -150,7 +150,6 @@ export type DelegationInfo =
             }
           | undefined;
         until_burn_ht: number | undefined;
-        signer_key?: string;
       };
     };
 
@@ -766,7 +765,6 @@ export class StackingClient {
     const poxOperationInfo = await this.getPoxOperationInfo(poxInfo);
 
     const contract = await this.getStackingContract(poxOperationInfo);
-
     ensureLegacyBtcAddressForPox1({ contract, poxAddress });
 
     const callOptions = this.getDelegateStackOptions({
@@ -797,7 +795,6 @@ export class StackingClient {
     stacker,
     poxAddress,
     extendCount,
-
     ...txOptions
   }: DelegateStackExtendOptions & BaseTxOptions): Promise<TxBroadcastResult> {
     const poxInfo = await this.getPoxInfo();
@@ -849,19 +846,6 @@ export class StackingClient {
 
   /**
    * As a delegator, generate and broadcast a transaction to commit partially committed delegatee tokens
-   *
-   * Commit partially stacked STX and allocate a new PoX reward address slot.
-   *   This allows a stacker/delegate to lock fewer STX than the minimal threshold in multiple transactions,
-   *   so long as: 1. The pox-addr is the same.
-   *               2. This "commit" transaction is called _before_ the PoX anchor block.
-   *   This ensures that each entry in the reward set returned to the stacks-node is greater than the threshold,
-   *   but does not require it be all locked up within a single transaction
-   *
-   * `stack-aggregation-commit-indexed` returns (ok uint) on success, where the given uint is the reward address's index in the list of reward
-   * addresses allocated in this reward cycle. This index can then be passed to `stack-aggregation-increase`
-   * to later increment the STX this PoX address represents, in amounts less than the stacking minimum.
-   *
-   * @category PoX-2
    * @param {StackAggregationCommitOptions} options - a required stack aggregation commit options object
    * @returns {Promise<string>} that resolves to a broadcasted txid if the operation succeeds
    */
@@ -891,6 +875,24 @@ export class StackingClient {
     return broadcastTransaction(tx, callOptions.network as StacksNetwork);
   }
 
+  /**
+   * As a delegator, generate and broadcast a transaction to commit partially committed delegatee tokens
+   *
+   * Commit partially stacked STX and allocate a new PoX reward address slot.
+   *   This allows a stacker/delegate to lock fewer STX than the minimal threshold in multiple transactions,
+   *   so long as: 1. The pox-addr is the same.
+   *               2. This "commit" transaction is called _before_ the PoX anchor block.
+   *   This ensures that each entry in the reward set returned to the stacks-node is greater than the threshold,
+   *   but does not require it be all locked up within a single transaction
+   *
+   * `stack-aggregation-commit-indexed` returns (ok uint) on success, where the given uint is the reward address's index in the list of reward
+   * addresses allocated in this reward cycle. This index can then be passed to `stack-aggregation-increase`
+   * to later increment the STX this PoX address represents, in amounts less than the stacking minimum.
+   *
+   * @category PoX-2
+   * @param {StackAggregationCommitOptions} options - a required stack aggregation commit options object
+   * @returns {Promise<string>} that resolves to a broadcasted txid if the operation succeeds
+   */
   async stackAggregationCommitIndexed({
     poxAddress,
     rewardCycle,
@@ -1114,19 +1116,17 @@ export class StackingClient {
     const address = poxAddressToTuple(poxAddress);
     const [contractAddress, contractName] = this.parseContractId(contract);
 
-    const functionArgs = [
-      principalCV(stacker),
-      uintCV(amountMicroStx),
-      address,
-      uintCV(burnBlockHeight),
-      uintCV(cycles),
-    ] as ClarityValue[];
-
     const callOptions: ContractCallOptions = {
       contractAddress,
       contractName,
       functionName: 'delegate-stack-stx',
-      functionArgs,
+      functionArgs: [
+        principalCV(stacker),
+        uintCV(amountMicroStx),
+        address,
+        uintCV(burnBlockHeight),
+        uintCV(cycles),
+      ],
       validateWithAbi: true,
       network: this.network,
       anchorMode: AnchorMode.Any,
@@ -1149,13 +1149,11 @@ export class StackingClient {
     const address = poxAddressToTuple(poxAddress);
     const [contractAddress, contractName] = this.parseContractId(contract);
 
-    const functionArgs = [principalCV(stacker), address, uintCV(extendCount)] as ClarityValue[];
-
     const callOptions: ContractCallOptions = {
       contractAddress,
       contractName,
       functionName: 'delegate-stack-extend',
-      functionArgs,
+      functionArgs: [principalCV(stacker), address, uintCV(extendCount)],
       validateWithAbi: true,
       network: this.network,
       anchorMode: AnchorMode.Any,
@@ -1375,7 +1373,6 @@ export class StackingClient {
           hashbytes: (tuple.data['hashbytes'] as BufferCV).buffer,
         }));
         const untilBurnBlockHeight = unwrap(tupleCV.data['until-burn-ht'] as OptionalCV<UIntCV>);
-        const signerKey = tupleCV.data['signer-key'] as BufferCV; // todo: double-check if this wasn't removed again
 
         return {
           delegated: true,
@@ -1384,7 +1381,6 @@ export class StackingClient {
             delegated_to: principalToString(delegatedTo),
             pox_address: poxAddress,
             until_burn_ht: untilBurnBlockHeight ? Number(untilBurnBlockHeight.value) : undefined,
-            signer_key: signerKey ? bytesToHex(signerKey.buffer) : undefined,
           },
         };
       } else if (responseCV.type === ClarityType.OptionalNone) {

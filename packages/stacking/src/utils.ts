@@ -376,7 +376,7 @@ export function ensureSignerArgsReadiness({
     // .pox-4 or later
     if (!signerKey || !signerSignature) {
       throw new Error(
-        'PoX-4 or later requires a signer-key (buff 33) and signer-sig (todo) to stack'
+        'PoX-4 or later requires a signer-key (buff 33) and signer-sig (buff 65) to stack'
       );
     }
   }
