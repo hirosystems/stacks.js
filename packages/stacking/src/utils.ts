@@ -1,17 +1,24 @@
+import { sha256 } from '@noble/hashes/sha256';
 import { bech32, bech32m } from '@scure/base';
-import { ChainID, bigIntToBytes } from '@stacks/common';
-import { base58CheckDecode, base58CheckEncode } from '@stacks/encryption';
+import { bigIntToBytes } from '@stacks/common';
 import {
-  bufferCV,
+  base58CheckDecode,
+  base58CheckEncode,
+  verifyMessageSignatureRsv,
+} from '@stacks/encryption';
+import { StacksNetwork, StacksNetworkName, StacksNetworks } from '@stacks/network';
+import {
   BufferCV,
   ClarityType,
   ClarityValue,
   OptionalCV,
-  signStructuredData,
   StacksPrivateKey,
+  TupleCV,
+  bufferCV,
+  encodeStructuredData,
+  signStructuredData,
   stringAsciiCV,
   tupleCV,
-  TupleCV,
   uintCV,
 } from '@stacks/transactions';
 import { PoxOperationInfo } from '.';
@@ -20,15 +27,14 @@ import {
   BitcoinNetworkVersion,
   PoXAddressVersion,
   PoxOperationPeriod,
-  SegwitPrefix,
   SEGWIT_ADDR_PREFIXES,
   SEGWIT_V0,
   SEGWIT_V0_ADDR_PREFIX,
   SEGWIT_V1,
   SEGWIT_V1_ADDR_PREFIX,
+  SegwitPrefix,
   StackingErrors,
 } from './constants';
-import { StacksNetworkName, StacksNetworks } from '@stacks/network';
 
 export class InvalidAddressError extends Error {
   innerError?: Error;
@@ -382,30 +388,74 @@ export function ensureSignerArgsReadiness({
   }
 }
 
-export enum Pox4SignatureTopics {
+export enum Pox4SignatureTopic {
   StackStx = 'stack-stx',
   AggregateCommit = 'agg-commit',
   StackExtend = 'stack-extend',
 }
 
-export function signPox4SignatureHash(
-  topic: Pox4SignatureTopics,
-  rewardCycle: number,
-  poxAddress: string,
-  lockPeriod: number,
-  chainId: ChainID,
-  privateKey: StacksPrivateKey
-) {
+export interface Pox4SignatureOptions {
+  /** topic of the signature (i.e. which stacking operation the signature is used for) */
+  topic: `${Pox4SignatureTopic}`;
+  poxAddress: string;
+  /** current reward cycle */
+  rewardCycle: number;
+  /** lock period (in cycles) */
+  period: number;
+  network: StacksNetwork;
+}
+
+export function signPox4SignatureHash({
+  topic,
+  poxAddress,
+  rewardCycle,
+  period,
+  network,
+  privateKey,
+}: Pox4SignatureOptions & { privateKey: StacksPrivateKey }) {
+  return signStructuredData({
+    ...pox4SignatureMessage({ topic, poxAddress, rewardCycle, period, network }),
+    privateKey,
+  }).data;
+}
+
+export function verifyPox4SignatureHash({
+  topic,
+  poxAddress,
+  rewardCycle,
+  period,
+  network,
+  publicKey,
+  signature,
+}: Pox4SignatureOptions & { publicKey: string; signature: string }) {
+  return verifyMessageSignatureRsv({
+    message: sha256(
+      encodeStructuredData(
+        pox4SignatureMessage({ topic, poxAddress, rewardCycle, period, network })
+      )
+    ),
+    publicKey,
+    signature,
+  });
+}
+
+function pox4SignatureMessage({
+  topic,
+  poxAddress,
+  rewardCycle,
+  period: lockPeriod,
+  network,
+}: Pox4SignatureOptions) {
+  const message = tupleCV({
+    'pox-addr': poxAddressToTuple(poxAddress),
+    'reward-cycle': uintCV(rewardCycle),
+    topic: stringAsciiCV(topic),
+    period: uintCV(lockPeriod),
+  });
   const domain = tupleCV({
     name: stringAsciiCV('pox-4-signer'),
     version: stringAsciiCV('1.0.0'),
-    'chain-id': uintCV(chainId),
+    'chain-id': uintCV(network.chainId),
   });
-  const message = tupleCV({
-    poxAddress: poxAddressToTuple(poxAddress),
-    rewardCycle: uintCV(rewardCycle),
-    period: uintCV(lockPeriod),
-    topic: stringAsciiCV(topic),
-  });
-  return signStructuredData({ message, domain, privateKey }).data;
+  return { message, domain };
 }

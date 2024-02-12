@@ -1,13 +1,15 @@
 import { bigIntToBytes, bytesToHex, hexToBytes } from '@stacks/common';
-import { base58CheckDecode } from '@stacks/encryption';
+import { base58CheckDecode, getPublicKeyFromPrivate } from '@stacks/encryption';
 import { StacksMainnet, StacksTestnet } from '@stacks/network';
 import {
   AnchorMode,
+  Cl,
   ClarityType,
   ReadOnlyFunctionOptions,
   SignedContractCallOptions,
   TupleCV,
   bufferCV,
+  createStacksPrivateKey,
   intCV,
   noneCV,
   responseErrorCV,
@@ -22,7 +24,13 @@ import {
 import fetchMock from 'jest-fetch-mock';
 import { StackingClient } from '../src';
 import { PoXAddressVersion, StackingErrors } from '../src/constants';
-import { decodeBtcAddress, poxAddressToBtcAddress } from '../src/utils';
+import {
+  decodeBtcAddress,
+  poxAddressToBtcAddress,
+  poxAddressToTuple,
+  signPox4SignatureHash,
+  verifyPox4SignatureHash,
+} from '../src/utils';
 import { V2_POX_REGTEST_POX_3, setApiMocks } from './apiMockingHelpers';
 
 const poxInfo = {
@@ -1156,4 +1164,35 @@ test('getSecondsUntilStackingDeadline', async () => {
   seconds = await client.getSecondsUntilStackingDeadline();
   expect(seconds).toBeLessThan(0); // negative (deadline passed)
   expect(seconds).toBe(-50 * 10 * 60); // this time we are in the prepare phase
+});
+
+test('correctly signs pox-4 signer signature', () => {
+  const network = new StacksTestnet();
+  const poxAddress = 'msiYwJCvXEzjgq6hDwD9ueBka6MTfN962Z';
+
+  const privateKey = '002bc479cae71c410cf10113de8fe1611b148231eccdfb19ca779ba365cc511601';
+  const publicKey = getPublicKeyFromPrivate(privateKey);
+
+  const signature = signPox4SignatureHash({
+    topic: 'stack-stx',
+    network,
+    period: 12,
+    rewardCycle: 2,
+    poxAddress,
+    privateKey: createStacksPrivateKey(privateKey),
+  });
+
+  const verified = verifyPox4SignatureHash({
+    topic: 'stack-stx',
+    network,
+    period: 12,
+    rewardCycle: 2,
+    poxAddress,
+    signature,
+    publicKey,
+  });
+
+  expect(verified).toBeTruthy(); // test vector also verified with pox-4.clar via clarinet
+  // >> (contract-call? .pox-4 verify-signer-key-sig { version: 0x00, hashbytes: 0x85d300b605fa25c983af5ceaf5b67b2b2b45c013 } u2 "stack-stx" u12 0x5689bc4403367ef91e1e2450663f2c5a31c48c815c336f73aecd705d87bd815b0f952108aa06de958fb61a6b571088de7fa4ea7df7f296c46438af3e8c3501f701 0x0329f14a91005e6b1e6f7df9d032f0f17c86a3eae25fa148e631f846486c91025f)
+  // (ok true)
 });
