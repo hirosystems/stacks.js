@@ -15,6 +15,7 @@ import {
   OptionalCV,
   PrincipalCV,
   ResponseErrorCV,
+  StacksPrivateKey,
   StacksTransaction,
   TupleCV,
   TxBroadcastResult,
@@ -34,10 +35,12 @@ import {
 } from '@stacks/transactions';
 import { PoxOperationPeriod, StackingErrors } from './constants';
 import {
+  Pox4SignatureTopic,
   ensureLegacyBtcAddressForPox1,
   ensurePox2Activated,
   ensureSignerArgsReadiness,
   poxAddressToTuple,
+  signPox4SignatureHash,
   unwrap,
   unwrapMap,
 } from './utils';
@@ -1438,6 +1441,34 @@ export class StackingClient {
     }
 
     throw new Error('Stacking contract ID is malformed');
+  }
+
+  /**
+   * Generates a `signer-sig` string for the current PoX contract.
+   */
+  signPoxSignature({
+    topic,
+    poxAddress,
+    rewardCycle,
+    period,
+    signerPrivateKey,
+  }: {
+    topic: `${Pox4SignatureTopic}`;
+    poxAddress: string;
+    rewardCycle: number;
+    period: number;
+    signerPrivateKey: StacksPrivateKey;
+  }) {
+    // todo: in the future add logic to determine if a later version of pox
+    // needs a different domain and thus use a different `signPox4SignatureHash`
+    return signPox4SignatureHash({
+      topic,
+      poxAddress,
+      rewardCycle,
+      period,
+      network: this.network,
+      privateKey: signerPrivateKey,
+    });
   }
 }
 

@@ -18,7 +18,7 @@ import {
   trueCV,
   tupleCV,
   uintCV,
-  validateContractCall
+  validateContractCall,
 } from '@stacks/transactions';
 import fetchMock from 'jest-fetch-mock';
 import { StackingClient } from '../src';
@@ -27,7 +27,7 @@ import {
   decodeBtcAddress,
   poxAddressToBtcAddress,
   signPox4SignatureHash,
-  verifyPox4SignatureHash
+  verifyPox4SignatureHash,
 } from '../src/utils';
 import { V2_POX_REGTEST_POX_3, setApiMocks } from './apiMockingHelpers';
 
@@ -1168,8 +1168,10 @@ test('correctly signs pox-4 signer signature', () => {
   const network = new StacksTestnet();
   const poxAddress = 'msiYwJCvXEzjgq6hDwD9ueBka6MTfN962Z';
 
-  const privateKey = '002bc479cae71c410cf10113de8fe1611b148231eccdfb19ca779ba365cc511601';
-  const publicKey = getPublicKeyFromPrivate(privateKey);
+  const privateKey = createStacksPrivateKey(
+    '002bc479cae71c410cf10113de8fe1611b148231eccdfb19ca779ba365cc511601'
+  );
+  const publicKey = getPublicKeyFromPrivate(privateKey.data);
 
   const signature = signPox4SignatureHash({
     topic: 'stack-stx',
@@ -1177,7 +1179,7 @@ test('correctly signs pox-4 signer signature', () => {
     period: 12,
     rewardCycle: 2,
     poxAddress,
-    privateKey: createStacksPrivateKey(privateKey),
+    privateKey,
   });
 
   const verified = verifyPox4SignatureHash({
