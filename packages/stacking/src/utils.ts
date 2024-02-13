@@ -405,6 +405,9 @@ export interface Pox4SignatureOptions {
   network: StacksNetwork;
 }
 
+/**
+ * Generate a signature (`signer-sig` in PoX-4 stacking operations).
+ */
 export function signPox4SignatureHash({
   topic,
   poxAddress,
@@ -419,6 +422,10 @@ export function signPox4SignatureHash({
   }).data;
 }
 
+/**
+ * Verify a signature (`signer-sig` in PoX-4 stacking operations) matches the given
+ * public key (`signer-key`) and the structured data of the operation.
+ */
 export function verifyPox4SignatureHash({
   topic,
   poxAddress,
@@ -439,7 +446,11 @@ export function verifyPox4SignatureHash({
   });
 }
 
-function pox4SignatureMessage({
+/**
+ * Helper method used to generate SIP018 `message` and `domain` in
+ * {@link signPox4SignatureHash} and {@link verifyPox4SignatureHash}.
+ */
+export function pox4SignatureMessage({
   topic,
   poxAddress,
   rewardCycle,
