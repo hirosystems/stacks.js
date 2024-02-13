@@ -96,18 +96,17 @@ const burnBlockHeight = 2000;
 
 // signer key
 const signerPrivateKey = randomPrivKey();
-const signerKey = getPublicKey(signerPrivateKey);
+const signerKey = getPublicKeyFromPrivate(signerPrivateKey.data);
 
-const signerSignature = signPox4SignatureHash({
+// Refer to initialization section to create client instance
+const signerSignature = client.signPoxSignature({
   topic: 'stack-stx',
   rewardCycle: 132, // current reward cycle
   poxAddress,
   period: cycles,
-  chainId,
-  privateKey,
+  signerPrivateKey,
 });
 
-// Refer to initialization section to create client instance
 const stackingResults = await client.stack({
   amountMicroStx,
   poxAddress,
