@@ -3,7 +3,6 @@ import { base58CheckDecode, getPublicKeyFromPrivate } from '@stacks/encryption';
 import { StacksMainnet, StacksTestnet } from '@stacks/network';
 import {
   AnchorMode,
-  Cl,
   ClarityType,
   ReadOnlyFunctionOptions,
   SignedContractCallOptions,
@@ -19,7 +18,7 @@ import {
   trueCV,
   tupleCV,
   uintCV,
-  validateContractCall,
+  validateContractCall
 } from '@stacks/transactions';
 import fetchMock from 'jest-fetch-mock';
 import { StackingClient } from '../src';
@@ -27,9 +26,8 @@ import { PoXAddressVersion, StackingErrors } from '../src/constants';
 import {
   decodeBtcAddress,
   poxAddressToBtcAddress,
-  poxAddressToTuple,
   signPox4SignatureHash,
-  verifyPox4SignatureHash,
+  verifyPox4SignatureHash
 } from '../src/utils';
 import { V2_POX_REGTEST_POX_3, setApiMocks } from './apiMockingHelpers';
 
