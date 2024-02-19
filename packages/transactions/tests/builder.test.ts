@@ -2187,3 +2187,41 @@ test('Post-conditions with amount larger than 8 bytes throw an error', () => {
     serializePostCondition(fungiblePc);
   }).toThrowError('The post-condition amount may not be larger than 8 bytes');
 });
+
+test('StacksTransaction serialize/deserialize equality with an empty memo', async () => {
+  const options = {
+    recipient: 'SP3FGQ8Z7JY9BWYZ5WM53E0M9NK7WHJF0691NZ159',
+    amount: 12345n,
+    fee: 100n,
+    nonce: 0n,
+    memo: '', // empty memo
+    network: new StacksMainnet(),
+    anchorMode: AnchorMode.Any,
+    senderKey: 'edf9aee84d9b7abc145504dde6726c64f369d37ee34ded868fabd876c26570bc01',
+  };
+  const tx = await makeSTXTokenTransfer(options);
+
+  const txHex = tx.serialize();
+  const txDecoded = deserializeTransaction(txHex);
+
+  expect(txDecoded).toEqual(tx);
+});
+
+test('StacksTransaction serialize/deserialize equality with a memo', async () => {
+  const options = {
+    recipient: 'SP3FGQ8Z7JY9BWYZ5WM53E0M9NK7WHJF0691NZ159',
+    amount: 12345n,
+    fee: 100n,
+    nonce: 0n,
+    memo: 'Hey there',
+    network: new StacksMainnet(),
+    anchorMode: AnchorMode.Any,
+    senderKey: 'edf9aee84d9b7abc145504dde6726c64f369d37ee34ded868fabd876c26570bc01',
+  };
+  const tx = await makeSTXTokenTransfer(options);
+
+  const txHex = tx.serialize();
+  const txDecoded = deserializeTransaction(txHex);
+
+  expect(txDecoded).toEqual(tx);
+});
