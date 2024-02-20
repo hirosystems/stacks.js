@@ -274,7 +274,7 @@ export function serializeMemoString(memoString: MemoString): Uint8Array {
 
 export function deserializeMemoString(bytesReader: BytesReader): MemoString {
   let content = bytesToUtf8(bytesReader.readBytes(MEMO_MAX_LENGTH_BYTES));
-  content = content.replace(/\u0000*$/, ''); // remove all trailing unicode empty characters
+  content = content.replace(/\u0000*$/, ''); // remove all trailing unicode null characters
   return { type: StacksMessageType.MemoString, content };
 }
 
