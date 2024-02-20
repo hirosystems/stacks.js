@@ -101,7 +101,7 @@ const signerKey = getPublicKeyFromPrivate(signerPrivateKey.data);
 // Refer to initialization section to create client instance
 const signerSignature = client.signPoxSignature({
   topic: 'stack-stx',
-  rewardCycle: 132, // current reward cycle
+  rewardCycle: await client.getPoxInfo().reward_cycle_id,
   poxAddress,
   period: cycles,
   signerPrivateKey,
