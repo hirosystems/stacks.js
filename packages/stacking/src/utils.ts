@@ -396,7 +396,7 @@ export enum Pox4SignatureTopic {
 
 export interface Pox4SignatureOptions {
   /** topic of the signature (i.e. which stacking operation the signature is used for) */
-  topic: `${Pox4SignatureTopic}`;
+  topic: `${Pox4SignatureTopic}` | Pox4SignatureTopic;
   poxAddress: string;
   /** current reward cycle */
   rewardCycle: number;

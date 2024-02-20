@@ -95,7 +95,7 @@ const privateKey = 'd48f215481c16cbe6426f8e557df9b78895661971d71735126545abddcd5
 const burnBlockHeight = 2000;
 
 // signer key
-const signerPrivateKey = randomPrivKey();
+const signerPrivateKey = makeRandomPrivKey();
 const signerKey = getPublicKeyFromPrivate(signerPrivateKey.data);
 
 // Refer to initialization section to create client instance
