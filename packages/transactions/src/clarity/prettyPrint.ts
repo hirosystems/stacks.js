@@ -66,9 +66,7 @@ function formatTuple(cv: TupleCV, space: number, depth = 1): string {
   const spaceBefore = formatSpace(space, depth, false);
   const endSpace = formatSpace(space, depth, true);
 
-  return `{${spaceBefore}${items
-    .sort((a, b) => a[0].localeCompare(b[0]))
-    .join(`,${spaceBefore}`)}${endSpace}}`;
+  return `{${spaceBefore}${items.sort().join(`,${spaceBefore}`)}${endSpace}}`;
 }
 
 function exhaustiveCheck(param: never): never {
