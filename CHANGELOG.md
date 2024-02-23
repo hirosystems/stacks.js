@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.12.0](https://github.com/hirosystems/stacks.js/compare/v6.11.3...v6.12.0) (2024-02-23)
+
+
+### Features
+
+* sort tuple properties in cl pretty print ([6ab94c4](https://github.com/hirosystems/stacks.js/commit/6ab94c4b72be91510f95bb8871a21d4ae86982d3))
+
+
+
 ## [6.11.3](https://github.com/hirosystems/stacks.js/compare/v6.11.2...v6.11.3) (2024-01-24)
 
 
