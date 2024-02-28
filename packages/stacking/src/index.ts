@@ -1007,7 +1007,7 @@ export class StackingClient {
       uintCV(cycles),
     ] as ClarityValue[];
 
-    if (signerSignature) functionArgs.push(someCV(someCV(bufferCV(hexToBytes(signerSignature)))));
+    if (signerSignature) functionArgs.push(someCV(bufferCV(hexToBytes(signerSignature))));
     if (signerKey) functionArgs.push(bufferCV(hexToBytes(signerKey)));
 
     const callOptions: ContractCallOptions = {
