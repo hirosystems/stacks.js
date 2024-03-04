@@ -22,13 +22,6 @@ import {
 import { c32address } from 'c32check';
 import { BytesReader } from './bytesReader';
 import {
-  addressFromVersionHash,
-  addressHashModeToVersion,
-  addressToString,
-  createMessageSignature,
-  MessageSignature,
-} from './common';
-import {
   AddressHashMode,
   AddressVersion,
   COMPRESSED_PUBKEY_LENGTH_BYTES,
@@ -38,6 +31,8 @@ import {
 } from './constants';
 import { hash160, hashP2PKH } from './utils';
 import { TransactionVersion } from '@stacks/network';
+import { addressFromVersionHash, addressHashModeToVersion, addressToString } from './address';
+import { createMessageSignature, MessageSignature } from './signature';
 
 /**
  * To use secp256k1.signSync set utils.hmacSha256Sync to a function using noble-hashes

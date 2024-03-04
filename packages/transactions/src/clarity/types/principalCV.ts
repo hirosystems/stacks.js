@@ -1,7 +1,7 @@
 import { utf8ToBytes } from '@stacks/common';
-import { Address, addressToString } from '../../common';
 import { LengthPrefixedString, createAddress, createLPString } from '../../postcondition-types';
 import { ClarityType } from '../constants';
+import { Address, addressToString } from '../../address';
 
 type PrincipalCV = StandardPrincipalCV | ContractPrincipalCV;
 

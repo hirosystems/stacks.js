@@ -13,7 +13,6 @@ import {
   createContractPrincipal,
   ContractPrincipal,
 } from '../src/postcondition-types';
-import { addressToString } from '../src/common';
 
 import {
   PostConditionType,
@@ -27,6 +26,7 @@ import { serializeDeserialize } from './macros';
 
 import { bufferCVFromString, BufferCV } from '../src/clarity';
 import { bytesToUtf8 } from '@stacks/common';
+import { addressToString } from '../src';
 
 test('STX post condition serialization and deserialization', () => {
   const postConditionType = PostConditionType.STX;

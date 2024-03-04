@@ -6,6 +6,7 @@ import {
   createFetchFn,
   utf8ToBytes,
 } from '@stacks/common';
+import { STACKS_TESTNET, TransactionVersion } from '@stacks/network';
 import * as fs from 'fs';
 import fetchMock from 'jest-fetch-mock';
 import {
@@ -39,7 +40,6 @@ import {
 } from '../src/authorization';
 import {
   SignedTokenTransferOptions,
-  estimateTransactionByteLength,
   makeContractCall,
   makeContractDeploy,
   makeContractFungiblePostCondition,
@@ -66,7 +66,6 @@ import {
   uintCV,
 } from '../src/clarity';
 import { principalCV } from '../src/clarity/types/principalCV';
-import { createMessageSignature } from '../src/common';
 import {
   AddressHashMode,
   AnchorMode,
@@ -87,11 +86,14 @@ import {
 } from '../src/keys';
 import { TokenTransferPayload, createTokenTransferPayload, serializePayload } from '../src/payload';
 import { createAssetInfo } from '../src/postcondition-types';
-import { createTransactionAuthField } from '../src/signature';
+import { createMessageSignature, createTransactionAuthField } from '../src/signature';
 import { TransactionSigner } from '../src/signer';
-import { StacksTransaction, deserializeTransaction } from '../src/transaction';
+import {
+  StacksTransaction,
+  deserializeTransaction,
+  estimateTransactionByteLength,
+} from '../src/transaction';
 import { cloneDeep } from '../src/utils';
-import { STACKS_TESTNET, TransactionVersion } from '@stacks/network';
 
 function setSignature(
   unsignedTransaction: StacksTransaction,

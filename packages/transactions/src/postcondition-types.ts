@@ -1,3 +1,6 @@
+import { c32addressDecode } from 'c32check';
+import { Address } from './address';
+import { ClarityValue } from './clarity';
 import {
   FungibleConditionCode,
   MAX_STRING_LENGTH_BYTES,
@@ -6,9 +9,6 @@ import {
   PostConditionType,
   StacksMessageType,
 } from './constants';
-import { c32addressDecode } from 'c32check';
-import { Address } from './common';
-import { ClarityValue } from './clarity';
 import { exceedsMaxLengthBytes } from './utils';
 
 export interface StandardPrincipal {

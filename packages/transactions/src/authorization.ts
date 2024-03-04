@@ -17,20 +17,8 @@ import {
   StacksMessageType,
 } from './constants';
 
-import { cloneDeep, leftPadHex, txidFromData } from './utils';
-import {
-  TransactionAuthField,
-  serializeMessageSignature,
-  deserializeMessageSignature,
-} from './signature';
-import {
-  addressFromPublicKeys,
-  createEmptyAddress,
-  createLPList,
-  deserializeLPList,
-  serializeLPList,
-} from './types';
-
+import { BytesReader } from './bytesReader';
+import { DeserializationError, SigningError, VerificationError } from './errors';
 import {
   createStacksPublicKey,
   getPublicKey,
@@ -40,10 +28,20 @@ import {
   StacksPrivateKey,
   StacksPublicKey,
 } from './keys';
-
-import { MessageSignature } from './common';
-import { DeserializationError, SigningError, VerificationError } from './errors';
-import { BytesReader } from './bytesReader';
+import {
+  deserializeMessageSignature,
+  MessageSignature,
+  serializeMessageSignature,
+  TransactionAuthField,
+} from './signature';
+import {
+  addressFromPublicKeys,
+  createEmptyAddress,
+  createLPList,
+  deserializeLPList,
+  serializeLPList,
+} from './types';
+import { cloneDeep, leftPadHex, txidFromData } from './utils';
 
 export function emptyMessageSignature(): MessageSignature {
   return {

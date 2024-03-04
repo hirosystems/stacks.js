@@ -7,11 +7,24 @@ import {
   serializePublicKey,
   StacksPublicKey,
 } from './keys';
-
-import { createMessageSignature, MessageSignature } from './common';
-
-// @ts-ignore
 import { bytesToHex, concatArray, hexToBytes } from '@stacks/common';
+
+export interface MessageSignature {
+  readonly type: StacksMessageType.MessageSignature;
+  data: string;
+}
+
+export function createMessageSignature(signature: string): MessageSignature {
+  const length = hexToBytes(signature).byteLength;
+  if (length != RECOVERABLE_ECDSA_SIG_LENGTH_BYTES) {
+    throw Error('Invalid signature');
+  }
+
+  return {
+    type: StacksMessageType.MessageSignature,
+    data: signature,
+  };
+}
 
 export enum AuthFieldType {
   PublicKeyCompressed = 0x00,

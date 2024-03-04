@@ -53,7 +53,6 @@ export { BytesReader } from './bytesReader';
  */
 export * as Cl from './cl';
 export * from './clarity';
-export * from './common';
 export * from './constants';
 export * from './contract-abi';
 export * from './keys';
@@ -95,10 +94,11 @@ export {
   createSTXPostCondition,
 } from './postcondition';
 export * from './postcondition-types';
+export * from './address';
 export * from './signature';
 export * from './signer';
 export * from './structuredDataSignature';
-export { StacksTransaction, deserializeTransaction } from './transaction';
+export * from './transaction';
 export * from './types';
 export * from './utils';
 export * from './fetch';

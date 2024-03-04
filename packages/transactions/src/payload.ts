@@ -1,10 +1,8 @@
 import { concatArray, IntegerType, intToBigInt, intToBytes, writeUInt32BE } from '@stacks/common';
-import { ClarityVersion, COINBASE_BYTES_LENGTH, PayloadType, StacksMessageType } from './constants';
-
 import { BytesReader } from './bytesReader';
 import { ClarityValue, deserializeCV, serializeCV } from './clarity/';
 import { PrincipalCV, principalCV } from './clarity/types/principalCV';
-import { Address } from './common';
+import { ClarityVersion, COINBASE_BYTES_LENGTH, PayloadType, StacksMessageType } from './constants';
 import { createAddress, createLPString, LengthPrefixedString } from './postcondition-types';
 import {
   codeBodyString,
@@ -15,6 +13,7 @@ import {
   MemoString,
   serializeStacksMessage,
 } from './types';
+import { Address } from './address';
 
 export type Payload =
   | TokenTransferPayload

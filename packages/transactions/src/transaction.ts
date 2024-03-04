@@ -7,18 +7,13 @@ import {
   writeUInt32BE,
 } from '@stacks/common';
 import {
-  AddressHashMode,
-  AnchorMode,
-  anchorModeFrom,
-  AnchorModeName,
-  AuthType,
-  PayloadType,
-  PostConditionMode,
-  PubKeyEncoding,
-  RECOVERABLE_ECDSA_SIG_LENGTH_BYTES,
-  StacksMessageType,
-} from './constants';
-
+  ChainId,
+  DEFAULT_CHAIN_ID,
+  STACKS_MAINNET,
+  STACKS_TESTNET,
+  TransactionVersion,
+  whenTransactionVersion,
+} from '@stacks/network';
 import {
   Authorization,
   deserializeAuthorization,
@@ -34,27 +29,25 @@ import {
   SpendingConditionOpts,
   verifyOrigin,
 } from './authorization';
-import { createTransactionAuthField } from './signature';
-
-import { cloneDeep, txidFromData } from './utils';
-
-import { deserializePayload, Payload, PayloadInput, serializePayload } from './payload';
-
-import { createLPList, deserializeLPList, LengthPrefixedList, serializeLPList } from './types';
-
-import { isCompressed, StacksPrivateKey, StacksPublicKey } from './keys';
-
 import { BytesReader } from './bytesReader';
-
-import { SerializationError, SigningError } from './errors';
 import {
-  ChainId,
-  DEFAULT_CHAIN_ID,
-  STACKS_MAINNET,
-  STACKS_TESTNET,
-  TransactionVersion,
-  whenTransactionVersion,
-} from '@stacks/network';
+  AddressHashMode,
+  AnchorMode,
+  anchorModeFrom,
+  AnchorModeName,
+  AuthType,
+  PayloadType,
+  PostConditionMode,
+  PubKeyEncoding,
+  RECOVERABLE_ECDSA_SIG_LENGTH_BYTES,
+  StacksMessageType,
+} from './constants';
+import { SerializationError, SigningError } from './errors';
+import { isCompressed, StacksPrivateKey, StacksPublicKey } from './keys';
+import { deserializePayload, Payload, PayloadInput, serializePayload } from './payload';
+import { createTransactionAuthField } from './signature';
+import { createLPList, deserializeLPList, LengthPrefixedList, serializeLPList } from './types';
+import { cloneDeep, txidFromData } from './utils';
 
 export class StacksTransaction {
   version: TransactionVersion;

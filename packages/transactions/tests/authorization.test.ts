@@ -1,3 +1,4 @@
+import { bytesToHex, concatArray } from '@stacks/common';
 import {
   createMultiSigSpendingCondition,
   createSingleSigSpendingCondition,
@@ -9,14 +10,10 @@ import {
   SponsoredAuthorization,
   StandardAuthorization,
 } from '../src/authorization';
-import { createMessageSignature } from '../src/common';
-import { createTransactionAuthField } from '../src/signature';
-
-import { AddressHashMode, AuthType, PubKeyEncoding } from '../src/constants';
-
-import { bytesToHex, concatArray } from '@stacks/common';
 import { BytesReader } from '../src/bytesReader';
+import { AddressHashMode, AuthType, PubKeyEncoding } from '../src/constants';
 import { createStacksPrivateKey, createStacksPublicKey, signWithKey } from '../src/keys';
+import { createMessageSignature, createTransactionAuthField } from '../src/signature';
 
 test('ECDSA recoverable signature', () => {
   const privKeyString = 'edf9aee84d9b7abc145504dde6726c64f369d37ee34ded868fabd876c26570bc';

@@ -6,40 +6,41 @@ import {
   hexToBytes,
   utf8ToBytes,
 } from '@stacks/common';
+import assert from 'assert';
+import { Cl, addressToString } from '../src';
 import { BytesReader } from '../src/bytesReader';
 import {
-  bufferCV,
   BufferCV,
   ClarityType,
   ClarityValue,
+  IntCV,
+  ListCV,
+  SomeCV,
+  StandardPrincipalCV,
+  StringAsciiCV,
+  StringUtf8CV,
+  TupleCV,
+  UIntCV,
+  bufferCV,
   contractPrincipalCV,
   contractPrincipalCVFromStandard,
   deserializeCV,
   falseCV,
-  IntCV,
   intCV,
   listCV,
-  ListCV,
   noneCV,
   responseErrorCV,
   responseOkCV,
   serializeCV,
   someCV,
-  SomeCV,
   standardPrincipalCV,
-  StandardPrincipalCV,
   standardPrincipalCVFromAddress,
   stringAsciiCV,
-  StringAsciiCV,
   stringUtf8CV,
-  StringUtf8CV,
   trueCV,
   tupleCV,
-  TupleCV,
   uintCV,
-  UIntCV,
 } from '../src/clarity';
-import { Cl } from '../src';
 import {
   cvToJSON,
   cvToString,
@@ -47,9 +48,7 @@ import {
   getCVTypeString,
   isClarityType,
 } from '../src/clarity/clarityValue';
-import { addressToString } from '../src/common';
 import { deserializeAddress } from '../src/types';
-import assert from 'assert';
 
 const ADDRESS = 'SP2JXKMSH007NPYAQHKJPQMAQYAD90NQGTVJVQ02B';
 

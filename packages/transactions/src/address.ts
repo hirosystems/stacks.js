@@ -1,35 +1,11 @@
-import {
-  AddressHashMode,
-  AddressVersion,
-  RECOVERABLE_ECDSA_SIG_LENGTH_BYTES,
-  StacksMessageType,
-} from './constants';
-
-import { c32address } from 'c32check';
-import { hexToBytes } from '@stacks/common';
 import { TransactionVersion } from '@stacks/network';
+import { c32address } from 'c32check';
+import { AddressHashMode, AddressVersion, StacksMessageType } from './constants';
 
 export interface Address {
   readonly type: StacksMessageType.Address;
   readonly version: AddressVersion;
   readonly hash160: string;
-}
-
-export interface MessageSignature {
-  readonly type: StacksMessageType.MessageSignature;
-  data: string;
-}
-
-export function createMessageSignature(signature: string): MessageSignature {
-  const length = hexToBytes(signature).byteLength;
-  if (length != RECOVERABLE_ECDSA_SIG_LENGTH_BYTES) {
-    throw Error('Invalid signature');
-  }
-
-  return {
-    type: StacksMessageType.MessageSignature,
-    data: signature,
-  };
 }
 
 /**
