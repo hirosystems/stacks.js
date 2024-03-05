@@ -39,7 +39,6 @@ import {
 } from '../src/authorization';
 import {
   SignedTokenTransferOptions,
-  estimateTransactionByteLength,
   makeContractCall,
   makeContractDeploy,
   makeContractFungiblePostCondition,
@@ -89,7 +88,11 @@ import { TokenTransferPayload, createTokenTransferPayload, serializePayload } fr
 import { createAssetInfo } from '../src/postcondition-types';
 import { createTransactionAuthField } from '../src/signature';
 import { TransactionSigner } from '../src/signer';
-import { StacksTransaction, deserializeTransaction } from '../src/transaction';
+import {
+  StacksTransaction,
+  deserializeTransaction,
+  estimateTransactionByteLength,
+} from '../src/transaction';
 import { cloneDeep } from '../src/utils';
 import { STACKS_TESTNET, TransactionVersion } from '@stacks/network';
 

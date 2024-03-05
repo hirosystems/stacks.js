@@ -24,7 +24,7 @@ interface IntCV {
  *  import { intCV } from '@stacks/transactions';
  *
  *  const value = intCV('100'); // parameter any of type: number | string | bigint | Uint8Array | BN
- *  // { type: 0, value: 100n }
+ *  // { type: 'int', value: 100n }
  * ```
  *
  * @see
@@ -57,7 +57,7 @@ interface UIntCV {
  *  import { uintCV } from '@stacks/transactions';
  *
  *  const value = uintCV('100'); // parameter any of type: number | string | bigint | Uint8Array | BN
- *  // { type: 1, value: 100n }
+ *  // { type: 'uint', value: 100n }
  * ```
  *
  * @see
