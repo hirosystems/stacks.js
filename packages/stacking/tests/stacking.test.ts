@@ -519,7 +519,6 @@ test('delegate stack stx with one delegator', async () => {
   });
 
   // eslint-disable-next-line @typescript-eslint/no-var-requires
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
   const { StackingClient } = require('../src'); // needed for jest.mock module // needed for jest.mock module
   const client = new StackingClient(address, network);
 
@@ -1172,6 +1171,8 @@ test('correctly signs pox-4 signer signature', () => {
     '002bc479cae71c410cf10113de8fe1611b148231eccdfb19ca779ba365cc511601'
   );
   const publicKey = getPublicKeyFromPrivate(privateKey.data);
+  const maxAmount = 1000n;
+  const authId = 1;
 
   const signature = signPox4SignatureHash({
     topic: 'stack-stx',
@@ -1180,6 +1181,8 @@ test('correctly signs pox-4 signer signature', () => {
     rewardCycle: 2,
     poxAddress,
     privateKey,
+    maxAmount,
+    authId,
   });
 
   const verified = verifyPox4SignatureHash({
@@ -1190,6 +1193,8 @@ test('correctly signs pox-4 signer signature', () => {
     poxAddress,
     signature,
     publicKey,
+    maxAmount,
+    authId,
   });
 
   expect(verified).toBeTruthy(); // test vector also verified with pox-4.clar via clarinet
