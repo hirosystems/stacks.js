@@ -1,6 +1,6 @@
 import { sha256 } from '@noble/hashes/sha256';
 import { bech32, bech32m } from '@scure/base';
-import { bigIntToBytes } from '@stacks/common';
+import { IntegerType, bigIntToBytes } from '@stacks/common';
 import {
   base58CheckDecode,
   base58CheckEncode,
@@ -368,19 +368,25 @@ export function ensureSignerArgsReadiness({
   contract,
   signerKey,
   signerSignature,
+  maxAmount,
+  authId,
 }: {
   contract: string;
   signerKey?: string;
   signerSignature?: string;
+  maxAmount?: IntegerType;
+  authId?: number;
 }) {
+  const hasMaxAmount = typeof maxAmount !== 'undefined';
+  const hasAuthId = typeof authId !== 'undefined';
   if (/\.pox(-[2-3])?$/.test(contract)) {
     // .pox, .pox-2 or .pox-3
-    if (signerKey || signerSignature) {
+    if (signerKey || signerSignature || hasMaxAmount || hasAuthId) {
       throw new Error('PoX-1, PoX-2 and PoX-3 do not accept a signer-key or signer-sig');
     }
   } else {
     // .pox-4 or later
-    if (!signerKey || !signerSignature) {
+    if (!signerKey || !signerSignature || !hasMaxAmount || !hasAuthId) {
       throw new Error(
         'PoX-4 or later requires a signer-key (buff 33) and signer-sig (buff 65) to stack'
       );
@@ -392,6 +398,7 @@ export enum Pox4SignatureTopic {
   StackStx = 'stack-stx',
   AggregateCommit = 'agg-commit',
   StackExtend = 'stack-extend',
+  StackIncrease = 'stack-increase',
 }
 
 export interface Pox4SignatureOptions {
@@ -403,6 +410,10 @@ export interface Pox4SignatureOptions {
   /** lock period (in cycles) */
   period: number;
   network: StacksNetwork;
+  /** Maximum amount of uSTX that can be locked during this function call */
+  maxAmount: IntegerType;
+  /** Random integer to prevent signature re-use */
+  authId: number;
 }
 
 /**
@@ -415,9 +426,11 @@ export function signPox4SignatureHash({
   period,
   network,
   privateKey,
+  maxAmount,
+  authId,
 }: Pox4SignatureOptions & { privateKey: StacksPrivateKey }) {
   return signStructuredData({
-    ...pox4SignatureMessage({ topic, poxAddress, rewardCycle, period, network }),
+    ...pox4SignatureMessage({ topic, poxAddress, rewardCycle, period, network, maxAmount, authId }),
     privateKey,
   }).data;
 }
@@ -434,11 +447,13 @@ export function verifyPox4SignatureHash({
   network,
   publicKey,
   signature,
+  maxAmount,
+  authId,
 }: Pox4SignatureOptions & { publicKey: string; signature: string }) {
   return verifyMessageSignatureRsv({
     message: sha256(
       encodeStructuredData(
-        pox4SignatureMessage({ topic, poxAddress, rewardCycle, period, network })
+        pox4SignatureMessage({ topic, poxAddress, rewardCycle, period, network, maxAmount, authId })
       )
     ),
     publicKey,
@@ -456,12 +471,16 @@ export function pox4SignatureMessage({
   rewardCycle,
   period: lockPeriod,
   network,
+  maxAmount,
+  authId,
 }: Pox4SignatureOptions) {
   const message = tupleCV({
     'pox-addr': poxAddressToTuple(poxAddress),
     'reward-cycle': uintCV(rewardCycle),
     topic: stringAsciiCV(topic),
     period: uintCV(lockPeriod),
+    'max-amount': uintCV(maxAmount),
+    'auth-id': uintCV(authId),
   });
   const domain = tupleCV({
     name: stringAsciiCV('pox-4-signer'),

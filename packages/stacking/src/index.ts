@@ -231,6 +231,10 @@ export interface LockStxOptions {
   signerKey?: string;
   /** hex-encoded signature `(buff 65)`, required for >= PoX-4 */
   signerSignature?: string;
+  /** Maximum amount of STX that can be locked in this transaction */
+  maxAmount?: IntegerType;
+  /** Random integer to prevent re-use of signer signature */
+  authId?: number;
 }
 
 /**
@@ -247,6 +251,10 @@ export interface StackExtendOptions {
   signerKey?: string;
   /** hex-encoded signature `(buff 65)`, required for >= PoX-4 */
   signerSignature?: string;
+  /** Maximum amount of STX that can be locked in this transaction */
+  maxAmount?: IntegerType;
+  /** Random integer to prevent re-use of signer signature */
+  authId?: number;
 }
 
 /**
@@ -257,6 +265,14 @@ export interface StackIncreaseOptions {
   privateKey: string;
   /** number of ustx to increase by */
   increaseBy: IntegerType;
+  /** hex-encoded signer key `(buff 33)`, required for >= PoX-4 */
+  signerKey?: string;
+  /** hex-encoded signature `(buff 65)`, required for >= PoX-4 */
+  signerSignature?: string;
+  /** Maximum amount of STX that can be locked in this transaction */
+  maxAmount?: IntegerType;
+  /** Random integer to prevent re-use of signer signature */
+  authId?: number;
 }
 
 /**
@@ -331,6 +347,10 @@ export interface StackAggregationCommitOptions {
   signerKey?: string;
   /** hex-encoded signature `(buff 65)`, required for >= PoX-4 */
   signerSignature?: string;
+  /** Maximum amount of STX that can be locked in this transaction */
+  maxAmount?: IntegerType;
+  /** Random integer to prevent re-use of signer signature */
+  authId?: number;
 }
 
 export interface StackAggregationIncreaseOptions {
@@ -623,6 +643,8 @@ export class StackingClient {
     burnBlockHeight,
     signerKey,
     signerSignature,
+    maxAmount,
+    authId,
     ...txOptions
   }: LockStxOptions & BaseTxOptions): Promise<TxBroadcastResult> {
     const poxInfo = await this.getPoxInfo();
@@ -631,7 +653,7 @@ export class StackingClient {
     const contract = await this.getStackingContract(poxOperationInfo);
 
     ensureLegacyBtcAddressForPox1({ contract, poxAddress });
-    ensureSignerArgsReadiness({ contract, signerKey, signerSignature });
+    ensureSignerArgsReadiness({ contract, signerKey, signerSignature, maxAmount, authId });
 
     const callOptions = this.getStackOptions({
       contract,
@@ -641,6 +663,8 @@ export class StackingClient {
       burnBlockHeight,
       signerKey,
       signerSignature,
+      maxAmount,
+      authId,
     });
     const tx = await makeContractCall({
       ...callOptions,
@@ -663,13 +687,21 @@ export class StackingClient {
     poxAddress,
     signerKey,
     signerSignature,
+    maxAmount,
+    authId,
     ...txOptions
   }: StackExtendOptions & BaseTxOptions): Promise<TxBroadcastResult> {
     const poxInfo = await this.getPoxInfo();
     const poxOperationInfo = await this.getPoxOperationInfo(poxInfo);
 
     ensurePox2Activated(poxOperationInfo);
-    ensureSignerArgsReadiness({ contract: poxInfo.contract_id, signerKey, signerSignature });
+    ensureSignerArgsReadiness({
+      contract: poxInfo.contract_id,
+      signerKey,
+      signerSignature,
+      maxAmount,
+      authId,
+    });
 
     const callOptions = this.getStackExtendOptions({
       contract: poxInfo.contract_id,
@@ -677,6 +709,8 @@ export class StackingClient {
       poxAddress,
       signerKey,
       signerSignature,
+      maxAmount,
+      authId,
     });
     const tx = await makeContractCall({
       ...callOptions,
@@ -694,15 +728,30 @@ export class StackingClient {
    */
   async stackIncrease({
     increaseBy,
+    signerKey,
+    signerSignature,
+    maxAmount,
+    authId,
     ...txOptions
   }: StackIncreaseOptions & BaseTxOptions): Promise<TxBroadcastResult> {
     const poxInfo = await this.getPoxInfo();
     const poxOperationInfo = await this.getPoxOperationInfo(poxInfo);
     ensurePox2Activated(poxOperationInfo);
+    ensureSignerArgsReadiness({
+      contract: poxInfo.contract_id,
+      signerKey,
+      signerSignature,
+      maxAmount,
+      authId,
+    });
 
     const callOptions = this.getStackIncreaseOptions({
       contract: poxInfo.contract_id,
       increaseBy,
+      signerKey,
+      signerSignature,
+      maxAmount,
+      authId,
     });
     const tx = await makeContractCall({
       ...callOptions,
@@ -857,6 +906,8 @@ export class StackingClient {
     rewardCycle,
     signerKey,
     signerSignature,
+    maxAmount,
+    authId,
     ...txOptions
   }: StackAggregationCommitOptions & BaseTxOptions): Promise<TxBroadcastResult> {
     const contract = await this.getStackingContract();
@@ -988,6 +1039,8 @@ export class StackingClient {
     burnBlockHeight,
     signerKey,
     signerSignature,
+    maxAmount,
+    authId,
   }: {
     cycles: number;
     poxAddress: string;
@@ -996,6 +1049,8 @@ export class StackingClient {
     burnBlockHeight: number;
     signerKey?: string;
     signerSignature?: string;
+    maxAmount?: IntegerType;
+    authId?: number;
   }) {
     const address = poxAddressToTuple(poxAddress);
     const [contractAddress, contractName] = this.parseContractId(contract);
@@ -1009,6 +1064,8 @@ export class StackingClient {
 
     if (signerSignature) functionArgs.push(someCV(bufferCV(hexToBytes(signerSignature))));
     if (signerKey) functionArgs.push(bufferCV(hexToBytes(signerKey)));
+    if (maxAmount) functionArgs.push(uintCV(maxAmount));
+    if (authId) functionArgs.push(uintCV(authId));
 
     const callOptions: ContractCallOptions = {
       contractAddress,
@@ -1028,12 +1085,16 @@ export class StackingClient {
     contract,
     signerKey,
     signerSignature,
+    maxAmount,
+    authId,
   }: {
     extendCycles: number;
     poxAddress: string;
     contract: string;
     signerKey?: string;
     signerSignature?: string;
+    maxAmount?: IntegerType;
+    authId?: number;
   }) {
     const address = poxAddressToTuple(poxAddress);
     const [contractAddress, contractName] = this.parseContractId(contract);
@@ -1042,6 +1103,8 @@ export class StackingClient {
 
     if (signerSignature) functionArgs.push(someCV(bufferCV(hexToBytes(signerSignature))));
     if (signerKey) functionArgs.push(bufferCV(hexToBytes(signerKey)));
+    if (maxAmount) functionArgs.push(uintCV(maxAmount));
+    if (authId) functionArgs.push(uintCV(authId));
 
     const callOptions: ContractCallOptions = {
       contractAddress,
@@ -1055,13 +1118,35 @@ export class StackingClient {
     return callOptions;
   }
 
-  getStackIncreaseOptions({ increaseBy, contract }: { increaseBy: IntegerType; contract: string }) {
+  getStackIncreaseOptions({
+    increaseBy,
+    contract,
+    signerKey,
+    signerSignature,
+    maxAmount,
+    authId,
+  }: {
+    increaseBy: IntegerType;
+    contract: string;
+    signerKey?: string;
+    signerSignature?: string;
+    maxAmount?: IntegerType;
+    authId?: number;
+  }) {
     const [contractAddress, contractName] = this.parseContractId(contract);
+
+    const functionArgs = [uintCV(increaseBy)] as ClarityValue[];
+
+    if (signerSignature) functionArgs.push(someCV(bufferCV(hexToBytes(signerSignature))));
+    if (signerKey) functionArgs.push(bufferCV(hexToBytes(signerKey)));
+    if (maxAmount) functionArgs.push(uintCV(maxAmount));
+    if (authId) functionArgs.push(uintCV(authId));
+
     const callOptions: ContractCallOptions = {
       contractAddress,
       contractName,
       functionName: 'stack-increase',
-      functionArgs: [uintCV(increaseBy)],
+      functionArgs,
       validateWithAbi: true,
       network: this.network,
       anchorMode: AnchorMode.Any,
@@ -1197,12 +1282,16 @@ export class StackingClient {
     rewardCycle,
     signerKey,
     signerSignature,
+    maxAmount,
+    authId,
   }: {
     contract: string;
     poxAddress: string;
     rewardCycle: number;
     signerKey?: string;
     signerSignature?: string;
+    maxAmount?: IntegerType;
+    authId?: number;
   }) {
     const address = poxAddressToTuple(poxAddress);
     const [contractAddress, contractName] = this.parseContractId(contract);
@@ -1211,6 +1300,8 @@ export class StackingClient {
 
     if (signerSignature) functionArgs.push(someCV(bufferCV(hexToBytes(signerSignature))));
     if (signerKey) functionArgs.push(bufferCV(hexToBytes(signerKey)));
+    if (maxAmount) functionArgs.push(uintCV(maxAmount));
+    if (authId) functionArgs.push(uintCV(authId));
 
     const callOptions: ContractCallOptions = {
       contractAddress,
@@ -1452,12 +1543,16 @@ export class StackingClient {
     rewardCycle,
     period,
     signerPrivateKey,
+    authId,
+    maxAmount,
   }: {
     topic: `${Pox4SignatureTopic}`;
     poxAddress: string;
     rewardCycle: number;
     period: number;
     signerPrivateKey: StacksPrivateKey;
+    maxAmount: IntegerType;
+    authId: number;
   }) {
     // todo: in the future add logic to determine if a later version of pox
     // needs a different domain and thus use a different `signPox4SignatureHash`
@@ -1468,6 +1563,8 @@ export class StackingClient {
       period,
       network: this.network,
       privateKey: signerPrivateKey,
+      maxAmount,
+      authId,
     });
   }
 }
