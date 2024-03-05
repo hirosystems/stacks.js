@@ -25,7 +25,7 @@ interface TupleCV<T extends TupleData = TupleData> {
  *    b: falseCV(),
  *    a: trueCV(),
  *  });
- *  // { type: 12, data: { c: { type: 3 }, b: { type: 4 }, a: { type: 3 } } }
+ *  // { type: 'tuple', data: { c: { type: 'true' }, b: { type: 'false' }, a: { type: 'true' } } }
  * ```
  *
  * @see

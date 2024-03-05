@@ -26,7 +26,7 @@ interface ResponseOkCV<T extends ClarityValue = ClarityValue> {
  *
  *  const respErrorCV = responseErrorCV(intCV(1));
  *
- *  // { type: 8, value: { type: 0, value: 1n } }
+ *  // { type: 'err', value: { type: 'int', value: 1n } }
  * ```
  *
  * @see
@@ -49,7 +49,7 @@ function responseErrorCV<T extends ClarityValue = ClarityValue>(value: T): Respo
  *
  *  const respOKCV = responseOkCV(intCV(1));
  *
- *  // { type: 7, value: { type: 0, value: 1n } }
+ *  // { type: 'ok', value: { type: 'int', value: 1n } }
  * ```
  *
  * @see

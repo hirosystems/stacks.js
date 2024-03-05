@@ -46,7 +46,7 @@ function principalCV(principal: string): PrincipalCV {
  *  import { standardPrincipalCV } from '@stacks/transactions';
  *
  *  const addr = standardPrincipalCV('SP2JXKMSH007NPYAQHKJPQMAQYAD90NQGTVJVQ02B');
- *  // { type: 5, address: { type: 0, version: 22, hash160: 'a5d9d331000f5b79578ce56bd157f29a9056f0d6' } }
+ *  // { type: 'address', address: { type: 0, version: 22, hash160: 'a5d9d331000f5b79578ce56bd157f29a9056f0d6' } }
  * ```
  *
  * @see
@@ -73,7 +73,7 @@ function standardPrincipalCV(addressString: string): StandardPrincipalCV {
  *  };
  *
  *  const principalCV = standardPrincipalCVFromAddress(address);
- *  // { type: 5, address: { type: 0, version: 22, hash160: 'a5d9d331000f5b79578ce56bd157f29a9056f0d6' } }
+ *  // { type: 'address', address: { type: 0, version: 22, hash160: 'a5d9d331000f5b79578ce56bd157f29a9056f0d6' } }
  * ```
  *
  * @see
@@ -94,7 +94,7 @@ function standardPrincipalCVFromAddress(address: Address): StandardPrincipalCV {
  *  import { contractPrincipalCV } from '@stacks/transactions';
  *
  *  const contractAddress = contractPrincipalCV('SP2JXKMSH007NPYAQHKJPQMAQYAD90NQGTVJVQ02B', 'test');
- *  // { type: 6, address: { type: 0, version: 22, hash160: 'a5d9d331000f5b79578ce56bd157f29a9056f0d6' }, contractName: { type: 2, content: 'test', lengthPrefixBytes: 1, maxLengthBytes: 128 } }
+ *  // { type: 'contract', address: { type: 0, version: 22, hash160: 'a5d9d331000f5b79578ce56bd157f29a9056f0d6' }, contractName: { type: 2, content: 'test', lengthPrefixBytes: 1, maxLengthBytes: 128 } }
  * ```
  *
  * @see
@@ -118,7 +118,7 @@ function contractPrincipalCV(addressString: string, contractName: string): Contr
  *
  *  const contractAddressCV = contractPrincipalCVFromAddress(createAddress('SP2JXKMSH007NPYAQHKJPQMAQYAD90NQGTVJVQ02B'), createLPString('test'));
  *
- *  // { type: 6, address: { type: 0, version: 22, hash160: 'a5d9d331000f5b79578ce56bd157f29a9056f0d6' }, contractName: { type: 2, content: 'test', lengthPrefixBytes: 1, maxLengthBytes: 128 } }
+ *  // { type: 'contract', address: { type: 0, version: 22, hash160: 'a5d9d331000f5b79578ce56bd157f29a9056f0d6' }, contractName: { type: 2, content: 'test', lengthPrefixBytes: 1, maxLengthBytes: 128 } }
  * ```
  *
  * @see

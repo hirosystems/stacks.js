@@ -22,23 +22,23 @@ import {
   TupleCV,
   ClarityValue,
 } from '.';
-import { ClarityType } from './constants';
+import { ClarityType, clarityTypeToByte } from './constants';
 
 import { SerializationError } from '../errors';
 import { StringAsciiCV, StringUtf8CV } from './types/stringCV';
 import { CLARITY_INT_BYTE_SIZE, CLARITY_INT_SIZE } from '../constants';
 
 function bytesWithTypeID(typeId: ClarityType, bytes: Uint8Array): Uint8Array {
-  return concatArray([typeId, bytes]);
+  return concatArray([clarityTypeToByte(typeId), bytes]);
 }
 
 function serializeBoolCV(value: BooleanCV): Uint8Array {
-  return new Uint8Array([value.type]);
+  return new Uint8Array([clarityTypeToByte(value.type)]);
 }
 
 function serializeOptionalCV(cv: OptionalCV): Uint8Array {
   if (cv.type === ClarityType.OptionalNone) {
-    return new Uint8Array([cv.type]);
+    return new Uint8Array([clarityTypeToByte(cv.type)]);
   } else {
     return bytesWithTypeID(cv.type, serializeCV(cv.value));
   }
