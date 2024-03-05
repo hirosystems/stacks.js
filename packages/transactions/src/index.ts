@@ -98,7 +98,7 @@ export * from './postcondition-types';
 export * from './signature';
 export * from './signer';
 export * from './structuredDataSignature';
-export { StacksTransaction, deserializeTransaction } from './transaction';
+export * from './transaction';
 export * from './types';
 export * from './utils';
 export * from './fetch';

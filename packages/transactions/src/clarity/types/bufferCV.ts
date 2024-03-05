@@ -19,7 +19,7 @@ interface BufferCV {
  *
  *  const buffer = utf8ToBytes('this is a test');
  *  const buf = bufferCV(buffer);
- *  // { type: 2, buffer: <Uint8Array 74 68 69 73 20 69 73 20 61 20 74 65 73 74> }
+ *  // { type: 'buffer', buffer: <Uint8Array 74 68 69 73 20 69 73 20 61 20 74 65 73 74> }
  *  const value = bytesToUtf8(buf.buffer);
  *  // this is a test
  * ```
@@ -48,7 +48,7 @@ const bufferCV = (buffer: Uint8Array): BufferCV => {
  *
  *  const str = 'this is a test';
  *  const buf = bufferCVFromString(str);
- *  // { type: 2, buffer: <Buffer 74 68 69 73 20 69 73 20 61 20 74 65 73 74> }
+ *  // { type: 'buffer', buffer: <Buffer 74 68 69 73 20 69 73 20 61 20 74 65 73 74> }
  *  const value = bytesToUtf8(buf.buffer);
  *  // this is a test
  *```
