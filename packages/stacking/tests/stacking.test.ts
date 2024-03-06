@@ -9,6 +9,7 @@ import {
   TupleCV,
   bufferCV,
   createStacksPrivateKey,
+  encodeStructuredData,
   intCV,
   noneCV,
   responseErrorCV,
@@ -25,11 +26,13 @@ import { StackingClient } from '../src';
 import { PoXAddressVersion, StackingErrors } from '../src/constants';
 import {
   decodeBtcAddress,
+  pox4SignatureMessage,
   poxAddressToBtcAddress,
   signPox4SignatureHash,
   verifyPox4SignatureHash,
 } from '../src/utils';
 import { V2_POX_REGTEST_POX_3, setApiMocks } from './apiMockingHelpers';
+import { sha256 } from '@noble/hashes/sha256';
 
 const poxInfo = {
   contract_id: 'ST000000000000000000002AMW42H.pox-3',
@@ -1200,4 +1203,35 @@ test('correctly signs pox-4 signer signature', () => {
   expect(verified).toBeTruthy(); // test vector also verified with pox-4.clar via clarinet
   // >> (contract-call? .pox-4 verify-signer-key-sig { version: 0x00, hashbytes: 0x85d300b605fa25c983af5ceaf5b67b2b2b45c013 } u2 "stack-stx" u12 0x5689bc4403367ef91e1e2450663f2c5a31c48c815c336f73aecd705d87bd815b0f952108aa06de958fb61a6b571088de7fa4ea7df7f296c46438af3e8c3501f701 0x0329f14a91005e6b1e6f7df9d032f0f17c86a3eae25fa148e631f846486c91025f)
   // (ok true)
+});
+
+/**
+ * Compare JS implementation with a fixture generated via Rust:
+ *
+ * https://github.com/stacks-network/stacks-core/blob/c9d8f8d66bea0b8983ae2a92fd9716be9dc0c4df/stackslib/src/util_lib/signed_structured_data.rs#L380
+ *
+ */
+test('correctly generates pox-4 message hash', () => {
+  const poxAddress = 'mfWxJ45yp2SFn7UciZyNpvDKrzbhyfKrY8';
+  const topic = 'stack-stx';
+  const period = 12;
+  const authId = 111;
+
+  const fixture = 'ec5b88aa81a96a6983c26cdba537a13d253425348ffc0ba6b07130869b025a2d';
+
+  const hash = sha256(
+    encodeStructuredData(
+      pox4SignatureMessage({
+        poxAddress: poxAddress,
+        topic,
+        period,
+        authId,
+        maxAmount: 340282366920938463463374607431768211455n,
+        rewardCycle: 1,
+        network: new StacksTestnet(),
+      })
+    )
+  );
+
+  expect(bytesToHex(hash)).toBe(fixture);
 });
