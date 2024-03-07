@@ -25,10 +25,8 @@ import {
   AddressHashMode,
   AnchorMode,
   AuthType,
-  DEFAULT_CHAIN_ID,
   FungibleConditionCode,
   PostConditionMode,
-  TransactionVersion,
 } from '../src/constants';
 
 import { createStacksPrivateKey, pubKeyfromPrivKey, publicKeyToString } from '../src/keys';
@@ -39,6 +37,7 @@ import { bytesToHex, hexToBytes } from '@stacks/common';
 import fetchMock from 'jest-fetch-mock';
 import { BytesReader } from '../src/bytesReader';
 import { contractPrincipalCV, standardPrincipalCV } from '../src/clarity';
+import { DEFAULT_CHAIN_ID, TransactionVersion } from '@stacks/network';
 
 beforeEach(() => {
   fetchMock.resetMocks();

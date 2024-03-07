@@ -14,11 +14,12 @@ import {
   createAssetInfo,
 } from '../src/postcondition-types';
 import { Address, addressToString } from '../src/common';
-import { TransactionVersion, AddressHashMode, StacksMessageType } from '../src/constants';
+import { AddressHashMode, StacksMessageType } from '../src/constants';
 
 import { serializeDeserialize } from './macros';
 import { BytesReader } from '../src/bytesReader';
 import { createStacksPublicKey } from '../src/keys';
+import { TransactionVersion } from '@stacks/network';
 
 test('Length prefixed strings serialization and deserialization', () => {
   const testString = 'test message string';
@@ -55,7 +56,7 @@ test('Length prefixed list serialization and deserialization', () => {
   expect(deserialized.values.length).toBe(addressList.length);
 
   for (let index = 0; index < addressList.length; index++) {
-    expect(deserialized.values[index].toString()).toBe(addressList[index].toString());
+    expect(deserialized.values[index]).toEqual(addressList[index]);
   }
 });
 
