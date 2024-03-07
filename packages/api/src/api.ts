@@ -8,6 +8,12 @@ import {
   networkFrom,
 } from '@stacks/network';
 import {
+  BurnchainRewardListResponse,
+  BurnchainRewardSlotHolderListResponse,
+  BurnchainRewardsTotal,
+} from '@stacks/stacks-blockchain-api-types';
+import {
+  Cl,
   ClarityAbi,
   FeeEstimation,
   StacksTransaction,
@@ -17,6 +23,14 @@ import {
   getAbi,
   getNonce,
 } from '@stacks/transactions';
+import {
+  BaseErrorResponse,
+  ExtendedAccountBalances,
+  PaginationOptions,
+  V1InfoBlockTimesResponse,
+  V2CoreInfoResponse as V2InfoResponse,
+  V2PoxInfoResponse,
+} from './types';
 
 export class StacksNodeApi {
   // TODO
@@ -87,39 +101,106 @@ export class StacksNodeApi {
 
   /**
    * Fetch a contract's ABI
-   * @param contractAddress - The contracts address
-   * @param contractName - The contracts name
    * @returns A promise that resolves to a ClarityAbi if the operation succeeds
    */
-  getAbi = async (contractAddress: string, contractName: string): Promise<ClarityAbi> => {
+  getAbi = async (contract: `${string}.${string}`): Promise<ClarityAbi> => {
+    const [contractAddress, contractName] = contract.split('.');
     return getAbi({ contractAddress, contractName, api: this });
   };
 
-  // todo: migrate to new api pattern
-  getNameInfo(fullyQualifiedName: string) {
-    /*
-      TODO: Update to v2 API URL for name lookups
-    */
-    const nameLookupURL = `${this.bnsLookupUrl}/v1/names/${fullyQualifiedName}`;
-    return this.fetch(nameLookupURL)
-      .then((resp: any) => {
-        if (resp.status === 404) {
-          throw new Error('Name not found');
-        } else if (resp.status !== 200) {
-          throw new Error(`Bad response status: ${resp.status}`);
-        } else {
-          return resp.json();
-        }
-      })
-      .then((nameInfo: any) => {
-        // the returned address _should_ be in the correct network ---
-        //  stacks node gets into trouble because it tries to coerce back to mainnet
-        //  and the regtest transaction generation libraries want to use testnet addresses
-        if (nameInfo.address) {
-          return Object.assign({}, nameInfo, { address: nameInfo.address });
-        } else {
-          return nameInfo;
-        }
+  /** Get stacks node info */
+  getInfo(): Promise<V2InfoResponse> {
+    return this.fetch(`${this.url}/v2/info`).then(res => res.json());
+  }
+
+  /** Get stacks node pox info */
+  getPoxInfo(): Promise<V2PoxInfoResponse> {
+    return this.fetch(`${this.url}/v2/pox`).then(res => res.json());
+  }
+
+  /** Get stacks node target block time */
+  async getTargetBlockTime() {
+    const res = await this.fetch(`${this.url}/extended/v1/info/network_block_times`).then(
+      (res: any): V1InfoBlockTimesResponse => res.json()
+    );
+
+    if (this.isMainnet()) return res.mainnet.target_block_time;
+    return res.testnet.target_block_time;
+  }
+
+  /** Get account status */
+  async getAccountInfo(address: string) {
+    // todo: add types for response
+    return this.fetch(`${this.url}/v2/accounts/${address}?proof=0`)
+      .then(res => res.json())
+      .then(json => {
+        json.balance = BigInt(json.balance);
+        json.locked = BigInt(json.locked);
+        return json;
       });
+  }
+
+  /** Get extended account balances */
+  async getExtendedAccountBalances(address: string): Promise<ExtendedAccountBalances> {
+    return this.fetch(`${this.url}/extended/v1/address/${address}/balances`)
+      .then(res => res.json())
+      .then(json => {
+        json.stx.balance = BigInt(json.stx.balance);
+        json.stx.total_sent = BigInt(json.stx.total_sent);
+        json.stx.total_received = BigInt(json.stx.total_received);
+        json.stx.locked = BigInt(json.stx.locked);
+        return json;
+      });
+  }
+
+  /** Get the total BTC stacking rewards total for an address */
+  async getExtendedBtcRewardsTotal(
+    /** BTC or STX address */
+    address: string
+  ): Promise<BurnchainRewardsTotal | BaseErrorResponse> {
+    return this.fetch(`${this.url}/extended/v1/burnchain/rewards/${address}/total`)
+      .then(res => res.json())
+      .then(json => {
+        json.reward_amount = BigInt(json.reward_amount);
+        return json;
+      });
+  }
+
+  /** Get paginated BTC stacking rewards total for an address */
+  async getExtendedBtcRewards(
+    /** BTC or STX address */
+    address: string,
+    options?: PaginationOptions
+  ): Promise<BurnchainRewardListResponse | BaseErrorResponse> {
+    let url = `${this.url}/extended/v1/burnchain/rewards/${address}`;
+    if (options) url += `?limit=${options.limit}&offset=${options.offset}`;
+
+    return this.fetch(url).then(res => res.json());
+  }
+
+  /** Get BTC reward holders for the an address */
+  async getExtendedBtcRewardHolders(
+    /** BTC or STX address */
+    address: string,
+    options?: PaginationOptions
+  ): Promise<BurnchainRewardSlotHolderListResponse | BaseErrorResponse> {
+    let url = `${this.url}/extended/v1/burnchain/reward_slot_holders/${address}`;
+    if (options) url += `?limit=${options.limit}&offset=${options.offset}`;
+
+    return this.fetch(url).then(res => res.json());
+  }
+
+  /** Gets the value of a data-var if it exists in the given contract */
+  async getDataVar(contract: `${string}.${string}`, dataVarName: string) {
+    // todo: (contractAddress: string, contractName: string, dataVarName: string) overload?
+    // todo: cleanup address/contract identifies types
+    const contractPath = contract.replace('.', '/');
+    const url = `${this.url}/v2/data_var/${contractPath}/${dataVarName}?proof=0`;
+    return this.fetch(url)
+      .then(res => res.json())
+      .then(json => ({
+        value: Cl.deserialize(json.value),
+        raw: json.data as string,
+      }));
   }
 }
