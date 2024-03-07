@@ -25,6 +25,7 @@
   "dependencies": {
     "@stacks/common": "^6.10.0",
     "@stacks/network": "^6.11.3",
+    "@stacks/stacks-blockchain-api-types": "^0.61.0",
     "@stacks/transactions": "^6.9.0"
   },
   "devDependencies": {
