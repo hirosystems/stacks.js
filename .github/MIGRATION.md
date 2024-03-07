@@ -24,7 +24,7 @@
 
 ### Breaking Changes
 
-- The `@stacks/network` `new StacksNetwork()` objects were removed. Instead `@stacks/network` now exports objects like `STACKS_MAINNET`, which are static (and shouldn't be changed for most use-cases). [Read more...](#stacks-network)
+- The `@stacks/network` `new StacksNetwork()` objects were removed. Instead `@stacks/network` now exports the objects `STACKS_MAINNET`, `STACKS_TESNET`, and `STACKS_DEVNET`, which are static (and shouldn't be changed for most use-cases). [Read more...](#stacks-network)
 - The `ClarityType` enum was replaced by a readable version. The previous (wire format compatible) enum is still available as `ClarityWireType`. [Read more...](#clarity-representation)
 
 ### Stacks Network
