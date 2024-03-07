@@ -1,15 +1,35 @@
-import { bytesToHex, bytesToUtf8, hexToBytes, utf8ToBytes } from '@stacks/common';
 import {
-  StacksMainnet,
-  StacksTestnet,
+  HIRO_MAINNET_URL,
+  HIRO_TESTNET_URL,
+  bytesToHex,
+  bytesToUtf8,
   createApiKeyMiddleware,
   createFetchFn,
-} from '@stacks/network';
+  hexToBytes,
+  utf8ToBytes,
+} from '@stacks/common';
+import { STACKS_MAINNET, STACKS_TESTNET, TransactionVersion } from '@stacks/network';
 import * as fs from 'fs';
 import fetchMock from 'jest-fetch-mock';
 import {
+  ACCOUNT_PATH,
+  BROADCAST_PATH,
+  BadNonceRejection,
+  CONTRACT_ABI_PATH,
+  ClarityAbi,
+  READONLY_FUNCTION_CALL_PATH,
+  TRANSACTION_FEE_ESTIMATE_PATH,
+  TxBroadcastResult,
+  TxBroadcastResultOk,
+  TxBroadcastResultRejected,
+  broadcastTransaction,
+  callReadOnlyFunction,
   createFungiblePostCondition,
   createSTXPostCondition,
+  estimateFee,
+  estimateTransaction,
+  getContractMapEntry,
+  getNonce,
   serializePostCondition,
 } from '../src';
 import {
@@ -25,16 +45,7 @@ import {
 } from '../src/authorization';
 import {
   SignedTokenTransferOptions,
-  TxBroadcastResult,
-  TxBroadcastResultOk,
-  TxBroadcastResultRejected,
-  broadcastTransaction,
-  callReadOnlyFunction,
-  estimateTransaction,
   estimateTransactionByteLength,
-  estimateTransactionFeeWithFallback,
-  getContractMapEntry,
-  getNonce,
   makeContractCall,
   makeContractDeploy,
   makeContractFungiblePostCondition,
@@ -68,16 +79,13 @@ import {
   AnchorModeName,
   AuthType,
   ClarityVersion,
-  DEFAULT_CORE_NODE_API_URL,
   FungibleConditionCode,
   NonFungibleConditionCode,
   PayloadType,
   PostConditionMode,
   PubKeyEncoding,
-  TransactionVersion,
   TxRejectedReason,
 } from '../src/constants';
-import { ClarityAbi } from '../src/contract-abi';
 import {
   createStacksPrivateKey,
   isCompressed,
@@ -114,15 +122,15 @@ beforeEach(() => {
 });
 
 test('API key middleware - get nonce', async () => {
-  const senderAddress = 'STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6';
+  const address = 'STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6';
 
   const apiKey = '1234-my-api-key-example';
-  const fetchFn = createFetchFn(createApiKeyMiddleware({ apiKey }));
-  const network = new StacksMainnet({ fetchFn });
+  const fetch = createFetchFn(createApiKeyMiddleware({ apiKey }));
+  const api = { fetch };
 
   fetchMock.mockOnce(`{"balance": "0", "nonce": "123"}`);
 
-  const fetchNonce = await getNonce(senderAddress, network);
+  const fetchNonce = await getNonce({ address, api });
   expect(fetchNonce).toBe(123n);
   expect(fetchMock.mock.calls.length).toEqual(1);
   expect(fetchMock.mock.calls[0][0]).toEqual(
@@ -204,7 +212,7 @@ test('Make STX token transfer with set tx fee', async () => {
 });
 
 test('Make STX token transfer with fee estimate', async () => {
-  const apiUrl = `${DEFAULT_CORE_NODE_API_URL}/v2/fees/transaction`;
+  const apiUrl = `${HIRO_MAINNET_URL}/v2/fees/transaction`;
   const recipient = standardPrincipalCV('SP3FGQ8Z7JY9BWYZ5WM53E0M9NK7WHJF0691NZ159');
   const amount = 12345;
   const nonce = 0;
@@ -278,7 +286,7 @@ test('Make STX token transfer with testnet', async () => {
     senderKey,
     fee,
     nonce,
-    network: new StacksTestnet(),
+    network: STACKS_TESTNET,
     memo: memo,
     anchorMode: AnchorMode.Any,
   });
@@ -728,7 +736,7 @@ test('Make versioned smart contract deploy', async () => {
     senderKey,
     fee,
     nonce,
-    network: new StacksTestnet(),
+    network: STACKS_TESTNET,
     anchorMode: AnchorMode.Any,
     clarityVersion: ClarityVersion.Clarity2,
   });
@@ -755,7 +763,7 @@ test('Make smart contract deploy (defaults to versioned smart contract, as of 2.
     senderKey,
     fee,
     nonce,
-    network: new StacksTestnet(),
+    network: STACKS_TESTNET,
     anchorMode: AnchorMode.Any,
   });
   expect(() => transaction.verifyOrigin()).not.toThrow();
@@ -803,7 +811,7 @@ test('Make smart contract deploy unsigned', async () => {
     publicKey,
     fee,
     nonce,
-    network: new StacksTestnet(),
+    network: STACKS_TESTNET,
     anchorMode: AnchorMode.Any,
   });
 
@@ -841,7 +849,7 @@ test('make a multi-sig contract deploy', async () => {
     signerKeys: privKeyStrings,
     fee,
     nonce,
-    network: new StacksTestnet(),
+    network: STACKS_TESTNET,
     anchorMode: AnchorMode.Any,
   });
   expect(() => transaction.verifyOrigin()).not.toThrow();
@@ -865,7 +873,7 @@ test('Make smart contract deploy signed', async () => {
     senderKey,
     fee,
     nonce,
-    network: new StacksTestnet(),
+    network: STACKS_TESTNET,
     anchorMode: AnchorMode.Any,
   });
   expect(() => transaction.verifyOrigin()).not.toThrow();
@@ -898,7 +906,7 @@ test('Make contract-call', async () => {
     senderKey,
     fee,
     nonce: 1,
-    network: new StacksTestnet(),
+    network: STACKS_TESTNET,
     anchorMode: AnchorMode.Any,
   });
   expect(() => transaction.verifyOrigin()).not.toThrow();
@@ -993,7 +1001,7 @@ test('Make contract-call with post conditions', async () => {
     senderKey,
     fee,
     nonce: 1,
-    network: new StacksTestnet(),
+    network: STACKS_TESTNET,
     postConditions,
     postConditionMode: PostConditionMode.Deny,
     anchorMode: AnchorMode.Any,
@@ -1039,7 +1047,7 @@ test('Make contract-call with post condition allow mode', async () => {
     senderKey,
     fee,
     nonce: 1,
-    network: new StacksTestnet(),
+    network: STACKS_TESTNET,
     postConditionMode: PostConditionMode.Allow,
     anchorMode: AnchorMode.Any,
   });
@@ -1072,7 +1080,7 @@ test('addSignature to an unsigned contract call transaction', async () => {
     publicKey,
     fee,
     nonce: 1,
-    network: new StacksTestnet(),
+    network: STACKS_TESTNET,
     postConditionMode: PostConditionMode.Allow,
     anchorMode: AnchorMode.Any,
   });
@@ -1117,7 +1125,7 @@ test('make a multi-sig contract call', async () => {
     signerKeys: privKeyStrings,
     fee,
     nonce: 1,
-    network: new StacksTestnet(),
+    network: STACKS_TESTNET,
     postConditionMode: PostConditionMode.Allow,
     anchorMode: AnchorMode.Any,
   });
@@ -1178,31 +1186,31 @@ test('Estimate transaction transfer fee', async () => {
 
   fetchMock.mockOnce(mockedResponse);
 
-  const mainnet = new StacksMainnet();
-  const resultEstimateFee = await estimateTransaction(
-    transaction.payload,
-    transactionByteLength,
-    mainnet
-  );
+  const mainnet = {}; // default
+  const resultEstimateFee = await estimateTransaction({
+    payload: bytesToHex(serializePayload(transaction.payload)),
+    estimatedLength: transactionByteLength,
+    api: mainnet,
+  });
 
   fetchMock.mockOnce(mockedResponse);
 
-  const testnet = new StacksTestnet();
-  const resultEstimateFee2 = await estimateTransaction(
-    transaction.payload,
-    transactionByteLength,
-    testnet
-  );
+  const testnet = { url: HIRO_TESTNET_URL };
+  const resultEstimateFee2 = await estimateTransaction({
+    payload: bytesToHex(serializePayload(transaction.payload)),
+    estimatedLength: transactionByteLength,
+    api: testnet,
+  });
 
   expect(fetchMock.mock.calls.length).toEqual(2);
-  expect(fetchMock.mock.calls[0][0]).toEqual(mainnet.getTransactionFeeEstimateApiUrl());
+  expect(fetchMock.mock.calls[0][0]).toEqual(`${HIRO_MAINNET_URL}${TRANSACTION_FEE_ESTIMATE_PATH}`);
   expect(fetchMock.mock.calls[0][1]?.body).toEqual(
     JSON.stringify({
       transaction_payload: bytesToHex(serializePayload(transaction.payload)),
       estimated_len: transactionByteLength,
     })
   );
-  expect(fetchMock.mock.calls[1][0]).toEqual(testnet.getTransactionFeeEstimateApiUrl());
+  expect(fetchMock.mock.calls[1][0]).toEqual(`${HIRO_TESTNET_URL}${TRANSACTION_FEE_ESTIMATE_PATH}`);
   expect(fetchMock.mock.calls[1][1]?.body).toEqual(
     JSON.stringify({
       transaction_payload: bytesToHex(serializePayload(transaction.payload)),
@@ -1216,7 +1224,7 @@ test('Estimate transaction transfer fee', async () => {
 test('Estimate transaction fee fallback', async () => {
   const privateKey = 'cb3df38053d132895220b9ce471f6b676db5b9bf0b4adefb55f2118ece2478df01';
   const poolAddress = 'ST11NJTTKGVT6D1HY4NJRVQWMQM7TVAR091EJ8P2Y';
-  const network = new StacksTestnet({ url: 'http://localhost:3999' });
+  const api = { url: 'http://localhost:3999' };
 
   // http://localhost:3999/v2/fees/transaction
   fetchMock.once(
@@ -1227,7 +1235,7 @@ test('Estimate transaction fee fallback', async () => {
   // http://localhost:3999/v2/fees/transfer
   fetchMock.once('1');
 
-  const tx = await makeContractCall({
+  const transaction = await makeContractCall({
     senderKey: privateKey,
     contractAddress: 'ST000000000000000000002AMW42H',
     contractName: 'pox-2',
@@ -1235,7 +1243,8 @@ test('Estimate transaction fee fallback', async () => {
     functionArgs: [uintCV(100_000), principalCV(poolAddress), noneCV(), noneCV()],
     anchorMode: AnchorMode.OnChainOnly,
     nonce: 1,
-    network,
+    network: STACKS_TESTNET,
+    api,
   });
 
   // http://localhost:3999/v2/fees/transaction
@@ -1247,22 +1256,9 @@ test('Estimate transaction fee fallback', async () => {
   // http://localhost:3999/v2/fees/transfer
   fetchMock.once('1');
 
-  const testnet = new StacksTestnet();
-  const resultEstimateFee = await estimateTransactionFeeWithFallback(tx, testnet);
+  const testnet = { url: HIRO_TESTNET_URL };
+  const resultEstimateFee = await estimateFee({ transaction, api: testnet });
   expect(resultEstimateFee).toBe(201n);
-
-  // Test with plain-text response
-  // http://localhost:3999/v2/fees/transaction
-  fetchMock.once(
-    `Estimator RPC endpoint failed to estimate tx TokenTransfer: NoEstimateAvailable`,
-    { status: 400 }
-  );
-
-  // http://localhost:3999/v2/fees/transfer
-  fetchMock.once('1');
-
-  const resultEstimateFee2 = await estimateTransactionFeeWithFallback(tx, testnet);
-  expect(resultEstimateFee2).toBe(201n);
 
   // http://localhost:3999/v2/fees/transaction
   fetchMock.once(
@@ -1273,10 +1269,10 @@ test('Estimate transaction fee fallback', async () => {
   // http://localhost:3999/v2/fees/transfer
   fetchMock.once('2'); // double
 
-  const doubleRate = await estimateTransactionFeeWithFallback(tx, testnet);
+  const doubleRate = await estimateFee({ transaction, api: testnet });
   expect(doubleRate).toBe(402n);
 
-  expect(fetchMock.mock.calls.length).toEqual(8);
+  expect(fetchMock.mock.calls.length).toEqual(6);
 });
 
 test('Single-sig transaction byte length must include signature', async () => {
@@ -1399,30 +1395,30 @@ test('Make STX token transfer with fetch account nonce', async () => {
   const amount = 12345;
   const fee = 0;
   const senderKey = 'cb3df38053d132895220b9ce471f6b676db5b9bf0b4adefb55f2118ece2478df01';
-  const senderAddress = 'STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6';
+  const address = 'STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6';
   const memo = 'test memo';
-  const network = new StacksTestnet();
-  const apiUrl = network.getAccountApiUrl(senderAddress);
 
   fetchMock.mockOnce(`{"balance":"0", "nonce":${nonce}}`);
-
-  const fetchNonce = await getNonce(senderAddress, network);
+  const fetchNonce = await getNonce({
+    address,
+    api: { url: HIRO_TESTNET_URL },
+  });
 
   fetchMock.mockOnce(`{"balance":"0", "nonce":${nonce}}`);
-
   const transaction = await makeSTXTokenTransfer({
     recipient,
     amount,
     senderKey,
     fee,
     memo,
-    network,
     anchorMode: AnchorMode.Any,
+    network: 'testnet',
   });
 
+  const EXPECTED_ACCOUNT_URL = `${HIRO_TESTNET_URL}${ACCOUNT_PATH}/${address}?proof=0`;
   expect(fetchMock.mock.calls.length).toEqual(2);
-  expect(fetchMock.mock.calls[0][0]).toEqual(apiUrl);
-  expect(fetchMock.mock.calls[1][0]).toEqual(apiUrl);
+  expect(fetchMock.mock.calls[0][0]).toEqual(EXPECTED_ACCOUNT_URL);
+  expect(fetchMock.mock.calls[1][0]).toEqual(EXPECTED_ACCOUNT_URL);
   expect(fetchNonce.toString()).toEqual(nonce.toString());
   expect(transaction.auth.spendingCondition?.nonce?.toString()).toEqual(nonce.toString());
 });
@@ -1559,7 +1555,7 @@ test('Make sponsored STX token transfer with sponsor fee estimate', async () => 
   const nonce = 2;
   const senderKey = 'edf9aee84d9b7abc145504dde6726c64f369d37ee34ded868fabd876c26570bc01';
   const memo = 'test memo';
-  const network = new StacksMainnet();
+  const api = { url: HIRO_MAINNET_URL };
 
   const sponsorKey = '9888d734e6e80a943a6544159e31d6c7e342f695ec867d549c569fa0028892d401';
   const sponsorNonce = 55;
@@ -1573,7 +1569,7 @@ test('Make sponsored STX token transfer with sponsor fee estimate', async () => 
     senderKey,
     fee,
     nonce,
-    memo: memo,
+    memo,
     sponsored: true,
     anchorMode: AnchorMode.Any,
   });
@@ -1615,7 +1611,7 @@ test('Make sponsored STX token transfer with sponsor fee estimate', async () => 
   const sponsorSignedTx = await sponsorTransaction(sponsorOptions);
 
   expect(fetchMock.mock.calls.length).toEqual(1);
-  expect(fetchMock.mock.calls[0][0]).toEqual(network.getTransactionFeeEstimateApiUrl());
+  expect(fetchMock.mock.calls[0][0]).toEqual(`${api.url}${TRANSACTION_FEE_ESTIMATE_PATH}`);
 
   const sponsorSignedTxSerialized = sponsorSignedTx.serialize();
 
@@ -1646,7 +1642,7 @@ test('Make sponsored STX token transfer with set tx fee', async () => {
   const nonce = 0;
   const senderKey = '8ca861519c4fa4a08de4beaa41688f60a24b575a976cf84099f38dc099a6d74401';
   // const senderAddress = 'ST2HTEQF50SW4X8077F8RSR8WCT57QG166TVG0GCE';
-  const network = new StacksTestnet();
+  const api = { url: HIRO_TESTNET_URL };
 
   const sponsorKey = '9888d734e6e80a943a6544159e31d6c7e342f695ec867d549c569fa0028892d401';
   // const sponsorAddress = 'ST2TPJ3NEZ63MMJ8AY9S45HZ10QSH51YF93GE89GQ';
@@ -1659,9 +1655,9 @@ test('Make sponsored STX token transfer with set tx fee', async () => {
     senderKey,
     fee,
     nonce,
-    network,
     sponsored: true,
     anchorMode: AnchorMode.Any,
+    api,
   });
 
   const sponsorOptions = {
@@ -1698,7 +1694,7 @@ test('Make sponsored contract deploy with sponsor fee estimate', async () => {
   const senderKey = '8ca861519c4fa4a08de4beaa41688f60a24b575a976cf84099f38dc099a6d74401';
   const fee = 0;
   const nonce = 0;
-  const network = new StacksTestnet();
+  const api = { url: HIRO_TESTNET_URL };
 
   const sponsorKey = '9888d734e6e80a943a6544159e31d6c7e342f695ec867d549c569fa0028892d401';
   // const sponsorAddress = 'ST2TPJ3NEZ63MMJ8AY9S45HZ10QSH51YF93GE89GQ';
@@ -1714,9 +1710,9 @@ test('Make sponsored contract deploy with sponsor fee estimate', async () => {
     senderKey,
     fee,
     nonce,
-    network,
     sponsored: true,
     anchorMode: AnchorMode.Any,
+    api,
   });
 
   const sponsorOptions = {
@@ -1756,7 +1752,6 @@ test('Make sponsored contract call with sponsor nonce fetch', async () => {
   const buffer = bufferCV(utf8ToBytes('foo'));
   const senderKey = 'e494f188c2d35887531ba474c433b1e41fadd8eb824aca983447fd4bb8b277a801';
   const nonce = 0;
-  const network = new StacksTestnet();
   const fee = 0;
   const sponsorFee = 1000;
 
@@ -1775,9 +1770,9 @@ test('Make sponsored contract call with sponsor nonce fetch', async () => {
     senderKey,
     fee,
     nonce,
-    network,
     sponsored: true,
     anchorMode: AnchorMode.Any,
+    network: 'testnet',
   });
 
   const sponsorOptions = {
@@ -1791,7 +1786,9 @@ test('Make sponsored contract call with sponsor nonce fetch', async () => {
   const sponsorSignedTx = await sponsorTransaction(sponsorOptions);
 
   expect(fetchMock.mock.calls.length).toEqual(1);
-  expect(fetchMock.mock.calls[0][0]).toEqual(network.getAccountApiUrl(sponsorAddress));
+  expect(fetchMock.mock.calls[0][0]).toEqual(
+    `${HIRO_TESTNET_URL}${ACCOUNT_PATH}/${sponsorAddress}?proof=0`
+  );
 
   const sponsorSignedTxSerialized = sponsorSignedTx.serialize();
 
@@ -1820,7 +1817,7 @@ test('Transaction broadcast success', async () => {
   const senderKey = 'edf9aee84d9b7abc145504dde6726c64f369d37ee34ded868fabd876c26570bc01';
   const memo = 'test memo';
 
-  const network = new StacksMainnet();
+  const api = { url: HIRO_MAINNET_URL };
 
   const transaction = await makeSTXTokenTransfer({
     recipient,
@@ -1832,14 +1829,17 @@ test('Transaction broadcast success', async () => {
     anchorMode: AnchorMode.Any,
   });
 
-  fetchMock.mockOnce('success');
+  const txid = transaction.txid();
+  fetchMock.mockOnce(`"${txid}"`);
 
-  const response: TxBroadcastResult = await broadcastTransaction(transaction, network);
+  const response: TxBroadcastResult = await broadcastTransaction({ transaction, api });
 
   expect(fetchMock.mock.calls.length).toEqual(1);
-  expect(fetchMock.mock.calls[0][0]).toEqual(network.getBroadcastApiUrl());
-  expect(fetchMock.mock.calls[0][1]?.body).toEqual(transaction.serialize());
-  expect(response as TxBroadcastResultOk).toEqual({ txid: 'success' });
+  expect(fetchMock.mock.calls[0][0]).toEqual(`${api.url}${BROADCAST_PATH}`);
+  expect(fetchMock.mock.calls[0][1]?.body).toEqual(
+    JSON.stringify({ tx: bytesToHex(transaction.serialize()) })
+  );
+  expect(response as TxBroadcastResultOk).toEqual({ txid });
 });
 
 test('Transaction broadcast success with string network name', async () => {
@@ -1854,14 +1854,17 @@ test('Transaction broadcast success with string network name', async () => {
     anchorMode: AnchorMode.Any,
   });
 
-  fetchMock.mockOnce('success');
+  const txid = transaction.txid();
+  fetchMock.mockOnce(`"${txid}"`);
 
-  const response: TxBroadcastResult = await broadcastTransaction(transaction, 'mainnet');
+  const response: TxBroadcastResult = await broadcastTransaction({ transaction });
 
   expect(fetchMock.mock.calls.length).toEqual(1);
-  expect(fetchMock.mock.calls[0][0]).toEqual(new StacksMainnet().getBroadcastApiUrl());
-  expect(fetchMock.mock.calls[0][1]?.body).toEqual(transaction.serialize());
-  expect(response as TxBroadcastResultOk).toEqual({ txid: 'success' });
+  expect(fetchMock.mock.calls[0][0]).toEqual(`${HIRO_MAINNET_URL}${BROADCAST_PATH}`);
+  expect(fetchMock.mock.calls[0][1]?.body).toEqual(
+    JSON.stringify({ tx: bytesToHex(transaction.serialize()) })
+  );
+  expect(response as TxBroadcastResultOk).toEqual({ txid });
 });
 
 test('Transaction broadcast success with network detection', async () => {
@@ -1876,14 +1879,17 @@ test('Transaction broadcast success with network detection', async () => {
     anchorMode: AnchorMode.Any,
   });
 
-  fetchMock.mockOnce('success');
+  const txid = transaction.txid();
+  fetchMock.mockOnce(`"${txid}"`);
 
-  const response: TxBroadcastResult = await broadcastTransaction(transaction);
+  const response: TxBroadcastResult = await broadcastTransaction({ transaction });
 
   expect(fetchMock.mock.calls.length).toEqual(1);
-  expect(fetchMock.mock.calls[0][0]).toEqual(new StacksTestnet().getBroadcastApiUrl());
-  expect(fetchMock.mock.calls[0][1]?.body).toEqual(transaction.serialize());
-  expect(response as TxBroadcastResultOk).toEqual({ txid: 'success' });
+  expect(fetchMock.mock.calls[0][0]).toEqual(`${HIRO_TESTNET_URL}${BROADCAST_PATH}`);
+  expect(fetchMock.mock.calls[0][1]?.body).toEqual(
+    JSON.stringify({ tx: bytesToHex(transaction.serialize()) })
+  );
+  expect(response as TxBroadcastResultOk).toEqual({ txid });
 });
 
 test('Transaction broadcast with attachment', async () => {
@@ -1893,9 +1899,7 @@ test('Transaction broadcast with attachment', async () => {
   const nonce = 0;
   const senderKey = 'edf9aee84d9b7abc145504dde6726c64f369d37ee34ded868fabd876c26570bc01';
   const memo = 'test memo';
-  const attachment = utf8ToBytes('this is an attachment...');
-
-  const network = new StacksMainnet();
+  const attachment = bytesToHex(utf8ToBytes('this is an attachment...'));
 
   const transaction = await makeSTXTokenTransfer({
     recipient,
@@ -1907,19 +1911,20 @@ test('Transaction broadcast with attachment', async () => {
     anchorMode: AnchorMode.Any,
   });
 
-  fetchMock.mockOnce('success');
+  const txid = transaction.txid();
+  fetchMock.mockOnce(`"${txid}"`);
 
-  const response: TxBroadcastResult = await broadcastTransaction(transaction, network, attachment);
+  const response: TxBroadcastResult = await broadcastTransaction({ transaction, attachment });
 
   expect(fetchMock.mock.calls.length).toEqual(1);
-  expect(fetchMock.mock.calls[0][0]).toEqual(network.getBroadcastApiUrl());
+  expect(fetchMock.mock.calls[0][0]).toEqual(`${HIRO_MAINNET_URL}${BROADCAST_PATH}`);
   expect(fetchMock.mock.calls[0][1]?.body).toEqual(
     JSON.stringify({
       tx: bytesToHex(transaction.serialize()),
-      attachment: bytesToHex(attachment),
+      attachment,
     })
   );
-  expect(response as TxBroadcastResultOk).toEqual({ txid: 'success' });
+  expect(response as TxBroadcastResultOk).toEqual({ txid });
 });
 
 test('Transaction broadcast returns error', async () => {
@@ -1929,8 +1934,6 @@ test('Transaction broadcast returns error', async () => {
   const nonce = 0;
   const senderKey = 'edf9aee84d9b7abc145504dde6726c64f369d37ee34ded868fabd876c26570bc01';
   const memo = 'test memo';
-
-  const network = new StacksMainnet();
 
   const transaction = await makeSTXTokenTransfer({
     recipient,
@@ -1956,9 +1959,9 @@ test('Transaction broadcast returns error', async () => {
 
   fetchMock.mockOnce(JSON.stringify(rejection), { status: 400 });
 
-  const result = await broadcastTransaction(transaction, network);
+  const result = await broadcastTransaction({ transaction });
   expect((result as TxBroadcastResultRejected).reason).toEqual(TxRejectedReason.BadNonce);
-  expect((result as TxBroadcastResultRejected).reason_data).toEqual(rejection.reason_data);
+  expect((result as BadNonceRejection).reason_data).toEqual(rejection.reason_data);
 });
 
 test('Transaction broadcast fails', async () => {
@@ -1968,8 +1971,6 @@ test('Transaction broadcast fails', async () => {
   const nonce = 0;
   const senderKey = 'edf9aee84d9b7abc145504dde6726c64f369d37ee34ded868fabd876c26570bc01';
   const memo = 'test memo';
-
-  const network = new StacksMainnet();
 
   const transaction = await makeSTXTokenTransfer({
     recipient,
@@ -1983,7 +1984,7 @@ test('Transaction broadcast fails', async () => {
 
   fetchMock.mockOnce('test', { status: 400 });
 
-  await expect(broadcastTransaction(transaction, network)).rejects.toThrow();
+  await expect(broadcastTransaction({ transaction })).rejects.toThrow();
 });
 
 test('Make contract-call with network ABI validation', async () => {
@@ -1994,8 +1995,6 @@ test('Make contract-call with network ABI validation', async () => {
   const senderKey = 'e494f188c2d35887531ba474c433b1e41fadd8eb824aca983447fd4bb8b277a801';
 
   const fee = 0;
-
-  const network = new StacksTestnet();
 
   const abi = fs.readFileSync('./tests/abi/kv-store-abi.json').toString();
   fetchMock.mockOnce(abi);
@@ -2008,14 +2007,16 @@ test('Make contract-call with network ABI validation', async () => {
     functionArgs: [buffer],
     fee,
     nonce: 1,
-    network: new StacksTestnet(),
+    network: STACKS_TESTNET,
     validateWithAbi: true,
     postConditionMode: PostConditionMode.Allow,
     anchorMode: AnchorMode.Any,
   });
 
   expect(fetchMock.mock.calls.length).toEqual(1);
-  expect(fetchMock.mock.calls[0][0]).toEqual(network.getAbiApiUrl(contractAddress, contractName));
+  expect(fetchMock.mock.calls[0][0]).toEqual(
+    `${HIRO_TESTNET_URL}${CONTRACT_ABI_PATH}/${contractAddress}/${contractName}`
+  );
 });
 
 test('Make contract-call with provided ABI validation', async () => {
@@ -2052,8 +2053,6 @@ test('Make contract-call with network ABI validation failure', async () => {
 
   const fee = 0;
 
-  const network = new StacksTestnet();
-
   fetchMock.mockOnce('failed', { status: 404 });
 
   let error;
@@ -2075,7 +2074,7 @@ test('Make contract-call with network ABI validation failure', async () => {
     error = e;
   }
 
-  const abiUrl = network.getAbiApiUrl(contractAddress, contractName);
+  const abiUrl = `${HIRO_TESTNET_URL}${CONTRACT_ABI_PATH}/${contractAddress}/${contractName}`;
   expect(error).toEqual(
     new Error(
       `Error fetching contract ABI for contract "kv-store" at address ST3KC0MTNW34S1ZXD36JYKFD3JJMWA01M55DSJ4JE. Response 404: Not Found. Attempted to fetch ${abiUrl} and failed with the message: "failed"`
@@ -2088,7 +2087,7 @@ test('Call read-only function', async () => {
   const contractName = 'kv-store';
   const functionName = 'get-value?';
   const buffer = bufferCVFromString('foo');
-  const network = new StacksTestnet();
+  const api = { url: HIRO_TESTNET_URL };
   const senderAddress = 'ST2F4BK4GZH6YFBNHYDDGN4T1RKBA7DA1BJZPJEJJ';
   const mockResult = bufferCVFromString('test');
 
@@ -2097,34 +2096,17 @@ test('Call read-only function', async () => {
     contractName,
     functionName,
     functionArgs: [buffer],
-    network,
     senderAddress,
+    api,
   };
 
-  const apiUrl = network.getReadOnlyFunctionCallApiUrl(contractAddress, contractName, functionName);
+  const apiUrl = `${api.url}${READONLY_FUNCTION_CALL_PATH}/${contractAddress}/kv-store/get-value%3F`; // uri encoded
   fetchMock.mockOnce(`{"okay": true, "result": "0x${bytesToHex(serializeCV(mockResult))}"}`);
 
   const result = await callReadOnlyFunction(options);
 
   expect(fetchMock.mock.calls.length).toEqual(1);
   expect(fetchMock.mock.calls[0][0]).toEqual(apiUrl);
-  expect(result).toEqual(mockResult);
-});
-
-test('Call read-only function with network string', async () => {
-  const mockResult = bufferCVFromString('test');
-  fetchMock.mockOnce(`{"okay": true, "result": "0x${bytesToHex(serializeCV(mockResult))}"}`);
-
-  const result = await callReadOnlyFunction({
-    contractAddress: 'ST3KC0MTNW34S1ZXD36JYKFD3JJMWA01M55DSJ4JE',
-    contractName: 'kv-store',
-    functionName: 'get-value?',
-    functionArgs: [bufferCVFromString('foo')],
-    network: 'testnet',
-    senderAddress: 'ST2F4BK4GZH6YFBNHYDDGN4T1RKBA7DA1BJZPJEJJ',
-  });
-
-  expect(fetchMock.mock.calls.length).toEqual(1);
   expect(result).toEqual(mockResult);
 });
 
@@ -2196,7 +2178,7 @@ test('StacksTransaction serialize/deserialize equality with an empty memo', asyn
     fee: 100n,
     nonce: 0n,
     memo: '', // empty memo
-    network: new StacksMainnet(),
+    network: STACKS_MAINNET,
     anchorMode: AnchorMode.Any,
     senderKey: 'edf9aee84d9b7abc145504dde6726c64f369d37ee34ded868fabd876c26570bc01',
   };
@@ -2215,7 +2197,7 @@ test('StacksTransaction serialize/deserialize equality with a memo', async () =>
     fee: 100n,
     nonce: 0n,
     memo: 'Memento Mori',
-    network: new StacksMainnet(),
+    network: STACKS_MAINNET,
     anchorMode: AnchorMode.Any,
     senderKey: 'edf9aee84d9b7abc145504dde6726c64f369d37ee34ded868fabd876c26570bc01',
   };
@@ -2234,7 +2216,7 @@ test('StacksTransaction serialize/deserialize equality with a memo ending in a z
     fee: 100n,
     nonce: 0n,
     memo: bytesToUtf8(hexToBytes('0')), // null character
-    network: new StacksMainnet(),
+    network: STACKS_MAINNET,
     anchorMode: AnchorMode.Any,
     senderKey: 'edf9aee84d9b7abc145504dde6726c64f369d37ee34ded868fabd876c26570bc01',
   };

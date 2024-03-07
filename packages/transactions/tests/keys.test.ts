@@ -34,12 +34,12 @@ import {
   StacksMessageType,
   StacksPublicKey,
   stringAsciiCV,
-  TransactionVersion,
   tupleCV,
   uintCV,
 } from '../src';
 import { randomBytes } from '../src/utils';
 import { serializeDeserialize } from './macros';
+import { TransactionVersion } from '@stacks/network';
 
 // Create and initialize EC context
 // Better do it once and reuse it
