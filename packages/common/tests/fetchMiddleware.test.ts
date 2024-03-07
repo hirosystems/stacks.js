@@ -5,7 +5,7 @@ import {
   FetchMiddleware,
   RequestContext,
   ResponseContext,
-} from '@stacks/common';
+} from '../src/fetch';
 
 beforeEach(() => {
   fetchMock.resetMocks();

@@ -86,6 +86,40 @@ export type SpendingCondition = SingleSigSpendingCondition | MultiSigSpendingCon
 
 export type SpendingConditionOpts = SingleSigSpendingConditionOpts | MultiSigSpendingConditionOpts;
 
+export function createSpendingCondition(
+  options:
+    | {
+        // Single-sig
+        publicKey: string;
+        nonce: IntegerType;
+        fee: IntegerType;
+      }
+    | {
+        // Multi-sig
+        publicKeys: string[];
+        numSignatures: number;
+        nonce: IntegerType;
+        fee: IntegerType;
+      }
+) {
+  if ('publicKey' in options) {
+    return createSingleSigSpendingCondition(
+      AddressHashMode.SerializeP2PKH,
+      options.publicKey,
+      options.nonce,
+      options.fee
+    );
+  }
+  // multi-sig
+  return createMultiSigSpendingCondition(
+    AddressHashMode.SerializeP2SH,
+    options.numSignatures,
+    options.publicKeys,
+    options.nonce,
+    options.fee
+  );
+}
+
 export function createSingleSigSpendingCondition(
   hashMode: SingleSigHashMode,
   pubKey: string,

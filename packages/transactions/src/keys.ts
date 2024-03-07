@@ -34,11 +34,11 @@ import {
   COMPRESSED_PUBKEY_LENGTH_BYTES,
   PubKeyEncoding,
   StacksMessageType,
-  TransactionVersion,
   UNCOMPRESSED_PUBKEY_LENGTH_BYTES,
 } from './constants';
 import { hash160, hashP2PKH } from './utils';
 import { StructuredDataSignature } from './message-types';
+import { TransactionVersion } from '@stacks/network';
 
 /**
  * To use secp256k1.signSync set utils.hmacSha256Sync to a function using noble-hashes
