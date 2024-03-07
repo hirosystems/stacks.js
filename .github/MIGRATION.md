@@ -41,7 +41,6 @@ The `@stacks/network` package exports the following network objects:
 ```ts
 import { STACKS_MAINNET } from '@stacks/network';
 import { STACKS_TESTNET } from '@stacks/network';
-import { STACKS_MOCKNET } from '@stacks/network';
 import { STACKS_DEVNET } from '@stacks/network';
 ```
 
