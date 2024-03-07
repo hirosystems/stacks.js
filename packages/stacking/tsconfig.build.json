@@ -9,6 +9,9 @@
   },
   "references": [
     {
+      "path": "../api/tsconfig.build.json"
+    },
+    {
       "path": "../common/tsconfig.build.json"
     },
     {
@@ -21,7 +24,5 @@
       "path": "../transactions/tsconfig.build.json"
     }
   ],
-  "include": [
-    "src/**/*"
-  ]
+  "include": ["src/**/*"]
 }

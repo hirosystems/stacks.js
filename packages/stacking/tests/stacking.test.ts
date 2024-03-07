@@ -1,7 +1,8 @@
-import { bigIntToBytes, bytesToHex, hexToBytes } from '@stacks/common';
+import { sha256 } from '@noble/hashes/sha256';
+import { HIRO_TESTNET_URL, bigIntToBytes, bytesToHex, hexToBytes } from '@stacks/common';
 import { base58CheckDecode, getPublicKeyFromPrivate } from '@stacks/encryption';
-import { StacksMainnet, StacksTestnet } from '@stacks/network';
 import {
+  ACCOUNT_PATH,
   AnchorMode,
   ClarityType,
   ReadOnlyFunctionOptions,
@@ -32,7 +33,7 @@ import {
   verifyPox4SignatureHash,
 } from '../src/utils';
 import { V2_POX_REGTEST_POX_3, setApiMocks } from './apiMockingHelpers';
-import { sha256 } from '@noble/hashes/sha256';
+import { STACKS_MAINNET, STACKS_TESTNET } from '@stacks/network/src';
 
 const poxInfo = {
   contract_id: 'ST000000000000000000002AMW42H.pox-3',
@@ -198,7 +199,7 @@ beforeEach(() => {
 test('check stacking eligibility true', async () => {
   const address = 'ST3XKKN4RPV69NN1PHFDNX3TYKXT7XPC4N8KC1ARH';
   const poxAddress = '1Xik14zRm29UsyS6DjhYg4iZeZqsDa8D3';
-  const network = new StacksTestnet();
+  const network = STACKS_TESTNET;
 
   const functionCallResponse = responseOkCV(trueCV());
   const callReadOnlyFunction = jest.fn().mockResolvedValue(functionCallResponse);
@@ -230,15 +231,15 @@ test('check stacking eligibility true', async () => {
   const stackingEligibility = await client.canStack({ poxAddress, cycles });
 
   expect(fetchMock.mock.calls.length).toEqual(2);
-  expect(fetchMock.mock.calls[0][0]).toEqual(network.getAccountApiUrl(address));
-  expect(fetchMock.mock.calls[1][0]).toEqual(network.getPoxInfoUrl());
+  expect(fetchMock.mock.calls[0][0]).toEqual(`${HIRO_TESTNET_URL}/${ACCOUNT_PATH}/${address}`);
+  expect(fetchMock.mock.calls[1][0]).toEqual(`${HIRO_TESTNET_URL}/v2/pox}`);
   expect(stackingEligibility.eligible).toBe(true);
 });
 
 test('check stacking eligibility false bad cycles', async () => {
   const address = 'ST3XKKN4RPV69NN1PHFDNX3TYKXT7XPC4N8KC1ARH';
   const poxAddress = '1Xik14zRm29UsyS6DjhYg4iZeZqsDa8D3';
-  const network = new StacksTestnet();
+  const network = STACKS_TESTNET;
 
   const expectedErrorString = StackingErrors[StackingErrors.ERR_STACKING_INVALID_LOCK_PERIOD];
   const functionCallResponse = responseErrorCV(intCV(2));
@@ -271,8 +272,8 @@ test('check stacking eligibility false bad cycles', async () => {
   const stackingEligibility = await client.canStack({ poxAddress, cycles: invalidCycles });
 
   expect(fetchMock.mock.calls.length).toEqual(2);
-  expect(fetchMock.mock.calls[0][0]).toEqual(network.getAccountApiUrl(address));
-  expect(fetchMock.mock.calls[1][0]).toEqual(network.getPoxInfoUrl());
+  expect(fetchMock.mock.calls[0][0]).toEqual(`${HIRO_TESTNET_URL}/${ACCOUNT_PATH}/`);
+  expect(fetchMock.mock.calls[1][0]).toEqual(`${HIRO_TESTNET_URL}/v2/pox}`);
   expect(stackingEligibility.eligible).toBe(false);
   expect(stackingEligibility.reason).toBe(expectedErrorString);
 });
@@ -280,7 +281,7 @@ test('check stacking eligibility false bad cycles', async () => {
 test('stack stx', async () => {
   const address = 'ST3XKKN4RPV69NN1PHFDNX3TYKXT7XPC4N8KC1ARH';
   const poxAddress = '1Xik14zRm29UsyS6DjhYg4iZeZqsDa8D3';
-  const network = new StacksTestnet();
+  const network = STACKS_TESTNET;
   const amountMicroStx = BigInt(100000000000);
   const cycles = 10;
   const privateKey = 'd48f215481c16cbe6426f8e557df9b78895661971d71735126545abddcd5377001';
@@ -340,7 +341,7 @@ test('stack stx', async () => {
     anchorMode: AnchorMode.Any,
   };
 
-  expect(fetchMock.mock.calls[0][0]).toEqual(network.getPoxInfoUrl());
+  expect(fetchMock.mock.calls[0][0]).toEqual(`${HIRO_TESTNET_URL}/v2/pox}`);
   expect(makeContractCall).toHaveBeenCalledTimes(1);
   expect(makeContractCall).toHaveBeenCalledWith(expectedContractCallOptions);
   expect(broadcastTransaction).toHaveBeenCalledTimes(1);
@@ -353,7 +354,7 @@ test('delegate stx', async () => {
   const address = 'ST3XKKN4RPV69NN1PHFDNX3TYKXT7XPC4N8KC1ARH';
   const delegateTo = 'ST2MCYPWTFMD2MGR5YY695EJG0G1R4J2BTJPRGM7H';
   const poxAddress = '1Xik14zRm29UsyS6DjhYg4iZeZqsDa8D3';
-  const network = new StacksTestnet();
+  const network = STACKS_TESTNET;
   const amountMicroStx = BigInt(100000000000);
   const untilBurnBlockHeight = 2000;
   const privateKey = 'd48f215481c16cbe6426f8e557df9b78895661971d71735126545abddcd5377001';
@@ -412,7 +413,7 @@ test('delegate stx', async () => {
     anchorMode: AnchorMode.Any,
   };
 
-  expect(fetchMock.mock.calls[0][0]).toEqual(network.getPoxInfoUrl());
+  expect(fetchMock.mock.calls[0][0]).toEqual(`${HIRO_TESTNET_URL}/v2/pox}`);
   expect(makeContractCall).toHaveBeenCalledTimes(1);
   expect(makeContractCall).toHaveBeenCalledWith(expectedContractCallOptions);
   expect(broadcastTransaction).toHaveBeenCalledTimes(1);
@@ -424,7 +425,7 @@ test('delegate stx', async () => {
 test('delegate stx with empty optional parameters', async () => {
   const address = 'ST3XKKN4RPV69NN1PHFDNX3TYKXT7XPC4N8KC1ARH';
   const delegateTo = 'ST2MCYPWTFMD2MGR5YY695EJG0G1R4J2BTJPRGM7H';
-  const network = new StacksTestnet();
+  const network = STACKS_TESTNET;
   const amountMicroStx = BigInt(100000000000);
   const privateKey = 'd48f215481c16cbe6426f8e557df9b78895661971d71735126545abddcd5377001';
 
@@ -476,7 +477,7 @@ test('delegate stx with empty optional parameters', async () => {
     anchorMode: AnchorMode.Any,
   };
 
-  expect(fetchMock.mock.calls[0][0]).toEqual(network.getPoxInfoUrl());
+  expect(fetchMock.mock.calls[0][0]).toEqual(`${HIRO_TESTNET_URL}/v2/pox}`);
   expect(makeContractCall).toHaveBeenCalledTimes(1);
   expect(makeContractCall).toHaveBeenCalledWith(expectedContractCallOptions);
   expect(broadcastTransaction).toHaveBeenCalledTimes(1);
@@ -489,7 +490,7 @@ test('delegate stack stx with one delegator', async () => {
   const stacker = 'ST3XKKN4RPV69NN1PHFDNX3TYKXT7XPC4N8KC1ARH';
   const address = 'ST2MCYPWTFMD2MGR5YY695EJG0G1R4J2BTJPRGM7H';
   const poxAddress = '1Xik14zRm29UsyS6DjhYg4iZeZqsDa8D3';
-  const network = new StacksTestnet();
+  const network = STACKS_TESTNET;
   const amountMicroStx = BigInt(100000000000);
   const burnBlockHeight = 2000;
   const cycles = 10;
@@ -559,7 +560,7 @@ test('delegate stack stx with one delegator', async () => {
     anchorMode: AnchorMode.Any,
   };
 
-  expect(fetchMock.mock.calls[0][0]).toEqual(network.getPoxInfoUrl());
+  expect(fetchMock.mock.calls[0][0]).toEqual(`${HIRO_TESTNET_URL}/v2/pox}`);
   expect(makeContractCall).toHaveBeenCalledTimes(1);
   expect(makeContractCall).toHaveBeenCalledWith(expectedContractCallOptions);
   expect(broadcastTransaction).toHaveBeenCalledTimes(1);
@@ -572,7 +573,7 @@ test('delegate stack stx with set nonce', async () => {
   const stacker = 'ST3XKKN4RPV69NN1PHFDNX3TYKXT7XPC4N8KC1ARH';
   const address = 'ST2MCYPWTFMD2MGR5YY695EJG0G1R4J2BTJPRGM7H';
   const poxAddress = '1Xik14zRm29UsyS6DjhYg4iZeZqsDa8D3';
-  const network = new StacksTestnet();
+  const network = STACKS_TESTNET;
   const amountMicroStx = BigInt(100000000000);
   const burnBlockHeight = 2000;
   const cycles = 10;
@@ -645,7 +646,7 @@ test('delegate stack stx with set nonce', async () => {
     anchorMode: AnchorMode.Any,
   };
 
-  expect(fetchMock.mock.calls[0][0]).toEqual(network.getPoxInfoUrl());
+  expect(fetchMock.mock.calls[0][0]).toEqual(`${HIRO_TESTNET_URL}/v2/pox}`);
   expect(makeContractCall).toHaveBeenCalledTimes(1);
   expect(makeContractCall).toHaveBeenCalledWith(expectedContractCallOptions);
   expect(broadcastTransaction).toHaveBeenCalledTimes(1);
@@ -657,7 +658,7 @@ test('delegate stack stx with set nonce', async () => {
 test('delegator commit', async () => {
   const address = 'ST3XKKN4RPV69NN1PHFDNX3TYKXT7XPC4N8KC1ARH';
   const poxAddress = '1Xik14zRm29UsyS6DjhYg4iZeZqsDa8D3';
-  const network = new StacksTestnet();
+  const network = STACKS_TESTNET;
   const rewardCycle = 10;
   const privateKey = 'd48f215481c16cbe6426f8e557df9b78895661971d71735126545abddcd5377001';
 
@@ -708,7 +709,7 @@ test('delegator commit', async () => {
     anchorMode: AnchorMode.Any,
   };
 
-  expect(fetchMock.mock.calls[0][0]).toEqual(network.getPoxInfoUrl());
+  expect(fetchMock.mock.calls[0][0]).toEqual(`${HIRO_TESTNET_URL}/v2/pox}`);
   expect(makeContractCall).toHaveBeenCalledTimes(1);
   expect(makeContractCall).toHaveBeenCalledWith(expectedContractCallOptions);
   expect(broadcastTransaction).toHaveBeenCalledTimes(1);
@@ -719,7 +720,7 @@ test('delegator commit', async () => {
 
 test('revoke delegate stx', async () => {
   const address = 'ST3XKKN4RPV69NN1PHFDNX3TYKXT7XPC4N8KC1ARH';
-  const network = new StacksTestnet();
+  const network = STACKS_TESTNET;
   const privateKey = 'd48f215481c16cbe6426f8e557df9b78895661971d71735126545abddcd5377001';
 
   const transaction = { serialize: () => 'mocktxhex' };
@@ -757,7 +758,7 @@ test('revoke delegate stx', async () => {
     anchorMode: AnchorMode.Any,
   };
 
-  expect(fetchMock.mock.calls[0][0]).toEqual(network.getPoxInfoUrl());
+  expect(fetchMock.mock.calls[0][0]).toEqual(`${HIRO_TESTNET_URL}/v2/pox}`);
   expect(makeContractCall).toHaveBeenCalledTimes(1);
   expect(makeContractCall).toHaveBeenCalledWith(expectedContractCallOptions);
   expect(broadcastTransaction).toHaveBeenCalledTimes(1);
@@ -768,7 +769,7 @@ test('revoke delegate stx', async () => {
 
 test('get stacking status', async () => {
   const address = 'ST3XKKN4RPV69NN1PHFDNX3TYKXT7XPC4N8KC1ARH';
-  const network = new StacksTestnet();
+  const network = STACKS_TESTNET;
   const amountMicrostx = 10_000;
   const firstRewardCycle = 10;
   const lockPeriod = 20;
@@ -837,7 +838,7 @@ test('get stacking status', async () => {
 
 test('get core info', async () => {
   const address = 'ST3XKKN4RPV69NN1PHFDNX3TYKXT7XPC4N8KC1ARH';
-  const network = new StacksTestnet();
+  const network = STACKS_TESTNET;
 
   fetchMock.mockResponse(() => {
     return Promise.resolve({
@@ -852,13 +853,13 @@ test('get core info', async () => {
 
   const responseCoreInfo = await client.getCoreInfo();
 
-  expect(fetchMock.mock.calls[0][0]).toEqual(network.getInfoUrl());
+  expect(fetchMock.mock.calls[0][0]).toEqual(`${HIRO_TESTNET_URL}/v2/info`);
   expect(responseCoreInfo).toEqual(coreInfo);
 });
 
 test('get pox info', async () => {
   const address = 'ST3XKKN4RPV69NN1PHFDNX3TYKXT7XPC4N8KC1ARH';
-  const network = new StacksTestnet();
+  const network = STACKS_TESTNET;
 
   fetchMock.mockResponse(() => {
     return Promise.resolve({
@@ -873,13 +874,13 @@ test('get pox info', async () => {
 
   const responsePoxInfo = await client.getPoxInfo();
 
-  expect(fetchMock.mock.calls[0][0]).toEqual(network.getPoxInfoUrl());
+  expect(fetchMock.mock.calls[0][0]).toEqual(`${HIRO_TESTNET_URL}/v2/pox}`);
   expect(responsePoxInfo).toEqual(poxInfo);
 });
 
 test('get a list of burnchain rewards for the set address', async () => {
   const address = 'myfTfju9XSMRusaY2qTitSEMSchsWRA441';
-  const network = new StacksTestnet();
+  const network = STACKS_TESTNET;
 
   fetchMock.mockResponse(() => {
     return Promise.resolve({
@@ -894,13 +895,15 @@ test('get a list of burnchain rewards for the set address', async () => {
   const options = { limit: 2, offset: 0 };
   const response = await client.getRewardsForBtcAddress(options);
 
-  expect(fetchMock.mock.calls[0][0]).toEqual(network.getRewardsUrl(address, options));
+  expect(fetchMock.mock.calls[0][0]).toEqual(
+    `${HIRO_TESTNET_URL}/extended/v1/burnchain/rewards/${address}`
+  );
   expect(response).toEqual(rewardsInfo);
 });
 
 test('get the burnchain rewards total for the set address', async () => {
   const address = 'myfTfju9XSMRusaY2qTitSEMSchsWRA441';
-  const network = new StacksTestnet();
+  const network = STACKS_TESTNET;
 
   fetchMock.mockResponse(() => {
     return Promise.resolve({
@@ -914,13 +917,15 @@ test('get the burnchain rewards total for the set address', async () => {
   const client = new StackingClient(address, network);
   const response = await client.getRewardsTotalForBtcAddress();
 
-  expect(fetchMock.mock.calls[0][0]).toEqual(network.getRewardsTotalUrl(address));
+  expect(fetchMock.mock.calls[0][0]).toEqual(
+    `${HIRO_TESTNET_URL}/extended/v1/burnchain/rewards/${address}/total`
+  );
   expect(response).toEqual(rewardsTotalInfo);
 });
 
 test('get a list of burnchain reward holders for the set address ', async () => {
   const address = 'myfTfju9XSMRusaY2qTitSEMSchsWRA441';
-  const network = new StacksTestnet();
+  const network = STACKS_TESTNET;
 
   fetchMock.mockResponse(() => {
     return Promise.resolve({
@@ -935,13 +940,15 @@ test('get a list of burnchain reward holders for the set address ', async () => 
   const options = { limit: 2, offset: 0 };
   const response = await client.getRewardHoldersForBtcAddress(options);
 
-  expect(fetchMock.mock.calls[0][0]).toEqual(network.getRewardHoldersUrl(address, options));
+  expect(fetchMock.mock.calls[0][0]).toEqual(
+    `${HIRO_TESTNET_URL}/extended/v1/burnchain/reward_slot_holders/${address}`
+  );
   expect(response).toEqual(rewardHoldersInfo);
 });
 
 test('get target block time info', async () => {
   const address = 'ST3XKKN4RPV69NN1PHFDNX3TYKXT7XPC4N8KC1ARH';
-  const network = new StacksTestnet();
+  const network = STACKS_TESTNET;
 
   fetchMock.mockResponse(() => {
     return Promise.resolve({
@@ -956,13 +963,15 @@ test('get target block time info', async () => {
 
   const responseBlockTimeInfo = await client.getTargetBlockTime();
 
-  expect(fetchMock.mock.calls[0][0]).toEqual(network.getBlockTimeInfoUrl());
+  expect(fetchMock.mock.calls[0][0]).toEqual(
+    `${HIRO_TESTNET_URL}/extended/v1/info/network_block_times`
+  );
   expect(responseBlockTimeInfo).toEqual(blocktimeInfo.testnet.target_block_time);
 });
 
 test('get account balance', async () => {
   const address = 'ST3XKKN4RPV69NN1PHFDNX3TYKXT7XPC4N8KC1ARH';
-  const network = new StacksTestnet();
+  const network = STACKS_TESTNET;
 
   fetchMock.mockResponse(() => {
     return Promise.resolve({
@@ -977,13 +986,13 @@ test('get account balance', async () => {
 
   const responseBalanceInfo = await client.getAccountBalance();
 
-  expect(fetchMock.mock.calls[0][0]).toEqual(network.getAccountApiUrl(address));
+  expect(fetchMock.mock.calls[0][0]).toEqual(`${HIRO_TESTNET_URL}/${ACCOUNT_PATH}/`);
   expect(responseBalanceInfo.toString()).toEqual(BigInt(balanceInfo.balance).toString());
 });
 
 test('get seconds until next cycle', async () => {
   const address = 'ST3XKKN4RPV69NN1PHFDNX3TYKXT7XPC4N8KC1ARH';
-  const network = new StacksTestnet();
+  const network = STACKS_TESTNET;
 
   fetchMock
     .mockResponseOnce(() => {
@@ -1010,9 +1019,11 @@ test('get seconds until next cycle', async () => {
   const client = new StackingClient(address, network);
 
   const responseSecondsUntilNextCycle = await client.getSecondsUntilNextCycle();
-  expect(fetchMock.mock.calls[0][0]).toEqual(network.getPoxInfoUrl());
-  expect(fetchMock.mock.calls[1][0]).toEqual(network.getBlockTimeInfoUrl());
-  expect(fetchMock.mock.calls[2][0]).toEqual(network.getInfoUrl());
+  expect(fetchMock.mock.calls[0][0]).toEqual(`${HIRO_TESTNET_URL}/v2/pox}`);
+  expect(fetchMock.mock.calls[1][0]).toEqual(
+    `${HIRO_TESTNET_URL}/extended/v1/info/network_block_times`
+  );
+  expect(fetchMock.mock.calls[2][0]).toEqual(`${HIRO_TESTNET_URL}/v2/info`);
 
   // next reward cycle in 10 blocks
   expect(responseSecondsUntilNextCycle.toString()).toEqual((10 * 120).toString());
@@ -1130,14 +1141,14 @@ test('client operations with contract principal stacker', () => {
   const { StackingClient } = require('../src'); // needed for jest.mock module
   const client = new StackingClient(
     'SP2HNY1HNF5X25VC7GZ3Y48JC4762AYFHKS061BM0.stacking-contract',
-    new StacksTestnet()
+    STACKS_TESTNET
   );
   expect(async () => await client.getStatus()).not.toThrow();
 });
 
 test('getSecondsUntilStackingDeadline', async () => {
-  const network = new StacksMainnet({ url: 'http://localhost:3999' });
-  const client = new StackingClient('', network);
+  const network = STACKS_MAINNET;
+  const client = new StackingClient({ address: '', network, api: { url: 'localhost:3999' } });
 
   setApiMocks({
     '/extended/v1/info/network_block_times': `{"testnet":{"target_block_time":120},"mainnet":{"target_block_time":600}}`,
@@ -1167,7 +1178,7 @@ test('getSecondsUntilStackingDeadline', async () => {
 });
 
 test('correctly signs pox-4 signer signature', () => {
-  const network = new StacksTestnet();
+  const network = STACKS_TESTNET;
   const poxAddress = 'msiYwJCvXEzjgq6hDwD9ueBka6MTfN962Z';
 
   const privateKey = createStacksPrivateKey(
@@ -1228,7 +1239,7 @@ test('correctly generates pox-4 message hash', () => {
         authId,
         maxAmount: 340282366920938463463374607431768211455n,
         rewardCycle: 1,
-        network: new StacksTestnet(),
+        network: STACKS_TESTNET,
       })
     )
   );
