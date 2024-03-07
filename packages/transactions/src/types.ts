@@ -55,8 +55,8 @@ import {
   addressHashModeToVersion,
   addressFromVersionHash,
 } from './common';
-import { deserializeCV, serializeCV } from './clarity';
-import { TransactionVersion } from '@stacks/network';
+import { ClarityValue, deserializeCV, serializeCV } from './clarity';
+import { StacksNetwork, StacksNetworkName, TransactionVersion } from '@stacks/network';
 
 export type StacksMessage =
   | Address
@@ -503,7 +503,7 @@ export type NoSuchContractRejection = {
 
 export type NoSuchPublicFunctionRejection = {
   reason: 'NoSuchPublicFunction';
-};
+} & BaseRejection;
 
 export type BadFunctionArgumentRejection = {
   reason: 'BadFunctionArgument';
@@ -599,4 +599,25 @@ export interface FeeEstimateResponse {
   };
   estimated_cost_scalar: bigint;
   estimations: [FeeEstimation, FeeEstimation, FeeEstimation];
+}
+
+/**
+ * Read only function options
+ *
+ * @param {String} contractAddress - the c32check address of the contract
+ * @param {String} contractName - the contract name
+ * @param {String} functionName - name of the function to be called
+ * @param {[ClarityValue]} functionArgs - an array of Clarity values as arguments to the function call
+ * @param {StacksNetwork} network - the Stacks blockchain network this transaction is destined for
+ * @param {String} senderAddress - the c32check address of the sender
+ */
+export interface ReadOnlyFunctionOptions {
+  contractName: string;
+  contractAddress: string;
+  functionName: string;
+  functionArgs: ClarityValue[];
+  /** the network that the contract which contains the function is deployed to */
+  network?: StacksNetworkName | StacksNetwork;
+  /** address of the sender */
+  senderAddress: string;
 }

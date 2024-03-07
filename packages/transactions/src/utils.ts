@@ -13,9 +13,7 @@ import {
 import { c32addressDecode } from 'c32check';
 import lodashCloneDeep from 'lodash.clonedeep';
 import { ClarityValue, deserializeCV, serializeCV } from './clarity';
-import { deriveDefaultUrl } from '@stacks/network/src';
-import { StacksNetworkName } from '@stacks/network';
-import { StacksNetwork } from '@stacks/network';
+import { StacksNetwork, deriveDefaultUrl, StacksNetworkName } from '@stacks/network';
 
 // Export verify as utility method for signature verification
 export { verify as verifySignature } from '@noble/secp256k1';

@@ -629,8 +629,8 @@ export function concatArray(elements: (Uint8Array | number[] | number)[]) {
  * Better `instanceof` check for types in different environments
  * @ignore
  */
-export function isInstance(object: any, type: any) {
-  return object instanceof type || object?.constructor?.name?.toLowerCase() === type.name;
+export function isInstance<T>(object: any, clazz: { new (...args: any[]): T }): object is T {
+  return object instanceof clazz || object?.constructor?.name?.toLowerCase() === clazz.name;
 }
 
 /**
