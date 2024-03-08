@@ -38,6 +38,7 @@ import {
   UNCOMPRESSED_PUBKEY_LENGTH_BYTES,
 } from './constants';
 import { hash160, hashP2PKH } from './utils';
+import { StructuredDataSignature } from './structuredDataSignature';
 
 /**
  * To use secp256k1.signSync set utils.hmacSha256Sync to a function using noble-hashes
@@ -89,7 +90,7 @@ export function createStacksPublicKey(key: string): StacksPublicKey {
 
 export function publicKeyFromSignatureVrs(
   messageHash: string,
-  messageSignature: MessageSignature,
+  messageSignature: MessageSignature | StructuredDataSignature,
   pubKeyEncoding = PubKeyEncoding.Compressed
 ): string {
   const parsedSignature = parseRecoverableSignatureVrs(messageSignature.data);
@@ -101,7 +102,7 @@ export function publicKeyFromSignatureVrs(
 
 export function publicKeyFromSignatureRsv(
   messageHash: string,
-  messageSignature: MessageSignature,
+  messageSignature: MessageSignature | StructuredDataSignature,
   pubKeyEncoding = PubKeyEncoding.Compressed
 ): string {
   return publicKeyFromSignatureVrs(
