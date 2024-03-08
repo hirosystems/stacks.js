@@ -17,6 +17,7 @@ import { ec as EC } from 'elliptic';
 import {
   compressPublicKey,
   createStacksPrivateKey,
+  encodeStructuredData,
   getAddressFromPrivateKey,
   getAddressFromPublicKey,
   getPublicKey,
@@ -28,10 +29,14 @@ import {
   publicKeyFromSignatureVrs,
   publicKeyToString,
   signMessageHashRsv,
+  signStructuredData,
   signWithKey,
   StacksMessageType,
   StacksPublicKey,
+  stringAsciiCV,
   TransactionVersion,
+  tupleCV,
+  uintCV,
 } from '../src';
 import { randomBytes } from '../src/utils';
 import { serializeDeserialize } from './macros';
@@ -213,6 +218,58 @@ test('Retrieve public key from vrs signature', () => {
     PubKeyEncoding.Compressed
   );
 
+  expect(uncompressedPubKeyFromSig).toBe(uncompressedPubKey);
+  expect(compressedPubKeyFromSig).toBe(compressedPubKey);
+});
+
+test('Retrieve public key from SIP-018 signature', () => {
+  const privKey = createStacksPrivateKey(
+    'edf9aee84d9b7abc145504dde6726c64f369d37ee34ded868fabd876c26570bc'
+  );
+  const uncompressedPubKey =
+    '04ef788b3830c00abe8f64f62dc32fc863bc0b2cafeb073b6c8e1c7657d9c2c3ab5b435d20ea91337cdd8c30dd7427bb098a5355e9c9bfad43797899b8137237cf';
+  const compressedPubKey = '03ef788b3830c00abe8f64f62dc32fc863bc0b2cafeb073b6c8e1c7657d9c2c3ab';
+
+  // test domain per SIP-018 definition
+  const domain = tupleCV({
+    name: stringAsciiCV('Test App'),
+    version: stringAsciiCV('1.0.0'),
+    'chain-id': uintCV(1),
+  });
+
+  // configure message to be signed
+  const message = 'hello world';
+  const messageCV = stringAsciiCV(message);
+
+  // sign domain + message
+  const sig = signStructuredData({
+    domain,
+    message: messageCV,
+    privateKey: privKey,
+  });
+
+  // get expected message hex from structured data
+  const expectedMessage = encodeStructuredData({
+    message: messageCV,
+    domain,
+  });
+  const expectedMessageHashed = sha256(expectedMessage);
+  const expectedMessageHex = bytesToHex(expectedMessageHashed);
+
+  // get both types of public keys
+  const uncompressedPubKeyFromSig = publicKeyFromSignatureRsv(
+    expectedMessageHex,
+    sig,
+    PubKeyEncoding.Uncompressed
+  );
+
+  const compressedPubKeyFromSig = publicKeyFromSignatureRsv(
+    expectedMessageHex,
+    sig,
+    PubKeyEncoding.Compressed
+  );
+
+  // check that everything matches
   expect(uncompressedPubKeyFromSig).toBe(uncompressedPubKey);
   expect(compressedPubKeyFromSig).toBe(compressedPubKey);
 });
