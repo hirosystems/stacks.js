@@ -1,36 +1,30 @@
-import fetchMock from 'jest-fetch-mock';
-
-import {
-  responseOkCV,
-  responseErrorCV,
-  trueCV,
-  falseCV,
-  uintCV,
-  bufferCV,
-  hash160,
-  standardPrincipalCV,
-  noneCV,
-  AnchorMode,
-  someCV,
-  createSTXPostCondition,
-  publicKeyToAddress,
-  createStacksPublicKey,
-  FungibleConditionCode,
-  AddressVersion,
-  createNonFungiblePostCondition,
-  NonFungibleConditionCode,
-  parseAssetInfoString,
-  tupleCV,
-  bufferCVFromString,
-} from '@stacks/transactions';
-
-import { ChainId, STACKS_TESTNET, StacksNetwork } from '@stacks/network';
-
-import { BNS_CONTRACT_NAME, BnsContractAddress, PriceFunction } from '../src';
-
-import { decodeFQN, getZonefileHash } from '../src/utils';
-
 import { utf8ToBytes } from '@stacks/common';
+import { ChainId, STACKS_TESTNET, StacksNetwork } from '@stacks/network';
+import {
+  AddressVersion,
+  AnchorMode,
+  FungibleConditionCode,
+  NonFungibleConditionCode,
+  bufferCV,
+  bufferCVFromString,
+  createNonFungiblePostCondition,
+  createSTXPostCondition,
+  falseCV,
+  hash160,
+  noneCV,
+  parseAssetInfoString,
+  publicKeyToAddress,
+  responseErrorCV,
+  responseOkCV,
+  someCV,
+  standardPrincipalCV,
+  trueCV,
+  tupleCV,
+  uintCV,
+} from '@stacks/transactions';
+import fetchMock from 'jest-fetch-mock';
+import { BNS_CONTRACT_NAME, BnsContractAddress, PriceFunction } from '../src';
+import { decodeFQN, getZonefileHash } from '../src/utils';
 
 beforeEach(() => {
   fetchMock.resetMocks();
@@ -338,7 +332,7 @@ test('preorderNamespace', async () => {
 
   const bnsFunctionName = 'namespace-preorder';
   const burnSTXPostCondition = createSTXPostCondition(
-    publicKeyToAddress(getAddressVersion(network), createStacksPublicKey(publicKey)),
+    publicKeyToAddress(getAddressVersion(network), publicKey),
     FungibleConditionCode.Equal,
     stxToBurn
   );
@@ -562,7 +556,7 @@ test('preorderName', async () => {
 
   const bnsFunctionName = 'name-preorder';
   const burnSTXPostCondition = createSTXPostCondition(
-    publicKeyToAddress(getAddressVersion(network), createStacksPublicKey(publicKey)),
+    publicKeyToAddress(getAddressVersion(network), publicKey),
     FungibleConditionCode.Equal,
     stxToBurn
   );
@@ -708,7 +702,7 @@ test('transferName', async () => {
 
   const { namespace, name } = decodeFQN(fullyQualifiedName);
   const nameTransferPostConditionOne = createNonFungiblePostCondition(
-    publicKeyToAddress(getAddressVersion(network), createStacksPublicKey(publicKey)),
+    publicKeyToAddress(getAddressVersion(network), publicKey),
     NonFungibleConditionCode.Sends,
     parseAssetInfoString(`${getBnsContractAddress(network)}.bns::names`),
     tupleCV({
@@ -776,7 +770,7 @@ test('transferName optionalArguments', async () => {
 
   const { namespace, name } = decodeFQN(fullyQualifiedName);
   const nameTransferPostConditionOne = createNonFungiblePostCondition(
-    publicKeyToAddress(getAddressVersion(network), createStacksPublicKey(publicKey)),
+    publicKeyToAddress(getAddressVersion(network), publicKey),
     NonFungibleConditionCode.Sends,
     parseAssetInfoString(`${getBnsContractAddress(network)}.bns::names`),
     tupleCV({
@@ -883,7 +877,7 @@ test('renewName', async () => {
 
   const { namespace, name } = decodeFQN(fullyQualifiedName);
   const burnSTXPostCondition = createSTXPostCondition(
-    publicKeyToAddress(getAddressVersion(network), createStacksPublicKey(publicKey)),
+    publicKeyToAddress(getAddressVersion(network), publicKey),
     FungibleConditionCode.Equal,
     stxToBurn
   );
@@ -939,7 +933,7 @@ test('renewName optionalArguments', async () => {
 
   const { namespace, name } = decodeFQN(fullyQualifiedName);
   const burnSTXPostCondition = createSTXPostCondition(
-    publicKeyToAddress(getAddressVersion(network), createStacksPublicKey(publicKey)),
+    publicKeyToAddress(getAddressVersion(network), publicKey),
     FungibleConditionCode.Equal,
     stxToBurn
   );
