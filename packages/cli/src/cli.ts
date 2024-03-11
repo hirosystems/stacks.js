@@ -19,7 +19,6 @@ import {
   ClarityValue,
   ContractCallPayload,
   SignedContractDeployOptions,
-  createStacksPrivateKey,
   cvToString,
   estimateTransfer,
   getAbi,
@@ -28,8 +27,6 @@ import {
   makeContractDeploy,
   makeSTXTokenTransfer,
   PostConditionMode,
-  pubKeyfromPrivKey,
-  publicKeyToString,
   ReadOnlyFunctionOptions,
   SignedContractCallOptions,
   SignedTokenTransferOptions,
@@ -44,6 +41,7 @@ import {
   estimateTransaction,
   serializePayload,
   estimateTransactionByteLength,
+  privateKeyToPublic,
 } from '@stacks/transactions';
 import express from 'express';
 import { prompt } from 'inquirer';
@@ -447,7 +445,7 @@ async function migrateSubdomains(network: CLINetworkAdapter, args: string[]): Pr
        * ********************************************************************************
        */
       const hash = crypto.createHash('sha256').update(textToSign).digest('hex');
-      const sig = signWithKey(createStacksPrivateKey(account.dataPrivateKey), hash);
+      const sig = signWithKey(account.dataPrivateKey, hash);
 
       // https://docs.stacks.co/build-apps/references/bns#subdomain-lifecycle
       subDomainOp.signature = sig.data;
@@ -1870,7 +1868,7 @@ async function register(network: CLINetworkAdapter, args: string[]): Promise<str
   const privateKey = args[1];
   const salt = args[2];
   const zonefile = args[3];
-  const publicKey = publicKeyToString(pubKeyfromPrivKey(privateKey));
+  const publicKey = privateKeyToPublic(privateKey);
 
   const api = new StacksNodeApi({ network: network.isMainnet() ? STACKS_MAINNET : STACKS_TESTNET });
 
@@ -1883,7 +1881,7 @@ async function register(network: CLINetworkAdapter, args: string[]): Promise<str
   });
 
   const signer = new TransactionSigner(unsignedTransaction);
-  signer.signOrigin(createStacksPrivateKey(privateKey));
+  signer.signOrigin(privateKey);
 
   return broadcastTransaction({ transaction: signer.transaction, api })
     .then((response: TxBroadcastResult) => {
@@ -1905,7 +1903,7 @@ async function preorder(network: CLINetworkAdapter, args: string[]): Promise<str
   const privateKey = args[1];
   const salt = args[2];
   const stxToBurn = args[3];
-  const publicKey = publicKeyToString(pubKeyfromPrivKey(privateKey));
+  const publicKey = privateKeyToPublic(privateKey);
 
   const api = new StacksNodeApi({ network: network.isMainnet() ? STACKS_MAINNET : STACKS_TESTNET });
 
@@ -1918,7 +1916,7 @@ async function preorder(network: CLINetworkAdapter, args: string[]): Promise<str
   });
 
   const signer = new TransactionSigner(unsignedTransaction);
-  signer.signOrigin(createStacksPrivateKey(privateKey));
+  signer.signOrigin(privateKey);
 
   return broadcastTransaction({ transaction: signer.transaction, api })
     .then((response: TxBroadcastResult) => {
