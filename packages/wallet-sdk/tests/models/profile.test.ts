@@ -1,5 +1,5 @@
 import { getPublicKeyFromPrivate } from '@stacks/encryption';
-import { makeRandomPrivKey, privateKeyToString } from '@stacks/transactions';
+import { makeRandomPrivKey } from '@stacks/transactions';
 import fetchMock from 'jest-fetch-mock';
 import { TokenVerifier } from 'jsontokens';
 import {
@@ -50,7 +50,7 @@ describe(signProfileForUpload, () => {
 
   test('sign with unknown private key', () => {
     const account = mockAccount;
-    account.stxPrivateKey = privateKeyToString(makeRandomPrivKey());
+    account.stxPrivateKey = makeRandomPrivKey();
     const profile = DEFAULT_PROFILE;
 
     const signedProfileString = signProfileForUpload({ profile, account });
