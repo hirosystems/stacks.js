@@ -36,7 +36,6 @@ import {
   anchorModeFrom,
   AnchorModeName,
   AuthType,
-  PayloadType,
   PostConditionMode,
   PubKeyEncoding,
   RECOVERABLE_ECDSA_SIG_LENGTH_BYTES,
@@ -86,25 +85,7 @@ export class StacksTransaction {
     this.postConditionMode = postConditionMode ?? PostConditionMode.Deny;
     this.postConditions = postConditions ?? createLPList([]);
 
-    if (anchorMode) {
-      this.anchorMode = anchorModeFrom(anchorMode);
-    } else {
-      switch (payload.payloadType) {
-        case PayloadType.Coinbase:
-        case PayloadType.CoinbaseToAltRecipient:
-        case PayloadType.NakamotoCoinbase:
-        case PayloadType.PoisonMicroblock:
-        case PayloadType.TenureChange:
-          this.anchorMode = AnchorMode.OnChainOnly;
-          break;
-        case PayloadType.ContractCall:
-        case PayloadType.SmartContract:
-        case PayloadType.VersionedSmartContract:
-        case PayloadType.TokenTransfer:
-          this.anchorMode = AnchorMode.Any;
-          break;
-      }
-    }
+    this.anchorMode = anchorModeFrom(anchorMode ?? AnchorMode.Any);
   }
 
   signBegin() {

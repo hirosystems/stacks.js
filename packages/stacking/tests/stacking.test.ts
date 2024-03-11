@@ -4,7 +4,6 @@ import { HIRO_TESTNET_URL, bigIntToBytes, bytesToHex, hexToBytes } from '@stacks
 import { base58CheckDecode, getPublicKeyFromPrivate } from '@stacks/encryption';
 import { STACKS_MAINNET, STACKS_TESTNET } from '@stacks/network';
 import {
-  AnchorMode,
   ClarityType,
   ReadOnlyFunctionOptions,
   SignedContractCallOptions,
@@ -337,7 +336,6 @@ test('stack stx', async () => {
     validateWithAbi: true,
     network,
     senderKey: privateKey,
-    anchorMode: AnchorMode.Any,
     api: client.api,
   };
 
@@ -410,7 +408,6 @@ test('delegate stx', async () => {
     validateWithAbi: true,
     network,
     senderKey: privateKey,
-    anchorMode: AnchorMode.Any,
     api: client.api,
   };
 
@@ -475,7 +472,6 @@ test('delegate stx with empty optional parameters', async () => {
     validateWithAbi: true,
     network,
     senderKey: privateKey,
-    anchorMode: AnchorMode.Any,
     api: client.api,
   };
 
@@ -559,7 +555,6 @@ test('delegate stack stx with one delegator', async () => {
     validateWithAbi: true,
     network,
     senderKey: privateKey,
-    anchorMode: AnchorMode.Any,
     api: client.api,
   };
 
@@ -646,7 +641,6 @@ test('delegate stack stx with set nonce', async () => {
     network,
     senderKey: privateKey,
     nonce,
-    anchorMode: AnchorMode.Any,
     api: client.api,
   };
 
@@ -710,7 +704,6 @@ test('delegator commit', async () => {
     validateWithAbi: true,
     network,
     senderKey: privateKey,
-    anchorMode: AnchorMode.Any,
     api: client.api,
   };
 
@@ -760,7 +753,6 @@ test('revoke delegate stx', async () => {
     validateWithAbi: true,
     network,
     senderKey: privateKey,
-    anchorMode: AnchorMode.Any,
     api: client.api,
   };
 

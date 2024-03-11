@@ -71,6 +71,7 @@ export enum ClarityVersion {
  *
  * For more information about the kinds of Stacks blocks and the various
  * AnchorModes, check out {@link https://github.com/stacksgov/sips/blob/main/sips/sip-001/sip-001-burn-election.md SIP 001} and
+ * @deprecated `AnchorMode` is not needed in Stacks since the Nakamoto update.
  * {@link https://github.com/stacksgov/sips/blob/main/sips/sip-005/sip-005-blocks-and-transactions.md SIP 005}
  */
 export enum AnchorMode {
@@ -82,7 +83,9 @@ export enum AnchorMode {
   Any = 0x03,
 }
 
+/** @deprecated `AnchorMode` is not needed in Stacks since the Nakamoto update. */
 export const AnchorModeNames = ['onChainOnly', 'offChainOnly', 'any'] as const;
+/** @deprecated `AnchorMode` is not needed in Stacks since the Nakamoto update. */
 export type AnchorModeName = (typeof AnchorModeNames)[number];
 
 const AnchorModeMap = {

@@ -2,7 +2,6 @@ import { ApiParam, IntegerType, utf8ToBytes } from '@stacks/common';
 import { ChainId, StacksNetwork } from '@stacks/network';
 import {
   AddressVersion,
-  AnchorMode,
   ClarityType,
   ClarityValue,
   FungibleConditionCode,
@@ -91,7 +90,6 @@ async function makeBnsContractCall(options: BnsContractCallOptions): Promise<Sta
     publicKey: options.publicKey,
     validateWithAbi: false,
     network: options.network,
-    anchorMode: AnchorMode.Any,
     postConditions: options.postConditions,
   };
 

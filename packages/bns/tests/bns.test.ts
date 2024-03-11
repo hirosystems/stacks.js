@@ -2,7 +2,6 @@ import { utf8ToBytes } from '@stacks/common';
 import { ChainId, STACKS_TESTNET, StacksNetwork } from '@stacks/network';
 import {
   AddressVersion,
-  AnchorMode,
   FungibleConditionCode,
   NonFungibleConditionCode,
   bufferCV,
@@ -344,7 +343,6 @@ test('preorderNamespace', async () => {
     validateWithAbi: false,
     publicKey,
     network,
-    anchorMode: AnchorMode.Any,
     postConditions: [burnSTXPostCondition],
   };
 
@@ -438,7 +436,6 @@ test('revealNamespace', async () => {
     validateWithAbi: false,
     publicKey,
     network,
-    anchorMode: AnchorMode.Any,
   };
 
   expect(makeUnsignedContractCall).toHaveBeenCalledTimes(1);
@@ -486,7 +483,6 @@ test('importName', async () => {
     publicKey,
     network,
     validateWithAbi: false,
-    anchorMode: AnchorMode.Any,
   };
 
   expect(makeUnsignedContractCall).toHaveBeenCalledTimes(1);
@@ -523,7 +519,6 @@ test('readyNamespace', async () => {
     publicKey,
     network,
     validateWithAbi: false,
-    anchorMode: AnchorMode.Any,
   };
 
   expect(makeUnsignedContractCall).toHaveBeenCalledTimes(1);
@@ -571,7 +566,6 @@ test('preorderName', async () => {
     publicKey,
     network,
     validateWithAbi: false,
-    anchorMode: AnchorMode.Any,
     postConditions: [burnSTXPostCondition],
   };
 
@@ -620,7 +614,6 @@ test('registerName', async () => {
     publicKey,
     network,
     validateWithAbi: false,
-    anchorMode: AnchorMode.Any,
   };
 
   expect(makeUnsignedContractCall).toHaveBeenCalledTimes(1);
@@ -665,7 +658,6 @@ test('updateName', async () => {
     publicKey,
     network,
     validateWithAbi: false,
-    anchorMode: AnchorMode.Any,
   };
 
   expect(makeUnsignedContractCall).toHaveBeenCalledTimes(1);
@@ -732,7 +724,6 @@ test('transferName', async () => {
     publicKey,
     network,
     validateWithAbi: false,
-    anchorMode: AnchorMode.Any,
     postConditions: [nameTransferPostConditionOne, nameTransferPostConditionTwo],
   };
 
@@ -800,7 +791,6 @@ test('transferName optionalArguments', async () => {
     publicKey,
     network,
     validateWithAbi: false,
-    anchorMode: AnchorMode.Any,
     postConditions: [nameTransferPostConditionOne, nameTransferPostConditionTwo],
   };
 
@@ -840,7 +830,6 @@ test('revokeName', async () => {
     publicKey,
     network,
     validateWithAbi: false,
-    anchorMode: AnchorMode.Any,
   };
 
   expect(makeUnsignedContractCall).toHaveBeenCalledTimes(1);
@@ -895,7 +884,6 @@ test('renewName', async () => {
     publicKey,
     network,
     validateWithAbi: false,
-    anchorMode: AnchorMode.Any,
     postConditions: [burnSTXPostCondition],
   };
 
@@ -951,7 +939,6 @@ test('renewName optionalArguments', async () => {
     publicKey,
     network,
     validateWithAbi: false,
-    anchorMode: AnchorMode.Any,
     postConditions: [burnSTXPostCondition],
   };
 
