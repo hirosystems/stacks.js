@@ -8,6 +8,8 @@
     "header-max-length": [0, "always"],
     "scope-max-length": [0, "always"],
     "subject-max-length": [0, "always"],
-    "type-max-length": [0, "always"]
+    "type-max-length": [0, "always"],
+
+    "subject-case": [0, "always", "sentence-case"]
   }
 }

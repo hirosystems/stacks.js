@@ -13,6 +13,7 @@ import {
   hexToBigInt,
   hexToBytes,
   intToHex,
+  isInstance,
   parseRecoverableSignatureVrs,
   PRIVATE_KEY_COMPRESSED_LENGTH,
   privateKeyToBytes,
@@ -128,7 +129,11 @@ export function publicKeyIsCompressed(publicKey: PublicKey): boolean {
   return !publicKeyToHex(publicKey).startsWith('04');
 }
 
-export function serializePublicKey(key: StacksPublicKey): Uint8Array {
+export function serializePublicKey(key: StacksPublicKey): string {
+  return bytesToHex(serializePublicKeyBytes(key));
+}
+/** @ignore */
+export function serializePublicKeyBytes(key: StacksPublicKey): Uint8Array {
   return key.data.slice();
 }
 
@@ -147,7 +152,14 @@ export function compressPublicKey(publicKey: PublicKey): string {
   return Point.fromHex(publicKeyToHex(publicKey)).toHex(true);
 }
 
-export function deserializePublicKey(bytesReader: BytesReader): StacksPublicKey {
+export function deserializePublicKey(serialized: string): StacksPublicKey {
+  return deserializePublicKeyBytes(hexToBytes(serialized));
+}
+/** @ignore */
+export function deserializePublicKeyBytes(serialized: Uint8Array | BytesReader): StacksPublicKey {
+  const bytesReader = isInstance(serialized, BytesReader)
+    ? serialized
+    : new BytesReader(serialized);
   const fieldId = bytesReader.readUInt8();
   const keyLength =
     fieldId === 4 ? UNCOMPRESSED_PUBKEY_LENGTH_BYTES : COMPRESSED_PUBKEY_LENGTH_BYTES;

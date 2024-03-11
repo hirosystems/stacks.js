@@ -783,7 +783,7 @@ async function contractDeploy(network: CLINetworkAdapter, args: string[]): Promi
 
   if (estimateOnly) {
     return estimateTransaction({
-      payload: bytesToHex(serializePayload(tx.payload)),
+      payload: serializePayload(tx.payload),
       estimatedLength: estimateTransactionByteLength(tx),
     }).then(costs => costs[1].fee.toString(10));
   }
@@ -870,7 +870,7 @@ async function contractFunctionCall(network: CLINetworkAdapter, args: string[]):
 
       if (estimateOnly) {
         return estimateTransaction({
-          payload: bytesToHex(serializePayload(tx.payload)),
+          payload: serializePayload(tx.payload),
           estimatedLength: estimateTransactionByteLength(tx),
         }).then(costs => costs[1].fee.toString(10));
       }

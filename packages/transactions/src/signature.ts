@@ -3,15 +3,15 @@ import { DeserializationError } from './errors';
 import { PubKeyEncoding, RECOVERABLE_ECDSA_SIG_LENGTH_BYTES, StacksMessageType } from './constants';
 import {
   compressPublicKey,
-  deserializePublicKey,
-  serializePublicKey,
+  deserializePublicKeyBytes,
+  serializePublicKeyBytes,
   StacksPublicKey,
 } from './keys';
 
 import { createMessageSignature, MessageSignature } from './common';
 
 // @ts-ignore
-import { bytesToHex, concatArray, hexToBytes } from '@stacks/common';
+import { bytesToHex, concatArray, hexToBytes, isInstance } from '@stacks/common';
 
 export enum AuthFieldType {
   PublicKeyCompressed = 0x00,
@@ -51,7 +51,16 @@ export function createTransactionAuthField(
   };
 }
 
-export function deserializeTransactionAuthField(bytesReader: BytesReader): TransactionAuthField {
+export function deserializeTransactionAuthField(serialized: string): TransactionAuthField {
+  return deserializeTransactionAuthFieldBytes(hexToBytes(serialized));
+}
+/** @ignore */
+export function deserializeTransactionAuthFieldBytes(
+  serialized: Uint8Array | BytesReader
+): TransactionAuthField {
+  const bytesReader = isInstance(serialized, BytesReader)
+    ? serialized
+    : new BytesReader(serialized);
   const authFieldType = bytesReader.readUInt8Enum(AuthFieldType, n => {
     throw new DeserializationError(`Could not read ${n} as AuthFieldType`);
   });
@@ -60,12 +69,12 @@ export function deserializeTransactionAuthField(bytesReader: BytesReader): Trans
     case AuthFieldType.PublicKeyCompressed:
       return createTransactionAuthField(
         PubKeyEncoding.Compressed,
-        deserializePublicKey(bytesReader)
+        deserializePublicKeyBytes(bytesReader)
       );
     case AuthFieldType.PublicKeyUncompressed:
       return createTransactionAuthField(
         PubKeyEncoding.Uncompressed,
-        deserializePublicKey(bytesReader)
+        deserializePublicKeyBytes(bytesReader)
       );
     case AuthFieldType.SignatureCompressed:
       return createTransactionAuthField(
@@ -82,18 +91,26 @@ export function deserializeTransactionAuthField(bytesReader: BytesReader): Trans
   }
 }
 
-export function serializeMessageSignature(messageSignature: MessageSignature): Uint8Array {
+export function serializeMessageSignature(messageSignature: MessageSignature): string {
+  return bytesToHex(serializeMessageSignatureBytes(messageSignature));
+}
+/** @ignore */
+export function serializeMessageSignatureBytes(messageSignature: MessageSignature): Uint8Array {
   return hexToBytes(messageSignature.data);
 }
 
-export function serializeTransactionAuthField(field: TransactionAuthField): Uint8Array {
+export function serializeTransactionAuthField(field: TransactionAuthField): string {
+  return bytesToHex(serializeTransactionAuthFieldBytes(field));
+}
+/** @ignore */
+export function serializeTransactionAuthFieldBytes(field: TransactionAuthField): Uint8Array {
   const bytesArray = [];
 
   switch (field.contents.type) {
     case StacksMessageType.PublicKey:
       if (field.pubKeyEncoding == PubKeyEncoding.Compressed) {
         bytesArray.push(AuthFieldType.PublicKeyCompressed);
-        bytesArray.push(serializePublicKey(field.contents));
+        bytesArray.push(serializePublicKeyBytes(field.contents));
       } else {
         bytesArray.push(AuthFieldType.PublicKeyUncompressed);
         bytesArray.push(hexToBytes(compressPublicKey(field.contents.data)));
@@ -105,7 +122,7 @@ export function serializeTransactionAuthField(field: TransactionAuthField): Uint
       } else {
         bytesArray.push(AuthFieldType.SignatureUncompressed);
       }
-      bytesArray.push(serializeMessageSignature(field.contents));
+      bytesArray.push(serializeMessageSignatureBytes(field.contents));
       break;
   }
 

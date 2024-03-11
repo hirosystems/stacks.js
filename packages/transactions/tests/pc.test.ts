@@ -1,5 +1,5 @@
 import {
-  createAssetInfo,
+  createAsset,
   FungibleConditionCode,
   makeContractFungiblePostCondition,
   makeContractNonFungiblePostCondition,
@@ -152,7 +152,7 @@ describe('pc -- post condition builder', () => {
           STANDARD_ADDRESS,
           FungibleConditionCode.Equal,
           100,
-          createAssetInfo(FT_CONTRACT_ADDRESS, FT_CONTRACT_NAME, FT_ASSET_NAME)
+          createAsset(FT_CONTRACT_ADDRESS, FT_CONTRACT_NAME, FT_ASSET_NAME)
         );
         expect(pc).toEqual(postCondition);
       });
@@ -165,7 +165,7 @@ describe('pc -- post condition builder', () => {
           STANDARD_ADDRESS,
           FungibleConditionCode.Less,
           100,
-          createAssetInfo(FT_CONTRACT_ADDRESS, FT_CONTRACT_NAME, FT_ASSET_NAME)
+          createAsset(FT_CONTRACT_ADDRESS, FT_CONTRACT_NAME, FT_ASSET_NAME)
         );
         expect(pc).toEqual(postCondition);
       });
@@ -178,7 +178,7 @@ describe('pc -- post condition builder', () => {
           STANDARD_ADDRESS,
           FungibleConditionCode.Less,
           100,
-          createAssetInfo(FT_CONTRACT_ADDRESS, FT_CONTRACT_NAME, FT_ASSET_NAME)
+          createAsset(FT_CONTRACT_ADDRESS, FT_CONTRACT_NAME, FT_ASSET_NAME)
         );
         expect(pc).toEqual(postCondition);
       });
@@ -191,7 +191,7 @@ describe('pc -- post condition builder', () => {
           STANDARD_ADDRESS,
           FungibleConditionCode.GreaterEqual,
           100,
-          createAssetInfo(FT_CONTRACT_ADDRESS, FT_CONTRACT_NAME, FT_ASSET_NAME)
+          createAsset(FT_CONTRACT_ADDRESS, FT_CONTRACT_NAME, FT_ASSET_NAME)
         );
         expect(pc).toEqual(postCondition);
       });
@@ -204,7 +204,7 @@ describe('pc -- post condition builder', () => {
           STANDARD_ADDRESS,
           FungibleConditionCode.Greater,
           100,
-          createAssetInfo(FT_CONTRACT_ADDRESS, FT_CONTRACT_NAME, FT_ASSET_NAME)
+          createAsset(FT_CONTRACT_ADDRESS, FT_CONTRACT_NAME, FT_ASSET_NAME)
         );
         expect(pc).toEqual(postCondition);
       });
@@ -218,7 +218,7 @@ describe('pc -- post condition builder', () => {
         const postCondition = makeStandardNonFungiblePostCondition(
           STANDARD_ADDRESS,
           NonFungibleConditionCode.Sends,
-          createAssetInfo(NFT_CONTRACT_ADDRESS, NFT_CONTRACT_NAME, NFT_TOKEN_NAME),
+          createAsset(NFT_CONTRACT_ADDRESS, NFT_CONTRACT_NAME, NFT_TOKEN_NAME),
           NFT_ASSET_ID
         );
         expect(pc).toEqual(postCondition);
@@ -231,7 +231,7 @@ describe('pc -- post condition builder', () => {
         const postCondition = makeStandardNonFungiblePostCondition(
           STANDARD_ADDRESS,
           NonFungibleConditionCode.DoesNotSend,
-          createAssetInfo(NFT_CONTRACT_ADDRESS, NFT_CONTRACT_NAME, NFT_TOKEN_NAME),
+          createAsset(NFT_CONTRACT_ADDRESS, NFT_CONTRACT_NAME, NFT_TOKEN_NAME),
           NFT_ASSET_ID
         );
         expect(pc).toEqual(postCondition);
@@ -307,7 +307,7 @@ describe('pc -- post condition builder', () => {
           CONTRACT_NAME,
           FungibleConditionCode.Equal,
           100,
-          createAssetInfo(FT_CONTRACT_ADDRESS, FT_CONTRACT_NAME, FT_ASSET_NAME)
+          createAsset(FT_CONTRACT_ADDRESS, FT_CONTRACT_NAME, FT_ASSET_NAME)
         );
         expect(pc).toEqual(postCondition);
       });
@@ -321,7 +321,7 @@ describe('pc -- post condition builder', () => {
           CONTRACT_NAME,
           FungibleConditionCode.Less,
           100,
-          createAssetInfo(FT_CONTRACT_ADDRESS, FT_CONTRACT_NAME, FT_ASSET_NAME)
+          createAsset(FT_CONTRACT_ADDRESS, FT_CONTRACT_NAME, FT_ASSET_NAME)
         );
         expect(pc).toEqual(postCondition);
       });
@@ -335,7 +335,7 @@ describe('pc -- post condition builder', () => {
           CONTRACT_NAME,
           FungibleConditionCode.Less,
           100,
-          createAssetInfo(FT_CONTRACT_ADDRESS, FT_CONTRACT_NAME, FT_ASSET_NAME)
+          createAsset(FT_CONTRACT_ADDRESS, FT_CONTRACT_NAME, FT_ASSET_NAME)
         );
         expect(pc).toEqual(postCondition);
       });
@@ -349,7 +349,7 @@ describe('pc -- post condition builder', () => {
           CONTRACT_NAME,
           FungibleConditionCode.GreaterEqual,
           100,
-          createAssetInfo(FT_CONTRACT_ADDRESS, FT_CONTRACT_NAME, FT_ASSET_NAME)
+          createAsset(FT_CONTRACT_ADDRESS, FT_CONTRACT_NAME, FT_ASSET_NAME)
         );
         expect(pc).toEqual(postCondition);
       });
@@ -363,7 +363,7 @@ describe('pc -- post condition builder', () => {
           CONTRACT_NAME,
           FungibleConditionCode.Greater,
           100,
-          createAssetInfo(FT_CONTRACT_ADDRESS, FT_CONTRACT_NAME, FT_ASSET_NAME)
+          createAsset(FT_CONTRACT_ADDRESS, FT_CONTRACT_NAME, FT_ASSET_NAME)
         );
         expect(pc).toEqual(postCondition);
       });
@@ -378,7 +378,7 @@ describe('pc -- post condition builder', () => {
           CONTRACT_ADDRESS,
           CONTRACT_NAME,
           NonFungibleConditionCode.Sends,
-          createAssetInfo(NFT_CONTRACT_ADDRESS, NFT_CONTRACT_NAME, NFT_TOKEN_NAME),
+          createAsset(NFT_CONTRACT_ADDRESS, NFT_CONTRACT_NAME, NFT_TOKEN_NAME),
           NFT_ASSET_ID
         );
         expect(pc).toEqual(postCondition);
@@ -392,7 +392,7 @@ describe('pc -- post condition builder', () => {
           CONTRACT_ADDRESS,
           CONTRACT_NAME,
           NonFungibleConditionCode.DoesNotSend,
-          createAssetInfo(NFT_CONTRACT_ADDRESS, NFT_CONTRACT_NAME, NFT_TOKEN_NAME),
+          createAsset(NFT_CONTRACT_ADDRESS, NFT_CONTRACT_NAME, NFT_TOKEN_NAME),
           NFT_ASSET_ID
         );
         expect(pc).toEqual(postCondition);

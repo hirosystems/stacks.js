@@ -21,7 +21,7 @@ export enum StacksMessageType {
   Principal,
   LengthPrefixedString,
   MemoString,
-  AssetInfo,
+  Asset,
   PostCondition,
   PublicKey,
   LengthPrefixedList,

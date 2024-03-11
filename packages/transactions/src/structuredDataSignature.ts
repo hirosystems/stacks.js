@@ -1,6 +1,6 @@
 import { sha256 } from '@noble/hashes/sha256';
 import { bytesToHex, concatBytes, utf8ToBytes } from '@stacks/common';
-import { ClarityType, ClarityValue, serializeCV } from './clarity';
+import { ClarityType, ClarityValue, serializeCVBytes } from './clarity';
 import { StacksMessageType } from './constants';
 import { StructuredDataSignature } from './message-types';
 import { PrivateKey, signMessageHashRsv } from './keys';
@@ -10,7 +10,7 @@ import { PrivateKey, signMessageHashRsv } from './keys';
 export const STRUCTURED_DATA_PREFIX = new Uint8Array([0x53, 0x49, 0x50, 0x30, 0x31, 0x38]);
 
 export function hashStructuredData(structuredData: ClarityValue): Uint8Array {
-  return sha256(serializeCV(structuredData));
+  return sha256(serializeCVBytes(structuredData));
 }
 
 const hash256BytesLength = 32;

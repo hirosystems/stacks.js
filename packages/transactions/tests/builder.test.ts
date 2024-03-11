@@ -34,8 +34,8 @@ import {
   privateKeyToPublic,
   publicKeyIsCompressed,
   publicKeyToHex,
-  serializePostCondition,
-  serializePublicKey,
+  serializePostConditionBytes,
+  serializePublicKeyBytes,
 } from '../src';
 import {
   MultiSigSpendingCondition,
@@ -72,6 +72,7 @@ import {
   bufferCVFromString,
   noneCV,
   serializeCV,
+  serializeCVBytes,
   standardPrincipalCV,
   uintCV,
 } from '../src/clarity';
@@ -90,8 +91,12 @@ import {
   PubKeyEncoding,
   TxRejectedReason,
 } from '../src/constants';
-import { TokenTransferPayload, createTokenTransferPayload, serializePayload } from '../src/payload';
-import { createAssetInfo } from '../src/postcondition-types';
+import {
+  TokenTransferPayload,
+  createTokenTransferPayload,
+  serializePayloadBytes,
+} from '../src/payload';
+import { createAsset } from '../src/postcondition-types';
 import { createTransactionAuthField } from '../src/signature';
 import { TransactionSigner } from '../src/signer';
 import {
@@ -395,7 +400,7 @@ test('Make Multi-Sig STX token transfer', async () => {
   ];
 
   const pubKeys = privKeys.map(privateKeyToPublic).map(createStacksPublicKey);
-  const pubKeyStrings = pubKeys.map(serializePublicKey).map(publicKeyToHex);
+  const pubKeyStrings = pubKeys.map(serializePublicKeyBytes).map(publicKeyToHex);
 
   const transaction = await makeUnsignedSTXTokenTransfer({
     recipient,
@@ -470,7 +475,7 @@ test('Should deserialize partially signed multi-Sig STX token transfer', async (
   ];
 
   const pubKeys = privKeys.map(privateKeyToPublic).map(createStacksPublicKey);
-  const pubKeyStrings = pubKeys.map(serializePublicKey).map(publicKeyToHex);
+  const pubKeyStrings = pubKeys.map(serializePublicKeyBytes).map(publicKeyToHex);
 
   const transaction = await makeUnsignedSTXTokenTransfer({
     recipient,
@@ -547,7 +552,7 @@ test('Should throw error if multisig transaction is oversigned', async () => {
   ];
 
   const pubKeys = privKeys.map(privateKeyToPublic).map(createStacksPublicKey);
-  const pubKeyStrings = pubKeys.map(serializePublicKey).map(publicKeyToHex);
+  const pubKeyStrings = pubKeys.map(serializePublicKeyBytes).map(publicKeyToHex);
 
   const transaction = await makeUnsignedSTXTokenTransfer({
     recipient,
@@ -591,7 +596,7 @@ test('Make Multi-Sig STX token transfer with two transaction signers', async () 
   ];
 
   const pubKeys = privKeys.map(privateKeyToPublic).map(createStacksPublicKey);
-  const pubKeyStrings = pubKeys.map(serializePublicKey).map(publicKeyToHex);
+  const pubKeyStrings = pubKeys.map(serializePublicKeyBytes).map(publicKeyToHex);
 
   const transaction = await makeUnsignedSTXTokenTransfer({
     recipient,
@@ -837,7 +842,7 @@ test('make a multi-sig contract deploy', async () => {
   ];
 
   const pubKeys = privKeys.map(privateKeyToPublic).map(createStacksPublicKey);
-  const pubKeyStrings = pubKeys.map(serializePublicKey).map(publicKeyToHex);
+  const pubKeyStrings = pubKeys.map(serializePublicKeyBytes).map(publicKeyToHex);
 
   const transaction = await makeContractDeploy({
     codeBody,
@@ -955,7 +960,7 @@ test('Make contract-call with post conditions', async () => {
   const assetAddress = 'ST34RKEJKQES7MXQFBT29KSJZD73QK3YNT5N56C6X';
   const assetContractName = 'test-asset-contract';
   const assetName = 'test-asset-name';
-  const info = createAssetInfo(assetAddress, assetContractName, assetName);
+  const info = createAsset(assetAddress, assetContractName, assetName);
   const tokenAssetName = 'token-asset-name';
 
   const fee = 0;
@@ -1111,7 +1116,7 @@ test('make a multi-sig contract call', async () => {
   ];
 
   const pubKeys = privKeys.map(privateKeyToPublic).map(createStacksPublicKey);
-  const pubKeyStrings = pubKeys.map(serializePublicKey).map(publicKeyToHex);
+  const pubKeyStrings = pubKeys.map(serializePublicKeyBytes).map(publicKeyToHex);
 
   const transaction = await makeContractCall({
     contractAddress,
@@ -1186,7 +1191,7 @@ test('Estimate transaction transfer fee', async () => {
 
   const mainnet = {}; // default
   const resultEstimateFee = await estimateTransaction({
-    payload: bytesToHex(serializePayload(transaction.payload)),
+    payload: bytesToHex(serializePayloadBytes(transaction.payload)),
     estimatedLength: transactionByteLength,
     api: mainnet,
   });
@@ -1195,7 +1200,7 @@ test('Estimate transaction transfer fee', async () => {
 
   const testnet = { url: HIRO_TESTNET_URL };
   const resultEstimateFee2 = await estimateTransaction({
-    payload: bytesToHex(serializePayload(transaction.payload)),
+    payload: bytesToHex(serializePayloadBytes(transaction.payload)),
     estimatedLength: transactionByteLength,
     api: testnet,
   });
@@ -1204,14 +1209,14 @@ test('Estimate transaction transfer fee', async () => {
   expect(fetchMock.mock.calls[0][0]).toEqual(`${HIRO_MAINNET_URL}${TRANSACTION_FEE_ESTIMATE_PATH}`);
   expect(fetchMock.mock.calls[0][1]?.body).toEqual(
     JSON.stringify({
-      transaction_payload: bytesToHex(serializePayload(transaction.payload)),
+      transaction_payload: bytesToHex(serializePayloadBytes(transaction.payload)),
       estimated_len: transactionByteLength,
     })
   );
   expect(fetchMock.mock.calls[1][0]).toEqual(`${HIRO_TESTNET_URL}${TRANSACTION_FEE_ESTIMATE_PATH}`);
   expect(fetchMock.mock.calls[1][1]?.body).toEqual(
     JSON.stringify({
-      transaction_payload: bytesToHex(serializePayload(transaction.payload)),
+      transaction_payload: bytesToHex(serializePayloadBytes(transaction.payload)),
       estimated_len: transactionByteLength,
     })
   );
@@ -1336,7 +1341,7 @@ test('Multi-sig transaction byte length must include the required signatures', a
   ];
 
   const pubKeys = privKeys.map(privateKeyToPublic).map(createStacksPublicKey);
-  const pubKeyStrings = pubKeys.map(serializePublicKey).map(publicKeyToHex);
+  const pubKeyStrings = pubKeys.map(serializePublicKeyBytes).map(publicKeyToHex);
 
   // Create a unsigned multi-sig transaction
   const transaction = await makeUnsignedSTXTokenTransfer({
@@ -2098,7 +2103,7 @@ test('Call read-only function', async () => {
   };
 
   const apiUrl = `${api.url}${READONLY_FUNCTION_CALL_PATH}/${contractAddress}/kv-store/get-value%3F`; // uri encoded
-  fetchMock.mockOnce(`{"okay": true, "result": "0x${bytesToHex(serializeCV(mockResult))}"}`);
+  fetchMock.mockOnce(`{"okay": true, "result": "0x${serializeCV(mockResult)}"}`);
 
   const result = await callReadOnlyFunction(options);
 
@@ -2110,7 +2115,7 @@ test('Call read-only function', async () => {
 test('Get contract map entry - success', async () => {
   const mockValue = 60n;
   const mockResult = uintCV(mockValue);
-  fetchMock.mockOnce(`{"data": "0x${bytesToHex(serializeCV(mockResult))}"}`);
+  fetchMock.mockOnce(`{"data": "0x${serializeCV(mockResult)}"}`);
 
   const result = await getContractMapEntry<UIntCV>({
     contractAddress: 'SPSCWDV3RKV5ZRN1FQD84YE1NQFEDJ9R1F4DYQ11',
@@ -2129,7 +2134,7 @@ test('Get contract map entry - success', async () => {
 
 test('Get contract map entry - no match', async () => {
   const mockResult = noneCV();
-  fetchMock.mockOnce(`{"data": "0x${bytesToHex(serializeCV(mockResult))}"}`);
+  fetchMock.mockOnce(`{"data": "0x${serializeCVBytes(mockResult)}"}`);
 
   const result = await getContractMapEntry({
     contractAddress: 'SPSCWDV3RKV5ZRN1FQD84YE1NQFEDJ9R1F4DYQ11',
@@ -2160,11 +2165,11 @@ test('Post-conditions with amount larger than 8 bytes throw an error', () => {
   );
 
   expect(() => {
-    serializePostCondition(stxPc);
+    serializePostConditionBytes(stxPc);
   }).toThrowError('The post-condition amount may not be larger than 8 bytes');
 
   expect(() => {
-    serializePostCondition(fungiblePc);
+    serializePostConditionBytes(fungiblePc);
   }).toThrowError('The post-condition amount may not be larger than 8 bytes');
 });
 

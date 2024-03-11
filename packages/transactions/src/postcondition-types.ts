@@ -11,6 +11,21 @@ import { Address } from './common';
 import { ClarityValue } from './clarity';
 import { exceedsMaxLengthBytes } from './utils';
 
+/**
+ * An address string encoded as c32check
+ */
+export type AddressString = string;
+
+/**
+ * A contract identifier string given as `<address>.<contract-name>`
+ */
+export type ContractIdString = `${string}.${string}`;
+
+/**
+ * An asset name string given as `<contract-id>::<token-name>` aka `<contract-address>.<contract-name>::<token-name>`
+ */
+export type AssetString = `${ContractIdString}::${string}`;
+
 export interface StandardPrincipal {
   readonly type: StacksMessageType.Principal;
   readonly prefix: PostConditionPrincipalId.Standard;
@@ -31,8 +46,8 @@ export interface LengthPrefixedString {
   readonly maxLengthBytes: number;
 }
 
-export interface AssetInfo {
-  readonly type: StacksMessageType.AssetInfo;
+export interface Asset {
+  readonly type: StacksMessageType.Asset;
   readonly address: Address;
   readonly contractName: LengthPrefixedString;
   readonly assetName: LengthPrefixedString;
@@ -52,7 +67,7 @@ export interface FungiblePostCondition {
   readonly principal: PostConditionPrincipal;
   readonly conditionCode: FungibleConditionCode;
   readonly amount: bigint;
-  readonly assetInfo: AssetInfo;
+  readonly asset: Asset;
 }
 
 export interface NonFungiblePostCondition {
@@ -61,15 +76,15 @@ export interface NonFungiblePostCondition {
   readonly principal: PostConditionPrincipal;
   readonly conditionCode: NonFungibleConditionCode;
   /** Structure that identifies the token type. */
-  readonly assetInfo: AssetInfo;
+  readonly asset: Asset;
   /** The Clarity value that names the token instance. */
   readonly assetName: ClarityValue;
 }
 
-export function parseAssetInfoString(id: string): AssetInfo {
+export function parseAssetString(id: AssetString): Asset {
   const [assetAddress, assetContractName, assetTokenName] = id.split(/\.|::/);
-  const assetInfo = createAssetInfo(assetAddress, assetContractName, assetTokenName);
-  return assetInfo;
+  const asset = createAsset(assetAddress, assetContractName, assetTokenName);
+  return asset;
 }
 
 export function createLPString(content: string): LengthPrefixedString;
@@ -97,13 +112,9 @@ export function createLPString(
   };
 }
 
-export function createAssetInfo(
-  addressString: string,
-  contractName: string,
-  assetName: string
-): AssetInfo {
+export function createAsset(addressString: string, contractName: string, assetName: string): Asset {
   return {
-    type: StacksMessageType.AssetInfo,
+    type: StacksMessageType.Asset,
     address: createAddress(addressString),
     contractName: createLPString(contractName),
     assetName: createLPString(assetName),

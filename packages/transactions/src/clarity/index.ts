@@ -44,5 +44,6 @@ export {
   stringAsciiCV,
   stringCV,
 } from './types/stringCV';
-export { serializeCV } from './serialize';
-export { deserializeCV } from './deserialize';
+
+export * from './serialize';
+export * from './deserialize';
