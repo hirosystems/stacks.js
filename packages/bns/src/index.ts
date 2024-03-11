@@ -1,39 +1,35 @@
 import { ApiParam, IntegerType, utf8ToBytes } from '@stacks/common';
+import { ChainId, StacksNetwork } from '@stacks/network';
 import {
+  AddressVersion,
   AnchorMode,
-  bufferCV,
-  callReadOnlyFunction,
   ClarityType,
   ClarityValue,
+  FungibleConditionCode,
+  NonFungibleConditionCode,
+  PostCondition,
+  ResponseErrorCV,
+  StacksTransaction,
+  UnsignedContractCallOptions,
+  bufferCV,
+  bufferCVFromString,
+  callReadOnlyFunction,
+  createNonFungiblePostCondition,
+  createSTXPostCondition,
   cvToString,
   getAddressFromPrivateKey,
   getCVTypeString,
   hash160,
   makeRandomPrivKey,
   makeUnsignedContractCall,
-  privateKeyToString,
-  ResponseErrorCV,
-  StacksTransaction,
-  standardPrincipalCV,
-  uintCV,
-  someCV,
   noneCV,
-  UnsignedContractCallOptions,
-  PostCondition,
-  createSTXPostCondition,
-  createStacksPublicKey,
-  publicKeyToAddress,
-  FungibleConditionCode,
-  AddressVersion,
-  createNonFungiblePostCondition,
-  NonFungibleConditionCode,
   parseAssetInfoString,
+  publicKeyToAddress,
+  someCV,
+  standardPrincipalCV,
   tupleCV,
-  bufferCVFromString,
+  uintCV,
 } from '@stacks/transactions';
-
-import { ChainId, StacksNetwork } from '@stacks/network';
-
 import { decodeFQN, getZonefileHash } from './utils';
 
 export const BNS_CONTRACT_NAME = 'bns';
@@ -154,7 +150,7 @@ export async function canRegisterName({
   // Create a random address as input to read-only function call
   // Not used by BNS contract function but required by core node API
   // https://github.com/blockstack/stacks-blockchain/blob/master/src/net/http.rs#L1796
-  const randomPrivateKey = privateKeyToString(makeRandomPrivKey());
+  const randomPrivateKey = makeRandomPrivKey();
   const randomAddress = getAddressFromPrivateKey(randomPrivateKey);
 
   return callReadOnlyBnsFunction({
@@ -199,7 +195,7 @@ export async function getNamespacePrice({
   // Create a random address as input to read-only function call
   // Not used by BNS contract function but required by core node API
   // https://github.com/blockstack/stacks-blockchain/blob/master/src/net/http.rs#L1796
-  const randomPrivateKey = privateKeyToString(makeRandomPrivKey());
+  const randomPrivateKey = makeRandomPrivKey();
   const randomAddress = getAddressFromPrivateKey(randomPrivateKey);
 
   return callReadOnlyBnsFunction({
@@ -254,7 +250,7 @@ export async function getNamePrice({
   // Create a random address as input to read-only function call
   // Not used by BNS contract function but required by core node API
   // https://github.com/blockstack/stacks-blockchain/blob/master/src/net/http.rs#L1796
-  const randomPrivateKey = privateKeyToString(makeRandomPrivKey());
+  const randomPrivateKey = makeRandomPrivKey();
   const randomAddress = getAddressFromPrivateKey(randomPrivateKey);
 
   return callReadOnlyBnsFunction({
@@ -315,7 +311,7 @@ export async function buildPreorderNamespaceTx({
   const hashedSaltedNamespace = hash160(saltedNamespaceBytes);
 
   const burnSTXPostCondition = createSTXPostCondition(
-    publicKeyToAddress(getAddressVersion(network), createStacksPublicKey(publicKey)),
+    publicKeyToAddress(getAddressVersion(network), publicKey),
     FungibleConditionCode.Equal,
     stxToBurn
   );
@@ -538,7 +534,7 @@ export async function buildPreorderNameTx({
   const hashedSaltedName = hash160(saltedNamesBytes);
 
   const burnSTXPostCondition = createSTXPostCondition(
-    publicKeyToAddress(getAddressVersion(network), createStacksPublicKey(publicKey)),
+    publicKeyToAddress(getAddressVersion(network), publicKey),
     FungibleConditionCode.Equal,
     stxToBurn
   );
@@ -707,7 +703,7 @@ export async function buildTransferNameTx({
     zonefile ? someCV(bufferCV(getZonefileHash(zonefile))) : noneCV(),
   ];
   const postConditionSender = createNonFungiblePostCondition(
-    publicKeyToAddress(getAddressVersion(network), createStacksPublicKey(publicKey)),
+    publicKeyToAddress(getAddressVersion(network), publicKey),
     NonFungibleConditionCode.Sends,
     parseAssetInfoString(`${getBnsContractAddress(network)}.bns::names`),
     tupleCV({
@@ -827,7 +823,7 @@ export async function buildRenewNameTx({
     zonefile ? someCV(bufferCV(getZonefileHash(zonefile))) : noneCV(),
   ];
   const burnSTXPostCondition = createSTXPostCondition(
-    publicKeyToAddress(getAddressVersion(network), createStacksPublicKey(publicKey)),
+    publicKeyToAddress(getAddressVersion(network), publicKey),
     FungibleConditionCode.Equal,
     stxToBurn
   );
