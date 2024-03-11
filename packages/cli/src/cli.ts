@@ -12,14 +12,14 @@ import { wordlist } from '@scure/bip39/wordlists/english';
 import { buildPreorderNameTx, buildRegisterNameTx } from '@stacks/bns';
 import { StacksMainnet, StacksTestnet } from '@stacks/network';
 import {
-  AnchorMode,
   broadcastTransaction,
   callReadOnlyFunction,
+  Cl,
   ClarityAbi,
   ClarityValue,
   ContractCallPayload,
-  SignedContractDeployOptions,
   createStacksPrivateKey,
+  cvToJSON,
   cvToString,
   estimateContractDeploy,
   estimateContractFunctionCall,
@@ -34,6 +34,7 @@ import {
   publicKeyToString,
   ReadOnlyFunctionOptions,
   SignedContractCallOptions,
+  SignedContractDeployOptions,
   SignedTokenTransferOptions,
   signWithKey,
   StacksTransaction,
@@ -41,8 +42,6 @@ import {
   TransactionVersion,
   TxBroadcastResult,
   validateContractCall,
-  Cl,
-  cvToJSON,
 } from '@stacks/transactions';
 import express from 'express';
 import { prompt } from 'inquirer';
@@ -75,10 +74,10 @@ import {
 
 import {
   checkArgs,
+  CLI_ARGS,
   CLIOptAsBool,
   CLIOptAsString,
   CLIOptAsStringArray,
-  CLI_ARGS,
   DEFAULT_CONFIG_PATH,
   DEFAULT_CONFIG_TESTNET_PATH,
   getCLIOpts,
@@ -92,7 +91,7 @@ import {
 
 import { decryptBackupPhrase, encryptBackupPhrase } from './encrypt';
 
-import { CLINetworkAdapter, CLI_NETWORK_OPTS, getNetwork, NameInfoType } from './network';
+import { CLI_NETWORK_OPTS, CLINetworkAdapter, getNetwork, NameInfoType } from './network';
 
 import { gaiaAuth, gaiaConnect, gaiaUploadProfileAll, getGaiaAddressFromProfile } from './data';
 
@@ -715,7 +714,6 @@ async function sendTokens(network: CLINetworkAdapter, args: string[]): Promise<s
     nonce,
     memo,
     network: txNetwork,
-    anchorMode: AnchorMode.Any,
   };
 
   const tx: StacksTransaction = await makeSTXTokenTransfer(options);
@@ -776,7 +774,6 @@ async function contractDeploy(network: CLINetworkAdapter, args: string[]): Promi
     nonce,
     network: txNetwork,
     postConditionMode: PostConditionMode.Allow,
-    anchorMode: AnchorMode.Any,
   };
 
   const tx = await makeContractDeploy(options);
@@ -858,7 +855,6 @@ async function contractFunctionCall(network: CLINetworkAdapter, args: string[]):
         nonce,
         network: txNetwork,
         postConditionMode: PostConditionMode.Allow,
-        anchorMode: AnchorMode.Any,
       };
 
       return makeContractCall(options);

@@ -1,42 +1,37 @@
-import { IntegerType, utf8ToBytes } from '@stacks/common';
+import { ChainID, IntegerType, utf8ToBytes } from '@stacks/common';
+import { StacksNetwork } from '@stacks/network';
 import {
-  AnchorMode,
-  bufferCV,
-  callReadOnlyFunction,
+  AddressVersion,
   ClarityType,
   ClarityValue,
+  FungibleConditionCode,
+  NonFungibleConditionCode,
+  PostCondition,
+  ResponseErrorCV,
+  StacksTransaction,
+  UnsignedContractCallOptions,
+  bufferCV,
+  bufferCVFromString,
+  callReadOnlyFunction,
+  createNonFungiblePostCondition,
+  createSTXPostCondition,
+  createStacksPublicKey,
   cvToString,
   getAddressFromPrivateKey,
   getCVTypeString,
   hash160,
   makeRandomPrivKey,
   makeUnsignedContractCall,
-  privateKeyToString,
-  ResponseErrorCV,
-  StacksTransaction,
-  standardPrincipalCV,
-  uintCV,
-  someCV,
   noneCV,
-  UnsignedContractCallOptions,
-  PostCondition,
-  createSTXPostCondition,
-  createStacksPublicKey,
-  publicKeyToAddress,
-  FungibleConditionCode,
-  AddressVersion,
-  createNonFungiblePostCondition,
-  NonFungibleConditionCode,
   parseAssetInfoString,
+  privateKeyToString,
+  publicKeyToAddress,
+  someCV,
+  standardPrincipalCV,
   tupleCV,
-  bufferCVFromString,
+  uintCV,
 } from '@stacks/transactions';
-
-import { StacksNetwork } from '@stacks/network';
-
 import { decodeFQN, getZonefileHash } from './utils';
-
-import { ChainID } from '@stacks/common';
 
 export const BNS_CONTRACT_NAME = 'bns';
 
@@ -97,7 +92,6 @@ async function makeBnsContractCall(options: BnsContractCallOptions): Promise<Sta
     publicKey: options.publicKey,
     validateWithAbi: false,
     network: options.network,
-    anchorMode: AnchorMode.Any,
     postConditions: options.postConditions,
   };
 

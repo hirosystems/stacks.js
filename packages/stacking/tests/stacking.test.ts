@@ -2,7 +2,6 @@ import { bigIntToBytes, bytesToHex, hexToBytes } from '@stacks/common';
 import { base58CheckDecode, getPublicKeyFromPrivate } from '@stacks/encryption';
 import { StacksMainnet, StacksTestnet } from '@stacks/network';
 import {
-  AnchorMode,
   ClarityType,
   ReadOnlyFunctionOptions,
   SignedContractCallOptions,
@@ -337,7 +336,6 @@ test('stack stx', async () => {
     validateWithAbi: true,
     network,
     senderKey: privateKey,
-    anchorMode: AnchorMode.Any,
   };
 
   expect(fetchMock.mock.calls[0][0]).toEqual(network.getPoxInfoUrl());
@@ -409,7 +407,6 @@ test('delegate stx', async () => {
     validateWithAbi: true,
     network,
     senderKey: privateKey,
-    anchorMode: AnchorMode.Any,
   };
 
   expect(fetchMock.mock.calls[0][0]).toEqual(network.getPoxInfoUrl());
@@ -473,7 +470,6 @@ test('delegate stx with empty optional parameters', async () => {
     validateWithAbi: true,
     network,
     senderKey: privateKey,
-    anchorMode: AnchorMode.Any,
   };
 
   expect(fetchMock.mock.calls[0][0]).toEqual(network.getPoxInfoUrl());
@@ -556,7 +552,6 @@ test('delegate stack stx with one delegator', async () => {
     validateWithAbi: true,
     network,
     senderKey: privateKey,
-    anchorMode: AnchorMode.Any,
   };
 
   expect(fetchMock.mock.calls[0][0]).toEqual(network.getPoxInfoUrl());
@@ -642,7 +637,6 @@ test('delegate stack stx with set nonce', async () => {
     network,
     senderKey: privateKey,
     nonce,
-    anchorMode: AnchorMode.Any,
   };
 
   expect(fetchMock.mock.calls[0][0]).toEqual(network.getPoxInfoUrl());
@@ -705,7 +699,6 @@ test('delegator commit', async () => {
     validateWithAbi: true,
     network,
     senderKey: privateKey,
-    anchorMode: AnchorMode.Any,
   };
 
   expect(fetchMock.mock.calls[0][0]).toEqual(network.getPoxInfoUrl());
@@ -754,7 +747,6 @@ test('revoke delegate stx', async () => {
     validateWithAbi: true,
     network,
     senderKey: privateKey,
-    anchorMode: AnchorMode.Any,
   };
 
   expect(fetchMock.mock.calls[0][0]).toEqual(network.getPoxInfoUrl());

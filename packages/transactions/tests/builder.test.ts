@@ -64,8 +64,6 @@ import { principalCV } from '../src/clarity/types/principalCV';
 import { createMessageSignature } from '../src/common';
 import {
   AddressHashMode,
-  AnchorMode,
-  AnchorModeName,
   AuthType,
   ClarityVersion,
   DEFAULT_CORE_NODE_API_URL,
@@ -133,45 +131,6 @@ test('API key middleware - get nonce', async () => {
   expect(callHeaders.get('x-api-key')).toBe(apiKey);
 });
 
-const anchorModeNameCases: [AnchorModeName | AnchorMode, AnchorMode | null][] = [
-  ['onChainOnly', AnchorMode.OnChainOnly],
-  ['offChainOnly', AnchorMode.OffChainOnly],
-  ['any', AnchorMode.Any],
-  [AnchorMode.OnChainOnly, AnchorMode.OnChainOnly],
-  [AnchorMode.OffChainOnly, AnchorMode.OffChainOnly],
-  [AnchorMode.Any, AnchorMode.Any],
-  ['invalid' as AnchorModeName, null],
-  [0x20 as AnchorMode, null],
-];
-
-test.each(anchorModeNameCases)(
-  'Build transaction with AnchorMode name %p',
-  async (anchorModeName, anchorModeValue) => {
-    const recipient = standardPrincipalCV('SP3FGQ8Z7JY9BWYZ5WM53E0M9NK7WHJF0691NZ159');
-    const amount = 12345;
-    const fee = 0;
-    const nonce = 0;
-    const senderKey = 'edf9aee84d9b7abc145504dde6726c64f369d37ee34ded868fabd876c26570bc01';
-    const memo = 'test memo';
-    const txOptions: SignedTokenTransferOptions = {
-      recipient,
-      amount,
-      senderKey,
-      fee,
-      nonce,
-      memo,
-      anchorMode: anchorModeName,
-    };
-    if (anchorModeValue === null) {
-      expect.assertions(1);
-      await expect(makeSTXTokenTransfer(txOptions)).rejects.toThrow(/Invalid anchor mode/);
-    } else {
-      const transaction = await makeSTXTokenTransfer(txOptions);
-      expect(transaction.anchorMode).toBe(anchorModeValue);
-    }
-  }
-);
-
 test('Make STX token transfer with set tx fee', async () => {
   const recipient = standardPrincipalCV('SP3FGQ8Z7JY9BWYZ5WM53E0M9NK7WHJF0691NZ159');
   const amount = 12345;
@@ -187,7 +146,6 @@ test('Make STX token transfer with set tx fee', async () => {
     fee,
     nonce,
     memo,
-    anchorMode: AnchorMode.Any,
   });
   expect(() => transaction.verifyOrigin()).not.toThrow();
 
@@ -245,7 +203,6 @@ test('Make STX token transfer with fee estimate', async () => {
     nonce,
     senderKey,
     memo,
-    anchorMode: AnchorMode.Any,
   });
 
   expect(() => transaction.verifyOrigin()).not.toThrow();
@@ -280,7 +237,6 @@ test('Make STX token transfer with testnet', async () => {
     nonce,
     network: new StacksTestnet(),
     memo: memo,
-    anchorMode: AnchorMode.Any,
   });
   expect(() => transaction.verifyOrigin()).not.toThrow();
 
@@ -304,7 +260,6 @@ test('Make STX token transfer with testnet string name', async () => {
     nonce: 0,
     network: 'testnet',
     memo: 'test memo',
-    anchorMode: AnchorMode.Any,
   });
   expect(() => transaction.verifyOrigin()).not.toThrow();
 
@@ -328,7 +283,6 @@ test('Throws making STX token transder with invalid network name', async () => {
     nonce: 0,
     network: 'invalidnet',
     memo: 'test memo',
-    anchorMode: AnchorMode.Any,
   };
 
   await expect(
@@ -356,7 +310,6 @@ test("STX token transfers don't take post conditions", async () => {
     nonce,
     memo,
     postConditions,
-    anchorMode: AnchorMode.Any,
   } as SignedTokenTransferOptions);
 
   const serialized = transaction.serialize();
@@ -396,7 +349,6 @@ test('Make Multi-Sig STX token transfer', async () => {
     memo: memo,
     numSignatures: 2,
     publicKeys: pubKeyStrings,
-    anchorMode: AnchorMode.Any,
   });
   const signer = new TransactionSigner(transaction);
   signer.signOrigin(privKeys[0]);
@@ -472,7 +424,6 @@ test('Should deserialize partially signed multi-Sig STX token transfer', async (
     memo: memo,
     numSignatures: 2,
     publicKeys: pubKeyStrings,
-    anchorMode: AnchorMode.Any,
   });
 
   const serializedTx = transaction.serialize();
@@ -550,7 +501,6 @@ test('Should throw error if multisig transaction is oversigned', async () => {
     memo: memo,
     numSignatures: 2,
     publicKeys: pubKeyStrings,
-    anchorMode: AnchorMode.Any,
   });
 
   const signer = new TransactionSigner(transaction);
@@ -595,7 +545,6 @@ test('Make Multi-Sig STX token transfer with two transaction signers', async () 
     memo: memo,
     numSignatures: 2,
     publicKeys: pubKeyStrings,
-    anchorMode: AnchorMode.Any,
   });
 
   const serializedTxUnsigned = transaction.serialize();
@@ -697,7 +646,6 @@ test('addSignature to an unsigned transaction', async () => {
     fee,
     nonce,
     publicKey,
-    anchorMode: AnchorMode.Any,
   });
 
   const nullSignature = (unsignedTx.auth.spendingCondition as any).signature.data;
@@ -729,7 +677,6 @@ test('Make versioned smart contract deploy', async () => {
     fee,
     nonce,
     network: new StacksTestnet(),
-    anchorMode: AnchorMode.Any,
     clarityVersion: ClarityVersion.Clarity2,
   });
   expect(() => transaction.verifyOrigin()).not.toThrow();
@@ -756,7 +703,6 @@ test('Make smart contract deploy (defaults to versioned smart contract, as of 2.
     fee,
     nonce,
     network: new StacksTestnet(),
-    anchorMode: AnchorMode.Any,
   });
   expect(() => transaction.verifyOrigin()).not.toThrow();
 
@@ -776,7 +722,6 @@ test('Make smart contract deploy with network string name (defaults to versioned
     fee: 0,
     nonce: 0,
     network: 'testnet',
-    anchorMode: AnchorMode.Any,
   });
   expect(() => transaction.verifyOrigin()).not.toThrow();
 
@@ -804,7 +749,6 @@ test('Make smart contract deploy unsigned', async () => {
     fee,
     nonce,
     network: new StacksTestnet(),
-    anchorMode: AnchorMode.Any,
   });
 
   const serializedTx = transaction.serialize();
@@ -842,7 +786,6 @@ test('make a multi-sig contract deploy', async () => {
     fee,
     nonce,
     network: new StacksTestnet(),
-    anchorMode: AnchorMode.Any,
   });
   expect(() => transaction.verifyOrigin()).not.toThrow();
   expect(transaction.auth.spendingCondition!.signer).toEqual(
@@ -866,7 +809,6 @@ test('Make smart contract deploy signed', async () => {
     fee,
     nonce,
     network: new StacksTestnet(),
-    anchorMode: AnchorMode.Any,
   });
   expect(() => transaction.verifyOrigin()).not.toThrow();
 
@@ -899,7 +841,6 @@ test('Make contract-call', async () => {
     fee,
     nonce: 1,
     network: new StacksTestnet(),
-    anchorMode: AnchorMode.Any,
   });
   expect(() => transaction.verifyOrigin()).not.toThrow();
 
@@ -924,7 +865,6 @@ test('Make contract-call with network string', async () => {
     fee: 0,
     nonce: 1,
     network: 'testnet',
-    anchorMode: AnchorMode.Any,
   });
   expect(() => transaction.verifyOrigin()).not.toThrow();
 
@@ -996,7 +936,6 @@ test('Make contract-call with post conditions', async () => {
     network: new StacksTestnet(),
     postConditions,
     postConditionMode: PostConditionMode.Deny,
-    anchorMode: AnchorMode.Any,
   });
   expect(() => transaction.verifyOrigin()).not.toThrow();
 
@@ -1041,7 +980,6 @@ test('Make contract-call with post condition allow mode', async () => {
     nonce: 1,
     network: new StacksTestnet(),
     postConditionMode: PostConditionMode.Allow,
-    anchorMode: AnchorMode.Any,
   });
   expect(() => transaction.verifyOrigin()).not.toThrow();
 
@@ -1074,7 +1012,6 @@ test('addSignature to an unsigned contract call transaction', async () => {
     nonce: 1,
     network: new StacksTestnet(),
     postConditionMode: PostConditionMode.Allow,
-    anchorMode: AnchorMode.Any,
   });
 
   const nullSignature = (unsignedTx.auth.spendingCondition as any).signature.data;
@@ -1119,7 +1056,6 @@ test('make a multi-sig contract call', async () => {
     nonce: 1,
     network: new StacksTestnet(),
     postConditionMode: PostConditionMode.Allow,
-    anchorMode: AnchorMode.Any,
   });
   expect(() => transaction.verifyOrigin()).not.toThrow();
 
@@ -1144,7 +1080,6 @@ test('Estimate transaction transfer fee', async () => {
     fee,
     nonce,
     memo,
-    anchorMode: AnchorMode.Any,
   });
 
   const serialized = transaction.serialize();
@@ -1233,7 +1168,6 @@ test('Estimate transaction fee fallback', async () => {
     contractName: 'pox-2',
     functionName: 'delegate-stx',
     functionArgs: [uintCV(100_000), principalCV(poolAddress), noneCV(), noneCV()],
-    anchorMode: AnchorMode.OnChainOnly,
     nonce: 1,
     network,
   });
@@ -1303,7 +1237,6 @@ test('Single-sig transaction byte length must include signature', async () => {
     nonce,
     memo: memo,
     publicKey: publicKey,
-    anchorMode: AnchorMode.Any,
   });
 
   // Due to empty message signature space will be allocated for signature
@@ -1354,7 +1287,6 @@ test('Multi-sig transaction byte length must include the required signatures', a
     memo: memo,
     numSignatures: 3,
     publicKeys: pubKeyStrings,
-    anchorMode: AnchorMode.Any,
   });
 
   // Total length without signatures
@@ -1417,7 +1349,6 @@ test('Make STX token transfer with fetch account nonce', async () => {
     fee,
     memo,
     network,
-    anchorMode: AnchorMode.Any,
   });
 
   expect(fetchMock.mock.calls.length).toEqual(2);
@@ -1450,7 +1381,6 @@ test('Make sponsored STX token transfer', async () => {
     nonce,
     memo: memo,
     sponsored: true,
-    anchorMode: AnchorMode.Any,
   });
 
   const preSponsorSerialized = bytesToHex(transaction.serialize());
@@ -1575,7 +1505,6 @@ test('Make sponsored STX token transfer with sponsor fee estimate', async () => 
     nonce,
     memo: memo,
     sponsored: true,
-    anchorMode: AnchorMode.Any,
   });
 
   const sponsorOptions = {
@@ -1661,7 +1590,6 @@ test('Make sponsored STX token transfer with set tx fee', async () => {
     nonce,
     network,
     sponsored: true,
-    anchorMode: AnchorMode.Any,
   });
 
   const sponsorOptions = {
@@ -1716,7 +1644,6 @@ test('Make sponsored contract deploy with sponsor fee estimate', async () => {
     nonce,
     network,
     sponsored: true,
-    anchorMode: AnchorMode.Any,
   });
 
   const sponsorOptions = {
@@ -1777,7 +1704,6 @@ test('Make sponsored contract call with sponsor nonce fetch', async () => {
     nonce,
     network,
     sponsored: true,
-    anchorMode: AnchorMode.Any,
   });
 
   const sponsorOptions = {
@@ -1829,7 +1755,6 @@ test('Transaction broadcast success', async () => {
     fee,
     nonce,
     memo,
-    anchorMode: AnchorMode.Any,
   });
 
   fetchMock.mockOnce('success');
@@ -1851,7 +1776,6 @@ test('Transaction broadcast success with string network name', async () => {
     fee: 0,
     nonce: 0,
     memo: 'test memo',
-    anchorMode: AnchorMode.Any,
   });
 
   fetchMock.mockOnce('success');
@@ -1873,7 +1797,6 @@ test('Transaction broadcast success with network detection', async () => {
     fee: 0,
     nonce: 0,
     memo: 'test memo',
-    anchorMode: AnchorMode.Any,
   });
 
   fetchMock.mockOnce('success');
@@ -1904,7 +1827,6 @@ test('Transaction broadcast with attachment', async () => {
     fee,
     nonce,
     memo,
-    anchorMode: AnchorMode.Any,
   });
 
   fetchMock.mockOnce('success');
@@ -1939,7 +1861,6 @@ test('Transaction broadcast returns error', async () => {
     fee,
     nonce,
     memo,
-    anchorMode: AnchorMode.Any,
   });
 
   const rejection = {
@@ -1978,7 +1899,6 @@ test('Transaction broadcast fails', async () => {
     fee,
     nonce,
     memo,
-    anchorMode: AnchorMode.Any,
   });
 
   fetchMock.mockOnce('test', { status: 400 });
@@ -2011,7 +1931,6 @@ test('Make contract-call with network ABI validation', async () => {
     network: new StacksTestnet(),
     validateWithAbi: true,
     postConditionMode: PostConditionMode.Allow,
-    anchorMode: AnchorMode.Any,
   });
 
   expect(fetchMock.mock.calls.length).toEqual(1);
@@ -2039,7 +1958,6 @@ test('Make contract-call with provided ABI validation', async () => {
     nonce: 1,
     validateWithAbi: abi,
     postConditionMode: PostConditionMode.Allow,
-    anchorMode: AnchorMode.Any,
   });
 });
 
@@ -2069,7 +1987,6 @@ test('Make contract-call with network ABI validation failure', async () => {
       network: 'testnet',
       validateWithAbi: true,
       postConditionMode: PostConditionMode.Allow,
-      anchorMode: AnchorMode.Any,
     });
   } catch (e) {
     error = e;
@@ -2197,7 +2114,6 @@ test('StacksTransaction serialize/deserialize equality with an empty memo', asyn
     nonce: 0n,
     memo: '', // empty memo
     network: new StacksMainnet(),
-    anchorMode: AnchorMode.Any,
     senderKey: 'edf9aee84d9b7abc145504dde6726c64f369d37ee34ded868fabd876c26570bc01',
   };
   const tx = await makeSTXTokenTransfer(options);
@@ -2216,7 +2132,6 @@ test('StacksTransaction serialize/deserialize equality with a memo', async () =>
     nonce: 0n,
     memo: 'Memento Mori',
     network: new StacksMainnet(),
-    anchorMode: AnchorMode.Any,
     senderKey: 'edf9aee84d9b7abc145504dde6726c64f369d37ee34ded868fabd876c26570bc01',
   };
   const tx = await makeSTXTokenTransfer(options);
@@ -2235,7 +2150,6 @@ test('StacksTransaction serialize/deserialize equality with a memo ending in a z
     nonce: 0n,
     memo: bytesToUtf8(hexToBytes('0')), // null character
     network: new StacksMainnet(),
-    anchorMode: AnchorMode.Any,
     senderKey: 'edf9aee84d9b7abc145504dde6726c64f369d37ee34ded868fabd876c26570bc01',
   };
   const tx = await makeSTXTokenTransfer(options);
