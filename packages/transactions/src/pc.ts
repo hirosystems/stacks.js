@@ -9,7 +9,13 @@ import {
 } from './builders';
 import { ClarityValue } from './clarity';
 import { FungibleConditionCode, NonFungibleConditionCode } from './constants';
-import { createAssetInfo, NonFungiblePostCondition } from './postcondition-types';
+import {
+  AddressString,
+  AssetString,
+  ContractIdString,
+  createAsset,
+  NonFungiblePostCondition,
+} from './postcondition-types';
 
 /// `Pc.` Post Condition Builder
 //
@@ -18,21 +24,6 @@ import { createAssetInfo, NonFungiblePostCondition } from './postcondition-types
 // The general pattern is:
 //   PRINCIPAL -> [AMOUNT] -> CODE -> ASSET
 //
-
-/**
- * An address string encoded as c32check
- */
-type AddressString = string;
-
-/**
- * A contract identifier string given as `<address>.<contract-name>`
- */
-type ContractIdString = `${string}.${string}`;
-
-/**
- * An asset name string given as `<contract-id>::<token-name>` aka `<contract-address>.<contract-name>::<token-name>`
- */
-type NftString = `${ContractIdString}::${string}`;
 
 /**
  * ### `Pc.` Post Condition Builder
@@ -234,14 +225,14 @@ class PartialPcFtWithCode {
         this.contractName,
         this.code,
         this.amount,
-        createAssetInfo(address, name, tokenName)
+        createAsset(address, name, tokenName)
       );
     }
     return makeStandardFungiblePostCondition(
       this.address,
       this.code,
       this.amount,
-      createAssetInfo(address, name, tokenName)
+      createAsset(address, name, tokenName)
     );
   }
 }
@@ -261,7 +252,7 @@ class PartialPcNftWithCode {
    * @param assetName - The name of the NFT asset. Formatted as `<contract-address>.<contract-name>::<token-name>`.
    * @param assetId - The asset identifier of the NFT. A Clarity value defining the single NFT instance.
    */
-  nft(assetName: NftString, assetId: ClarityValue): NonFungiblePostCondition;
+  nft(assetName: AssetString, assetId: ClarityValue): NonFungiblePostCondition;
   /**
    * ### Non-Fungible Token Post Condition
    * @param contractId - The contract identifier of the NFT. Formatted as `<contract-address>.<contract-name>`.
@@ -283,7 +274,7 @@ class PartialPcNftWithCode {
         this.principal,
         this.contractName,
         this.code,
-        createAssetInfo(contractAddress, contractName, tokenName),
+        createAsset(contractAddress, contractName, tokenName),
         assetId
       );
     }
@@ -291,7 +282,7 @@ class PartialPcNftWithCode {
     return makeStandardNonFungiblePostCondition(
       this.principal,
       this.code,
-      createAssetInfo(contractAddress, contractName, tokenName),
+      createAsset(contractAddress, contractName, tokenName),
       assetId
     );
   }
@@ -305,7 +296,7 @@ function parseContractId(contractId: ContractIdString) {
 }
 
 /** @internal */
-function parseNft(nftAssetName: NftString) {
+function parseNft(nftAssetName: AssetString) {
   const [principal, tokenName] = nftAssetName.split('::') as [ContractIdString, string];
   if (!principal || !tokenName)
     throw new Error(`Invalid fully-qualified nft asset name: ${nftAssetName}`);
@@ -324,7 +315,7 @@ function isContractIdString(value: AddressString | ContractIdString): value is C
  * @internal
  */
 function getNftArgs(
-  assetName: NftString,
+  asset: AssetString,
   assetId: ClarityValue
 ): { contractAddress: string; contractName: string; tokenName: string; assetId: ClarityValue };
 function getNftArgs(

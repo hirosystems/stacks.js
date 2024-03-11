@@ -7,12 +7,13 @@ import {
   StacksMessageType,
 } from './constants';
 import {
-  AssetInfo,
+  Asset,
+  AssetString,
   FungiblePostCondition,
   NonFungiblePostCondition,
   PostConditionPrincipal,
   STXPostCondition,
-  parseAssetInfoString,
+  parseAssetString,
   parsePrincipalString,
 } from './postcondition-types';
 
@@ -38,13 +39,13 @@ export function createFungiblePostCondition(
   principal: string | PostConditionPrincipal,
   conditionCode: FungibleConditionCode,
   amount: IntegerType,
-  assetInfo: string | AssetInfo
+  asset: AssetString | Asset
 ): FungiblePostCondition {
   if (typeof principal === 'string') {
     principal = parsePrincipalString(principal);
   }
-  if (typeof assetInfo === 'string') {
-    assetInfo = parseAssetInfoString(assetInfo);
+  if (typeof asset === 'string') {
+    asset = parseAssetString(asset);
   }
 
   return {
@@ -53,21 +54,21 @@ export function createFungiblePostCondition(
     principal,
     conditionCode,
     amount: intToBigInt(amount, false),
-    assetInfo,
+    asset: asset,
   };
 }
 
 export function createNonFungiblePostCondition(
   principal: string | PostConditionPrincipal,
   conditionCode: NonFungibleConditionCode,
-  assetInfo: string | AssetInfo,
+  asset: AssetString | Asset,
   assetName: ClarityValue
 ): NonFungiblePostCondition {
   if (typeof principal === 'string') {
     principal = parsePrincipalString(principal);
   }
-  if (typeof assetInfo === 'string') {
-    assetInfo = parseAssetInfoString(assetInfo);
+  if (typeof asset === 'string') {
+    asset = parseAssetString(asset);
   }
 
   return {
@@ -75,7 +76,7 @@ export function createNonFungiblePostCondition(
     conditionType: PostConditionType.NonFungible,
     principal,
     conditionCode,
-    assetInfo,
+    asset: asset,
     assetName,
   };
 }

@@ -23,7 +23,7 @@ import {
   makeRandomPrivKey,
   makeUnsignedContractCall,
   noneCV,
-  parseAssetInfoString,
+  parseAssetString,
   publicKeyToAddress,
   someCV,
   standardPrincipalCV,
@@ -705,7 +705,7 @@ export async function buildTransferNameTx({
   const postConditionSender = createNonFungiblePostCondition(
     publicKeyToAddress(getAddressVersion(network), publicKey),
     NonFungibleConditionCode.Sends,
-    parseAssetInfoString(`${getBnsContractAddress(network)}.bns::names`),
+    parseAssetString(`${getBnsContractAddress(network)}.bns::names`),
     tupleCV({
       name: bufferCVFromString(name),
       namespace: bufferCVFromString(namespace),
@@ -714,7 +714,7 @@ export async function buildTransferNameTx({
   const postConditionReceiver = createNonFungiblePostCondition(
     newOwnerAddress,
     NonFungibleConditionCode.DoesNotSend,
-    parseAssetInfoString(`${getBnsContractAddress(network)}.bns::names`),
+    parseAssetString(`${getBnsContractAddress(network)}.bns::names`),
     tupleCV({
       name: bufferCVFromString(name),
       namespace: bufferCVFromString(namespace),

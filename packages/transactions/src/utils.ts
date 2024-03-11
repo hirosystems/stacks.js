@@ -153,7 +153,7 @@ export function isClarityName(name: string) {
  */
 export function cvToHex(cv: ClarityValue) {
   const serialized = serializeCV(cv);
-  return `0x${bytesToHex(serialized)}`;
+  return `0x${serialized}`;
 }
 
 /**
