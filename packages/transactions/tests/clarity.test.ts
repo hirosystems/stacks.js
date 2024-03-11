@@ -1,48 +1,43 @@
-import {
-  asciiToBytes,
-  bytesToHex,
-  bytesToUtf8,
-  concatBytes,
-  hexToBytes,
-  utf8ToBytes,
-} from '@stacks/common';
+import { asciiToBytes, bytesToUtf8, concatBytes, hexToBytes, utf8ToBytes } from '@stacks/common';
+import assert from 'assert';
+import { Cl } from '../src';
 import { BytesReader } from '../src/bytesReader';
 import {
-  bufferCV,
   BufferCV,
-  clarityByteToType,
   ClarityType,
-  clarityTypeToByte,
   ClarityValue,
   ClarityWireType,
+  IntCV,
+  ListCV,
+  SomeCV,
+  StandardPrincipalCV,
+  StringAsciiCV,
+  StringUtf8CV,
+  TupleCV,
+  UIntCV,
+  bufferCV,
+  clarityByteToType,
+  clarityTypeToByte,
   contractPrincipalCV,
   contractPrincipalCVFromStandard,
   deserializeCV,
   falseCV,
-  IntCV,
   intCV,
   listCV,
-  ListCV,
   noneCV,
   responseErrorCV,
   responseOkCV,
   serializeCV,
+  serializeCVBytes,
   someCV,
-  SomeCV,
   standardPrincipalCV,
-  StandardPrincipalCV,
   standardPrincipalCVFromAddress,
   stringAsciiCV,
-  StringAsciiCV,
   stringUtf8CV,
-  StringUtf8CV,
   trueCV,
   tupleCV,
-  TupleCV,
   uintCV,
-  UIntCV,
 } from '../src/clarity';
-import { Cl } from '../src';
 import {
   cvToJSON,
   cvToString,
@@ -51,13 +46,12 @@ import {
   isClarityType,
 } from '../src/clarity/clarityValue';
 import { addressToString } from '../src/common';
-import { deserializeAddress } from '../src/types';
-import assert from 'assert';
+import { deserializeAddressBytes } from '../src/types';
 
 const ADDRESS = 'SP2JXKMSH007NPYAQHKJPQMAQYAD90NQGTVJVQ02B';
 
 function serializeDeserialize<T extends ClarityValue>(value: T): T {
-  const serializedDeserialized: Uint8Array = serializeCV(value);
+  const serializedDeserialized: Uint8Array = serializeCVBytes(value);
   const bytesReader = new BytesReader(serializedDeserialized);
   return deserializeCV(bytesReader) as T;
 }
@@ -271,7 +265,7 @@ describe('Clarity Types', () => {
       const numCV = intCV(num);
       expect(numCV.value.toString()).toBe(expectedInt);
       const serialized = serializeCV(numCV);
-      expect('0x' + bytesToHex(serialized.slice(1))).toBe(expectedHex);
+      expect('0x' + serialized.slice(2)).toBe(expectedHex);
       expect(cvToString(deserializeCV(serialized))).toBe(expectedInt);
     });
 
@@ -280,7 +274,7 @@ describe('Clarity Types', () => {
       const maxSigned128 = intCV(2n ** 127n - 1n);
       expect(maxSigned128.value.toString()).toBe('170141183460469231731687303715884105727');
       const serializedMax = serializeCV(maxSigned128);
-      expect('0x' + bytesToHex(serializedMax.slice(1))).toBe('0x7fffffffffffffffffffffffffffffff');
+      expect('0x' + serializedMax.slice(2)).toBe('0x7fffffffffffffffffffffffffffffff');
       const serializedDeserializedMax = serializeDeserialize(maxSigned128) as IntCV;
       expect(cvToString(serializedDeserializedMax)).toBe(cvToString(maxSigned128));
 
@@ -288,7 +282,7 @@ describe('Clarity Types', () => {
       const minSigned128 = intCV((-2n) ** 127n);
       expect(minSigned128.value.toString()).toBe('-170141183460469231731687303715884105728');
       const serializedMin = serializeCV(minSigned128);
-      expect('0x' + bytesToHex(serializedMin.slice(1))).toBe('0x80000000000000000000000000000000');
+      expect('0x' + serializedMin.slice(2)).toBe('0x80000000000000000000000000000000');
       const serializedDeserializedMin = serializeDeserialize(minSigned128) as IntCV;
       expect(cvToString(serializedDeserializedMin)).toBe(cvToString(minSigned128));
 
@@ -304,13 +298,13 @@ describe('Clarity Types', () => {
       const uint = uintCV(10);
       expect(uint.value.toString()).toBe('10');
       const serialized1 = serializeCV(uint);
-      expect('0x' + bytesToHex(serialized1.slice(1))).toBe('0x0000000000000000000000000000000a');
+      expect('0x' + serialized1.slice(2)).toBe('0x0000000000000000000000000000000a');
       const serializedDeserialized = serializeDeserialize(uint) as UIntCV;
       expect(cvToString(serializedDeserialized)).toBe(cvToString(uint));
 
       const uint2 = uintCV('0x0a');
       const serialized2 = serializeCV(uint2);
-      expect('0x' + bytesToHex(serialized2.slice(1))).toBe('0x0000000000000000000000000000000a');
+      expect('0x' + serialized2.slice(2)).toBe('0x0000000000000000000000000000000a');
       expect(cvToString(serializeDeserialize(uint2))).toBe(cvToString(uint));
 
       expect(() => uintCV(10000000000000000000000000000000)).toThrowError(RangeError);
@@ -321,7 +315,7 @@ describe('Clarity Types', () => {
       const max128 = uintCV(2n ** 128n - 1n);
       expect(max128.value.toString()).toBe('340282366920938463463374607431768211455');
       const serializedMax = serializeCV(max128);
-      expect('0x' + bytesToHex(serializedMax.slice(1))).toBe('0xffffffffffffffffffffffffffffffff');
+      expect('0x' + serializedMax.slice(2)).toBe('0xffffffffffffffffffffffffffffffff');
       const serializedDeserializedMax = serializeDeserialize(max128);
       expect(cvToString(serializedDeserializedMax)).toBe(cvToString(max128));
 
@@ -329,7 +323,7 @@ describe('Clarity Types', () => {
       const min128 = uintCV(0);
       expect(min128.value.toString()).toBe('0');
       const serializedMin = serializeCV(min128);
-      expect('0x' + bytesToHex(serializedMin.slice(1))).toBe('0x00000000000000000000000000000000');
+      expect('0x' + serializedMin.slice(2)).toBe('0x00000000000000000000000000000000');
       const serializedDeserializedMin = serializeDeserialize(min128);
       expect(cvToString(serializedDeserializedMin)).toBe(cvToString(min128));
 
@@ -354,7 +348,7 @@ describe('Clarity Types', () => {
       const numCV = uintCV(num);
       expect(numCV.value.toString()).toBe(expectedInt);
       const serialized = serializeCV(numCV);
-      expect('0x' + bytesToHex(serialized.slice(1))).toBe(expectedHex);
+      expect('0x' + serialized.slice(2)).toBe(expectedHex);
       expect(cvToString(deserializeCV(serialized))).toBe('u' + expectedInt);
     });
 
@@ -458,37 +452,37 @@ describe('Clarity Types', () => {
   describe('Serialization Test Vectors', () => {
     test('Int 1 Vector', () => {
       const int = intCV(1);
-      const serialized = bytesToHex(serializeCV(int));
+      const serialized = serializeCV(int);
       expect(serialized).toEqual('0000000000000000000000000000000001');
     });
 
     test('Int -1 Vector', () => {
       const int = intCV(-1);
-      const serialized = bytesToHex(serializeCV(int));
+      const serialized = serializeCV(int);
       expect(serialized).toEqual('00ffffffffffffffffffffffffffffffff');
     });
 
     test('UInt 1 Vector', () => {
       const uint = uintCV(1);
-      const serialized = bytesToHex(serializeCV(uint));
+      const serialized = serializeCV(uint);
       expect(serialized).toEqual('0100000000000000000000000000000001');
     });
 
     test('Buffer Vector', () => {
       const buffer = bufferCV(new Uint8Array([0xde, 0xad, 0xbe, 0xef]));
-      const serialized = bytesToHex(serializeCV(buffer));
+      const serialized = serializeCV(buffer);
       expect(serialized).toEqual('0200000004deadbeef');
     });
 
     test('True Vector', () => {
       const t = trueCV();
-      const serialized = bytesToHex(serializeCV(t));
+      const serialized = serializeCV(t);
       expect(serialized).toEqual('03');
     });
 
     test('False Vector', () => {
       const f = falseCV();
-      const serialized = bytesToHex(serializeCV(f));
+      const serialized = serializeCV(f);
       expect(serialized).toEqual('04');
     });
 
@@ -498,8 +492,10 @@ describe('Clarity Types', () => {
         0x11, 0xab, 0xab, 0xff, 0xff,
       ]);
       const bytesReader = new BytesReader(concatBytes(new Uint8Array([0x00]), addressBuffer));
-      const standardPrincipal = standardPrincipalCVFromAddress(deserializeAddress(bytesReader));
-      const serialized = bytesToHex(serializeCV(standardPrincipal));
+      const standardPrincipal = standardPrincipalCVFromAddress(
+        deserializeAddressBytes(bytesReader)
+      );
+      const serialized = serializeCV(standardPrincipal);
       expect(serialized).toEqual('050011deadbeef11ababffff11deadbeef11ababffff');
     });
 
@@ -510,39 +506,41 @@ describe('Clarity Types', () => {
       ]);
       const contractName = 'abcd';
       const bytesReader = new BytesReader(concatBytes(new Uint8Array([0x00]), addressBuffer));
-      const standardPrincipal = standardPrincipalCVFromAddress(deserializeAddress(bytesReader));
+      const standardPrincipal = standardPrincipalCVFromAddress(
+        deserializeAddressBytes(bytesReader)
+      );
       const contractPrincipal = contractPrincipalCVFromStandard(standardPrincipal, contractName);
-      const serialized = bytesToHex(serializeCV(contractPrincipal));
+      const serialized = serializeCV(contractPrincipal);
       expect(serialized).toEqual('060011deadbeef11ababffff11deadbeef11ababffff0461626364');
     });
 
     test('Response Ok Vector', () => {
       const ok = responseOkCV(intCV(-1));
-      const serialized = bytesToHex(serializeCV(ok));
+      const serialized = serializeCV(ok);
       expect(serialized).toEqual('0700ffffffffffffffffffffffffffffffff');
     });
 
     test('Response Err Vector', () => {
       const err = responseErrorCV(intCV(-1));
-      const serialized = bytesToHex(serializeCV(err));
+      const serialized = serializeCV(err);
       expect(serialized).toEqual('0800ffffffffffffffffffffffffffffffff');
     });
 
     test('None Vector', () => {
       const none = noneCV();
-      const serialized = bytesToHex(serializeCV(none));
+      const serialized = serializeCV(none);
       expect(serialized).toEqual('09');
     });
 
     test('Some Vector', () => {
       const some = someCV(intCV(-1));
-      const serialized = bytesToHex(serializeCV(some));
+      const serialized = serializeCV(some);
       expect(serialized).toEqual('0a00ffffffffffffffffffffffffffffffff');
     });
 
     test('List Vector', () => {
       const list = listCV([intCV(1), intCV(2), intCV(3), intCV(-4)]);
-      const serialized = bytesToHex(serializeCV(list));
+      const serialized = serializeCV(list);
       expect(serialized).toEqual(
         '0b0000000400000000000000000000000000000000010000000000000000000000000000000002000000000000000000000000000000000300fffffffffffffffffffffffffffffffc'
       );
@@ -553,13 +551,13 @@ describe('Clarity Types', () => {
         baz: noneCV(),
         foobar: trueCV(),
       });
-      const serialized = bytesToHex(serializeCV(tuple));
+      const serialized = serializeCV(tuple);
       expect(serialized).toEqual('0c000000020362617a0906666f6f62617203');
     });
 
     test('Ascii String Vector', () => {
       const str = stringAsciiCV('hello world');
-      const serialized = bytesToHex(serializeCV(str));
+      const serialized = serializeCV(str);
       expect(serialized).toEqual('0d0000000b68656c6c6f20776f726c64');
     });
 
@@ -572,7 +570,7 @@ describe('Clarity Types', () => {
         stringAsciiCV('\r'),
         stringAsciiCV('\0'),
       ];
-      const serialized = strings.map(serializeCV);
+      const serialized = strings.map(serializeCVBytes);
       serialized.forEach(ser => {
         const reader = new BytesReader(ser);
         const serializedStringLenByte = reader.readBytes(5)[4];
@@ -583,7 +581,7 @@ describe('Clarity Types', () => {
 
     test('Utf8 String Vector', () => {
       const str = stringUtf8CV('hello world');
-      const serialized = bytesToHex(serializeCV(str));
+      const serialized = serializeCV(str);
       expect(serialized).toEqual('0e0000000b68656c6c6f20776f726c64');
     });
   });

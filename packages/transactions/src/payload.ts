@@ -5,6 +5,7 @@ import {
   IntegerType,
   intToBigInt,
   intToBytes,
+  isInstance,
   writeUInt32BE,
   writeUInt8,
 } from '@stacks/common';
@@ -15,7 +16,7 @@ import {
   deserializeCV,
   noneCV,
   OptionalCV,
-  serializeCV,
+  serializeCVBytes,
   someCV,
 } from './clarity/';
 import { PrincipalCV, principalCV } from './clarity/types/principalCV';
@@ -31,11 +32,11 @@ import { createAddress, createLPString, LengthPrefixedString } from './postcondi
 import {
   codeBodyString,
   createMemoString,
-  deserializeAddress,
-  deserializeLPString,
-  deserializeMemoString,
+  deserializeAddressBytes,
+  deserializeLPStringBytes,
+  deserializeMemoStringBytes,
   MemoString,
-  serializeStacksMessage,
+  serializeStacksMessageBytes,
 } from './types';
 
 export type Payload =
@@ -319,35 +320,39 @@ export function createTenureChangePayload(
   };
 }
 
-export function serializePayload(payload: PayloadInput): Uint8Array {
+export function serializePayload(payload: PayloadInput): string {
+  return bytesToHex(serializePayloadBytes(payload));
+}
+/** @ignore */
+export function serializePayloadBytes(payload: PayloadInput): Uint8Array {
   const bytesArray = [];
   bytesArray.push(payload.payloadType);
 
   switch (payload.payloadType) {
     case PayloadType.TokenTransfer:
-      bytesArray.push(serializeCV(payload.recipient));
+      bytesArray.push(serializeCVBytes(payload.recipient));
       bytesArray.push(intToBytes(payload.amount, false, 8));
-      bytesArray.push(serializeStacksMessage(payload.memo));
+      bytesArray.push(serializeStacksMessageBytes(payload.memo));
       break;
     case PayloadType.ContractCall:
-      bytesArray.push(serializeStacksMessage(payload.contractAddress));
-      bytesArray.push(serializeStacksMessage(payload.contractName));
-      bytesArray.push(serializeStacksMessage(payload.functionName));
+      bytesArray.push(serializeStacksMessageBytes(payload.contractAddress));
+      bytesArray.push(serializeStacksMessageBytes(payload.contractName));
+      bytesArray.push(serializeStacksMessageBytes(payload.functionName));
       const numArgs = new Uint8Array(4);
       writeUInt32BE(numArgs, payload.functionArgs.length, 0);
       bytesArray.push(numArgs);
       payload.functionArgs.forEach(arg => {
-        bytesArray.push(serializeCV(arg));
+        bytesArray.push(serializeCVBytes(arg));
       });
       break;
     case PayloadType.SmartContract:
-      bytesArray.push(serializeStacksMessage(payload.contractName));
-      bytesArray.push(serializeStacksMessage(payload.codeBody));
+      bytesArray.push(serializeStacksMessageBytes(payload.contractName));
+      bytesArray.push(serializeStacksMessageBytes(payload.codeBody));
       break;
     case PayloadType.VersionedSmartContract:
       bytesArray.push(payload.clarityVersion);
-      bytesArray.push(serializeStacksMessage(payload.contractName));
-      bytesArray.push(serializeStacksMessage(payload.codeBody));
+      bytesArray.push(serializeStacksMessageBytes(payload.contractName));
+      bytesArray.push(serializeStacksMessageBytes(payload.codeBody));
       break;
     case PayloadType.PoisonMicroblock:
       // TODO: implement
@@ -357,11 +362,11 @@ export function serializePayload(payload: PayloadInput): Uint8Array {
       break;
     case PayloadType.CoinbaseToAltRecipient:
       bytesArray.push(payload.coinbaseBytes);
-      bytesArray.push(serializeCV(payload.recipient));
+      bytesArray.push(serializeCVBytes(payload.recipient));
       break;
     case PayloadType.NakamotoCoinbase:
       bytesArray.push(payload.coinbaseBytes);
-      bytesArray.push(serializeCV(payload.recipient ? someCV(payload.recipient) : noneCV()));
+      bytesArray.push(serializeCVBytes(payload.recipient ? someCV(payload.recipient) : noneCV()));
       bytesArray.push(payload.vrfProof);
       break;
     case PayloadType.TenureChange:
@@ -378,7 +383,14 @@ export function serializePayload(payload: PayloadInput): Uint8Array {
   return concatArray(bytesArray);
 }
 
-export function deserializePayload(bytesReader: BytesReader): Payload {
+export function deserializePayload(serialized: string): Payload {
+  return deserializePayloadBytes(hexToBytes(serialized));
+}
+/** @ignore */
+export function deserializePayloadBytes(serialized: Uint8Array | BytesReader): Payload {
+  const bytesReader = isInstance(serialized, BytesReader)
+    ? serialized
+    : new BytesReader(serialized);
   const payloadType = bytesReader.readUInt8Enum(PayloadType, n => {
     throw new Error(`Cannot recognize PayloadType: ${n}`);
   });
@@ -387,12 +399,12 @@ export function deserializePayload(bytesReader: BytesReader): Payload {
     case PayloadType.TokenTransfer:
       const recipient = deserializeCV(bytesReader) as PrincipalCV;
       const amount = intToBigInt(bytesReader.readBytes(8), false);
-      const memo = deserializeMemoString(bytesReader);
+      const memo = deserializeMemoStringBytes(bytesReader);
       return createTokenTransferPayload(recipient, amount, memo);
     case PayloadType.ContractCall:
-      const contractAddress = deserializeAddress(bytesReader);
-      const contractCallName = deserializeLPString(bytesReader);
-      const functionName = deserializeLPString(bytesReader);
+      const contractAddress = deserializeAddressBytes(bytesReader);
+      const contractCallName = deserializeLPStringBytes(bytesReader);
+      const functionName = deserializeLPStringBytes(bytesReader);
       const functionArgs: ClarityValue[] = [];
       const numberOfArgs = bytesReader.readUInt32BE();
       for (let i = 0; i < numberOfArgs; i++) {
@@ -406,16 +418,16 @@ export function deserializePayload(bytesReader: BytesReader): Payload {
         functionArgs
       );
     case PayloadType.SmartContract:
-      const smartContractName = deserializeLPString(bytesReader);
-      const codeBody = deserializeLPString(bytesReader, 4, 100_000);
+      const smartContractName = deserializeLPStringBytes(bytesReader);
+      const codeBody = deserializeLPStringBytes(bytesReader, 4, 100_000);
       return createSmartContractPayload(smartContractName, codeBody);
 
     case PayloadType.VersionedSmartContract: {
       const clarityVersion = bytesReader.readUInt8Enum(ClarityVersion, n => {
         throw new Error(`Cannot recognize ClarityVersion: ${n}`);
       });
-      const smartContractName = deserializeLPString(bytesReader);
-      const codeBody = deserializeLPString(bytesReader, 4, 100_000);
+      const smartContractName = deserializeLPStringBytes(bytesReader);
+      const codeBody = deserializeLPStringBytes(bytesReader, 4, 100_000);
       return createSmartContractPayload(smartContractName, codeBody, clarityVersion);
     }
     case PayloadType.PoisonMicroblock:

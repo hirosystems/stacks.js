@@ -23,7 +23,7 @@ import {
   createStacksPublicKey,
   privateKeyToPublic,
   publicKeyToHex,
-  serializePublicKey,
+  serializePublicKeyBytes,
 } from '../src/keys';
 import {
   CoinbasePayloadToAltRecipient,
@@ -204,7 +204,7 @@ test('STX token transfer transaction multi-sig serialization and deserialization
   ];
 
   const pubKeys = privKeys.map(privateKeyToPublic).map(createStacksPublicKey);
-  const pubKeyStrings = pubKeys.map(serializePublicKey).map(publicKeyToHex);
+  const pubKeyStrings = pubKeys.map(serializePublicKeyBytes).map(publicKeyToHex);
 
   const spendingCondition = createMultiSigSpendingCondition(
     addressHashMode,
@@ -273,7 +273,7 @@ test('STX token transfer transaction multi-sig uncompressed keys serialization a
   ];
 
   const pubKeys = privKeys.map(privateKeyToPublic).map(createStacksPublicKey);
-  const pubKeyStrings = pubKeys.map(serializePublicKey).map(publicKeyToHex);
+  const pubKeyStrings = pubKeys.map(serializePublicKeyBytes).map(publicKeyToHex);
 
   const spendingCondition = createMultiSigSpendingCondition(
     addressHashMode,

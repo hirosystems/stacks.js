@@ -37,9 +37,14 @@ import {
 } from './constants';
 import { SerializationError, SigningError } from './errors';
 import { PrivateKey, privateKeyIsCompressed, publicKeyIsCompressed, StacksPublicKey } from './keys';
-import { deserializePayload, Payload, PayloadInput, serializePayload } from './payload';
+import { deserializePayloadBytes, Payload, PayloadInput, serializePayloadBytes } from './payload';
 import { createTransactionAuthField } from './signature';
-import { createLPList, deserializeLPList, LengthPrefixedList, serializeLPList } from './types';
+import {
+  createLPList,
+  deserializeLPListBytes,
+  LengthPrefixedList,
+  serializeLPListBytes,
+} from './types';
 import { cloneDeep, txidFromData } from './utils';
 
 export class StacksTransaction {
@@ -247,8 +252,8 @@ export class StacksTransaction {
     bytesArray.push(serializeAuthorization(this.auth));
     bytesArray.push(this.anchorMode);
     bytesArray.push(this.postConditionMode);
-    bytesArray.push(serializeLPList(this.postConditions));
-    bytesArray.push(serializePayload(this.payload));
+    bytesArray.push(serializeLPListBytes(this.postConditions));
+    bytesArray.push(serializePayloadBytes(this.payload));
 
     return concatArray(bytesArray);
   }
@@ -281,8 +286,8 @@ export function deserializeTransaction(tx: string | Uint8Array | BytesReader) {
   const postConditionMode = bytesReader.readUInt8Enum(PostConditionMode, n => {
     throw new Error(`Could not parse ${n} as PostConditionMode`);
   });
-  const postConditions = deserializeLPList(bytesReader, StacksMessageType.PostCondition);
-  const payload = deserializePayload(bytesReader);
+  const postConditions = deserializeLPListBytes(bytesReader, StacksMessageType.PostCondition);
+  const payload = deserializePayloadBytes(bytesReader);
 
   return new StacksTransaction(
     version,
