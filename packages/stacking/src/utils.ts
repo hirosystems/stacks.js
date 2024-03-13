@@ -382,13 +382,15 @@ export function ensureSignerArgsReadiness({
   if (/\.pox(-[2-3])?$/.test(contract)) {
     // .pox, .pox-2 or .pox-3
     if (signerKey || signerSignature || hasMaxAmount || hasAuthId) {
-      throw new Error('PoX-1, PoX-2 and PoX-3 do not accept a signer-key or signer-sig');
+      throw new Error(
+        'PoX-1, PoX-2 and PoX-3 do not accept a `signerKey`, `signerSignature`, `maxAmount` or `authId`'
+      );
     }
   } else {
     // .pox-4 or later
-    if (!signerKey || !signerSignature || !hasMaxAmount || !hasAuthId) {
+    if (!signerKey || !hasMaxAmount || typeof authId === 'undefined') {
       throw new Error(
-        'PoX-4 or later requires a signer-key (buff 33) and signer-sig (buff 65) to stack'
+        'PoX-4 requires a `signerKey` (buff 33), `maxAmount` (uint), and `authId` (uint)'
       );
     }
   }

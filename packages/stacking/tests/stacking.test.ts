@@ -1175,7 +1175,7 @@ test('correctly signs pox-4 signer signature', () => {
   );
   const publicKey = getPublicKeyFromPrivate(privateKey.data);
   const maxAmount = 1000n;
-  const authId = 1;
+  const authId = 0;
 
   const signature = signPox4SignatureHash({
     topic: 'stack-stx',
