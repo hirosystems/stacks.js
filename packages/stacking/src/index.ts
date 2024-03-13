@@ -231,9 +231,9 @@ export interface LockStxOptions {
   signerKey?: string;
   /** hex-encoded signature `(buff 65)`, required for >= PoX-4 */
   signerSignature?: string;
-  /** Maximum amount of STX that can be locked in this transaction */
+  /** Maximum amount of STX that can be locked in this transaction, required for >= PoX-4 */
   maxAmount?: IntegerType;
-  /** Random integer to prevent re-use of signer signature */
+  /** Random integer to prevent re-use of signer signature, required for >= PoX-4 */
   authId?: number;
 }
 
@@ -251,9 +251,9 @@ export interface StackExtendOptions {
   signerKey?: string;
   /** hex-encoded signature `(buff 65)`, required for >= PoX-4 */
   signerSignature?: string;
-  /** Maximum amount of STX that can be locked in this transaction */
+  /** Maximum amount of STX that can be locked in this transaction, required for >= PoX-4 */
   maxAmount?: IntegerType;
-  /** Random integer to prevent re-use of signer signature */
+  /** Random integer to prevent re-use of signer signature, required for >= PoX-4 */
   authId?: number;
 }
 
@@ -269,9 +269,9 @@ export interface StackIncreaseOptions {
   signerKey?: string;
   /** hex-encoded signature `(buff 65)`, required for >= PoX-4 */
   signerSignature?: string;
-  /** Maximum amount of STX that can be locked in this transaction */
+  /** Maximum amount of STX that can be locked in this transaction, required for >= PoX-4 */
   maxAmount?: IntegerType;
-  /** Random integer to prevent re-use of signer signature */
+  /** Random integer to prevent re-use of signer signature, required for >= PoX-4 */
   authId?: number;
 }
 
@@ -347,9 +347,9 @@ export interface StackAggregationCommitOptions {
   signerKey?: string;
   /** hex-encoded signature `(buff 65)`, required for >= PoX-4 */
   signerSignature?: string;
-  /** Maximum amount of STX that can be locked in this transaction */
+  /** Maximum amount of STX that can be locked in this transaction, required for >= PoX-4 */
   maxAmount?: IntegerType;
-  /** Random integer to prevent re-use of signer signature */
+  /** Random integer to prevent re-use of signer signature, required for >= PoX-4 */
   authId?: number;
 }
 
@@ -912,7 +912,7 @@ export class StackingClient {
   }: StackAggregationCommitOptions & BaseTxOptions): Promise<TxBroadcastResult> {
     const contract = await this.getStackingContract();
     ensureLegacyBtcAddressForPox1({ contract, poxAddress });
-    ensureSignerArgsReadiness({ contract, signerKey, signerSignature });
+    ensureSignerArgsReadiness({ contract, signerKey, signerSignature, maxAmount, authId });
 
     const callOptions = this.getStackAggregationCommitOptions({
       contract,
@@ -952,11 +952,13 @@ export class StackingClient {
     rewardCycle,
     signerKey,
     signerSignature,
+    maxAmount,
+    authId,
     ...txOptions
   }: StackAggregationCommitOptions & BaseTxOptions): Promise<TxBroadcastResult> {
     const contract = await this.getStackingContract();
     ensureLegacyBtcAddressForPox1({ contract, poxAddress });
-    ensureSignerArgsReadiness({ contract, signerKey, signerSignature });
+    ensureSignerArgsReadiness({ contract, signerKey, signerSignature, maxAmount, authId });
 
     const callOptions = this.getStackAggregationCommitOptionsIndexed({
       contract,
@@ -964,6 +966,8 @@ export class StackingClient {
       rewardCycle,
       signerKey,
       signerSignature,
+      maxAmount,
+      authId,
     });
     const tx = await makeContractCall({
       ...callOptions,
@@ -1062,10 +1066,12 @@ export class StackingClient {
       uintCV(cycles),
     ] as ClarityValue[];
 
-    if (signerSignature) functionArgs.push(someCV(bufferCV(hexToBytes(signerSignature))));
-    if (signerKey) functionArgs.push(bufferCV(hexToBytes(signerKey)));
-    if (maxAmount) functionArgs.push(uintCV(maxAmount));
-    if (authId) functionArgs.push(uintCV(authId));
+    if (signerKey && maxAmount && typeof authId !== 'undefined') {
+      functionArgs.push(signerSignature ? someCV(bufferCV(hexToBytes(signerSignature))) : noneCV());
+      functionArgs.push(bufferCV(hexToBytes(signerKey)));
+      functionArgs.push(uintCV(maxAmount));
+      functionArgs.push(uintCV(authId));
+    }
 
     const callOptions: ContractCallOptions = {
       contractAddress,
@@ -1101,10 +1107,12 @@ export class StackingClient {
 
     const functionArgs = [uintCV(extendCycles), address] as ClarityValue[];
 
-    if (signerSignature) functionArgs.push(someCV(bufferCV(hexToBytes(signerSignature))));
-    if (signerKey) functionArgs.push(bufferCV(hexToBytes(signerKey)));
-    if (maxAmount) functionArgs.push(uintCV(maxAmount));
-    if (authId) functionArgs.push(uintCV(authId));
+    if (signerKey && maxAmount && typeof authId !== 'undefined') {
+      functionArgs.push(signerSignature ? someCV(bufferCV(hexToBytes(signerSignature))) : noneCV());
+      functionArgs.push(bufferCV(hexToBytes(signerKey)));
+      functionArgs.push(uintCV(maxAmount));
+      functionArgs.push(uintCV(authId));
+    }
 
     const callOptions: ContractCallOptions = {
       contractAddress,
@@ -1137,10 +1145,12 @@ export class StackingClient {
 
     const functionArgs = [uintCV(increaseBy)] as ClarityValue[];
 
-    if (signerSignature) functionArgs.push(someCV(bufferCV(hexToBytes(signerSignature))));
-    if (signerKey) functionArgs.push(bufferCV(hexToBytes(signerKey)));
-    if (maxAmount) functionArgs.push(uintCV(maxAmount));
-    if (authId) functionArgs.push(uintCV(authId));
+    if (signerKey && maxAmount && typeof authId !== 'undefined') {
+      functionArgs.push(signerSignature ? someCV(bufferCV(hexToBytes(signerSignature))) : noneCV());
+      functionArgs.push(bufferCV(hexToBytes(signerKey)));
+      functionArgs.push(uintCV(maxAmount));
+      functionArgs.push(uintCV(authId));
+    }
 
     const callOptions: ContractCallOptions = {
       contractAddress,
@@ -1298,10 +1308,12 @@ export class StackingClient {
 
     const functionArgs = [address, uintCV(rewardCycle)] as ClarityValue[];
 
-    if (signerSignature) functionArgs.push(someCV(bufferCV(hexToBytes(signerSignature))));
-    if (signerKey) functionArgs.push(bufferCV(hexToBytes(signerKey)));
-    if (maxAmount) functionArgs.push(uintCV(maxAmount));
-    if (authId) functionArgs.push(uintCV(authId));
+    if (signerKey && maxAmount && typeof authId !== 'undefined') {
+      functionArgs.push(signerSignature ? someCV(bufferCV(hexToBytes(signerSignature))) : noneCV());
+      functionArgs.push(bufferCV(hexToBytes(signerKey)));
+      functionArgs.push(uintCV(maxAmount));
+      functionArgs.push(uintCV(authId));
+    }
 
     const callOptions: ContractCallOptions = {
       contractAddress,
@@ -1346,20 +1358,28 @@ export class StackingClient {
     rewardCycle,
     signerKey,
     signerSignature,
+    maxAmount,
+    authId,
   }: {
     contract: string;
     poxAddress: string;
     rewardCycle: number;
     signerKey?: string;
     signerSignature?: string;
+    maxAmount?: IntegerType;
+    authId?: number;
   }) {
     const address = poxAddressToTuple(poxAddress);
     const [contractAddress, contractName] = this.parseContractId(contract);
 
     const functionArgs = [address, uintCV(rewardCycle)] as ClarityValue[];
 
-    if (signerSignature) functionArgs.push(someCV(bufferCV(hexToBytes(signerSignature))));
-    if (signerKey) functionArgs.push(bufferCV(hexToBytes(signerKey)));
+    if (signerKey && maxAmount && typeof authId !== 'undefined') {
+      functionArgs.push(signerSignature ? someCV(bufferCV(hexToBytes(signerSignature))) : noneCV());
+      functionArgs.push(bufferCV(hexToBytes(signerKey)));
+      functionArgs.push(uintCV(maxAmount));
+      functionArgs.push(uintCV(authId));
+    }
 
     const callOptions: ContractCallOptions = {
       contractAddress,
