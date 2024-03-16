@@ -20,6 +20,11 @@ export interface MessageSignature {
   data: string;
 }
 
+export interface StructuredDataSignature {
+  readonly type: StacksMessageType.StructuredDataSignature;
+  data: string;
+}
+
 export function createMessageSignature(signature: string): MessageSignature {
   const length = hexToBytes(signature).byteLength;
   if (length != RECOVERABLE_ECDSA_SIG_LENGTH_BYTES) {

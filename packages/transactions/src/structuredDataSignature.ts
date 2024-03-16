@@ -4,6 +4,7 @@ import { bytesToHex, concatBytes, utf8ToBytes } from '@stacks/common';
 import { ClarityType, ClarityValue, serializeCV } from './clarity';
 import { StacksMessageType } from './constants';
 import { signMessageHashRsv, StacksPrivateKey } from './keys';
+import { StructuredDataSignature } from './common';
 
 // Refer to SIP018 https://github.com/stacksgov/sips/
 // > asciiToBytes('SIP018')
@@ -64,11 +65,6 @@ export function decodeStructuredDataSignature(
     domainHash,
     messageHash,
   };
-}
-
-export interface StructuredDataSignature {
-  readonly type: StacksMessageType.StructuredDataSignature;
-  data: string;
 }
 
 /**
