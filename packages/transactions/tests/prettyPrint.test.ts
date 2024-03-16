@@ -109,25 +109,25 @@ describe.only('test format of Stacks.js clarity values into clarity style string
 
     const expected = `{
   id: u1,
-  messageAscii: "hello world",
-  someMessageUtf8: (some u"hello world"),
   items: (some (list
     (ok {
-      id: u1,
-      owner: (some 'ST2CY5V39NHDPWSXMW9QDT3HC3GD6Q6XX4CFRK9AG),
-      valid: (ok u2),
       history: (some (list
         u1
         u2
-      ))
+      )),
+      id: u1,
+      owner: (some 'ST2CY5V39NHDPWSXMW9QDT3HC3GD6Q6XX4CFRK9AG),
+      valid: (ok u2)
     })
     (ok {
+      history: none,
       id: u2,
       owner: none,
-      valid: (err u1000),
-      history: none
+      valid: (err u1000)
     })
-  ))
+  )),
+  messageAscii: "hello world",
+  someMessageUtf8: (some u"hello world")
 }`;
 
     const result = Cl.prettyPrint(value, 2);

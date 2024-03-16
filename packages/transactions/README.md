@@ -485,14 +485,14 @@ const postConditionCode = NonFungibleConditionCode.DoesNotSend;
 const assetAddress = 'SP62M8MEFH32WGSB7XSF9WJZD7TQB48VQB5ANWSJ';
 const assetContractName = 'test-asset-contract';
 const assetName = 'test-asset';
-const tokenAssetName = bufferCVFromString('test-token-asset');
+const assetId = bufferCVFromString('test-token-asset-id');
 const nonFungibleAssetInfo = createAssetInfo(assetAddress, assetContractName, assetName);
 
 const standardNonFungiblePostCondition = makeStandardNonFungiblePostCondition(
   postConditionAddress,
   postConditionCode,
   nonFungibleAssetInfo,
-  tokenAssetName
+  assetId
 );
 
 // With a contract principal
@@ -504,7 +504,7 @@ const contractNonFungiblePostCondition = makeContractNonFungiblePostCondition(
   contractName,
   postConditionCode,
   nonFungibleAssetInfo,
-  tokenAssetName
+  assetId
 );
 ```
 

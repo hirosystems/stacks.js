@@ -41,14 +41,16 @@ function formatList(cv: ListCV, space: number, depth = 1): string {
 
 /**
  * @description format Tuple clarity values in clarity style strings
+ * the keys are alphabetically sorted
  * with the ability to prettify the result with line break end space indentation
  * @example
  * ```ts
- * formatTuple(Cl.tuple({ id: Cl.uint(1) }))
- * // { id: u1 }
+ * formatTuple(Cl.tuple({ id: Cl.uint(1), age: Cl.uint(20) }))
+ * // { age: 20, id: u1 }
  *
- * formatTuple(Cl.tuple({ id: Cl.uint(1) }, 2))
+ * formatTuple(Cl.tuple({ id: Cl.uint(1), age: Cl.uint(20) }, 2))
  * // {
+ * //   age: 20,
  * //   id: u1
  * // }
  * ```
@@ -64,7 +66,7 @@ function formatTuple(cv: TupleCV, space: number, depth = 1): string {
   const spaceBefore = formatSpace(space, depth, false);
   const endSpace = formatSpace(space, depth, true);
 
-  return `{${spaceBefore}${items.join(`,${spaceBefore}`)}${endSpace}}`;
+  return `{${spaceBefore}${items.sort().join(`,${spaceBefore}`)}${endSpace}}`;
 }
 
 function exhaustiveCheck(param: never): never {
@@ -114,11 +116,12 @@ function prettyPrintWithDepth(cv: ClarityValue, space = 0, depth: number): strin
  * @param space The indentation size of the output string. There's no indentation and no line breaks if space = 0
  * @example
  * ```ts
- * prettyPrint(Cl.tuple({ id: Cl.some(Cl.uint(1)) }))
- * // { id: (some u1) }
+ * prettyPrint(Cl.tuple({ id: Cl.uint(1), age: Cl.some(Cl.uint(42)) }))
+ * // { age: (some u42), id: u1 }
  *
- * prettyPrint(Cl.tuple({ id: Cl.uint(1) }, 2))
+ * prettyPrint(Cl.tuple({ id: Cl.uint(1), age: Cl.some(Cl.uint(42)) }, 2))
  * // {
+ * //   age: (some u42),
  * //   id: u1
  * // }
  * ```

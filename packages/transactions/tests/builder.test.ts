@@ -1,24 +1,33 @@
-import { bytesToHex, utf8ToBytes } from '@stacks/common';
+import { bytesToHex, bytesToUtf8, hexToBytes, utf8ToBytes } from '@stacks/common';
 import {
-  createApiKeyMiddleware,
-  createFetchFn,
   StacksMainnet,
   StacksTestnet,
+  createApiKeyMiddleware,
+  createFetchFn,
 } from '@stacks/network';
 import * as fs from 'fs';
 import fetchMock from 'jest-fetch-mock';
 import {
+  createFungiblePostCondition,
+  createSTXPostCondition,
+  serializePostCondition,
+} from '../src';
+import {
+  MultiSigSpendingCondition,
+  SingleSigSpendingCondition,
+  SponsoredAuthorization,
+  StandardAuthorization,
   createSingleSigSpendingCondition,
   createSponsoredAuth,
   emptyMessageSignature,
   isSingleSig,
-  MultiSigSpendingCondition,
   nextSignature,
-  SingleSigSpendingCondition,
-  SponsoredAuthorization,
-  StandardAuthorization,
 } from '../src/authorization';
 import {
+  SignedTokenTransferOptions,
+  TxBroadcastResult,
+  TxBroadcastResultOk,
+  TxBroadcastResultRejected,
   broadcastTransaction,
   callReadOnlyFunction,
   estimateTransaction,
@@ -31,28 +40,24 @@ import {
   makeContractFungiblePostCondition,
   makeContractNonFungiblePostCondition,
   makeContractSTXPostCondition,
+  makeSTXTokenTransfer,
   makeStandardFungiblePostCondition,
   makeStandardNonFungiblePostCondition,
   makeStandardSTXPostCondition,
-  makeSTXTokenTransfer,
   makeUnsignedContractCall,
   makeUnsignedContractDeploy,
   makeUnsignedSTXTokenTransfer,
-  SignedTokenTransferOptions,
   sponsorTransaction,
-  TxBroadcastResult,
-  TxBroadcastResultOk,
-  TxBroadcastResultRejected,
 } from '../src/builders';
 import { BytesReader } from '../src/bytesReader';
 import {
+  ClarityType,
+  UIntCV,
   bufferCV,
   bufferCVFromString,
-  ClarityType,
   noneCV,
   serializeCV,
   standardPrincipalCV,
-  UIntCV,
   uintCV,
 } from '../src/clarity';
 import { principalCV } from '../src/clarity/types/principalCV';
@@ -66,6 +71,7 @@ import {
   DEFAULT_CORE_NODE_API_URL,
   FungibleConditionCode,
   NonFungibleConditionCode,
+  PayloadType,
   PostConditionMode,
   PubKeyEncoding,
   TransactionVersion,
@@ -78,17 +84,12 @@ import {
   pubKeyfromPrivKey,
   publicKeyToString,
 } from '../src/keys';
-import { createTokenTransferPayload, serializePayload, TokenTransferPayload } from '../src/payload';
+import { TokenTransferPayload, createTokenTransferPayload, serializePayload } from '../src/payload';
 import { createAssetInfo } from '../src/postcondition-types';
 import { createTransactionAuthField } from '../src/signature';
 import { TransactionSigner } from '../src/signer';
-import { deserializeTransaction, StacksTransaction } from '../src/transaction';
+import { StacksTransaction, deserializeTransaction } from '../src/transaction';
 import { cloneDeep } from '../src/utils';
-import {
-  createFungiblePostCondition,
-  createSTXPostCondition,
-  serializePostCondition,
-} from '../src';
 
 function setSignature(
   unsignedTransaction: StacksTransaction,
@@ -2186,4 +2187,100 @@ test('Post-conditions with amount larger than 8 bytes throw an error', () => {
   expect(() => {
     serializePostCondition(fungiblePc);
   }).toThrowError('The post-condition amount may not be larger than 8 bytes');
+});
+
+test('StacksTransaction serialize/deserialize equality with an empty memo', async () => {
+  const options = {
+    recipient: 'SP3FGQ8Z7JY9BWYZ5WM53E0M9NK7WHJF0691NZ159',
+    amount: 12345n,
+    fee: 100n,
+    nonce: 0n,
+    memo: '', // empty memo
+    network: new StacksMainnet(),
+    anchorMode: AnchorMode.Any,
+    senderKey: 'edf9aee84d9b7abc145504dde6726c64f369d37ee34ded868fabd876c26570bc01',
+  };
+  const tx = await makeSTXTokenTransfer(options);
+
+  const txHex = tx.serialize();
+  const txDecoded = deserializeTransaction(txHex);
+
+  expect(txDecoded).toEqual(tx);
+});
+
+test('StacksTransaction serialize/deserialize equality with a memo', async () => {
+  const options = {
+    recipient: 'SP3FGQ8Z7JY9BWYZ5WM53E0M9NK7WHJF0691NZ159',
+    amount: 12345n,
+    fee: 100n,
+    nonce: 0n,
+    memo: 'Memento Mori',
+    network: new StacksMainnet(),
+    anchorMode: AnchorMode.Any,
+    senderKey: 'edf9aee84d9b7abc145504dde6726c64f369d37ee34ded868fabd876c26570bc01',
+  };
+  const tx = await makeSTXTokenTransfer(options);
+
+  const txHex = tx.serialize();
+  const txDecoded = deserializeTransaction(txHex);
+
+  expect(txDecoded).toEqual(tx);
+});
+
+test('StacksTransaction serialize/deserialize equality with a memo ending in a zero byte', async () => {
+  const options = {
+    recipient: 'SP3FGQ8Z7JY9BWYZ5WM53E0M9NK7WHJF0691NZ159',
+    amount: 12345n,
+    fee: 100n,
+    nonce: 0n,
+    memo: bytesToUtf8(hexToBytes('0')), // null character
+    network: new StacksMainnet(),
+    anchorMode: AnchorMode.Any,
+    senderKey: 'edf9aee84d9b7abc145504dde6726c64f369d37ee34ded868fabd876c26570bc01',
+  };
+  const tx = await makeSTXTokenTransfer(options);
+
+  const txHex = tx.serialize();
+  const txDecoded = deserializeTransaction(txHex);
+
+  expect(txDecoded).not.toEqual(tx); // we are expecting the zero byte to be stripped (null character)
+});
+
+test('StacksTransaction serialize/deserialize equality with an invalid utf-8 byte sequence', () => {
+  // custom memo with `c200` included; invalid utf-8 (`c200`; `c2` indicating two bytes, but is followed by a null character)
+  const txHex =
+    '000000000104006b323aaec89736bc54f751991daeb2e18fe60d2e00000000000000060000000000002710000195deaac518e5e9f910b9214690af80fea0dd13745e392f33392e959208c3e8393e61b355608e4bc23248253c8b6286de63d782bb65dd5f4da5741288095c478c030200000000000516f0f57e9989bca0cf5269db54a4ea809b0291c3fa000000000112a8806d656d6fc20000000000000000000000000000000000000000000000000000000000';
+  const txDecoded = deserializeTransaction(txHex);
+
+  if (txDecoded.payload.payloadType !== PayloadType.TokenTransfer) throw Error;
+
+  expect(txDecoded.payload.memo.content).toContain('memo'); //                _m_e_m_o--
+  expect(utf8ToBytes(txDecoded.payload.memo.content)).not.toEqual(hexToBytes('6d656d6fc2'));
+  expect(utf8ToBytes(txDecoded.payload.memo.content)).not.toEqual(hexToBytes('6d656d6fc200'));
+
+  expect(utf8ToBytes(txDecoded.payload.memo.content)).toEqual(hexToBytes('6d656d6fefbfbd')); // javascript may replace invalid utf-8 with `efbfbd` (�)
+});
+
+test('StacksTransaction serialize/deserialize equality with an invalid utf-8 byte sequence', () => {
+  // custom memo with `81` at the start; invalid utf-8 (`81` is a continuation byte, but is not preceded)
+  const txHex =
+    '000000000104006b323aaec89736bc54f751991daeb2e18fe60d2e00000000000000060000000000002710000195deaac518e5e9f910b9214690af80fea0dd13745e392f33392e959208c3e8393e61b355608e4bc23248253c8b6286de63d782bb65dd5f4da5741288095c478c030200000000000516f0f57e9989bca0cf5269db54a4ea809b0291c3fa000000000112a880816d656d6f0000000000000000000000000000000000000000000000000000000000';
+  const txDecoded = deserializeTransaction(txHex);
+
+  if (txDecoded.payload.payloadType !== PayloadType.TokenTransfer) throw Error;
+
+  expect(txDecoded.payload.memo.content).toContain('memo');
+  expect(utf8ToBytes(txDecoded.payload.memo.content)).toEqual(hexToBytes('efbfbd6d656d6f')); // javascript may replace invalid utf-8 with `efbfbd` (�)
+});
+
+test('StacksTransaction serialize/deserialize equality with an invalid utf-8 byte sequence', () => {
+  // custom memo with `f0f00000` included; invalid utf-8 (`f0f00000`; `f0` indicating four bytes, but is followed by null characters)
+  const txHex =
+    '000000000104006b323aaec89736bc54f751991daeb2e18fe60d2e00000000000000060000000000002710000195deaac518e5e9f910b9214690af80fea0dd13745e392f33392e959208c3e8393e61b355608e4bc23248253c8b6286de63d782bb65dd5f4da5741288095c478c030200000000000516f0f57e9989bca0cf5269db54a4ea809b0291c3fa000000000112a8806d656d6ff0f000000000000000000000000000000000000000000000000000000000';
+  const txDecoded = deserializeTransaction(txHex);
+
+  if (txDecoded.payload.payloadType !== PayloadType.TokenTransfer) throw Error;
+
+  expect(txDecoded.payload.memo.content).toContain('memo');
+  expect(bytesToHex(utf8ToBytes(txDecoded.payload.memo.content))).toContain('efbfbd'); // javascript may replace invalid utf-8 with `efbfbd` (�) twice
 });
