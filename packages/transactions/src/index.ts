@@ -71,6 +71,7 @@ export {
   isSmartContractPayload,
   isTokenTransferPayload,
   serializePayload,
+  serializePayloadBytes,
 } from './payload';
 /**
  * ### `Pc.` Post Condition Builder

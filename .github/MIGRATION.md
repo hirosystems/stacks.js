@@ -6,6 +6,8 @@
   - [StacksNodeApi](#stacksnodeapi)
   - [StacksNetwork to StacksNodeApi](#stacksnetwork-to-stacksnodeapi)
   - [Clarity Representation](#clarity-representation)
+  - [`serialize` methods](#serialize-methods)
+  - [Asset Helper Methods](#asset-helper-methods)
 - [Stacks.js (\<=4.x.x) → (5.x.x)](#stacksjs-4xx--5xx)
   - [Breaking Changes](#breaking-changes-1)
     - [Buffer to Uint8Array](#buffer-to-uint8array)
@@ -26,6 +28,8 @@
 
 - The `@stacks/network` `new StacksNetwork()` objects were removed. Instead `@stacks/network` now exports the objects `STACKS_MAINNET`, `STACKS_TESNET`, and `STACKS_DEVNET`, which are static (and shouldn't be changed for most use-cases). [Read more...](#stacks-network)
 - The `ClarityType` enum was replaced by a readable version. The previous (wire format compatible) enum is still available as `ClarityWireType`. [Read more...](#clarity-representation)
+- The `serializeXyz` methods were changed to return `string` (hex-encoded) instead of `Uint8Array`. Compatible `serializeXzyBytes` methods were added to ease the migration. [Read more...](#serialize-methods)
+- The `AssetInfo` type was renamed to `Asset` for accuracy. The `Asset` helper methods were also renamed to to remove the `Info` suffix. [Read more...](#asset-helper-methods)
 
 ### Stacks Network
 
@@ -143,6 +147,42 @@ For `bigint` values, the type of the `value` property is a now `string`, for bet
 +  value: [ ... ],
 }
 ```
+
+### `serialize` methods
+
+Existing methods now use hex-encoded strings instead of `Uint8Array`s.
+For easiery migrating, renaming the following methods is possible to keep the previous behavior:
+
+- `serializeCV` → `serializeCVBytes`
+- `serializeAddress` → `serializeAddressBytes`
+- `deserializeAddress` → `deserializeAddressBytes`
+- `serializeLPList` → `serializeLPListBytes`
+- `deserializeLPList` → `deserializeLPListBytes`
+- `serializeLPString` → `serializeLPStringBytes`
+- `deserializeLPString` → `deserializeLPStringBytes`
+- `serializePayload` → `serializePayloadBytes`
+- `deserializePayload` → `deserializePayloadBytes`
+- `serializePublicKey` → `serializePublicKeyBytes`
+- `deserializePublicKey` → `deserializePublicKeyBytes`
+- `serializeStacksMessage` → `serializeStacksMessageBytes`
+- `deserializeStacksMessage` → `deserializeStacksMessageBytes`
+- `serializeMemoString` → `serializeMemoStringBytes`
+- `deserializeMemoString` → `deserializeMemoStringBytes`
+- `serializeTransactionAuthField` → `serializeTransactionAuthFieldBytes`
+- `deserializeTransactionAuthField` → `deserializeTransactionAuthFieldBytes`
+- `serializeMessageSignature` → `serializeMessageSignatureBytes`
+- `deserializeMessageSignature` → `deserializeMessageSignatureBytes`
+- `serializePostCondition` → `serializePostConditionBytes`
+- `deserializePostCondition` → `deserializePostConditionBytes`
+
+### Asset Helper Methods
+
+The following interfaces and methods were renamed:
+
+- `AssetInfo` → `Asset`
+- `StacksMessageType.AssetInfo` → `StacksMessageType.Asset`
+- `createAssetInfo` → `createAsset`
+- `parseAssetInfoString` → `parseAssetString`
 
 ## Stacks.js (&lt;=4.x.x) → (5.x.x)
 

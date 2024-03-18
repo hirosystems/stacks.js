@@ -42,7 +42,8 @@ import {
   createSTXPostCondition,
 } from './postcondition';
 import {
-  AssetInfo,
+  Asset,
+  AssetString,
   FungiblePostCondition,
   NonFungiblePostCondition,
   PostCondition,
@@ -595,19 +596,19 @@ export function makeContractSTXPostCondition(
  * @param address - the c32check address
  * @param conditionCode - the condition code
  * @param amount - the amount of fungible tokens (in their respective base unit)
- * @param assetInfo - asset info describing the fungible token
+ * @param asset - asset info describing the fungible token
  */
 export function makeStandardFungiblePostCondition(
   address: string,
   conditionCode: FungibleConditionCode,
   amount: IntegerType,
-  assetInfo: string | AssetInfo
+  asset: AssetString | Asset
 ): FungiblePostCondition {
   return createFungiblePostCondition(
     createStandardPrincipal(address),
     conditionCode,
     amount,
-    assetInfo
+    asset
   );
 }
 
@@ -620,20 +621,20 @@ export function makeStandardFungiblePostCondition(
  * @param contractName - the name of the contract
  * @param conditionCode - the condition code
  * @param amount - the amount of fungible tokens (in their respective base unit)
- * @param assetInfo - asset info describing the fungible token
+ * @param asset - asset info describing the fungible token
  */
 export function makeContractFungiblePostCondition(
   address: string,
   contractName: string,
   conditionCode: FungibleConditionCode,
   amount: IntegerType,
-  assetInfo: string | AssetInfo
+  asset: AssetString | Asset
 ): FungiblePostCondition {
   return createFungiblePostCondition(
     createContractPrincipal(address, contractName),
     conditionCode,
     amount,
-    assetInfo
+    asset
   );
 }
 
@@ -644,7 +645,7 @@ export function makeContractFungiblePostCondition(
  *
  * @param {String} address - the c32check address
  * @param {FungibleConditionCode} conditionCode - the condition code
- * @param {AssetInfo} assetInfo - asset info describing the non-fungible token
+ * @param {Asset} asset - asset info describing the non-fungible token
  * @param {ClarityValue} assetId - asset identifier of the nft instance (typically a uint/buffer/string)
  *
  * @return {NonFungiblePostCondition}
@@ -652,13 +653,13 @@ export function makeContractFungiblePostCondition(
 export function makeStandardNonFungiblePostCondition(
   address: string,
   conditionCode: NonFungibleConditionCode,
-  assetInfo: string | AssetInfo,
+  asset: AssetString | Asset,
   assetId: ClarityValue
 ): NonFungiblePostCondition {
   return createNonFungiblePostCondition(
     createStandardPrincipal(address),
     conditionCode,
-    assetInfo,
+    asset,
     assetId
   );
 }
@@ -671,7 +672,7 @@ export function makeStandardNonFungiblePostCondition(
  * @param {String} address - the c32check address
  * @param {String} contractName - the name of the contract
  * @param {FungibleConditionCode} conditionCode - the condition code
- * @param {AssetInfo} assetInfo - asset info describing the non-fungible token
+ * @param {Asset} asset - asset info describing the non-fungible token
  * @param {ClarityValue} assetId - asset identifier of the nft instance (typically a uint/buffer/string)
  *
  * @return {NonFungiblePostCondition}
@@ -680,13 +681,13 @@ export function makeContractNonFungiblePostCondition(
   address: string,
   contractName: string,
   conditionCode: NonFungibleConditionCode,
-  assetInfo: string | AssetInfo,
+  asset: AssetString | Asset,
   assetId: ClarityValue
 ): NonFungiblePostCondition {
   return createNonFungiblePostCondition(
     createContractPrincipal(address, contractName),
     conditionCode,
-    assetInfo,
+    asset,
     assetId
   );
 }

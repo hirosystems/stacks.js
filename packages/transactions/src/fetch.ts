@@ -6,15 +6,16 @@ import {
   validateHash256,
   with0x,
 } from '@stacks/common';
+import { deriveDefaultUrl } from '@stacks/network';
 import { ClarityValue, NoneCV, deserializeCV, serializeCV } from './clarity';
+import { ClarityAbi } from './contract-abi';
 import { NoEstimateAvailableError } from './errors';
-import { serializePayload } from './payload';
+import { serializePayloadBytes } from './payload';
 import {
   StacksTransaction,
   deriveNetworkFromTx,
   estimateTransactionByteLength,
 } from './transaction';
-import { cvToHex, defaultApiFromNetwork, parseReadOnlyResponse } from './utils';
 import {
   FeeEstimateResponse,
   FeeEstimation,
@@ -22,8 +23,7 @@ import {
   TxBroadcastResultOk,
   TxBroadcastResultRejected,
 } from './types';
-import { deriveDefaultUrl } from '@stacks/network';
-import { ClarityAbi } from './contract-abi';
+import { cvToHex, defaultApiFromNetwork, parseReadOnlyResponse } from './utils';
 
 export const BROADCAST_PATH = '/v2/transactions';
 export const TRANSFER_FEE_ESTIMATE_PATH = '/v2/fees/transfer';
@@ -227,7 +227,7 @@ export async function estimateFee({
     const estimatedLength = estimateTransactionByteLength(txOpt);
     return (
       await estimateTransaction({
-        payload: bytesToHex(serializePayload(txOpt.payload)),
+        payload: bytesToHex(serializePayloadBytes(txOpt.payload)),
         estimatedLength,
         api,
       })
@@ -344,7 +344,7 @@ export async function getContractMapEntry<T extends ClarityValue = ClarityValue>
   mapName: string;
   mapKey: ClarityValue;
 } & ApiParam): Promise<T | NoneCV> {
-  const keyHex = with0x(bytesToHex(serializeCV(mapKey)));
+  const keyHex = with0x(serializeCV(mapKey));
 
   const options = {
     method: 'POST',

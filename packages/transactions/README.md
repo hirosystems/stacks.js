@@ -425,7 +425,7 @@ const contractSTXPostCondition = makeContractSTXPostCondition(
 ```typescript
 import {
   FungibleConditionCode,
-  createAssetInfo,
+  createAsset,
   makeStandardFungiblePostCondition,
 } from '@stacks/transactions';
 
@@ -436,13 +436,13 @@ const postConditionAmount = 12345n;
 const assetAddress = 'SP62M8MEFH32WGSB7XSF9WJZD7TQB48VQB5ANWSJ';
 const assetContractName = 'test-asset-contract';
 const assetName = 'test-token';
-const fungibleAssetInfo = createAssetInfo(assetAddress, assetContractName, assetName);
+const fungibleAsset = createAsset(assetAddress, assetContractName, assetName);
 
 const standardFungiblePostCondition = makeStandardFungiblePostCondition(
   postConditionAddress,
   postConditionCode,
   postConditionAmount,
-  fungibleAssetInfo
+  fungibleAsset
 );
 
 // With a contract principal
@@ -451,14 +451,14 @@ const contractName = 'test-contract';
 const assetAddress = 'SP62M8MEFH32WGSB7XSF9WJZD7TQB48VQB5ANWSJ';
 const assetContractName = 'test-asset-contract';
 const assetName = 'test-token';
-const fungibleAssetInfo = createAssetInfo(assetAddress, assetContractName, assetName);
+const fungibleAsset = createAsset(assetAddress, assetContractName, assetName);
 
 const contractFungiblePostCondition = makeContractFungiblePostCondition(
   contractAddress,
   contractName,
   postConditionCode,
   postConditionAmount,
-  fungibleAssetInfo
+  fungibleAsset
 );
 ```
 
@@ -473,7 +473,7 @@ const contractFungiblePostCondition = makeContractFungiblePostCondition(
 ```typescript
 import {
   NonFungibleConditionCode,
-  createAssetInfo,
+  createAsset,
   makeStandardNonFungiblePostCondition,
   makeContractNonFungiblePostCondition,
   bufferCVFromString,
@@ -486,12 +486,12 @@ const assetAddress = 'SP62M8MEFH32WGSB7XSF9WJZD7TQB48VQB5ANWSJ';
 const assetContractName = 'test-asset-contract';
 const assetName = 'test-asset';
 const assetId = bufferCVFromString('test-token-asset-id');
-const nonFungibleAssetInfo = createAssetInfo(assetAddress, assetContractName, assetName);
+const nonFungibleAsset = createAsset(assetAddress, assetContractName, assetName);
 
 const standardNonFungiblePostCondition = makeStandardNonFungiblePostCondition(
   postConditionAddress,
   postConditionCode,
-  nonFungibleAssetInfo,
+  nonFungibleAsset,
   assetId
 );
 
@@ -503,7 +503,7 @@ const contractNonFungiblePostCondition = makeContractNonFungiblePostCondition(
   contractAddress,
   contractName,
   postConditionCode,
-  nonFungibleAssetInfo,
+  nonFungibleAsset,
   assetId
 );
 ```

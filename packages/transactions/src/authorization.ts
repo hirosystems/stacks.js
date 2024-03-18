@@ -31,15 +31,15 @@ import {
 } from './keys';
 import {
   deserializeMessageSignature,
-  serializeMessageSignature,
+  serializeMessageSignatureBytes,
   TransactionAuthField,
 } from './signature';
 import {
   addressFromPublicKeys,
   createEmptyAddress,
   createLPList,
-  deserializeLPList,
-  serializeLPList,
+  deserializeLPListBytes,
+  serializeLPListBytes,
 } from './types';
 import { cloneDeep, leftPadHex, txidFromData } from './utils';
 
@@ -205,7 +205,7 @@ export function serializeSingleSigSpendingCondition(
     intToBytes(condition.nonce, false, 8),
     intToBytes(condition.fee, false, 8),
     condition.keyEncoding as number,
-    serializeMessageSignature(condition.signature),
+    serializeMessageSignatureBytes(condition.signature),
   ];
   return concatArray(bytesArray);
 }
@@ -221,7 +221,7 @@ export function serializeMultiSigSpendingCondition(
   ];
 
   const fields = createLPList(condition.fields);
-  bytesArray.push(serializeLPList(fields));
+  bytesArray.push(serializeLPListBytes(fields));
 
   const numSigs = new Uint8Array(2);
   writeUInt16BE(numSigs, condition.signaturesRequired, 0);
@@ -265,7 +265,7 @@ export function deserializeMultiSigSpendingCondition(
   const nonce = BigInt('0x' + bytesToHex(bytesReader.readBytes(8)));
   const fee = BigInt('0x' + bytesToHex(bytesReader.readBytes(8)));
 
-  const fields = deserializeLPList(bytesReader, StacksMessageType.TransactionAuthField)
+  const fields = deserializeLPListBytes(bytesReader, StacksMessageType.TransactionAuthField)
     .values as TransactionAuthField[];
 
   let haveUncompressed = false;

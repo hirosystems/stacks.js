@@ -16,18 +16,13 @@ import {
   tupleCV,
 } from '.';
 import { BytesReader as BytesReader } from '../bytesReader';
-import { deserializeAddress, deserializeLPString } from '../types';
+import { deserializeAddressBytes, deserializeLPStringBytes } from '../types';
 import { DeserializationError } from '../errors';
 import { stringAsciiCV, stringUtf8CV } from './types/stringCV';
 import { bytesToAscii, bytesToUtf8, hexToBytes } from '@stacks/common';
 
 /**
  * Deserializes clarity value to clarity type
- *
- * @param {value} Uint8Array | string value to be converted to clarity type
- **
- * @returns {ClarityType} returns the clarity type instance
- *
  * @example
  * ```
  *  import { intCV, serializeCV, deserializeCV } from '@stacks/transactions';
@@ -79,12 +74,12 @@ export function deserializeCV<T extends ClarityValue = ClarityValue>(
       return falseCV() as T;
 
     case ClarityWireType.address:
-      const sAddress = deserializeAddress(bytesReader);
+      const sAddress = deserializeAddressBytes(bytesReader);
       return standardPrincipalCVFromAddress(sAddress) as T;
 
     case ClarityWireType.contract:
-      const cAddress = deserializeAddress(bytesReader);
-      const contractName = deserializeLPString(bytesReader);
+      const cAddress = deserializeAddressBytes(bytesReader);
+      const contractName = deserializeLPStringBytes(bytesReader);
       return contractPrincipalCVFromAddress(cAddress, contractName) as T;
 
     case ClarityWireType.ok:
@@ -111,7 +106,7 @@ export function deserializeCV<T extends ClarityValue = ClarityValue>(
       const tupleLength = bytesReader.readUInt32BE();
       const tupleContents: { [key: string]: ClarityValue } = {};
       for (let i = 0; i < tupleLength; i++) {
-        const clarityName = deserializeLPString(bytesReader).content;
+        const clarityName = deserializeLPStringBytes(bytesReader).content;
         if (clarityName === undefined) {
           throw new DeserializationError('"content" is undefined');
         }

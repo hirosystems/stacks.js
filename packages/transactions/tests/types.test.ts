@@ -1,17 +1,17 @@
 import {
   createLPList,
-  serializeStacksMessage,
-  deserializeLPList,
+  serializeStacksMessageBytes,
+  deserializeLPListBytes,
   addressFromHashMode,
   LengthPrefixedList,
   addressFromPublicKeys,
 } from '../src/types';
 import {
   LengthPrefixedString,
-  AssetInfo,
+  Asset,
   createLPString,
   createAddress,
-  createAssetInfo,
+  createAsset,
 } from '../src/postcondition-types';
 import { Address, addressToString } from '../src/common';
 import { AddressHashMode, StacksMessageType } from '../src/constants';
@@ -48,10 +48,10 @@ test('Length prefixed list serialization and deserialization', () => {
     l.push(addressList[index]);
   }
   const lpList: LengthPrefixedList = createLPList(l);
-  const serialized = serializeStacksMessage(lpList);
+  const serialized = serializeStacksMessageBytes(lpList);
 
   const bytesReader = new BytesReader(serialized);
-  const deserialized = deserializeLPList(bytesReader, StacksMessageType.Address);
+  const deserialized = deserializeLPListBytes(bytesReader, StacksMessageType.Address);
 
   expect(deserialized.values.length).toBe(addressList.length);
 
@@ -143,8 +143,8 @@ test('Asset info serialization and deserialization', () => {
   const assetAddress = 'SP2ZP4GJDZJ1FDHTQ963F0292PE9J9752TZJ68F21';
   const assetContractName = 'contract_name';
   const assetName = 'asset_name';
-  const info = createAssetInfo(assetAddress, assetContractName, assetName);
-  const deserialized = serializeDeserialize(info, StacksMessageType.AssetInfo) as AssetInfo;
+  const info = createAsset(assetAddress, assetContractName, assetName);
+  const deserialized = serializeDeserialize(info, StacksMessageType.Asset) as Asset;
   expect(addressToString(deserialized.address)).toBe(assetAddress);
   expect(deserialized.contractName.content).toBe(assetContractName);
   expect(deserialized.assetName.content).toBe(assetName);
