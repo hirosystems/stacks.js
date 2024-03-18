@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.12.1](https://github.com/hirosystems/stacks.js/compare/v6.12.0...v6.12.1) (2024-03-18)
+
+
+### Bug Fixes
+
+* add stacks transaction memo equality by auto-removing trailing null bytes ([#1630](https://github.com/hirosystems/stacks.js/issues/1630)) ([bb0b85d](https://github.com/hirosystems/stacks.js/commit/bb0b85d45db3daeed24f12324aa8cb87b03b74a5))
+* add test to retrieve public key from StructuredDataSignature ([20c1aaf](https://github.com/hirosystems/stacks.js/commit/20c1aaf7c8b8e7808ed7cf4bff2b72b44fecf045))
+* allow StructuredDataSignature type in publicKeyFromSignature* ([92c9f6c](https://github.com/hirosystems/stacks.js/commit/92c9f6c838de8c3a824d0a15edb3d6c8f27bc69b))
+
+
+
 ## [6.12.0](https://github.com/hirosystems/stacks.js/compare/v6.11.3...v6.12.0) (2024-02-23)
 
 
