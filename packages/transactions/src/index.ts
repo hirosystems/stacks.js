@@ -100,4 +100,5 @@ export * from './signer';
 export * from './structuredDataSignature';
 export { StacksTransaction, deserializeTransaction } from './transaction';
 export * from './types';
+export * from './message-types';
 export * from './utils';
