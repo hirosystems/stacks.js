@@ -920,6 +920,8 @@ export class StackingClient {
       rewardCycle,
       signerKey,
       signerSignature,
+      maxAmount,
+      authId,
     });
     const tx = await makeContractCall({
       ...callOptions,
