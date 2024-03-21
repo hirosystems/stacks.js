@@ -375,7 +375,7 @@ export function ensureSignerArgsReadiness({
   signerKey?: string;
   signerSignature?: string;
   maxAmount?: IntegerType;
-  authId?: number;
+  authId?: IntegerType;
 }) {
   const hasMaxAmount = typeof maxAmount !== 'undefined';
   const hasAuthId = typeof authId !== 'undefined';
