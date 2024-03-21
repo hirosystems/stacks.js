@@ -234,7 +234,7 @@ export interface LockStxOptions {
   /** Maximum amount of STX that can be locked in this transaction, required for >= PoX-4 */
   maxAmount?: IntegerType;
   /** Random integer to prevent re-use of signer signature, required for >= PoX-4 */
-  authId?: number;
+  authId?: IntegerType;
 }
 
 /**
@@ -254,7 +254,7 @@ export interface StackExtendOptions {
   /** Maximum amount of STX that can be locked in this transaction, required for >= PoX-4 */
   maxAmount?: IntegerType;
   /** Random integer to prevent re-use of signer signature, required for >= PoX-4 */
-  authId?: number;
+  authId?: IntegerType;
 }
 
 /**
@@ -272,7 +272,7 @@ export interface StackIncreaseOptions {
   /** Maximum amount of STX that can be locked in this transaction, required for >= PoX-4 */
   maxAmount?: IntegerType;
   /** Random integer to prevent re-use of signer signature, required for >= PoX-4 */
-  authId?: number;
+  authId?: IntegerType;
 }
 
 /**
@@ -350,7 +350,7 @@ export interface StackAggregationCommitOptions {
   /** Maximum amount of STX that can be locked in this transaction, required for >= PoX-4 */
   maxAmount?: IntegerType;
   /** Random integer to prevent re-use of signer signature, required for >= PoX-4 */
-  authId?: number;
+  authId?: IntegerType;
 }
 
 export interface StackAggregationIncreaseOptions {
@@ -1056,7 +1056,7 @@ export class StackingClient {
     signerKey?: string;
     signerSignature?: string;
     maxAmount?: IntegerType;
-    authId?: number;
+    authId?: IntegerType;
   }) {
     const address = poxAddressToTuple(poxAddress);
     const [contractAddress, contractName] = this.parseContractId(contract);
@@ -1102,7 +1102,7 @@ export class StackingClient {
     signerKey?: string;
     signerSignature?: string;
     maxAmount?: IntegerType;
-    authId?: number;
+    authId?: IntegerType;
   }) {
     const address = poxAddressToTuple(poxAddress);
     const [contractAddress, contractName] = this.parseContractId(contract);
@@ -1141,7 +1141,7 @@ export class StackingClient {
     signerKey?: string;
     signerSignature?: string;
     maxAmount?: IntegerType;
-    authId?: number;
+    authId?: IntegerType;
   }) {
     const [contractAddress, contractName] = this.parseContractId(contract);
 
@@ -1303,7 +1303,7 @@ export class StackingClient {
     signerKey?: string;
     signerSignature?: string;
     maxAmount?: IntegerType;
-    authId?: number;
+    authId?: IntegerType;
   }) {
     const address = poxAddressToTuple(poxAddress);
     const [contractAddress, contractName] = this.parseContractId(contract);
@@ -1369,7 +1369,7 @@ export class StackingClient {
     signerKey?: string;
     signerSignature?: string;
     maxAmount?: IntegerType;
-    authId?: number;
+    authId?: IntegerType;
   }) {
     const address = poxAddressToTuple(poxAddress);
     const [contractAddress, contractName] = this.parseContractId(contract);
