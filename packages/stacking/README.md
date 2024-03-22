@@ -94,13 +94,27 @@ const privateKey = 'd48f215481c16cbe6426f8e557df9b78895661971d71735126545abddcd5
 // block height at which to stack
 const burnBlockHeight = 2000;
 
+// signer key
+const signerPrivateKey = makeRandomPrivKey();
+const signerKey = getPublicKeyFromPrivate(signerPrivateKey.data);
+
 // Refer to initialization section to create client instance
+const signerSignature = client.signPoxSignature({
+  topic: 'stack-stx',
+  rewardCycle: await client.getPoxInfo().reward_cycle_id,
+  poxAddress,
+  period: cycles,
+  signerPrivateKey,
+});
+
 const stackingResults = await client.stack({
   amountMicroStx,
   poxAddress,
   cycles,
   privateKey,
   burnBlockHeight,
+  signerKey,
+  signerSignature,
 });
 
 // {
@@ -521,7 +535,7 @@ const delegetateCommitResponse = await poolClient.stackAggregationCommitIndexed(
 
 #### Increase existing commitment
 
-The result of this commit transaction will contain the index of the pools reward set entry.
+Increase partially stacked STX via the index of the reward set entry.
 
 ```typescript
 // reward cycle id to commit to

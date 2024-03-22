@@ -1,5 +1,5 @@
 import { bigIntToBytes, bytesToHex, hexToBytes } from '@stacks/common';
-import { base58CheckDecode } from '@stacks/encryption';
+import { base58CheckDecode, getPublicKeyFromPrivate } from '@stacks/encryption';
 import { StacksMainnet, StacksTestnet } from '@stacks/network';
 import {
   AnchorMode,
@@ -8,6 +8,8 @@ import {
   SignedContractCallOptions,
   TupleCV,
   bufferCV,
+  createStacksPrivateKey,
+  encodeStructuredData,
   intCV,
   noneCV,
   responseErrorCV,
@@ -22,11 +24,18 @@ import {
 import fetchMock from 'jest-fetch-mock';
 import { StackingClient } from '../src';
 import { PoXAddressVersion, StackingErrors } from '../src/constants';
-import { decodeBtcAddress, poxAddressToBtcAddress } from '../src/utils';
+import {
+  decodeBtcAddress,
+  pox4SignatureMessage,
+  poxAddressToBtcAddress,
+  signPox4SignatureHash,
+  verifyPox4SignatureHash,
+} from '../src/utils';
 import { V2_POX_REGTEST_POX_3, setApiMocks } from './apiMockingHelpers';
+import { sha256 } from '@noble/hashes/sha256';
 
 const poxInfo = {
-  contract_id: 'ST000000000000000000002AMW42H.pox',
+  contract_id: 'ST000000000000000000002AMW42H.pox-3',
   first_burnchain_block_height: 0,
   min_amount_ustx: 83333940625000,
   prepare_cycle_length: 30,
@@ -35,6 +44,47 @@ const poxInfo = {
   reward_cycle_length: 120,
   rejection_votes_left_required: 12,
   total_liquid_supply_ustx: 40000291500000000,
+  pox_activation_threshold_ustx: 71566102085843,
+  current_burnchain_block_height: 825166,
+  prepare_phase_block_length: 100,
+  reward_phase_block_length: 2000,
+  reward_slots: 4000,
+  current_cycle: {
+    id: 75,
+    min_threshold_ustx: 90000000000,
+    stacked_ustx: 340958364660109,
+    is_pox_active: true,
+  },
+  next_cycle: {
+    id: 76,
+    min_threshold_ustx: 90000000000,
+    min_increment_ustx: 71566102085,
+    stacked_ustx: 273136107683519,
+    prepare_phase_start_block_height: 825550,
+    blocks_until_prepare_phase: 384,
+    reward_phase_start_block_height: 825650,
+    blocks_until_reward_phase: 484,
+    ustx_until_pox_rejection: 357830510429200,
+  },
+
+  next_reward_cycle_in: 484,
+  contract_versions: [
+    {
+      contract_id: 'ST000000000000000000002AMW42H.pox',
+      activation_burnchain_block_height: 666050,
+      first_reward_cycle_id: 0,
+    },
+    {
+      contract_id: 'ST000000000000000000002AMW42H.pox-2',
+      activation_burnchain_block_height: 781552,
+      first_reward_cycle_id: 56,
+    },
+    {
+      contract_id: 'ST000000000000000000002AMW42H.pox-3',
+      activation_burnchain_block_height: 791551,
+      first_reward_cycle_id: 60,
+    },
+  ],
 };
 
 const balanceInfo = {
@@ -471,7 +521,6 @@ test('delegate stack stx with one delegator', async () => {
     }
   });
 
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const { StackingClient } = require('../src'); // needed for jest.mock module // needed for jest.mock module
   const client = new StackingClient(address, network);
@@ -1115,4 +1164,74 @@ test('getSecondsUntilStackingDeadline', async () => {
   seconds = await client.getSecondsUntilStackingDeadline();
   expect(seconds).toBeLessThan(0); // negative (deadline passed)
   expect(seconds).toBe(-50 * 10 * 60); // this time we are in the prepare phase
+});
+
+test('correctly signs pox-4 signer signature', () => {
+  const network = new StacksTestnet();
+  const poxAddress = 'msiYwJCvXEzjgq6hDwD9ueBka6MTfN962Z';
+
+  const privateKey = createStacksPrivateKey(
+    '002bc479cae71c410cf10113de8fe1611b148231eccdfb19ca779ba365cc511601'
+  );
+  const publicKey = getPublicKeyFromPrivate(privateKey.data);
+  const maxAmount = 1000n;
+  const authId = 0;
+
+  const signature = signPox4SignatureHash({
+    topic: 'stack-stx',
+    network,
+    period: 12,
+    rewardCycle: 2,
+    poxAddress,
+    privateKey,
+    maxAmount,
+    authId,
+  });
+
+  const verified = verifyPox4SignatureHash({
+    topic: 'stack-stx',
+    network,
+    period: 12,
+    rewardCycle: 2,
+    poxAddress,
+    signature,
+    publicKey,
+    maxAmount,
+    authId,
+  });
+
+  expect(verified).toBeTruthy(); // test vector also verified with pox-4.clar via clarinet
+  // >> (contract-call? .pox-4 verify-signer-key-sig { version: 0x00, hashbytes: 0x85d300b605fa25c983af5ceaf5b67b2b2b45c013 } u2 "stack-stx" u12 0x5689bc4403367ef91e1e2450663f2c5a31c48c815c336f73aecd705d87bd815b0f952108aa06de958fb61a6b571088de7fa4ea7df7f296c46438af3e8c3501f701 0x0329f14a91005e6b1e6f7df9d032f0f17c86a3eae25fa148e631f846486c91025f)
+  // (ok true)
+});
+
+/**
+ * Compare JS implementation with a fixture generated via Rust:
+ *
+ * https://github.com/stacks-network/stacks-core/blob/c9d8f8d66bea0b8983ae2a92fd9716be9dc0c4df/stackslib/src/util_lib/signed_structured_data.rs#L380
+ *
+ */
+test('correctly generates pox-4 message hash', () => {
+  const poxAddress = 'mfWxJ45yp2SFn7UciZyNpvDKrzbhyfKrY8';
+  const topic = 'stack-stx';
+  const period = 12;
+  const authId = 111;
+
+  const fixture = 'ec5b88aa81a96a6983c26cdba537a13d253425348ffc0ba6b07130869b025a2d';
+
+  const hash = sha256(
+    encodeStructuredData(
+      pox4SignatureMessage({
+        poxAddress: poxAddress,
+        topic,
+        period,
+        authId,
+        maxAmount: 340282366920938463463374607431768211455n,
+        rewardCycle: 1,
+        network: new StacksTestnet(),
+      })
+    )
+  );
+
+  expect(bytesToHex(hash)).toBe(fixture);
 });
