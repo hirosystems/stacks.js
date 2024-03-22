@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.13.0](https://github.com/hirosystems/stacks.js/compare/v6.12.1...v6.13.0) (2024-03-22)
+
+
+### Features
+
+* add pox-4 signer-key to StackingClient methods ([#1614](https://github.com/hirosystems/stacks.js/issues/1614)) ([3e649de](https://github.com/hirosystems/stacks.js/commit/3e649de86becd93db044ae5253cc7cadf1f802b6))
+
+
+
 ## [6.12.1](https://github.com/hirosystems/stacks.js/compare/v6.12.0...v6.12.1) (2024-03-18)
 
 
