@@ -6,7 +6,6 @@ import {
   BurnchainRewardsTotal,
 } from '@stacks/stacks-blockchain-api-types';
 import {
-  AnchorMode,
   BufferCV,
   ClarityType,
   ClarityValue,
@@ -1082,7 +1081,6 @@ export class StackingClient {
       functionArgs,
       validateWithAbi: true,
       network: this.network,
-      anchorMode: AnchorMode.Any,
     };
     return callOptions;
   }
@@ -1123,7 +1121,6 @@ export class StackingClient {
       functionArgs,
       validateWithAbi: true,
       network: this.network,
-      anchorMode: AnchorMode.Any,
     };
     return callOptions;
   }
@@ -1161,7 +1158,6 @@ export class StackingClient {
       functionArgs,
       validateWithAbi: true,
       network: this.network,
-      anchorMode: AnchorMode.Any,
     };
     return callOptions;
   }
@@ -1193,7 +1189,6 @@ export class StackingClient {
       ],
       validateWithAbi: true,
       network: this.network,
-      anchorMode: AnchorMode.Any,
     };
     return callOptions;
   }
@@ -1229,7 +1224,6 @@ export class StackingClient {
       ],
       validateWithAbi: true,
       network: this.network,
-      anchorMode: AnchorMode.Any,
     };
 
     return callOptions;
@@ -1256,7 +1250,6 @@ export class StackingClient {
       functionArgs: [principalCV(stacker), address, uintCV(extendCount)],
       validateWithAbi: true,
       network: this.network,
-      anchorMode: AnchorMode.Any,
     };
 
     return callOptions;
@@ -1282,7 +1275,6 @@ export class StackingClient {
       functionArgs: [principalCV(stacker), address, uintCV(increaseBy)],
       validateWithAbi: true,
       network: this.network,
-      anchorMode: AnchorMode.Any,
     };
 
     return callOptions;
@@ -1324,7 +1316,6 @@ export class StackingClient {
       functionArgs,
       validateWithAbi: true,
       network: this.network,
-      anchorMode: AnchorMode.Any,
     };
     return callOptions;
   }
@@ -1349,7 +1340,6 @@ export class StackingClient {
       functionArgs: [address, uintCV(rewardCycle), uintCV(rewardCycleIndex)],
       validateWithAbi: true,
       network: this.network,
-      anchorMode: AnchorMode.Any,
     };
     return callOptions;
   }
@@ -1390,7 +1380,6 @@ export class StackingClient {
       functionArgs,
       validateWithAbi: true,
       network: this.network,
-      anchorMode: AnchorMode.Any,
     };
     return callOptions;
   }
@@ -1404,7 +1393,6 @@ export class StackingClient {
       functionArgs: [],
       validateWithAbi: true,
       network: this.network,
-      anchorMode: AnchorMode.Any,
     };
     return callOptions;
   }

@@ -28,7 +28,6 @@ import {
   AuthType,
   ChainID,
   DEFAULT_CHAIN_ID,
-  PayloadType,
   PostConditionMode,
   PubKeyEncoding,
   StacksMessageType,
@@ -73,25 +72,7 @@ export class StacksTransaction {
     this.postConditionMode = postConditionMode ?? PostConditionMode.Deny;
     this.postConditions = postConditions ?? createLPList([]);
 
-    if (anchorMode) {
-      this.anchorMode = anchorModeFromNameOrValue(anchorMode);
-    } else {
-      switch (payload.payloadType) {
-        case PayloadType.Coinbase:
-        case PayloadType.CoinbaseToAltRecipient:
-        case PayloadType.NakamotoCoinbase:
-        case PayloadType.PoisonMicroblock:
-        case PayloadType.TenureChange:
-          this.anchorMode = AnchorMode.OnChainOnly;
-          break;
-        case PayloadType.ContractCall:
-        case PayloadType.SmartContract:
-        case PayloadType.VersionedSmartContract:
-        case PayloadType.TokenTransfer:
-          this.anchorMode = AnchorMode.Any;
-          break;
-      }
-    }
+    this.anchorMode = anchorModeFromNameOrValue(anchorMode ?? AnchorMode.Any);
   }
 
   signBegin() {

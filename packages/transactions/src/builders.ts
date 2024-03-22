@@ -21,7 +21,6 @@ import { ClarityValue, deserializeCV, NoneCV, PrincipalCV, serializeCV } from '.
 import {
   AddressHashMode,
   AddressVersion,
-  AnchorMode,
   FungibleConditionCode,
   NonFungibleConditionCode,
   PayloadType,
@@ -32,7 +31,7 @@ import {
   RECOVERABLE_ECDSA_SIG_LENGTH_BYTES,
   StacksMessageType,
   ClarityVersion,
-  AnchorModeName,
+  AnchorMode,
 } from './constants';
 import { ClarityAbi, validateContractCall } from './contract-abi';
 import { NoEstimateAvailableError } from './errors';
@@ -601,9 +600,6 @@ export interface TokenTransferOptions {
   nonce?: IntegerType;
   /** the network that the transaction will ultimately be broadcast to */
   network?: StacksNetworkName | StacksNetwork;
-  /** the transaction anchorMode, which specifies whether it should be
-   * included in an anchor block or a microblock */
-  anchorMode: AnchorModeName | AnchorMode;
   /** an arbitrary string to include in the transaction, must be less than 34 bytes */
   memo?: string;
   /** set to true if another account is sponsoring the transaction (covering the transaction fee) */
@@ -689,7 +685,7 @@ export async function makeUnsignedSTXTokenTransfer(
     payload,
     undefined, // no post conditions on STX transfers (see SIP-005)
     undefined, // no post conditions on STX transfers (see SIP-005)
-    options.anchorMode,
+    AnchorMode.Any,
     network.chainId
   );
 
@@ -769,9 +765,6 @@ export interface BaseContractDeployOptions {
   nonce?: IntegerType;
   /** the network that the transaction will ultimately be broadcast to */
   network?: StacksNetworkName | StacksNetwork;
-  /** the transaction anchorMode, which specifies whether it should be
-   * included in an anchor block or a microblock */
-  anchorMode: AnchorModeName | AnchorMode;
   /** the post condition mode, specifying whether or not post-conditions must fully cover all
    * transfered assets */
   postConditionMode?: PostConditionMode;
@@ -965,7 +958,7 @@ export async function makeUnsignedContractDeploy(
     payload,
     lpPostConditions,
     options.postConditionMode,
-    options.anchorMode,
+    AnchorMode.Any,
     network.chainId
   );
 
@@ -1003,9 +996,6 @@ export interface ContractCallOptions {
   nonce?: IntegerType;
   /** the Stacks blockchain network that will ultimately be used to broadcast this transaction */
   network?: StacksNetworkName | StacksNetwork;
-  /** the transaction anchorMode, which specifies whether it should be
-   * included in an anchor block or a microblock */
-  anchorMode: AnchorModeName | AnchorMode;
   /** the post condition mode, specifying whether or not post-conditions must fully cover all
    * transfered assets */
   postConditionMode?: PostConditionMode;
@@ -1172,7 +1162,7 @@ export async function makeUnsignedContractCall(
     payload,
     lpPostConditions,
     options.postConditionMode,
-    options.anchorMode,
+    AnchorMode.Any,
     network.chainId
   );
 

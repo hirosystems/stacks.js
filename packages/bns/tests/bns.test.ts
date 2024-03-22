@@ -1,36 +1,30 @@
-import fetchMock from 'jest-fetch-mock';
-
-import {
-  responseOkCV,
-  responseErrorCV,
-  trueCV,
-  falseCV,
-  uintCV,
-  bufferCV,
-  hash160,
-  standardPrincipalCV,
-  noneCV,
-  AnchorMode,
-  someCV,
-  createSTXPostCondition,
-  publicKeyToAddress,
-  createStacksPublicKey,
-  FungibleConditionCode,
-  AddressVersion,
-  createNonFungiblePostCondition,
-  NonFungibleConditionCode,
-  parseAssetInfoString,
-  tupleCV,
-  bufferCVFromString,
-} from '@stacks/transactions';
-
-import { StacksNetwork, StacksTestnet } from '@stacks/network';
-
-import { BNS_CONTRACT_NAME, BnsContractAddress, PriceFunction } from '../src';
-
-import { decodeFQN, getZonefileHash } from '../src/utils';
-
 import { ChainID, utf8ToBytes } from '@stacks/common';
+import { StacksNetwork, StacksTestnet } from '@stacks/network';
+import {
+  AddressVersion,
+  FungibleConditionCode,
+  NonFungibleConditionCode,
+  bufferCV,
+  bufferCVFromString,
+  createNonFungiblePostCondition,
+  createSTXPostCondition,
+  createStacksPublicKey,
+  falseCV,
+  hash160,
+  noneCV,
+  parseAssetInfoString,
+  publicKeyToAddress,
+  responseErrorCV,
+  responseOkCV,
+  someCV,
+  standardPrincipalCV,
+  trueCV,
+  tupleCV,
+  uintCV,
+} from '@stacks/transactions';
+import fetchMock from 'jest-fetch-mock';
+import { BNS_CONTRACT_NAME, BnsContractAddress, PriceFunction } from '../src';
+import { decodeFQN, getZonefileHash } from '../src/utils';
 
 beforeEach(() => {
   fetchMock.resetMocks();
@@ -350,7 +344,6 @@ test('preorderNamespace', async () => {
     validateWithAbi: false,
     publicKey,
     network,
-    anchorMode: AnchorMode.Any,
     postConditions: [burnSTXPostCondition],
   };
 
@@ -444,7 +437,6 @@ test('revealNamespace', async () => {
     validateWithAbi: false,
     publicKey,
     network,
-    anchorMode: AnchorMode.Any,
   };
 
   expect(makeUnsignedContractCall).toHaveBeenCalledTimes(1);
@@ -492,7 +484,6 @@ test('importName', async () => {
     publicKey,
     network,
     validateWithAbi: false,
-    anchorMode: AnchorMode.Any,
   };
 
   expect(makeUnsignedContractCall).toHaveBeenCalledTimes(1);
@@ -529,7 +520,6 @@ test('readyNamespace', async () => {
     publicKey,
     network,
     validateWithAbi: false,
-    anchorMode: AnchorMode.Any,
   };
 
   expect(makeUnsignedContractCall).toHaveBeenCalledTimes(1);
@@ -577,7 +567,6 @@ test('preorderName', async () => {
     publicKey,
     network,
     validateWithAbi: false,
-    anchorMode: AnchorMode.Any,
     postConditions: [burnSTXPostCondition],
   };
 
@@ -626,7 +615,6 @@ test('registerName', async () => {
     publicKey,
     network,
     validateWithAbi: false,
-    anchorMode: AnchorMode.Any,
   };
 
   expect(makeUnsignedContractCall).toHaveBeenCalledTimes(1);
@@ -671,7 +659,6 @@ test('updateName', async () => {
     publicKey,
     network,
     validateWithAbi: false,
-    anchorMode: AnchorMode.Any,
   };
 
   expect(makeUnsignedContractCall).toHaveBeenCalledTimes(1);
@@ -738,7 +725,6 @@ test('transferName', async () => {
     publicKey,
     network,
     validateWithAbi: false,
-    anchorMode: AnchorMode.Any,
     postConditions: [nameTransferPostConditionOne, nameTransferPostConditionTwo],
   };
 
@@ -806,7 +792,6 @@ test('transferName optionalArguments', async () => {
     publicKey,
     network,
     validateWithAbi: false,
-    anchorMode: AnchorMode.Any,
     postConditions: [nameTransferPostConditionOne, nameTransferPostConditionTwo],
   };
 
@@ -846,7 +831,6 @@ test('revokeName', async () => {
     publicKey,
     network,
     validateWithAbi: false,
-    anchorMode: AnchorMode.Any,
   };
 
   expect(makeUnsignedContractCall).toHaveBeenCalledTimes(1);
@@ -901,7 +885,6 @@ test('renewName', async () => {
     publicKey,
     network,
     validateWithAbi: false,
-    anchorMode: AnchorMode.Any,
     postConditions: [burnSTXPostCondition],
   };
 
@@ -957,7 +940,6 @@ test('renewName optionalArguments', async () => {
     publicKey,
     network,
     validateWithAbi: false,
-    anchorMode: AnchorMode.Any,
     postConditions: [burnSTXPostCondition],
   };
 
