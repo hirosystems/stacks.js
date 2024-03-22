@@ -1,14 +1,25 @@
+import { sha256 } from '@noble/hashes/sha256';
 import { bech32, bech32m } from '@scure/base';
-import { bigIntToBytes } from '@stacks/common';
-import { base58CheckDecode, base58CheckEncode } from '@stacks/encryption';
+import { IntegerType, bigIntToBytes } from '@stacks/common';
 import {
-  bufferCV,
+  base58CheckDecode,
+  base58CheckEncode,
+  verifyMessageSignatureRsv,
+} from '@stacks/encryption';
+import { StacksNetwork, StacksNetworkName, StacksNetworks } from '@stacks/network';
+import {
   BufferCV,
   ClarityType,
   ClarityValue,
   OptionalCV,
-  tupleCV,
+  StacksPrivateKey,
   TupleCV,
+  bufferCV,
+  encodeStructuredData,
+  signStructuredData,
+  stringAsciiCV,
+  tupleCV,
+  uintCV,
 } from '@stacks/transactions';
 import { PoxOperationInfo } from '.';
 import {
@@ -16,15 +27,14 @@ import {
   BitcoinNetworkVersion,
   PoXAddressVersion,
   PoxOperationPeriod,
-  SegwitPrefix,
   SEGWIT_ADDR_PREFIXES,
   SEGWIT_V0,
   SEGWIT_V0_ADDR_PREFIX,
   SEGWIT_V1,
   SEGWIT_V1_ADDR_PREFIX,
+  SegwitPrefix,
   StackingErrors,
 } from './constants';
-import { StacksNetworkName, StacksNetworks } from '@stacks/network';
 
 export class InvalidAddressError extends Error {
   innerError?: Error;
@@ -335,7 +345,7 @@ export function ensurePox2Activated(operationInfo: PoxOperationInfo) {
 
 /**
  * @internal
- * Throws unless the given PoX address is a legacy address.
+ * Throws if the given PoX address is not a legacy address for PoX-1.
  */
 export function ensureLegacyBtcAddressForPox1({
   contract,
@@ -348,4 +358,136 @@ export function ensureLegacyBtcAddressForPox1({
   if (contract.endsWith('.pox') && !B58_ADDR_PREFIXES.test(poxAddress)) {
     throw new Error('PoX-1 requires P2PKH/P2SH/P2SH-P2WPKH/P2SH-P2WSH bitcoin addresses');
   }
+}
+
+/**
+ * @internal
+ * Throws if signer args are given for <= PoX-3 or the signer args are missing otherwise.
+ */
+export function ensureSignerArgsReadiness({
+  contract,
+  signerKey,
+  signerSignature,
+  maxAmount,
+  authId,
+}: {
+  contract: string;
+  signerKey?: string;
+  signerSignature?: string;
+  maxAmount?: IntegerType;
+  authId?: IntegerType;
+}) {
+  const hasMaxAmount = typeof maxAmount !== 'undefined';
+  const hasAuthId = typeof authId !== 'undefined';
+  if (/\.pox(-[2-3])?$/.test(contract)) {
+    // .pox, .pox-2 or .pox-3
+    if (signerKey || signerSignature || hasMaxAmount || hasAuthId) {
+      throw new Error(
+        'PoX-1, PoX-2 and PoX-3 do not accept a `signerKey`, `signerSignature`, `maxAmount` or `authId`'
+      );
+    }
+  } else {
+    // .pox-4 or later
+    if (!signerKey || !hasMaxAmount || typeof authId === 'undefined') {
+      throw new Error(
+        'PoX-4 requires a `signerKey` (buff 33), `maxAmount` (uint), and `authId` (uint)'
+      );
+    }
+  }
+}
+
+export enum Pox4SignatureTopic {
+  StackStx = 'stack-stx',
+  AggregateCommit = 'agg-commit',
+  StackExtend = 'stack-extend',
+  StackIncrease = 'stack-increase',
+}
+
+export interface Pox4SignatureOptions {
+  /** topic of the signature (i.e. which stacking operation the signature is used for) */
+  topic: `${Pox4SignatureTopic}` | Pox4SignatureTopic;
+  poxAddress: string;
+  /** current reward cycle */
+  rewardCycle: number;
+  /** lock period (in cycles) */
+  period: number;
+  network: StacksNetwork;
+  /** Maximum amount of uSTX that can be locked during this function call */
+  maxAmount: IntegerType;
+  /** Random integer to prevent signature re-use */
+  authId: number;
+}
+
+/**
+ * Generate a signature (`signer-sig` in PoX-4 stacking operations).
+ */
+export function signPox4SignatureHash({
+  topic,
+  poxAddress,
+  rewardCycle,
+  period,
+  network,
+  privateKey,
+  maxAmount,
+  authId,
+}: Pox4SignatureOptions & { privateKey: StacksPrivateKey }) {
+  return signStructuredData({
+    ...pox4SignatureMessage({ topic, poxAddress, rewardCycle, period, network, maxAmount, authId }),
+    privateKey,
+  }).data;
+}
+
+/**
+ * Verify a signature (`signer-sig` in PoX-4 stacking operations) matches the given
+ * public key (`signer-key`) and the structured data of the operation.
+ */
+export function verifyPox4SignatureHash({
+  topic,
+  poxAddress,
+  rewardCycle,
+  period,
+  network,
+  publicKey,
+  signature,
+  maxAmount,
+  authId,
+}: Pox4SignatureOptions & { publicKey: string; signature: string }) {
+  return verifyMessageSignatureRsv({
+    message: sha256(
+      encodeStructuredData(
+        pox4SignatureMessage({ topic, poxAddress, rewardCycle, period, network, maxAmount, authId })
+      )
+    ),
+    publicKey,
+    signature,
+  });
+}
+
+/**
+ * Helper method used to generate SIP018 `message` and `domain` in
+ * {@link signPox4SignatureHash} and {@link verifyPox4SignatureHash}.
+ */
+export function pox4SignatureMessage({
+  topic,
+  poxAddress,
+  rewardCycle,
+  period: lockPeriod,
+  network,
+  maxAmount,
+  authId,
+}: Pox4SignatureOptions) {
+  const message = tupleCV({
+    'pox-addr': poxAddressToTuple(poxAddress),
+    'reward-cycle': uintCV(rewardCycle),
+    topic: stringAsciiCV(topic),
+    period: uintCV(lockPeriod),
+    'max-amount': uintCV(maxAmount),
+    'auth-id': uintCV(authId),
+  });
+  const domain = tupleCV({
+    name: stringAsciiCV('pox-4-signer'),
+    version: stringAsciiCV('1.0.0'),
+    'chain-id': uintCV(network.chainId),
+  });
+  return { message, domain };
 }
