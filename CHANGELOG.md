@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.13.0](https://github.com/hirosystems/stacks.js/compare/v6.12.1...v6.13.0) (2024-03-22)
+
+
+### Features
+
+* **nakamoto:** add nakamoto coinbase payload ([85daaff](https://github.com/hirosystems/stacks.js/commit/85daaffea3c8791fb6ca30a8958b4cbd74480759))
+* **nakamoto:** add pox-4 signer-key to StackingClient methods ([#1614](https://github.com/hirosystems/stacks.js/issues/1614)) ([bf48df5](https://github.com/hirosystems/stacks.js/commit/bf48df5036a5f4146b31e438d7e85fab15b369d5))
+* **nakamoto:** add tenure change payload ([b341b5a](https://github.com/hirosystems/stacks.js/commit/b341b5a2d88159c38e0577568d04a13febdcc393))
+
+
+
 ## [6.12.1](https://github.com/hirosystems/stacks.js/compare/v6.12.0...v6.12.1) (2024-03-18)
 
 
