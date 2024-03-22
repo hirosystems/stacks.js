@@ -1,5 +1,6 @@
 import { bytesToHex, concatBytes, equals, utf8ToBytes } from '@stacks/common';
-import { getAddressFromPublicKey, TransactionVersion } from '@stacks/transactions';
+import { TransactionVersion } from '@stacks/network';
+import { getAddressFromPublicKey } from '@stacks/transactions';
 import { verifyMessageSignatureRsv } from '../src/ec';
 import { decodeMessage, encodeMessage, hashMessage } from '../src/messageSignature';
 

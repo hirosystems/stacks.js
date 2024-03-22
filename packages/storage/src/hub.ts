@@ -21,7 +21,7 @@ import {
   randomBytes,
   Signature,
 } from '@stacks/encryption';
-import { createFetchFn, FetchFn } from '@stacks/network';
+import { createFetchFn, FetchFn } from '@stacks/common';
 import { fromByteArray } from 'base64-js';
 import { TokenSigner } from 'jsontokens';
 

@@ -21,7 +21,7 @@ interface SomeCV<T extends ClarityValue = ClarityValue> {
  *  import { noneCV } from '@stacks/transactions';
  *
  *  const value = noneCV();
- *  // { type: 9 }
+ *  // { type: 'none' }
  * ```
  *
  * @see
@@ -43,7 +43,7 @@ function noneCV(): NoneCV {
  *  import { someCV, trueCV } from '@stacks/transactions';
  *
  *  const value = someCV(trueCV());
- *  // { type: 10, value: { type: 3 } }
+ *  // { type: 'some', value: { type: 'true' } }
  * ```
  *
  * @see

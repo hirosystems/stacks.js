@@ -10,8 +10,11 @@ import { BytesReader } from '../src/bytesReader';
 import {
   bufferCV,
   BufferCV,
+  clarityByteToType,
   ClarityType,
+  clarityTypeToByte,
   ClarityValue,
+  ClarityWireType,
   contractPrincipalCV,
   contractPrincipalCVFromStandard,
   deserializeCV,
@@ -53,10 +56,10 @@ import assert from 'assert';
 
 const ADDRESS = 'SP2JXKMSH007NPYAQHKJPQMAQYAD90NQGTVJVQ02B';
 
-function serializeDeserialize<T extends ClarityValue>(value: T): ClarityValue {
+function serializeDeserialize<T extends ClarityValue>(value: T): T {
   const serializedDeserialized: Uint8Array = serializeCV(value);
   const bytesReader = new BytesReader(serializedDeserialized);
-  return deserializeCV(bytesReader);
+  return deserializeCV(bytesReader) as T;
 }
 
 describe('Clarity Types', () => {
@@ -319,7 +322,7 @@ describe('Clarity Types', () => {
       expect(max128.value.toString()).toBe('340282366920938463463374607431768211455');
       const serializedMax = serializeCV(max128);
       expect('0x' + bytesToHex(serializedMax.slice(1))).toBe('0xffffffffffffffffffffffffffffffff');
-      const serializedDeserializedMax = serializeDeserialize(max128) as IntCV;
+      const serializedDeserializedMax = serializeDeserialize(max128);
       expect(cvToString(serializedDeserializedMax)).toBe(cvToString(max128));
 
       // Min 128-bit integer
@@ -327,7 +330,7 @@ describe('Clarity Types', () => {
       expect(min128.value.toString()).toBe('0');
       const serializedMin = serializeCV(min128);
       expect('0x' + bytesToHex(serializedMin.slice(1))).toBe('0x00000000000000000000000000000000');
-      const serializedDeserializedMin = serializeDeserialize(min128) as IntCV;
+      const serializedDeserializedMin = serializeDeserialize(min128);
       expect(cvToString(serializedDeserializedMin)).toBe(cvToString(min128));
 
       // Out of bounds, too large
@@ -433,7 +436,6 @@ describe('Clarity Types', () => {
       // Test lexicographic ordering of tuple keys (to match Node Buffer compare)
       const lexicographic = Object.keys(tuple.data).sort((a, b) => {
         const bufA = Buffer.from(a);
-
         const bufB = Buffer.from(b);
         return bufA.compare(bufB);
       });
@@ -706,6 +708,73 @@ describe('Clarity Types', () => {
       assert(isClarityType(vInt, ClarityType.Int));
       const intTest: IntCV = vInt;
       intTest; // avoid the "value is never read warning"
+    });
+  });
+
+  describe('Clarity type wire format', () => {
+    test(clarityTypeToByte.name, () => {
+      expect(clarityTypeToByte(ClarityType.Int)).toEqual(0x00);
+      expect(clarityTypeToByte(ClarityType.Int)).toEqual(ClarityWireType.int);
+
+      expect(clarityTypeToByte(ClarityType.UInt)).toEqual(0x01);
+      expect(clarityTypeToByte(ClarityType.UInt)).toEqual(ClarityWireType.uint);
+
+      expect(clarityTypeToByte(ClarityType.Buffer)).toEqual(0x02);
+      expect(clarityTypeToByte(ClarityType.Buffer)).toEqual(ClarityWireType.buffer);
+
+      expect(clarityTypeToByte(ClarityType.BoolTrue)).toEqual(0x03);
+      expect(clarityTypeToByte(ClarityType.BoolTrue)).toEqual(ClarityWireType.true);
+
+      expect(clarityTypeToByte(ClarityType.BoolFalse)).toEqual(0x04);
+      expect(clarityTypeToByte(ClarityType.BoolFalse)).toEqual(ClarityWireType.false);
+
+      expect(clarityTypeToByte(ClarityType.PrincipalStandard)).toEqual(0x05);
+      expect(clarityTypeToByte(ClarityType.PrincipalStandard)).toEqual(ClarityWireType.address);
+
+      expect(clarityTypeToByte(ClarityType.PrincipalContract)).toEqual(0x06);
+      expect(clarityTypeToByte(ClarityType.PrincipalContract)).toEqual(ClarityWireType.contract);
+
+      expect(clarityTypeToByte(ClarityType.ResponseOk)).toEqual(0x07);
+      expect(clarityTypeToByte(ClarityType.ResponseOk)).toEqual(ClarityWireType.ok);
+
+      expect(clarityTypeToByte(ClarityType.ResponseErr)).toEqual(0x08);
+      expect(clarityTypeToByte(ClarityType.ResponseErr)).toEqual(ClarityWireType.err);
+
+      expect(clarityTypeToByte(ClarityType.OptionalNone)).toEqual(0x09);
+      expect(clarityTypeToByte(ClarityType.OptionalNone)).toEqual(ClarityWireType.none);
+
+      expect(clarityTypeToByte(ClarityType.OptionalSome)).toEqual(0x0a);
+      expect(clarityTypeToByte(ClarityType.OptionalSome)).toEqual(ClarityWireType.some);
+
+      expect(clarityTypeToByte(ClarityType.List)).toEqual(0x0b);
+      expect(clarityTypeToByte(ClarityType.List)).toEqual(ClarityWireType.list);
+
+      expect(clarityTypeToByte(ClarityType.Tuple)).toEqual(0x0c);
+      expect(clarityTypeToByte(ClarityType.Tuple)).toEqual(ClarityWireType.tuple);
+
+      expect(clarityTypeToByte(ClarityType.StringASCII)).toEqual(0x0d);
+      expect(clarityTypeToByte(ClarityType.StringASCII)).toEqual(ClarityWireType.ascii);
+
+      expect(clarityTypeToByte(ClarityType.StringUTF8)).toEqual(0x0e);
+      expect(clarityTypeToByte(ClarityType.StringUTF8)).toEqual(ClarityWireType.utf8);
+    });
+
+    test(clarityByteToType.name, () => {
+      expect(clarityByteToType(0x00)).toEqual(ClarityType.Int);
+      expect(clarityByteToType(0x01)).toEqual(ClarityType.UInt);
+      expect(clarityByteToType(0x02)).toEqual(ClarityType.Buffer);
+      expect(clarityByteToType(0x03)).toEqual(ClarityType.BoolTrue);
+      expect(clarityByteToType(0x04)).toEqual(ClarityType.BoolFalse);
+      expect(clarityByteToType(0x05)).toEqual(ClarityType.PrincipalStandard);
+      expect(clarityByteToType(0x06)).toEqual(ClarityType.PrincipalContract);
+      expect(clarityByteToType(0x07)).toEqual(ClarityType.ResponseOk);
+      expect(clarityByteToType(0x08)).toEqual(ClarityType.ResponseErr);
+      expect(clarityByteToType(0x09)).toEqual(ClarityType.OptionalNone);
+      expect(clarityByteToType(0x0a)).toEqual(ClarityType.OptionalSome);
+      expect(clarityByteToType(0x0b)).toEqual(ClarityType.List);
+      expect(clarityByteToType(0x0c)).toEqual(ClarityType.Tuple);
+      expect(clarityByteToType(0x0d)).toEqual(ClarityType.StringASCII);
+      expect(clarityByteToType(0x0e)).toEqual(ClarityType.StringUTF8);
     });
   });
 });

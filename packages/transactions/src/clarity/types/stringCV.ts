@@ -23,7 +23,7 @@ interface StringUtf8CV {
  *
  *  const stringAscii = stringAsciiCV('test');
  *
- *  // { type: 13, data: 'hello' }
+ *  // { type: 'ascii', data: 'hello' }
  * ```
  *
  * @see
@@ -46,7 +46,7 @@ const stringAsciiCV = (data: string): StringAsciiCV => {
  *
  *  const stringUTF8 = stringUtf8CV('test');
  *
- *  // { type: 13, data: 'hello' }
+ *  // { type: 'utf8', data: 'hello' }
  * ```
  *
  * @see

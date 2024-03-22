@@ -20,7 +20,7 @@ import {
   FungibleConditionCode,
   NonFungibleConditionCode,
   StacksMessageType,
-  PostConditionPrincipalID,
+  PostConditionPrincipalId,
 } from '../src/constants';
 
 import { serializeDeserialize } from './macros';
@@ -44,7 +44,7 @@ test('STX post condition serialization and deserialization', () => {
     StacksMessageType.PostCondition
   ) as STXPostCondition;
   expect(deserialized.conditionType).toBe(postConditionType);
-  expect(deserialized.principal.prefix).toBe(PostConditionPrincipalID.Standard);
+  expect(deserialized.principal.prefix).toBe(PostConditionPrincipalId.Standard);
   expect(addressToString(deserialized.principal.address)).toBe(address);
   expect(deserialized.conditionCode).toBe(conditionCode);
   expect(deserialized.amount.toString()).toBe(amount.toString());
@@ -71,7 +71,7 @@ test('Fungible post condition serialization and deserialization', () => {
     StacksMessageType.PostCondition
   ) as FungiblePostCondition;
   expect(deserialized.conditionType).toBe(postConditionType);
-  expect(deserialized.principal.prefix).toBe(PostConditionPrincipalID.Standard);
+  expect(deserialized.principal.prefix).toBe(PostConditionPrincipalId.Standard);
   expect(addressToString(deserialized.principal.address)).toBe(address);
   expect(deserialized.conditionCode).toBe(conditionCode);
   expect(deserialized.amount.toString()).toBe(amount.toString());
@@ -108,7 +108,7 @@ test('Non-fungible post condition serialization and deserialization', () => {
     StacksMessageType.PostCondition
   ) as NonFungiblePostCondition;
   expect(deserialized.conditionType).toBe(postConditionType);
-  expect(deserialized.principal.prefix).toBe(PostConditionPrincipalID.Contract);
+  expect(deserialized.principal.prefix).toBe(PostConditionPrincipalId.Contract);
   expect(addressToString(deserialized.principal.address)).toBe(address);
   expect((deserialized.principal as ContractPrincipal).contractName.content).toBe(contractName);
   expect(deserialized.conditionCode).toBe(conditionCode);
@@ -144,7 +144,7 @@ test('Non-fungible post condition with string IDs serialization and deserializat
     StacksMessageType.PostCondition
   ) as NonFungiblePostCondition;
   expect(deserialized.conditionType).toBe(postConditionType);
-  expect(deserialized.principal.prefix).toBe(PostConditionPrincipalID.Contract);
+  expect(deserialized.principal.prefix).toBe(PostConditionPrincipalId.Contract);
   expect(addressToString(deserialized.principal.address)).toBe(address);
   expect((deserialized.principal as ContractPrincipal).contractName.content).toBe(contractName);
   expect(deserialized.conditionCode).toBe(conditionCode);

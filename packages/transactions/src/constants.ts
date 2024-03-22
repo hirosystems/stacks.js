@@ -1,13 +1,6 @@
-/**
- * The chain ID (unsigned 32-bit integer), used so transactions can't be replayed on other chains.
- * Similar to the {@link TransactionVersion}.
- */
-export enum ChainID {
-  Testnet = 0x80000000,
-  Mainnet = 0x00000001,
-}
+/** @ignore internal */
+export const BLOCKSTACK_DEFAULT_GAIA_HUB_URL = 'https://hub.blockstack.org';
 
-export const DEFAULT_CHAIN_ID = ChainID.Mainnet;
 export const MAX_STRING_LENGTH_BYTES = 128;
 export const CLARITY_INT_SIZE = 128;
 export const CLARITY_INT_BYTE_SIZE = 16;
@@ -16,7 +9,6 @@ export const RECOVERABLE_ECDSA_SIG_LENGTH_BYTES = 65;
 export const COMPRESSED_PUBKEY_LENGTH_BYTES = 32;
 export const UNCOMPRESSED_PUBKEY_LENGTH_BYTES = 64;
 export const MEMO_MAX_LENGTH_BYTES = 34;
-export const DEFAULT_CORE_NODE_API_URL = 'https://api.mainnet.hiro.so';
 
 // todo: add explicit enum values
 /**
@@ -100,22 +92,10 @@ const AnchorModeMap = {
 };
 
 /** @ignore */
-export function anchorModeFromNameOrValue(mode: AnchorModeName | AnchorMode): AnchorMode {
+export function anchorModeFrom(mode: AnchorModeName | AnchorMode): AnchorMode {
   if (mode in AnchorModeMap) return AnchorModeMap[mode];
   throw new Error(`Invalid anchor mode "${mode}", must be one of: ${AnchorModeNames.join(', ')}`);
 }
-
-/**
- * The transaction version, used so transactions can't be replayed on other networks.
- * Similar to the {@link ChainID}.
- * Used internally for serializing and deserializing transactions.
- */
-export enum TransactionVersion {
-  Mainnet = 0x00,
-  Testnet = 0x80,
-}
-
-export const DEFAULT_TRANSACTION_VERSION = TransactionVersion.Mainnet;
 
 /**
  * How to treat unspecified transfers of a transaction.
@@ -218,7 +198,7 @@ export enum NonFungibleConditionCode {
 /**
  * The type of sender for a post-condition.
  */
-export enum PostConditionPrincipalID {
+export enum PostConditionPrincipalId {
   Origin = 0x01,
   Standard = 0x02,
   Contract = 0x03,
@@ -252,13 +232,6 @@ export enum TxRejectedReason {
   BadAddressVersionByte = 'BadAddressVersionByte',
   NoCoinbaseViaMempool = 'NoCoinbaseViaMempool',
   ServerFailureNoSuchChainTip = 'ServerFailureNoSuchChainTip',
-  TooMuchChaining = 'TooMuchChaining',
-  ConflictingNonceInMempool = 'ConflictingNonceInMempool',
-  BadTransactionVersion = 'BadTransactionVersion',
-  TransferRecipientCannotEqualSender = 'TransferRecipientCannotEqualSender',
-  TransferAmountMustBePositive = 'TransferAmountMustBePositive',
   ServerFailureDatabase = 'ServerFailureDatabase',
-  EstimatorError = 'EstimatorError',
-  TemporarilyBlacklisted = 'TemporarilyBlacklisted',
   ServerFailureOther = 'ServerFailureOther',
 }

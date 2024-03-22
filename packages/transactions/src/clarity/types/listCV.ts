@@ -18,7 +18,7 @@ interface ListCV<T extends ClarityValue = ClarityValue> {
  *  import { listCV, intCV } from '@stacks/transactions';
  *
  *  const list = listCV([intCV(1), intCV(2), intCV(3), intCV(-4)]);
- *  // { type: 11, list: [ { type: 0, value: 1n }, { type: 0, value: 2n }, { type: 0, value: 3n }, { type: 0, value: -4n } ] }
+ *  // { type: 'list', list: [ { type: 0, value: 1n }, { type: 0, value: 2n }, { type: 0, value: 3n }, { type: 0, value: -4n } ] }
  * ```
  *
  * @see

@@ -1,4 +1,6 @@
-import {
+// todo: use `export *` for more exports here
+
+export {
   ClarityValue,
   getCVTypeString,
   cvToString,
@@ -6,15 +8,13 @@ import {
   cvToValue,
   isClarityType,
 } from './clarityValue';
-import { ClarityType } from './constants';
-import { BooleanCV, TrueCV, FalseCV, trueCV, falseCV, boolCV } from './types/booleanCV';
-import { IntCV, UIntCV, intCV, uintCV } from './types/intCV';
-import { BufferCV, bufferCV, bufferCVFromString } from './types/bufferCV';
-import { OptionalCV, NoneCV, SomeCV, noneCV, someCV, optionalCVOf } from './types/optionalCV';
+export * from './constants';
+export { BooleanCV, TrueCV, FalseCV, trueCV, falseCV, boolCV } from './types/booleanCV';
+export { IntCV, UIntCV, intCV, uintCV } from './types/intCV';
+export { BufferCV, bufferCV, bufferCVFromString } from './types/bufferCV';
+export { OptionalCV, NoneCV, SomeCV, noneCV, someCV, optionalCVOf } from './types/optionalCV';
 
-// todo: reduce manual re-exporting
-
-import {
+export {
   ResponseCV,
   ResponseOkCV,
   ResponseErrorCV,
@@ -22,7 +22,7 @@ import {
   responseErrorCV,
 } from './types/responseCV';
 
-import {
+export {
   StandardPrincipalCV,
   ContractPrincipalCV,
   standardPrincipalCV,
@@ -35,74 +35,14 @@ import {
   principalToString,
 } from './types/principalCV';
 
-import { ListCV, listCV } from './types/listCV';
-import { TupleCV, tupleCV } from './types/tupleCV';
-import {
+export { ListCV, listCV } from './types/listCV';
+export { TupleCV, tupleCV } from './types/tupleCV';
+export {
   StringAsciiCV,
   StringUtf8CV,
   stringUtf8CV,
   stringAsciiCV,
   stringCV,
 } from './types/stringCV';
-import { serializeCV } from './serialize';
-import deserializeCV from './deserialize';
-
-// Types
-export {
-  ClarityType,
-  ClarityValue,
-  BooleanCV,
-  TrueCV,
-  FalseCV,
-  IntCV,
-  UIntCV,
-  BufferCV,
-  OptionalCV,
-  NoneCV,
-  SomeCV,
-  ResponseCV,
-  ResponseOkCV,
-  ResponseErrorCV,
-  PrincipalCV,
-  StandardPrincipalCV,
-  ContractPrincipalCV,
-  ListCV,
-  TupleCV,
-  StringAsciiCV,
-  StringUtf8CV,
-};
-
-// Value construction functions
-export {
-  boolCV,
-  trueCV,
-  falseCV,
-  intCV,
-  uintCV,
-  bufferCV,
-  bufferCVFromString,
-  noneCV,
-  someCV,
-  optionalCVOf,
-  responseOkCV,
-  responseErrorCV,
-  principalCV,
-  standardPrincipalCV,
-  standardPrincipalCVFromAddress,
-  contractPrincipalCV,
-  contractPrincipalCVFromAddress,
-  contractPrincipalCVFromStandard,
-  listCV,
-  tupleCV,
-  stringCV,
-  stringAsciiCV,
-  stringUtf8CV,
-  getCVTypeString,
-  isClarityType,
-};
-
-// Serialization
-export { serializeCV, deserializeCV };
-
-// toString
-export { cvToString, cvToJSON, cvToValue, principalToString };
+export { serializeCV } from './serialize';
+export { deserializeCV } from './deserialize';

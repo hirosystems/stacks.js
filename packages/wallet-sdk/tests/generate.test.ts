@@ -13,7 +13,6 @@ import {
 // Reference: https://github.com/paulmillr/scure-bip39
 import { wordlist } from '@scure/bip39/wordlists/english';
 import { bytesToHex } from '@stacks/common';
-import { TransactionVersion } from '@stacks/transactions';
 import {
   generateSecretKey,
   generateWallet,
@@ -21,6 +20,7 @@ import {
   getGaiaAddress,
   getStxAddress,
 } from '../src';
+import { TransactionVersion } from '@stacks/network';
 
 describe(generateSecretKey, () => {
   test('generates a 24 word phrase by default', () => {
