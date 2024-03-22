@@ -1,6 +1,6 @@
 {
   "name": "@stacks/transactions",
-  "version": "6.12.1",
+  "version": "6.13.0",
   "description": "Javascript library for constructing transactions on the Stacks blockchain.",
   "license": "MIT",
   "author": "Hiro Systems PBC (https://hiro.so)",
@@ -27,13 +27,13 @@
   "dependencies": {
     "@noble/hashes": "1.1.5",
     "@noble/secp256k1": "1.7.1",
-    "@stacks/common": "^6.10.0",
-    "@stacks/network": "^6.11.3",
+    "@stacks/common": "^6.13.0",
+    "@stacks/network": "^6.13.0",
     "c32check": "^2.0.0",
     "lodash.clonedeep": "^4.5.0"
   },
   "devDependencies": {
-    "@stacks/encryption": "^6.12.1",
+    "@stacks/encryption": "^6.13.0",
     "@types/common-tags": "^1.8.0",
     "@types/elliptic": "^6.4.12",
     "@types/lodash.clonedeep": "^4.5.6",
