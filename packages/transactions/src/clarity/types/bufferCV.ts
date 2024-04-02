@@ -28,7 +28,8 @@ interface BufferCV {
  * {@link https://github.com/hirosystems/stacks.js/blob/main/packages/transactions/tests/clarity.test.ts | clarity test cases for more examples}
  */
 const bufferCV = (buffer: Uint8Array): BufferCV => {
-  if (buffer.byteLength > 1_048_576) { // 1024 * 1024 = 1MB
+  // max size 1024 * 1024 = 1MB; https://github.com/stacks-network/stacks-core/blob/c50a93088d7c0261f1dbe31ab24b95028a038447/clarity/src/vm/types/mod.rs#L47
+  if (buffer.byteLength > 1_048_576) {
     throw new Error('Cannot construct clarity buffer that is greater than 1MB');
   }
 
