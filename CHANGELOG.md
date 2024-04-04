@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.13.1](https://github.com/hirosystems/stacks.js/compare/v6.13.0...v6.13.1) (2024-04-04)
+
+
+### Bug Fixes
+
+* consolidate authId types ([7e0fdc6](https://github.com/hirosystems/stacks.js/commit/7e0fdc66161a434bd0abd03589af187e64ac399b))
+* remove empty signer_key from stacker info response type ([f700a7f](https://github.com/hirosystems/stacks.js/commit/f700a7f832f66cd2021666ffbaa03b4a0f5ef803))
+* update buffer max size to correct 1MB limit ([#1665](https://github.com/hirosystems/stacks.js/issues/1665)) ([91b5dab](https://github.com/hirosystems/stacks.js/commit/91b5dabf2d48616ece00a7075ad1aebc92508e6f))
+
+
+
 ## [6.13.0](https://github.com/hirosystems/stacks.js/compare/v6.12.1...v6.13.0) (2024-03-22)
 
 

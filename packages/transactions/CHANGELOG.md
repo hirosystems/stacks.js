@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.13.1](https://github.com/hirosystems/stacks.js/compare/v6.13.0...v6.13.1) (2024-04-04)
+
+
+### Bug Fixes
+
+* update buffer max size to correct 1MB limit ([#1665](https://github.com/hirosystems/stacks.js/issues/1665)) ([91b5dab](https://github.com/hirosystems/stacks.js/commit/91b5dabf2d48616ece00a7075ad1aebc92508e6f))
+
+
+
 ## [6.13.0](https://github.com/hirosystems/stacks.js/compare/v6.12.1...v6.13.0) (2024-03-22)
 
 
