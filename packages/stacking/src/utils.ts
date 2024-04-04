@@ -415,7 +415,7 @@ export interface Pox4SignatureOptions {
   /** Maximum amount of uSTX that can be locked during this function call */
   maxAmount: IntegerType;
   /** Random integer to prevent signature re-use */
-  authId: number;
+  authId: IntegerType;
 }
 
 /**

@@ -1,4 +1,4 @@
-import { IntegerType, bytesToHex, hexToBytes, intToBigInt } from '@stacks/common';
+import { IntegerType, hexToBytes, intToBigInt } from '@stacks/common';
 import { StacksNetwork } from '@stacks/network';
 import {
   BurnchainRewardListResponse,
@@ -1571,7 +1571,7 @@ export class StackingClient {
     period: number;
     signerPrivateKey: StacksPrivateKey;
     maxAmount: IntegerType;
-    authId: number;
+    authId: IntegerType;
   }) {
     // todo: in the future add logic to determine if a later version of pox
     // needs a different domain and thus use a different `signPox4SignatureHash`
