@@ -133,7 +133,6 @@ export type StackerInfo =
           version: Uint8Array;
           hashbytes: Uint8Array;
         };
-        signer_key?: string;
       };
     };
 
@@ -1436,7 +1435,6 @@ export class StackingClient {
         const lockPeriod: UIntCV = tupleCV.data['lock-period'] as UIntCV;
         const version: BufferCV = poxAddress.data['version'] as BufferCV;
         const hashbytes: BufferCV = poxAddress.data['hashbytes'] as BufferCV;
-        const signerKey: BufferCV = tupleCV.data['signer-key'] as BufferCV;
 
         return {
           stacked: true,
@@ -1448,7 +1446,6 @@ export class StackingClient {
               version: version.buffer,
               hashbytes: hashbytes.buffer,
             },
-            signer_key: signerKey ? bytesToHex(signerKey.buffer) : undefined,
           },
         };
       } else if (responseCV.type === ClarityType.OptionalNone) {
