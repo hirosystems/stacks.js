@@ -357,6 +357,14 @@ export interface StackAggregationIncreaseOptions {
   rewardCycle: number;
   rewardIndex: number;
   privateKey: string;
+  /** hex-encoded signer key `(buff 33)`, required for >= PoX-4 */
+  signerKey?: string;
+  /** hex-encoded signature `(buff 65)`, required for >= PoX-4 */
+  signerSignature?: string;
+  /** Maximum amount of STX that can be locked in this transaction, required for >= PoX-4 */
+  maxAmount?: IntegerType;
+  /** Random integer to prevent re-use of signer signature, required for >= PoX-4 */
+  authId?: IntegerType;
 }
 
 export class StackingClient {
@@ -988,17 +996,26 @@ export class StackingClient {
     poxAddress,
     rewardCycle,
     rewardIndex,
+    signerKey,
+    signerSignature,
+    maxAmount,
+    authId,
     ...txOptions
   }: StackAggregationIncreaseOptions & BaseTxOptions): Promise<TxBroadcastResult> {
     // todo: deprecate this method in favor of Indexed as soon as PoX-2 is live
     const contract = await this.getStackingContract();
     ensureLegacyBtcAddressForPox1({ contract, poxAddress });
+    ensureSignerArgsReadiness({ contract, signerKey, signerSignature, maxAmount, authId });
 
     const callOptions = this.getStackAggregationIncreaseOptions({
       contract,
       poxAddress,
       rewardCycle,
       rewardCycleIndex: rewardIndex,
+      signerKey,
+      signerSignature,
+      maxAmount,
+      authId,
     });
     const tx = await makeContractCall({
       ...callOptions,
@@ -1333,19 +1350,37 @@ export class StackingClient {
     poxAddress,
     rewardCycle,
     rewardCycleIndex,
+    signerKey,
+    signerSignature,
+    maxAmount,
+    authId,
   }: {
     contract: string;
     poxAddress: string;
     rewardCycle: number;
     rewardCycleIndex: number;
+    signerKey?: string;
+    signerSignature?: string;
+    maxAmount?: IntegerType;
+    authId?: IntegerType;
   }) {
     const address = poxAddressToTuple(poxAddress);
     const [contractAddress, contractName] = this.parseContractId(contract);
+
+    const functionArgs = [address, uintCV(rewardCycle), uintCV(rewardCycleIndex)] as ClarityValue[];
+
+    if (signerKey && maxAmount && typeof authId !== 'undefined') {
+      functionArgs.push(signerSignature ? someCV(bufferCV(hexToBytes(signerSignature))) : noneCV());
+      functionArgs.push(bufferCV(hexToBytes(signerKey)));
+      functionArgs.push(uintCV(maxAmount));
+      functionArgs.push(uintCV(authId));
+    }
+
     const callOptions: ContractCallOptions = {
       contractAddress,
       contractName,
       functionName: 'stack-aggregation-increase',
-      functionArgs: [address, uintCV(rewardCycle), uintCV(rewardCycleIndex)],
+      functionArgs,
       validateWithAbi: true,
       network: this.network,
       anchorMode: AnchorMode.Any,
