@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.13.2](https://github.com/hirosystems/stacks.js/compare/v6.13.1...v6.13.2) (2024-04-11)
+
+
+### Bug Fixes
+
+* add missing signer topic ([#1671](https://github.com/hirosystems/stacks.js/issues/1671)) ([9db023e](https://github.com/hirosystems/stacks.js/commit/9db023e324f8de351c8e3f0078d52dea84f84610))
+* add signer opts to agg increase ([#1669](https://github.com/hirosystems/stacks.js/issues/1669)) ([61d9d98](https://github.com/hirosystems/stacks.js/commit/61d9d980a752d8d76c48ad758c212fb024e1b4bc))
+
+
+
 ## [6.13.1](https://github.com/hirosystems/stacks.js/compare/v6.13.0...v6.13.1) (2024-04-04)
 
 
