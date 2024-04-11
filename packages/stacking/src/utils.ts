@@ -399,6 +399,7 @@ export function ensureSignerArgsReadiness({
 export enum Pox4SignatureTopic {
   StackStx = 'stack-stx',
   AggregateCommit = 'agg-commit',
+  AggregateIncrease = 'agg-increase',
   StackExtend = 'stack-extend',
   StackIncrease = 'stack-increase',
 }
