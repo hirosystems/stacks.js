@@ -80,6 +80,8 @@ const maxAmount = 100000000000n;
 // the auth id of the signer (a random id to not allow reusing the signature)
 const authId = 702;
 
+const signerPrivateKey = makeRandomPrivKey(); // replace with your signer private key
+
 const signature = client.signPoxSignature({
   topic: 'stack-stx', // the topic of the transaction
   poxAddress,
@@ -92,7 +94,7 @@ const signature = client.signPoxSignature({
 ```
 
 > [!WARNING]
-> Make sure to replace `signerPrivateKey` with the signer private key of your setup.
+> Make sure to replace `signerPrivateKey` with the signer private key of your setup and keep it private.
 
 ### Topics
 
