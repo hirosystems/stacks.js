@@ -30,6 +30,7 @@ import {
   principalCV,
   principalToString,
   someCV,
+  stringAsciiCV,
   uintCV,
   validateStacksAddress,
 } from '@stacks/transactions';
@@ -1539,6 +1540,58 @@ export class StackingClient {
         throw new Error(`Error fetching delegation info`);
       }
     });
+  }
+
+  /**
+   * Call the `verify-signer-key-sig` read-only function on the PoX contract.
+   * @returns (async) a boolean indicating if the signature is valid
+   */
+  async verifySignerKeySignature({
+    topic,
+    poxAddress,
+    rewardCycle,
+    period,
+    signerSignature,
+    signerKey,
+    amount,
+    maxAmount,
+    authId,
+  }: {
+    topic: string;
+    poxAddress: string;
+    rewardCycle: number;
+    period: number;
+    signerSignature?: string;
+    signerKey: string;
+    amount: IntegerType;
+    maxAmount: IntegerType;
+    authId: IntegerType;
+  }): Promise<boolean> {
+    const poxInfo = await this.getPoxInfo();
+
+    const [contractAddress, contractName] = this.parseContractId(poxInfo.contract_id);
+    const functionName = 'verify-signer-key-sig';
+
+    const functionArgs = [
+      poxAddressToTuple(poxAddress),
+      uintCV(rewardCycle),
+      stringAsciiCV(topic),
+      uintCV(period),
+      signerSignature ? someCV(bufferCV(hexToBytes(signerSignature))) : noneCV(),
+      bufferCV(hexToBytes(signerKey)),
+      uintCV(amount),
+      uintCV(maxAmount),
+      uintCV(authId),
+    ];
+
+    return callReadOnlyFunction({
+      contractAddress,
+      contractName,
+      functionName,
+      functionArgs,
+      network: this.network,
+      senderAddress: this.address,
+    }).then(responseCV => responseCV.type === ClarityType.ResponseOk);
   }
 
   /**
