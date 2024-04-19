@@ -1,22 +1,22 @@
-import { cloneDeep } from './utils';
+import { hexToBytes, utf8ToBytes } from '@stacks/common';
 import {
-  ClarityValue,
-  uintCV,
-  intCV,
-  contractPrincipalCV,
-  standardPrincipalCV,
-  noneCV,
-  bufferCV,
-  falseCV,
-  trueCV,
   ClarityType,
-  getCVTypeString,
+  ClarityValue,
+  bufferCV,
   bufferCVFromString,
+  contractPrincipalCV,
+  falseCV,
+  getCVTypeString,
+  intCV,
+  noneCV,
+  standardPrincipalCV,
+  trueCV,
+  uintCV,
 } from './clarity';
-import { ContractCallPayload } from './payload';
-import { NotImplementedError } from './errors';
 import { stringAsciiCV, stringUtf8CV } from './clarity/types/stringCV';
-import { utf8ToBytes } from '@stacks/common';
+import { NotImplementedError } from './errors';
+import { ContractCallPayload } from './payload';
+import { cloneDeep } from './utils';
 
 // From https://github.com/blockstack/stacks-blockchain-sidecar/blob/master/src/event-stream/contract-abi.ts
 
@@ -172,7 +172,7 @@ function encodeClarityValue(
     case ClarityAbiTypeId.ClarityAbiTypeNone:
       return noneCV();
     case ClarityAbiTypeId.ClarityAbiTypeBuffer:
-      return bufferCV(utf8ToBytes(val));
+      return bufferCV(hexToBytes(val));
     case ClarityAbiTypeId.ClarityAbiTypeStringAscii:
       return stringAsciiCV(val);
     case ClarityAbiTypeId.ClarityAbiTypeStringUtf8:
