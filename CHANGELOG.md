@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.14.0](https://github.com/hirosystems/stacks.js/compare/v6.13.2...v6.14.0) (2024-04-19)
+
+
+### Features
+
+* add verifySignerKeySignature read-only to StackingClient ([9ddbf9b](https://github.com/hirosystems/stacks.js/commit/9ddbf9b9f29c4da016db03854ee57dbd842f87e8))
+
+
+
 ## [6.13.2](https://github.com/hirosystems/stacks.js/compare/v6.13.1...v6.13.2) (2024-04-11)
 
 

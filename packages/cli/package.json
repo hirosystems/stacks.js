@@ -1,6 +1,6 @@
 {
   "name": "@stacks/cli",
-  "version": "6.13.2",
+  "version": "6.14.0",
   "description": "Stacks command line tool",
   "license": "MIT",
   "author": "Hiro Systems PBC (https://hiro.so)",
@@ -26,7 +26,7 @@
     "@stacks/common": "^6.13.0",
     "@stacks/encryption": "^6.13.1",
     "@stacks/network": "^6.13.0",
-    "@stacks/stacking": "^6.13.2",
+    "@stacks/stacking": "^6.14.0",
     "@stacks/storage": "^6.13.1",
     "@stacks/transactions": "^6.13.1",
     "@stacks/wallet-sdk": "^6.13.1",
