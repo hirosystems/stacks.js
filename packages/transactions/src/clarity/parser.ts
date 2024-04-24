@@ -1,0 +1,237 @@
+import { Cl, ClarityValue, TupleCV } from '..';
+
+// COMBINATOR TYPES
+type Combinator = (str: string) => ParseResult;
+
+type ParseResult = ParseSuccess | ParseFail;
+
+type Capture = ClarityValue | string;
+
+interface ParseSuccess {
+  success: true;
+  value: string;
+  rest: string;
+  capture?: Capture;
+}
+
+interface ParseFail {
+  success: false;
+}
+
+// GENERAL COMBINATORS
+function regex(pattern: RegExp, map?: (value: string) => ClarityValue): Combinator {
+  return (s: string) => {
+    const match = s.match(pattern);
+    if (!match || match.index !== 0) return { success: false };
+    return {
+      success: true,
+      value: match[0],
+      rest: s.substring(match[0].length),
+      capture: map ? map(match[0]) : undefined,
+    };
+  };
+}
+
+function whitespace(): Combinator {
+  return regex(/\s+/);
+}
+
+function lazy(c: () => Combinator): Combinator {
+  return (s: string) => c()(s);
+}
+
+function either(combinators: Combinator[]): Combinator {
+  return (s: string) => {
+    for (const c of combinators) {
+      const result = c(s);
+      if (result.success) return result;
+    }
+    return { success: false };
+  };
+}
+
+function entire(combinator: Combinator): Combinator {
+  return (s: string) => {
+    const result = combinator(s);
+    if (!result.success || result.rest) return { success: false };
+    return result;
+  };
+}
+
+function optional(c: Combinator): Combinator {
+  return (s: string) => {
+    const result = c(s);
+    if (result.success) return result;
+    return {
+      success: true,
+      value: '',
+      rest: s,
+    };
+  };
+}
+
+function sequence(
+  combinators: Combinator[],
+  reduce: (values: Capture[]) => Capture = v => v[0]
+): Combinator {
+  return (s: string) => {
+    let rest = s;
+    let value = '';
+    const captures: Capture[] = [];
+
+    for (const c of combinators) {
+      const result = c(rest);
+      if (!result.success) return { success: false };
+
+      rest = result.rest;
+      value += result.value;
+      if (result.capture) captures.push(result.capture);
+    }
+
+    return {
+      success: true,
+      value,
+      rest,
+      capture: reduce(captures),
+    };
+  };
+}
+
+// todo: push down if only used in `parens`
+function chain(
+  combinators: Combinator[],
+  reduce: (values: Capture[]) => Capture = v => v[0]
+): Combinator {
+  const joined = combinators.flatMap((combinator, index) =>
+    index === 0 ? [combinator] : [optional(whitespace()), combinator]
+  );
+  return sequence(joined, reduce);
+}
+
+function parens(combinator: Combinator): Combinator {
+  return chain([regex(/\(/), combinator, regex(/\)/)]);
+}
+
+function greedy(
+  min: number,
+  combinator: Combinator,
+  reduce: (values: Capture[]) => Capture = v => v[v.length - 1]
+): Combinator {
+  return (s: string) => {
+    let rest = s;
+    let value = '';
+    const captures: Capture[] = [];
+
+    let count;
+    for (count = 0; ; count++) {
+      const result = combinator(rest);
+      if (!result.success) break;
+      rest = result.rest;
+      value += result.value;
+      if (result.capture) captures.push(result.capture);
+    }
+
+    if (count < min) return { success: false };
+    return {
+      success: true,
+      value,
+      rest,
+      capture: reduce(captures),
+    };
+  };
+}
+
+function capture(combinator: Combinator, map?: (value: string) => Capture): Combinator {
+  return (s: string) => {
+    const result = combinator(s);
+    if (!result.success) return { success: false };
+    return {
+      success: true,
+      value: result.value,
+      rest: result.rest,
+      capture: map ? map(result.value) : result.value,
+    };
+  };
+}
+
+// CLARITY VALUE PARSERS
+function clInt(): Combinator {
+  return capture(regex(/\-?[0-9]+/), v => Cl.int(parseInt(v)));
+}
+
+function clUint(): Combinator {
+  return sequence([regex(/u/), capture(regex(/[0-9]+/), v => Cl.uint(parseInt(v)))]);
+}
+
+function clBool(): Combinator {
+  return capture(regex(/true|false/), v => Cl.bool(v === 'true'));
+}
+
+function clPrincipal(): Combinator {
+  return sequence([
+    regex(/\'/),
+    capture(
+      sequence([regex(/[A-Z0-9]+/), optional(sequence([regex(/\./), regex(/[a-zA-Z0-9\-]+/)]))]),
+      Cl.address
+    ),
+  ]);
+}
+
+function clBuffer(): Combinator {
+  return sequence([regex(/0x/), capture(regex(/[0-9a-fA-F]+/), Cl.bufferFromHex)]);
+}
+
+function clAscii(): Combinator {
+  return sequence([regex(/"/), capture(regex(/[^"]*/), Cl.stringAscii), regex(/"/)]);
+}
+
+function clUtf8(): Combinator {
+  return sequence([regex(/u"/), capture(regex(/[^"]*/), Cl.stringUtf8), regex(/"/)]);
+}
+
+function clList(): Combinator {
+  return parens(
+    sequence([
+      regex(/list/),
+      greedy(0, sequence([whitespace(), clValue()]), c => Cl.list(c as ClarityValue[])),
+    ])
+  );
+}
+
+function clTuple(): Combinator {
+  // todo: add `(tuple` syntax
+  return chain([
+    regex(/\{/),
+    greedy(
+      1,
+      // rows
+      sequence(
+        [
+          optional(whitespace()),
+          capture(regex(/[a-zA-Z][a-zA-Z0-9_]*/)),
+          regex(/\s*\:/),
+          whitespace(),
+          clValue(),
+          regex(/\s*\,?/),
+        ],
+        ([k, v]) => Cl.tuple({ [k as string]: v as ClarityValue })
+      ),
+      c => Cl.tuple(Object.assign({}, ...c.map(t => (t as TupleCV).data)))
+    ),
+    regex(/\}/),
+  ]);
+}
+
+function clValue(map: (combinator: Combinator) => Combinator = v => v) {
+  return either(
+    [clInt, clUint, clBool, clPrincipal, clAscii, clBuffer, clUtf8, clList, clTuple, clSome]
+      .map(lazy)
+      .map(map)
+  );
+}
+
+export function parse(clarityValueString: string): ClarityValue {
+  const result = clValue(entire)(clarityValueString);
+  if (!result.success || !result.capture) throw 'Parse error'; // todo: we can add better error messages and add position tracking
+  return result.capture as ClarityValue;
+}
