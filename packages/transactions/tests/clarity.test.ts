@@ -6,40 +6,41 @@ import {
   hexToBytes,
   utf8ToBytes,
 } from '@stacks/common';
+import assert from 'assert';
+import { Cl } from '../src';
 import { BytesReader } from '../src/bytesReader';
 import {
-  bufferCV,
   BufferCV,
   ClarityType,
   ClarityValue,
+  IntCV,
+  ListCV,
+  SomeCV,
+  StandardPrincipalCV,
+  StringAsciiCV,
+  StringUtf8CV,
+  TupleCV,
+  UIntCV,
+  bufferCV,
   contractPrincipalCV,
   contractPrincipalCVFromStandard,
   deserializeCV,
   falseCV,
-  IntCV,
   intCV,
   listCV,
-  ListCV,
   noneCV,
   responseErrorCV,
   responseOkCV,
   serializeCV,
   someCV,
-  SomeCV,
   standardPrincipalCV,
-  StandardPrincipalCV,
   standardPrincipalCVFromAddress,
   stringAsciiCV,
-  StringAsciiCV,
   stringUtf8CV,
-  StringUtf8CV,
   trueCV,
   tupleCV,
-  TupleCV,
   uintCV,
-  UIntCV,
 } from '../src/clarity';
-import { Cl } from '../src';
 import {
   cvToJSON,
   cvToString,
@@ -47,9 +48,9 @@ import {
   getCVTypeString,
   isClarityType,
 } from '../src/clarity/clarityValue';
+import { parse } from '../src/clarity/parser';
 import { addressToString } from '../src/common';
 import { deserializeAddress } from '../src/types';
-import assert from 'assert';
 
 const ADDRESS = 'SP2JXKMSH007NPYAQHKJPQMAQYAD90NQGTVJVQ02B';
 
@@ -708,4 +709,36 @@ describe('Clarity Types', () => {
       intTest; // avoid the "value is never read warning"
     });
   });
+});
+
+const TEST_CASES_PARSER = [
+  { input: '123', expected: Cl.int(123) },
+  { input: '0', expected: Cl.int(0) },
+  { input: '-15', expected: Cl.int(-15) },
+  { input: 'u123', expected: Cl.uint(123) },
+  { input: 'u0', expected: Cl.uint(0) },
+  { input: 'true', expected: Cl.bool(true) },
+  { input: 'false', expected: Cl.bool(false) },
+  {
+    input: "'SP2JXKMSH007NPYAQHKJPQMAQYAD90NQGTVJVQ02B",
+    expected: Cl.address('SP2JXKMSH007NPYAQHKJPQMAQYAD90NQGTVJVQ02B'),
+  },
+  {
+    input: "'SP2JXKMSH007NPYAQHKJPQMAQYAD90NQGTVJVQ02B.some-contract",
+    expected: Cl.address('SP2JXKMSH007NPYAQHKJPQMAQYAD90NQGTVJVQ02B.some-contract'),
+  },
+  { input: '0x68656c6c6f21', expected: Cl.bufferFromHex('68656c6c6f21') },
+  { input: '"hello world"', expected: Cl.stringAscii('hello world') },
+  { input: 'u"hello world"', expected: Cl.stringUtf8('hello world') },
+  { input: '(list 1 2 3)', expected: Cl.list([Cl.int(1), Cl.int(2), Cl.int(3)]) },
+  { input: '( list  1   2    3 )', expected: Cl.list([Cl.int(1), Cl.int(2), Cl.int(3)]) },
+  { input: '( list )', expected: Cl.list([]) },
+  { input: '(list)', expected: Cl.list([]) },
+] as const;
+
+test.each(TEST_CASES_PARSER)('clarity parser %p', ({ input, expected }) => {
+  const result = parse(input);
+
+  if (!result.success) throw 'parse fail';
+  expect(result.clarity).toEqual(expected);
 });
