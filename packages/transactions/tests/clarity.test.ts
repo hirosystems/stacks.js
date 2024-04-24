@@ -742,9 +742,24 @@ const TEST_CASES_PARSER = [
     input: '{something : (list 3 2 1),}',
     expected: Cl.tuple({ something: Cl.list([Cl.int(3), Cl.int(2), Cl.int(1)]) }),
   },
+  { input: 'none', expected: Cl.none() },
+  { input: '( some u1 )', expected: Cl.some(Cl.uint(1)) },
+  { input: '(some none)', expected: Cl.some(Cl.none()) },
+  { input: '( ok  true   )', expected: Cl.ok(Cl.bool(true)) },
+  { input: '(err false)', expected: Cl.error(Cl.bool(false)) },
+  {
+    input: '( ok (list {id: 3} {id: 4} {id: 5} ))',
+    expected: Cl.ok(
+      Cl.list([
+        Cl.tuple({ id: Cl.int(3) }),
+        Cl.tuple({ id: Cl.int(4) }),
+        Cl.tuple({ id: Cl.int(5) }),
+      ])
+    ),
+  },
 ] as const;
 
-test.each(TEST_CASES_PARSER)('clarity parser', ({ input, expected }) => {
+test.each(TEST_CASES_PARSER)('clarity parser %p', ({ input, expected }) => {
   const result = parse(input);
   expect(result).toEqual(expected);
 });

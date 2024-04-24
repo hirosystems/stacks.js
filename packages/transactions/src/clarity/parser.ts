@@ -222,9 +222,43 @@ function clTuple(): Combinator {
   ]);
 }
 
+function clNone(): Combinator {
+  return capture(regex(/none/), Cl.none);
+}
+
+function clSome(): Combinator {
+  return parens(
+    sequence([regex(/some/), whitespace(), clValue()], c => Cl.some(c[0] as ClarityValue))
+  );
+}
+
+function clOk(): Combinator {
+  return parens(sequence([regex(/ok/), whitespace(), clValue()], c => Cl.ok(c[0] as ClarityValue)));
+}
+
+function clErr(): Combinator {
+  return parens(
+    sequence([regex(/err/), whitespace(), clValue()], c => Cl.error(c[0] as ClarityValue))
+  );
+}
+
 function clValue(map: (combinator: Combinator) => Combinator = v => v) {
   return either(
-    [clInt, clUint, clBool, clPrincipal, clAscii, clBuffer, clUtf8, clList, clTuple, clSome]
+    [
+      clInt,
+      clUint,
+      clBool,
+      clPrincipal,
+      clAscii,
+      clBuffer,
+      clUtf8,
+      clList,
+      clTuple,
+      clNone,
+      clSome,
+      clOk,
+      clErr,
+    ]
       .map(lazy)
       .map(map)
   );
