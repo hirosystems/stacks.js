@@ -734,11 +734,19 @@ const TEST_CASES_PARSER = [
   { input: '( list  1   2    3 )', expected: Cl.list([Cl.int(1), Cl.int(2), Cl.int(3)]) },
   { input: '( list )', expected: Cl.list([]) },
   { input: '(list)', expected: Cl.list([]) },
+  {
+    input: '{ id: u5, name: "clarity" }',
+    expected: Cl.tuple({ id: Cl.uint(5), name: Cl.stringAscii('clarity') }),
+  },
+  {
+    input: '{something : (list 3 2 1),}',
+    expected: Cl.tuple({ something: Cl.list([Cl.int(3), Cl.int(2), Cl.int(1)]) }),
+  },
 ] as const;
 
-test.each(TEST_CASES_PARSER)('clarity parser %p', ({ input, expected }) => {
+test.each(TEST_CASES_PARSER)('clarity parser', ({ input, expected }) => {
   const result = parse(input);
-
-  if (!result.success) throw 'parse fail';
-  expect(result.clarity).toEqual(expected);
+  expect(result).toEqual(expected);
 });
+
+// const TEST_CASES_PARSER_THROW = []; // todo: e.g. `{}`
