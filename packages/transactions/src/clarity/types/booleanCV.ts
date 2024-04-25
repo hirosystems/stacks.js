@@ -20,7 +20,7 @@ interface FalseCV {
  *  import { trueCV } from '@stacks/transactions';
  *
  *  const trueCV = trueCV();
- *  // { type: 3 }
+ *  // { type: 'true' }
  * ```
  *
  * @see
@@ -38,7 +38,7 @@ const trueCV = (): BooleanCV => ({ type: ClarityType.BoolTrue });
  *  import { falseCV } from '@stacks/transactions';
  *
  *  const falseCV = falseCV();
- *  // { type: 4 }
+ *  // { type: 'false' }
  * ```
  *
  * @see
@@ -56,7 +56,7 @@ const falseCV = (): BooleanCV => ({ type: ClarityType.BoolFalse });
  *  import { boolCV } from '@stacks/transactions';
  *
  *  const boolCV = boolCV(false);
- *  // { type: 4 }
+ *  // { type: 'false' }
  * ```
  *
  * @see

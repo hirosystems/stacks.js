@@ -22,6 +22,7 @@
   "dependencies": {
     "@noble/hashes": "1.1.5",
     "@scure/base": "1.1.1",
+    "@stacks/api": "file:../api",
     "@stacks/common": "^6.13.0",
     "@stacks/encryption": "^6.13.1",
     "@stacks/network": "^6.13.0",

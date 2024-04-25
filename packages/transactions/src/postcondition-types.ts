@@ -2,7 +2,7 @@ import {
   FungibleConditionCode,
   MAX_STRING_LENGTH_BYTES,
   NonFungibleConditionCode,
-  PostConditionPrincipalID,
+  PostConditionPrincipalId,
   PostConditionType,
   StacksMessageType,
 } from './constants';
@@ -13,13 +13,13 @@ import { exceedsMaxLengthBytes } from './utils';
 
 export interface StandardPrincipal {
   readonly type: StacksMessageType.Principal;
-  readonly prefix: PostConditionPrincipalID.Standard;
+  readonly prefix: PostConditionPrincipalId.Standard;
   readonly address: Address;
 }
 
 export interface ContractPrincipal {
   readonly type: StacksMessageType.Principal;
-  readonly prefix: PostConditionPrincipalID.Contract;
+  readonly prefix: PostConditionPrincipalId.Contract;
   readonly address: Address;
   readonly contractName: LengthPrefixedString;
 }
@@ -144,7 +144,7 @@ export function createContractPrincipal(
   const name = createLPString(contractName);
   return {
     type: StacksMessageType.Principal,
-    prefix: PostConditionPrincipalID.Contract,
+    prefix: PostConditionPrincipalId.Contract,
     address: addr,
     contractName: name,
   };
@@ -154,7 +154,7 @@ export function createStandardPrincipal(addressString: string): StandardPrincipa
   const addr = createAddress(addressString);
   return {
     type: StacksMessageType.Principal,
-    prefix: PostConditionPrincipalID.Standard,
+    prefix: PostConditionPrincipalId.Standard,
     address: addr,
   };
 }

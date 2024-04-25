@@ -3,6 +3,7 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
+      "@stacks/api": ["packages/api/src"],
       "@stacks/auth": ["packages/auth/src"],
       "@stacks/bns": ["packages/bns/src"],
       "@stacks/cli": ["packages/cli/src"],
@@ -23,6 +24,7 @@
     "entryPointStrategy": "packages",
     "entryPoints": [
       // "packages/*", without packages/cli
+      "packages/api",
       "packages/auth",
       "packages/encryption",
       "packages/network",

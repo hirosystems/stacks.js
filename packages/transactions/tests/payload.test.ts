@@ -1,5 +1,5 @@
-import { bytesToHex, hexToBytes, utf8ToBytes } from '@stacks/common';
-import { BytesReader, randomBytes } from '../src';
+import { bytesToHex, utf8ToBytes } from '@stacks/common';
+import { randomBytes } from '../src';
 import {
   contractPrincipalCV,
   falseCV,
@@ -223,9 +223,9 @@ test.each([
   '081212121212121212121212121212121212121212121212121212121212121212099275df67a68c8745c0ff97b48201ee6db447f7c93b23ae24cdc2400f52fdb08a1a6ac7ec71bf9c9c76e96ee4675ebff60625af28718501047bfd87b810c2d2139b73c23bd69de66360953a642c2a330a',
   // test vector taken from https://github.com/stacks-network/stacks-core/blob/396b34ba414220834de7ff96a890d55458ded51b/stackslib/src/chainstate/stacks/transaction.rs#L2143-L2301
   '0812121212121212121212121212121212121212121212121212121212121212120a0601ffffffffffffffffffffffffffffffffffffffff0c666f6f2d636f6e74726163749275df67a68c8745c0ff97b48201ee6db447f7c93b23ae24cdc2400f52fdb08a1a6ac7ec71bf9c9c76e96ee4675ebff60625af28718501047bfd87b810c2d2139b73c23bd69de66360953a642c2a330a',
-])('deserialize/serialize nakamoto coinbase payload', payloadBytes => {
-  const payload = deserializePayload(new BytesReader(hexToBytes(payloadBytes)));
+])('deserialize/serialize nakamoto coinbase payload', payloadHex => {
+  const payload = deserializePayload(payloadHex);
 
   expect(payload).toBeDefined();
-  expect(bytesToHex(serializePayload(payload))).toEqual(payloadBytes);
+  expect(serializePayload(payload)).toEqual(payloadHex);
 });
