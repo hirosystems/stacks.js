@@ -9,7 +9,6 @@
       "@stacks/cli": ["packages/cli/src"],
       "@stacks/common": ["packages/common/src"],
       "@stacks/encryption": ["packages/encryption/src"],
-      "@stacks/keychain": ["packages/keychain/src"],
       "@stacks/network": ["packages/network/src"],
       "@stacks/profile": ["packages/profile/src"],
       "@stacks/stacking": ["packages/stacking/src"],
@@ -32,7 +31,6 @@
       "packages/transactions",
       "packages/bns",
       "packages/common",
-      "packages/keychain",
       "packages/profile",
       "packages/storage",
       "packages/wallet-sdk"
