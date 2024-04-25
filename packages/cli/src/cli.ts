@@ -1,25 +1,21 @@
-import { bytesToHex, HIRO_MAINNET_URL, HIRO_TESTNET_URL } from '@stacks/common';
-import { StacksNodeApi } from '@stacks/api';
-import * as bitcoin from 'bitcoinjs-lib';
-import * as blockstack from 'blockstack';
-import cors from 'cors';
-import * as crypto from 'crypto';
-import * as fs from 'fs';
-import * as process from 'process';
-import * as winston from 'winston';
-
 import * as scureBip39 from '@scure/bip39';
 import { wordlist } from '@scure/bip39/wordlists/english';
+import { StacksNodeApi } from '@stacks/api';
 import { buildPreorderNameTx, buildRegisterNameTx } from '@stacks/bns';
+import { bytesToHex, HIRO_MAINNET_URL, HIRO_TESTNET_URL } from '@stacks/common';
 import {
+  ACCOUNT_PATH,
   AnchorMode,
   broadcastTransaction,
   callReadOnlyFunction,
+  Cl,
   ClarityAbi,
   ClarityValue,
   ContractCallPayload,
-  SignedContractDeployOptions,
+  cvToJSON,
   cvToString,
+  estimateTransaction,
+  estimateTransactionByteLength,
   estimateTransfer,
   getAbi,
   getAddressFromPrivateKey,
@@ -27,32 +23,33 @@ import {
   makeContractDeploy,
   makeSTXTokenTransfer,
   PostConditionMode,
+  privateKeyToPublic,
   ReadOnlyFunctionOptions,
+  serializePayload,
   SignedContractCallOptions,
+  SignedContractDeployOptions,
   SignedTokenTransferOptions,
   signWithKey,
   StacksTransaction,
   TransactionSigner,
   TxBroadcastResult,
   validateContractCall,
-  Cl,
-  cvToJSON,
-  ACCOUNT_PATH,
-  estimateTransaction,
-  serializePayload,
-  estimateTransactionByteLength,
-  privateKeyToPublic,
 } from '@stacks/transactions';
-import express from 'express';
+import * as bitcoin from 'bitcoinjs-lib';
+import * as blockstack from 'blockstack';
+import * as crypto from 'crypto';
+import * as fs from 'fs';
 import { prompt } from 'inquirer';
 import fetch from 'node-fetch';
 import * as path from 'path';
+import * as process from 'process';
+import * as winston from 'winston';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const c32check = require('c32check');
 
 import { UserData } from '@stacks/auth';
-import crossfetch from 'cross-fetch';
+import 'cross-fetch/polyfill';
 
 import { StackerInfo, StackingClient } from '@stacks/stacking';
 
@@ -74,10 +71,10 @@ import {
 
 import {
   checkArgs,
+  CLI_ARGS,
   CLIOptAsBool,
   CLIOptAsString,
   CLIOptAsStringArray,
-  CLI_ARGS,
   DEFAULT_CONFIG_PATH,
   DEFAULT_CONFIG_TESTNET_PATH,
   getCLIOpts,
@@ -91,7 +88,7 @@ import {
 
 import { decryptBackupPhrase, encryptBackupPhrase } from './encrypt';
 
-import { CLINetworkAdapter, CLI_NETWORK_OPTS, getNetwork, NameInfoType } from './network';
+import { CLI_NETWORK_OPTS, CLINetworkAdapter, getNetwork, NameInfoType } from './network';
 
 import { gaiaAuth, gaiaConnect, gaiaUploadProfileAll, getGaiaAddressFromProfile } from './data';
 
@@ -116,19 +113,18 @@ import {
 } from './utils';
 
 import {
-  generateNewAccount,
-  generateWallet,
-  getAppPrivateKey,
-  restoreWalletAccounts,
-} from '@stacks/wallet-sdk';
-import { handleAuth, handleSignIn } from './auth';
-import { getMaxIDSearchIndex, getPrivateKeyAddress, setMaxIDSearchIndex } from './common';
-import {
   deriveDefaultUrl,
   STACKS_MAINNET,
   STACKS_TESTNET,
   TransactionVersion,
 } from '@stacks/network';
+import {
+  generateNewAccount,
+  generateWallet,
+  getAppPrivateKey,
+  restoreWalletAccounts,
+} from '@stacks/wallet-sdk';
+import { getMaxIDSearchIndex, getPrivateKeyAddress, setMaxIDSearchIndex } from './common';
 
 // global CLI options
 let txOnly = false;
@@ -136,7 +132,7 @@ let estimateOnly = false;
 let safetyChecks = true;
 let receiveFeesPeriod = 52595;
 let gracePeriod = 5000;
-let noExit = false;
+const noExit = false;
 
 let BLOCKSTACK_TEST = !!process.env.BLOCKSTACK_TEST;
 
@@ -1558,60 +1554,6 @@ function addressConvert(network: CLINetworkAdapter, args: string[]): Promise<str
 }
 
 /*
- * Run an authentication daemon on a given port.
- * args:
- * @gaiaHubUrl (string) the write endpoint of your app Gaia hub, where app data will be stored
- * @mnemonic (string) your 12-word phrase, optionally encrypted.  If encrypted, then
- * a password will be prompted.
- * @profileGaiaHubUrl (string) the write endpoint of your profile Gaia hub, where your profile
- *   will be stored (optional)
- * @port (number) the port to listen on (optional)
- */
-function authDaemon(network: CLINetworkAdapter, args: string[]): Promise<string> {
-  const gaiaHubUrl = args[0];
-  const mnemonicOrCiphertext = args[1];
-  let port = 3000; // default port
-  let profileGaiaHub = gaiaHubUrl;
-
-  if (args.length > 2 && !!args[2]) {
-    profileGaiaHub = args[2];
-  }
-
-  if (args.length > 3 && !!args[3]) {
-    port = parseInt(args[3]);
-  }
-
-  if (port < 0 || port > 65535) {
-    return Promise.resolve().then(() => JSONStringify({ error: 'Invalid port' }));
-  }
-
-  const mnemonicPromise = getBackupPhrase(mnemonicOrCiphertext);
-
-  return mnemonicPromise
-    .then((mnemonic: string) => {
-      noExit = true;
-
-      // load up all of our identity addresses, profiles, profile URLs, and Gaia connections
-      const authServer = express();
-      authServer.use(cors());
-
-      authServer.get(/^\/auth\/*$/, (req: express.Request, res: express.Response) => {
-        void handleAuth(network, mnemonic, gaiaHubUrl, profileGaiaHub, port, req, res);
-      });
-
-      authServer.get(/^\/signin\/*$/, (req: express.Request, res: express.Response) => {
-        void handleSignIn(network, mnemonic, gaiaHubUrl, profileGaiaHub, req, res);
-      });
-
-      authServer.listen(port, () => console.log(`Authentication server started on ${port}`));
-      return 'Press Ctrl+C to exit';
-    })
-    .catch((e: Error) => {
-      return JSONStringify({ error: e.message });
-    });
-}
-
-/*
  * Encrypt a backup phrase
  * args:
  * @backup_phrase (string) the 12-word phrase to encrypt
@@ -1737,7 +1679,6 @@ async function canStack(_network: CLINetworkAdapter, args: string[]): Promise<st
   const stacker = new StackingClient({ address: stxAddress, network, api });
 
   const apiConfig = new Configuration({
-    fetchApi: crossfetch,
     basePath: api.url,
   });
   const accounts = new AccountsApi(apiConfig);
@@ -1799,7 +1740,6 @@ async function stack(_network: CLINetworkAdapter, args: string[]): Promise<strin
   const api = new StacksNodeApi({ network });
 
   const apiConfig = new Configuration({
-    fetchApi: crossfetch,
     basePath: api.url,
   });
   const accounts = new AccountsApi(apiConfig);
@@ -1938,7 +1878,6 @@ function faucetCall(_: CLINetworkAdapter, args: string[]): Promise<string> {
   // console.log(address);
 
   const apiConfig = new Configuration({
-    fetchApi: crossfetch,
     basePath: 'https://api.testnet.hiro.so',
   });
 
@@ -2012,8 +1951,6 @@ type CommandFunction = (network: CLINetworkAdapter, args: string[]) => Promise<s
  * Global set of commands
  */
 const COMMANDS: Record<string, CommandFunction> = {
-  authenticator: authDaemon,
-  // 'announce': announce,
   balance: balance,
   can_stack: canStack,
   call_contract_func: contractFunctionCall,
