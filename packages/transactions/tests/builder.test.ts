@@ -71,12 +71,12 @@ import {
   bufferCV,
   bufferCVFromString,
   noneCV,
+  principalCV,
   serializeCV,
   serializeCVBytes,
   standardPrincipalCV,
   uintCV,
 } from '../src/clarity';
-import { principalCV } from '../src/clarity/types/principalCV';
 import { createMessageSignature } from '../src/common';
 import {
   AddressHashMode,

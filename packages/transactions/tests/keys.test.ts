@@ -13,13 +13,14 @@ import {
   signatureRsvToVrs,
   utf8ToBytes,
 } from '@stacks/common';
+import { TransactionVersion } from '@stacks/network';
 import { ec as EC } from 'elliptic';
 import {
   PubKeyEncoding,
   StacksMessageType,
   compressPublicKey,
-  encodeStructuredData,
   createStacksPublicKey,
+  encodeStructuredData,
   getAddressFromPrivateKey,
   getAddressFromPublicKey,
   makeRandomPrivKey,
@@ -37,7 +38,6 @@ import {
 } from '../src';
 import { randomBytes } from '../src/utils';
 import { serializeDeserialize } from './macros';
-import { TransactionVersion } from '@stacks/network';
 
 // Create and initialize EC context
 // Better do it once and reuse it

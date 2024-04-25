@@ -5,6 +5,7 @@ import {
   IntegerType,
   intToBigInt,
   intToBytes,
+  PrivateKey,
   writeUInt16BE,
 } from '@stacks/common';
 import {
@@ -22,7 +23,6 @@ import { MessageSignature } from './common';
 import { DeserializationError, SigningError, VerificationError } from './errors';
 import {
   createStacksPublicKey,
-  PrivateKey,
   privateKeyToPublic,
   publicKeyFromSignatureVrs,
   publicKeyIsCompressed,

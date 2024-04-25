@@ -5,7 +5,14 @@ import {
   StacksNodeApi,
   V2PoxInfoResponse,
 } from '@stacks/api';
-import { ApiOpts, IntegerType, hexToBytes, intToBigInt, isInstance } from '@stacks/common';
+import {
+  ApiOpts,
+  IntegerType,
+  PrivateKey,
+  hexToBytes,
+  intToBigInt,
+  isInstance,
+} from '@stacks/common';
 import { StacksNetwork } from '@stacks/network';
 import {
   BurnchainRewardListResponse,
@@ -21,7 +28,6 @@ import {
   ContractCallPayload,
   OptionalCV,
   PrincipalCV,
-  PrivateKey,
   ResponseErrorCV,
   StacksTransaction,
   TupleCV,

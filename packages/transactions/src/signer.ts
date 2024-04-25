@@ -3,8 +3,9 @@ import { StacksTransaction } from './transaction';
 import { SpendingConditionOpts, isSingleSig, nextVerification } from './authorization';
 import { AuthType, PubKeyEncoding, StacksMessageType } from './constants';
 import { SigningError } from './errors';
-import { PrivateKey, StacksPublicKey } from './keys';
+import { StacksPublicKey } from './keys';
 import { cloneDeep } from './utils';
+import { PrivateKey } from '@stacks/common';
 
 export class TransactionSigner {
   transaction: StacksTransaction;

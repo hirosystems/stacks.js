@@ -12,10 +12,11 @@ import {
   ClarityType,
   getCVTypeString,
   bufferCVFromString,
+  stringAsciiCV,
+  stringUtf8CV,
 } from './clarity';
 import { ContractCallPayload } from './payload';
 import { NotImplementedError } from './errors';
-import { stringAsciiCV, stringUtf8CV } from './clarity/types/stringCV';
 import { utf8ToBytes } from '@stacks/common';
 
 // From https://github.com/blockstack/stacks-blockchain-sidecar/blob/master/src/event-stream/contract-abi.ts

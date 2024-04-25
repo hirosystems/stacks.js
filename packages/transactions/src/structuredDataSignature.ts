@@ -1,9 +1,9 @@
 import { sha256 } from '@noble/hashes/sha256';
-import { bytesToHex, concatBytes, utf8ToBytes } from '@stacks/common';
+import { PrivateKey, bytesToHex, concatBytes, utf8ToBytes } from '@stacks/common';
 import { ClarityType, ClarityValue, serializeCVBytes } from './clarity';
 import { StacksMessageType } from './constants';
 import { StructuredDataSignature } from './message-types';
-import { PrivateKey, signMessageHashRsv } from './keys';
+import { signMessageHashRsv } from './keys';
 
 // Refer to SIP018 https://github.com/stacksgov/sips/
 // > asciiToBytes('SIP018')

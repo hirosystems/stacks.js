@@ -19,15 +19,12 @@ import {
   StandardPrincipalCV,
   ContractPrincipalCV,
   ResponseCV,
-  ListCV,
-  TupleCV,
   ClarityValue,
 } from '.';
 import { ClarityType, clarityTypeToByte } from './constants';
-
 import { SerializationError } from '../errors';
-import { StringAsciiCV, StringUtf8CV } from './types/stringCV';
 import { CLARITY_INT_BYTE_SIZE, CLARITY_INT_SIZE } from '../constants';
+import { ListCV, StringAsciiCV, StringUtf8CV, TupleCV } from './types';
 
 function bytesWithTypeID(typeId: ClarityType, bytes: Uint8Array): Uint8Array {
   return concatArray([clarityTypeToByte(typeId), bytes]);
