@@ -1,4 +1,11 @@
-import { concatArray, hexToBytes, IntegerType, intToBigInt, writeUInt32BE } from '@stacks/common';
+import {
+  concatArray,
+  hexToBytes,
+  IntegerType,
+  intToBigInt,
+  PrivateKey,
+  writeUInt32BE,
+} from '@stacks/common';
 import {
   ChainId,
   DEFAULT_CHAIN_ID,
@@ -36,7 +43,7 @@ import {
   StacksMessageType,
 } from './constants';
 import { SerializationError, SigningError } from './errors';
-import { PrivateKey, privateKeyIsCompressed, publicKeyIsCompressed, StacksPublicKey } from './keys';
+import { privateKeyIsCompressed, publicKeyIsCompressed, StacksPublicKey } from './keys';
 import { deserializePayloadBytes, Payload, PayloadInput, serializePayloadBytes } from './payload';
 import { createTransactionAuthField } from './signature';
 import {

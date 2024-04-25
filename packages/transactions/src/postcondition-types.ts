@@ -81,6 +81,10 @@ export interface NonFungiblePostCondition {
   readonly assetName: ClarityValue;
 }
 
+export type PostCondition = STXPostCondition | FungiblePostCondition | NonFungiblePostCondition;
+
+export type PostConditionPrincipal = StandardPrincipal | ContractPrincipal;
+
 export function parseAssetString(id: AssetString): Asset {
   const [assetAddress, assetContractName, assetTokenName] = id.split(/\.|::/);
   const asset = createAsset(assetAddress, assetContractName, assetTokenName);
@@ -169,7 +173,3 @@ export function createStandardPrincipal(addressString: string): StandardPrincipa
     address: addr,
   };
 }
-
-export type PostCondition = STXPostCondition | FungiblePostCondition | NonFungiblePostCondition;
-
-export type PostConditionPrincipal = StandardPrincipal | ContractPrincipal;

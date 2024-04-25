@@ -16,7 +16,9 @@ import {
   isInstance,
   parseRecoverableSignatureVrs,
   PRIVATE_KEY_COMPRESSED_LENGTH,
+  PrivateKey,
   privateKeyToBytes,
+  PublicKey,
   signatureRsvToVrs,
   signatureVrsToRsv,
 } from '@stacks/common';
@@ -170,10 +172,6 @@ export function deserializePublicKeyBytes(serialized: Uint8Array | BytesReader):
 export function makeRandomPrivKey(): string {
   return bytesToHex(utils.randomPrivateKey());
 }
-
-// todo: complete refactor
-export type PrivateKey = string | Uint8Array;
-export type PublicKey = string | Uint8Array;
 
 /**
  * @deprecated The Clarity compatible {@link signMessageHashRsv} is preferred, but differs in signature format

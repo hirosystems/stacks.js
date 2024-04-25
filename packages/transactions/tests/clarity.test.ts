@@ -8,12 +8,8 @@ import {
   ClarityValue,
   ClarityWireType,
   IntCV,
-  ListCV,
   SomeCV,
   StandardPrincipalCV,
-  StringAsciiCV,
-  StringUtf8CV,
-  TupleCV,
   UIntCV,
   bufferCV,
   clarityByteToType,
@@ -47,6 +43,7 @@ import {
 } from '../src/clarity/clarityValue';
 import { addressToString } from '../src/common';
 import { deserializeAddressBytes } from '../src/types';
+import { ListCV, StringAsciiCV, StringUtf8CV, TupleCV } from '../src/clarity/types';
 
 const ADDRESS = 'SP2JXKMSH007NPYAQHKJPQMAQYAD90NQGTVJVQ02B';
 

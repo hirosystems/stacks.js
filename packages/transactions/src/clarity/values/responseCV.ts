@@ -1,17 +1,6 @@
 import { ClarityValue } from '../clarityValue';
 import { ClarityType } from '../constants';
-
-type ResponseCV = ResponseErrorCV | ResponseOkCV;
-
-interface ResponseErrorCV<T extends ClarityValue = ClarityValue> {
-  readonly type: ClarityType.ResponseErr;
-  readonly value: T;
-}
-
-interface ResponseOkCV<T extends ClarityValue = ClarityValue> {
-  readonly type: ClarityType.ResponseOk;
-  readonly value: T;
-}
+import { ResponseErrorCV, ResponseOkCV } from '../types';
 
 /**
  * Converts ClarityValue to responseErrorCV
@@ -32,7 +21,9 @@ interface ResponseOkCV<T extends ClarityValue = ClarityValue> {
  * @see
  * {@link https://github.com/hirosystems/stacks.js/blob/main/packages/transactions/tests/clarity.test.ts | clarity test cases for more examples}
  */
-function responseErrorCV<T extends ClarityValue = ClarityValue>(value: T): ResponseErrorCV<T> {
+export function responseErrorCV<T extends ClarityValue = ClarityValue>(
+  value: T
+): ResponseErrorCV<T> {
   return { type: ClarityType.ResponseErr, value };
 }
 
@@ -55,8 +46,6 @@ function responseErrorCV<T extends ClarityValue = ClarityValue>(value: T): Respo
  * @see
  * {@link https://github.com/hirosystems/stacks.js/blob/main/packages/transactions/tests/clarity.test.ts | clarity test cases for more examples}
  */
-function responseOkCV<T extends ClarityValue = ClarityValue>(value: T): ResponseOkCV<T> {
+export function responseOkCV<T extends ClarityValue = ClarityValue>(value: T): ResponseOkCV<T> {
   return { type: ClarityType.ResponseOk, value };
 }
-
-export { ResponseCV, ResponseErrorCV, ResponseOkCV, responseErrorCV, responseOkCV };

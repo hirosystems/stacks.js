@@ -16,10 +16,10 @@ import {
   deserializeCV,
   noneCV,
   OptionalCV,
+  principalCV,
   serializeCVBytes,
   someCV,
 } from './clarity/';
-import { PrincipalCV, principalCV } from './clarity/types/principalCV';
 import { Address } from './common';
 import {
   ClarityVersion,
@@ -38,6 +38,7 @@ import {
   MemoString,
   serializeStacksMessageBytes,
 } from './types';
+import { PrincipalCV } from './clarity/types';
 
 export type Payload =
   | TokenTransferPayload

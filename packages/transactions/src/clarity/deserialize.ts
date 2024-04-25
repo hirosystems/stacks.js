@@ -12,13 +12,14 @@ import {
   responseErrorCV,
   noneCV,
   someCV,
-  listCV,
+  stringAsciiCV,
+  stringUtf8CV,
   tupleCV,
+  listCV,
 } from '.';
 import { BytesReader as BytesReader } from '../bytesReader';
 import { deserializeAddressBytes, deserializeLPStringBytes } from '../types';
 import { DeserializationError } from '../errors';
-import { stringAsciiCV, stringUtf8CV } from './types/stringCV';
 import { bytesToAscii, bytesToUtf8, hexToBytes } from '@stacks/common';
 
 /**

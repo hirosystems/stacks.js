@@ -3,6 +3,7 @@ import { sha256 } from '@noble/hashes/sha256';
 import { getPublicKey as nobleGetPublicKey, signSync, utils } from '@noble/secp256k1';
 import {
   PRIVATE_KEY_COMPRESSED_LENGTH,
+  PrivateKey,
   bytesToHex,
   concatBytes,
   hexToBytes,
@@ -10,7 +11,6 @@ import {
   readUInt8,
 } from '@stacks/common';
 import base58 from 'bs58';
-import { PrivateKey } from '../../transactions/src';
 import { hashRipemd160 } from './hashRipemd160';
 import { hashSha256Sync } from './sha2Hash';
 
