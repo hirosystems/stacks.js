@@ -8,6 +8,7 @@
   - [Clarity Representation](#clarity-representation)
   - [`serialize` methods](#serialize-methods)
   - [Asset Helper Methods](#asset-helper-methods)
+  - [CLI](#cli)
 - [Stacks.js (\<=4.x.x) → (5.x.x)](#stacksjs-4xx--5xx)
   - [Breaking Changes](#breaking-changes-1)
     - [Buffer to Uint8Array](#buffer-to-uint8array)
@@ -30,6 +31,7 @@
 - The `ClarityType` enum was replaced by a readable version. The previous (wire format compatible) enum is still available as `ClarityWireType`. [Read more...](#clarity-representation)
 - The `serializeXyz` methods were changed to return `string` (hex-encoded) instead of `Uint8Array`. Compatible `serializeXzyBytes` methods were added to ease the migration. [Read more...](#serialize-methods)
 - The `AssetInfo` type was renamed to `Asset` for accuracy. The `Asset` helper methods were also renamed to to remove the `Info` suffix. [Read more...](#asset-helper-methods)
+- Remove legacy CLI methods. [Read more...](#cli)
 
 ### Stacks Network
 
@@ -183,6 +185,10 @@ The following interfaces and methods were renamed:
 - `StacksMessageType.AssetInfo` → `StacksMessageType.Asset`
 - `createAssetInfo` → `createAsset`
 - `parseAssetInfoString` → `parseAssetString`
+
+### CLI
+
+- Removed the `authenticator` method for legacy Blockstack authentication.
 
 ## Stacks.js (&lt;=4.x.x) → (5.x.x)
 
