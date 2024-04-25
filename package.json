@@ -54,9 +54,9 @@
     "rimraf": "^5.0.1",
     "stream-http": "^3.2.0",
     "ts-jest": "^29.1.1",
-    "typedoc": "^0.25.1",
-    "typedoc-plugin-replace-text": "^3.2.0",
-    "typescript": "^5.2.2",
+    "typedoc": "^0.24.8",
+    "typedoc-plugin-replace-text": "^3.1.0",
+    "typescript": "^5.1.6",
     "webpack": "^5.88.2",
     "webpack-bundle-analyzer": "^4.9.0",
     "webpack-cli": "^5.1.4"
