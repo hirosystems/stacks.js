@@ -54,12 +54,12 @@ jobs:
       - run: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > ~/.npmrc
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-      - run: npx lerna publish --canary --force-publish --preid pr.$SHA --dist-tag pr --no-verify-access --no-push --no-git-tag-version --yes
+      - run: npx lerna publish --canary --force-publish --preid pr --dist-tag pr --no-verify-access --no-push --no-git-tag-version --yes
         env:
           SHA: ${{ steps.git-commit.outputs.sha }}
           SKIP_TESTS: true
       - id: published-version
-        run: echo "::set-output name=version::$(cat lerna.json | jq -r '.version')"
+        run: echo "::set-output name=version::$(cat packages/common/package.json | jq -r '.version')"
       - uses: janniks/pull-request-fixed-header@v1.0.1
         with:
           header: "> This PR was published to npm with the version `${{ steps.published-version.outputs.version }}`\n> e.g. `npm install @stacks/common@${{ steps.published-version.outputs.version }} --save-exact`"
