@@ -151,7 +151,7 @@ For `bigint` values, the type of the `value` property is a now `string`, for bet
 ### `serialize` methods
 
 Existing methods now use hex-encoded strings instead of `Uint8Array`s.
-For easiery migrating, renaming the following methods is possible to keep the previous behavior:
+For easier migrating, renaming the following methods is possible to keep the previous behavior:
 
 - `serializeCV` → `serializeCVBytes`
 - `serializeAddress` → `serializeAddressBytes`
