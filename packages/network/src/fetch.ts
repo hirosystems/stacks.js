@@ -128,7 +128,7 @@ function argsForCreateFetchFn(args: any[]): { fetchLib: FetchFn; middlewares: Fe
 }
 
 /**
- * Creates a new network fetching function, which combines an optional fetch-compatible library with optional middlware.
+ * Creates a new network fetching function, which combines an optional fetch-compatible library with optional middleware.
  * @example
  * ```
  * const customFetch = createFetchFn(someMiddleware)

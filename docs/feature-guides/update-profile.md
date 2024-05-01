@@ -105,7 +105,7 @@ export interface ProfileLookupOptions {
 }
 ```
 
-The function returns a promise with the data of the public profile if the data could be retrieved from the BNS name owner's storage and if the retrieved JSON token was sucessfully verified.
+The function returns a promise with the data of the public profile if the data could be retrieved from the BNS name owner's storage and if the retrieved JSON token was successfully verified.
 
 The recommended schema for the profile is as follows:
 
