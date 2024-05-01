@@ -37,10 +37,8 @@
     "@stacks/profile": "^6.13.1",
     "@stacks/storage": "^6.13.1",
     "@stacks/transactions": "^6.13.1",
-    "buffer": "^6.0.3",
     "c32check": "^2.0.0",
     "jsontokens": "^4.0.1",
-    "triplesec": "^4.0.3",
     "zone-file": "^2.0.0-beta.3"
   },
   "devDependencies": {

@@ -9,6 +9,7 @@
   - [`serialize` methods](#serialize-methods)
   - [Asset Helper Methods](#asset-helper-methods)
   - [CLI](#cli)
+  - [Triplesec](#triplesec)
 - [Stacks.js (\<=4.x.x) → (5.x.x)](#stacksjs-4xx--5xx)
   - [Breaking Changes](#breaking-changes-1)
     - [Buffer to Uint8Array](#buffer-to-uint8array)
@@ -32,6 +33,7 @@
 - The `serializeXyz` methods were changed to return `string` (hex-encoded) instead of `Uint8Array`. Compatible `serializeXzyBytes` methods were added to ease the migration. [Read more...](#serialize-methods)
 - The `AssetInfo` type was renamed to `Asset` for accuracy. The `Asset` helper methods were also renamed to to remove the `Info` suffix. [Read more...](#asset-helper-methods)
 - Remove legacy CLI methods. [Read more...](#cli)
+- Disable legacy `triplesec` mnemonic encryption support. [Read more...](#triplesec)
 
 ### Stacks Network
 
@@ -189,6 +191,12 @@ The following interfaces and methods were renamed:
 ### CLI
 
 - Removed the `authenticator` method for legacy Blockstack authentication.
+
+### Triplesec
+
+Support for encrypting/decrypting mnemonics with `triplesec` was removed.
+This impacts the methods: `decrypt`, `decryptMnemonic`, and `decryptLegacy`.
+Make sure to update your code to if mnemonics are stored somewhere encrypted using the legacy method.
 
 ## Stacks.js (&lt;=4.x.x) → (5.x.x)
 

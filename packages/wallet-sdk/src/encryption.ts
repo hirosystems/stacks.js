@@ -1,15 +1,13 @@
-import { encryptMnemonic, decryptMnemonic } from '@stacks/encryption';
-import { triplesecDecrypt } from './triplesec';
+import { decryptMnemonic, encryptMnemonic } from '@stacks/encryption';
 
 /**
  * Decrypt an encrypted mnemonic phrase with a password.
- * Legacy triplesec encrypted payloads are also supported.
  * @param data - Uint8Array or hex-encoded string of the encrypted mnemonic
  * @param password - Password for data
  * @return the raw mnemonic phrase
  */
 export function decrypt(dataBytes: Uint8Array | string, password: string): Promise<string> {
-  return decryptMnemonic(dataBytes, password, triplesecDecrypt);
+  return decryptMnemonic(dataBytes, password);
 }
 
 /**
