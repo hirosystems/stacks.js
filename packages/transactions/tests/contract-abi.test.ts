@@ -61,8 +61,12 @@ test.each(TEST_CASES)(encodeClarityValue.name, ({ type, value, expected }) => {
 
 test(encodeAbiClarityValue.name, () => {
   // buffer is expected to be hex
-  const result = encodeAbiClarityValue('beef', { buffer: { length: 10 } });
-  expect(result).toEqual(Cl.bufferFromHex('beef'));
+
+  const resultA = encodeAbiClarityValue('beef', { buffer: { length: 10 } });
+  expect(resultA).toEqual(Cl.bufferFromHex('beef'));
+
+  const resultB = encodeAbiClarityValue('0xbeef', { buffer: { length: 10 } });
+  expect(resultB).toEqual(Cl.bufferFromHex('beef'));
 
   TEST_CASES.filter((tc: any) => !tc.type.buffer).forEach(({ type, value, expected }) => {
     const result = encodeAbiClarityValue(value, type);
