@@ -45,7 +45,8 @@ jobs:
 
       - name: Upload test coverage
         uses: codecov/codecov-action@v4
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          slug: ${{ github.repository }}
           verbose: true
