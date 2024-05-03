@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.15.0](https://github.com/hirosystems/stacks.js/compare/v6.14.0...v6.15.0) (2024-05-03)
+
+
+### Features
+
+* add encodeAbiClarityValue method for better encoding ([2885813](https://github.com/hirosystems/stacks.js/commit/28858138c8f6366b37fa7210ba85c0c5a9cc0955))
+
+
+
 ## [6.13.1](https://github.com/hirosystems/stacks.js/compare/v6.13.0...v6.13.1) (2024-04-04)
 
 
