@@ -291,6 +291,17 @@ function clValue(map: (combinator: Combinator) => Combinator = v => v) {
   );
 }
 
+/**
+ * Parse a piece of string text as Clarity value syntax.
+ * Supports all Clarity value types (primitives, sequences, composite types).
+ *
+ * @example
+ * ```
+ * const repr = Cl.parse("u4");
+ * const repr = Cl.parse(`"hello"`);
+ * const repr = Cl.parse('(tuple (a 1) (b 2))');
+ * ```
+ */
 export function parse(clarityValueString: string): ClarityValue {
   const result = clValue(entire)(clarityValueString);
   if (!result.success || !result.capture) throw 'Parse error'; // todo: we can add better error messages and add position tracking
