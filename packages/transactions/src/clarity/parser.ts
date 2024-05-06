@@ -210,7 +210,6 @@ function clList(): Combinator {
 }
 
 function clTuple(): Combinator {
-  // todo: add `(tuple` syntax
   const tupleCurly = chain([
     regex(/\{/),
     greedy(
