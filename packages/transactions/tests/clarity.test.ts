@@ -743,6 +743,10 @@ const TEST_CASES_PARSER = [
     expected: Cl.tuple({ something: Cl.list([Cl.int(3), Cl.int(2), Cl.int(1)]) }),
   },
   {
+    input: '{ a: 0x68656c6c6f21 }',
+    expected: Cl.tuple({ a: Cl.bufferFromHex('68656c6c6f21') }),
+  },
+  {
     input: '( tuple ( something  (list 1 2 3)) (other "other" ) )',
     expected: Cl.tuple({
       something: Cl.list([Cl.int(1), Cl.int(2), Cl.int(3)]),

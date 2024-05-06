@@ -280,13 +280,13 @@ function clErr(): Combinator {
 function clValue(map: (combinator: Combinator) => Combinator = v => v) {
   return either(
     [
+      clBuffer,
+      clAscii,
+      clUtf8,
       clInt,
       clUint,
       clBool,
       clPrincipal,
-      clAscii,
-      clBuffer,
-      clUtf8,
       clList,
       clTuple,
       clNone,
