@@ -115,7 +115,8 @@ function parens(combinator: Combinator): Combinator {
 function greedy(
   min: number,
   combinator: Combinator,
-  reduce: (values: Capture[]) => Capture = v => v[v.length - 1]
+  reduce: (values: Capture[]) => Capture = v => v[v.length - 1],
+  separator?: Combinator
 ): Combinator {
   return (s: string) => {
     let rest = s;
@@ -129,6 +130,16 @@ function greedy(
       rest = result.rest;
       value += result.value;
       if (result.capture) captures.push(result.capture);
+
+      if (separator) {
+        const sepResult = separator(rest);
+        if (!sepResult.success) {
+          count++; // count as matched but no trailing separator
+          break;
+        }
+        rest = sepResult.rest;
+        value += sepResult.value;
+      }
     }
 
     if (count < min) return { success: false };
@@ -204,45 +215,43 @@ function clTuple(): Combinator {
     regex(/\{/),
     greedy(
       1,
-      // rows
+      // entries
       sequence(
         [
-          optional(whitespace()),
           capture(regex(/[a-zA-Z][a-zA-Z0-9_]*/)), // key
           regex(/\s*\:/),
-          whitespace(),
+          whitespace(), // todo: can this be optional?
           clValue(), // value
-          regex(/\s*\,?/),
         ],
         ([k, v]) => Cl.tuple({ [k as string]: v as ClarityValue })
       ),
-      c => Cl.tuple(Object.assign({}, ...c.map(t => (t as TupleCV).data)))
+      c => Cl.tuple(Object.assign({}, ...c.map(t => (t as TupleCV).data))),
+      regex(/\s*\,\s*/)
     ),
     regex(/\}/),
   ]);
   const tupleFunction = parens(
     sequence([
-      optional(whitespace()), // todo: is this wanted?
+      optional(whitespace()),
       regex(/tuple/),
+      whitespace(),
       greedy(
         1,
-        sequence([
-          whitespace(),
+        parens(
           // entries
-          parens(
-            sequence(
-              [
-                optional(whitespace()),
-                capture(regex(/[a-zA-Z][a-zA-Z0-9_]*/)), // key
-                whitespace(),
-                clValue(), // value
-                optional(whitespace()),
-              ],
-              ([k, v]) => Cl.tuple({ [k as string]: v as ClarityValue })
-            )
-          ),
-        ]),
-        c => Cl.tuple(Object.assign({}, ...c.map(t => (t as TupleCV).data)))
+          sequence(
+            [
+              optional(whitespace()),
+              capture(regex(/[a-zA-Z][a-zA-Z0-9_]*/)), // key
+              whitespace(),
+              clValue(), // value
+              optional(whitespace()),
+            ],
+            ([k, v]) => Cl.tuple({ [k as string]: v as ClarityValue })
+          )
+        ),
+        c => Cl.tuple(Object.assign({}, ...c.map(t => (t as TupleCV).data))),
+        whitespace()
       ),
     ])
   );
