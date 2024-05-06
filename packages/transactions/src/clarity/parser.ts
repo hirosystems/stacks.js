@@ -97,7 +97,6 @@ function sequence(
   };
 }
 
-// todo: push down if only used in `parens`
 function chain(
   combinators: Combinator[],
   reduce: (values: Capture[]) => Capture = v => v[0]
