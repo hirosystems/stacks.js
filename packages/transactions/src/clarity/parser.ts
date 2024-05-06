@@ -200,7 +200,7 @@ function clList(): Combinator {
 
 function clTuple(): Combinator {
   // todo: add `(tuple` syntax
-  return chain([
+  const tupleCurly = chain([
     regex(/\{/),
     greedy(
       1,
@@ -208,10 +208,10 @@ function clTuple(): Combinator {
       sequence(
         [
           optional(whitespace()),
-          capture(regex(/[a-zA-Z][a-zA-Z0-9_]*/)),
+          capture(regex(/[a-zA-Z][a-zA-Z0-9_]*/)), // key
           regex(/\s*\:/),
           whitespace(),
-          clValue(),
+          clValue(), // value
           regex(/\s*\,?/),
         ],
         ([k, v]) => Cl.tuple({ [k as string]: v as ClarityValue })
@@ -220,6 +220,33 @@ function clTuple(): Combinator {
     ),
     regex(/\}/),
   ]);
+  const tupleFunction = parens(
+    sequence([
+      optional(whitespace()), // todo: is this wanted?
+      regex(/tuple/),
+      greedy(
+        1,
+        sequence([
+          whitespace(),
+          // entries
+          parens(
+            sequence(
+              [
+                optional(whitespace()),
+                capture(regex(/[a-zA-Z][a-zA-Z0-9_]*/)), // key
+                whitespace(),
+                clValue(), // value
+                optional(whitespace()),
+              ],
+              ([k, v]) => Cl.tuple({ [k as string]: v as ClarityValue })
+            )
+          ),
+        ]),
+        c => Cl.tuple(Object.assign({}, ...c.map(t => (t as TupleCV).data)))
+      ),
+    ])
+  );
+  return either([tupleCurly, tupleFunction]);
 }
 
 function clNone(): Combinator {

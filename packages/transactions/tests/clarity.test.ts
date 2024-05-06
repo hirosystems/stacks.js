@@ -742,6 +742,13 @@ const TEST_CASES_PARSER = [
     input: '{something : (list 3 2 1),}',
     expected: Cl.tuple({ something: Cl.list([Cl.int(3), Cl.int(2), Cl.int(1)]) }),
   },
+  {
+    input: '( tuple ( something  (list 1 2 3)) (other "other" ) )',
+    expected: Cl.tuple({
+      something: Cl.list([Cl.int(1), Cl.int(2), Cl.int(3)]),
+      other: Cl.stringAscii('other'),
+    }),
+  },
   { input: 'none', expected: Cl.none() },
   { input: '( some u1 )', expected: Cl.some(Cl.uint(1)) },
   { input: '(some none)', expected: Cl.some(Cl.none()) },
