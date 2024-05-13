@@ -730,6 +730,7 @@ const TEST_CASES_PARSER = [
   { input: '0x68656c6c6f21', expected: Cl.bufferFromHex('68656c6c6f21') },
   { input: '"hello world"', expected: Cl.stringAscii('hello world') },
   { input: 'u"hello world"', expected: Cl.stringUtf8('hello world') },
+  { input: '"hello \\"world\\""', expected: Cl.stringAscii('hello "world"') },
   { input: '(list 1 2 3)', expected: Cl.list([Cl.int(1), Cl.int(2), Cl.int(3)]) },
   { input: '( list  1   2    3 )', expected: Cl.list([Cl.int(1), Cl.int(2), Cl.int(3)]) },
   { input: '( list )', expected: Cl.list([]) },

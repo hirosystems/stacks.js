@@ -191,12 +191,25 @@ function clBuffer(): Combinator {
   return sequence([regex(/0x/), capture(regex(/[0-9a-fA-F]+/), Cl.bufferFromHex)]);
 }
 
+/** @ignore helper for string values, removes escaping and unescapes special characters */
+function unescape(input: string): string {
+  return input.replace(/\\\\/g, '\\').replace(/\\(.)/g, '$1');
+}
+
 function clAscii(): Combinator {
-  return sequence([regex(/"/), capture(regex(/[^"]*/), Cl.stringAscii), regex(/"/)]);
+  return sequence([
+    regex(/"/),
+    capture(regex(/(\\.|[^"])*/), t => Cl.stringAscii(unescape(t))),
+    regex(/"/),
+  ]);
 }
 
 function clUtf8(): Combinator {
-  return sequence([regex(/u"/), capture(regex(/[^"]*/), Cl.stringUtf8), regex(/"/)]);
+  return sequence([
+    regex(/u"/),
+    capture(regex(/(\\.|[^"])*/), t => Cl.stringUtf8(unescape(t))),
+    regex(/"/),
+  ]);
 }
 
 function clList(): Combinator {
