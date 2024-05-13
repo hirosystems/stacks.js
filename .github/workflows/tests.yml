@@ -46,5 +46,5 @@ jobs:
       - name: Upload test coverage
         uses: codecov/codecov-action@v4
         with:
-          token: bc24bc04-e671-4a41-994d-9a9ed8fc2354
+          token: ${{ secrets.CODECOV_TOKEN }}
           verbose: true
