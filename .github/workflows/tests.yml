@@ -43,11 +43,7 @@ jobs:
       - name: Run tests
         run: npm run lerna run test --stream --parallel -- -- --coverage
 
-      - name: echo token (remove this again)
-        run: echo ${{ secrets.CODECOV_TOKEN }}
-
       - name: Upload test coverage
         uses: codecov/codecov-action@v4
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          verbose: true
