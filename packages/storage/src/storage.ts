@@ -443,7 +443,7 @@ export class Storage {
   }
 
   /**
-   * Stores the data provided in the app's data store to to the file specified.
+   * Stores the data provided in the app's data store to the file specified.
    * @param {String} path - the path to store the data in
    * @param {String|Uint8Array} content - the data to store in the file
    * @param options a [[PutFileOptions]] object
