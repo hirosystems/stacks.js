@@ -1,5 +1,5 @@
 import { DEVNET_URL, HIRO_MAINNET_URL, HIRO_TESTNET_URL } from '@stacks/common';
-import { ChainId, PeerNetworkId, TransactionVersion } from './constants';
+import { AddressVersion, ChainId, PeerNetworkId, TransactionVersion } from './constants';
 
 export interface StacksNetwork {
   chainId: number;
@@ -7,6 +7,10 @@ export interface StacksNetwork {
   peerNetworkId: number;
   magicBytes: string;
   bootAddress: string;
+  addressVersion: {
+    singleSig: number;
+    multiSig: number;
+  };
   // todo: add check32 character bytes string
 }
 
@@ -16,6 +20,10 @@ export const STACKS_MAINNET: StacksNetwork = {
   peerNetworkId: PeerNetworkId.Mainnet,
   magicBytes: 'X2', // todo: comment bytes version of magic bytes
   bootAddress: 'SP000000000000000000002Q6VF78',
+  addressVersion: {
+    singleSig: AddressVersion.MainnetSingleSig,
+    multiSig: AddressVersion.MainnetMultiSig,
+  },
 };
 
 export const STACKS_TESTNET: StacksNetwork = {
@@ -24,6 +32,10 @@ export const STACKS_TESTNET: StacksNetwork = {
   peerNetworkId: PeerNetworkId.Testnet,
   magicBytes: 'T2', // todo: comment bytes version of magic bytes
   bootAddress: 'ST000000000000000000002AMW42H',
+  addressVersion: {
+    singleSig: AddressVersion.TestnetSingleSig,
+    multiSig: AddressVersion.TestnetMultiSig,
+  },
 };
 
 export const STACKS_DEVNET: StacksNetwork = {

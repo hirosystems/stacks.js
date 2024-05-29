@@ -1,7 +1,6 @@
 import { ApiParam, IntegerType, utf8ToBytes } from '@stacks/common';
-import { ChainId, StacksNetwork } from '@stacks/network';
+import { StacksNetwork } from '@stacks/network';
 import {
-  AddressVersion,
   ClarityType,
   ClarityValue,
   FungibleConditionCode,
@@ -32,12 +31,6 @@ import {
 import { decodeFQN, getZonefileHash } from './utils';
 
 export const BNS_CONTRACT_NAME = 'bns';
-
-function getAddressVersion(network: StacksNetwork) {
-  return network.chainId === ChainId.Mainnet
-    ? AddressVersion.MainnetSingleSig
-    : AddressVersion.TestnetSingleSig;
-}
 
 export interface PriceFunction {
   base: IntegerType;
@@ -298,7 +291,7 @@ export async function buildPreorderNamespaceTx({
   const hashedSaltedNamespace = hash160(saltedNamespaceBytes);
 
   const burnSTXPostCondition = createSTXPostCondition(
-    publicKeyToAddress(getAddressVersion(network), publicKey),
+    publicKeyToAddress(network.addressVersion.singleSig, publicKey),
     FungibleConditionCode.Equal,
     stxToBurn
   );
@@ -521,7 +514,7 @@ export async function buildPreorderNameTx({
   const hashedSaltedName = hash160(saltedNamesBytes);
 
   const burnSTXPostCondition = createSTXPostCondition(
-    publicKeyToAddress(getAddressVersion(network), publicKey),
+    publicKeyToAddress(network.addressVersion.singleSig, publicKey),
     FungibleConditionCode.Equal,
     stxToBurn
   );
@@ -690,7 +683,7 @@ export async function buildTransferNameTx({
     zonefile ? someCV(bufferCV(getZonefileHash(zonefile))) : noneCV(),
   ];
   const postConditionSender = createNonFungiblePostCondition(
-    publicKeyToAddress(getAddressVersion(network), publicKey),
+    publicKeyToAddress(network.addressVersion.singleSig, publicKey),
     NonFungibleConditionCode.Sends,
     parseAssetString(`${network.bootAddress}.bns::names`),
     tupleCV({
@@ -810,7 +803,7 @@ export async function buildRenewNameTx({
     zonefile ? someCV(bufferCV(getZonefileHash(zonefile))) : noneCV(),
   ];
   const burnSTXPostCondition = createSTXPostCondition(
-    publicKeyToAddress(getAddressVersion(network), publicKey),
+    publicKeyToAddress(network.addressVersion.singleSig, publicKey),
     FungibleConditionCode.Equal,
     stxToBurn
   );
