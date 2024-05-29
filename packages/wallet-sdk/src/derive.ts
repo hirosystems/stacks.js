@@ -3,17 +3,11 @@
 import { HDKey } from '@scure/bip32';
 import { ApiParam, bytesToHex, defaultApiLike, utf8ToBytes } from '@stacks/common';
 import { compressPrivateKey, createSha2Hash } from '@stacks/encryption';
-import {
-  ChainId,
-  STACKS_MAINNET,
-  StacksNetwork,
-  TransactionVersion,
-  deriveDefaultUrl,
-} from '@stacks/network';
+import { STACKS_MAINNET, StacksNetwork, deriveDefaultUrl } from '@stacks/network';
 import { getAddressFromPrivateKey } from '@stacks/transactions';
 import { Account, HARDENED_OFFSET, WalletKeys } from './models/common';
 import { fetchFirstName } from './usernames';
-import { assertIsTruthy, whenChainId } from './utils';
+import { assertIsTruthy } from './utils';
 import { getNameInfo } from '@stacks/auth';
 
 const DATA_DERIVATION_PATH = `m/888'/0'`;
@@ -181,19 +175,15 @@ const selectUsernameForAccount = async (
 
   // try to find existing usernames owned by stx derivation path
   if (opts.network) {
-    const txVersion = whenChainId(opts.network.chainId)({
-      [ChainId.Mainnet]: TransactionVersion.Mainnet,
-      [ChainId.Testnet]: TransactionVersion.Testnet,
-    });
     const stxPrivateKey = deriveStxPrivateKey(opts);
-    const address = getAddressFromPrivateKey(stxPrivateKey, txVersion);
+    const address = getAddressFromPrivateKey(stxPrivateKey, opts.network.transactionVersion);
     let username = await fetchFirstName({ address, api });
     if (username) {
       return { username, derivationType: DerivationType.Wallet };
     } else {
       // try to find existing usernames owned by data derivation path
       const dataPrivateKey = deriveDataPrivateKey(opts);
-      const address = getAddressFromPrivateKey(dataPrivateKey, txVersion);
+      const address = getAddressFromPrivateKey(dataPrivateKey, opts.network.transactionVersion);
       username = await fetchFirstName({ address, api });
       if (username) {
         return { username, derivationType: DerivationType.Data };
@@ -219,12 +209,8 @@ export const fetchUsernameForAccountByDerivationType = async (
 
   // try to find existing usernames owned by given derivation path
   const selectedNetwork = opts.network ?? STACKS_MAINNET;
-  const txVersion = whenChainId(selectedNetwork.chainId)({
-    [ChainId.Mainnet]: TransactionVersion.Mainnet,
-    [ChainId.Testnet]: TransactionVersion.Testnet,
-  });
   const privateKey = derivePrivateKeyByType(opts);
-  const address = getAddressFromPrivateKey(privateKey, txVersion);
+  const address = getAddressFromPrivateKey(privateKey, selectedNetwork.transactionVersion);
   const username = await fetchFirstName({ address, api });
   return { username };
 };

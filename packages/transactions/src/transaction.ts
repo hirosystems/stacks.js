@@ -63,6 +63,7 @@ export class StacksTransaction {
   postConditionMode: PostConditionMode;
   postConditions: LengthPrefixedList;
 
+  // todo: next: change to opts object with `network` opt
   constructor(
     version: TransactionVersion,
     auth: Authorization,
