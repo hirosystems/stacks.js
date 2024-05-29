@@ -33,17 +33,6 @@ import { decodeFQN, getZonefileHash } from './utils';
 
 export const BNS_CONTRACT_NAME = 'bns';
 
-export const enum BnsContractAddress {
-  mainnet = 'SP000000000000000000002Q6VF78',
-  testnet = 'ST000000000000000000002AMW42H',
-}
-
-function getBnsContractAddress(network: StacksNetwork) {
-  if (network.chainId === ChainId.Mainnet) return BnsContractAddress.mainnet;
-  else if (network.chainId == ChainId.Testnet) return BnsContractAddress.testnet;
-  else throw new Error(`Unexpected ChainID: ${network.chainId}`);
-}
-
 function getAddressVersion(network: StacksNetwork) {
   return network.chainId === ChainId.Mainnet
     ? AddressVersion.MainnetSingleSig
@@ -83,7 +72,7 @@ export interface BnsContractCallOptions {
 
 async function makeBnsContractCall(options: BnsContractCallOptions): Promise<StacksTransaction> {
   const txOptions: UnsignedContractCallOptions = {
-    contractAddress: getBnsContractAddress(options.network),
+    contractAddress: options.network.bootAddress,
     contractName: BNS_CONTRACT_NAME,
     functionName: options.functionName,
     functionArgs: options.functionArgs,
@@ -107,7 +96,7 @@ async function callReadOnlyBnsFunction(
   options: BnsReadOnlyOptions & ApiParam
 ): Promise<ClarityValue> {
   return callReadOnlyFunction({
-    contractAddress: getBnsContractAddress(options.network),
+    contractAddress: options.network.bootAddress,
     contractName: BNS_CONTRACT_NAME,
     functionName: options.functionName,
     senderAddress: options.senderAddress,
@@ -703,7 +692,7 @@ export async function buildTransferNameTx({
   const postConditionSender = createNonFungiblePostCondition(
     publicKeyToAddress(getAddressVersion(network), publicKey),
     NonFungibleConditionCode.Sends,
-    parseAssetString(`${getBnsContractAddress(network)}.bns::names`),
+    parseAssetString(`${network.bootAddress}.bns::names`),
     tupleCV({
       name: bufferCVFromString(name),
       namespace: bufferCVFromString(namespace),
@@ -712,7 +701,7 @@ export async function buildTransferNameTx({
   const postConditionReceiver = createNonFungiblePostCondition(
     newOwnerAddress,
     NonFungibleConditionCode.DoesNotSend,
-    parseAssetString(`${getBnsContractAddress(network)}.bns::names`),
+    parseAssetString(`${network.bootAddress}.bns::names`),
     tupleCV({
       name: bufferCVFromString(name),
       namespace: bufferCVFromString(namespace),

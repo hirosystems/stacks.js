@@ -3,6 +3,7 @@
 - [Stacks.js (\>=5.x.x) → (7.x.x)](#stacksjs-5xx--7xx)
   - [Breaking Changes](#breaking-changes)
   - [Stacks Network](#stacks-network)
+    - [Impacts](#impacts)
   - [StacksNodeApi](#stacksnodeapi)
   - [StacksNetwork to StacksNodeApi](#stacksnetwork-to-stacksnodeapi)
   - [Clarity Representation](#clarity-representation)
@@ -51,6 +52,10 @@ import { STACKS_MAINNET } from '@stacks/network';
 import { STACKS_TESTNET } from '@stacks/network';
 import { STACKS_DEVNET } from '@stacks/network';
 ```
+
+#### Impacts
+
+- @stacks/bns: `BnsContractAddress` was removed, since `.bootAddress` is now a part of the network objects.
 
 ### StacksNodeApi
 
