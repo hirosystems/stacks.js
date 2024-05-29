@@ -20,7 +20,6 @@ import {
 import { ClarityValue, PrincipalCV } from './clarity';
 import {
   AddressHashMode,
-  AddressVersion,
   AnchorMode,
   ClarityVersion,
   FungibleConditionCode,
@@ -201,10 +200,7 @@ export async function makeUnsignedSTXTokenTransfer(
   }
 
   if (txOptions.nonce == null) {
-    const addressVersion =
-      options.network.transactionVersion === TransactionVersion.Mainnet
-        ? AddressVersion.MainnetSingleSig
-        : AddressVersion.TestnetSingleSig;
+    const addressVersion = network.addressVersion.singleSig;
     const address = c32address(addressVersion, transaction.auth.spendingCondition!.signer);
     const txNonce = await getNonce({ address, api: options.api });
     transaction.setNonce(txNonce);
@@ -418,10 +414,7 @@ export async function makeUnsignedContractDeploy(
   }
 
   if (txOptions.nonce === undefined || txOptions.nonce === null) {
-    const addressVersion =
-      options.network.transactionVersion === TransactionVersion.Mainnet
-        ? AddressVersion.MainnetSingleSig
-        : AddressVersion.TestnetSingleSig;
+    const addressVersion = network.addressVersion.singleSig;
     const address = c32address(addressVersion, transaction.auth.spendingCondition!.signer);
     const txNonce = await getNonce({ address, api: options.api });
     transaction.setNonce(txNonce);
@@ -578,10 +571,7 @@ export async function makeUnsignedContractCall(
   }
 
   if (txOptions.nonce === undefined || txOptions.nonce === null) {
-    const addressVersion =
-      network.transactionVersion === TransactionVersion.Mainnet
-        ? AddressVersion.MainnetSingleSig
-        : AddressVersion.TestnetSingleSig;
+    const addressVersion = network.addressVersion.singleSig;
     const address = c32address(addressVersion, transaction.auth.spendingCondition!.signer);
     const txNonce = await getNonce({ address, api: options.api });
     transaction.setNonce(txNonce);
@@ -822,6 +812,7 @@ export async function sponsorTransaction(
   const options = Object.assign(defaultOptions, sponsorOptions);
   options.api = defaultApiFromNetwork(options.network, sponsorOptions.api);
 
+  const network = networkFrom(options.network);
   const sponsorPubKey = privateKeyToPublic(options.sponsorPrivateKey);
 
   if (sponsorOptions.fee == null) {
@@ -845,10 +836,7 @@ export async function sponsorTransaction(
   }
 
   if (sponsorOptions.sponsorNonce == null) {
-    const addressVersion = whenTransactionVersion(options.transaction.version)({
-      [TransactionVersion.Mainnet]: AddressVersion.MainnetSingleSig,
-      [TransactionVersion.Testnet]: AddressVersion.TestnetSingleSig,
-    }); // detect address version from transaction version
+    const addressVersion = network.addressVersion.singleSig;
     const address = publicKeyToAddress(addressVersion, sponsorPubKey);
     const sponsorNonce = await getNonce({ address, api: options.api });
     options.sponsorNonce = sponsorNonce;

@@ -56,6 +56,7 @@ import { STACKS_DEVNET } from '@stacks/network';
 #### Impacts
 
 - @stacks/bns: `BnsContractAddress` was removed, since `.bootAddress` is now a part of the network objects.
+- @stacks/transactions: `AddressVersion` was moved to `@stacks/network`.
 
 ### StacksNodeApi
 

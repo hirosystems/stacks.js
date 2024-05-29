@@ -1,7 +1,6 @@
 import { utf8ToBytes } from '@stacks/common';
-import { ChainId, STACKS_TESTNET, StacksNetwork } from '@stacks/network';
+import { STACKS_TESTNET } from '@stacks/network';
 import {
-  AddressVersion,
   FungibleConditionCode,
   NonFungibleConditionCode,
   bufferCV,
@@ -29,12 +28,6 @@ beforeEach(() => {
   fetchMock.resetMocks();
   jest.resetModules();
 });
-
-function getAddressVersion(network: StacksNetwork) {
-  return network.chainId === ChainId.Mainnet
-    ? AddressVersion.MainnetSingleSig
-    : AddressVersion.TestnetSingleSig;
-}
 
 test('canRegisterName true', async () => {
   const fullyQualifiedName = 'test.id';
@@ -325,7 +318,7 @@ test('preorderNamespace', async () => {
 
   const bnsFunctionName = 'namespace-preorder';
   const burnSTXPostCondition = createSTXPostCondition(
-    publicKeyToAddress(getAddressVersion(network), publicKey),
+    publicKeyToAddress(network.addressVersion.singleSig, publicKey),
     FungibleConditionCode.Equal,
     stxToBurn
   );
@@ -545,7 +538,7 @@ test('preorderName', async () => {
 
   const bnsFunctionName = 'name-preorder';
   const burnSTXPostCondition = createSTXPostCondition(
-    publicKeyToAddress(getAddressVersion(network), publicKey),
+    publicKeyToAddress(network.addressVersion.singleSig, publicKey),
     FungibleConditionCode.Equal,
     stxToBurn
   );
@@ -688,7 +681,7 @@ test('transferName', async () => {
 
   const { namespace, name } = decodeFQN(fullyQualifiedName);
   const nameTransferPostConditionOne = createNonFungiblePostCondition(
-    publicKeyToAddress(getAddressVersion(network), publicKey),
+    publicKeyToAddress(network.addressVersion.singleSig, publicKey),
     NonFungibleConditionCode.Sends,
     parseAssetString(`${network.bootAddress}.bns::names`),
     tupleCV({
@@ -755,7 +748,7 @@ test('transferName optionalArguments', async () => {
 
   const { namespace, name } = decodeFQN(fullyQualifiedName);
   const nameTransferPostConditionOne = createNonFungiblePostCondition(
-    publicKeyToAddress(getAddressVersion(network), publicKey),
+    publicKeyToAddress(network.addressVersion.singleSig, publicKey),
     NonFungibleConditionCode.Sends,
     parseAssetString(`${network.bootAddress}.bns::names`),
     tupleCV({
@@ -860,7 +853,7 @@ test('renewName', async () => {
 
   const { namespace, name } = decodeFQN(fullyQualifiedName);
   const burnSTXPostCondition = createSTXPostCondition(
-    publicKeyToAddress(getAddressVersion(network), publicKey),
+    publicKeyToAddress(network.addressVersion.singleSig, publicKey),
     FungibleConditionCode.Equal,
     stxToBurn
   );
@@ -915,7 +908,7 @@ test('renewName optionalArguments', async () => {
 
   const { namespace, name } = decodeFQN(fullyQualifiedName);
   const burnSTXPostCondition = createSTXPostCondition(
-    publicKeyToAddress(getAddressVersion(network), publicKey),
+    publicKeyToAddress(network.addressVersion.singleSig, publicKey),
     FungibleConditionCode.Equal,
     stxToBurn
   );
