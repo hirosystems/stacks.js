@@ -6,6 +6,7 @@ export interface StacksNetwork {
   transactionVersion: number; // todo: txVersion better?
   peerNetworkId: number;
   magicBytes: string;
+  bootAddress: string;
   // todo: add check32 character bytes string
 }
 
@@ -14,6 +15,7 @@ export const STACKS_MAINNET: StacksNetwork = {
   transactionVersion: TransactionVersion.Mainnet,
   peerNetworkId: PeerNetworkId.Mainnet,
   magicBytes: 'X2', // todo: comment bytes version of magic bytes
+  bootAddress: 'SP000000000000000000002Q6VF78',
 };
 
 export const STACKS_TESTNET: StacksNetwork = {
@@ -21,6 +23,7 @@ export const STACKS_TESTNET: StacksNetwork = {
   transactionVersion: TransactionVersion.Testnet,
   peerNetworkId: PeerNetworkId.Testnet,
   magicBytes: 'T2', // todo: comment bytes version of magic bytes
+  bootAddress: 'ST000000000000000000002AMW42H',
 };
 
 export const STACKS_DEVNET: StacksNetwork = {
@@ -54,7 +57,7 @@ export function networkFrom(network: StacksNetworkName | StacksNetwork) {
   return network;
 }
 
-export function deriveDefaultUrl(network: StacksNetwork | StacksNetworkName | undefined) {
+export function deriveDefaultUrl(network?: StacksNetwork | StacksNetworkName) {
   if (!network) return HIRO_MAINNET_URL; // default to mainnet if no network is given
 
   network = networkFrom(network);
