@@ -169,22 +169,8 @@ export type MultiSigHashMode =
   | AddressHashMode.SerializeP2SHNonSequential
   | AddressHashMode.SerializeP2WSHNonSequential;
 
-/**
- * Address versions for identifying address types in an encoded Stacks address.
- * The address version is a single byte, indicating the address type.
- * Every Stacks address starts with `S` followed by a single character indicating the address version.
- * The second character is the c32-encoded AddressVersion byte.
- */
-export enum AddressVersion {
-  /** `P` — A single-sig address for mainnet (starting with `SP`) */
-  MainnetSingleSig = 22,
-  /** `M` — A multi-sig address for mainnet (starting with `SM`) */
-  MainnetMultiSig = 20,
-  /** `T` — A single-sig address for testnet (starting with `ST`) */
-  TestnetSingleSig = 26,
-  /** `N` — A multi-sig address for testnet (starting with `SN`) */
-  TestnetMultiSig = 21,
-}
+// re-export for backwards compatibility
+export { AddressVersion } from '@stacks/network';
 
 // todo: try to remove this
 export enum PubKeyEncoding {
