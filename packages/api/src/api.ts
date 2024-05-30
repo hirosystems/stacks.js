@@ -15,6 +15,7 @@ import {
 import {
   Cl,
   ClarityAbi,
+  ContractIdString,
   FeeEstimation,
   StacksTransaction,
   TxBroadcastResult,
@@ -100,7 +101,7 @@ export class StacksNodeApi {
    * Fetch a contract's ABI
    * @returns A promise that resolves to a ClarityAbi if the operation succeeds
    */
-  getAbi = async (contract: `${string}.${string}`): Promise<ClarityAbi> => {
+  getAbi = async (contract: ContractIdString): Promise<ClarityAbi> => {
     const [contractAddress, contractName] = contract.split('.');
     return getAbi({ contractAddress, contractName, api: this });
   };
@@ -188,7 +189,7 @@ export class StacksNodeApi {
   }
 
   /** Gets the value of a data-var if it exists in the given contract */
-  async getDataVar(contract: `${string}.${string}`, dataVarName: string) {
+  async getDataVar(contract: ContractIdString, dataVarName: string) {
     // todo: (contractAddress: string, contractName: string, dataVarName: string) overload?
     // todo: cleanup address/contract identifies types
     const contractPath = contract.replace('.', '/');
