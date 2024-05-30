@@ -197,8 +197,8 @@ export function signWithKey(privateKey: PrivateKey, messageHash: string): Messag
 }
 
 /**
- * Signs a message using a private key. The resulting signature along with the
- * original message can be verified using {@link verifyMessageSignatureRsv}
+ * Signs a message hash using a private key. The resulting signature along with
+ * the original message can be verified using {@link verifyMessageSignatureRsv}
  * @returns A recoverable signature (in RSV order)
  */
 export function signMessageHashRsv({

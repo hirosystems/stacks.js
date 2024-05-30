@@ -61,6 +61,11 @@ import {
   rightPadHexToLength,
 } from './utils';
 
+/**
+ * An address string encoded as c32check
+ */
+export type AddressString = string;
+
 export type StacksMessage =
   | Address
   | PostConditionPrincipal
