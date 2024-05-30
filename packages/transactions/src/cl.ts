@@ -117,7 +117,6 @@ export const contractPrincipal = contractPrincipalCV;
  * @see {@link serialize}, {@link deserialize}
  */
 export const standardPrincipal = standardPrincipalCV;
-// todo: add .principal method that detects `.` inside string for both standard and contract principals
 
 // Sequences ///////////////////////////////////////////////////////////////////
 /**

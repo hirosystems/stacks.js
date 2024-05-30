@@ -12,11 +12,6 @@ import { ClarityValue } from './clarity';
 import { exceedsMaxLengthBytes } from './utils';
 
 /**
- * An address string encoded as c32check
- */
-export type AddressString = string;
-
-/**
  * A contract identifier string given as `<address>.<contract-name>`
  */
 export type ContractIdString = `${string}.${string}`;
