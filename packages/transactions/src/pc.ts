@@ -28,12 +28,13 @@ import {
 /**
  * ### `Pc.` Post Condition Builder
  * @beta Interface may be subject to change in future releases.
- * @param {AddressString | ContractIdString} principal The principal to check, which should/should-not be sending assets. A string in the format "address" or "address.contractId".
+ * @param {AddressString | ContractIdString} principal The principal to check, which should/should-not be sending assets. A string in the format `<address>` or `<contractAddress>.<contractName>`.
  * @returns A partial post condition builder, which can be chained into a final post condition.
  * @example
  * ```
  * import { Pc } from '@stacks/transactions';
  * Pc.principal('STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6').willSendEq(10000).ustx();
+ * Pc.principal('STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6.mycontract').willSendGte(2000).ft();
  * ```
  */
 // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
@@ -218,6 +219,7 @@ class PartialPcFtWithCode {
    * ⚠ Amount of fungible tokens is denoted in the smallest unit of the token
    */
   ft(contractId: ContractIdString, tokenName: string) {
+    // todo: allow taking one arg (`Asset`) as well, overload
     const [address, name] = parseContractId(contractId);
     if (this.contractName) {
       return makeContractFungiblePostCondition(
