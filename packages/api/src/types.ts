@@ -1,3 +1,5 @@
+import type { ContractIdString } from '@stacks/transactions';
+
 export interface V2CoreInfoResponse {
   burn_block_height: number;
   stable_pox_consensus: string;
@@ -11,7 +13,7 @@ export interface CycleInfoResponse {
 }
 
 export interface ContractVersionResponse {
-  contract_id: `${string}.${string}`;
+  contract_id: ContractIdString;
   activation_burnchain_block_height: number;
   first_reward_cycle_id: number;
 }
