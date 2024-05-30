@@ -64,11 +64,13 @@ export function networkFromName(name: StacksNetworkName) {
   }
 }
 
+/** @ignore */
 export function networkFrom(network: StacksNetworkName | StacksNetwork) {
   if (typeof network === 'string') return networkFromName(network);
   return network;
 }
 
+/** @ignore */
 export function deriveDefaultUrl(network?: StacksNetwork | StacksNetworkName) {
   if (!network) return HIRO_MAINNET_URL; // default to mainnet if no network is given
 
