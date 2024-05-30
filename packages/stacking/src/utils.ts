@@ -6,7 +6,7 @@ import {
   base58CheckEncode,
   verifyMessageSignatureRsv,
 } from '@stacks/encryption';
-import { StacksNetwork, StacksNetworkName, StacksNetworks } from '@stacks/network';
+import { StacksNetwork, StacksNetworkName, StacksNetworks, networkFrom } from '@stacks/network';
 import {
   BufferCV,
   ClarityType,
@@ -317,6 +317,7 @@ export function poxAddressToBtcAddress(
   network: StacksNetworkName
 ): string;
 export function poxAddressToBtcAddress(...args: any[]): string {
+  // todo: allow these helpers to take a bitcoin network instead of a stacks network, once we have a concept of bitcoin networks in the codebase
   if (typeof args[0] === 'number') return _poxAddressToBtcAddress_Values(args[0], args[1], args[2]);
   return _poxAddressToBtcAddress_ClarityValue(args[0], args[1]);
 }
@@ -411,7 +412,7 @@ export interface Pox4SignatureOptions {
   rewardCycle: number;
   /** lock period (in cycles) */
   period: number;
-  network: StacksNetwork;
+  network: StacksNetworkName | StacksNetwork;
   /** Maximum amount of uSTX that can be locked during this function call */
   maxAmount: IntegerType;
   /** Random integer to prevent signature re-use */
@@ -472,10 +473,11 @@ export function pox4SignatureMessage({
   poxAddress,
   rewardCycle,
   period: lockPeriod,
-  network,
+  network: networkOrName,
   maxAmount,
   authId,
 }: Pox4SignatureOptions) {
+  const network = networkFrom(networkOrName);
   const message = tupleCV({
     'pox-addr': poxAddressToTuple(poxAddress),
     'reward-cycle': uintCV(rewardCycle),

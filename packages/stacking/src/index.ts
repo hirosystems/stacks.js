@@ -13,7 +13,7 @@ import {
   intToBigInt,
   isInstance,
 } from '@stacks/common';
-import { StacksNetwork } from '@stacks/network';
+import { StacksNetwork, StacksNetworkName, networkFrom } from '@stacks/network';
 import {
   BurnchainRewardListResponse,
   BurnchainRewardSlotHolderListResponse,
@@ -341,9 +341,14 @@ export class StackingClient {
 
   public api: StacksNodeApi;
 
-  constructor(opts: { address: string; network: StacksNetwork; api?: StacksNodeApi | ApiOpts }) {
+  // todo: make more constructor opts optional
+  constructor(opts: {
+    address: string;
+    network: StacksNetworkName | StacksNetwork;
+    api?: StacksNodeApi | ApiOpts;
+  }) {
     this.address = opts.address;
-    this.network = opts.network;
+    this.network = networkFrom(opts.network);
     this.api = isInstance(opts.api, StacksNodeApi)
       ? opts.api
       : new StacksNodeApi({ url: opts.api?.url, fetch: opts.api?.fetch, network: opts.network });
