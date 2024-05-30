@@ -10,12 +10,12 @@ import {
 import { ClarityValue } from './clarity';
 import { FungibleConditionCode, NonFungibleConditionCode } from './constants';
 import {
-  AddressString,
   AssetString,
   ContractIdString,
-  createAsset,
   NonFungiblePostCondition,
+  createAsset,
 } from './postcondition-types';
+import { AddressString } from './types';
 
 /// `Pc.` Post Condition Builder
 //
