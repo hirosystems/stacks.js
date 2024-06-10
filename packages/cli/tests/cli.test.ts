@@ -5,7 +5,6 @@ import { CLINetworkAdapter, CLI_NETWORK_OPTS, getNetwork } from '../src/network'
 import {
   Cl,
   ClarityAbi,
-  createStacksPrivateKey,
   publicKeyFromSignatureVrs,
   randomBytes,
   signWithKey,
@@ -417,7 +416,7 @@ describe('Subdomain Migration', () => {
      * ********************************************************************************
      */
     const hash = crypto.createHash('sha256').update(textToSign).digest('hex');
-    const sig = signWithKey(createStacksPrivateKey(privateKey), hash);
+    const sig = signWithKey(privateKey, hash);
 
     subDomainOp.signature = sig.data; // Assign signature to subDomainOp
 
