@@ -1,7 +1,6 @@
 import { ApiParam, IntegerType, utf8ToBytes } from '@stacks/common';
-import { ChainId, StacksNetwork } from '@stacks/network';
+import { StacksNetwork } from '@stacks/network';
 import {
-  AddressVersion,
   ClarityType,
   ClarityValue,
   FungibleConditionCode,
@@ -32,23 +31,6 @@ import {
 import { decodeFQN, getZonefileHash } from './utils';
 
 export const BNS_CONTRACT_NAME = 'bns';
-
-export const enum BnsContractAddress {
-  mainnet = 'SP000000000000000000002Q6VF78',
-  testnet = 'ST000000000000000000002AMW42H',
-}
-
-function getBnsContractAddress(network: StacksNetwork) {
-  if (network.chainId === ChainId.Mainnet) return BnsContractAddress.mainnet;
-  else if (network.chainId == ChainId.Testnet) return BnsContractAddress.testnet;
-  else throw new Error(`Unexpected ChainID: ${network.chainId}`);
-}
-
-function getAddressVersion(network: StacksNetwork) {
-  return network.chainId === ChainId.Mainnet
-    ? AddressVersion.MainnetSingleSig
-    : AddressVersion.TestnetSingleSig;
-}
 
 export interface PriceFunction {
   base: IntegerType;
@@ -83,7 +65,7 @@ export interface BnsContractCallOptions {
 
 async function makeBnsContractCall(options: BnsContractCallOptions): Promise<StacksTransaction> {
   const txOptions: UnsignedContractCallOptions = {
-    contractAddress: getBnsContractAddress(options.network),
+    contractAddress: options.network.bootAddress,
     contractName: BNS_CONTRACT_NAME,
     functionName: options.functionName,
     functionArgs: options.functionArgs,
@@ -107,7 +89,7 @@ async function callReadOnlyBnsFunction(
   options: BnsReadOnlyOptions & ApiParam
 ): Promise<ClarityValue> {
   return callReadOnlyFunction({
-    contractAddress: getBnsContractAddress(options.network),
+    contractAddress: options.network.bootAddress,
     contractName: BNS_CONTRACT_NAME,
     functionName: options.functionName,
     senderAddress: options.senderAddress,
@@ -309,7 +291,7 @@ export async function buildPreorderNamespaceTx({
   const hashedSaltedNamespace = hash160(saltedNamespaceBytes);
 
   const burnSTXPostCondition = createSTXPostCondition(
-    publicKeyToAddress(getAddressVersion(network), publicKey),
+    publicKeyToAddress(network.addressVersion.singleSig, publicKey),
     FungibleConditionCode.Equal,
     stxToBurn
   );
@@ -532,7 +514,7 @@ export async function buildPreorderNameTx({
   const hashedSaltedName = hash160(saltedNamesBytes);
 
   const burnSTXPostCondition = createSTXPostCondition(
-    publicKeyToAddress(getAddressVersion(network), publicKey),
+    publicKeyToAddress(network.addressVersion.singleSig, publicKey),
     FungibleConditionCode.Equal,
     stxToBurn
   );
@@ -701,9 +683,9 @@ export async function buildTransferNameTx({
     zonefile ? someCV(bufferCV(getZonefileHash(zonefile))) : noneCV(),
   ];
   const postConditionSender = createNonFungiblePostCondition(
-    publicKeyToAddress(getAddressVersion(network), publicKey),
+    publicKeyToAddress(network.addressVersion.singleSig, publicKey),
     NonFungibleConditionCode.Sends,
-    parseAssetString(`${getBnsContractAddress(network)}.bns::names`),
+    parseAssetString(`${network.bootAddress}.bns::names`),
     tupleCV({
       name: bufferCVFromString(name),
       namespace: bufferCVFromString(namespace),
@@ -712,7 +694,7 @@ export async function buildTransferNameTx({
   const postConditionReceiver = createNonFungiblePostCondition(
     newOwnerAddress,
     NonFungibleConditionCode.DoesNotSend,
-    parseAssetString(`${getBnsContractAddress(network)}.bns::names`),
+    parseAssetString(`${network.bootAddress}.bns::names`),
     tupleCV({
       name: bufferCVFromString(name),
       namespace: bufferCVFromString(namespace),
@@ -821,7 +803,7 @@ export async function buildRenewNameTx({
     zonefile ? someCV(bufferCV(getZonefileHash(zonefile))) : noneCV(),
   ];
   const burnSTXPostCondition = createSTXPostCondition(
-    publicKeyToAddress(getAddressVersion(network), publicKey),
+    publicKeyToAddress(network.addressVersion.singleSig, publicKey),
     FungibleConditionCode.Equal,
     stxToBurn
   );
