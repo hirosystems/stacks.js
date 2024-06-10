@@ -5,7 +5,6 @@ import { buildPreorderNameTx, buildRegisterNameTx } from '@stacks/bns';
 import { bytesToHex, HIRO_MAINNET_URL, HIRO_TESTNET_URL } from '@stacks/common';
 import {
   ACCOUNT_PATH,
-  AnchorMode,
   broadcastTransaction,
   callReadOnlyFunction,
   Cl,
@@ -713,7 +712,6 @@ async function sendTokens(network: CLINetworkAdapter, args: string[]): Promise<s
     nonce,
     memo,
     network: api.network,
-    anchorMode: AnchorMode.Any,
   };
 
   const tx: StacksTransaction = await makeSTXTokenTransfer(options);
@@ -772,7 +770,6 @@ async function contractDeploy(network: CLINetworkAdapter, args: string[]): Promi
     nonce,
     network: api.network,
     postConditionMode: PostConditionMode.Allow,
-    anchorMode: AnchorMode.Any,
   };
 
   const tx = await makeContractDeploy(options);
@@ -853,7 +850,6 @@ async function contractFunctionCall(network: CLINetworkAdapter, args: string[]):
         nonce,
         network: api.network,
         postConditionMode: PostConditionMode.Allow,
-        anchorMode: AnchorMode.Any,
         api,
       };
 
