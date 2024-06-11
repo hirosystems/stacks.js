@@ -13,7 +13,7 @@ import {
   signatureRsvToVrs,
   utf8ToBytes,
 } from '@stacks/common';
-import { TransactionVersion } from '@stacks/network';
+import { AddressVersion, TransactionVersion } from '@stacks/network';
 import { ec as EC } from 'elliptic';
 import {
   PubKeyEncoding,
@@ -28,6 +28,7 @@ import {
   privateKeyToPublic,
   publicKeyFromSignatureRsv,
   publicKeyFromSignatureVrs,
+  publicKeyToAddress,
   publicKeyToHex,
   signMessageHashRsv,
   signStructuredData,
@@ -320,4 +321,12 @@ test('Sign msg using @noble/secp256k1 and verify signature using elliptic/secp25
 
   // Verification result by elliptic/secp256k1 should be true
   expect(ellipticVerifyResult).toBeTruthy();
+});
+
+describe(publicKeyToAddress.name, () => {
+  it('should return the correct address', () => {
+    const publicKey = '03ef788b3830c00abe8f64f62dc32fc863bc0b2cafeb073b6c8e1c7657d9c2c3ab';
+    const address = publicKeyToAddress(AddressVersion.MainnetSingleSig, publicKey);
+    expect(address).toBe('SPAW66WC3G8WA5F28JVNG1NTRJ6H76E7EN5H6QQD');
+  });
 });
