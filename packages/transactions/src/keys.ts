@@ -22,7 +22,13 @@ import {
   signatureRsvToVrs,
   signatureVrsToRsv,
 } from '@stacks/common';
-import { TransactionVersion } from '@stacks/network';
+import {
+  networkFrom,
+  STACKS_MAINNET,
+  StacksNetwork,
+  StacksNetworkName,
+  TransactionVersion,
+} from '@stacks/network';
 import { c32address } from 'c32check';
 import { BytesReader } from './bytesReader';
 import {
@@ -212,8 +218,41 @@ export function signMessageHashRsv({
   return { ...messageSignature, data: signatureVrsToRsv(messageSignature.data) };
 }
 
-// todo: use network as last parameter instead of addressversion param. next refactor
-export function publicKeyToAddress(version: AddressVersion, publicKey: PublicKey): string {
+/**
+ * Convert a public key to an address.
+ * @returns A Stacks address string (encoded with c32check)
+ * @example Public key to address
+ * ```
+ * const address = publicKeyToAddress("03ef788b3830c00abe8f64f62dc32fc863bc0b2cafeb073b6c8e1c7657d9c2c3ab");
+ * const address = publicKeyToAddress("03ef788b3830c00abe8f64f62dc32fc863bc0b2cafeb073b6c8e1c7657d9c2c3ab", STACKS_TESTNET);
+ * ```
+ */
+export function publicKeyToAddress(
+  publicKey: PublicKey,
+  network?: StacksNetworkName | StacksNetwork
+): string;
+export function publicKeyToAddress(version: AddressVersion, publicKey: PublicKey): string;
+export function publicKeyToAddress(
+  ...args: Parameters<typeof publicKeyToAddressSingleSig> | Parameters<typeof _publicKeyToAddress>
+): string {
+  if (typeof args[0] === 'number') return _publicKeyToAddress(...args);
+  return publicKeyToAddressSingleSig(...args);
+}
+
+/** Legacy implementation for backwards compatibility @ignore */
+function _publicKeyToAddress(version: AddressVersion, publicKey: PublicKey): string {
   publicKey = typeof publicKey === 'string' ? hexToBytes(publicKey) : publicKey;
   return c32address(version, bytesToHex(hash160(publicKey)));
 }
+
+/** Alias for {@link publicKeyToAddress} */
+export function publicKeyToAddressSingleSig(
+  publicKey: PublicKey,
+  network?: StacksNetworkName | StacksNetwork
+): string {
+  network = network ? networkFrom(network) : STACKS_MAINNET;
+  publicKey = typeof publicKey === 'string' ? hexToBytes(publicKey) : publicKey;
+  return c32address(network.addressVersion.singleSig, bytesToHex(hash160(publicKey)));
+}
+
+// todo: add multi-sig address support from [key]s!
