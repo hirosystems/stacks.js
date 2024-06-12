@@ -37,7 +37,7 @@ import {
 } from './keys';
 import { Payload, deserializePayloadBytes, serializePayloadBytes } from './payload';
 import {
-  Asset as Asset,
+  Asset,
   ContractPrincipal,
   LengthPrefixedString,
   PostCondition,
@@ -60,6 +60,11 @@ import {
   hashP2WSH,
   rightPadHexToLength,
 } from './utils';
+
+/**
+ * An address string encoded as c32check
+ */
+export type AddressString = string;
 
 export type StacksMessage =
   | Address
