@@ -20,7 +20,7 @@ import {
   serializeCVBytes,
   someCV,
 } from './clarity/';
-import { Address } from './common';
+import { AddressWire } from './common';
 import {
   ClarityVersion,
   COINBASE_BYTES_LENGTH,
@@ -28,69 +28,72 @@ import {
   StacksWireType,
   VRF_PROOF_BYTES_LENGTH,
 } from './constants';
-import { createAddress, createLPString, LengthPrefixedString } from './postcondition-types';
+import { createAddress, createLPString, LengthPrefixedStringWire } from './postcondition-types';
 import {
   codeBodyString,
   createMemoString,
   deserializeAddressBytes,
   deserializeLPStringBytes,
   deserializeMemoStringBytes,
-  MemoString,
+  MemoStringWire,
   serializeStacksWireBytes,
 } from './types';
 import { PrincipalCV } from './clarity/types';
 
-export type Payload =
-  | TokenTransferPayload
+export type PayloadWire =
+  | TokenTransferPayloadWire
   | ContractCallPayload
-  | SmartContractPayload
-  | VersionedSmartContractPayload
-  | PoisonPayload
-  | CoinbasePayload
+  | SmartContractPayloadWire
+  | VersionedSmartContractPayloadWire
+  | PoisonPayloadWire
+  | CoinbasePayloadWire
   | CoinbasePayloadToAltRecipient
-  | NakamotoCoinbasePayload
-  | TenureChangePayload;
+  | NakamotoCoinbasePayloadWire
+  | TenureChangePayloadWire;
 
-export function isTokenTransferPayload(p: Payload): p is TokenTransferPayload {
+export function isTokenTransferPayload(p: PayloadWire): p is TokenTransferPayloadWire {
   return p.payloadType === PayloadType.TokenTransfer;
 }
-export function isContractCallPayload(p: Payload): p is ContractCallPayload {
+export function isContractCallPayload(p: PayloadWire): p is ContractCallPayload {
   return p.payloadType === PayloadType.ContractCall;
 }
-export function isSmartContractPayload(p: Payload): p is SmartContractPayload {
+export function isSmartContractPayload(p: PayloadWire): p is SmartContractPayloadWire {
   return p.payloadType === PayloadType.SmartContract;
 }
-export function isPoisonPayload(p: Payload): p is PoisonPayload {
+export function isPoisonPayload(p: PayloadWire): p is PoisonPayloadWire {
   return p.payloadType === PayloadType.PoisonMicroblock;
 }
-export function isCoinbasePayload(p: Payload): p is CoinbasePayload {
+export function isCoinbasePayload(p: PayloadWire): p is CoinbasePayloadWire {
   return p.payloadType === PayloadType.Coinbase;
 }
 
-export interface TokenTransferPayload {
+export interface TokenTransferPayloadWire {
   readonly type: StacksWireType.Payload;
   readonly payloadType: PayloadType.TokenTransfer;
   readonly recipient: PrincipalCV;
   readonly amount: bigint;
-  readonly memo: MemoString;
+  readonly memo: MemoStringWire;
 }
 
 export type PayloadInput =
-  | (TokenTransferPayload | (Omit<TokenTransferPayload, 'amount'> & { amount: IntegerType }))
+  | (
+      | TokenTransferPayloadWire
+      | (Omit<TokenTransferPayloadWire, 'amount'> & { amount: IntegerType })
+    )
   | ContractCallPayload
-  | SmartContractPayload
-  | VersionedSmartContractPayload
-  | PoisonPayload
-  | CoinbasePayload
+  | SmartContractPayloadWire
+  | VersionedSmartContractPayloadWire
+  | PoisonPayloadWire
+  | CoinbasePayloadWire
   | CoinbasePayloadToAltRecipient
-  | NakamotoCoinbasePayload
-  | TenureChangePayload;
+  | NakamotoCoinbasePayloadWire
+  | TenureChangePayloadWire;
 
 export function createTokenTransferPayload(
   recipient: string | PrincipalCV,
   amount: IntegerType,
-  memo?: string | MemoString
-): TokenTransferPayload {
+  memo?: string | MemoStringWire
+): TokenTransferPayloadWire {
   if (typeof recipient === 'string') {
     recipient = principalCV(recipient);
   }
@@ -110,16 +113,16 @@ export function createTokenTransferPayload(
 export interface ContractCallPayload {
   readonly type: StacksWireType.Payload;
   readonly payloadType: PayloadType.ContractCall;
-  readonly contractAddress: Address;
-  readonly contractName: LengthPrefixedString;
-  readonly functionName: LengthPrefixedString;
+  readonly contractAddress: AddressWire;
+  readonly contractName: LengthPrefixedStringWire;
+  readonly functionName: LengthPrefixedStringWire;
   readonly functionArgs: ClarityValue[];
 }
 
 export function createContractCallPayload(
-  contractAddress: string | Address,
-  contractName: string | LengthPrefixedString,
-  functionName: string | LengthPrefixedString,
+  contractAddress: string | AddressWire,
+  contractName: string | LengthPrefixedStringWire,
+  functionName: string | LengthPrefixedStringWire,
   functionArgs: ClarityValue[]
 ): ContractCallPayload {
   if (typeof contractAddress === 'string') {
@@ -142,26 +145,26 @@ export function createContractCallPayload(
   };
 }
 
-export interface SmartContractPayload {
+export interface SmartContractPayloadWire {
   readonly type: StacksWireType.Payload;
   readonly payloadType: PayloadType.SmartContract;
-  readonly contractName: LengthPrefixedString;
-  readonly codeBody: LengthPrefixedString;
+  readonly contractName: LengthPrefixedStringWire;
+  readonly codeBody: LengthPrefixedStringWire;
 }
 
-export interface VersionedSmartContractPayload {
+export interface VersionedSmartContractPayloadWire {
   readonly type: StacksWireType.Payload;
   readonly payloadType: PayloadType.VersionedSmartContract;
   readonly clarityVersion: ClarityVersion;
-  readonly contractName: LengthPrefixedString;
-  readonly codeBody: LengthPrefixedString;
+  readonly contractName: LengthPrefixedStringWire;
+  readonly codeBody: LengthPrefixedStringWire;
 }
 
 export function createSmartContractPayload(
-  contractName: string | LengthPrefixedString,
-  codeBody: string | LengthPrefixedString,
+  contractName: string | LengthPrefixedStringWire,
+  codeBody: string | LengthPrefixedStringWire,
   clarityVersion?: ClarityVersion
-): SmartContractPayload | VersionedSmartContractPayload {
+): SmartContractPayloadWire | VersionedSmartContractPayloadWire {
   if (typeof contractName === 'string') {
     contractName = createLPString(contractName);
   }
@@ -186,16 +189,16 @@ export function createSmartContractPayload(
   };
 }
 
-export interface PoisonPayload {
+export interface PoisonPayloadWire {
   readonly type: StacksWireType.Payload;
   readonly payloadType: PayloadType.PoisonMicroblock;
 }
 
-export function createPoisonPayload(): PoisonPayload {
+export function createPoisonPayload(): PoisonPayloadWire {
   return { type: StacksWireType.Payload, payloadType: PayloadType.PoisonMicroblock };
 }
 
-export interface CoinbasePayload {
+export interface CoinbasePayloadWire {
   readonly type: StacksWireType.Payload;
   readonly payloadType: PayloadType.Coinbase;
   readonly coinbaseBytes: Uint8Array;
@@ -211,7 +214,7 @@ export interface CoinbasePayloadToAltRecipient {
 export function createCoinbasePayload(
   coinbaseBytes: Uint8Array,
   altRecipient?: PrincipalCV
-): CoinbasePayload | CoinbasePayloadToAltRecipient {
+): CoinbasePayloadWire | CoinbasePayloadToAltRecipient {
   if (coinbaseBytes.byteLength != COINBASE_BYTES_LENGTH) {
     throw Error(`Coinbase buffer size must be ${COINBASE_BYTES_LENGTH} bytes`);
   }
@@ -231,7 +234,7 @@ export function createCoinbasePayload(
   };
 }
 
-export interface NakamotoCoinbasePayload {
+export interface NakamotoCoinbasePayloadWire {
   readonly type: StacksWireType.Payload;
   readonly payloadType: PayloadType.NakamotoCoinbase;
   readonly coinbaseBytes: Uint8Array;
@@ -243,7 +246,7 @@ export function createNakamotoCoinbasePayload(
   coinbaseBytes: Uint8Array,
   recipient: OptionalCV<PrincipalCV>,
   vrfProof: Uint8Array
-): NakamotoCoinbasePayload {
+): NakamotoCoinbasePayloadWire {
   if (coinbaseBytes.byteLength != COINBASE_BYTES_LENGTH) {
     throw Error(`Coinbase buffer size must be ${COINBASE_BYTES_LENGTH} bytes`);
   }
@@ -268,7 +271,7 @@ export enum TenureChangeCause {
   Extended = 1,
 }
 
-export interface TenureChangePayload {
+export interface TenureChangePayloadWire {
   readonly type: StacksWireType.Payload;
   readonly payloadType: PayloadType.TenureChange;
   /**
@@ -307,7 +310,7 @@ export function createTenureChangePayload(
   previousTenureBlocks: number,
   cause: TenureChangeCause,
   publicKeyHash: string
-): TenureChangePayload {
+): TenureChangePayloadWire {
   return {
     type: StacksWireType.Payload,
     payloadType: PayloadType.TenureChange,
@@ -384,11 +387,11 @@ export function serializePayloadBytes(payload: PayloadInput): Uint8Array {
   return concatArray(bytesArray);
 }
 
-export function deserializePayload(serialized: string): Payload {
+export function deserializePayload(serialized: string): PayloadWire {
   return deserializePayloadBytes(hexToBytes(serialized));
 }
 /** @ignore */
-export function deserializePayloadBytes(serialized: Uint8Array | BytesReader): Payload {
+export function deserializePayloadBytes(serialized: Uint8Array | BytesReader): PayloadWire {
   const bytesReader = isInstance(serialized, BytesReader)
     ? serialized
     : new BytesReader(serialized);

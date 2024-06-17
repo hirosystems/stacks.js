@@ -198,7 +198,7 @@ For easier migrating, renaming the following methods is possible to keep the pre
 The following interfaces and methods were renamed:
 
 - `AssetInfo` → `Asset`
-- `StacksMessageType.AssetInfo` → `StacksMessageType.Asset`
+- `StacksWireType.AssetInfo` → `StacksWireType.Asset`
 - `createAssetInfo` → `createAsset`
 - `parseAssetInfoString` → `parseAssetString`
 
@@ -221,6 +221,29 @@ This is only used for advanced serialization use-cases internally and should not
 - `StacksMessageType` → `StacksWireType`
 - `serializeStacksMessage` → `serializeStacksWireBytes`
 - `deserializeStacksMessage` → `deserializeStacksWireBytes`
+
+More types were renamed to indicate use for serialization to _wire-format_:
+
+- `MessageSignature` → `MessageSignatureWire`
+- `StacksPublicKey` → `PublicKeyWire`
+- `TransactionAuthField` → `TransactionAuthFieldWire`
+- `Asset` → `AssetWire`
+- `Address` → `AddressWire`
+- `PostCondition` → `PostConditionWire`
+- `PostConditionPrincipal` → `PostConditionPrincipalWire`
+- `STXPostCondition` → `STXPostConditionWire`
+- `FungiblePostCondition` → `FungiblePostConditionWire`
+- `NonFungiblePostCondition` → `NonFungiblePostConditionWire`
+- `LengthPrefixedString` → `LengthPrefixedStringWire`
+- `CoinbasePayload` → `CoinbasePayloadWire`
+- `PoisonPayload` → `PoisonPayloadWire`
+- `SmartContractPayload` → `SmartContractPayloadWire`
+- `TokenTransferPayload` → `TokenTransferPayloadWire`
+- `VersionedSmartContractPayload` → `VersionedSmartContractPayloadWire`
+- `NakamotoCoinbasePayload` → `NakamotoCoinbasePayloadWire`
+- `TenureChangePayload` → `TenureChangePayloadWire`
+- `StandardPrincipal` → `StandardPrincipalWire`
+- `ContractPrincipal` → `ContractPrincipalWire`
 
 ## Stacks.js (&lt;=4.x.x) → (5.x.x)
 

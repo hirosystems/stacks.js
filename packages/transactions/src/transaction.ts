@@ -44,8 +44,13 @@ import {
   anchorModeFrom,
 } from './constants';
 import { SerializationError, SigningError } from './errors';
-import { StacksPublicKey, privateKeyIsCompressed, publicKeyIsCompressed } from './keys';
-import { Payload, PayloadInput, deserializePayloadBytes, serializePayloadBytes } from './payload';
+import { PublicKeyWire, privateKeyIsCompressed, publicKeyIsCompressed } from './keys';
+import {
+  PayloadWire,
+  PayloadInput,
+  deserializePayloadBytes,
+  serializePayloadBytes,
+} from './payload';
 import { createTransactionAuthField } from './signature';
 import {
   LengthPrefixedList,
@@ -60,7 +65,7 @@ export class StacksTransaction {
   chainId: ChainId;
   auth: Authorization;
   anchorMode: AnchorMode;
-  payload: Payload;
+  payload: PayloadWire;
   postConditionMode: PostConditionMode;
   postConditions: LengthPrefixedList;
 
@@ -132,7 +137,7 @@ export class StacksTransaction {
     }
   }
 
-  appendPubkey(publicKey: StacksPublicKey) {
+  appendPubkey(publicKey: PublicKeyWire) {
     const cond = this.auth.spendingCondition;
     if (cond && !isSingleSig(cond)) {
       const compressed = publicKeyIsCompressed(publicKey.data);

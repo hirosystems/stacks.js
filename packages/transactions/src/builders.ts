@@ -43,12 +43,12 @@ import {
   createSTXPostCondition,
 } from './postcondition';
 import {
-  Asset,
   AssetString,
-  FungiblePostCondition,
-  NonFungiblePostCondition,
-  PostCondition,
-  STXPostCondition,
+  AssetWire,
+  FungiblePostConditionWire,
+  NonFungiblePostConditionWire,
+  PostConditionWire,
+  STXPostConditionWire,
   createAddress,
   createContractPrincipal,
   createStandardPrincipal,
@@ -268,7 +268,7 @@ export interface BaseContractDeployOptions {
    * transfered assets */
   postConditionMode?: PostConditionMode;
   /** a list of post conditions to add to the transaction */
-  postConditions?: PostCondition[];
+  postConditions?: PostConditionWire[];
   /** set to true if another account is sponsoring the transaction (covering the transaction fee) */
   sponsored?: boolean;
 }
@@ -390,7 +390,7 @@ export async function makeUnsignedContractDeploy(
     ? createSponsoredAuth(spendingCondition)
     : createStandardAuth(spendingCondition);
 
-  const postConditions: PostCondition[] = [];
+  const postConditions: PostConditionWire[] = [];
   if (options.postConditions && options.postConditions.length > 0) {
     options.postConditions.forEach(postCondition => {
       postConditions.push(postCondition);
@@ -444,7 +444,7 @@ export interface ContractCallOptions {
    * transfered assets */
   postConditionMode?: PostConditionMode;
   /** a list of post conditions to add to the transaction */
-  postConditions?: PostCondition[];
+  postConditions?: PostConditionWire[];
   /** set to true to validate that the supplied function args match those specified in
    * the published contract */
   validateWithAbi?: boolean | ClarityAbi;
@@ -547,7 +547,7 @@ export async function makeUnsignedContractCall(
     ? createSponsoredAuth(spendingCondition)
     : createStandardAuth(spendingCondition);
 
-  const postConditions: PostCondition[] = [];
+  const postConditions: PostConditionWire[] = [];
   if (options.postConditions && options.postConditions.length > 0) {
     options.postConditions.forEach(postCondition => {
       postConditions.push(postCondition);
@@ -632,7 +632,7 @@ export function makeStandardSTXPostCondition(
   address: string,
   conditionCode: FungibleConditionCode,
   amount: IntegerType
-): STXPostCondition {
+): STXPostConditionWire {
   return createSTXPostCondition(createStandardPrincipal(address), conditionCode, amount);
 }
 
@@ -646,14 +646,14 @@ export function makeStandardSTXPostCondition(
  * @param conditionCode - the condition code
  * @param amount - the amount of STX tokens (denoted in micro-STX)
  *
- * @return {STXPostCondition}
+ * @return {STXPostConditionWire}
  */
 export function makeContractSTXPostCondition(
   address: string,
   contractName: string,
   conditionCode: FungibleConditionCode,
   amount: IntegerType
-): STXPostCondition {
+): STXPostConditionWire {
   return createSTXPostCondition(
     createContractPrincipal(address, contractName),
     conditionCode,
@@ -675,8 +675,8 @@ export function makeStandardFungiblePostCondition(
   address: string,
   conditionCode: FungibleConditionCode,
   amount: IntegerType,
-  asset: AssetString | Asset
-): FungiblePostCondition {
+  asset: AssetString | AssetWire
+): FungiblePostConditionWire {
   return createFungiblePostCondition(
     createStandardPrincipal(address),
     conditionCode,
@@ -701,8 +701,8 @@ export function makeContractFungiblePostCondition(
   contractName: string,
   conditionCode: FungibleConditionCode,
   amount: IntegerType,
-  asset: AssetString | Asset
-): FungiblePostCondition {
+  asset: AssetString | AssetWire
+): FungiblePostConditionWire {
   return createFungiblePostCondition(
     createContractPrincipal(address, contractName),
     conditionCode,
@@ -718,17 +718,17 @@ export function makeContractFungiblePostCondition(
  *
  * @param {String} address - the c32check address
  * @param {FungibleConditionCode} conditionCode - the condition code
- * @param {Asset} asset - asset info describing the non-fungible token
+ * @param {AssetWire} asset - asset info describing the non-fungible token
  * @param {ClarityValue} assetId - asset identifier of the nft instance (typically a uint/buffer/string)
  *
- * @return {NonFungiblePostCondition}
+ * @return {NonFungiblePostConditionWire}
  */
 export function makeStandardNonFungiblePostCondition(
   address: string,
   conditionCode: NonFungibleConditionCode,
-  asset: AssetString | Asset,
+  asset: AssetString | AssetWire,
   assetId: ClarityValue
-): NonFungiblePostCondition {
+): NonFungiblePostConditionWire {
   return createNonFungiblePostCondition(
     createStandardPrincipal(address),
     conditionCode,
@@ -745,18 +745,18 @@ export function makeStandardNonFungiblePostCondition(
  * @param {String} address - the c32check address
  * @param {String} contractName - the name of the contract
  * @param {FungibleConditionCode} conditionCode - the condition code
- * @param {Asset} asset - asset info describing the non-fungible token
+ * @param {AssetWire} asset - asset info describing the non-fungible token
  * @param {ClarityValue} assetId - asset identifier of the nft instance (typically a uint/buffer/string)
  *
- * @return {NonFungiblePostCondition}
+ * @return {NonFungiblePostConditionWire}
  */
 export function makeContractNonFungiblePostCondition(
   address: string,
   contractName: string,
   conditionCode: NonFungibleConditionCode,
-  asset: AssetString | Asset,
+  asset: AssetString | AssetWire,
   assetId: ClarityValue
-): NonFungiblePostCondition {
+): NonFungiblePostConditionWire {
   return createNonFungiblePostCondition(
     createContractPrincipal(address, contractName),
     conditionCode,

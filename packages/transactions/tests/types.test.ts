@@ -7,13 +7,13 @@ import {
   addressFromPublicKeys,
 } from '../src/types';
 import {
-  LengthPrefixedString,
-  Asset,
+  LengthPrefixedStringWire,
+  AssetWire,
   createLPString,
   createAddress,
   createAsset,
 } from '../src/postcondition-types';
-import { Address, addressToString } from '../src/common';
+import { AddressWire, addressToString } from '../src/common';
 import { AddressHashMode, StacksWireType } from '../src/constants';
 
 import { serializeDeserialize } from './macros';
@@ -27,7 +27,7 @@ test('Length prefixed strings serialization and deserialization', () => {
   const deserialized = serializeDeserialize(
     lpString,
     StacksWireType.LengthPrefixedString
-  ) as LengthPrefixedString;
+  ) as LengthPrefixedStringWire;
   expect(deserialized.content).toBe(testString);
 
   const longTestString = 'a'.repeat(129);
@@ -135,7 +135,7 @@ test('C32 address hash mode - testnet P2WSH', () => {
 test('C32check addresses serialization and deserialization', () => {
   const c32AddressString = 'SP9YX31TK12T0EZKWP3GZXX8AM37JDQHAWM7VBTH';
   const addr = createAddress(c32AddressString);
-  const deserialized = serializeDeserialize(addr, StacksWireType.Address) as Address;
+  const deserialized = serializeDeserialize(addr, StacksWireType.Address) as AddressWire;
   expect(addressToString(deserialized)).toBe(c32AddressString);
 });
 
@@ -144,7 +144,7 @@ test('Asset info serialization and deserialization', () => {
   const assetContractName = 'contract_name';
   const assetName = 'asset_name';
   const info = createAsset(assetAddress, assetContractName, assetName);
-  const deserialized = serializeDeserialize(info, StacksWireType.Asset) as Asset;
+  const deserialized = serializeDeserialize(info, StacksWireType.Asset) as AssetWire;
   expect(addressToString(deserialized.address)).toBe(assetAddress);
   expect(deserialized.contractName.content).toBe(assetContractName);
   expect(deserialized.assetName.content).toBe(assetName);

@@ -12,7 +12,7 @@ import { FungibleConditionCode, NonFungibleConditionCode } from './constants';
 import {
   AssetString,
   ContractIdString,
-  NonFungiblePostCondition,
+  NonFungiblePostConditionWire,
   createAsset,
 } from './postcondition-types';
 import { AddressString } from './types';
@@ -254,7 +254,7 @@ class PartialPcNftWithCode {
    * @param assetName - The name of the NFT asset. Formatted as `<contract-address>.<contract-name>::<token-name>`.
    * @param assetId - The asset identifier of the NFT. A Clarity value defining the single NFT instance.
    */
-  nft(assetName: AssetString, assetId: ClarityValue): NonFungiblePostCondition;
+  nft(assetName: AssetString, assetId: ClarityValue): NonFungiblePostConditionWire;
   /**
    * ### Non-Fungible Token Post Condition
    * @param contractId - The contract identifier of the NFT. Formatted as `<contract-address>.<contract-name>`.
@@ -265,8 +265,8 @@ class PartialPcNftWithCode {
     contractId: ContractIdString,
     tokenName: string,
     assetId: ClarityValue
-  ): NonFungiblePostCondition;
-  nft(...args: [any, any] | [any, any, any]): NonFungiblePostCondition {
+  ): NonFungiblePostConditionWire;
+  nft(...args: [any, any] | [any, any, any]): NonFungiblePostConditionWire {
     const { contractAddress, contractName, tokenName, assetId } = getNftArgs(
       ...(args as [any, any, any])
     );

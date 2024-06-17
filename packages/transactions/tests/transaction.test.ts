@@ -27,11 +27,11 @@ import {
 } from '../src/keys';
 import {
   CoinbasePayloadToAltRecipient,
-  TokenTransferPayload,
+  TokenTransferPayloadWire,
   createTokenTransferPayload,
 } from '../src/payload';
 import { createSTXPostCondition } from '../src/postcondition';
-import { STXPostCondition, createStandardPrincipal } from '../src/postcondition-types';
+import { STXPostConditionWire, createStandardPrincipal } from '../src/postcondition-types';
 import { TransactionSigner } from '../src/signer';
 import {
   StacksTransaction,
@@ -110,12 +110,12 @@ test('STX token transfer transaction serialization and deserialization', () => {
   expect(deserialized.postConditionMode).toBe(postConditionMode);
   expect(deserialized.postConditions.values.length).toBe(1);
 
-  const deserializedPostCondition = deserialized.postConditions.values[0] as STXPostCondition;
+  const deserializedPostCondition = deserialized.postConditions.values[0] as STXPostConditionWire;
   expect(deserializedPostCondition.principal.address).toStrictEqual(recipient.address);
   expect(deserializedPostCondition.conditionCode).toBe(FungibleConditionCode.GreaterEqual);
   expect(deserializedPostCondition.amount.toString()).toBe('0');
 
-  const deserializedPayload = deserialized.payload as TokenTransferPayload;
+  const deserializedPayload = deserialized.payload as TokenTransferPayloadWire;
   expect(deserializedPayload.recipient).toEqual(recipientCV);
   expect(deserializedPayload.amount.toString()).toBe(amount.toString());
 });
@@ -185,12 +185,12 @@ test('STX token transfer transaction fee setting', () => {
   expect(postSetFeeDeserialized.postConditions.values.length).toBe(1);
 
   const deserializedPostCondition = postSetFeeDeserialized.postConditions
-    .values[0] as STXPostCondition;
+    .values[0] as STXPostConditionWire;
   expect(deserializedPostCondition.principal.address).toStrictEqual(recipient.address);
   expect(deserializedPostCondition.conditionCode).toBe(FungibleConditionCode.GreaterEqual);
   expect(deserializedPostCondition.amount.toString()).toBe('0');
 
-  const deserializedPayload = postSetFeeDeserialized.payload as TokenTransferPayload;
+  const deserializedPayload = postSetFeeDeserialized.payload as TokenTransferPayloadWire;
   expect(deserializedPayload.recipient).toEqual(recipientCV);
   expect(deserializedPayload.amount.toString()).toBe(amount.toString());
 });
@@ -259,7 +259,7 @@ test('STX token transfer transaction multi-sig serialization and deserialization
   expect(deserialized.postConditionMode).toBe(PostConditionMode.Deny);
   expect(deserialized.postConditions.values.length).toBe(0);
 
-  const deserializedPayload = deserialized.payload as TokenTransferPayload;
+  const deserializedPayload = deserialized.payload as TokenTransferPayloadWire;
   expect(deserializedPayload.recipient).toEqual(recipientCV);
   expect(deserializedPayload.amount.toString()).toBe(amount.toString());
 });
@@ -379,7 +379,7 @@ test('Sponsored STX token transfer transaction serialization and deserialization
   expect(deserialized.anchorMode).toBe(anchorMode);
   expect(deserialized.postConditionMode).toBe(postConditionMode);
 
-  const deserializedPayload = deserialized.payload as TokenTransferPayload;
+  const deserializedPayload = deserialized.payload as TokenTransferPayloadWire;
   expect(deserializedPayload.recipient).toEqual(recipientCV);
   expect(deserializedPayload.amount.toString()).toBe(amount.toString());
 });
