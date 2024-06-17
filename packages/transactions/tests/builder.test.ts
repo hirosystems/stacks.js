@@ -170,7 +170,7 @@ test('Make STX token transfer with set tx fee', async () => {
   });
   expect(() => transaction.verifyOrigin()).not.toThrow();
 
-  const serialized = bytesToHex(transaction.serialize());
+  const serialized = transaction.serialize();
 
   const tx =
     '0000000001040015c31b8c1c11c515e244b75806bac48d1399c77500000000000000000000000000000000' +
@@ -229,7 +229,7 @@ test('Make STX token transfer with fee estimate', async () => {
   expect(() => transaction.verifyOrigin()).not.toThrow();
   expect(transaction.auth.spendingCondition?.fee?.toString()).toEqual('180');
 
-  const serialized = bytesToHex(transaction.serialize());
+  const serialized = transaction.serialize();
   const tx =
     '0000000001040015c31b8c1c11c515e244b75806bac48d1399c775000000000000000000000000000000b4' +
     '0001e5ac1152f6018fbfded102268b22086666150823d0ae57f4023bde058a7ff0b279076db25b358b8833' +
@@ -261,7 +261,7 @@ test('Make STX token transfer with testnet', async () => {
   });
   expect(() => transaction.verifyOrigin()).not.toThrow();
 
-  const serialized = bytesToHex(transaction.serialize());
+  const serialized = transaction.serialize();
   const tx =
     '8080000000040015c31b8c1c11c515e244b75806bac48d1399c77500000000000000000000000000000000' +
     '00014199f63f7e010141a36a4624d032758f54e08ff03b24ed2667463eb405b4d81505631b32a1f13b5737' +
@@ -284,7 +284,7 @@ test('Make STX token transfer with testnet string name', async () => {
   });
   expect(() => transaction.verifyOrigin()).not.toThrow();
 
-  const serialized = bytesToHex(transaction.serialize());
+  const serialized = transaction.serialize();
   const tx =
     '8080000000040015c31b8c1c11c515e244b75806bac48d1399c77500000000000000000000000000000000' +
     '00014199f63f7e010141a36a4624d032758f54e08ff03b24ed2667463eb405b4d81505631b32a1f13b5737' +
@@ -333,7 +333,7 @@ test("STX token transfers don't take post conditions", async () => {
     postConditions,
   } as SignedTokenTransferOptions);
 
-  const serialized = transaction.serialize();
+  const serialized = transaction.serializeBytes();
 
   const bytesReader = new BytesReader(serialized);
   const deserializedTx = deserializeTransaction(bytesReader);
@@ -388,9 +388,9 @@ test('Make Multi-Sig STX token transfer', async () => {
     '030200000000000516df0ba3e79792be7be5e50a370289accfc8c9e03200000000002625a074657374206d' +
     '656d6f00000000000000000000000000000000000000000000000000';
 
-  expect(bytesToHex(serializedTx)).toBe(tx);
+  expect(serializedTx).toBe(tx);
 
-  const bytesReader = new BytesReader(serializedTx);
+  const bytesReader = new BytesReader(hexToBytes(serializedTx));
   const deserializedTx = deserializeTransaction(bytesReader);
 
   expect(deserializedTx.auth.authType).toBe(authType);
@@ -415,7 +415,7 @@ test('Make Multi-Sig STX token transfer', async () => {
     '0000000000516df0ba3e79792be7be5e50a370289accfc8c9e03200000000002625a074657374206d656d6f' +
     '00000000000000000000000000000000000000000000000000';
 
-  expect(bytesToHex(serializedSignedTx)).toBe(signedTx);
+  expect(serializedSignedTx).toBe(signedTx);
 });
 
 test('Should deserialize partially signed multi-Sig STX token transfer', async () => {
@@ -454,9 +454,9 @@ test('Should deserialize partially signed multi-Sig STX token transfer', async (
     '000000000002030200000000000516df0ba3e79792be7be5e50a370289accfc8c9e03200000000002625a0' +
     '74657374206d656d6f00000000000000000000000000000000000000000000000000';
 
-  expect(bytesToHex(serializedTx)).toBe(tx);
+  expect(serializedTx).toBe(tx);
 
-  const bytesReader = new BytesReader(serializedTx);
+  const bytesReader = new BytesReader(hexToBytes(serializedTx));
 
   // Partially signed or unsigned multi-sig tx can be serialized and deserialized without exception (Incorrect number of signatures)
   // Should be able to deserializeTransaction with missing signatures.
@@ -468,7 +468,7 @@ test('Should deserialize partially signed multi-Sig STX token transfer', async (
   signer.signOrigin(privKeys[1]);
   signer.appendOrigin(pubKeys[2]);
 
-  const fullySignedTransaction = transaction.serialize();
+  const fullySignedTransaction = transaction.serializeBytes();
   const bytesReaderSignedTx = new BytesReader(fullySignedTransaction);
 
   // Should deserialize fully signed multi sig transaction
@@ -573,7 +573,7 @@ test('Make Multi-Sig STX token transfer with two transaction signers', async () 
     '000000000002030200000000000516df0ba3e79792be7be5e50a370289accfc8c9e03200000000002625a0' +
     '74657374206d656d6f00000000000000000000000000000000000000000000000000';
 
-  expect(bytesToHex(serializedTxUnsigned)).toBe(tx);
+  expect(serializedTxUnsigned).toBe(tx);
 
   // obtain first auth field and sign once
   const signer = new TransactionSigner(transaction);
@@ -588,7 +588,7 @@ test('Make Multi-Sig STX token transfer with two transaction signers', async () 
   signer.signOrigin(privKeys[0]);
 
   // serialize
-  const partiallySignedSerialized = transaction.serialize();
+  const partiallySignedSerialized = transaction.serializeBytes();
 
   // deserialize
   const bytesReader2 = new BytesReader(partiallySignedSerialized);
@@ -616,7 +616,7 @@ test('Make Multi-Sig STX token transfer with two transaction signers', async () 
   signer2.signOrigin(privKeys[1]);
   signer2.appendOrigin(pubKeys[2]);
 
-  const serializedTx = transaction.serialize();
+  const serializedTx = transaction.serializeBytes();
 
   const bytesReader = new BytesReader(serializedTx);
   const deserializedTx = deserializeTransaction(bytesReader);
@@ -649,7 +649,7 @@ test('Make Multi-Sig STX token transfer with two transaction signers', async () 
     '0000000000516df0ba3e79792be7be5e50a370289accfc8c9e03200000000002625a074657374206d656d6f' +
     '00000000000000000000000000000000000000000000000000';
 
-  expect(bytesToHex(serializedSignedTx)).toBe(signedTx);
+  expect(serializedSignedTx).toBe(signedTx);
 });
 
 test('addSignature to an unsigned transaction', async () => {
@@ -700,7 +700,7 @@ test('Make versioned smart contract deploy', async () => {
   });
   expect(() => transaction.verifyOrigin()).not.toThrow();
 
-  const serialized = bytesToHex(transaction.serialize());
+  const serialized = transaction.serialize();
 
   const tx =
     '80800000000400e6c05355e0c990ffad19a5e9bda394a9c50034290000000000000000000000000000000000009172c9841e763c32e827c177491f5228956e6ef1071043be898bfdd694bf3e680309b0666e8fec013a8a453573a8bd707152c9f21aa6f2d5e57c407af672b6f00302000000000602086b762d73746f72650000015628646566696e652d6d61702073746f72652028286b657920286275666620333229292920282876616c7565202862756666203332292929290a0a28646566696e652d7075626c696320286765742d76616c756520286b65792028627566662033322929290a20202020286d6174636820286d61702d6765743f2073746f72652028286b6579206b65792929290a2020202020202020656e74727920286f6b20286765742076616c756520656e74727929290a20202020202020202865727220302929290a0a28646566696e652d7075626c696320287365742d76616c756520286b65792028627566662033322929202876616c75652028627566662033322929290a2020202028626567696e0a2020202020202020286d61702d7365742073746f72652028286b6579206b6579292920282876616c75652076616c75652929290a2020202020202020286f6b2027747275652929290a';
@@ -725,7 +725,7 @@ test('Make smart contract deploy (defaults to versioned smart contract, as of 2.
   });
   expect(() => transaction.verifyOrigin()).not.toThrow();
 
-  const serialized = bytesToHex(transaction.serialize());
+  const serialized = transaction.serialize();
 
   const tx =
     '80800000000400e6c05355e0c990ffad19a5e9bda394a9c50034290000000000000000000000000000000000009172c9841e763c32e827c177491f5228956e6ef1071043be898bfdd694bf3e680309b0666e8fec013a8a453573a8bd707152c9f21aa6f2d5e57c407af672b6f00302000000000602086b762d73746f72650000015628646566696e652d6d61702073746f72652028286b657920286275666620333229292920282876616c7565202862756666203332292929290a0a28646566696e652d7075626c696320286765742d76616c756520286b65792028627566662033322929290a20202020286d6174636820286d61702d6765743f2073746f72652028286b6579206b65792929290a2020202020202020656e74727920286f6b20286765742076616c756520656e74727929290a20202020202020202865727220302929290a0a28646566696e652d7075626c696320287365742d76616c756520286b65792028627566662033322929202876616c75652028627566662033322929290a2020202028626567696e0a2020202020202020286d61702d7365742073746f72652028286b6579206b6579292920282876616c75652076616c75652929290a2020202020202020286f6b2027747275652929290a';
@@ -744,7 +744,7 @@ test('Make smart contract deploy with network string name (defaults to versioned
   });
   expect(() => transaction.verifyOrigin()).not.toThrow();
 
-  const serialized = bytesToHex(transaction.serialize());
+  const serialized = transaction.serialize();
 
   const tx =
     '80800000000400e6c05355e0c990ffad19a5e9bda394a9c50034290000000000000000000000000000000000009172c9841e763c32e827c177491f5228956e6ef1071043be898bfdd694bf3e680309b0666e8fec013a8a453573a8bd707152c9f21aa6f2d5e57c407af672b6f00302000000000602086b762d73746f72650000015628646566696e652d6d61702073746f72652028286b657920286275666620333229292920282876616c7565202862756666203332292929290a0a28646566696e652d7075626c696320286765742d76616c756520286b65792028627566662033322929290a20202020286d6174636820286d61702d6765743f2073746f72652028286b6579206b65792929290a2020202020202020656e74727920286f6b20286765742076616c756520656e74727929290a20202020202020202865727220302929290a0a28646566696e652d7075626c696320287365742d76616c756520286b65792028627566662033322929202876616c75652028627566662033322929290a2020202028626567696e0a2020202020202020286d61702d7365742073746f72652028286b6579206b6579292920282876616c75652076616c75652929290a2020202020202020286f6b2027747275652929290a';
@@ -770,7 +770,7 @@ test('Make smart contract deploy unsigned', async () => {
     network: STACKS_TESTNET,
   });
 
-  const serializedTx = transaction.serialize();
+  const serializedTx = transaction.serializeBytes();
 
   const bytesReader = new BytesReader(serializedTx);
   const deserializedTx = deserializeTransaction(bytesReader);
@@ -831,7 +831,7 @@ test('Make smart contract deploy signed', async () => {
   });
   expect(() => transaction.verifyOrigin()).not.toThrow();
 
-  const serializedTx = transaction.serialize();
+  const serializedTx = transaction.serializeBytes();
 
   const bytesReader = new BytesReader(serializedTx);
   const deserializedTx = deserializeTransaction(bytesReader);
@@ -863,7 +863,7 @@ test('Make contract-call', async () => {
   });
   expect(() => transaction.verifyOrigin()).not.toThrow();
 
-  const serialized = bytesToHex(transaction.serialize());
+  const serialized = transaction.serialize();
 
   const tx =
     '80800000000400e6c05355e0c990ffad19a5e9bda394a9c500342900000000000000010000000000000000' +
@@ -887,7 +887,7 @@ test('Make contract-call with network string', async () => {
   });
   expect(() => transaction.verifyOrigin()).not.toThrow();
 
-  const serialized = bytesToHex(transaction.serialize());
+  const serialized = transaction.serialize();
 
   const tx =
     '80800000000400e6c05355e0c990ffad19a5e9bda394a9c500342900000000000000010000000000000000' +
@@ -958,7 +958,7 @@ test('Make contract-call with post conditions', async () => {
   });
   expect(() => transaction.verifyOrigin()).not.toThrow();
 
-  const serialized = bytesToHex(transaction.serialize());
+  const serialized = transaction.serialize();
 
   const tx =
     '80800000000400e6c05355e0c990ffad19a5e9bda394a9c500342900000000000000010000000000000000' +
@@ -1002,7 +1002,7 @@ test('Make contract-call with post condition allow mode', async () => {
   });
   expect(() => transaction.verifyOrigin()).not.toThrow();
 
-  const serialized = bytesToHex(transaction.serialize());
+  const serialized = transaction.serialize();
 
   const tx =
     '80800000000400e6c05355e0c990ffad19a5e9bda394a9c50034290000000000000001000000000000000' +
@@ -1101,7 +1101,7 @@ test('Estimate transaction transfer fee', async () => {
     memo,
   });
 
-  const serialized = transaction.serialize();
+  const serialized = transaction.serializeBytes();
   const transactionByteLength = serialized.byteLength;
 
   const mockedResponse = JSON.stringify({
@@ -1247,7 +1247,7 @@ test('Single-sig transaction byte length must include signature', async () => {
   });
 
   // Due to empty message signature space will be allocated for signature
-  expect(unsignedTransaction.serialize().byteLength).toEqual(
+  expect(unsignedTransaction.serializeBytes().byteLength).toEqual(
     estimateTransactionByteLength(unsignedTransaction)
   );
 
@@ -1255,7 +1255,7 @@ test('Single-sig transaction byte length must include signature', async () => {
   // Now sign the transaction and verify the byteLength after adding signature
   signer.signOrigin(privateKey);
 
-  const finalSerializedTx = signer.transaction.serialize();
+  const finalSerializedTx = signer.transaction.serializeBytes();
 
   // Byte length will remains the same after signing due to pre allocated space by empty message signature
   expect(finalSerializedTx.byteLength).toEqual(estimateTransactionByteLength(signer.transaction));
@@ -1298,7 +1298,7 @@ test('Multi-sig transaction byte length must include the required signatures', a
   // Total length without signatures
   const unsignedByteLength = 120;
 
-  const serializedTx = transaction.serialize();
+  const serializedTx = transaction.serializeBytes();
   // Unsigned transaction byte length without signatures
   expect(serializedTx.byteLength).toEqual(unsignedByteLength);
 
@@ -1323,7 +1323,7 @@ test('Multi-sig transaction byte length must include the required signatures', a
   // Should calculate correct length if transaction is completely signed
   expect(estimateTransactionByteLength(signer.transaction)).toEqual(expectedFinalLength);
 
-  const finalSerializedTx = signer.transaction.serialize();
+  const finalSerializedTx = signer.transaction.serializeBytes();
   // Validate expectedFinalLength is correct
   expect(finalSerializedTx.byteLength).toEqual(expectedFinalLength);
 
@@ -1391,7 +1391,7 @@ test('Make sponsored STX token transfer', async () => {
     sponsored: true,
   });
 
-  const preSponsorSerialized = bytesToHex(transaction.serialize());
+  const preSponsorSerialized = transaction.serialize();
   const preSponsorTx =
     '0000000001050015c31b8c1c11c515e244b75806bac48d1399c77500000000000000020000000000000032' +
     '000012f0e0f7eec8657e814bdcde9352920dd9416dd757f1ada573ef268cc93001fd76db462508ffd90dec' +
@@ -1410,7 +1410,7 @@ test('Make sponsored STX token transfer', async () => {
   };
 
   const sponsorSignedTx = await sponsorTransaction(sponsorOptions);
-  const sponsorSignedTxSerialized = sponsorSignedTx.serialize();
+  const sponsorSignedTxSerialized = sponsorSignedTx.serializeBytes();
 
   const bytesReader = new BytesReader(sponsorSignedTxSerialized);
   const deserializedSponsorTx = deserializeTransaction(bytesReader);
@@ -1554,7 +1554,7 @@ test('Make sponsored STX token transfer with sponsor fee estimate', async () => 
   expect(fetchMock.mock.calls.length).toEqual(1);
   expect(fetchMock.mock.calls[0][0]).toEqual(`${api.url}${TRANSACTION_FEE_ESTIMATE_PATH}`);
 
-  const sponsorSignedTxSerialized = sponsorSignedTx.serialize();
+  const sponsorSignedTxSerialized = sponsorSignedTx.serializeBytes();
 
   const bytesReader = new BytesReader(sponsorSignedTxSerialized);
   const deserializedSponsorTx = deserializeTransaction(bytesReader);
@@ -1609,7 +1609,7 @@ test('Make sponsored STX token transfer with set tx fee', async () => {
 
   const sponsorSignedTx = await sponsorTransaction(sponsorOptions);
 
-  const sponsorSignedTxSerialized = sponsorSignedTx.serialize();
+  const sponsorSignedTxSerialized = sponsorSignedTx.serializeBytes();
 
   const bytesReader = new BytesReader(sponsorSignedTxSerialized);
   const deserializedSponsorTx = deserializeTransaction(bytesReader);
@@ -1665,7 +1665,7 @@ test('Make sponsored contract deploy with sponsor fee estimate', async () => {
 
   expect(fetchMock.mock.calls.length).toEqual(0);
 
-  const sponsorSignedTxSerialized = sponsorSignedTx.serialize();
+  const sponsorSignedTxSerialized = sponsorSignedTx.serializeBytes();
 
   const bytesReader = new BytesReader(sponsorSignedTxSerialized);
   const deserializedSponsorTx = deserializeTransaction(bytesReader);
@@ -1729,7 +1729,7 @@ test('Make sponsored contract call with sponsor nonce fetch', async () => {
     `${HIRO_TESTNET_URL}${ACCOUNT_PATH}/${sponsorAddress}?proof=0`
   );
 
-  const sponsorSignedTxSerialized = sponsorSignedTx.serialize();
+  const sponsorSignedTxSerialized = sponsorSignedTx.serializeBytes();
 
   const bytesReader = new BytesReader(sponsorSignedTxSerialized);
   const deserializedSponsorTx = deserializeTransaction(bytesReader);
@@ -1775,7 +1775,7 @@ test('Transaction broadcast success', async () => {
   expect(fetchMock.mock.calls.length).toEqual(1);
   expect(fetchMock.mock.calls[0][0]).toEqual(`${api.url}${BROADCAST_PATH}`);
   expect(fetchMock.mock.calls[0][1]?.body).toEqual(
-    JSON.stringify({ tx: bytesToHex(transaction.serialize()) })
+    JSON.stringify({ tx: bytesToHex(transaction.serializeBytes()) })
   );
   expect(response as TxBroadcastResultOk).toEqual({ txid });
 });
@@ -1798,9 +1798,7 @@ test('Transaction broadcast success with string network name', async () => {
 
   expect(fetchMock.mock.calls.length).toEqual(1);
   expect(fetchMock.mock.calls[0][0]).toEqual(`${HIRO_MAINNET_URL}${BROADCAST_PATH}`);
-  expect(fetchMock.mock.calls[0][1]?.body).toEqual(
-    JSON.stringify({ tx: bytesToHex(transaction.serialize()) })
-  );
+  expect(fetchMock.mock.calls[0][1]?.body).toEqual(JSON.stringify({ tx: transaction.serialize() }));
   expect(response as TxBroadcastResultOk).toEqual({ txid });
 });
 
@@ -1822,9 +1820,7 @@ test('Transaction broadcast success with network detection', async () => {
 
   expect(fetchMock.mock.calls.length).toEqual(1);
   expect(fetchMock.mock.calls[0][0]).toEqual(`${HIRO_TESTNET_URL}${BROADCAST_PATH}`);
-  expect(fetchMock.mock.calls[0][1]?.body).toEqual(
-    JSON.stringify({ tx: bytesToHex(transaction.serialize()) })
-  );
+  expect(fetchMock.mock.calls[0][1]?.body).toEqual(JSON.stringify({ tx: transaction.serialize() }));
   expect(response as TxBroadcastResultOk).toEqual({ txid });
 });
 
@@ -1855,7 +1851,7 @@ test('Transaction broadcast with attachment', async () => {
   expect(fetchMock.mock.calls[0][0]).toEqual(`${HIRO_MAINNET_URL}${BROADCAST_PATH}`);
   expect(fetchMock.mock.calls[0][1]?.body).toEqual(
     JSON.stringify({
-      tx: bytesToHex(transaction.serialize()),
+      tx: transaction.serialize(),
       attachment,
     })
   );
@@ -2247,7 +2243,7 @@ describe('serialize/deserialize tenure change', () => {
       '808000000004000f873150e9790e305b701aa8c7b3bcff9e31a5f9000000000000000000000000000000000001d367da530b92f4984f537f0b903c330eb5158262afa08d67cbbdea6c8e2ecae06008248ac147fc34101d3cc207b1b3e386e0f53732b5548bd5abe1570c2271340302000000000755c9861be5cff984a20ce6d99d4aa65941412889bdc665094136429b84f8c2ee00000001000000000000000000000000000000000000000000000000000279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f817980000000000000000000000000000000000000000000000000000000000000000';
     const transaction = deserializeTransaction(txBytes);
 
-    expect(bytesToHex(transaction.serialize())).toEqual(txBytes);
+    expect(transaction.serialize()).toEqual(txBytes);
   });
 
   test('deserialize/serialize tenure change transaction', () => {
@@ -2256,7 +2252,7 @@ describe('serialize/deserialize tenure change', () => {
       '808000000004001dc27eba0247f8cc9575e7d45e50a0bc7e72427d000000000000001d000000000000000000011dc72b6dfd9b36e414a2709e3b01eb5bbdd158f9bc77cd2ca6c3c8b0c803613e2189f6dacf709b34e8182e99d3a1af15812b75e59357d9c255c772695998665f010200000000076f2ff2c4517ab683bf2d588727f09603cc3e9328b9c500e21a939ead57c0560af8a3a132bd7d56566f2ff2c4517ab683bf2d588727f09603cc3e932828dcefb98f6b221eef731cabec7538314441c1e0ff06b44c22085d41aae447c1000000010014ff3cb19986645fd7e71282ad9fea07d540a60e';
     const transaction = deserializeTransaction(txBytes);
 
-    expect(bytesToHex(transaction.serialize())).toEqual(txBytes);
+    expect(transaction.serialize()).toEqual(txBytes);
   });
 });
 
@@ -2272,7 +2268,7 @@ test.each([
 ])('deserialize/serialize nakamoto coinbase transaction', txBytes => {
   const transaction = deserializeTransaction(txBytes);
 
-  expect(bytesToHex(transaction.serialize())).toEqual(txBytes);
+  expect(bytesToHex(transaction.serializeBytes())).toEqual(txBytes);
 });
 
 describe('multi-sig', () => {
@@ -2406,7 +2402,7 @@ describe('multi-sig', () => {
 
       // random byte changes
       for (let i = 0; i < 100; i++) {
-        const bytes = Array.from(tx.serialize());
+        const bytes = Array.from(tx.serializeBytes());
         const randomIdx = Math.floor(Math.random() * bytes.length);
         bytes[randomIdx] ^= 1;
         expect(() => deserializeTransaction(Uint8Array.from(bytes)).verifyOrigin()).toThrow();
