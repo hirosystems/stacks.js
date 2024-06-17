@@ -89,7 +89,7 @@ import {
   PayloadType,
   PostConditionMode,
   PubKeyEncoding,
-  StacksMessageType,
+  StacksWireType,
   TxRejectedReason,
 } from '../src/constants';
 import { makeRandomPrivKey } from '../src/keys';
@@ -2386,7 +2386,7 @@ describe('multi-sig', () => {
       expect(parsed.auth.spendingCondition.signaturesRequired).toBe(required);
 
       const signatures = parsed.auth.spendingCondition.fields
-        .filter(f => f.contents.type === StacksMessageType.MessageSignature)
+        .filter(f => f.contents.type === StacksWireType.MessageSignature)
         .map(s => s.contents.data);
       expect(signatures.length).toBe(signing.length);
 
@@ -2400,7 +2400,7 @@ describe('multi-sig', () => {
       expect(Array.from(signingSigs)).toEqual(expect.arrayContaining(signatures));
 
       const appendedKeys = parsed.auth.spendingCondition.fields.filter(
-        f => f.contents.type === StacksMessageType.PublicKey
+        f => f.contents.type === StacksWireType.PublicKey
       );
       expect(appendedKeys.length).toBe(signers.length - signing.length);
 
@@ -2451,7 +2451,7 @@ describe('multi-sig', () => {
         const signerPublicKey = privateKeyToPublic(signerKey);
         const fieldIdx = tx.auth.spendingCondition.fields.findIndex(field => {
           return (
-            field.contents.type === StacksMessageType.PublicKey &&
+            field.contents.type === StacksWireType.PublicKey &&
             bytesToHex(field.contents.data) === signerPublicKey
           );
         });

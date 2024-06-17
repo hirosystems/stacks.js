@@ -16,7 +16,7 @@ export const MEMO_MAX_LENGTH_BYTES = 34;
  * The type of message that is being serialized.
  * Used internally for serializing and deserializing messages.
  */
-export enum StacksMessageType {
+export enum StacksWireType {
   Address,
   Principal,
   LengthPrefixedString,
@@ -31,10 +31,10 @@ export enum StacksMessageType {
   TransactionAuthField,
 }
 
-type WhenMessageTypeMap<T> = Record<StacksMessageType, T>;
+type WhenWireTypeMap<T> = Record<StacksWireType, T>;
 
-export function whenMessageType(messageType: StacksMessageType) {
-  return <T>(messageTypeMap: WhenMessageTypeMap<T>): T => messageTypeMap[messageType];
+export function whenWireType(wireType: StacksWireType) {
+  return <T>(wireTypeMap: WhenWireTypeMap<T>): T => wireTypeMap[wireType];
 }
 
 /**

@@ -1,7 +1,7 @@
 import { sha256 } from '@noble/hashes/sha256';
 import { PrivateKey, bytesToHex, concatBytes, utf8ToBytes } from '@stacks/common';
 import { ClarityType, ClarityValue, serializeCVBytes } from './clarity';
-import { StacksMessageType } from './constants';
+import { StacksWireType } from './constants';
 import { StructuredDataSignature } from './message-types';
 import { signMessageHashRsv } from './keys';
 
@@ -88,6 +88,6 @@ export function signStructuredData({
   });
   return {
     data,
-    type: StacksMessageType.StructuredDataSignature,
+    type: StacksWireType.StructuredDataSignature,
   };
 }

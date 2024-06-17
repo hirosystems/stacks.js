@@ -25,7 +25,7 @@ import {
   ClarityVersion,
   COINBASE_BYTES_LENGTH,
   PayloadType,
-  StacksMessageType,
+  StacksWireType,
   VRF_PROOF_BYTES_LENGTH,
 } from './constants';
 import { createAddress, createLPString, LengthPrefixedString } from './postcondition-types';
@@ -36,7 +36,7 @@ import {
   deserializeLPStringBytes,
   deserializeMemoStringBytes,
   MemoString,
-  serializeStacksMessageBytes,
+  serializeStacksWireBytes,
 } from './types';
 import { PrincipalCV } from './clarity/types';
 
@@ -68,7 +68,7 @@ export function isCoinbasePayload(p: Payload): p is CoinbasePayload {
 }
 
 export interface TokenTransferPayload {
-  readonly type: StacksMessageType.Payload;
+  readonly type: StacksWireType.Payload;
   readonly payloadType: PayloadType.TokenTransfer;
   readonly recipient: PrincipalCV;
   readonly amount: bigint;
@@ -99,7 +99,7 @@ export function createTokenTransferPayload(
   }
 
   return {
-    type: StacksMessageType.Payload,
+    type: StacksWireType.Payload,
     payloadType: PayloadType.TokenTransfer,
     recipient,
     amount: intToBigInt(amount, false),
@@ -108,7 +108,7 @@ export function createTokenTransferPayload(
 }
 
 export interface ContractCallPayload {
-  readonly type: StacksMessageType.Payload;
+  readonly type: StacksWireType.Payload;
   readonly payloadType: PayloadType.ContractCall;
   readonly contractAddress: Address;
   readonly contractName: LengthPrefixedString;
@@ -133,7 +133,7 @@ export function createContractCallPayload(
   }
 
   return {
-    type: StacksMessageType.Payload,
+    type: StacksWireType.Payload,
     payloadType: PayloadType.ContractCall,
     contractAddress,
     contractName,
@@ -143,14 +143,14 @@ export function createContractCallPayload(
 }
 
 export interface SmartContractPayload {
-  readonly type: StacksMessageType.Payload;
+  readonly type: StacksWireType.Payload;
   readonly payloadType: PayloadType.SmartContract;
   readonly contractName: LengthPrefixedString;
   readonly codeBody: LengthPrefixedString;
 }
 
 export interface VersionedSmartContractPayload {
-  readonly type: StacksMessageType.Payload;
+  readonly type: StacksWireType.Payload;
   readonly payloadType: PayloadType.VersionedSmartContract;
   readonly clarityVersion: ClarityVersion;
   readonly contractName: LengthPrefixedString;
@@ -171,7 +171,7 @@ export function createSmartContractPayload(
 
   if (typeof clarityVersion === 'number') {
     return {
-      type: StacksMessageType.Payload,
+      type: StacksWireType.Payload,
       payloadType: PayloadType.VersionedSmartContract,
       clarityVersion,
       contractName,
@@ -179,7 +179,7 @@ export function createSmartContractPayload(
     };
   }
   return {
-    type: StacksMessageType.Payload,
+    type: StacksWireType.Payload,
     payloadType: PayloadType.SmartContract,
     contractName,
     codeBody,
@@ -187,22 +187,22 @@ export function createSmartContractPayload(
 }
 
 export interface PoisonPayload {
-  readonly type: StacksMessageType.Payload;
+  readonly type: StacksWireType.Payload;
   readonly payloadType: PayloadType.PoisonMicroblock;
 }
 
 export function createPoisonPayload(): PoisonPayload {
-  return { type: StacksMessageType.Payload, payloadType: PayloadType.PoisonMicroblock };
+  return { type: StacksWireType.Payload, payloadType: PayloadType.PoisonMicroblock };
 }
 
 export interface CoinbasePayload {
-  readonly type: StacksMessageType.Payload;
+  readonly type: StacksWireType.Payload;
   readonly payloadType: PayloadType.Coinbase;
   readonly coinbaseBytes: Uint8Array;
 }
 
 export interface CoinbasePayloadToAltRecipient {
-  readonly type: StacksMessageType.Payload;
+  readonly type: StacksWireType.Payload;
   readonly payloadType: PayloadType.CoinbaseToAltRecipient;
   readonly coinbaseBytes: Uint8Array;
   readonly recipient: PrincipalCV;
@@ -218,21 +218,21 @@ export function createCoinbasePayload(
 
   if (altRecipient != undefined) {
     return {
-      type: StacksMessageType.Payload,
+      type: StacksWireType.Payload,
       payloadType: PayloadType.CoinbaseToAltRecipient,
       coinbaseBytes,
       recipient: altRecipient,
     };
   }
   return {
-    type: StacksMessageType.Payload,
+    type: StacksWireType.Payload,
     payloadType: PayloadType.Coinbase,
     coinbaseBytes,
   };
 }
 
 export interface NakamotoCoinbasePayload {
-  readonly type: StacksMessageType.Payload;
+  readonly type: StacksWireType.Payload;
   readonly payloadType: PayloadType.NakamotoCoinbase;
   readonly coinbaseBytes: Uint8Array;
   readonly recipient?: PrincipalCV;
@@ -253,7 +253,7 @@ export function createNakamotoCoinbasePayload(
   }
 
   return {
-    type: StacksMessageType.Payload,
+    type: StacksWireType.Payload,
     payloadType: PayloadType.NakamotoCoinbase,
     coinbaseBytes,
     recipient: recipient.type === ClarityType.OptionalSome ? recipient.value : undefined,
@@ -269,7 +269,7 @@ export enum TenureChangeCause {
 }
 
 export interface TenureChangePayload {
-  readonly type: StacksMessageType.Payload;
+  readonly type: StacksWireType.Payload;
   readonly payloadType: PayloadType.TenureChange;
   /**
    * The consensus hash of this tenure (hex string). Corresponds to the
@@ -309,7 +309,7 @@ export function createTenureChangePayload(
   publicKeyHash: string
 ): TenureChangePayload {
   return {
-    type: StacksMessageType.Payload,
+    type: StacksWireType.Payload,
     payloadType: PayloadType.TenureChange,
     tenureHash,
     previousTenureHash,
@@ -333,12 +333,12 @@ export function serializePayloadBytes(payload: PayloadInput): Uint8Array {
     case PayloadType.TokenTransfer:
       bytesArray.push(serializeCVBytes(payload.recipient));
       bytesArray.push(intToBytes(payload.amount, false, 8));
-      bytesArray.push(serializeStacksMessageBytes(payload.memo));
+      bytesArray.push(serializeStacksWireBytes(payload.memo));
       break;
     case PayloadType.ContractCall:
-      bytesArray.push(serializeStacksMessageBytes(payload.contractAddress));
-      bytesArray.push(serializeStacksMessageBytes(payload.contractName));
-      bytesArray.push(serializeStacksMessageBytes(payload.functionName));
+      bytesArray.push(serializeStacksWireBytes(payload.contractAddress));
+      bytesArray.push(serializeStacksWireBytes(payload.contractName));
+      bytesArray.push(serializeStacksWireBytes(payload.functionName));
       const numArgs = new Uint8Array(4);
       writeUInt32BE(numArgs, payload.functionArgs.length, 0);
       bytesArray.push(numArgs);
@@ -347,13 +347,13 @@ export function serializePayloadBytes(payload: PayloadInput): Uint8Array {
       });
       break;
     case PayloadType.SmartContract:
-      bytesArray.push(serializeStacksMessageBytes(payload.contractName));
-      bytesArray.push(serializeStacksMessageBytes(payload.codeBody));
+      bytesArray.push(serializeStacksWireBytes(payload.contractName));
+      bytesArray.push(serializeStacksWireBytes(payload.codeBody));
       break;
     case PayloadType.VersionedSmartContract:
       bytesArray.push(payload.clarityVersion);
-      bytesArray.push(serializeStacksMessageBytes(payload.contractName));
-      bytesArray.push(serializeStacksMessageBytes(payload.codeBody));
+      bytesArray.push(serializeStacksWireBytes(payload.contractName));
+      bytesArray.push(serializeStacksWireBytes(payload.codeBody));
       break;
     case PayloadType.PoisonMicroblock:
       // TODO: implement

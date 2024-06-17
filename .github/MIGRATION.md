@@ -11,6 +11,7 @@
   - [Asset Helper Methods](#asset-helper-methods)
   - [CLI](#cli)
   - [Triplesec](#triplesec)
+  - [Advanced: WireType](#advanced-wiretype)
 - [Stacks.js (\<=4.x.x) → (5.x.x)](#stacksjs-4xx--5xx)
   - [Breaking Changes](#breaking-changes-1)
     - [Buffer to Uint8Array](#buffer-to-uint8array)
@@ -35,6 +36,7 @@
 - The `AssetInfo` type was renamed to `Asset` for accuracy. The `Asset` helper methods were also renamed to to remove the `Info` suffix. [Read more...](#asset-helper-methods)
 - Remove legacy CLI methods. [Read more...](#cli)
 - Disable legacy `triplesec` mnemonic encryption support. [Read more...](#triplesec)
+- **Advanced:** Rename `MessageType` and related concepts to `WireType`. [Read more...](#advanced-wiretype)
 
 ### Stacks Network
 
@@ -184,6 +186,8 @@ For easier migrating, renaming the following methods is possible to keep the pre
 - `deserializeMessageSignature` → `deserializeMessageSignatureBytes`
 - `serializePostCondition` → `serializePostConditionBytes`
 - `deserializePostCondition` → `deserializePostConditionBytes`
+- `serializeStacksMessage` → `serializeStacksWireBytes`
+- `deserializeStacksMessage` → `deserializeStacksWireBytes`
 
 ### Asset Helper Methods
 
@@ -203,6 +207,16 @@ The following interfaces and methods were renamed:
 Support for encrypting/decrypting mnemonics with `triplesec` was removed.
 This impacts the methods: `decrypt`, `decryptMnemonic`, and `decryptLegacy`.
 Make sure to update your code to if mnemonics are stored somewhere encrypted using the legacy method.
+
+### Advanced: WireType
+
+Renamed internals to avoid confusion between "message" and wire-format for serialization.
+This is only used for advanced serialization use-cases internally and should not be needed for most users.
+
+- `StacksMessage` → `StacksWire`
+- `StacksMessageType` → `StacksWireType`
+- `serializeStacksMessage` → `serializeStacksWireBytes`
+- `deserializeStacksMessage` → `deserializeStacksWireBytes`
 
 ## Stacks.js (&lt;=4.x.x) → (5.x.x)
 

@@ -43,7 +43,7 @@ import {
   AddressVersion,
   COMPRESSED_PUBKEY_LENGTH_BYTES,
   PubKeyEncoding,
-  StacksMessageType,
+  StacksWireType,
   UNCOMPRESSED_PUBKEY_LENGTH_BYTES,
 } from './constants';
 import { StructuredDataSignature } from './message-types';
@@ -63,7 +63,7 @@ utils.hmacSha256Sync = (key: Uint8Array, ...msgs: Uint8Array[]) => {
 };
 
 export interface StacksPublicKey {
-  readonly type: StacksMessageType.PublicKey;
+  readonly type: StacksWireType.PublicKey;
   readonly data: Uint8Array;
 }
 
@@ -94,7 +94,7 @@ export function getAddressFromPublicKey(
 export function createStacksPublicKey(publicKey: PublicKey): StacksPublicKey {
   publicKey = typeof publicKey === 'string' ? hexToBytes(publicKey) : publicKey;
   return {
-    type: StacksMessageType.PublicKey,
+    type: StacksWireType.PublicKey,
     data: publicKey,
   };
 }
