@@ -18,7 +18,8 @@ import {
   uintCV,
 } from './clarity';
 
-export { prettyPrint } from './clarity/prettyPrint';
+export { prettyPrint, stringify } from './clarity/prettyPrint';
+export { parse } from './clarity/parser';
 
 // todo: https://github.com/hirosystems/clarinet/issues/786
 
