@@ -293,3 +293,36 @@ export function deserializeTransaction(tx: string | Uint8Array | BytesReader) {
     chainId
   );
 }
+
+/**
+ * Alias for `transaction.serialize()`
+ *
+ * Serializes a transaction to bytes.
+ *
+ * @example
+ * ```ts
+ * import { makeSTXTokenTransfer, serializeTransaction } from '@stacks/transactions';
+ *
+ * const transaction = makeSTXTokenTransfer({ ... });
+ * const bytes = serializeTransaction(transaction);
+ * ```
+ */
+export function serializeTransaction(transaction: StacksTransaction): Uint8Array {
+  // todo: refactor to hex instead of bytes for `next` release
+  return transaction.serialize();
+}
+
+/**
+ * Serializes a transaction to a hex string.
+ *
+ * @example
+ * ```ts
+ * import { makeSTXTokenTransfer, transactionToHex } from '@stacks/transactions';
+ *
+ * const transaction = makeSTXTokenTransfer({ ... });
+ * const hex = transactionToHex(transaction);
+ * ```
+ */
+export function transactionToHex(transaction: StacksTransaction): string {
+  return bytesToHex(transaction.serialize());
+}
