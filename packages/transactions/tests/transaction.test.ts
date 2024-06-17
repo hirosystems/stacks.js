@@ -87,16 +87,14 @@ test('STX token transfer transaction serialization and deserialization', () => {
 
   transaction.verifyOrigin();
 
-  const serialized = transaction.serialize();
+  const serialized = transaction.serializeBytes();
   const deserialized = deserializeTransaction(new BytesReader(serialized));
 
   const serializedHexString = bytesToHex(serialized);
-  expect(bytesToHex(deserializeTransaction(serializedHexString).serialize())).toEqual(
-    bytesToHex(serialized)
-  );
+  expect(deserializeTransaction(serializedHexString).serialize()).toEqual(bytesToHex(serialized));
 
   const serializedHexStringPrefixed = '0x' + serializedHexString;
-  expect(bytesToHex(deserializeTransaction(serializedHexStringPrefixed).serialize())).toEqual(
+  expect(deserializeTransaction(serializedHexStringPrefixed).serialize()).toEqual(
     bytesToHex(serialized)
   );
 
@@ -165,14 +163,14 @@ test('STX token transfer transaction fee setting', () => {
 
   transaction.verifyOrigin();
 
-  const serialized = transaction.serialize();
+  const serialized = transaction.serializeBytes();
   const deserialized = deserializeTransaction(new BytesReader(serialized));
   expect(deserialized.auth.spendingCondition!.fee!.toString()).toBe(fee.toString());
 
   const setFee = 123;
   transaction.setFee(setFee);
 
-  const postSetFeeSerialized = transaction.serialize();
+  const postSetFeeSerialized = transaction.serializeBytes();
   const postSetFeeDeserialized = deserializeTransaction(new BytesReader(postSetFeeSerialized));
   expect(postSetFeeDeserialized.version).toBe(transactionVersion);
   expect(postSetFeeDeserialized.chainId).toBe(chainId);
@@ -247,7 +245,7 @@ test('STX token transfer transaction multi-sig serialization and deserialization
 
   transaction.verifyOrigin();
 
-  const serialized = transaction.serialize();
+  const serialized = transaction.serializeBytes();
   const deserialized = deserializeTransaction(new BytesReader(serialized));
   expect(deserialized.version).toBe(transactionVersion);
   expect(deserialized.chainId).toBe(chainId);
@@ -316,7 +314,7 @@ test('STX token transfer transaction multi-sig uncompressed keys serialization a
   expect(() => transaction.verifyOrigin()).toThrow(expectedError);
 
   const serialized = transaction.serialize();
-  expect(() => deserializeTransaction(new BytesReader(serialized))).toThrow(expectedError);
+  expect(() => deserializeTransaction(serialized)).toThrow(expectedError);
 });
 
 test('Sponsored STX token transfer transaction serialization and deserialization', () => {
@@ -362,7 +360,7 @@ test('Sponsored STX token transfer transaction serialization and deserialization
   transaction.verifyOrigin();
 
   const serialized = transaction.serialize();
-  const deserialized = deserializeTransaction(new BytesReader(serialized));
+  const deserialized = deserializeTransaction(serialized);
   expect(deserialized.version).toBe(transactionVersion);
   expect(deserialized.chainId).toBe(chainId);
   expect(deserialized.auth.authType).toBe(authType);
@@ -440,6 +438,6 @@ describe(serializeTransaction.name, () => {
   });
 
   test(transactionToHex.name, () => {
-    expect(transactionToHex(tx)).toEqual(bytesToHex(serializeTransaction(tx)));
+    expect(transactionToHex(tx)).toEqual(serializeTransaction(tx));
   });
 });

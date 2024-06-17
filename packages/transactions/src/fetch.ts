@@ -50,7 +50,7 @@ export async function broadcastTransaction({
   /** Optional attachment in bytes or encoded as a hex string */
   attachment?: Uint8Array | string;
 } & ApiParam): Promise<TxBroadcastResult> {
-  const tx = bytesToHex(txOpt.serialize());
+  const tx = txOpt.serialize();
   const attachment = attachOpt
     ? typeof attachOpt === 'string'
       ? attachOpt
@@ -165,7 +165,7 @@ export async function estimateTransfer({
   }
 
   const feeRateResult = await response.text();
-  const txBytes = BigInt(Math.ceil(txOpt.serialize().byteLength));
+  const txBytes = BigInt(Math.ceil(txOpt.serializeBytes().byteLength));
   const feeRate = BigInt(feeRateResult);
   return feeRate * txBytes;
 }

@@ -723,7 +723,7 @@ async function sendTokens(network: CLINetworkAdapter, args: string[]): Promise<s
   }
 
   if (txOnly) {
-    return Promise.resolve(bytesToHex(tx.serialize()));
+    return Promise.resolve(tx.serialize());
   }
 
   return broadcastTransaction({ transaction: tx, api })
@@ -782,7 +782,7 @@ async function contractDeploy(network: CLINetworkAdapter, args: string[]): Promi
   }
 
   if (txOnly) {
-    return Promise.resolve(bytesToHex(tx.serialize()));
+    return Promise.resolve(tx.serialize());
   }
 
   return broadcastTransaction({ transaction: tx })
@@ -868,7 +868,7 @@ async function contractFunctionCall(network: CLINetworkAdapter, args: string[]):
       }
 
       if (txOnly) {
-        return Promise.resolve(bytesToHex(tx.serialize()));
+        return Promise.resolve(tx.serialize());
       }
 
       return broadcastTransaction({ transaction: tx, api })
