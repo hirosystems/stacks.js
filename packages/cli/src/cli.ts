@@ -53,7 +53,7 @@ import * as path from 'path';
 const c32check = require('c32check');
 
 import { UserData } from '@stacks/auth';
-import crossfetch from 'cross-fetch';
+import 'cross-fetch/polyfill';
 
 import { StackerInfo, StackingClient } from '@stacks/stacking';
 
@@ -1735,7 +1735,6 @@ async function canStack(network: CLINetworkAdapter, args: string[]): Promise<str
   const txNetwork = network.isMainnet() ? new StacksMainnet() : new StacksTestnet();
 
   const apiConfig = new Configuration({
-    fetchApi: crossfetch,
     basePath: txNetwork.coreApiUrl,
   });
   const accounts = new AccountsApi(apiConfig);
@@ -1799,7 +1798,6 @@ async function stack(network: CLINetworkAdapter, args: string[]): Promise<string
   const txVersion = txNetwork.isMainnet() ? TransactionVersion.Mainnet : TransactionVersion.Testnet;
 
   const apiConfig = new Configuration({
-    fetchApi: crossfetch,
     basePath: txNetwork.coreApiUrl,
   });
   const accounts = new AccountsApi(apiConfig);
@@ -1936,7 +1934,6 @@ function faucetCall(_: CLINetworkAdapter, args: string[]): Promise<string> {
   // console.log(address);
 
   const apiConfig = new Configuration({
-    fetchApi: crossfetch,
     basePath: 'https://api.testnet.hiro.so',
   });
 

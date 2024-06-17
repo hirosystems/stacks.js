@@ -120,12 +120,13 @@ test('API key middleware - get nonce', async () => {
   const fetchFn = createFetchFn(createApiKeyMiddleware({ apiKey }));
   const network = new StacksMainnet({ fetchFn });
 
+  fetchMock.mockRejectOnce();
   fetchMock.mockOnce(`{"balance": "0", "nonce": "123"}`);
 
   const fetchNonce = await getNonce(senderAddress, network);
   expect(fetchNonce).toBe(123n);
-  expect(fetchMock.mock.calls.length).toEqual(1);
-  expect(fetchMock.mock.calls[0][0]).toEqual(
+  expect(fetchMock.mock.calls.length).toEqual(2);
+  expect(fetchMock.mock.calls[1][0]).toEqual(
     'https://api.mainnet.hiro.so/v2/accounts/STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6?proof=0'
   );
   const callHeaders = new Headers(fetchMock.mock.calls[0][1]?.headers);
@@ -1404,10 +1405,12 @@ test('Make STX token transfer with fetch account nonce', async () => {
   const network = new StacksTestnet();
   const apiUrl = network.getAccountApiUrl(senderAddress);
 
+  fetchMock.mockRejectOnce();
   fetchMock.mockOnce(`{"balance":"0", "nonce":${nonce}}`);
 
   const fetchNonce = await getNonce(senderAddress, network);
 
+  fetchMock.mockRejectOnce();
   fetchMock.mockOnce(`{"balance":"0", "nonce":${nonce}}`);
 
   const transaction = await makeSTXTokenTransfer({
@@ -1420,9 +1423,9 @@ test('Make STX token transfer with fetch account nonce', async () => {
     anchorMode: AnchorMode.Any,
   });
 
-  expect(fetchMock.mock.calls.length).toEqual(2);
-  expect(fetchMock.mock.calls[0][0]).toEqual(apiUrl);
+  expect(fetchMock.mock.calls.length).toEqual(4);
   expect(fetchMock.mock.calls[1][0]).toEqual(apiUrl);
+  expect(fetchMock.mock.calls[3][0]).toEqual(apiUrl);
   expect(fetchNonce.toString()).toEqual(nonce.toString());
   expect(transaction.auth.spendingCondition?.nonce?.toString()).toEqual(nonce.toString());
 });
@@ -1786,12 +1789,13 @@ test('Make sponsored contract call with sponsor nonce fetch', async () => {
     fee: sponsorFee,
   };
 
+  fetchMock.mockRejectOnce();
   fetchMock.mockOnce(`{"balance":"100000", "nonce":${sponsorNonce}}`);
 
   const sponsorSignedTx = await sponsorTransaction(sponsorOptions);
 
-  expect(fetchMock.mock.calls.length).toEqual(1);
-  expect(fetchMock.mock.calls[0][0]).toEqual(network.getAccountApiUrl(sponsorAddress));
+  expect(fetchMock.mock.calls.length).toEqual(2);
+  expect(fetchMock.mock.calls[1][0]).toEqual(network.getAccountApiUrl(sponsorAddress));
 
   const sponsorSignedTxSerialized = sponsorSignedTx.serialize();
 
@@ -2162,6 +2166,42 @@ test('Get contract map entry - no match', async () => {
   expect(fetchMock.mock.calls.length).toEqual(1);
   expect(result).toEqual(mockResult);
   expect(result.type).toBe(ClarityType.OptionalNone);
+});
+
+describe(getNonce.name, () => {
+  test('without API', async () => {
+    const nonce = 123n;
+    const address = 'STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6';
+
+    const network = new StacksTestnet();
+
+    fetchMock.mockRejectOnce(); // missing API
+    fetchMock.mockOnce(`{"balance":"0", "nonce":${nonce}}`);
+
+    await expect(getNonce(address, network)).resolves.toEqual(nonce);
+
+    expect(fetchMock.mock.calls.length).toEqual(2);
+    expect(fetchMock.mock.calls[0][0]).toContain('https://api.testnet.hiro.so/extended/');
+    expect(fetchMock.mock.calls[1][0]).toContain('https://api.testnet.hiro.so/v2/');
+  });
+
+  test('with API', async () => {
+    const nonce = 123n;
+    const address = 'STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6';
+
+    const network = new StacksTestnet();
+
+    fetchMock.mockOnce(
+      `{"last_executed_tx_nonce":${nonce - 2n},"last_mempool_tx_nonce":${
+        nonce - 1n
+      },"possible_next_nonce":${nonce},"detected_missing_nonces":[],"detected_mempool_nonces":[]}`
+    );
+
+    await expect(getNonce(address, network)).resolves.toEqual(nonce);
+
+    expect(fetchMock.mock.calls.length).toEqual(1);
+    expect(fetchMock.mock.calls[0][0]).toContain('https://api.testnet.hiro.so/extended/');
+  });
 });
 
 test('Post-conditions with amount larger than 8 bytes throw an error', () => {
