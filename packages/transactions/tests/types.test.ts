@@ -1,6 +1,6 @@
 import {
   createLPList,
-  serializeStacksMessageBytes,
+  serializeStacksWireBytes,
   deserializeLPListBytes,
   addressFromHashMode,
   LengthPrefixedList,
@@ -14,7 +14,7 @@ import {
   createAsset,
 } from '../src/postcondition-types';
 import { Address, addressToString } from '../src/common';
-import { AddressHashMode, StacksMessageType } from '../src/constants';
+import { AddressHashMode, StacksWireType } from '../src/constants';
 
 import { serializeDeserialize } from './macros';
 import { BytesReader } from '../src/bytesReader';
@@ -26,7 +26,7 @@ test('Length prefixed strings serialization and deserialization', () => {
   const lpString = createLPString(testString);
   const deserialized = serializeDeserialize(
     lpString,
-    StacksMessageType.LengthPrefixedString
+    StacksWireType.LengthPrefixedString
   ) as LengthPrefixedString;
   expect(deserialized.content).toBe(testString);
 
@@ -48,10 +48,10 @@ test('Length prefixed list serialization and deserialization', () => {
     l.push(addressList[index]);
   }
   const lpList: LengthPrefixedList = createLPList(l);
-  const serialized = serializeStacksMessageBytes(lpList);
+  const serialized = serializeStacksWireBytes(lpList);
 
   const bytesReader = new BytesReader(serialized);
-  const deserialized = deserializeLPListBytes(bytesReader, StacksMessageType.Address);
+  const deserialized = deserializeLPListBytes(bytesReader, StacksWireType.Address);
 
   expect(deserialized.values.length).toBe(addressList.length);
 
@@ -135,7 +135,7 @@ test('C32 address hash mode - testnet P2WSH', () => {
 test('C32check addresses serialization and deserialization', () => {
   const c32AddressString = 'SP9YX31TK12T0EZKWP3GZXX8AM37JDQHAWM7VBTH';
   const addr = createAddress(c32AddressString);
-  const deserialized = serializeDeserialize(addr, StacksMessageType.Address) as Address;
+  const deserialized = serializeDeserialize(addr, StacksWireType.Address) as Address;
   expect(addressToString(deserialized)).toBe(c32AddressString);
 });
 
@@ -144,7 +144,7 @@ test('Asset info serialization and deserialization', () => {
   const assetContractName = 'contract_name';
   const assetName = 'asset_name';
   const info = createAsset(assetAddress, assetContractName, assetName);
-  const deserialized = serializeDeserialize(info, StacksMessageType.Asset) as Asset;
+  const deserialized = serializeDeserialize(info, StacksWireType.Asset) as Asset;
   expect(addressToString(deserialized.address)).toBe(assetAddress);
   expect(deserialized.contractName.content).toBe(assetContractName);
   expect(deserialized.assetName.content).toBe(assetName);

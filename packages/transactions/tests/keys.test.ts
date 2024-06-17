@@ -17,7 +17,7 @@ import { AddressVersion, TransactionVersion } from '@stacks/network';
 import { ec as EC } from 'elliptic';
 import {
   PubKeyEncoding,
-  StacksMessageType,
+  StacksWireType,
   compressPublicKey,
   createStacksPublicKey,
   encodeStructuredData,
@@ -61,7 +61,7 @@ test('Stacks public key and private keys', () => {
   const pubKey = createStacksPublicKey(privateKeyToPublic(privKey));
   expect(publicKeyToHex(pubKey.data)).toBe(pubKeyString);
 
-  const deserialized = serializeDeserialize(pubKey, StacksMessageType.PublicKey);
+  const deserialized = serializeDeserialize(pubKey, StacksWireType.PublicKey);
   expect(bytesToHex(deserialized.data)).toBe(pubKeyString);
 
   expect(privateKeyToPublic(privKey)).toBe(pubKeyString);

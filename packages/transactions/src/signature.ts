@@ -1,6 +1,6 @@
 import { BytesReader } from './bytesReader';
 import { DeserializationError } from './errors';
-import { PubKeyEncoding, RECOVERABLE_ECDSA_SIG_LENGTH_BYTES, StacksMessageType } from './constants';
+import { PubKeyEncoding, RECOVERABLE_ECDSA_SIG_LENGTH_BYTES, StacksWireType } from './constants';
 import {
   compressPublicKey,
   deserializePublicKeyBytes,
@@ -21,21 +21,30 @@ export enum AuthFieldType {
 }
 
 export interface TransactionAuthField {
-  type: StacksMessageType.TransactionAuthField;
+  type: StacksWireType.TransactionAuthField;
   pubKeyEncoding: PubKeyEncoding;
   contents: TransactionAuthFieldContents;
 }
 
 export type TransactionAuthFieldContents = StacksPublicKey | MessageSignature;
 
-export function deserializeMessageSignature(bytesReader: BytesReader): MessageSignature {
+export function deserializeMessageSignature(serialized: string): MessageSignature {
+  return deserializeMessageSignatureBytes(hexToBytes(serialized));
+}
+/** @ignore */
+export function deserializeMessageSignatureBytes(
+  serialized: Uint8Array | BytesReader
+): MessageSignature {
+  const bytesReader = isInstance(serialized, BytesReader)
+    ? serialized
+    : new BytesReader(serialized);
   return createMessageSignature(
     bytesToHex(bytesReader.readBytes(RECOVERABLE_ECDSA_SIG_LENGTH_BYTES))
   );
 }
 
 export interface TransactionAuthField {
-  type: StacksMessageType.TransactionAuthField;
+  type: StacksWireType.TransactionAuthField;
   pubKeyEncoding: PubKeyEncoding;
   contents: TransactionAuthFieldContents;
 }
@@ -46,7 +55,7 @@ export function createTransactionAuthField(
 ): TransactionAuthField {
   return {
     pubKeyEncoding,
-    type: StacksMessageType.TransactionAuthField,
+    type: StacksWireType.TransactionAuthField,
     contents,
   };
 }
@@ -79,12 +88,12 @@ export function deserializeTransactionAuthFieldBytes(
     case AuthFieldType.SignatureCompressed:
       return createTransactionAuthField(
         PubKeyEncoding.Compressed,
-        deserializeMessageSignature(bytesReader)
+        deserializeMessageSignatureBytes(bytesReader)
       );
     case AuthFieldType.SignatureUncompressed:
       return createTransactionAuthField(
         PubKeyEncoding.Uncompressed,
-        deserializeMessageSignature(bytesReader)
+        deserializeMessageSignatureBytes(bytesReader)
       );
     default:
       throw new Error(`Unknown auth field type: ${JSON.stringify(authFieldType)}`);
@@ -107,7 +116,7 @@ export function serializeTransactionAuthFieldBytes(field: TransactionAuthField):
   const bytesArray = [];
 
   switch (field.contents.type) {
-    case StacksMessageType.PublicKey:
+    case StacksWireType.PublicKey:
       if (field.pubKeyEncoding == PubKeyEncoding.Compressed) {
         bytesArray.push(AuthFieldType.PublicKeyCompressed);
         bytesArray.push(serializePublicKeyBytes(field.contents));
@@ -116,7 +125,7 @@ export function serializeTransactionAuthFieldBytes(field: TransactionAuthField):
         bytesArray.push(hexToBytes(compressPublicKey(field.contents.data)));
       }
       break;
-    case StacksMessageType.MessageSignature:
+    case StacksWireType.MessageSignature:
       if (field.pubKeyEncoding == PubKeyEncoding.Compressed) {
         bytesArray.push(AuthFieldType.SignatureCompressed);
       } else {
