@@ -1,4 +1,9 @@
-import { deserializeTransaction, StacksTransaction } from '../src/transaction';
+import {
+  deserializeTransaction,
+  serializeTransaction,
+  StacksTransaction,
+  transactionToHex,
+} from '../src/transaction';
 
 import {
   createMultiSigSpendingCondition,
@@ -434,4 +439,18 @@ test('Coinbase pay to alt contract principal recipient deserialization', () => {
     'bd1a9e1d60ca29fc630633170f396f5b6b85c9620bd16d63384ebc5a01a1829b'
   );
   expect(deserializedTx.version).toBe(TransactionVersion.Testnet);
+});
+
+describe(serializeTransaction.name, () => {
+  const serializedTx =
+    '0x8080000000040055a0a92720d20398211cd4c7663d65d018efcc1f00000000000000030000000000000000010118da31f542913e8c56961b87ee4794924e655a28a2034e37ef4823eeddf074747285bd6efdfbd84eecdf62cffa7c1864e683c688f4c105f4db7429066735b4e2010200000000050000000000000000000000000000000000000000000000000000000000000000061aba27f99e007c7f605a8305e318c1abde3cd220ac0b68656c6c6f5f776f726c64';
+  const tx = deserializeTransaction(serializedTx);
+
+  test('alias of .serialize', () => {
+    expect(tx.serialize()).toEqual(serializeTransaction(tx));
+  });
+
+  test(transactionToHex.name, () => {
+    expect(transactionToHex(tx)).toEqual(bytesToHex(serializeTransaction(tx)));
+  });
 });
