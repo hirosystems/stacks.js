@@ -70,21 +70,33 @@ import { StacksTransaction } from './transaction';
 import { createLPList } from './types';
 import { cvToHex, omit, parseReadOnlyResponse, validateTxId } from './utils';
 
+/** @internal */
+async function _getNonceApi(address: string, network: StacksNetwork): Promise<bigint> {
+  const url = `${network.coreApiUrl}/extended/v1/address/${address}/nonces`;
+  const response = await network.fetchFn(url);
+  const result = await response.json();
+  return BigInt(result.possible_next_nonce);
+}
+
 /**
- * Lookup the nonce for an address from a core node
- *
- * @param {string} address - the c32check address to look up
- * @param {StacksNetworkName | StacksNetwork} network - the Stacks network to look up address on
- *
- * @return a promise that resolves to an integer
+ * Lookup the nonce for an address from an API or core node
+ * @return a promise that resolves to a bigint
  */
 export async function getNonce(
+  /** The Stacks (c32check) address to look up */
   address: string,
+  /** The Stacks network to look up the address on */
   network?: StacksNetworkName | StacksNetwork
 ): Promise<bigint> {
   const derivedNetwork = StacksNetwork.fromNameOrNetwork(network ?? new StacksMainnet());
   const url = derivedNetwork.getAccountApiUrl(address);
 
+  // Try API first
+  try {
+    return await _getNonceApi(address, derivedNetwork);
+  } catch (e) {}
+
+  // Try node if API endpoint isn't available
   const response = await derivedNetwork.fetchFn(url);
   if (!response.ok) {
     let msg = '';

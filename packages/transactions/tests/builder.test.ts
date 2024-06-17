@@ -2164,6 +2164,40 @@ test('Get contract map entry - no match', async () => {
   expect(result.type).toBe(ClarityType.OptionalNone);
 });
 
+describe(getNonce.name, () => {
+  test('without API', async () => {
+    const nonce = 123n;
+    const address = 'STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6';
+
+    const network = new StacksTestnet();
+
+    fetchMock.mockRejectOnce(); // missing API
+    fetchMock.mockOnce(`{"balance":"0", "nonce":${nonce}}`);
+
+    await expect(getNonce(address, network)).resolves.toEqual(nonce);
+
+    expect(fetchMock.mock.calls.length).toEqual(2);
+    expect(fetchMock.mock.calls[0][0]).toContain('https://api.testnet.hiro.so/extended/');
+    expect(fetchMock.mock.calls[1][0]).toContain('https://api.testnet.hiro.so/v2/');
+  });
+
+  test('with API', async () => {
+    const nonce = 123n;
+    const address = 'STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6';
+
+    const network = new StacksTestnet();
+
+    fetchMock.mockOnce(
+      `{"last_executed_tx_nonce":${nonce - 2n},"last_mempool_tx_nonce":${nonce - 1n},"possible_next_nonce":${nonce},"detected_missing_nonces":[],"detected_mempool_nonces":[]}`
+    );
+
+    await expect(getNonce(address, network)).resolves.toEqual(nonce);
+
+    expect(fetchMock.mock.calls.length).toEqual(1);
+    expect(fetchMock.mock.calls[0][0]).toContain('https://api.testnet.hiro.so/extended/');
+  });
+});
+
 test('Post-conditions with amount larger than 8 bytes throw an error', () => {
   const amount = BigInt('0xffffffffffffffff') + 1n;
 
