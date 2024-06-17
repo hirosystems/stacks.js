@@ -1,4 +1,5 @@
 import {
+  Hex,
   IntegerType,
   PrivateKey,
   bytesToHex,
@@ -178,7 +179,7 @@ export class StacksTransaction {
   }
 
   txid(): string {
-    const serialized = this.serialize();
+    const serialized = this.serializeBytes();
     return txidFromData(serialized);
   }
 
@@ -221,7 +222,35 @@ export class StacksTransaction {
     this.auth = setSponsorNonce(this.auth, nonce);
   }
 
-  serialize(): Uint8Array {
+  /**
+   * Serialize a transaction to a hex string (byte representation)
+   *
+   * @returns A hex string of the serialized transaction
+   * @example
+   * ```ts
+   * import { makeSTXTokenTransfer } from '@stacks/transactions';
+   *
+   * const transaction = makeSTXTokenTransfer({ ... });
+   * const hex = transaction.serialize();
+   * ```
+   */
+  serialize(): Hex {
+    return bytesToHex(this.serializeBytes());
+  }
+
+  /**
+   * Serialize a transaction to bytes
+   *
+   * @returns A Uint8Array of the serialized transaction
+   * @example
+   * ```ts
+   * import { makeSTXTokenTransfer } from '@stacks/transactions';
+   *
+   * const transaction = makeSTXTokenTransfer({ ... });
+   * const bytes = transaction.serializeBytes();
+   * ```
+   */
+  serializeBytes(): Uint8Array {
     if (this.version === undefined) {
       throw new SerializationError('"version" is undefined');
     }
@@ -333,33 +362,51 @@ export function estimateTransactionByteLength(transaction: StacksTransaction): n
       (multiSigSpendingCondition.signaturesRequired - existingSignatures) *
       (RECOVERABLE_ECDSA_SIG_LENGTH_BYTES + 1);
 
-    return transaction.serialize().byteLength + totalSignatureLength;
+    return transaction.serializeBytes().byteLength + totalSignatureLength;
   } else {
     // Single-sig transaction
     // Signature space already allocated by empty message signature
-    return transaction.serialize().byteLength;
+    return transaction.serializeBytes().byteLength;
   }
 }
 
 /**
  * Alias for `transaction.serialize()`
  *
- * Serializes a transaction to bytes.
+ * Serializes a transaction to a hex string.
  *
  * @example
  * ```ts
  * import { makeSTXTokenTransfer, serializeTransaction } from '@stacks/transactions';
  *
  * const transaction = makeSTXTokenTransfer({ ... });
- * const bytes = serializeTransaction(transaction);
+ * const hex = serializeTransaction(transaction);
  * ```
  */
-export function serializeTransaction(transaction: StacksTransaction): Uint8Array {
-  // todo: refactor to hex instead of bytes for `next` release
+export function serializeTransaction(transaction: StacksTransaction): Hex {
   return transaction.serialize();
 }
 
 /**
+ * Alias for `transaction.serializeBytes()`
+ *
+ * Serializes a transaction to bytes.
+ *
+ * @example
+ * ```ts
+ * import { makeSTXTokenTransfer, serializeTransactionBytes } from '@stacks/transactions';
+ *
+ * const transaction = makeSTXTokenTransfer({ ... });
+ * const bytes = serializeTransactionBytes(transaction);
+ * ```
+ */
+export function serializeTransactionBytes(transaction: StacksTransaction): Uint8Array {
+  return transaction.serializeBytes();
+}
+
+/**
+ * Alias for `transaction.serialize()`
+ *
  * Serializes a transaction to a hex string.
  *
  * @example
@@ -371,5 +418,5 @@ export function serializeTransaction(transaction: StacksTransaction): Uint8Array
  * ```
  */
 export function transactionToHex(transaction: StacksTransaction): string {
-  return bytesToHex(transaction.serialize());
+  return transaction.serialize();
 }
