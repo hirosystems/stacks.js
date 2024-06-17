@@ -7,21 +7,21 @@ import {
   StacksWireType,
 } from './constants';
 import {
-  Asset,
   AssetString,
-  FungiblePostCondition,
-  NonFungiblePostCondition,
-  PostConditionPrincipal,
-  STXPostCondition,
+  AssetWire,
+  FungiblePostConditionWire,
+  NonFungiblePostConditionWire,
+  PostConditionPrincipalWire,
+  STXPostConditionWire,
   parseAssetString,
   parsePrincipalString,
 } from './postcondition-types';
 
 export function createSTXPostCondition(
-  principal: string | PostConditionPrincipal,
+  principal: string | PostConditionPrincipalWire,
   conditionCode: FungibleConditionCode,
   amount: IntegerType
-): STXPostCondition {
+): STXPostConditionWire {
   if (typeof principal === 'string') {
     principal = parsePrincipalString(principal);
   }
@@ -36,11 +36,11 @@ export function createSTXPostCondition(
 }
 
 export function createFungiblePostCondition(
-  principal: string | PostConditionPrincipal,
+  principal: string | PostConditionPrincipalWire,
   conditionCode: FungibleConditionCode,
   amount: IntegerType,
-  asset: AssetString | Asset
-): FungiblePostCondition {
+  asset: AssetString | AssetWire
+): FungiblePostConditionWire {
   if (typeof principal === 'string') {
     principal = parsePrincipalString(principal);
   }
@@ -59,11 +59,11 @@ export function createFungiblePostCondition(
 }
 
 export function createNonFungiblePostCondition(
-  principal: string | PostConditionPrincipal,
+  principal: string | PostConditionPrincipalWire,
   conditionCode: NonFungibleConditionCode,
-  asset: AssetString | Asset,
+  asset: AssetString | AssetWire,
   assetName: ClarityValue
-): NonFungiblePostCondition {
+): NonFungiblePostConditionWire {
   if (typeof principal === 'string') {
     principal = parsePrincipalString(principal);
   }

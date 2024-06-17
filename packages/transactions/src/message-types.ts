@@ -2,7 +2,8 @@
 // needed now to fix a circular dependency issue in structuredDataSignature
 import { StacksWireType } from './constants';
 
-export interface StructuredDataSignature {
+/** @deprecated  */
+export interface StructuredDataSignatureWire {
   readonly type: StacksWireType.StructuredDataSignature;
   data: string;
 }
