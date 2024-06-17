@@ -5,10 +5,10 @@ import {
   compressPublicKey,
   deserializePublicKeyBytes,
   serializePublicKeyBytes,
-  StacksPublicKey,
+  PublicKeyWire,
 } from './keys';
 
-import { createMessageSignature, MessageSignature } from './common';
+import { createMessageSignature, MessageSignatureWire } from './common';
 
 // @ts-ignore
 import { bytesToHex, concatArray, hexToBytes, isInstance } from '@stacks/common';
@@ -20,21 +20,21 @@ export enum AuthFieldType {
   SignatureUncompressed = 0x03,
 }
 
-export interface TransactionAuthField {
+export interface TransactionAuthFieldWire {
   type: StacksWireType.TransactionAuthField;
   pubKeyEncoding: PubKeyEncoding;
   contents: TransactionAuthFieldContents;
 }
 
-export type TransactionAuthFieldContents = StacksPublicKey | MessageSignature;
+export type TransactionAuthFieldContents = PublicKeyWire | MessageSignatureWire;
 
-export function deserializeMessageSignature(serialized: string): MessageSignature {
+export function deserializeMessageSignature(serialized: string): MessageSignatureWire {
   return deserializeMessageSignatureBytes(hexToBytes(serialized));
 }
 /** @ignore */
 export function deserializeMessageSignatureBytes(
   serialized: Uint8Array | BytesReader
-): MessageSignature {
+): MessageSignatureWire {
   const bytesReader = isInstance(serialized, BytesReader)
     ? serialized
     : new BytesReader(serialized);
@@ -43,7 +43,7 @@ export function deserializeMessageSignatureBytes(
   );
 }
 
-export interface TransactionAuthField {
+export interface TransactionAuthFieldWire {
   type: StacksWireType.TransactionAuthField;
   pubKeyEncoding: PubKeyEncoding;
   contents: TransactionAuthFieldContents;
@@ -52,7 +52,7 @@ export interface TransactionAuthField {
 export function createTransactionAuthField(
   pubKeyEncoding: PubKeyEncoding,
   contents: TransactionAuthFieldContents
-): TransactionAuthField {
+): TransactionAuthFieldWire {
   return {
     pubKeyEncoding,
     type: StacksWireType.TransactionAuthField,
@@ -60,13 +60,13 @@ export function createTransactionAuthField(
   };
 }
 
-export function deserializeTransactionAuthField(serialized: string): TransactionAuthField {
+export function deserializeTransactionAuthField(serialized: string): TransactionAuthFieldWire {
   return deserializeTransactionAuthFieldBytes(hexToBytes(serialized));
 }
 /** @ignore */
 export function deserializeTransactionAuthFieldBytes(
   serialized: Uint8Array | BytesReader
-): TransactionAuthField {
+): TransactionAuthFieldWire {
   const bytesReader = isInstance(serialized, BytesReader)
     ? serialized
     : new BytesReader(serialized);
@@ -100,19 +100,19 @@ export function deserializeTransactionAuthFieldBytes(
   }
 }
 
-export function serializeMessageSignature(messageSignature: MessageSignature): string {
+export function serializeMessageSignature(messageSignature: MessageSignatureWire): string {
   return bytesToHex(serializeMessageSignatureBytes(messageSignature));
 }
 /** @ignore */
-export function serializeMessageSignatureBytes(messageSignature: MessageSignature): Uint8Array {
+export function serializeMessageSignatureBytes(messageSignature: MessageSignatureWire): Uint8Array {
   return hexToBytes(messageSignature.data);
 }
 
-export function serializeTransactionAuthField(field: TransactionAuthField): string {
+export function serializeTransactionAuthField(field: TransactionAuthFieldWire): string {
   return bytesToHex(serializeTransactionAuthFieldBytes(field));
 }
 /** @ignore */
-export function serializeTransactionAuthFieldBytes(field: TransactionAuthField): Uint8Array {
+export function serializeTransactionAuthFieldBytes(field: TransactionAuthFieldWire): Uint8Array {
   const bytesArray = [];
 
   switch (field.contents.type) {

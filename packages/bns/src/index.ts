@@ -5,7 +5,7 @@ import {
   ClarityValue,
   FungibleConditionCode,
   NonFungibleConditionCode,
-  PostCondition,
+  PostConditionWire,
   ResponseErrorCV,
   StacksTransaction,
   UnsignedContractCallOptions,
@@ -60,7 +60,7 @@ export interface BnsContractCallOptions {
   functionArgs: ClarityValue[];
   publicKey: string;
   network: StacksNetwork;
-  postConditions?: PostCondition[];
+  postConditions?: PostConditionWire[];
 }
 
 async function makeBnsContractCall(options: BnsContractCallOptions): Promise<StacksTransaction> {

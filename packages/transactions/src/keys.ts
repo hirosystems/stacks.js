@@ -29,7 +29,7 @@ import {
   addressHashModeToVersion,
   addressToString,
   createMessageSignature,
-  MessageSignature,
+  MessageSignatureWire,
 } from './common';
 import {
   AddressHashMode,
@@ -40,7 +40,6 @@ import {
   UNCOMPRESSED_PUBKEY_LENGTH_BYTES,
 } from './constants';
 import { hash160, hashP2PKH } from './utils';
-import { StructuredDataSignature } from './message-types';
 import {
   networkFrom,
   STACKS_MAINNET,
@@ -48,6 +47,7 @@ import {
   StacksNetworkName,
   TransactionVersion,
 } from '@stacks/network';
+import { StructuredDataSignatureWire } from './message-types';
 
 /**
  * To use secp256k1.signSync set utils.hmacSha256Sync to a function using noble-hashes
@@ -62,7 +62,7 @@ utils.hmacSha256Sync = (key: Uint8Array, ...msgs: Uint8Array[]) => {
   return h.digest();
 };
 
-export interface StacksPublicKey {
+export interface PublicKeyWire {
   readonly type: StacksWireType.PublicKey;
   readonly data: Uint8Array;
 }
@@ -91,7 +91,7 @@ export function getAddressFromPublicKey(
   return addrString;
 }
 
-export function createStacksPublicKey(publicKey: PublicKey): StacksPublicKey {
+export function createStacksPublicKey(publicKey: PublicKey): PublicKeyWire {
   publicKey = typeof publicKey === 'string' ? hexToBytes(publicKey) : publicKey;
   return {
     type: StacksWireType.PublicKey,
@@ -101,7 +101,7 @@ export function createStacksPublicKey(publicKey: PublicKey): StacksPublicKey {
 
 export function publicKeyFromSignatureVrs(
   messageHash: string,
-  messageSignature: MessageSignature | StructuredDataSignature,
+  messageSignature: MessageSignatureWire | StructuredDataSignatureWire,
   pubKeyEncoding = PubKeyEncoding.Compressed
 ): string {
   const parsedSignature = parseRecoverableSignatureVrs(messageSignature.data);
@@ -113,7 +113,7 @@ export function publicKeyFromSignatureVrs(
 
 export function publicKeyFromSignatureRsv(
   messageHash: string,
-  messageSignature: MessageSignature | StructuredDataSignature,
+  messageSignature: MessageSignatureWire | StructuredDataSignatureWire,
   pubKeyEncoding = PubKeyEncoding.Compressed
 ): string {
   return publicKeyFromSignatureVrs(
@@ -137,11 +137,11 @@ export function publicKeyIsCompressed(publicKey: PublicKey): boolean {
   return !publicKeyToHex(publicKey).startsWith('04');
 }
 
-export function serializePublicKey(key: StacksPublicKey): string {
+export function serializePublicKey(key: PublicKeyWire): string {
   return bytesToHex(serializePublicKeyBytes(key));
 }
 /** @ignore */
-export function serializePublicKeyBytes(key: StacksPublicKey): Uint8Array {
+export function serializePublicKeyBytes(key: PublicKeyWire): Uint8Array {
   return key.data.slice();
 }
 
@@ -160,11 +160,11 @@ export function compressPublicKey(publicKey: PublicKey): string {
   return Point.fromHex(publicKeyToHex(publicKey)).toHex(true);
 }
 
-export function deserializePublicKey(serialized: string): StacksPublicKey {
+export function deserializePublicKey(serialized: string): PublicKeyWire {
   return deserializePublicKeyBytes(hexToBytes(serialized));
 }
 /** @ignore */
-export function deserializePublicKeyBytes(serialized: Uint8Array | BytesReader): StacksPublicKey {
+export function deserializePublicKeyBytes(serialized: Uint8Array | BytesReader): PublicKeyWire {
   const bytesReader = isInstance(serialized, BytesReader)
     ? serialized
     : new BytesReader(serialized);
@@ -183,7 +183,7 @@ export function makeRandomPrivKey(): string {
  * @deprecated The Clarity compatible {@link signMessageHashRsv} is preferred, but differs in signature format
  * @returns A recoverable signature (in VRS order)
  */
-export function signWithKey(privateKey: PrivateKey, messageHash: string): MessageSignature {
+export function signWithKey(privateKey: PrivateKey, messageHash: string): MessageSignatureWire {
   privateKey = privateKeyToBytes(privateKey);
   const [rawSignature, recoveryId] = signSync(messageHash, privateKey.slice(0, 32), {
     canonical: true,
@@ -208,7 +208,7 @@ export function signMessageHashRsv({
 }: {
   messageHash: string;
   privateKey: PrivateKey;
-}): MessageSignature {
+}): MessageSignatureWire {
   const messageSignature = signWithKey(privateKey, messageHash);
   return { ...messageSignature, data: signatureVrsToRsv(messageSignature.data) };
 }

@@ -7,7 +7,7 @@ import {
   StacksWireType,
 } from './constants';
 import { c32addressDecode } from 'c32check';
-import { Address } from './common';
+import { AddressWire } from './common';
 import { ClarityValue } from './clarity';
 import { exceedsMaxLengthBytes } from './utils';
 
@@ -21,83 +21,89 @@ export type ContractIdString = `${string}.${string}`;
  */
 export type AssetString = `${ContractIdString}::${string}`;
 
-export interface StandardPrincipal {
+export interface StandardPrincipalWire {
   readonly type: StacksWireType.Principal;
   readonly prefix: PostConditionPrincipalId.Standard;
-  readonly address: Address;
+  readonly address: AddressWire;
 }
 
-export interface ContractPrincipal {
+export interface ContractPrincipalWire {
   readonly type: StacksWireType.Principal;
   readonly prefix: PostConditionPrincipalId.Contract;
-  readonly address: Address;
-  readonly contractName: LengthPrefixedString;
+  readonly address: AddressWire;
+  readonly contractName: LengthPrefixedStringWire;
 }
 
-export interface LengthPrefixedString {
+export interface LengthPrefixedStringWire {
   readonly type: StacksWireType.LengthPrefixedString;
   readonly content: string;
   readonly lengthPrefixBytes: number;
   readonly maxLengthBytes: number;
 }
 
-export interface Asset {
+export interface AssetWire {
   readonly type: StacksWireType.Asset;
-  readonly address: Address;
-  readonly contractName: LengthPrefixedString;
-  readonly assetName: LengthPrefixedString;
+  readonly address: AddressWire;
+  readonly contractName: LengthPrefixedStringWire;
+  readonly assetName: LengthPrefixedStringWire;
 }
 
-export interface STXPostCondition {
+export interface STXPostConditionWire {
   readonly type: StacksWireType.PostCondition;
   readonly conditionType: PostConditionType.STX;
-  readonly principal: PostConditionPrincipal;
+  readonly principal: PostConditionPrincipalWire;
   readonly conditionCode: FungibleConditionCode;
   readonly amount: bigint;
 }
 
-export interface FungiblePostCondition {
+export interface FungiblePostConditionWire {
   readonly type: StacksWireType.PostCondition;
   readonly conditionType: PostConditionType.Fungible;
-  readonly principal: PostConditionPrincipal;
+  readonly principal: PostConditionPrincipalWire;
   readonly conditionCode: FungibleConditionCode;
   readonly amount: bigint;
-  readonly asset: Asset;
+  readonly asset: AssetWire;
 }
 
-export interface NonFungiblePostCondition {
+export interface NonFungiblePostConditionWire {
   readonly type: StacksWireType.PostCondition;
   readonly conditionType: PostConditionType.NonFungible;
-  readonly principal: PostConditionPrincipal;
+  readonly principal: PostConditionPrincipalWire;
   readonly conditionCode: NonFungibleConditionCode;
   /** Structure that identifies the token type. */
-  readonly asset: Asset;
+  readonly asset: AssetWire;
   /** The Clarity value that names the token instance. */
   readonly assetName: ClarityValue;
 }
 
-export type PostCondition = STXPostCondition | FungiblePostCondition | NonFungiblePostCondition;
+export type PostConditionWire =
+  | STXPostConditionWire
+  | FungiblePostConditionWire
+  | NonFungiblePostConditionWire;
 
-export type PostConditionPrincipal = StandardPrincipal | ContractPrincipal;
+export type PostConditionPrincipalWire = StandardPrincipalWire | ContractPrincipalWire;
 
-export function parseAssetString(id: AssetString): Asset {
+export function parseAssetString(id: AssetString): AssetWire {
   const [assetAddress, assetContractName, assetTokenName] = id.split(/\.|::/);
   const asset = createAsset(assetAddress, assetContractName, assetTokenName);
   return asset;
 }
 
-export function createLPString(content: string): LengthPrefixedString;
-export function createLPString(content: string, lengthPrefixBytes: number): LengthPrefixedString;
+export function createLPString(content: string): LengthPrefixedStringWire;
+export function createLPString(
+  content: string,
+  lengthPrefixBytes: number
+): LengthPrefixedStringWire;
 export function createLPString(
   content: string,
   lengthPrefixBytes: number,
   maxLengthBytes: number
-): LengthPrefixedString;
+): LengthPrefixedStringWire;
 export function createLPString(
   content: string,
   lengthPrefixBytes?: number,
   maxLengthBytes?: number
-): LengthPrefixedString {
+): LengthPrefixedStringWire {
   const prefixLength = lengthPrefixBytes || 1;
   const maxLength = maxLengthBytes || MAX_STRING_LENGTH_BYTES;
   if (exceedsMaxLengthBytes(content, maxLength)) {
@@ -111,7 +117,11 @@ export function createLPString(
   };
 }
 
-export function createAsset(addressString: string, contractName: string, assetName: string): Asset {
+export function createAsset(
+  addressString: string,
+  contractName: string,
+  assetName: string
+): AssetWire {
   return {
     type: StacksWireType.Asset,
     address: createAddress(addressString),
@@ -120,7 +130,7 @@ export function createAsset(addressString: string, contractName: string, assetNa
   };
 }
 
-export function createAddress(c32AddressString: string): Address {
+export function createAddress(c32AddressString: string): AddressWire {
   const addressData = c32addressDecode(c32AddressString);
   return {
     type: StacksWireType.Address,
@@ -137,7 +147,7 @@ export function createAddress(c32AddressString: string): Address {
  */
 export function parsePrincipalString(
   principalString: string
-): StandardPrincipal | ContractPrincipal {
+): StandardPrincipalWire | ContractPrincipalWire {
   if (principalString.includes('.')) {
     const [address, contractName] = principalString.split('.');
     return createContractPrincipal(address, contractName);
@@ -149,7 +159,7 @@ export function parsePrincipalString(
 export function createContractPrincipal(
   addressString: string,
   contractName: string
-): ContractPrincipal {
+): ContractPrincipalWire {
   const addr = createAddress(addressString);
   const name = createLPString(contractName);
   return {
@@ -160,7 +170,7 @@ export function createContractPrincipal(
   };
 }
 
-export function createStandardPrincipal(addressString: string): StandardPrincipal {
+export function createStandardPrincipal(addressString: string): StandardPrincipalWire {
   const addr = createAddress(addressString);
   return {
     type: StacksWireType.Principal,
