@@ -15,7 +15,7 @@ import {
   PubKeyEncoding,
   RECOVERABLE_ECDSA_SIG_LENGTH_BYTES,
   SingleSigHashMode,
-  StacksMessageType,
+  StacksWireType,
 } from './constants';
 
 import { BytesReader } from './bytesReader';
@@ -30,7 +30,7 @@ import {
   StacksPublicKey,
 } from './keys';
 import {
-  deserializeMessageSignature,
+  deserializeMessageSignatureBytes,
   serializeMessageSignatureBytes,
   TransactionAuthField,
 } from './signature';
@@ -45,7 +45,7 @@ import { cloneDeep, leftPadHex, txidFromData } from './utils';
 
 export function emptyMessageSignature(): MessageSignature {
   return {
-    type: StacksMessageType.MessageSignature,
+    type: StacksWireType.MessageSignature,
     data: bytesToHex(new Uint8Array(RECOVERABLE_ECDSA_SIG_LENGTH_BYTES)),
   };
 }
@@ -260,7 +260,7 @@ export function deserializeSingleSigSpendingCondition(
       'Failed to parse singlesig spending condition: incomaptible hash mode and key encoding'
     );
   }
-  const signature = deserializeMessageSignature(bytesReader);
+  const signature = deserializeMessageSignatureBytes(bytesReader);
   return {
     hashMode,
     signer,
@@ -279,7 +279,7 @@ export function deserializeMultiSigSpendingCondition(
   const nonce = BigInt('0x' + bytesToHex(bytesReader.readBytes(8)));
   const fee = BigInt('0x' + bytesToHex(bytesReader.readBytes(8)));
 
-  const fields = deserializeLPListBytes(bytesReader, StacksMessageType.TransactionAuthField)
+  const fields = deserializeLPListBytes(bytesReader, StacksWireType.TransactionAuthField)
     .values as TransactionAuthField[];
 
   let haveUncompressed = false;
@@ -287,10 +287,10 @@ export function deserializeMultiSigSpendingCondition(
 
   for (const field of fields) {
     switch (field.contents.type) {
-      case StacksMessageType.PublicKey:
+      case StacksWireType.PublicKey:
         if (!publicKeyIsCompressed(field.contents.data)) haveUncompressed = true;
         break;
-      case StacksMessageType.MessageSignature:
+      case StacksWireType.MessageSignature:
         if (field.pubKeyEncoding === PubKeyEncoding.Uncompressed) haveUncompressed = true;
         numSigs += 1;
         if (numSigs === 65536)
@@ -506,11 +506,11 @@ function verifyMultiSig(
 
   for (const field of condition.fields) {
     switch (field.contents.type) {
-      case StacksMessageType.PublicKey:
+      case StacksWireType.PublicKey:
         if (!publicKeyIsCompressed(field.contents.data)) haveUncompressed = true;
         publicKeys.push(field.contents);
         break;
-      case StacksMessageType.MessageSignature:
+      case StacksWireType.MessageSignature:
         if (field.pubKeyEncoding === PubKeyEncoding.Uncompressed) haveUncompressed = true;
         const { pubKey, nextSigHash } = nextVerification(
           curSigHash,

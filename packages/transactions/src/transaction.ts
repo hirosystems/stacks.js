@@ -39,7 +39,7 @@ import {
   PostConditionMode,
   PubKeyEncoding,
   RECOVERABLE_ECDSA_SIG_LENGTH_BYTES,
-  StacksMessageType,
+  StacksWireType,
   anchorModeFrom,
 } from './constants';
 import { SerializationError, SigningError } from './errors';
@@ -281,7 +281,7 @@ export function deserializeTransaction(tx: string | Uint8Array | BytesReader) {
   const postConditionMode = bytesReader.readUInt8Enum(PostConditionMode, n => {
     throw new Error(`Could not parse ${n} as PostConditionMode`);
   });
-  const postConditions = deserializeLPListBytes(bytesReader, StacksMessageType.PostCondition);
+  const postConditions = deserializeLPListBytes(bytesReader, StacksWireType.PostCondition);
   const payload = deserializePayloadBytes(bytesReader);
 
   return new StacksTransaction(
@@ -324,7 +324,7 @@ export function estimateTransactionByteLength(transaction: StacksTransaction): n
 
     // Find number of existing signatures if the transaction is signed or partially signed
     const existingSignatures = multiSigSpendingCondition.fields.filter(
-      field => field.contents.type === StacksMessageType.MessageSignature
+      field => field.contents.type === StacksWireType.MessageSignature
     ).length; // existingSignatures will be 0 if its a unsigned transaction
 
     // Estimate total signature bytes size required for this multi-sig transaction

@@ -19,7 +19,7 @@ import {
   PostConditionType,
   FungibleConditionCode,
   NonFungibleConditionCode,
-  StacksMessageType,
+  StacksWireType,
   PostConditionPrincipalId,
 } from '../src/constants';
 
@@ -41,7 +41,7 @@ test('STX post condition serialization and deserialization', () => {
 
   const deserialized = serializeDeserialize(
     postCondition,
-    StacksMessageType.PostCondition
+    StacksWireType.PostCondition
   ) as STXPostCondition;
   expect(deserialized.conditionType).toBe(postConditionType);
   expect(deserialized.principal.prefix).toBe(PostConditionPrincipalId.Standard);
@@ -68,7 +68,7 @@ test('Fungible post condition serialization and deserialization', () => {
 
   const deserialized = serializeDeserialize(
     postCondition,
-    StacksMessageType.PostCondition
+    StacksWireType.PostCondition
   ) as FungiblePostCondition;
   expect(deserialized.conditionType).toBe(postConditionType);
   expect(deserialized.principal.prefix).toBe(PostConditionPrincipalId.Standard);
@@ -105,7 +105,7 @@ test('Non-fungible post condition serialization and deserialization', () => {
 
   const deserialized = serializeDeserialize(
     postCondition,
-    StacksMessageType.PostCondition
+    StacksWireType.PostCondition
   ) as NonFungiblePostCondition;
   expect(deserialized.conditionType).toBe(postConditionType);
   expect(deserialized.principal.prefix).toBe(PostConditionPrincipalId.Contract);
@@ -141,7 +141,7 @@ test('Non-fungible post condition with string IDs serialization and deserializat
 
   const deserialized = serializeDeserialize(
     postCondition,
-    StacksMessageType.PostCondition
+    StacksWireType.PostCondition
   ) as NonFungiblePostCondition;
   expect(deserialized.conditionType).toBe(postConditionType);
   expect(deserialized.principal.prefix).toBe(PostConditionPrincipalId.Contract);

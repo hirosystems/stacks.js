@@ -26,7 +26,7 @@ import {
   NonFungibleConditionCode,
   PostConditionPrincipalId,
   PostConditionType,
-  StacksMessageType,
+  StacksWireType,
 } from './constants';
 import { DeserializationError, SerializationError } from './errors';
 import {
@@ -47,7 +47,7 @@ import {
 } from './postcondition-types';
 import {
   TransactionAuthField,
-  deserializeMessageSignature,
+  deserializeMessageSignatureBytes,
   deserializeTransactionAuthFieldBytes,
   serializeMessageSignatureBytes,
   serializeTransactionAuthFieldBytes,
@@ -66,7 +66,7 @@ import {
  */
 export type AddressString = string;
 
-export type StacksMessage =
+export type StacksWire =
   | Address
   | PostConditionPrincipal
   | LengthPrefixedString
@@ -79,74 +79,74 @@ export type StacksMessage =
   | TransactionAuthField
   | MessageSignature;
 
-export function serializeStacksMessage(message: StacksMessage): string {
-  return bytesToHex(serializeStacksMessageBytes(message));
+export function serializeStacksWire(wire: StacksWire): string {
+  return bytesToHex(serializeStacksWireBytes(wire));
 }
 /** @ignore */
-export function serializeStacksMessageBytes(message: StacksMessage): Uint8Array {
-  switch (message.type) {
-    case StacksMessageType.Address:
-      return serializeAddressBytes(message);
-    case StacksMessageType.Principal:
-      return serializePrincipalBytes(message);
-    case StacksMessageType.LengthPrefixedString:
-      return serializeLPStringBytes(message);
-    case StacksMessageType.MemoString:
-      return serializeMemoStringBytes(message);
-    case StacksMessageType.Asset:
-      return serializeAssetBytes(message);
-    case StacksMessageType.PostCondition:
-      return serializePostConditionBytes(message);
-    case StacksMessageType.PublicKey:
-      return serializePublicKeyBytes(message);
-    case StacksMessageType.LengthPrefixedList:
-      return serializeLPListBytes(message);
-    case StacksMessageType.Payload:
-      return serializePayloadBytes(message);
-    case StacksMessageType.TransactionAuthField:
-      return serializeTransactionAuthFieldBytes(message);
-    case StacksMessageType.MessageSignature:
-      return serializeMessageSignatureBytes(message);
+export function serializeStacksWireBytes(wire: StacksWire): Uint8Array {
+  switch (wire.type) {
+    case StacksWireType.Address:
+      return serializeAddressBytes(wire);
+    case StacksWireType.Principal:
+      return serializePrincipalBytes(wire);
+    case StacksWireType.LengthPrefixedString:
+      return serializeLPStringBytes(wire);
+    case StacksWireType.MemoString:
+      return serializeMemoStringBytes(wire);
+    case StacksWireType.Asset:
+      return serializeAssetBytes(wire);
+    case StacksWireType.PostCondition:
+      return serializePostConditionBytes(wire);
+    case StacksWireType.PublicKey:
+      return serializePublicKeyBytes(wire);
+    case StacksWireType.LengthPrefixedList:
+      return serializeLPListBytes(wire);
+    case StacksWireType.Payload:
+      return serializePayloadBytes(wire);
+    case StacksWireType.TransactionAuthField:
+      return serializeTransactionAuthFieldBytes(wire);
+    case StacksWireType.MessageSignature:
+      return serializeMessageSignatureBytes(wire);
   }
 }
 
-export function deserializeStacksMessage(
+export function deserializeStacksWireBytes(
   bytesReader: BytesReader,
-  type: StacksMessageType,
-  listType?: StacksMessageType
-): StacksMessage {
+  type: StacksWireType,
+  listType?: StacksWireType
+): StacksWire {
   switch (type) {
-    case StacksMessageType.Address:
+    case StacksWireType.Address:
       return deserializeAddressBytes(bytesReader);
-    case StacksMessageType.Principal:
+    case StacksWireType.Principal:
       return deserializePrincipalBytes(bytesReader);
-    case StacksMessageType.LengthPrefixedString:
+    case StacksWireType.LengthPrefixedString:
       return deserializeLPStringBytes(bytesReader);
-    case StacksMessageType.MemoString:
+    case StacksWireType.MemoString:
       return deserializeMemoStringBytes(bytesReader);
-    case StacksMessageType.Asset:
+    case StacksWireType.Asset:
       return deserializeAssetBytes(bytesReader);
-    case StacksMessageType.PostCondition:
+    case StacksWireType.PostCondition:
       return deserializePostConditionBytes(bytesReader);
-    case StacksMessageType.PublicKey:
+    case StacksWireType.PublicKey:
       return deserializePublicKeyBytes(bytesReader);
-    case StacksMessageType.Payload:
+    case StacksWireType.Payload:
       return deserializePayloadBytes(bytesReader);
-    case StacksMessageType.LengthPrefixedList:
+    case StacksWireType.LengthPrefixedList:
       if (!listType) {
-        throw new DeserializationError('No List Type specified');
+        throw new DeserializationError('No list type specified');
       }
       return deserializeLPListBytes(bytesReader, listType);
-    case StacksMessageType.MessageSignature:
-      return deserializeMessageSignature(bytesReader);
+    case StacksWireType.MessageSignature:
+      return deserializeMessageSignatureBytes(bytesReader);
     default:
-      throw new Error('Could not recognize StacksMessageType');
+      throw new Error('Could not recognize StacksWireType');
   }
 }
 
 export function createEmptyAddress(): Address {
   return {
-    type: StacksMessageType.Address,
+    type: StacksWireType.Address,
     version: AddressVersion.MainnetSingleSig,
     hash160: '0'.repeat(40),
   };
@@ -230,7 +230,7 @@ export function deserializeAddressBytes(serialized: Uint8Array | BytesReader): A
   const version = hexToInt(bytesToHex(bytesReader.readBytes(1)));
   const data = bytesToHex(bytesReader.readBytes(20));
 
-  return { type: StacksMessageType.Address, version, hash160: data };
+  return { type: StacksWireType.Address, version, hash160: data };
 }
 
 export function serializePrincipal(principal: PostConditionPrincipal): string {
@@ -262,11 +262,11 @@ export function deserializePrincipalBytes(
   });
   const address = deserializeAddressBytes(bytesReader);
   if (prefix === PostConditionPrincipalId.Standard) {
-    return { type: StacksMessageType.Principal, prefix, address } as StandardPrincipal;
+    return { type: StacksWireType.Principal, prefix, address } as StandardPrincipal;
   }
   const contractName = deserializeLPStringBytes(bytesReader);
   return {
-    type: StacksMessageType.Principal,
+    type: StacksWireType.Principal,
     prefix,
     address,
     contractName,
@@ -313,7 +313,7 @@ export function codeBodyString(content: string): LengthPrefixedString {
 }
 
 export interface MemoString {
-  readonly type: StacksMessageType.MemoString;
+  readonly type: StacksWireType.MemoString;
   readonly content: string;
 }
 
@@ -321,7 +321,7 @@ export function createMemoString(content: string): MemoString {
   if (content && exceedsMaxLengthBytes(content, MEMO_MAX_LENGTH_BYTES)) {
     throw new Error(`Memo exceeds maximum length of ${MEMO_MAX_LENGTH_BYTES} bytes`);
   }
-  return { type: StacksMessageType.MemoString, content };
+  return { type: StacksWireType.MemoString, content };
 }
 
 export function serializeMemoString(memoString: MemoString): string {
@@ -346,7 +346,7 @@ export function deserializeMemoStringBytes(serialized: Uint8Array | BytesReader)
     : new BytesReader(serialized);
   let content = bytesToUtf8(bytesReader.readBytes(MEMO_MAX_LENGTH_BYTES));
   content = content.replace(/\u0000*$/, ''); // remove all trailing unicode null characters
-  return { type: StacksMessageType.MemoString, content };
+  return { type: StacksWireType.MemoString, content };
 }
 
 export function serializeAsset(info: Asset): string {
@@ -370,7 +370,7 @@ export function deserializeAssetBytes(serialized: Uint8Array | BytesReader): Ass
     ? serialized
     : new BytesReader(serialized);
   return {
-    type: StacksMessageType.Asset,
+    type: StacksWireType.Asset,
     address: deserializeAddressBytes(bytesReader),
     contractName: deserializeLPStringBytes(bytesReader),
     assetName: deserializeLPStringBytes(bytesReader),
@@ -378,17 +378,17 @@ export function deserializeAssetBytes(serialized: Uint8Array | BytesReader): Ass
 }
 
 export interface LengthPrefixedList {
-  readonly type: StacksMessageType.LengthPrefixedList;
+  readonly type: StacksWireType.LengthPrefixedList;
   readonly lengthPrefixBytes: number;
-  readonly values: StacksMessage[];
+  readonly values: StacksWire[];
 }
 
-export function createLPList<T extends StacksMessage>(
+export function createLPList<T extends StacksWire>(
   values: T[],
   lengthPrefixBytes?: number
 ): LengthPrefixedList {
   return {
-    type: StacksMessageType.LengthPrefixedList,
+    type: StacksWireType.LengthPrefixedList,
     lengthPrefixBytes: lengthPrefixBytes || 4,
     values,
   };
@@ -403,7 +403,7 @@ export function serializeLPListBytes(lpList: LengthPrefixedList): Uint8Array {
   const bytesArray = [];
   bytesArray.push(hexToBytes(intToHex(list.length, lpList.lengthPrefixBytes)));
   for (const l of list) {
-    bytesArray.push(serializeStacksMessageBytes(l));
+    bytesArray.push(serializeStacksWireBytes(l));
   }
   return concatArray(bytesArray);
 }
@@ -411,7 +411,7 @@ export function serializeLPListBytes(lpList: LengthPrefixedList): Uint8Array {
 // todo: `next` refactor for inversion of control
 export function deserializeLPList(
   serialized: string,
-  type: StacksMessageType,
+  type: StacksWireType,
   lengthPrefixBytes?: number
 ): LengthPrefixedList {
   return deserializeLPListBytes(hexToBytes(serialized), type, lengthPrefixBytes);
@@ -419,7 +419,7 @@ export function deserializeLPList(
 /** @ignore */
 export function deserializeLPListBytes(
   serialized: Uint8Array | BytesReader,
-  type: StacksMessageType,
+  type: StacksWireType,
   lengthPrefixBytes?: number
 ): LengthPrefixedList {
   const bytesReader = isInstance(serialized, BytesReader)
@@ -427,28 +427,28 @@ export function deserializeLPListBytes(
     : new BytesReader(serialized);
   const length = hexToInt(bytesToHex(bytesReader.readBytes(lengthPrefixBytes || 4)));
 
-  const l: StacksMessage[] = [];
+  const l: StacksWire[] = [];
   for (let index = 0; index < length; index++) {
     switch (type) {
-      case StacksMessageType.Address:
+      case StacksWireType.Address:
         l.push(deserializeAddressBytes(bytesReader));
         break;
-      case StacksMessageType.LengthPrefixedString:
+      case StacksWireType.LengthPrefixedString:
         l.push(deserializeLPStringBytes(bytesReader));
         break;
-      case StacksMessageType.MemoString:
+      case StacksWireType.MemoString:
         l.push(deserializeMemoStringBytes(bytesReader));
         break;
-      case StacksMessageType.Asset:
+      case StacksWireType.Asset:
         l.push(deserializeAssetBytes(bytesReader));
         break;
-      case StacksMessageType.PostCondition:
+      case StacksWireType.PostCondition:
         l.push(deserializePostConditionBytes(bytesReader));
         break;
-      case StacksMessageType.PublicKey:
+      case StacksWireType.PublicKey:
         l.push(deserializePublicKeyBytes(bytesReader));
         break;
-      case StacksMessageType.TransactionAuthField:
+      case StacksWireType.TransactionAuthField:
         l.push(deserializeTransactionAuthFieldBytes(bytesReader));
         break;
     }
@@ -515,7 +515,7 @@ export function deserializePostConditionBytes(serialized: Uint8Array | BytesRead
       });
       amount = BigInt(`0x${bytesToHex(bytesReader.readBytes(8))}`);
       return {
-        type: StacksMessageType.PostCondition,
+        type: StacksWireType.PostCondition,
         conditionType: PostConditionType.STX,
         principal,
         conditionCode,
@@ -528,7 +528,7 @@ export function deserializePostConditionBytes(serialized: Uint8Array | BytesRead
       });
       amount = BigInt(`0x${bytesToHex(bytesReader.readBytes(8))}`);
       return {
-        type: StacksMessageType.PostCondition,
+        type: StacksWireType.PostCondition,
         conditionType: PostConditionType.Fungible,
         principal,
         conditionCode,
@@ -542,7 +542,7 @@ export function deserializePostConditionBytes(serialized: Uint8Array | BytesRead
         throw new DeserializationError(`Could not read ${n} as FungibleConditionCode`);
       });
       return {
-        type: StacksMessageType.PostCondition,
+        type: StacksWireType.PostCondition,
         conditionType: PostConditionType.NonFungible,
         principal,
         conditionCode,
