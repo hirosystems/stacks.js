@@ -1,5 +1,5 @@
-import { Address } from '../common';
-import { LengthPrefixedString } from '../postcondition-types';
+import { AddressWire } from '../common';
+import { LengthPrefixedStringWire } from '../postcondition-types';
 import { ClarityValue } from './clarityValue';
 import { ClarityType } from './constants';
 
@@ -48,13 +48,13 @@ export type PrincipalCV = StandardPrincipalCV | ContractPrincipalCV;
 
 export interface StandardPrincipalCV {
   readonly type: ClarityType.PrincipalStandard;
-  readonly address: Address;
+  readonly address: AddressWire;
 }
 
 export interface ContractPrincipalCV {
   readonly type: ClarityType.PrincipalContract;
-  readonly address: Address;
-  readonly contractName: LengthPrefixedString;
+  readonly address: AddressWire;
+  readonly contractName: LengthPrefixedStringWire;
 }
 
 export type ResponseCV = ResponseErrorCV | ResponseOkCV;

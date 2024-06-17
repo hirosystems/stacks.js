@@ -9,18 +9,18 @@ import { c32address } from 'c32check';
 import { hexToBytes } from '@stacks/common';
 import { TransactionVersion } from '@stacks/network';
 
-export interface Address {
+export interface AddressWire {
   readonly type: StacksWireType.Address;
   readonly version: AddressVersion;
   readonly hash160: string;
 }
 
-export interface MessageSignature {
+export interface MessageSignatureWire {
   readonly type: StacksWireType.MessageSignature;
   data: string;
 }
 
-export function createMessageSignature(signature: string): MessageSignature {
+export function createMessageSignature(signature: string): MessageSignatureWire {
   const length = hexToBytes(signature).byteLength;
   if (length != RECOVERABLE_ECDSA_SIG_LENGTH_BYTES) {
     throw Error('Invalid signature');
@@ -73,10 +73,10 @@ export function addressHashModeToVersion(
   }
 }
 
-export function addressFromVersionHash(version: AddressVersion, hash: string): Address {
+export function addressFromVersionHash(version: AddressVersion, hash: string): AddressWire {
   return { type: StacksWireType.Address, version, hash160: hash };
 }
 
-export function addressToString(address: Address): string {
+export function addressToString(address: AddressWire): string {
   return c32address(address.version, address.hash160);
 }

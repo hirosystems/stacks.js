@@ -2,8 +2,8 @@ import { sha256 } from '@noble/hashes/sha256';
 import { PrivateKey, bytesToHex, concatBytes, utf8ToBytes } from '@stacks/common';
 import { ClarityType, ClarityValue, serializeCVBytes } from './clarity';
 import { StacksWireType } from './constants';
-import { StructuredDataSignature } from './message-types';
 import { signMessageHashRsv } from './keys';
+import { StructuredDataSignatureWire } from './message-types';
 
 // Refer to SIP018 https://github.com/stacksgov/sips/
 // > asciiToBytes('SIP018')
@@ -79,7 +79,7 @@ export function signStructuredData({
   message: ClarityValue;
   domain: ClarityValue;
   privateKey: PrivateKey;
-}): StructuredDataSignature {
+}): StructuredDataSignatureWire {
   const structuredDataHash: string = bytesToHex(sha256(encodeStructuredData({ message, domain })));
 
   const { data } = signMessageHashRsv({

@@ -1,6 +1,6 @@
 import { utf8ToBytes } from '@stacks/common';
-import { Address, addressToString } from '../../common';
-import { LengthPrefixedString, createAddress, createLPString } from '../../postcondition-types';
+import { AddressWire, addressToString } from '../../common';
+import { LengthPrefixedStringWire, createAddress, createLPString } from '../../postcondition-types';
 import { ClarityType } from '../constants';
 import { ContractPrincipalCV, PrincipalCV, StandardPrincipalCV } from '../types';
 
@@ -68,7 +68,7 @@ export function standardPrincipalCV(addressString: string): StandardPrincipalCV 
  * @see
  * {@link https://github.com/hirosystems/stacks.js/blob/main/packages/transactions/tests/clarity.test.ts | clarity test cases for more examples}
  */
-export function standardPrincipalCVFromAddress(address: Address): StandardPrincipalCV {
+export function standardPrincipalCVFromAddress(address: AddressWire): StandardPrincipalCV {
   return { type: ClarityType.PrincipalStandard, address };
 }
 
@@ -117,8 +117,8 @@ export function contractPrincipalCV(
  * {@link https://github.com/hirosystems/stacks.js/blob/main/packages/transactions/tests/clarity.test.ts | clarity test cases for more examples}
  */
 export function contractPrincipalCVFromAddress(
-  address: Address,
-  contractName: LengthPrefixedString
+  address: AddressWire,
+  contractName: LengthPrefixedStringWire
 ): ContractPrincipalCV {
   if (utf8ToBytes(contractName.content).byteLength >= 128) {
     throw new Error('Contract name must be less than 128 bytes');
