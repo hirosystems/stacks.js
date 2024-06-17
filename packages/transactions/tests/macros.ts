@@ -1,12 +1,12 @@
-import { StacksMessage, serializeStacksMessageBytes, deserializeStacksMessage } from '../src/types';
+import { StacksWire, serializeStacksWireBytes, deserializeStacksWireBytes } from '../src/types';
 import { BytesReader } from '../src/bytesReader';
-import { StacksMessageType } from '../src/constants';
+import { StacksWireType } from '../src/constants';
 
-export function serializeDeserialize<V extends StacksMessage, T extends StacksMessageType>(
+export function serializeDeserialize<V extends StacksWire, T extends StacksWireType>(
   value: V,
   type: T
 ): V {
-  const serialized = serializeStacksMessageBytes(value);
+  const serialized = serializeStacksWireBytes(value);
   const byteReader = new BytesReader(serialized);
-  return deserializeStacksMessage(byteReader, type) as V;
+  return deserializeStacksWireBytes(byteReader, type) as V;
 }

@@ -6,7 +6,7 @@ import {
   isSingleSig,
   nextVerification,
 } from './authorization';
-import { AddressHashMode, AuthType, PubKeyEncoding, StacksMessageType } from './constants';
+import { AddressHashMode, AuthType, PubKeyEncoding, StacksWireType } from './constants';
 import { SigningError } from './errors';
 import { StacksPublicKey } from './keys';
 import { StacksTransaction } from './transaction';
@@ -33,14 +33,14 @@ export class TransactionSigner {
     if (spendingCondition && !isSingleSig(spendingCondition)) {
       if (
         spendingCondition.fields.filter(
-          field => field.contents.type === StacksMessageType.MessageSignature
+          field => field.contents.type === StacksWireType.MessageSignature
         ).length >= spendingCondition.signaturesRequired
       ) {
         throw new Error('SpendingCondition has more signatures than are expected');
       }
 
       spendingCondition.fields.forEach(field => {
-        if (field.contents.type !== StacksMessageType.MessageSignature) return;
+        if (field.contents.type !== StacksWireType.MessageSignature) return;
 
         const signature = field.contents;
         const nextVerify = nextVerification(
@@ -99,7 +99,7 @@ export class TransactionSigner {
       if (
         this.checkOversign &&
         spendingCondition.fields.filter(
-          field => field.contents.type === StacksMessageType.MessageSignature
+          field => field.contents.type === StacksWireType.MessageSignature
         ).length >= spendingCondition.signaturesRequired
       ) {
         throw new Error('Origin would have too many signatures');
