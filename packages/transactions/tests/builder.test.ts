@@ -90,7 +90,7 @@ import {
   TxRejectedReason,
 } from '../src/constants';
 import {
-  TokenTransferPayload,
+  TokenTransferPayloadWire,
   createTokenTransferPayload,
   serializePayloadBytes,
 } from '../src/payload';
@@ -393,7 +393,7 @@ test('Make Multi-Sig STX token transfer', async () => {
   expect(deserializedTx.auth.spendingCondition!.signer).toEqual(
     'a23ea89d6529ac48ac766f720e480beec7f19273'
   );
-  const deserializedPayload = deserializedTx.payload as TokenTransferPayload;
+  const deserializedPayload = deserializedTx.payload as TokenTransferPayloadWire;
   expect(deserializedPayload.amount.toString()).toBe(amount.toString());
 
   const serializedSignedTx = serializedTx;
@@ -474,7 +474,7 @@ test('Should deserialize partially signed multi-Sig STX token transfer', async (
   expect(deserializedTx.auth.spendingCondition!.signer).toEqual(
     'a23ea89d6529ac48ac766f720e480beec7f19273'
   );
-  const deserializedPayload = deserializedTx.payload as TokenTransferPayload;
+  const deserializedPayload = deserializedTx.payload as TokenTransferPayloadWire;
   expect(deserializedPayload.amount.toString()).toBe(amount.toString());
 
   const signedTx =
@@ -622,7 +622,7 @@ test('Make Multi-Sig STX token transfer with two transaction signers', async () 
   expect(deserializedTx.auth.spendingCondition!.signer).toEqual(
     'a23ea89d6529ac48ac766f720e480beec7f19273'
   );
-  const deserializedPayload = deserializedTx.payload as TokenTransferPayload;
+  const deserializedPayload = deserializedTx.payload as TokenTransferPayloadWire;
   expect(deserializedPayload.amount.toString()).toBe(amount.toString());
 
   const spendingCondition = deserializedTx.auth.spendingCondition as MultiSigSpendingCondition;
@@ -1476,7 +1476,7 @@ test('Make sponsored STX token transfer', async () => {
     signerSpendingCondition.signature.type.toString()
   );
 
-  const deserializedPayload = deserializedSponsorTx.payload as TokenTransferPayload;
+  const deserializedPayload = deserializedSponsorTx.payload as TokenTransferPayloadWire;
   expect(deserializedPayload.amount.toString()).toBe(amount.toString());
 });
 
@@ -1562,7 +1562,7 @@ test('Make sponsored STX token transfer with sponsor fee estimate', async () => 
   expect(deserializedSponsorSpendingCondition.nonce!.toString()).toBe(sponsorNonce.toString());
   expect(deserializedSponsorSpendingCondition.fee!.toString()).toBe('1');
 
-  const deserializedPayload = deserializedSponsorTx.payload as TokenTransferPayload;
+  const deserializedPayload = deserializedSponsorTx.payload as TokenTransferPayloadWire;
   expect(deserializedPayload.amount.toString()).toBe(amount.toString());
 });
 
@@ -1614,7 +1614,7 @@ test('Make sponsored STX token transfer with set tx fee', async () => {
   expect(deserializedSponsorSpendingCondition.nonce!.toString()).toBe(sponsorNonce.toString());
   expect(deserializedSponsorSpendingCondition.fee!.toString()).toBe(sponsorFee.toString());
 
-  const deserializedPayload = deserializedSponsorTx.payload as TokenTransferPayload;
+  const deserializedPayload = deserializedSponsorTx.payload as TokenTransferPayloadWire;
   expect(deserializedPayload.amount.toString()).toBe(amount.toString());
 });
 

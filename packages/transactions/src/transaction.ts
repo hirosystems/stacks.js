@@ -44,7 +44,7 @@ import {
   StacksWireType,
 } from './constants';
 import { SerializationError, SigningError } from './errors';
-import { privateKeyIsCompressed, publicKeyIsCompressed, StacksPublicKey } from './keys';
+import { privateKeyIsCompressed, publicKeyIsCompressed, PublicKeyWire } from './keys';
 import { deserializePayloadBytes, Payload, PayloadInput, serializePayloadBytes } from './payload';
 import { createTransactionAuthField } from './signature';
 import {
@@ -130,7 +130,7 @@ export class StacksTransaction {
     }
   }
 
-  appendPubkey(publicKey: StacksPublicKey) {
+  appendPubkey(publicKey: PublicKeyWire) {
     const cond = this.auth.spendingCondition;
     if (cond && !isSingleSig(cond)) {
       const compressed = publicKeyIsCompressed(publicKey.data);

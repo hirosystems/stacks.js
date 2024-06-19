@@ -3,7 +3,7 @@ import { StacksTransaction } from './transaction';
 import { SpendingConditionOpts, isSingleSig, nextVerification } from './authorization';
 import { AuthType, PubKeyEncoding, StacksWireType } from './constants';
 import { SigningError } from './errors';
-import { StacksPublicKey } from './keys';
+import { PublicKeyWire } from './keys';
 import { cloneDeep } from './utils';
 import { PrivateKey } from '@stacks/common';
 
@@ -97,7 +97,7 @@ export class TransactionSigner {
     this.sigHash = nextSighash;
   }
 
-  appendOrigin(publicKey: StacksPublicKey) {
+  appendOrigin(publicKey: PublicKeyWire) {
     if (this.checkOverlap && this.originDone) {
       throw Error('Cannot append public key to origin after sponsor key');
     }

@@ -13,8 +13,8 @@ import { StacksNetwork, StacksNetworkName, TransactionVersion } from '@stacks/ne
 import { BytesReader } from './bytesReader';
 import { ClarityValue, deserializeCV, serializeCVBytes } from './clarity';
 import {
-  Address,
-  MessageSignature,
+  AddressWire,
+  MessageSignatureWire,
   addressFromVersionHash,
   addressHashModeToVersion,
 } from './common';
@@ -30,23 +30,23 @@ import {
 } from './constants';
 import { DeserializationError, SerializationError } from './errors';
 import {
-  StacksPublicKey,
+  PublicKeyWire,
   deserializePublicKeyBytes,
   publicKeyIsCompressed,
   serializePublicKeyBytes,
 } from './keys';
 import { Payload, deserializePayloadBytes, serializePayloadBytes } from './payload';
 import {
-  Asset,
-  ContractPrincipal,
-  LengthPrefixedString,
-  PostCondition,
-  PostConditionPrincipal,
-  StandardPrincipal,
+  AssetWire,
+  ContractPrincipalWire,
+  LengthPrefixedStringWire,
+  PostConditionWire,
+  PostConditionPrincipalWire,
+  StandardPrincipalWire,
   createLPString,
 } from './postcondition-types';
 import {
-  TransactionAuthField,
+  TransactionAuthFieldWire,
   deserializeMessageSignatureBytes,
   deserializeTransactionAuthFieldBytes,
   serializeMessageSignatureBytes,
@@ -66,19 +66,21 @@ import {
  */
 export type AddressString = string;
 
+/** @ignore */
 export type StacksWire =
-  | Address
-  | PostConditionPrincipal
-  | LengthPrefixedString
+  | AddressWire
+  | PostConditionPrincipalWire
+  | LengthPrefixedStringWire
   | LengthPrefixedList
   | Payload
   | MemoString
-  | Asset
-  | PostCondition
-  | StacksPublicKey
-  | TransactionAuthField
-  | MessageSignature;
+  | AssetWire
+  | PostConditionWire
+  | PublicKeyWire
+  | TransactionAuthFieldWire
+  | MessageSignatureWire;
 
+/** @ignore */
 export function serializeStacksWire(wire: StacksWire): string {
   return bytesToHex(serializeStacksWireBytes(wire));
 }
@@ -110,6 +112,7 @@ export function serializeStacksWireBytes(wire: StacksWire): Uint8Array {
   }
 }
 
+/** @ignore */
 export function deserializeStacksWireBytes(
   bytesReader: BytesReader,
   type: StacksWireType,
@@ -144,7 +147,7 @@ export function deserializeStacksWireBytes(
   }
 }
 
-export function createEmptyAddress(): Address {
+export function createEmptyAddress(): AddressWire {
   return {
     type: StacksWireType.Address,
     version: AddressVersion.MainnetSingleSig,
@@ -156,7 +159,7 @@ export function addressFromHashMode(
   hashMode: AddressHashMode,
   txVersion: TransactionVersion,
   data: string
-): Address {
+): AddressWire {
   const version = addressHashModeToVersion(hashMode, txVersion);
   return addressFromVersionHash(version, data);
 }
@@ -165,8 +168,8 @@ export function addressFromPublicKeys(
   version: AddressVersion,
   hashMode: AddressHashMode,
   numSigs: number,
-  publicKeys: StacksPublicKey[]
-): Address {
+  publicKeys: PublicKeyWire[]
+): AddressWire {
   if (publicKeys.length === 0) {
     throw Error('Invalid number of public keys');
   }
@@ -203,22 +206,22 @@ export function addressFromPublicKeys(
   }
 }
 
-export function serializeAddress(address: Address): string {
+export function serializeAddress(address: AddressWire): string {
   return bytesToHex(serializeAddressBytes(address));
 }
 /** @ignore */
-export function serializeAddressBytes(address: Address): Uint8Array {
+export function serializeAddressBytes(address: AddressWire): Uint8Array {
   const bytesArray = [];
   bytesArray.push(hexToBytes(intToHex(address.version, 1)));
   bytesArray.push(hexToBytes(address.hash160));
   return concatArray(bytesArray);
 }
 
-export function deserializeAddress(serialized: string): Address {
+export function deserializeAddress(serialized: string): AddressWire {
   return deserializeAddressBytes(hexToBytes(serialized));
 }
 /** @ignore */
-export function deserializeAddressBytes(serialized: Uint8Array | BytesReader): Address {
+export function deserializeAddressBytes(serialized: Uint8Array | BytesReader): AddressWire {
   const bytesReader = isInstance(serialized, BytesReader)
     ? serialized
     : new BytesReader(serialized);
@@ -228,11 +231,11 @@ export function deserializeAddressBytes(serialized: Uint8Array | BytesReader): A
   return { type: StacksWireType.Address, version, hash160: data };
 }
 
-export function serializePrincipal(principal: PostConditionPrincipal): string {
+export function serializePrincipal(principal: PostConditionPrincipalWire): string {
   return bytesToHex(serializePrincipalBytes(principal));
 }
 /** @ignore */
-export function serializePrincipalBytes(principal: PostConditionPrincipal): Uint8Array {
+export function serializePrincipalBytes(principal: PostConditionPrincipalWire): Uint8Array {
   const bytesArray = [];
   bytesArray.push(principal.prefix);
   bytesArray.push(serializeAddressBytes(principal.address));
@@ -242,13 +245,13 @@ export function serializePrincipalBytes(principal: PostConditionPrincipal): Uint
   return concatArray(bytesArray);
 }
 
-export function deserializePrincipal(serialized: string): PostConditionPrincipal {
+export function deserializePrincipal(serialized: string): PostConditionPrincipalWire {
   return deserializePrincipalBytes(hexToBytes(serialized));
 }
 /** @ignore */
 export function deserializePrincipalBytes(
   serialized: Uint8Array | BytesReader
-): PostConditionPrincipal {
+): PostConditionPrincipalWire {
   const bytesReader = isInstance(serialized, BytesReader)
     ? serialized
     : new BytesReader(serialized);
@@ -257,7 +260,7 @@ export function deserializePrincipalBytes(
   });
   const address = deserializeAddressBytes(bytesReader);
   if (prefix === PostConditionPrincipalId.Standard) {
-    return { type: StacksWireType.Principal, prefix, address } as StandardPrincipal;
+    return { type: StacksWireType.Principal, prefix, address } as StandardPrincipalWire;
   }
   const contractName = deserializeLPStringBytes(bytesReader);
   return {
@@ -265,14 +268,14 @@ export function deserializePrincipalBytes(
     prefix,
     address,
     contractName,
-  } as ContractPrincipal;
+  } as ContractPrincipalWire;
 }
 
-export function serializeLPString(lps: LengthPrefixedString): string {
+export function serializeLPString(lps: LengthPrefixedStringWire): string {
   return bytesToHex(serializeLPStringBytes(lps));
 }
 /** @ignore */
-export function serializeLPStringBytes(lps: LengthPrefixedString): Uint8Array {
+export function serializeLPStringBytes(lps: LengthPrefixedStringWire): Uint8Array {
   const bytesArray = [];
   const contentBytes = utf8ToBytes(lps.content);
   const length = contentBytes.byteLength;
@@ -285,7 +288,7 @@ export function deserializeLPString(
   serialized: string,
   prefixBytes?: number,
   maxLength?: number
-): LengthPrefixedString {
+): LengthPrefixedStringWire {
   return deserializeLPStringBytes(hexToBytes(serialized), prefixBytes, maxLength);
 }
 /** @ignore */
@@ -293,7 +296,7 @@ export function deserializeLPStringBytes(
   serialized: Uint8Array | BytesReader,
   prefixBytes?: number,
   maxLength?: number
-): LengthPrefixedString {
+): LengthPrefixedStringWire {
   prefixBytes = prefixBytes ? prefixBytes : 1;
   const bytesReader = isInstance(serialized, BytesReader)
     ? serialized
@@ -303,7 +306,7 @@ export function deserializeLPStringBytes(
   return createLPString(content, prefixBytes, maxLength ?? 128);
 }
 
-export function codeBodyString(content: string): LengthPrefixedString {
+export function codeBodyString(content: string): LengthPrefixedStringWire {
   return createLPString(content, 4, 100_000);
 }
 
@@ -344,11 +347,11 @@ export function deserializeMemoStringBytes(serialized: Uint8Array | BytesReader)
   return { type: StacksWireType.MemoString, content };
 }
 
-export function serializeAsset(info: Asset): string {
+export function serializeAsset(info: AssetWire): string {
   return bytesToHex(serializeAssetBytes(info));
 }
 /** @ignore */
-export function serializeAssetBytes(info: Asset): Uint8Array {
+export function serializeAssetBytes(info: AssetWire): Uint8Array {
   const bytesArray = [];
   bytesArray.push(serializeAddressBytes(info.address));
   bytesArray.push(serializeLPStringBytes(info.contractName));
@@ -356,11 +359,11 @@ export function serializeAssetBytes(info: Asset): Uint8Array {
   return concatArray(bytesArray);
 }
 
-export function deserializeAsset(serialized: string): Asset {
+export function deserializeAsset(serialized: string): AssetWire {
   return deserializeAssetBytes(hexToBytes(serialized));
 }
 /** @ignore */
-export function deserializeAssetBytes(serialized: Uint8Array | BytesReader): Asset {
+export function deserializeAssetBytes(serialized: Uint8Array | BytesReader): AssetWire {
   const bytesReader = isInstance(serialized, BytesReader)
     ? serialized
     : new BytesReader(serialized);
@@ -450,11 +453,11 @@ export function deserializeLPListBytes(
   return createLPList(l, lengthPrefixBytes);
 }
 
-export function serializePostCondition(postCondition: PostCondition): string {
+export function serializePostCondition(postCondition: PostConditionWire): string {
   return bytesToHex(serializePostConditionBytes(postCondition));
 }
 /** @ignore */
-export function serializePostConditionBytes(postCondition: PostCondition): Uint8Array {
+export function serializePostConditionBytes(postCondition: PostConditionWire): Uint8Array {
   const bytesArray = [];
   bytesArray.push(postCondition.conditionType);
   bytesArray.push(serializePrincipalBytes(postCondition.principal));
@@ -485,11 +488,13 @@ export function serializePostConditionBytes(postCondition: PostCondition): Uint8
   return concatArray(bytesArray);
 }
 
-export function deserializePostCondition(serialized: string): PostCondition {
+export function deserializePostCondition(serialized: string): PostConditionWire {
   return deserializePostConditionBytes(hexToBytes(serialized));
 }
 /** @ignore */
-export function deserializePostConditionBytes(serialized: Uint8Array | BytesReader): PostCondition {
+export function deserializePostConditionBytes(
+  serialized: Uint8Array | BytesReader
+): PostConditionWire {
   const bytesReader = isInstance(serialized, BytesReader)
     ? serialized
     : new BytesReader(serialized);
