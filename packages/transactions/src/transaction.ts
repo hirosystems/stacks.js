@@ -1,5 +1,7 @@
 import {
+  bytesToHex,
   concatArray,
+  Hex,
   hexToBytes,
   IntegerType,
   intToBigInt,
@@ -172,7 +174,7 @@ export class StacksTransaction {
   }
 
   txid(): string {
-    const serialized = this.serialize();
+    const serialized = this.serializeBytes();
     return txidFromData(serialized);
   }
 
@@ -215,7 +217,17 @@ export class StacksTransaction {
     this.auth = setSponsorNonce(this.auth, nonce);
   }
 
-  serialize(): Uint8Array {
+  /**
+   * Serialize a transaction to a hex string (byte representation)
+   *
+   * @returns A hex string of the serialized transaction
+   */
+  serialize(): Hex {
+    return bytesToHex(this.serializeBytes());
+  }
+
+  /** @ignore */
+  serializeBytes(): Uint8Array {
     if (this.version === undefined) {
       throw new SerializationError('"version" is undefined');
     }
@@ -327,10 +339,10 @@ export function estimateTransactionByteLength(transaction: StacksTransaction): n
       (multiSigSpendingCondition.signaturesRequired - existingSignatures) *
       (RECOVERABLE_ECDSA_SIG_LENGTH_BYTES + 1);
 
-    return transaction.serialize().byteLength + totalSignatureLength;
+    return transaction.serializeBytes().byteLength + totalSignatureLength;
   } else {
     // Single-sig transaction
     // Signature space already allocated by empty message signature
-    return transaction.serialize().byteLength;
+    return transaction.serializeBytes().byteLength;
   }
 }
