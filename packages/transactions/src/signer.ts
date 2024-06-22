@@ -1,11 +1,17 @@
 import { StacksTransaction } from './transaction';
 
 import { StacksPrivateKey, StacksPublicKey } from './keys';
-import { isSingleSig, nextVerification, SpendingConditionOpts } from './authorization';
+import {
+  isNonSequential,
+  isSingleSig,
+  nextVerification,
+  SpendingConditionOpts,
+} from './authorization';
 import { cloneDeep } from './utils';
-import { AuthType, PubKeyEncoding, StacksMessageType } from './constants';
+import { AddressHashMode, AuthType, PubKeyEncoding, StacksMessageType } from './constants';
 import { SigningError } from './errors';
 
+// todo: get rid of signer and combine with transaction class? could reduce code and complexity by calculating sighash newly each sign and append.
 export class TransactionSigner {
   transaction: StacksTransaction;
   sigHash: string;
@@ -80,8 +86,12 @@ export class TransactionSigner {
       throw new SigningError('"transaction.auth.spendingCondition" is undefined');
     }
 
-    if (!isSingleSig(this.transaction.auth.spendingCondition)) {
-      const spendingCondition = this.transaction.auth.spendingCondition;
+    const spendingCondition = this.transaction.auth.spendingCondition;
+    if (
+      spendingCondition.hashMode === AddressHashMode.SerializeP2SH ||
+      spendingCondition.hashMode === AddressHashMode.SerializeP2WSH
+    ) {
+      // only check oversign on legacy multisig modes
       if (
         this.checkOversign &&
         spendingCondition.fields.filter(
@@ -92,7 +102,11 @@ export class TransactionSigner {
       }
     }
 
-    const nextSighash = this.transaction.signNextOrigin(this.sigHash, privateKey);
+    const curSigHash = isNonSequential(this.transaction.auth.spendingCondition.hashMode)
+      ? this.transaction.signBegin() // non-sequential multi-sig always signs original sighash
+      : this.sigHash;
+
+    const nextSighash = this.transaction.signNextOrigin(curSigHash, privateKey);
     this.sigHash = nextSighash;
   }
 

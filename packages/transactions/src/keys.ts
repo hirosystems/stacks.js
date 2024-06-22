@@ -140,6 +140,12 @@ export function compressPublicKey(publicKey: string | Uint8Array): StacksPublicK
   return createStacksPublicKey(compressed);
 }
 
+export function uncompressPublicKey(publicKey: string | Uint8Array): StacksPublicKey {
+  const hex = typeof publicKey === 'string' ? publicKey : bytesToHex(publicKey);
+  const compressed = Point.fromHex(hex).toHex(false);
+  return createStacksPublicKey(compressed);
+}
+
 export function deserializePublicKey(bytesReader: BytesReader): StacksPublicKey {
   const fieldId = bytesReader.readUInt8();
   const keyLength =
@@ -161,6 +167,7 @@ export function createStacksPrivateKey(key: string | Uint8Array): StacksPrivateK
 }
 
 export function makeRandomPrivKey(): StacksPrivateKey {
+  // todo: `next` default to compressed private key
   return createStacksPrivateKey(utils.randomPrivateKey());
 }
 

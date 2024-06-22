@@ -16,6 +16,7 @@ import {
   createStandardAuth,
   SpendingCondition,
   MultiSigSpendingCondition,
+  isNonSequential,
 } from './authorization';
 import { ClarityValue, deserializeCV, NoneCV, PrincipalCV, serializeCV } from './clarity';
 import {
@@ -593,11 +594,23 @@ function deriveNetwork(transaction: StacksTransaction) {
   }
 }
 
+/** @deprecated Not used internally */
 export interface MultiSigOptions {
   numSignatures: number;
   publicKeys: string[];
   signerKeys?: string[];
 }
+
+export interface UnsignedMultiSigOptions {
+  numSignatures: number;
+  publicKeys: string[];
+  /** @experimental Use newer non-sequential multi-sig hashmode for transaction. Future releases may make this the default. */
+  useNonSequentialMultiSig?: boolean;
+}
+
+export type SignedMultiSigOptions = UnsignedMultiSigOptions & {
+  signerKeys: string[];
+};
 
 /**
  * STX token transfer transaction options
@@ -630,16 +643,9 @@ export interface SignedTokenTransferOptions extends TokenTransferOptions {
   senderKey: string;
 }
 
-export interface UnsignedMultiSigTokenTransferOptions extends TokenTransferOptions {
-  numSignatures: number;
-  publicKeys: string[];
-}
+export type UnsignedMultiSigTokenTransferOptions = TokenTransferOptions & UnsignedMultiSigOptions;
 
-export interface SignedMultiSigTokenTransferOptions extends TokenTransferOptions {
-  numSignatures: number;
-  publicKeys: string[];
-  signerKeys: string[];
-}
+export type SignedMultiSigTokenTransferOptions = TokenTransferOptions & SignedMultiSigOptions;
 
 /**
  * Generates an unsigned Stacks token transfer transaction
@@ -679,7 +685,9 @@ export async function makeUnsignedSTXTokenTransfer(
   } else {
     // multi-sig
     spendingCondition = createMultiSigSpendingCondition(
-      AddressHashMode.SerializeP2SH,
+      options.useNonSequentialMultiSig
+        ? AddressHashMode.SerializeP2SHNonSequential
+        : AddressHashMode.SerializeP2SH,
       options.numSignatures,
       options.publicKeys,
       options.nonce,
@@ -736,7 +744,7 @@ export async function makeSTXTokenTransfer(
   txOptions: SignedTokenTransferOptions | SignedMultiSigTokenTransferOptions
 ): Promise<StacksTransaction> {
   if ('senderKey' in txOptions) {
-    // txOptions is SignedTokenTransferOptions
+    // single-sig
     const publicKey = publicKeyToString(getPublicKey(createStacksPrivateKey(txOptions.senderKey)));
     const options = omit(txOptions, 'senderKey');
     const transaction = await makeUnsignedSTXTokenTransfer({ publicKey, ...options });
@@ -747,20 +755,31 @@ export async function makeSTXTokenTransfer(
 
     return transaction;
   } else {
-    // txOptions is SignedMultiSigTokenTransferOptions
+    // multi-sig
     const options = omit(txOptions, 'signerKeys');
     const transaction = await makeUnsignedSTXTokenTransfer(options);
 
     const signer = new TransactionSigner(transaction);
-    let pubKeys = txOptions.publicKeys;
-    for (const key of txOptions.signerKeys) {
-      const pubKey = pubKeyfromPrivKey(key);
-      pubKeys = pubKeys.filter(pk => pk !== bytesToHex(pubKey.data));
-      signer.signOrigin(createStacksPrivateKey(key));
+
+    const publicKeys = txOptions.publicKeys.slice();
+
+    // sort public keys (only for newer non-sequential multi-sig for backwards compatibility)
+    if (isNonSequential(transaction.auth.spendingCondition.hashMode)) {
+      publicKeys.sort();
     }
 
-    for (const key of pubKeys) {
-      signer.appendOrigin(publicKeyFromBytes(hexToBytes(key)));
+    // sign in order of public keys
+    for (const publicKey of publicKeys) {
+      const signerKey = txOptions.signerKeys.find(
+        key => bytesToHex(pubKeyfromPrivKey(key).data) === publicKey
+      );
+      if (signerKey) {
+        // either sign and append message signature (which allows for recovering the public key)
+        signer.signOrigin(createStacksPrivateKey(signerKey));
+      } else {
+        // or append the public key (which did not sign here)
+        signer.appendOrigin(publicKeyFromBytes(hexToBytes(publicKey)));
+      }
     }
 
     return transaction;
@@ -805,16 +824,10 @@ export interface SignedContractDeployOptions extends BaseContractDeployOptions {
 /** @deprecated Use {@link SignedContractDeployOptions} or {@link UnsignedContractDeployOptions} instead. */
 export interface ContractDeployOptions extends SignedContractDeployOptions {}
 
-export interface UnsignedMultiSigContractDeployOptions extends BaseContractDeployOptions {
-  numSignatures: number;
-  publicKeys: string[];
-}
+export type UnsignedMultiSigContractDeployOptions = BaseContractDeployOptions &
+  UnsignedMultiSigOptions;
 
-export interface SignedMultiSigContractDeployOptions extends BaseContractDeployOptions {
-  numSignatures: number;
-  publicKeys: string[];
-  signerKeys: string[];
-}
+export type SignedMultiSigContractDeployOptions = BaseContractDeployOptions & SignedMultiSigOptions;
 
 /**
  * @deprecated Use the new {@link estimateTransaction} function insterad.
@@ -947,7 +960,9 @@ export async function makeUnsignedContractDeploy(
   } else {
     // multi-sig
     spendingCondition = createMultiSigSpendingCondition(
-      AddressHashMode.SerializeP2SH,
+      options.useNonSequentialMultiSig
+        ? AddressHashMode.SerializeP2SHNonSequential
+        : AddressHashMode.SerializeP2SH,
       options.numSignatures,
       options.publicKeys,
       options.nonce,
@@ -1038,16 +1053,9 @@ export interface SignedContractCallOptions extends ContractCallOptions {
   senderKey: string;
 }
 
-export interface UnsignedMultiSigContractCallOptions extends ContractCallOptions {
-  numSignatures: number;
-  publicKeys: string[];
-}
+export type UnsignedMultiSigContractCallOptions = ContractCallOptions & UnsignedMultiSigOptions;
 
-export interface SignedMultiSigContractCallOptions extends ContractCallOptions {
-  numSignatures: number;
-  publicKeys: string[];
-  signerKeys: string[];
-}
+export type SignedMultiSigContractCallOptions = ContractCallOptions & SignedMultiSigOptions;
 
 /**
  * @deprecated Use the new {@link estimateTransaction} function insterad.
@@ -1154,7 +1162,9 @@ export async function makeUnsignedContractCall(
   } else {
     // multi-sig
     spendingCondition = createMultiSigSpendingCondition(
-      AddressHashMode.SerializeP2SH,
+      options.useNonSequentialMultiSig
+        ? AddressHashMode.SerializeP2SHNonSequential
+        : AddressHashMode.SerializeP2SH,
       options.numSignatures,
       options.publicKeys,
       options.nonce,

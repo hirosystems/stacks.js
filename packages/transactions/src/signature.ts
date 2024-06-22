@@ -6,6 +6,7 @@ import {
   deserializePublicKey,
   serializePublicKey,
   StacksPublicKey,
+  uncompressPublicKey,
 } from './keys';
 
 import { createMessageSignature, MessageSignature } from './common';
@@ -34,6 +35,8 @@ export function deserializeMessageSignature(bytesReader: BytesReader): MessageSi
   );
 }
 
+// todo: `next` refactor to match wire format more precisely eg https://github.com/jbencin/sips/blob/sip-02x-non-sequential-multisig-transactions/sips/sip-02x/sip-02x-non-sequential-multisig-transactions.md
+//  "A spending authorization field is encoded as follows:" ...
 export interface TransactionAuthField {
   type: StacksMessageType.TransactionAuthField;
   pubKeyEncoding: PubKeyEncoding;
@@ -65,7 +68,7 @@ export function deserializeTransactionAuthField(bytesReader: BytesReader): Trans
     case AuthFieldType.PublicKeyUncompressed:
       return createTransactionAuthField(
         PubKeyEncoding.Uncompressed,
-        deserializePublicKey(bytesReader)
+        uncompressPublicKey(deserializePublicKey(bytesReader).data)
       );
     case AuthFieldType.SignatureCompressed:
       return createTransactionAuthField(
@@ -91,20 +94,19 @@ export function serializeTransactionAuthField(field: TransactionAuthField): Uint
 
   switch (field.contents.type) {
     case StacksMessageType.PublicKey:
-      if (field.pubKeyEncoding == PubKeyEncoding.Compressed) {
-        bytesArray.push(AuthFieldType.PublicKeyCompressed);
-        bytesArray.push(serializePublicKey(field.contents));
-      } else {
-        bytesArray.push(AuthFieldType.PublicKeyUncompressed);
-        bytesArray.push(serializePublicKey(compressPublicKey(field.contents.data)));
-      }
+      bytesArray.push(
+        field.pubKeyEncoding === PubKeyEncoding.Compressed
+          ? AuthFieldType.PublicKeyCompressed
+          : AuthFieldType.PublicKeyUncompressed
+      );
+      bytesArray.push(serializePublicKey(compressPublicKey(field.contents.data)));
       break;
     case StacksMessageType.MessageSignature:
-      if (field.pubKeyEncoding == PubKeyEncoding.Compressed) {
-        bytesArray.push(AuthFieldType.SignatureCompressed);
-      } else {
-        bytesArray.push(AuthFieldType.SignatureUncompressed);
-      }
+      bytesArray.push(
+        field.pubKeyEncoding === PubKeyEncoding.Compressed
+          ? AuthFieldType.SignatureCompressed
+          : AuthFieldType.SignatureUncompressed
+      );
       bytesArray.push(serializeMessageSignature(field.contents));
       break;
   }

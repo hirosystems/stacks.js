@@ -120,7 +120,14 @@ export function createMultiSigSpendingCondition(
   nonce: IntegerType,
   fee: IntegerType
 ): MultiSigSpendingCondition {
-  const stacksPublicKeys = pubKeys.map(createStacksPublicKey);
+  const publicKeys = pubKeys.slice();
+
+  // sort public keys (only for newer non-sequential multi-sig for backwards compatibility)
+  if (isNonSequential(hashMode)) {
+    publicKeys.sort();
+  }
+
+  const stacksPublicKeys = publicKeys.map(createStacksPublicKey);
 
   // address version arg doesn't matter for signer hash generation
   const signer = addressFromPublicKeys(
@@ -140,10 +147,24 @@ export function createMultiSigSpendingCondition(
   };
 }
 
+/** @internal */
 export function isSingleSig(
   condition: SpendingConditionOpts
 ): condition is SingleSigSpendingConditionOpts {
   return 'signature' in condition;
+}
+
+/** @internal */
+export function isSequential(hashMode: AddressHashMode): boolean {
+  return hashMode === AddressHashMode.SerializeP2SH || hashMode === AddressHashMode.SerializeP2WSH;
+}
+
+/** @internal */
+export function isNonSequential(hashMode: AddressHashMode): boolean {
+  return (
+    hashMode === AddressHashMode.SerializeP2SHNonSequential ||
+    hashMode === AddressHashMode.SerializeP2WSHNonSequential
+  );
 }
 
 function clearCondition(condition: SpendingConditionOpts): SpendingCondition {
@@ -463,7 +484,7 @@ function verifyMultiSig(
       case StacksMessageType.MessageSignature:
         if (field.pubKeyEncoding === PubKeyEncoding.Uncompressed) haveUncompressed = true;
         const { pubKey, nextSigHash } = nextVerification(
-          curSigHash,
+          isNonSequential(condition.hashMode) ? initialSigHash : curSigHash,
           authType,
           condition.fee,
           condition.nonce,
@@ -481,7 +502,10 @@ function verifyMultiSig(
     publicKeys.push(foundPubKey);
   }
 
-  if (numSigs !== condition.signaturesRequired)
+  if (
+    (isSequential(condition.hashMode) && numSigs !== condition.signaturesRequired) ||
+    (isNonSequential(condition.hashMode) && numSigs < condition.signaturesRequired)
+  )
     throw new VerificationError('Incorrect number of signatures');
 
   if (haveUncompressed && condition.hashMode === AddressHashMode.SerializeP2SH)
@@ -554,7 +578,7 @@ export function verifyOrigin(auth: Authorization, initialSigHash: string): strin
     case AuthType.Standard:
       return verify(auth.spendingCondition, initialSigHash, AuthType.Standard);
     case AuthType.Sponsored:
-      return verify(auth.spendingCondition, initialSigHash, AuthType.Standard);
+      return verify(auth.spendingCondition, initialSigHash, AuthType.Standard); // todo: should this be .Sponsored?
     default:
       throw new SigningError('Invalid origin auth type');
   }

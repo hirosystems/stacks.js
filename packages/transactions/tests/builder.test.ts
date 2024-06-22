@@ -1,4 +1,10 @@
-import { bytesToHex, bytesToUtf8, hexToBytes, utf8ToBytes } from '@stacks/common';
+import {
+  PRIVATE_KEY_COMPRESSED_LENGTH,
+  bytesToHex,
+  bytesToUtf8,
+  hexToBytes,
+  utf8ToBytes,
+} from '@stacks/common';
 import {
   StacksMainnet,
   StacksTestnet,
@@ -74,13 +80,17 @@ import {
   PayloadType,
   PostConditionMode,
   PubKeyEncoding,
+  StacksMessageType,
   TransactionVersion,
   TxRejectedReason,
 } from '../src/constants';
 import { ClarityAbi } from '../src/contract-abi';
 import {
   createStacksPrivateKey,
+  getPublicKey,
   isCompressed,
+  makeRandomPrivKey,
+  privateKeyToString,
   pubKeyfromPrivKey,
   publicKeyToString,
 } from '../src/keys';
@@ -88,8 +98,8 @@ import { TokenTransferPayload, createTokenTransferPayload, serializePayload } fr
 import { createAssetInfo } from '../src/postcondition-types';
 import { createTransactionAuthField } from '../src/signature';
 import { TransactionSigner } from '../src/signer';
-import { StacksTransaction, deserializeTransaction } from '../src/transaction';
-import { cloneDeep } from '../src/utils';
+import { StacksTransaction, deserializeTransaction, transactionToHex } from '../src/transaction';
+import { cloneDeep, randomBytes } from '../src/utils';
 
 function setSignature(
   unsignedTransaction: StacksTransaction,
@@ -2358,4 +2368,170 @@ test.each([
   const transaction = deserializeTransaction(txBytes);
 
   expect(bytesToHex(transaction.serialize())).toEqual(txBytes);
+});
+
+describe('multi-sig', () => {
+  test('working legacy (sequential) multi-sig', async () => {
+    const pk1 = createStacksPrivateKey(bytesToHex(randomBytes(32)) + '01');
+    const pk2 = createStacksPrivateKey(bytesToHex(randomBytes(32)) + '01');
+    const pk3 = createStacksPrivateKey(bytesToHex(randomBytes(32)) + '01');
+
+    const publicKeys = [pk1, pk2, pk3].map(pk => publicKeyToString(getPublicKey(pk)));
+    const signerKeys = [pk1, pk2].map(pk => privateKeyToString(pk));
+
+    const tx = await makeSTXTokenTransfer({
+      recipient: 'STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6',
+      amount: 12345n,
+      fee: 1_000_000n,
+      nonce: 0n,
+      network: 'testnet',
+      anchorMode: AnchorMode.Any,
+      numSignatures: 2,
+      publicKeys,
+      signerKeys,
+    });
+
+    expect(() => tx.verifyOrigin()).not.toThrow();
+  });
+
+  test('working legacy (sequential) skipped signer multi-sig', async () => {
+    const pk1 = createStacksPrivateKey(bytesToHex(randomBytes(32)) + '01');
+    const pk2 = createStacksPrivateKey(bytesToHex(randomBytes(32)) + '01');
+    const pk3 = createStacksPrivateKey(bytesToHex(randomBytes(32)) + '01');
+
+    const publicKeys = [pk1, pk2, pk3].map(pk => publicKeyToString(getPublicKey(pk)));
+
+    //                  pk1 signer was skipped
+    const signerKeys = [pk2, pk3].map(pk => privateKeyToString(pk));
+
+    const tx = await makeSTXTokenTransfer({
+      recipient: 'STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6',
+      amount: 12345n,
+      fee: 1_000_000n,
+      nonce: 0n,
+      network: 'testnet',
+      anchorMode: AnchorMode.Any,
+      numSignatures: 2,
+      publicKeys,
+      signerKeys,
+    });
+
+    expect(() => tx.verifyOrigin()).not.toThrow();
+  });
+
+  test('working (local) signer key sorting for legacy (sequential) multi-sig', async () => {
+    const pk1 = createStacksPrivateKey(bytesToHex(randomBytes(32)) + '01');
+    const pk2 = createStacksPrivateKey(bytesToHex(randomBytes(32)) + '01');
+    const pk3 = createStacksPrivateKey(bytesToHex(randomBytes(32)) + '01');
+
+    const publicKeys = [pk1, pk2, pk3].map(pk => publicKeyToString(getPublicKey(pk)));
+    const signerKeys = [pk2, pk1].map(pk => privateKeyToString(pk));
+
+    const tx = await makeSTXTokenTransfer({
+      recipient: 'STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6',
+      amount: 12345n,
+      fee: 1_000_000n,
+      nonce: 0n,
+      network: 'testnet',
+      anchorMode: AnchorMode.Any,
+      numSignatures: 2,
+      publicKeys,
+      signerKeys,
+    });
+
+    expect(() => tx.verifyOrigin()).not.toThrow();
+  });
+
+  describe('working non-sequential multi-sig', () => {
+    const pk1 = makeRandomPrivKey();
+    const pk2 = makeRandomPrivKey();
+    const pk3 = createStacksPrivateKey(bytesToHex(randomBytes(32)) + '01');
+    const pk4 = createStacksPrivateKey(bytesToHex(randomBytes(32)) + '01');
+
+    const CASES = [
+      { signers: [pk1, pk2, pk3], signing: [pk1, pk2], required: 2 },
+      { signers: [pk2, pk3, pk1], signing: [pk1, pk2], required: 2 },
+      { signers: [pk3, pk2, pk1], signing: [pk1, pk2, pk3], required: 2 },
+      { signers: [pk4, pk2, pk3], signing: [pk2, pk4], required: 2 },
+      { signers: [pk1, pk2, pk3], signing: [pk3, pk2], required: 2 },
+      { signers: [pk1, pk4, pk3], signing: [pk4, pk1, pk3], required: 3 },
+    ];
+
+    test.each(CASES)('works in multi-sig make method', async ({ signers, signing, required }) => {
+      const publicKeys = signers.map(pk => publicKeyToString(getPublicKey(pk)));
+      const signerKeys = signing.map(pk => privateKeyToString(pk)); // also works out-of-order
+
+      const tx = await makeSTXTokenTransfer({
+        recipient: 'STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6',
+        amount: 12_345n,
+        fee: 1_000n,
+        nonce: 2n,
+        network: 'testnet',
+        anchorMode: AnchorMode.Any,
+        numSignatures: required,
+        publicKeys,
+        signerKeys,
+        useNonSequentialMultiSig: true,
+      });
+
+      expect(() => tx.verifyOrigin()).not.toThrow();
+    });
+
+    test.each(CASES)('works when signing separately', async ({ signers, signing, required }) => {
+      const publicKeys = signers.map(pk => publicKeyToString(getPublicKey(pk)));
+      const signerKeys = signing.map(pk => privateKeyToString(pk));
+
+      const txInitial = await makeSTXTokenTransfer({
+        recipient: 'STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6',
+        amount: 12_345n,
+        fee: 1_000n,
+        nonce: 2n,
+        network: 'testnet',
+        anchorMode: AnchorMode.Any,
+        numSignatures: required,
+        publicKeys,
+        signerKeys: [], // empty at first (e.g. created by a web interface)
+        useNonSequentialMultiSig: true,
+      });
+
+      let serialized = transactionToHex(txInitial); // unsigned, so far (but has public key auth fields instead)
+
+      // mimic signing and serializing in between (e.g. shared group of people over the web)
+      for (const signerKey of signerKeys) {
+        // todo: this whole for loop content should be a helper function in TransactionSigner or StacksTransaction
+
+        const tx = deserializeTransaction(serialized);
+
+        // replace signers public key, with signature
+        const { nextSig } = nextSignature(
+          tx.signBegin(),
+          tx.auth.authType,
+          tx.auth.spendingCondition.fee,
+          tx.auth.spendingCondition.nonce,
+          createStacksPrivateKey(signerKey)
+        );
+
+        if (isSingleSig(tx.auth.spendingCondition)) throw 'type error';
+
+        const signerPublicKey = pubKeyfromPrivKey(signerKey).data;
+        const fieldIdx = tx.auth.spendingCondition.fields.findIndex(field => {
+          return (
+            field.contents.type === StacksMessageType.PublicKey &&
+            bytesToHex(field.contents.data) == bytesToHex(signerPublicKey)
+          );
+        });
+        tx.auth.spendingCondition.fields[fieldIdx] = createTransactionAuthField(
+          hexToBytes(signerKey).byteLength === PRIVATE_KEY_COMPRESSED_LENGTH
+            ? PubKeyEncoding.Compressed
+            : PubKeyEncoding.Uncompressed,
+          nextSig
+        );
+
+        serialized = transactionToHex(tx);
+      }
+
+      const txFinal = deserializeTransaction(serialized);
+      expect(() => txFinal.verifyOrigin()).not.toThrow();
+    });
+  });
 });
