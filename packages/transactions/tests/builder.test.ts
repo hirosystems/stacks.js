@@ -2533,5 +2533,79 @@ describe('multi-sig', () => {
       const txFinal = deserializeTransaction(serialized);
       expect(() => txFinal.verifyOrigin()).not.toThrow();
     });
+
+    test('non sequential multi-sig test vector', async () => {
+      // test vector generated from manual test in stacks-core
+      const EXPECTED =
+        '8080000000040535e2fdeee173024af6848ca6e335691b55498fc4000000000000000000000000000000640000000300028bd9dd96b66534e23cbcce4e69447b92bf1d738edb83182005cfb3b402666e42020158146dc95e76926e3add7289821e983e0dd2f2b0bf464c8e94bb082a213a91067ced1381a64bd03afa662992099b04d4c3f538cc6afa3d043ae081e25ebbde6f0300e30e7e744c6eef7c0a4d1a2dad6f0daa3c7655eb6e9fd6c34d1efa87b648d3e55cdd004ca4e8637cddad3316f3fbd6146665fad2e7ca26725ad09f58c4e43aa0000203020000000000051a70f696e2bda63701e044609eb7a7ce5876571905000000000000271000000000000000000000000000000000000000000000000000000000000000000000';
+
+      const pk1 = '04fbae5c79d50dc21c653ed8bf1ad53a43081f839f1ecdda9774d9170e4bb5c501';
+      const pk2 = 'f8cefc8e181a06ab004c722cb156e7a24f57d9b08af27f36b15fa1357d572b9301';
+      const pk3 = '84e72ac806a425bdef5add21be8771c7498b5e36c235d295d8339a83daf364e3';
+
+      const signers = [pk1, pk2, pk3];
+      const publicKeys = signers
+        .map(createStacksPrivateKey)
+        .map(getPublicKey)
+        .map(publicKeyToString);
+
+      const signerKeys = [pk3, pk2];
+
+      const recipient = 'ST1RFD5Q2QPK3E0F08HG9XDX7SSC7CNRS0QR0SGEV';
+      const amount = 10000;
+      const nonce = 0;
+      const fee = 100;
+      const numSignatures = 2;
+
+      const txMake = await makeSTXTokenTransfer({
+        useNonSequentialMultiSig: true,
+
+        recipient,
+        amount,
+        nonce,
+        fee,
+        network: 'testnet',
+        anchorMode: 'any',
+
+        numSignatures,
+        publicKeys,
+        signerKeys, // "make" will technically ignore these and sign in the sorted order
+      });
+
+      expect(() => txMake.verifyOrigin()).not.toThrow();
+      expect(transactionToHex(txMake)).toBe(EXPECTED);
+
+      ///
+
+      const tx = await makeUnsignedSTXTokenTransfer({
+        useNonSequentialMultiSig: true,
+
+        recipient,
+        amount,
+        nonce,
+        fee,
+        network: 'testnet',
+        anchorMode: 'any',
+
+        numSignatures,
+        publicKeys,
+      });
+
+      const signer = new TransactionSigner(tx);
+
+      // sign in reverse order
+      signer.signOrigin(createStacksPrivateKey(pk3));
+      signer.signOrigin(createStacksPrivateKey(pk2));
+      signer.appendOrigin(getPublicKey(createStacksPrivateKey(pk1)));
+
+      if (isSingleSig(tx.auth.spendingCondition)) throw 'type error';
+
+      // todo: a `finalize` method would be nice to do this for us
+      // we'll manually need to fix the order (for now)
+      tx.auth.spendingCondition.fields.reverse();
+
+      expect(() => tx.verifyOrigin()).not.toThrow();
+      expect(transactionToHex(tx)).toBe(EXPECTED);
+    });
   });
 });
