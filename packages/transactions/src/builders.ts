@@ -759,28 +759,7 @@ export async function makeSTXTokenTransfer(
     const options = omit(txOptions, 'signerKeys');
     const transaction = await makeUnsignedSTXTokenTransfer(options);
 
-    const signer = new TransactionSigner(transaction);
-
-    const publicKeys = txOptions.publicKeys.slice();
-
-    // sort public keys (only for newer non-sequential multi-sig for backwards compatibility)
-    if (isNonSequential(transaction.auth.spendingCondition.hashMode)) {
-      publicKeys.sort();
-    }
-
-    // sign in order of public keys
-    for (const publicKey of publicKeys) {
-      const signerKey = txOptions.signerKeys.find(
-        key => bytesToHex(pubKeyfromPrivKey(key).data) === publicKey
-      );
-      if (signerKey) {
-        // either sign and append message signature (which allows for recovering the public key)
-        signer.signOrigin(createStacksPrivateKey(signerKey));
-      } else {
-        // or append the public key (which did not sign here)
-        signer.appendOrigin(publicKeyFromBytes(hexToBytes(publicKey)));
-      }
-    }
+    mutatingSignMultiSig(transaction, txOptions.publicKeys.slice(), txOptions.signerKeys);
 
     return transaction;
   }
@@ -894,7 +873,7 @@ export async function makeContractDeploy(
   txOptions: SignedContractDeployOptions | SignedMultiSigContractDeployOptions
 ): Promise<StacksTransaction> {
   if ('senderKey' in txOptions) {
-    // txOptions is SignedContractDeployOptions
+    // single-sig
     const publicKey = publicKeyToString(getPublicKey(createStacksPrivateKey(txOptions.senderKey)));
     const options = omit(txOptions, 'senderKey');
     const transaction = await makeUnsignedContractDeploy({ publicKey, ...options });
@@ -905,21 +884,11 @@ export async function makeContractDeploy(
 
     return transaction;
   } else {
-    // txOptions is SignedMultiSigContractDeployOptions
+    // multi-sig
     const options = omit(txOptions, 'signerKeys');
     const transaction = await makeUnsignedContractDeploy(options);
 
-    const signer = new TransactionSigner(transaction);
-    let pubKeys = txOptions.publicKeys;
-    for (const key of txOptions.signerKeys) {
-      const pubKey = pubKeyfromPrivKey(key);
-      pubKeys = pubKeys.filter(pk => pk !== bytesToHex(pubKey.data));
-      signer.signOrigin(createStacksPrivateKey(key));
-    }
-
-    for (const key of pubKeys) {
-      signer.appendOrigin(publicKeyFromBytes(hexToBytes(key)));
-    }
+    mutatingSignMultiSig(transaction, txOptions.publicKeys.slice(), txOptions.signerKeys);
 
     return transaction;
   }
@@ -1229,6 +1198,7 @@ export async function makeContractCall(
   txOptions: SignedContractCallOptions | SignedMultiSigContractCallOptions
 ): Promise<StacksTransaction> {
   if ('senderKey' in txOptions) {
+    // single-sig
     const publicKey = publicKeyToString(getPublicKey(createStacksPrivateKey(txOptions.senderKey)));
     const options = omit(txOptions, 'senderKey');
     const transaction = await makeUnsignedContractCall({ publicKey, ...options });
@@ -1239,20 +1209,11 @@ export async function makeContractCall(
 
     return transaction;
   } else {
+    // multi-sig
     const options = omit(txOptions, 'signerKeys');
     const transaction = await makeUnsignedContractCall(options);
 
-    const signer = new TransactionSigner(transaction);
-    let pubKeys = txOptions.publicKeys;
-    for (const key of txOptions.signerKeys) {
-      const pubKey = pubKeyfromPrivKey(key);
-      pubKeys = pubKeys.filter(pk => pk !== bytesToHex(pubKey.data));
-      signer.signOrigin(createStacksPrivateKey(key));
-    }
-
-    for (const key of pubKeys) {
-      signer.appendOrigin(publicKeyFromBytes(hexToBytes(key)));
-    }
+    mutatingSignMultiSig(transaction, txOptions.publicKeys.slice(), txOptions.signerKeys);
 
     return transaction;
   }
@@ -1700,5 +1661,32 @@ export async function estimateTransactionFeeWithFallback(
       return await estimateTransferUnsafe(transaction, network);
     }
     throw error;
+  }
+}
+
+/** @internal multi-sig signing re-use */
+function mutatingSignMultiSig(
+  /** **Warning:** method mutates `transaction` */
+  transaction: StacksTransaction,
+  publicKeys: string[],
+  signerKeys: string[]
+) {
+  const signer = new TransactionSigner(transaction);
+
+  // sort public keys (only for newer non-sequential multi-sig for backwards compatibility)
+  if (isNonSequential(transaction.auth.spendingCondition.hashMode)) {
+    publicKeys.sort();
+  }
+
+  // sign in order of public keys
+  for (const publicKey of publicKeys) {
+    const signerKey = signerKeys.find(key => bytesToHex(pubKeyfromPrivKey(key).data) === publicKey);
+    if (signerKey) {
+      // either sign and append message signature (which allows for recovering the public key)
+      signer.signOrigin(createStacksPrivateKey(signerKey));
+    } else {
+      // or append the public key (which did not sign here)
+      signer.appendOrigin(publicKeyFromBytes(hexToBytes(publicKey)));
+    }
   }
 }
