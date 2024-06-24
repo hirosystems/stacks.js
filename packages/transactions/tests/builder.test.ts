@@ -87,6 +87,7 @@ import {
 import { ClarityAbi } from '../src/contract-abi';
 import {
   createStacksPrivateKey,
+  createStacksPublicKey,
   getPublicKey,
   isCompressed,
   makeRandomPrivKey,
@@ -2455,6 +2456,7 @@ describe('multi-sig', () => {
       { signers: [pk4, pk2, pk3], signing: [pk2, pk4], required: 2 },
       { signers: [pk1, pk2, pk3], signing: [pk3, pk2], required: 2 },
       { signers: [pk1, pk4, pk3], signing: [pk4, pk1, pk3], required: 3 },
+      { signers: [pk2, pk1, pk4, pk3], signing: [pk4, pk1, pk3, pk2], required: 3 }, // oversign
     ];
 
     test.each(CASES)('works in multi-sig make method', async ({ signers, signing, required }) => {
@@ -2607,5 +2609,40 @@ describe('multi-sig', () => {
       expect(() => tx.verifyOrigin()).not.toThrow();
       expect(transactionToHex(tx)).toBe(EXPECTED);
     });
+  });
+
+  test('non-sequential multi-sig oversign', async () => {
+    // test case needs 3 of 5 signers, but 4 sign (too many)
+    // but here the oversign is ok
+
+    const privateKeys = Array.from({ length: 5 }, () => makeRandomPrivKey());
+    const signers = new Map(privateKeys.map(pk => [publicKeyToString(getPublicKey(pk)), pk]));
+    const publicKeys = Array.from(signers.keys()).sort();
+
+    const tx = await makeUnsignedSTXTokenTransfer({
+      recipient: 'STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6',
+      amount: 12_345n,
+      fee: 1_000_000n,
+      nonce: 2n,
+      network: 'testnet',
+      anchorMode: AnchorMode.Any,
+
+      numSignatures: 3,
+      publicKeys,
+
+      useNonSequentialMultiSig: true,
+    });
+
+    const missingSigner = publicKeys.pop();
+
+    const signer = new TransactionSigner(tx);
+
+    for (const pub of publicKeys) {
+      signer.signOrigin(signers.get(pub)!);
+    }
+
+    signer.appendOrigin(createStacksPublicKey(missingSigner!));
+
+    expect(() => tx.verifyOrigin()).not.toThrow();
   });
 });
