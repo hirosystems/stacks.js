@@ -2477,6 +2477,38 @@ describe('multi-sig', () => {
       });
 
       expect(() => tx.verifyOrigin()).not.toThrow();
+
+      const parsed = deserializeTransaction(tx.serialize());
+      if (isSingleSig(parsed.auth.spendingCondition)) throw 'type error';
+
+      expect(parsed.auth.spendingCondition.signaturesRequired).toBe(required);
+
+      const signatures = parsed.auth.spendingCondition.fields
+        .filter(f => f.contents.type === StacksMessageType.MessageSignature)
+        .map(s => s.contents.data);
+      expect(signatures.length).toBe(signing.length);
+
+      const signingSigs = new Set(
+        // deduplicate
+        signing.map(
+          sk => nextSignature(tx.signBegin(), tx.auth.authType, 1_000n, 2n, sk).nextSig.data
+        )
+      );
+      expect(signingSigs.size).toBe(signatures.length);
+      expect(Array.from(signingSigs)).toEqual(expect.arrayContaining(signatures));
+
+      const appendedKeys = parsed.auth.spendingCondition.fields.filter(
+        f => f.contents.type === StacksMessageType.PublicKey
+      );
+      expect(appendedKeys.length).toBe(signers.length - signing.length);
+
+      // random byte changes
+      for (let i = 0; i < 100; i++) {
+        const bytes = Array.from(tx.serialize());
+        const randomIdx = Math.floor(Math.random() * bytes.length);
+        bytes[randomIdx] ^= 1;
+        expect(() => deserializeTransaction(Uint8Array.from(bytes)).verifyOrigin()).toThrow();
+      }
     });
 
     test.each(CASES)('works when signing separately', async ({ signers, signing, required }) => {
