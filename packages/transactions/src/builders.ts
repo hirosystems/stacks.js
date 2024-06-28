@@ -701,7 +701,7 @@ export async function makeUnsignedSTXTokenTransfer(
       : AddressHashMode.SerializeP2SH;
 
     const publicKeys = options.address
-      ? ensureValidMultiSigPublicKeyOrder(
+      ? sortPublicKeysForAddress(
           options.publicKeys,
           options.numSignatures,
           hashMode,
@@ -966,7 +966,7 @@ export async function makeUnsignedContractDeploy(
       : AddressHashMode.SerializeP2SH;
 
     const publicKeys = options.address
-      ? ensureValidMultiSigPublicKeyOrder(
+      ? sortPublicKeysForAddress(
           options.publicKeys,
           options.numSignatures,
           hashMode,
@@ -1179,7 +1179,7 @@ export async function makeUnsignedContractCall(
       : AddressHashMode.SerializeP2SH;
 
     const publicKeys = options.address
-      ? ensureValidMultiSigPublicKeyOrder(
+      ? sortPublicKeysForAddress(
           options.publicKeys,
           options.numSignatures,
           hashMode,
@@ -1738,7 +1738,7 @@ function mutatingSignAppendMultiSig(
 
   const signer = new TransactionSigner(transaction);
 
-  const pubs = ensureValidMultiSigPublicKeyOrder(
+  const pubs = sortPublicKeysForAddress(
     publicKeys,
     transaction.auth.spendingCondition.signaturesRequired,
     transaction.auth.spendingCondition.hashMode,
@@ -1759,7 +1759,7 @@ function mutatingSignAppendMultiSig(
 }
 
 /** @internal Get the matching public-keys array for a multi-sig address */
-function ensureValidMultiSigPublicKeyOrder(
+function sortPublicKeysForAddress(
   publicKeys: string[],
   numSigs: number,
   hashMode: MultiSigHashMode,
