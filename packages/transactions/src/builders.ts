@@ -1738,12 +1738,14 @@ function mutatingSignAppendMultiSig(
 
   const signer = new TransactionSigner(transaction);
 
-  const pubs = sortPublicKeysForAddress(
-    publicKeys,
-    transaction.auth.spendingCondition.signaturesRequired,
-    transaction.auth.spendingCondition.hashMode,
-    address ? createAddress(address).hash160 : undefined
-  );
+  const pubs = address
+    ? sortPublicKeysForAddress(
+        publicKeys,
+        transaction.auth.spendingCondition.signaturesRequired,
+        transaction.auth.spendingCondition.hashMode,
+        createAddress(address).hash160
+      )
+    : publicKeys;
 
   // sign in order of public keys
   for (const publicKey of pubs) {
@@ -1763,10 +1765,8 @@ function sortPublicKeysForAddress(
   publicKeys: string[],
   numSigs: number,
   hashMode: MultiSigHashMode,
-  hash?: string
+  hash: string
 ): string[] {
-  if (!hash) return publicKeys;
-
   // unsorted
   const hashUnsorted = addressFromPublicKeys(
     0 as any, // only used for hash, so version doesn't matter
