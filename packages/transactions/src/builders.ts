@@ -16,7 +16,7 @@ import {
   createStandardAuth,
   SpendingCondition,
   MultiSigSpendingCondition,
-  isNonSequential,
+  isSingleSig,
 } from './authorization';
 import { ClarityValue, deserializeCV, NoneCV, PrincipalCV, serializeCV } from './clarity';
 import {
@@ -34,11 +34,13 @@ import {
   StacksMessageType,
   ClarityVersion,
   AnchorModeName,
+  MultiSigHashMode,
 } from './constants';
 import { ClarityAbi, validateContractCall } from './contract-abi';
 import { NoEstimateAvailableError } from './errors';
 import {
   createStacksPrivateKey,
+  createStacksPublicKey,
   getPublicKey,
   pubKeyfromPrivKey,
   publicKeyFromBytes,
@@ -59,6 +61,7 @@ import {
 } from './postcondition';
 import {
   AssetInfo,
+  createAddress,
   createContractPrincipal,
   createStandardPrincipal,
   FungiblePostCondition,
@@ -68,7 +71,7 @@ import {
 } from './postcondition-types';
 import { TransactionSigner } from './signer';
 import { StacksTransaction } from './transaction';
-import { createLPList } from './types';
+import { addressFromPublicKeys, createLPList } from './types';
 import { cvToHex, omit, parseReadOnlyResponse, validateTxId } from './utils';
 
 /** @internal */
@@ -602,8 +605,17 @@ export interface MultiSigOptions {
 }
 
 export interface UnsignedMultiSigOptions {
+  /** The minimum required signatures N (in a N of M multi-sig) */
   numSignatures: number;
+  /** The M public-keys (in a N of M multi-sig), which together form the address of the multi-sig account */
   publicKeys: string[];
+  /**
+   * The `address` of the multi-sig account.
+   * - If NOT provided, the public-key order is taken AS IS.
+   * - If provided, the address will be checked against the order of the public-keys (either AS IS or SORTED).
+   * The default is to SORT the public-keys (only if the `address` is provided).
+   */
+  address?: string;
   /** @experimental Use newer non-sequential multi-sig hashmode for transaction. Future releases may make this the default. */
   useNonSequentialMultiSig?: boolean;
 }
@@ -684,12 +696,23 @@ export async function makeUnsignedSTXTokenTransfer(
     );
   } else {
     // multi-sig
+    const hashMode = options.useNonSequentialMultiSig
+      ? AddressHashMode.SerializeP2SHNonSequential
+      : AddressHashMode.SerializeP2SH;
+
+    const publicKeys = options.address
+      ? getMultiSigPublicKeysOrder(
+          options.publicKeys,
+          options.numSignatures,
+          hashMode,
+          createAddress(options.address).hash160
+        )
+      : options.publicKeys;
+
     spendingCondition = createMultiSigSpendingCondition(
-      options.useNonSequentialMultiSig
-        ? AddressHashMode.SerializeP2SHNonSequential
-        : AddressHashMode.SerializeP2SH,
+      hashMode,
       options.numSignatures,
-      options.publicKeys,
+      publicKeys,
       options.nonce,
       options.fee
     );
@@ -759,7 +782,12 @@ export async function makeSTXTokenTransfer(
     const options = omit(txOptions, 'signerKeys');
     const transaction = await makeUnsignedSTXTokenTransfer(options);
 
-    mutatingSignMultiSig(transaction, txOptions.publicKeys.slice(), txOptions.signerKeys);
+    mutatingSignAppendMultiSig(
+      transaction,
+      txOptions.publicKeys.slice(),
+      txOptions.signerKeys,
+      txOptions.address
+    );
 
     return transaction;
   }
@@ -888,7 +916,12 @@ export async function makeContractDeploy(
     const options = omit(txOptions, 'signerKeys');
     const transaction = await makeUnsignedContractDeploy(options);
 
-    mutatingSignMultiSig(transaction, txOptions.publicKeys.slice(), txOptions.signerKeys);
+    mutatingSignAppendMultiSig(
+      transaction,
+      txOptions.publicKeys.slice(),
+      txOptions.signerKeys,
+      txOptions.address
+    );
 
     return transaction;
   }
@@ -928,12 +961,23 @@ export async function makeUnsignedContractDeploy(
     );
   } else {
     // multi-sig
+    const hashMode = options.useNonSequentialMultiSig
+      ? AddressHashMode.SerializeP2SHNonSequential
+      : AddressHashMode.SerializeP2SH;
+
+    const publicKeys = options.address
+      ? getMultiSigPublicKeysOrder(
+          options.publicKeys,
+          options.numSignatures,
+          hashMode,
+          createAddress(options.address).hash160
+        )
+      : options.publicKeys;
+
     spendingCondition = createMultiSigSpendingCondition(
-      options.useNonSequentialMultiSig
-        ? AddressHashMode.SerializeP2SHNonSequential
-        : AddressHashMode.SerializeP2SH,
+      hashMode,
       options.numSignatures,
-      options.publicKeys,
+      publicKeys,
       options.nonce,
       options.fee
     );
@@ -1130,12 +1174,23 @@ export async function makeUnsignedContractCall(
     );
   } else {
     // multi-sig
+    const hashMode = options.useNonSequentialMultiSig
+      ? AddressHashMode.SerializeP2SHNonSequential
+      : AddressHashMode.SerializeP2SH;
+
+    const publicKeys = options.address
+      ? getMultiSigPublicKeysOrder(
+          options.publicKeys,
+          options.numSignatures,
+          hashMode,
+          createAddress(options.address).hash160
+        )
+      : options.publicKeys;
+
     spendingCondition = createMultiSigSpendingCondition(
-      options.useNonSequentialMultiSig
-        ? AddressHashMode.SerializeP2SHNonSequential
-        : AddressHashMode.SerializeP2SH,
+      hashMode,
       options.numSignatures,
-      options.publicKeys,
+      publicKeys,
       options.nonce,
       options.fee
     );
@@ -1213,7 +1268,12 @@ export async function makeContractCall(
     const options = omit(txOptions, 'signerKeys');
     const transaction = await makeUnsignedContractCall(options);
 
-    mutatingSignMultiSig(transaction, txOptions.publicKeys.slice(), txOptions.signerKeys);
+    mutatingSignAppendMultiSig(
+      transaction,
+      txOptions.publicKeys.slice(),
+      txOptions.signerKeys,
+      txOptions.address
+    );
 
     return transaction;
   }
@@ -1665,21 +1725,28 @@ export async function estimateTransactionFeeWithFallback(
 }
 
 /** @internal multi-sig signing re-use */
-function mutatingSignMultiSig(
+function mutatingSignAppendMultiSig(
   /** **Warning:** method mutates `transaction` */
   transaction: StacksTransaction,
   publicKeys: string[],
-  signerKeys: string[]
+  signerKeys: string[],
+  address?: string
 ) {
-  const signer = new TransactionSigner(transaction);
-
-  // sort public keys (only for newer non-sequential multi-sig for backwards compatibility)
-  if (isNonSequential(transaction.auth.spendingCondition.hashMode)) {
-    publicKeys.sort();
+  if (isSingleSig(transaction.auth.spendingCondition)) {
+    throw new Error('Transaction is not a multi-sig transaction');
   }
 
+  const signer = new TransactionSigner(transaction);
+
+  const pubs = getMultiSigPublicKeysOrder(
+    publicKeys,
+    transaction.auth.spendingCondition.signaturesRequired,
+    transaction.auth.spendingCondition.hashMode,
+    address ? createAddress(address).hash160 : undefined
+  );
+
   // sign in order of public keys
-  for (const publicKey of publicKeys) {
+  for (const publicKey of pubs) {
     const signerKey = signerKeys.find(key => bytesToHex(pubKeyfromPrivKey(key).data) === publicKey);
     if (signerKey) {
       // either sign and append message signature (which allows for recovering the public key)
@@ -1689,4 +1756,27 @@ function mutatingSignMultiSig(
       signer.appendOrigin(publicKeyFromBytes(hexToBytes(publicKey)));
     }
   }
+}
+
+/** @internal Get the matching public-keys array for a multi-sig address */
+function getMultiSigPublicKeysOrder(
+  publicKeys: string[],
+  numSigs: number,
+  hashMode: MultiSigHashMode,
+  hash?: string
+): string[] {
+  if (!hash) return publicKeys;
+
+  // unsorted
+  const hashUnsorted = addressFromPublicKeys(
+    0 as any, // only used for hash, so version doesn't matter
+    hashMode,
+    numSigs,
+    publicKeys.map(createStacksPublicKey)
+  ).hash160;
+
+  if (hashUnsorted === hash) return publicKeys;
+
+  // sorted
+  return publicKeys.slice().sort();
 }

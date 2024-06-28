@@ -1,8 +1,7 @@
 import { StacksTransaction } from './transaction';
-
 import { StacksPrivateKey, StacksPublicKey } from './keys';
 import {
-  isNonSequential,
+  isSequentialMultiSig,
   isSingleSig,
   nextVerification,
   SpendingConditionOpts,
@@ -102,12 +101,14 @@ export class TransactionSigner {
       }
     }
 
-    const curSigHash = isNonSequential(this.transaction.auth.spendingCondition.hashMode)
-      ? this.transaction.signBegin() // non-sequential multi-sig always signs original sighash
-      : this.sigHash;
+    const nextSighash = this.transaction.signNextOrigin(this.sigHash, privateKey);
 
-    const nextSighash = this.transaction.signNextOrigin(curSigHash, privateKey);
-    this.sigHash = nextSighash;
+    if (
+      isSingleSig(this.transaction.auth.spendingCondition) ||
+      isSequentialMultiSig(this.transaction.auth.spendingCondition.hashMode)
+    ) {
+      this.sigHash = nextSighash;
+    }
   }
 
   appendOrigin(publicKey: StacksPublicKey) {

@@ -120,14 +120,7 @@ export function createMultiSigSpendingCondition(
   nonce: IntegerType,
   fee: IntegerType
 ): MultiSigSpendingCondition {
-  const publicKeys = pubKeys.slice();
-
-  // sort public keys (only for newer non-sequential multi-sig for backwards compatibility)
-  if (isNonSequential(hashMode)) {
-    publicKeys.sort();
-  }
-
-  const stacksPublicKeys = publicKeys.map(createStacksPublicKey);
+  const stacksPublicKeys = pubKeys.map(createStacksPublicKey);
 
   // address version arg doesn't matter for signer hash generation
   const signer = addressFromPublicKeys(
@@ -155,12 +148,12 @@ export function isSingleSig(
 }
 
 /** @internal */
-export function isSequential(hashMode: AddressHashMode): boolean {
+export function isSequentialMultiSig(hashMode: AddressHashMode): boolean {
   return hashMode === AddressHashMode.SerializeP2SH || hashMode === AddressHashMode.SerializeP2WSH;
 }
 
 /** @internal */
-export function isNonSequential(hashMode: AddressHashMode): boolean {
+export function isNonSequentialMultiSig(hashMode: AddressHashMode): boolean {
   return (
     hashMode === AddressHashMode.SerializeP2SHNonSequential ||
     hashMode === AddressHashMode.SerializeP2WSHNonSequential
@@ -469,42 +462,43 @@ function verifyMultiSig(
   authType: AuthType
 ): string {
   const publicKeys: StacksPublicKey[] = [];
+
   let curSigHash = initialSigHash;
   let haveUncompressed = false;
   let numSigs = 0;
 
   for (const field of condition.fields) {
-    let foundPubKey: StacksPublicKey;
-
     switch (field.contents.type) {
       case StacksMessageType.PublicKey:
         if (!isCompressed(field.contents)) haveUncompressed = true;
-        foundPubKey = field.contents;
+        publicKeys.push(field.contents);
         break;
       case StacksMessageType.MessageSignature:
         if (field.pubKeyEncoding === PubKeyEncoding.Uncompressed) haveUncompressed = true;
         const { pubKey, nextSigHash } = nextVerification(
-          isNonSequential(condition.hashMode) ? initialSigHash : curSigHash,
+          curSigHash,
           authType,
           condition.fee,
           condition.nonce,
           field.pubKeyEncoding,
           field.contents
         );
-        curSigHash = nextSigHash;
-        foundPubKey = pubKey;
+
+        if (isSequentialMultiSig(condition.hashMode)) {
+          curSigHash = nextSigHash;
+        }
+
+        publicKeys.push(pubKey);
 
         numSigs += 1;
         if (numSigs === 65536) throw new VerificationError('Too many signatures');
-
         break;
     }
-    publicKeys.push(foundPubKey);
   }
 
   if (
-    (isSequential(condition.hashMode) && numSigs !== condition.signaturesRequired) ||
-    (isNonSequential(condition.hashMode) && numSigs < condition.signaturesRequired)
+    (isSequentialMultiSig(condition.hashMode) && numSigs !== condition.signaturesRequired) ||
+    (isNonSequentialMultiSig(condition.hashMode) && numSigs < condition.signaturesRequired)
   )
     throw new VerificationError('Incorrect number of signatures');
 
