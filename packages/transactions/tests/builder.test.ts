@@ -14,6 +14,7 @@ import {
 import * as fs from 'fs';
 import fetchMock from 'jest-fetch-mock';
 import {
+  addressFromPublicKeys,
   createFungiblePostCondition,
   createSTXPostCondition,
   serializePostCondition,
@@ -67,7 +68,7 @@ import {
   uintCV,
 } from '../src/clarity';
 import { principalCV } from '../src/clarity/types/principalCV';
-import { createMessageSignature } from '../src/common';
+import { addressToString, createMessageSignature } from '../src/common';
 import {
   AddressHashMode,
   AnchorMode,
@@ -2676,5 +2677,82 @@ describe('multi-sig', () => {
     signer.appendOrigin(createStacksPublicKey(missingSigner!));
 
     expect(() => tx.verifyOrigin()).not.toThrow();
+  });
+
+  test('multi-sig optional address param', async () => {
+    const pk1 = createStacksPrivateKey(bytesToHex(randomBytes(32)) + '01');
+    const pk2 = createStacksPrivateKey(bytesToHex(randomBytes(32)) + '01');
+    const pk3 = createStacksPrivateKey(bytesToHex(randomBytes(32)) + '01');
+
+    const publicKeys = [pk1, pk2, pk3]
+      .map(pk => publicKeyToString(getPublicKey(pk)))
+      .sort()
+      .reverse(); // ensure doesn't match sorted
+
+    const address = addressFromPublicKeys(
+      0 as any, // only used for hash, so version doesn't matter
+      AddressHashMode.SerializeP2SHNonSequential,
+      2,
+      publicKeys.map(createStacksPublicKey)
+    );
+
+    const addressSorted = addressFromPublicKeys(
+      0 as any, // only used for hash, so version doesn't matter
+      AddressHashMode.SerializeP2SHNonSequential,
+      2,
+      publicKeys.slice().sort().map(createStacksPublicKey)
+    );
+
+    expect(addressSorted).not.toEqual(address);
+
+    // normal works
+    const tx = await makeSTXTokenTransfer({
+      recipient: 'STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6',
+      amount: 12345n,
+      fee: 1_000_000n,
+      nonce: 0n,
+      network: 'testnet',
+      anchorMode: AnchorMode.Any,
+
+      numSignatures: 2,
+      publicKeys,
+      signerKeys: [pk1, pk2].map(privateKeyToString),
+
+      address: addressToString(address),
+    });
+    expect(() => tx.verifyOrigin()).not.toThrow();
+
+    // sorted works
+    const txSorted = await makeSTXTokenTransfer({
+      recipient: 'STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6',
+      amount: 12345n,
+      fee: 1_000_000n,
+      nonce: 0n,
+      network: 'testnet',
+      anchorMode: AnchorMode.Any,
+
+      numSignatures: 2,
+      publicKeys,
+      signerKeys: [pk1, pk2].map(privateKeyToString),
+
+      address: addressToString(addressSorted),
+    });
+    expect(() => txSorted.verifyOrigin()).not.toThrow();
+
+    const txMismatch = makeSTXTokenTransfer({
+      recipient: 'STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6',
+      amount: 12345n,
+      fee: 1_000_000n,
+      nonce: 0n,
+      network: 'testnet',
+      anchorMode: AnchorMode.Any,
+
+      numSignatures: 2,
+      publicKeys: publicKeys.slice().sort(), // already sorted (Stacks.js "cannot" think of anything else to check)
+      signerKeys: [pk1, pk2].map(privateKeyToString),
+
+      address: addressToString(address), // Stacks.js "cannot" figure out how to get to this sorting
+    });
+    await expect(txMismatch).rejects.toThrow();
   });
 });
