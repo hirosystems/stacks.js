@@ -701,7 +701,7 @@ export async function makeUnsignedSTXTokenTransfer(
       : AddressHashMode.SerializeP2SH;
 
     const publicKeys = options.address
-      ? getMultiSigPublicKeysOrder(
+      ? ensureValidMultiSigPublicKeyOrder(
           options.publicKeys,
           options.numSignatures,
           hashMode,
@@ -966,7 +966,7 @@ export async function makeUnsignedContractDeploy(
       : AddressHashMode.SerializeP2SH;
 
     const publicKeys = options.address
-      ? getMultiSigPublicKeysOrder(
+      ? ensureValidMultiSigPublicKeyOrder(
           options.publicKeys,
           options.numSignatures,
           hashMode,
@@ -1179,7 +1179,7 @@ export async function makeUnsignedContractCall(
       : AddressHashMode.SerializeP2SH;
 
     const publicKeys = options.address
-      ? getMultiSigPublicKeysOrder(
+      ? ensureValidMultiSigPublicKeyOrder(
           options.publicKeys,
           options.numSignatures,
           hashMode,
@@ -1738,7 +1738,7 @@ function mutatingSignAppendMultiSig(
 
   const signer = new TransactionSigner(transaction);
 
-  const pubs = getMultiSigPublicKeysOrder(
+  const pubs = ensureValidMultiSigPublicKeyOrder(
     publicKeys,
     transaction.auth.spendingCondition.signaturesRequired,
     transaction.auth.spendingCondition.hashMode,
@@ -1759,7 +1759,7 @@ function mutatingSignAppendMultiSig(
 }
 
 /** @internal Get the matching public-keys array for a multi-sig address */
-function getMultiSigPublicKeysOrder(
+function ensureValidMultiSigPublicKeyOrder(
   publicKeys: string[],
   numSigs: number,
   hashMode: MultiSigHashMode,
@@ -1778,5 +1778,15 @@ function getMultiSigPublicKeysOrder(
   if (hashUnsorted === hash) return publicKeys;
 
   // sorted
-  return publicKeys.slice().sort();
+  const publicKeysSorted = publicKeys.slice().sort();
+  const hashSorted = addressFromPublicKeys(
+    0 as any, // only used for hash, so version doesn't matter
+    hashMode,
+    numSigs,
+    publicKeysSorted.map(createStacksPublicKey)
+  ).hash160;
+
+  if (hashSorted === hash) return publicKeysSorted;
+
+  throw new Error('Failed to find matching multi-sig address given public-keys.');
 }
