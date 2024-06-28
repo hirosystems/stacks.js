@@ -273,8 +273,13 @@ export function deserializeMultiSigSpendingCondition(
   // Partially signed multi-sig tx can be serialized and deserialized without exception (Incorrect number of signatures)
   // No need to check numSigs !== signaturesRequired to throw Incorrect number of signatures error
 
-  if (haveUncompressed && hashMode === AddressHashMode.SerializeP2SH)
+  if (
+    haveUncompressed &&
+    (hashMode === AddressHashMode.SerializeP2WSH ||
+      hashMode === AddressHashMode.SerializeP2WSHNonSequential)
+  ) {
     throw new VerificationError('Uncompressed keys are not allowed in this hash mode');
+  }
 
   return {
     hashMode,
@@ -502,7 +507,11 @@ function verifyMultiSig(
   )
     throw new VerificationError('Incorrect number of signatures');
 
-  if (haveUncompressed && condition.hashMode === AddressHashMode.SerializeP2SH)
+  if (
+    haveUncompressed &&
+    (condition.hashMode === AddressHashMode.SerializeP2WSH ||
+      condition.hashMode === AddressHashMode.SerializeP2WSHNonSequential)
+  )
     throw new VerificationError('Uncompressed keys are not allowed in this hash mode');
 
   const addrBytes = addressFromPublicKeys(

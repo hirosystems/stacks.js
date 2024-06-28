@@ -272,7 +272,6 @@ test('STX token transfer transaction multi-sig serialization and deserialization
 });
 
 test('STX token transfer transaction multi-sig uncompressed keys serialization and deserialization', () => {
-  const addressHashMode = AddressHashMode.SerializeP2SH;
   const nonce = 0;
   const fee = 0;
 
@@ -286,17 +285,21 @@ test('STX token transfer transaction multi-sig uncompressed keys serialization a
   const pubKeys = privKeyStrings.map(pubKeyfromPrivKey);
   const pubKeyStrings = pubKeys.map(publicKeyToString);
 
+  expect(() =>
+    createMultiSigSpendingCondition(AddressHashMode.SerializeP2WSH, 2, pubKeyStrings, nonce, fee)
+  ).toThrowError('Public keys must be compressed for segwit');
+
   const spendingCondition = createMultiSigSpendingCondition(
-    addressHashMode,
+    AddressHashMode.SerializeP2SH, // will be replaced in the next step
     2,
     pubKeyStrings,
     nonce,
     fee
   );
+  spendingCondition.hashMode = AddressHashMode.SerializeP2WSH;
+
   const originAuth = createStandardAuth(spendingCondition);
-
   const originAddress = originAuth.spendingCondition?.signer;
-
   expect(originAddress).toEqual('73a8b4a751a678fe83e9d35ce301371bb3d397f7');
 
   const transactionVersion = TransactionVersion.Mainnet;
@@ -316,17 +319,9 @@ test('STX token transfer transaction multi-sig uncompressed keys serialization a
   signer.appendOrigin(pubKeys[2]);
 
   const expectedError = 'Uncompressed keys are not allowed in this hash mode';
-
   expect(() => transaction.verifyOrigin()).toThrow(expectedError);
 
   const serialized = transaction.serialize();
-
-  // serialized tx that has been successfully deserialized and had
-  // its auth verified via the stacks-blockchain implementation
-  const verifiedTx =
-    '0000000001040173a8b4a751a678fe83e9d35ce301371bb3d397f7000000000000000000000000000000000000000303010359b18fbcb6d5e26efc1eae70aefdae54995e6fd4f3ec40d2ff43b2227c4def1ee6416bf3dd5c92c8150fa51717f1f2db778c02ba47b8c70c1a8ff640b4edee03017b7d76c3d1f7d449604df864e4013da5094be7276aa02cb73ec9fc8108a0bed46c7cde4d702830c1db34ef7c19e2776f59107afef39084776fc88bc78dbb96560103661ec7479330bf1ef7a4c9d1816f089666a112e72d671048e5424fc528ca51530002030200000000000516df0ba3e79792be7be5e50a370289accfc8c9e03200000000002625a06d656d6f000000000000000000000000000000000000000000000000000000000000';
-  expect(bytesToHex(serialized)).toBe(verifiedTx);
-
   expect(() => deserializeTransaction(new BytesReader(serialized))).toThrow(expectedError);
 });
 
