@@ -4,6 +4,7 @@ import {
   hexToBytes,
   IntegerType,
   intToBigInt,
+  PRIVATE_KEY_COMPRESSED_LENGTH,
   writeUInt32BE,
 } from '@stacks/common';
 import {
@@ -94,12 +95,14 @@ export class StacksTransaction {
     }
   }
 
+  /** @deprecated Does NOT mutate transaction, but rather returns the hash of the transaction with a cleared initial authorization */
   signBegin() {
     const tx = cloneDeep(this);
     tx.auth = intoInitialSighashAuth(tx.auth);
     return tx.txid();
   }
 
+  /** @deprecated Alias of `.signBegin()` */
   verifyBegin() {
     const tx = cloneDeep(this);
     tx.auth = intoInitialSighashAuth(tx.auth);
@@ -148,7 +151,10 @@ export class StacksTransaction {
     }
   }
 
+  // todo: this could be static?
+  /** **Warning**: method mutates the `condition` param */
   signAndAppend(
+    /** `condition` is mutated by this method */
     condition: SpendingConditionOpts,
     curSigHash: string,
     authType: AuthType,
@@ -164,10 +170,11 @@ export class StacksTransaction {
     if (isSingleSig(condition)) {
       condition.signature = nextSig;
     } else {
-      const compressed = bytesToHex(privateKey.data).endsWith('01');
       condition.fields.push(
         createTransactionAuthField(
-          compressed ? PubKeyEncoding.Compressed : PubKeyEncoding.Uncompressed,
+          privateKey.data.byteLength === PRIVATE_KEY_COMPRESSED_LENGTH
+            ? PubKeyEncoding.Compressed
+            : PubKeyEncoding.Uncompressed,
           nextSig
         )
       );
@@ -257,7 +264,7 @@ export class StacksTransaction {
  * @param tx hex string or bytes of serialized transaction
  */
 export function deserializeTransaction(tx: string | Uint8Array | BytesReader) {
-  let bytesReader: BytesReader;
+  let bytesReader: BytesReader; // todo: add readerFrom method
   if (typeof tx === 'string') {
     if (tx.slice(0, 2).toLowerCase() === '0x') {
       bytesReader = new BytesReader(hexToBytes(tx.slice(2)));
