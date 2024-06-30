@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.16.0](https://github.com/hirosystems/stacks.js/compare/v6.15.0...v6.16.0) (2024-06-30)
+
+
+### Features
+
+* Add non-sequential multi-sig support (and fix legacy multi-sig bugs) ([#1710](https://github.com/hirosystems/stacks.js/issues/1710)) ([879263c](https://github.com/hirosystems/stacks.js/commit/879263cb5f3fb896b868ccaac00b4a8d635054ff))
+* Allow `0x` prefix in hexToBytes helper ([#1690](https://github.com/hirosystems/stacks.js/issues/1690)) ([33ca645](https://github.com/hirosystems/stacks.js/commit/33ca64598b639fbe2a752e8f2055c8e0053f44a1))
+
+
+
 ## [6.13.0](https://github.com/hirosystems/stacks.js/compare/v6.12.1...v6.13.0) (2024-03-22)
 
 **Note:** Version bump only for package @stacks/common

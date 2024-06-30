@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.16.0](https://github.com/hirosystems/stacks.js/compare/v6.15.0...v6.16.0) (2024-06-30)
+
+
+### Features
+
+* Use API for nonce detection if available ([#1704](https://github.com/hirosystems/stacks.js/issues/1704)) ([855ca69](https://github.com/hirosystems/stacks.js/commit/855ca69cecc00ac836077fbeef1f89e952f110c3))
+
+
+
 ## [6.15.0](https://github.com/hirosystems/stacks.js/compare/v6.14.0...v6.15.0) (2024-05-03)
 
 **Note:** Version bump only for package @stacks/cli
