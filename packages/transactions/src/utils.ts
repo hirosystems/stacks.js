@@ -42,6 +42,7 @@ export function cloneDeep<T>(obj: T): T {
   return lodashCloneDeep(obj);
 }
 
+// todo: remove this function and instead delete param without clone (if possible)?
 export function omit<T, K extends keyof any>(obj: T, prop: K): Omit<T, K> {
   const clone = cloneDeep(obj);
   // @ts-expect-error

@@ -82,6 +82,18 @@ export async function broadcastTransaction({
   return { txid } as TxBroadcastResultOk;
 }
 
+/** @internal */
+async function _getNonceApi({
+  address,
+  api: apiOpt,
+}: { address: string } & ApiParam): Promise<bigint> {
+  const api = defaultApiLike(apiOpt);
+  const url = `${api.url}/extended/v1/address/${address}/nonces`;
+  const response = await api.fetch(url);
+  const result = await response.json();
+  return BigInt(result.possible_next_nonce);
+}
+
 /**
  * Lookup the nonce for an address from a core node
  * @param opts.address - The Stacks address to look up the next nonce for
@@ -95,7 +107,10 @@ export async function getNonce({
   /** The Stacks address to look up the next nonce for */
   address: string;
 } & ApiParam): Promise<bigint> {
-  // todo: could derive the network from the address and use as default if no apiOd
+  // Try API first
+  try {
+    return await _getNonceApi({ address, api: apiOpt });
+  } catch (e) {}
 
   const api = defaultApiLike(apiOpt);
   const url = `${api.url}${ACCOUNT_PATH}/${address}?proof=0`;

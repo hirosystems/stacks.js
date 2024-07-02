@@ -8,6 +8,7 @@ export const GAIA_URL = 'https://hub.blockstack.org';
 
 /** @ignore internal */
 export const PRIVATE_KEY_COMPRESSED_LENGTH = 33;
+// todo: `next` make length consts more consistent in naming
 
 /** @ignore internal */
 export const PRIVATE_KEY_UNCOMPRESSED_LENGTH = 32;

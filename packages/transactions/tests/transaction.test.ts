@@ -2,13 +2,13 @@ import { bytesToHex, hexToBytes } from '@stacks/common';
 import { DEFAULT_CHAIN_ID, TransactionVersion } from '@stacks/network';
 import fetchMock from 'jest-fetch-mock';
 import {
+  MultiSigSpendingCondition,
+  SingleSigSpendingCondition,
+  SponsoredAuthorization,
   createMultiSigSpendingCondition,
   createSingleSigSpendingCondition,
   createSponsoredAuth,
   createStandardAuth,
-  MultiSigSpendingCondition,
-  SingleSigSpendingCondition,
-  SponsoredAuthorization,
 } from '../src/authorization';
 import { BytesReader } from '../src/bytesReader';
 import { contractPrincipalCV, standardPrincipalCV } from '../src/clarity';
@@ -27,13 +27,18 @@ import {
 } from '../src/keys';
 import {
   CoinbasePayloadToAltRecipient,
-  createTokenTransferPayload,
   TokenTransferPayload,
+  createTokenTransferPayload,
 } from '../src/payload';
 import { createSTXPostCondition } from '../src/postcondition';
-import { createStandardPrincipal, STXPostCondition } from '../src/postcondition-types';
+import { STXPostCondition, createStandardPrincipal } from '../src/postcondition-types';
 import { TransactionSigner } from '../src/signer';
-import { deserializeTransaction, StacksTransaction } from '../src/transaction';
+import {
+  StacksTransaction,
+  deserializeTransaction,
+  serializeTransaction,
+  transactionToHex,
+} from '../src/transaction';
 import { createLPList } from '../src/types';
 
 beforeEach(() => {
@@ -262,7 +267,6 @@ test('STX token transfer transaction multi-sig serialization and deserialization
 });
 
 test('STX token transfer transaction multi-sig uncompressed keys serialization and deserialization', () => {
-  const addressHashMode = AddressHashMode.SerializeP2SH;
   const nonce = 0;
   const fee = 0;
 
@@ -275,17 +279,21 @@ test('STX token transfer transaction multi-sig uncompressed keys serialization a
   const pubKeys = privKeys.map(privateKeyToPublic).map(createStacksPublicKey);
   const pubKeyStrings = pubKeys.map(serializePublicKeyBytes).map(publicKeyToHex);
 
+  expect(() =>
+    createMultiSigSpendingCondition(AddressHashMode.SerializeP2WSH, 2, pubKeyStrings, nonce, fee)
+  ).toThrowError('Public keys must be compressed for segwit');
+
   const spendingCondition = createMultiSigSpendingCondition(
-    addressHashMode,
+    AddressHashMode.SerializeP2SH, // will be replaced in the next step
     2,
     pubKeyStrings,
     nonce,
     fee
   );
+  spendingCondition.hashMode = AddressHashMode.SerializeP2WSH;
+
   const originAuth = createStandardAuth(spendingCondition);
-
   const originAddress = originAuth.spendingCondition?.signer;
-
   expect(originAddress).toEqual('73a8b4a751a678fe83e9d35ce301371bb3d397f7');
 
   const transactionVersion = TransactionVersion.Mainnet;
@@ -305,17 +313,9 @@ test('STX token transfer transaction multi-sig uncompressed keys serialization a
   signer.appendOrigin(pubKeys[2]);
 
   const expectedError = 'Uncompressed keys are not allowed in this hash mode';
-
   expect(() => transaction.verifyOrigin()).toThrow(expectedError);
 
   const serialized = transaction.serialize();
-
-  // serialized tx that has been successfully deserialized and had
-  // its auth verified via the stacks-blockchain implementation
-  const verifiedTx =
-    '0000000001040173a8b4a751a678fe83e9d35ce301371bb3d397f7000000000000000000000000000000000000000303010359b18fbcb6d5e26efc1eae70aefdae54995e6fd4f3ec40d2ff43b2227c4def1ee6416bf3dd5c92c8150fa51717f1f2db778c02ba47b8c70c1a8ff640b4edee03017b7d76c3d1f7d449604df864e4013da5094be7276aa02cb73ec9fc8108a0bed46c7cde4d702830c1db34ef7c19e2776f59107afef39084776fc88bc78dbb96560103661ec7479330bf1ef7a4c9d1816f089666a112e72d671048e5424fc528ca51530002030200000000000516df0ba3e79792be7be5e50a370289accfc8c9e03200000000002625a06d656d6f000000000000000000000000000000000000000000000000000000000000';
-  expect(bytesToHex(serialized)).toBe(verifiedTx);
-
   expect(() => deserializeTransaction(new BytesReader(serialized))).toThrow(expectedError);
 });
 
@@ -428,4 +428,18 @@ test('Coinbase pay to alt contract principal recipient deserialization', () => {
     'bd1a9e1d60ca29fc630633170f396f5b6b85c9620bd16d63384ebc5a01a1829b'
   );
   expect(deserializedTx.version).toBe(TransactionVersion.Testnet);
+});
+
+describe(serializeTransaction.name, () => {
+  const serializedTx =
+    '0x8080000000040055a0a92720d20398211cd4c7663d65d018efcc1f00000000000000030000000000000000010118da31f542913e8c56961b87ee4794924e655a28a2034e37ef4823eeddf074747285bd6efdfbd84eecdf62cffa7c1864e683c688f4c105f4db7429066735b4e2010200000000050000000000000000000000000000000000000000000000000000000000000000061aba27f99e007c7f605a8305e318c1abde3cd220ac0b68656c6c6f5f776f726c64';
+  const tx = deserializeTransaction(serializedTx);
+
+  test('alias of .serialize', () => {
+    expect(tx.serialize()).toEqual(serializeTransaction(tx));
+  });
+
+  test(transactionToHex.name, () => {
+    expect(transactionToHex(tx)).toEqual(bytesToHex(serializeTransaction(tx)));
+  });
 });

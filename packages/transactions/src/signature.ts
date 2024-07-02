@@ -1,17 +1,15 @@
-import { BytesReader } from './bytesReader';
-import { DeserializationError } from './errors';
-import { PubKeyEncoding, RECOVERABLE_ECDSA_SIG_LENGTH_BYTES, StacksMessageType } from './constants';
-import {
-  compressPublicKey,
-  deserializePublicKeyBytes,
-  serializePublicKeyBytes,
-  StacksPublicKey,
-} from './keys';
-
-import { createMessageSignature, MessageSignature } from './common';
-
-// @ts-ignore
 import { bytesToHex, concatArray, hexToBytes, isInstance } from '@stacks/common';
+import { BytesReader } from './bytesReader';
+import { MessageSignature, createMessageSignature } from './common';
+import { PubKeyEncoding, RECOVERABLE_ECDSA_SIG_LENGTH_BYTES, StacksMessageType } from './constants';
+import { DeserializationError } from './errors';
+import {
+  StacksPublicKey,
+  compressPublicKey,
+  createStacksPublicKey,
+  deserializePublicKeyBytes,
+  uncompressPublicKey,
+} from './keys';
 
 export enum AuthFieldType {
   PublicKeyCompressed = 0x00,
@@ -34,6 +32,8 @@ export function deserializeMessageSignature(bytesReader: BytesReader): MessageSi
   );
 }
 
+// todo: `next` refactor to match wire format more precisely eg https://github.com/jbencin/sips/blob/sip-02x-non-sequential-multisig-transactions/sips/sip-02x/sip-02x-non-sequential-multisig-transactions.md
+//  "A spending authorization field is encoded as follows:" ...
 export interface TransactionAuthField {
   type: StacksMessageType.TransactionAuthField;
   pubKeyEncoding: PubKeyEncoding;
@@ -74,7 +74,7 @@ export function deserializeTransactionAuthFieldBytes(
     case AuthFieldType.PublicKeyUncompressed:
       return createTransactionAuthField(
         PubKeyEncoding.Uncompressed,
-        deserializePublicKeyBytes(bytesReader)
+        createStacksPublicKey(uncompressPublicKey(deserializePublicKeyBytes(bytesReader).data))
       );
     case AuthFieldType.SignatureCompressed:
       return createTransactionAuthField(
@@ -108,20 +108,19 @@ export function serializeTransactionAuthFieldBytes(field: TransactionAuthField):
 
   switch (field.contents.type) {
     case StacksMessageType.PublicKey:
-      if (field.pubKeyEncoding == PubKeyEncoding.Compressed) {
-        bytesArray.push(AuthFieldType.PublicKeyCompressed);
-        bytesArray.push(serializePublicKeyBytes(field.contents));
-      } else {
-        bytesArray.push(AuthFieldType.PublicKeyUncompressed);
-        bytesArray.push(hexToBytes(compressPublicKey(field.contents.data)));
-      }
+      bytesArray.push(
+        field.pubKeyEncoding === PubKeyEncoding.Compressed
+          ? AuthFieldType.PublicKeyCompressed
+          : AuthFieldType.PublicKeyUncompressed
+      );
+      bytesArray.push(hexToBytes(compressPublicKey(field.contents.data)));
       break;
     case StacksMessageType.MessageSignature:
-      if (field.pubKeyEncoding == PubKeyEncoding.Compressed) {
-        bytesArray.push(AuthFieldType.SignatureCompressed);
-      } else {
-        bytesArray.push(AuthFieldType.SignatureUncompressed);
-      }
+      bytesArray.push(
+        field.pubKeyEncoding === PubKeyEncoding.Compressed
+          ? AuthFieldType.SignatureCompressed
+          : AuthFieldType.SignatureUncompressed
+      );
       bytesArray.push(serializeMessageSignatureBytes(field.contents));
       break;
   }

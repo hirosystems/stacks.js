@@ -22,6 +22,7 @@ import {
   signatureRsvToVrs,
   signatureVrsToRsv,
 } from '@stacks/common';
+import { TransactionVersion } from '@stacks/network';
 import { c32address } from 'c32check';
 import { BytesReader } from './bytesReader';
 import {
@@ -39,9 +40,8 @@ import {
   StacksMessageType,
   UNCOMPRESSED_PUBKEY_LENGTH_BYTES,
 } from './constants';
-import { hash160, hashP2PKH } from './utils';
 import { StructuredDataSignature } from './message-types';
-import { TransactionVersion } from '@stacks/network';
+import { hash160, hashP2PKH } from './utils';
 
 /**
  * To use secp256k1.signSync set utils.hmacSha256Sync to a function using noble-hashes
@@ -145,6 +145,7 @@ export function serializePublicKeyBytes(key: StacksPublicKey): Uint8Array {
  * > Matches legacy `pubKeyfromPrivKey`, `getPublic` function behavior
  */
 export function privateKeyToPublic(privateKey: PrivateKey): string {
+  // todo: improve return result type `next`
   privateKey = privateKeyToBytes(privateKey);
   const isCompressed = privateKeyIsCompressed(privateKey);
   return bytesToHex(nobleGetPublicKey(privateKey.slice(0, 32), isCompressed));
@@ -152,6 +153,10 @@ export function privateKeyToPublic(privateKey: PrivateKey): string {
 
 export function compressPublicKey(publicKey: PublicKey): string {
   return Point.fromHex(publicKeyToHex(publicKey)).toHex(true);
+}
+
+export function uncompressPublicKey(publicKey: PublicKey): string {
+  return Point.fromHex(publicKeyToHex(publicKey)).toHex(false);
 }
 
 export function deserializePublicKey(serialized: string): StacksPublicKey {

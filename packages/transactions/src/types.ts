@@ -37,7 +37,7 @@ import {
 } from './keys';
 import { Payload, deserializePayloadBytes, serializePayloadBytes } from './payload';
 import {
-  Asset as Asset,
+  Asset,
   ContractPrincipal,
   LengthPrefixedString,
   PostCondition,
@@ -162,6 +162,7 @@ export function addressFromPublicKeys(
   numSigs: number,
   publicKeys: StacksPublicKey[]
 ): Address {
+  // todo: `next` refactor to `requiredSignatures`, and opts object
   if (publicKeys.length === 0) {
     throw Error('Invalid number of public keys');
   }
@@ -172,11 +173,13 @@ export function addressFromPublicKeys(
     }
   }
 
-  if (hashMode === AddressHashMode.SerializeP2WPKH || hashMode === AddressHashMode.SerializeP2WSH) {
-    for (const publicKey of publicKeys) {
-      if (!publicKeyIsCompressed(publicKey.data)) {
-        throw Error('Public keys must be compressed for segwit');
-      }
+  if (
+    hashMode === AddressHashMode.SerializeP2WPKH ||
+    hashMode === AddressHashMode.SerializeP2WSH ||
+    hashMode === AddressHashMode.SerializeP2WSHNonSequential
+  ) {
+    if (!publicKeys.map(p => p.data).every(publicKeyIsCompressed)) {
+      throw Error('Public keys must be compressed for segwit');
     }
   }
 
@@ -186,11 +189,13 @@ export function addressFromPublicKeys(
     case AddressHashMode.SerializeP2WPKH:
       return addressFromVersionHash(version, hashP2WPKH(publicKeys[0].data));
     case AddressHashMode.SerializeP2SH:
+    case AddressHashMode.SerializeP2SHNonSequential:
       return addressFromVersionHash(
         version,
         hashP2SH(numSigs, publicKeys.map(serializePublicKeyBytes))
       );
     case AddressHashMode.SerializeP2WSH:
+    case AddressHashMode.SerializeP2WSHNonSequential:
       return addressFromVersionHash(
         version,
         hashP2WSH(numSigs, publicKeys.map(serializePublicKeyBytes))
@@ -398,6 +403,7 @@ export function serializeLPListBytes(lpList: LengthPrefixedList): Uint8Array {
   return concatArray(bytesArray);
 }
 
+// todo: `next` refactor for inversion of control
 export function deserializeLPList(
   serialized: string,
   type: StacksMessageType,

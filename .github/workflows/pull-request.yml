@@ -25,6 +25,7 @@ jobs:
   tests:
     needs: pre-run
     uses: ./.github/workflows/tests.yml
+    secrets: inherit
 
   publish-pr:
     runs-on: ubuntu-latest

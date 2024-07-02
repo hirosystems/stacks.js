@@ -1,9 +1,10 @@
 import {
+  IntegerType,
+  PrivateKey,
+  bytesToHex,
   concatArray,
   hexToBytes,
-  IntegerType,
   intToBigInt,
-  PrivateKey,
   writeUInt32BE,
 } from '@stacks/common';
 import {
@@ -16,39 +17,39 @@ import {
 } from '@stacks/network';
 import {
   Authorization,
+  MultiSigSpendingCondition,
+  SpendingConditionOpts,
   deserializeAuthorization,
   intoInitialSighashAuth,
   isSingleSig,
-  MultiSigSpendingCondition,
   nextSignature,
   serializeAuthorization,
   setFee,
   setNonce,
   setSponsor,
   setSponsorNonce,
-  SpendingConditionOpts,
   verifyOrigin,
 } from './authorization';
 import { BytesReader } from './bytesReader';
 import {
   AddressHashMode,
   AnchorMode,
-  anchorModeFrom,
   AnchorModeName,
   AuthType,
   PostConditionMode,
   PubKeyEncoding,
   RECOVERABLE_ECDSA_SIG_LENGTH_BYTES,
   StacksMessageType,
+  anchorModeFrom,
 } from './constants';
 import { SerializationError, SigningError } from './errors';
-import { privateKeyIsCompressed, publicKeyIsCompressed, StacksPublicKey } from './keys';
-import { deserializePayloadBytes, Payload, PayloadInput, serializePayloadBytes } from './payload';
+import { StacksPublicKey, privateKeyIsCompressed, publicKeyIsCompressed } from './keys';
+import { Payload, PayloadInput, deserializePayloadBytes, serializePayloadBytes } from './payload';
 import { createTransactionAuthField } from './signature';
 import {
+  LengthPrefixedList,
   createLPList,
   deserializeLPListBytes,
-  LengthPrefixedList,
   serializeLPListBytes,
 } from './types';
 import { cloneDeep, txidFromData } from './utils';
@@ -88,12 +89,14 @@ export class StacksTransaction {
     this.anchorMode = anchorModeFrom(anchorMode ?? AnchorMode.Any);
   }
 
+  /** @deprecated Does NOT mutate transaction, but rather returns the hash of the transaction with a cleared initial authorization */
   signBegin() {
     const tx = cloneDeep(this);
     tx.auth = intoInitialSighashAuth(tx.auth);
     return tx.txid();
   }
 
+  /** @deprecated Alias of `.signBegin()` */
   verifyBegin() {
     const tx = cloneDeep(this);
     tx.auth = intoInitialSighashAuth(tx.auth);
@@ -142,7 +145,10 @@ export class StacksTransaction {
     }
   }
 
+  // todo: this could be static?
+  /** **Warning**: method mutates the `condition` param */
   signAndAppend(
+    /** `condition` is mutated by this method */
     condition: SpendingConditionOpts,
     curSigHash: string,
     authType: AuthType,
@@ -251,7 +257,7 @@ export class StacksTransaction {
  * @param tx hex string or bytes of serialized transaction
  */
 export function deserializeTransaction(tx: string | Uint8Array | BytesReader) {
-  let bytesReader: BytesReader;
+  let bytesReader: BytesReader; // todo: add readerFrom method
   if (typeof tx === 'string') {
     if (tx.slice(0, 2).toLowerCase() === '0x') {
       bytesReader = new BytesReader(hexToBytes(tx.slice(2)));
@@ -332,4 +338,37 @@ export function estimateTransactionByteLength(transaction: StacksTransaction): n
     // Signature space already allocated by empty message signature
     return transaction.serialize().byteLength;
   }
+}
+
+/**
+ * Alias for `transaction.serialize()`
+ *
+ * Serializes a transaction to bytes.
+ *
+ * @example
+ * ```ts
+ * import { makeSTXTokenTransfer, serializeTransaction } from '@stacks/transactions';
+ *
+ * const transaction = makeSTXTokenTransfer({ ... });
+ * const bytes = serializeTransaction(transaction);
+ * ```
+ */
+export function serializeTransaction(transaction: StacksTransaction): Uint8Array {
+  // todo: refactor to hex instead of bytes for `next` release
+  return transaction.serialize();
+}
+
+/**
+ * Serializes a transaction to a hex string.
+ *
+ * @example
+ * ```ts
+ * import { makeSTXTokenTransfer, transactionToHex } from '@stacks/transactions';
+ *
+ * const transaction = makeSTXTokenTransfer({ ... });
+ * const hex = transactionToHex(transaction);
+ * ```
+ */
+export function transactionToHex(transaction: StacksTransaction): string {
+  return bytesToHex(transaction.serialize());
 }

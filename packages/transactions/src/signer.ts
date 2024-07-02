@@ -1,12 +1,17 @@
-import { StacksTransaction } from './transaction';
-
-import { SpendingConditionOpts, isSingleSig, nextVerification } from './authorization';
-import { AuthType, PubKeyEncoding, StacksMessageType } from './constants';
+import { PrivateKey } from '@stacks/common';
+import {
+  SpendingConditionOpts,
+  isSequentialMultiSig,
+  isSingleSig,
+  nextVerification,
+} from './authorization';
+import { AddressHashMode, AuthType, PubKeyEncoding, StacksMessageType } from './constants';
 import { SigningError } from './errors';
 import { StacksPublicKey } from './keys';
+import { StacksTransaction } from './transaction';
 import { cloneDeep } from './utils';
-import { PrivateKey } from '@stacks/common';
 
+// todo: get rid of signer and combine with transaction class? could reduce code and complexity by calculating sighash newly each sign and append.
 export class TransactionSigner {
   transaction: StacksTransaction;
   sigHash: string;
@@ -81,8 +86,12 @@ export class TransactionSigner {
       throw new SigningError('"transaction.auth.spendingCondition" is undefined');
     }
 
-    if (!isSingleSig(this.transaction.auth.spendingCondition)) {
-      const spendingCondition = this.transaction.auth.spendingCondition;
+    const spendingCondition = this.transaction.auth.spendingCondition;
+    if (
+      spendingCondition.hashMode === AddressHashMode.SerializeP2SH ||
+      spendingCondition.hashMode === AddressHashMode.SerializeP2WSH
+    ) {
+      // only check oversign on legacy multisig modes
       if (
         this.checkOversign &&
         spendingCondition.fields.filter(
@@ -94,7 +103,13 @@ export class TransactionSigner {
     }
 
     const nextSighash = this.transaction.signNextOrigin(this.sigHash, privateKey);
-    this.sigHash = nextSighash;
+
+    if (
+      isSingleSig(this.transaction.auth.spendingCondition) ||
+      isSequentialMultiSig(this.transaction.auth.spendingCondition.hashMode)
+    ) {
+      this.sigHash = nextSighash;
+    }
   }
 
   appendOrigin(publicKey: StacksPublicKey) {

@@ -2039,8 +2039,8 @@ export function CLIMain() {
     const configPath = CLIOptAsString(opts, 'c')
       ? CLIOptAsString(opts, 'c')
       : testnet
-        ? DEFAULT_CONFIG_TESTNET_PATH
-        : DEFAULT_CONFIG_PATH;
+      ? DEFAULT_CONFIG_TESTNET_PATH
+      : DEFAULT_CONFIG_PATH;
 
     const namespaceBurnAddr = CLIOptAsString(opts, 'B');
     const feeRate = CLIOptAsString(opts, 'F') ? parseInt(CLIOptAsString(opts, 'F')!) : 0;

@@ -172,10 +172,24 @@ export function createMultiSigSpendingCondition(
   };
 }
 
+/** @internal */
 export function isSingleSig(
   condition: SpendingConditionOpts
 ): condition is SingleSigSpendingConditionOpts {
   return 'signature' in condition;
+}
+
+/** @internal */
+export function isSequentialMultiSig(hashMode: AddressHashMode): boolean {
+  return hashMode === AddressHashMode.SerializeP2SH || hashMode === AddressHashMode.SerializeP2WSH;
+}
+
+/** @internal */
+export function isNonSequentialMultiSig(hashMode: AddressHashMode): boolean {
+  return (
+    hashMode === AddressHashMode.SerializeP2SHNonSequential ||
+    hashMode === AddressHashMode.SerializeP2WSHNonSequential
+  );
 }
 
 function clearCondition(condition: SpendingConditionOpts): SpendingCondition {
@@ -291,8 +305,13 @@ export function deserializeMultiSigSpendingCondition(
   // Partially signed multi-sig tx can be serialized and deserialized without exception (Incorrect number of signatures)
   // No need to check numSigs !== signaturesRequired to throw Incorrect number of signatures error
 
-  if (haveUncompressed && hashMode === AddressHashMode.SerializeP2SH)
+  if (
+    haveUncompressed &&
+    (hashMode === AddressHashMode.SerializeP2WSH ||
+      hashMode === AddressHashMode.SerializeP2WSHNonSequential)
+  ) {
     throw new VerificationError('Uncompressed keys are not allowed in this hash mode');
+  }
 
   return {
     hashMode,
@@ -480,17 +499,16 @@ function verifyMultiSig(
   authType: AuthType
 ): string {
   const publicKeys: StacksPublicKey[] = [];
+
   let curSigHash = initialSigHash;
   let haveUncompressed = false;
   let numSigs = 0;
 
   for (const field of condition.fields) {
-    let foundPubKey: StacksPublicKey;
-
     switch (field.contents.type) {
       case StacksMessageType.PublicKey:
         if (!publicKeyIsCompressed(field.contents.data)) haveUncompressed = true;
-        foundPubKey = field.contents;
+        publicKeys.push(field.contents);
         break;
       case StacksMessageType.MessageSignature:
         if (field.pubKeyEncoding === PubKeyEncoding.Uncompressed) haveUncompressed = true;
@@ -502,21 +520,30 @@ function verifyMultiSig(
           field.pubKeyEncoding,
           field.contents
         );
-        curSigHash = nextSigHash;
-        foundPubKey = pubKey;
+
+        if (isSequentialMultiSig(condition.hashMode)) {
+          curSigHash = nextSigHash;
+        }
+
+        publicKeys.push(pubKey);
 
         numSigs += 1;
         if (numSigs === 65536) throw new VerificationError('Too many signatures');
-
         break;
     }
-    publicKeys.push(foundPubKey);
   }
 
-  if (numSigs !== condition.signaturesRequired)
+  if (
+    (isSequentialMultiSig(condition.hashMode) && numSigs !== condition.signaturesRequired) ||
+    (isNonSequentialMultiSig(condition.hashMode) && numSigs < condition.signaturesRequired)
+  )
     throw new VerificationError('Incorrect number of signatures');
 
-  if (haveUncompressed && condition.hashMode === AddressHashMode.SerializeP2SH)
+  if (
+    haveUncompressed &&
+    (condition.hashMode === AddressHashMode.SerializeP2WSH ||
+      condition.hashMode === AddressHashMode.SerializeP2WSHNonSequential)
+  )
     throw new VerificationError('Uncompressed keys are not allowed in this hash mode');
 
   const addrBytes = addressFromPublicKeys(
@@ -586,7 +613,7 @@ export function verifyOrigin(auth: Authorization, initialSigHash: string): strin
     case AuthType.Standard:
       return verify(auth.spendingCondition, initialSigHash, AuthType.Standard);
     case AuthType.Sponsored:
-      return verify(auth.spendingCondition, initialSigHash, AuthType.Standard);
+      return verify(auth.spendingCondition, initialSigHash, AuthType.Standard); // todo: should this be .Sponsored?
     default:
       throw new SigningError('Invalid origin auth type');
   }

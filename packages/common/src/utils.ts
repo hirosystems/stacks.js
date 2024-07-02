@@ -517,12 +517,17 @@ export function bytesToHex(uint8a: Uint8Array): string {
  * @example
  * ```
  * hexToBytes('deadbeef') // Uint8Array(4) [ 222, 173, 190, 239 ]
+ * hexToBytes('0xdeadbeef') // Uint8Array(4) [ 222, 173, 190, 239 ]
  * ```
  */
 export function hexToBytes(hex: string): Uint8Array {
   if (typeof hex !== 'string') {
     throw new TypeError(`hexToBytes: expected string, got ${typeof hex}`);
   }
+
+  // todo: add use `without0x` from current `next` to replace duplicate trimming code
+  hex = hex.startsWith('0x') || hex.startsWith('0X') ? hex.slice(2) : hex; // remove 0x prefix
+
   const paddedHex = hex.length % 2 ? `0${hex}` : hex; // left pad with a zero if odd length
   const array = new Uint8Array(paddedHex.length / 2);
   for (let i = 0; i < array.length; i++) {

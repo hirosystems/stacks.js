@@ -3,6 +3,28 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.16.0](https://github.com/hirosystems/stacks.js/compare/v6.15.0...v6.16.0) (2024-06-30)
+
+
+### Features
+
+* Add `Cl.parse` Clarity value parser ([#1681](https://github.com/hirosystems/stacks.js/issues/1681)) ([b9f8775](https://github.com/hirosystems/stacks.js/commit/b9f8775e28f044894f6415df2d29bb3e1ed8e1c7))
+* Add non-sequential multi-sig support (and fix legacy multi-sig bugs) ([#1710](https://github.com/hirosystems/stacks.js/issues/1710)) ([879263c](https://github.com/hirosystems/stacks.js/commit/879263cb5f3fb896b868ccaac00b4a8d635054ff))
+* add serialization helpers for transaction ([#1706](https://github.com/hirosystems/stacks.js/issues/1706)) ([2c57ea4](https://github.com/hirosystems/stacks.js/commit/2c57ea4e5abed76da903f5138c79c1d2eceb008b))
+* Allow `0x` prefix in hexToBytes helper ([#1690](https://github.com/hirosystems/stacks.js/issues/1690)) ([33ca645](https://github.com/hirosystems/stacks.js/commit/33ca64598b639fbe2a752e8f2055c8e0053f44a1))
+* Use API for nonce detection if available ([#1704](https://github.com/hirosystems/stacks.js/issues/1704)) ([855ca69](https://github.com/hirosystems/stacks.js/commit/855ca69cecc00ac836077fbeef1f89e952f110c3))
+
+
+
+## [6.15.0](https://github.com/hirosystems/stacks.js/compare/v6.14.0...v6.15.0) (2024-05-03)
+
+
+### Features
+
+* add encodeAbiClarityValue method for better encoding ([2885813](https://github.com/hirosystems/stacks.js/commit/28858138c8f6366b37fa7210ba85c0c5a9cc0955))
+
+
+
 ## [6.13.1](https://github.com/hirosystems/stacks.js/compare/v6.13.0...v6.13.1) (2024-04-04)
 
 

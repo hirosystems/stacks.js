@@ -40,6 +40,7 @@ export function addressHashModeToVersion(
   hashMode: AddressHashMode,
   txVersion: TransactionVersion
 ): AddressVersion {
+  // todo: `next` refacto with network param
   switch (hashMode) {
     case AddressHashMode.SerializeP2PKH:
       switch (txVersion) {
@@ -53,8 +54,10 @@ export function addressHashModeToVersion(
           );
       }
     case AddressHashMode.SerializeP2SH:
+    case AddressHashMode.SerializeP2SHNonSequential:
     case AddressHashMode.SerializeP2WPKH:
     case AddressHashMode.SerializeP2WSH:
+    case AddressHashMode.SerializeP2WSHNonSequential:
       switch (txVersion) {
         case TransactionVersion.Mainnet:
           return AddressVersion.MainnetMultiSig;

@@ -7,7 +7,7 @@ import {
   validateMnemonic,
 } from '@scure/bip39';
 // Word lists not imported by default as that would increase bundle sizes too much as in case of bitcoinjs/bip39
-// Use default english world list similiar to bitcoinjs/bip39
+// Use default english world list similar to bitcoinjs/bip39
 // Backward compatible with bitcoinjs/bip39 dependency
 // Very small in size as compared to bitcoinjs/bip39 wordlist
 // Reference: https://github.com/paulmillr/scure-bip39

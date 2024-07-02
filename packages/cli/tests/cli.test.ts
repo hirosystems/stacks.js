@@ -285,6 +285,7 @@ describe('BNS', () => {
     const randomTxid = bytesToHex(randomBytes());
 
     fetchMock.mockOnce(mockedResponse);
+    fetchMock.mockRejectOnce();
     fetchMock.mockOnce(JSON.stringify({ nonce: 1000 }));
     fetchMock.mockOnce(JSON.stringify(randomTxid));
 
@@ -305,6 +306,7 @@ describe('BNS', () => {
     const randomTxid = bytesToHex(randomBytes());
 
     fetchMock.mockOnce(mockedResponse);
+    fetchMock.mockRejectOnce();
     fetchMock.mockOnce(JSON.stringify({ nonce: 1000 }));
     fetchMock.mockOnce(JSON.stringify(randomTxid));
 
