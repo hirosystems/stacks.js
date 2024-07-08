@@ -30,7 +30,6 @@ import {
   TokenTransferPayloadWire,
   createTokenTransferPayload,
 } from '../src/payload';
-import { createSTXPostCondition } from '../src/postcondition';
 import { STXPostConditionWire, createStandardPrincipal } from '../src/postcondition-types';
 import { TransactionSigner } from '../src/signer';
 import {
@@ -40,6 +39,8 @@ import {
   transactionToHex,
 } from '../src/transaction';
 import { createLPList } from '../src/types';
+import { postConditionToWire } from '../src/postcondition';
+import { Pc } from '../src';
 
 beforeEach(() => {
   fetchMock.resetMocks();
@@ -69,7 +70,12 @@ test('STX token transfer transaction serialization and deserialization', () => {
   const authType = AuthType.Standard;
   const authorization = createStandardAuth(spendingCondition);
 
-  const postCondition = createSTXPostCondition(recipient, FungibleConditionCode.GreaterEqual, 0);
+  const postCondition = postConditionToWire({
+    type: 'stx-postcondition',
+    address,
+    condition: 'gte',
+    amount: 0,
+  });
 
   const postConditions = createLPList([postCondition]);
   const transaction = new StacksTransaction(
@@ -144,7 +150,7 @@ test('STX token transfer transaction fee setting', () => {
   const authType = AuthType.Standard;
   const authorization = createStandardAuth(spendingCondition);
 
-  const postCondition = createSTXPostCondition(recipient, FungibleConditionCode.GreaterEqual, 0);
+  const postCondition = postConditionToWire(Pc.principal(address).willSendGte(0).ustx());
 
   const postConditions = createLPList([postCondition]);
 

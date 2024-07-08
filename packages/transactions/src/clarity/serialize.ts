@@ -7,9 +7,10 @@ import {
   utf8ToBytes,
   asciiToBytes,
   bytesToHex,
+  hexToBytes,
 } from '@stacks/common';
 import { serializeAddressBytes, serializeLPStringBytes } from '../types';
-import { createLPString } from '../postcondition-types';
+import { createAddress, createLPString } from '../postcondition-types';
 import {
   BooleanCV,
   OptionalCV,
@@ -25,6 +26,7 @@ import { ClarityType, clarityTypeToByte } from './constants';
 import { SerializationError } from '../errors';
 import { CLARITY_INT_BYTE_SIZE, CLARITY_INT_SIZE } from '../constants';
 import { ListCV, StringAsciiCV, StringUtf8CV, TupleCV } from './types';
+import { parseContractId } from '../utils';
 
 function bytesWithTypeID(typeId: ClarityType, bytes: Uint8Array): Uint8Array {
   return concatArray([clarityTypeToByte(typeId), bytes]);
@@ -44,28 +46,35 @@ function serializeOptionalCV(cv: OptionalCV): Uint8Array {
 
 function serializeBufferCV(cv: BufferCV): Uint8Array {
   const length = new Uint8Array(4);
-  writeUInt32BE(length, cv.buffer.length, 0);
-  return bytesWithTypeID(cv.type, concatBytes(length, cv.buffer));
+  writeUInt32BE(length, Math.ceil(cv.value.length / 2), 0);
+  return bytesWithTypeID(cv.type, concatBytes(length, hexToBytes(cv.value)));
 }
 
 function serializeIntCV(cv: IntCV): Uint8Array {
-  const bytes = bigIntToBytes(toTwos(cv.value, BigInt(CLARITY_INT_SIZE)), CLARITY_INT_BYTE_SIZE);
+  const bytes = bigIntToBytes(
+    toTwos(BigInt(cv.value), BigInt(CLARITY_INT_SIZE)),
+    CLARITY_INT_BYTE_SIZE
+  );
   return bytesWithTypeID(cv.type, bytes);
 }
 
 function serializeUIntCV(cv: UIntCV): Uint8Array {
-  const bytes = bigIntToBytes(cv.value, CLARITY_INT_BYTE_SIZE);
+  const bytes = bigIntToBytes(BigInt(cv.value), CLARITY_INT_BYTE_SIZE);
   return bytesWithTypeID(cv.type, bytes);
 }
 
 function serializeStandardPrincipalCV(cv: StandardPrincipalCV): Uint8Array {
-  return bytesWithTypeID(cv.type, serializeAddressBytes(cv.address));
+  return bytesWithTypeID(cv.type, serializeAddressBytes(createAddress(cv.value)));
 }
 
 function serializeContractPrincipalCV(cv: ContractPrincipalCV): Uint8Array {
+  const [address, name] = parseContractId(cv.value);
   return bytesWithTypeID(
     cv.type,
-    concatBytes(serializeAddressBytes(cv.address), serializeLPStringBytes(cv.contractName))
+    concatBytes(
+      serializeAddressBytes(createAddress(address)),
+      serializeLPStringBytes(createLPString(name))
+    )
   );
 }
 
@@ -77,10 +86,10 @@ function serializeListCV(cv: ListCV) {
   const bytesArray = [];
 
   const length = new Uint8Array(4);
-  writeUInt32BE(length, cv.list.length, 0);
+  writeUInt32BE(length, cv.value.length, 0);
   bytesArray.push(length);
 
-  for (const value of cv.list) {
+  for (const value of cv.value) {
     const serializedValue = serializeCVBytes(value);
     bytesArray.push(serializedValue);
   }
@@ -92,16 +101,16 @@ function serializeTupleCV(cv: TupleCV) {
   const bytesArray = [];
 
   const length = new Uint8Array(4);
-  writeUInt32BE(length, Object.keys(cv.data).length, 0);
+  writeUInt32BE(length, Object.keys(cv.value).length, 0);
   bytesArray.push(length);
 
-  const lexicographicOrder = Object.keys(cv.data).sort((a, b) => a.localeCompare(b));
+  const lexicographicOrder = Object.keys(cv.value).sort((a, b) => a.localeCompare(b));
 
   for (const key of lexicographicOrder) {
     const nameWithLength = createLPString(key);
     bytesArray.push(serializeLPStringBytes(nameWithLength));
 
-    const serializedValue = serializeCVBytes(cv.data[key]);
+    const serializedValue = serializeCVBytes(cv.value[key]);
     bytesArray.push(serializedValue);
   }
 
@@ -111,7 +120,7 @@ function serializeTupleCV(cv: TupleCV) {
 function serializeStringCV(cv: StringAsciiCV | StringUtf8CV, encoding: 'ascii' | 'utf8') {
   const bytesArray = [];
 
-  const str = encoding == 'ascii' ? asciiToBytes(cv.data) : utf8ToBytes(cv.data);
+  const str = encoding == 'ascii' ? asciiToBytes(cv.value) : utf8ToBytes(cv.value);
   const len = new Uint8Array(4);
   writeUInt32BE(len, str.length, 0);
 

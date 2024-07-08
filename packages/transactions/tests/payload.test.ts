@@ -1,12 +1,6 @@
 import { bytesToHex, utf8ToBytes } from '@stacks/common';
 import { randomBytes } from '../src';
-import {
-  contractPrincipalCV,
-  falseCV,
-  principalToString,
-  standardPrincipalCV,
-  trueCV,
-} from '../src/clarity';
+import { contractPrincipalCV, falseCV, standardPrincipalCV, trueCV } from '../src/clarity';
 import { ClarityVersion, StacksWireType } from '../src/constants';
 import {
   CoinbasePayloadWire,
@@ -71,7 +65,7 @@ test('STX token transfer payload (with contract principal string) serialization 
     StacksWireType.Payload
   ) as TokenTransferPayloadWire;
   expect(deserialized.payloadType).toBe(payload.payloadType);
-  expect(principalToString(deserialized.recipient)).toEqual(recipient);
+  expect(deserialized.recipient.value).toEqual(recipient);
   expect(deserialized.amount.toString()).toBe(amount.toString());
 });
 
@@ -86,7 +80,7 @@ test('STX token transfer payload (with address principal string) serialization a
     StacksWireType.Payload
   ) as TokenTransferPayloadWire;
   expect(deserialized.payloadType).toBe(payload.payloadType);
-  expect(principalToString(deserialized.recipient)).toEqual(recipient);
+  expect(deserialized.recipient.value).toEqual(recipient);
   expect(deserialized.amount.toString()).toBe(amount.toString());
 });
 

@@ -4,18 +4,6 @@ import { LengthPrefixedStringWire, createAddress, createLPString } from '../../p
 import { ClarityType } from '../constants';
 import { ContractPrincipalCV, PrincipalCV, StandardPrincipalCV } from '../types';
 
-/** Returns a string in the format `address` or `address.contract-name` from a principal (standard or contract) */
-export function principalToString(principal: PrincipalCV): string {
-  if (principal.type === ClarityType.PrincipalStandard) {
-    return addressToString(principal.address);
-  } else if (principal.type === ClarityType.PrincipalContract) {
-    const address = addressToString(principal.address);
-    return `${address}.${principal.contractName.content}`;
-  } else {
-    throw new Error(`Unexpected principal data: ${JSON.stringify(principal)}`);
-  }
-}
-
 export function principalCV(principal: string): PrincipalCV {
   if (principal.includes('.')) {
     const [address, contractName] = principal.split('.');
@@ -43,7 +31,7 @@ export function principalCV(principal: string): PrincipalCV {
  */
 export function standardPrincipalCV(addressString: string): StandardPrincipalCV {
   const addr = createAddress(addressString);
-  return { type: ClarityType.PrincipalStandard, address: addr };
+  return { type: ClarityType.PrincipalStandard, value: addressToString(addr) };
 }
 
 /**
@@ -69,7 +57,7 @@ export function standardPrincipalCV(addressString: string): StandardPrincipalCV 
  * {@link https://github.com/hirosystems/stacks.js/blob/main/packages/transactions/tests/clarity.test.ts | clarity test cases for more examples}
  */
 export function standardPrincipalCVFromAddress(address: AddressWire): StandardPrincipalCV {
-  return { type: ClarityType.PrincipalStandard, address };
+  return { type: ClarityType.PrincipalStandard, value: addressToString(address) };
 }
 
 /**
@@ -123,17 +111,18 @@ export function contractPrincipalCVFromAddress(
   if (utf8ToBytes(contractName.content).byteLength >= 128) {
     throw new Error('Contract name must be less than 128 bytes');
   }
-  return { type: ClarityType.PrincipalContract, address, contractName };
+  return {
+    type: ClarityType.PrincipalContract,
+    value: `${addressToString(address)}.${contractName.content}`,
+  };
 }
 
 export function contractPrincipalCVFromStandard(
   sp: StandardPrincipalCV,
   contractName: string
 ): ContractPrincipalCV {
-  const lengthPrefixedContractName = createLPString(contractName);
   return {
     type: ClarityType.PrincipalContract,
-    address: sp.address,
-    contractName: lengthPrefixedContractName,
+    value: `${sp.value}.${contractName}`,
   };
 }

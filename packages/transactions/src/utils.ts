@@ -14,6 +14,7 @@ import { c32addressDecode } from 'c32check';
 import lodashCloneDeep from 'lodash.clonedeep';
 import { ClarityValue, deserializeCV, serializeCV } from './clarity';
 import { StacksNetwork, deriveDefaultUrl, StacksNetworkName } from '@stacks/network';
+import { ContractIdString } from './types';
 
 // Export verify as utility method for signature verification
 export { verify as verifySignature } from '@noble/secp256k1';
@@ -37,7 +38,7 @@ export const rightPadHexToLength = (hexString: string, length: number): string =
 export const exceedsMaxLengthBytes = (string: string, maxLengthBytes: number): boolean =>
   string ? utf8ToBytes(string).length > maxLengthBytes : false;
 
-/** @ignore */
+/** @internal */
 export function cloneDeep<T>(obj: T): T {
   return lodashCloneDeep(obj);
 }
@@ -66,14 +67,14 @@ export const txidFromBytes = txidFromData;
 
 // Internally, the Stacks blockchain encodes address the same as Bitcoin
 // single-sig address (p2pkh)
-/** @ignore */
+/** @internal */
 export const hashP2PKH = (input: Uint8Array): string => {
   return bytesToHex(hash160(input));
 };
 
 // Internally, the Stacks blockchain encodes address the same as Bitcoin
 // single-sig address over p2sh (p2h-p2wpkh)
-/** @ignore */
+/** @internal */
 export const hashP2WPKH = (input: Uint8Array): string => {
   const keyHash = hash160(input);
   const redeemScript = concatBytes(new Uint8Array([0]), new Uint8Array([keyHash.length]), keyHash);
@@ -83,7 +84,7 @@ export const hashP2WPKH = (input: Uint8Array): string => {
 
 // Internally, the Stacks blockchain encodes address the same as Bitcoin
 // multi-sig address (p2sh)
-/** @ignore */
+/** @internal */
 export const hashP2SH = (numSigs: number, pubKeys: Uint8Array[]): string => {
   if (numSigs > 15 || pubKeys.length > 15) {
     throw Error('P2SH multisig address can only contain up to 15 public keys');
@@ -110,7 +111,7 @@ export const hashP2SH = (numSigs: number, pubKeys: Uint8Array[]): string => {
 
 // Internally, the Stacks blockchain encodes address the same as Bitcoin
 // multisig address over p2sh (p2sh-p2wsh)
-/** @ignore */
+/** @internal */
 export const hashP2WSH = (numSigs: number, pubKeys: Uint8Array[]): string => {
   if (numSigs > 15 || pubKeys.length > 15) {
     throw Error('P2WSH multisig address can only contain up to 15 public keys');
@@ -203,7 +204,7 @@ export const validateStacksAddress = (address: string): boolean => {
   }
 };
 
-/** @ignore */
+/** @internal */
 export const defaultApiFromNetwork = (
   network: StacksNetworkName | StacksNetwork,
   override?: ApiOpts
@@ -217,3 +218,10 @@ export const defaultApiFromNetwork = (
     override
   );
 };
+
+/** @internal */
+export function parseContractId(contractId: ContractIdString) {
+  const [address, name] = contractId.split('.');
+  if (!address || !name) throw new Error(`Invalid contract identifier: ${contractId}`);
+  return [address, name];
+}
