@@ -40,7 +40,6 @@ import {
   makeContractCall,
   noneCV,
   principalCV,
-  principalToString,
   someCV,
   stringAsciiCV,
   uintCV,
@@ -434,10 +433,14 @@ export class StackingClient {
 
     return unwrapMap(result as OptionalCV<TupleCV>, tuple => ({
       pox_address: {
-        version: ((tuple.data['pox-addr'] as TupleCV).data['version'] as BufferCV).buffer,
-        hashbytes: ((tuple.data['pox-addr'] as TupleCV).data['hashbytes'] as BufferCV).buffer,
+        version: hexToBytes(
+          ((tuple.value['pox-addr'] as TupleCV).value['version'] as BufferCV).value
+        ),
+        hashbytes: hexToBytes(
+          ((tuple.value['pox-addr'] as TupleCV).value['hashbytes'] as BufferCV).value
+        ),
       },
-      total_ustx: (tuple.data['total-ustx'] as UIntCV).value,
+      total_ustx: BigInt((tuple.value['total-ustx'] as UIntCV).value),
     }));
   }
 
@@ -1388,11 +1391,11 @@ export class StackingClient {
       if (responseCV.type === ClarityType.OptionalSome) {
         const someCV = responseCV;
         const tupleCV: TupleCV = someCV.value as TupleCV;
-        const poxAddress: TupleCV = tupleCV.data['pox-addr'] as TupleCV;
-        const firstRewardCycle: UIntCV = tupleCV.data['first-reward-cycle'] as UIntCV;
-        const lockPeriod: UIntCV = tupleCV.data['lock-period'] as UIntCV;
-        const version: BufferCV = poxAddress.data['version'] as BufferCV;
-        const hashbytes: BufferCV = poxAddress.data['hashbytes'] as BufferCV;
+        const poxAddress: TupleCV = tupleCV.value['pox-addr'] as TupleCV;
+        const firstRewardCycle: UIntCV = tupleCV.value['first-reward-cycle'] as UIntCV;
+        const lockPeriod: UIntCV = tupleCV.value['lock-period'] as UIntCV;
+        const version: BufferCV = poxAddress.value['version'] as BufferCV;
+        const hashbytes: BufferCV = poxAddress.value['hashbytes'] as BufferCV;
 
         return {
           stacked: true,
@@ -1401,8 +1404,8 @@ export class StackingClient {
             lock_period: Number(lockPeriod.value),
             unlock_height: account.unlock_height,
             pox_address: {
-              version: version.buffer,
-              hashbytes: hashbytes.buffer,
+              version: hexToBytes(version.value),
+              hashbytes: hexToBytes(hashbytes.value),
             },
           },
         };
@@ -1436,20 +1439,20 @@ export class StackingClient {
     }).then((responseCV: ClarityValue) => {
       if (responseCV.type === ClarityType.OptionalSome) {
         const tupleCV = responseCV.value as TupleCV;
-        const amountMicroStx = tupleCV.data['amount-ustx'] as UIntCV;
-        const delegatedTo = tupleCV.data['delegated-to'] as PrincipalCV;
+        const amountMicroStx = tupleCV.value['amount-ustx'] as UIntCV;
+        const delegatedTo = tupleCV.value['delegated-to'] as PrincipalCV;
 
-        const poxAddress = unwrapMap(tupleCV.data['pox-addr'] as OptionalCV<TupleCV>, tuple => ({
-          version: (tuple.data['version'] as BufferCV).buffer[0],
-          hashbytes: (tuple.data['hashbytes'] as BufferCV).buffer,
+        const poxAddress = unwrapMap(tupleCV.value['pox-addr'] as OptionalCV<TupleCV>, tuple => ({
+          version: hexToBytes((tuple.value['version'] as BufferCV).value)[0],
+          hashbytes: hexToBytes((tuple.value['hashbytes'] as BufferCV).value),
         }));
-        const untilBurnBlockHeight = unwrap(tupleCV.data['until-burn-ht'] as OptionalCV<UIntCV>);
+        const untilBurnBlockHeight = unwrap(tupleCV.value['until-burn-ht'] as OptionalCV<UIntCV>);
 
         return {
           delegated: true,
           details: {
             amount_micro_stx: BigInt(amountMicroStx.value),
-            delegated_to: principalToString(delegatedTo),
+            delegated_to: delegatedTo.value,
             pox_address: poxAddress,
             until_burn_ht: untilBurnBlockHeight ? Number(untilBurnBlockHeight.value) : undefined,
           },

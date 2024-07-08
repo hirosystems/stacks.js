@@ -46,7 +46,6 @@ import {
   isClarityType,
 } from '../src/clarity/clarityValue';
 import { parse } from '../src/clarity/parser';
-import { addressToString } from '../src/common';
 import { deserializeAddressBytes } from '../src/types';
 
 const ADDRESS = 'SP2JXKMSH007NPYAQHKJPQMAQYAD90NQGTVJVQ02B';
@@ -66,33 +65,33 @@ describe('Clarity Types', () => {
     function parseWithManualTypeAssertions() {
       const deserializedCv = deserializeCV(serializedClarityValue);
       const clVal = deserializedCv as TupleCV;
-      const namespaceCV = clVal.data['namespace'] as BufferCV;
-      const statusCV = clVal.data['status'] as StringAsciiCV;
-      const properties = clVal.data['properties'] as TupleCV;
-      const launchedAtCV = properties.data['launched-at'] as SomeCV;
+      const namespaceCV = clVal.value['namespace'] as BufferCV;
+      const statusCV = clVal.value['status'] as StringAsciiCV;
+      const properties = clVal.value['properties'] as TupleCV;
+      const launchedAtCV = properties.value['launched-at'] as SomeCV;
       const launchAtIntCV = launchedAtCV.value as UIntCV;
-      const lifetimeCV = properties.data['lifetime'] as IntCV;
-      const revealedAtCV = properties.data['revealed-at'] as IntCV;
-      const addressCV = properties.data['namespace-import'] as StandardPrincipalCV;
-      const priceFunction = properties.data['price-function'] as TupleCV;
-      const baseCV = priceFunction.data['base'] as IntCV;
-      const coeffCV = priceFunction.data['coeff'] as IntCV;
-      const noVowelDiscountCV = priceFunction.data['no-vowel-discount'] as IntCV;
-      const nonalphaDiscountCV = priceFunction.data['nonalpha-discount'] as IntCV;
-      const bucketsCV = priceFunction.data['buckets'] as ListCV;
+      const lifetimeCV = properties.value['lifetime'] as IntCV;
+      const revealedAtCV = properties.value['revealed-at'] as IntCV;
+      const addressCV = properties.value['namespace-import'] as StandardPrincipalCV;
+      const priceFunction = properties.value['price-function'] as TupleCV;
+      const baseCV = priceFunction.value['base'] as IntCV;
+      const coeffCV = priceFunction.value['coeff'] as IntCV;
+      const noVowelDiscountCV = priceFunction.value['no-vowel-discount'] as IntCV;
+      const nonalphaDiscountCV = priceFunction.value['nonalpha-discount'] as IntCV;
+      const bucketsCV = priceFunction.value['buckets'] as ListCV;
       const buckets: string[] = [];
-      const listCV = bucketsCV.list;
+      const listCV = bucketsCV.value;
       for (let i = 0; i < listCV.length; i++) {
         const cv = listCV[i] as UIntCV;
         buckets.push(cv.value.toString());
       }
       return {
-        namespace: bytesToUtf8(namespaceCV.buffer),
-        status: statusCV.data,
+        namespace: bytesToUtf8(hexToBytes(namespaceCV.value)),
+        status: statusCV.value,
         launchedAt: launchAtIntCV.value.toString(),
         lifetime: lifetimeCV.value.toString(),
         revealedAt: revealedAtCV.value.toString(),
-        address: addressToString(addressCV.address),
+        address: addressCV.value,
         base: baseCV.value.toString(),
         coeff: coeffCV.value.toString(),
         noVowelDiscount: noVowelDiscountCV.value.toString(),
@@ -138,20 +137,20 @@ describe('Clarity Types', () => {
       }>;
       const cv = deserializeCV<BnsNamespaceCV>(serializedClarityValue);
       // easy, fully-typed access into the Clarity value properties
-      const namespaceProps = cv.data.properties.data;
-      const priceProps = namespaceProps['price-function'].data;
+      const namespaceProps = cv.value.properties.value;
+      const priceProps = namespaceProps['price-function'].value;
       return {
-        namespace: bytesToUtf8(cv.data.namespace.buffer),
-        status: cv.data.status.data,
+        namespace: bytesToUtf8(hexToBytes(cv.value.namespace.value)),
+        status: cv.value.status.value,
         launchedAt: namespaceProps['launched-at'].value.value.toString(),
         lifetime: namespaceProps.lifetime.value.toString(),
         revealedAt: namespaceProps['revealed-at'].value.toString(),
-        address: addressToString(namespaceProps['namespace-import'].address),
+        address: namespaceProps['namespace-import'].value,
         base: priceProps.base.value.toString(),
         coeff: priceProps.coeff.value.toString(),
         noVowelDiscount: priceProps['no-vowel-discount'].value.toString(),
         nonalphaDiscount: priceProps['nonalpha-discount'].value.toString(),
-        buckets: priceProps.buckets.list.map(b => b.value.toString()),
+        buckets: priceProps.buckets.value.map(b => b.value.toString()),
       };
     }
 
@@ -429,12 +428,12 @@ describe('Clarity Types', () => {
       expect(serializedDeserialized).toEqual(tuple);
 
       // Test lexicographic ordering of tuple keys (to match Node Buffer compare)
-      const lexicographic = Object.keys(tuple.data).sort((a, b) => {
+      const lexicographic = Object.keys(tuple.value).sort((a, b) => {
         const bufA = Buffer.from(a);
         const bufB = Buffer.from(b);
         return bufA.compare(bufB);
       });
-      expect(Object.keys(serializedDeserialized.data)).toEqual(lexicographic);
+      expect(Object.keys(serializedDeserialized.value)).toEqual(lexicographic);
     });
 
     test('StringAsciiCV', () => {

@@ -34,5 +34,5 @@ export function tupleCV<T extends ClarityValue = ClarityValue>(
     }
   }
 
-  return { type: ClarityType.Tuple, data };
+  return { type: ClarityType.Tuple, value: data };
 }

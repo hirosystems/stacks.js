@@ -26,13 +26,12 @@ import {
   addressFromPublicKeys,
   broadcastTransaction,
   callReadOnlyFunction,
-  createFungiblePostCondition,
-  createSTXPostCondition,
   createStacksPublicKey,
   estimateFee,
   estimateTransaction,
   getContractMapEntry,
   getNonce,
+  postConditionToWire,
   privateKeyToPublic,
   publicKeyIsCompressed,
   publicKeyToHex,
@@ -54,13 +53,7 @@ import {
   SignedTokenTransferOptions,
   makeContractCall,
   makeContractDeploy,
-  makeContractFungiblePostCondition,
-  makeContractNonFungiblePostCondition,
-  makeContractSTXPostCondition,
   makeSTXTokenTransfer,
-  makeStandardFungiblePostCondition,
-  makeStandardNonFungiblePostCondition,
-  makeStandardSTXPostCondition,
   makeUnsignedContractCall,
   makeUnsignedContractDeploy,
   makeUnsignedSTXTokenTransfer,
@@ -84,8 +77,6 @@ import {
   AddressHashMode,
   AuthType,
   ClarityVersion,
-  FungibleConditionCode,
-  NonFungibleConditionCode,
   PayloadType,
   PostConditionMode,
   PubKeyEncoding,
@@ -98,7 +89,7 @@ import {
   createTokenTransferPayload,
   serializePayloadBytes,
 } from '../src/payload';
-import { createAsset } from '../src/postcondition-types';
+import { FungiblePostCondition, PostCondition, StxPostCondition } from '../src/postcondition-types';
 import { createTransactionAuthField } from '../src/signature';
 import { TransactionSigner } from '../src/signer';
 import {
@@ -320,7 +311,12 @@ test("STX token transfers don't take post conditions", async () => {
   const memo = 'test memo';
 
   const postConditions = [
-    makeStandardSTXPostCondition(recipientAddress, FungibleConditionCode.GreaterEqual, 54321),
+    {
+      type: 'stx-postcondition',
+      address: recipientAddress,
+      condition: 'gte',
+      amount: 54321,
+    },
   ];
 
   const transaction = await makeSTXTokenTransfer({
@@ -908,40 +904,51 @@ test('Make contract-call with post conditions', async () => {
   const assetAddress = 'ST34RKEJKQES7MXQFBT29KSJZD73QK3YNT5N56C6X';
   const assetContractName = 'test-asset-contract';
   const assetName = 'test-asset-name';
-  const info = createAsset(assetAddress, assetContractName, assetName);
   const tokenAssetName = 'token-asset-name';
 
   const fee = 0;
 
-  const postConditions = [
-    makeStandardSTXPostCondition(postConditionAddress, FungibleConditionCode.GreaterEqual, 10),
-    makeContractSTXPostCondition(
-      contractAddress,
-      contractName,
-      FungibleConditionCode.GreaterEqual,
-      12345
-    ),
-    makeStandardFungiblePostCondition(postConditionAddress, FungibleConditionCode.Less, 1000, info),
-    makeContractFungiblePostCondition(
-      postConditionAddress,
-      contractName,
-      FungibleConditionCode.Equal,
-      1,
-      info
-    ),
-    makeStandardNonFungiblePostCondition(
-      postConditionAddress,
-      NonFungibleConditionCode.DoesNotSend,
-      info,
-      bufferCVFromString(tokenAssetName)
-    ),
-    makeContractNonFungiblePostCondition(
-      postConditionAddress,
-      contractName,
-      NonFungibleConditionCode.Sends,
-      info,
-      bufferCVFromString(tokenAssetName)
-    ),
+  const postConditions: PostCondition[] = [
+    {
+      type: 'stx-postcondition',
+      address: postConditionAddress,
+      condition: 'gte',
+      amount: 10,
+    },
+    {
+      type: 'stx-postcondition',
+      address: `${contractAddress}.${contractName}`,
+      condition: 'gte',
+      amount: 12345,
+    },
+    {
+      type: 'ft-postcondition',
+      address: postConditionAddress,
+      condition: 'lt',
+      amount: 1000,
+      asset: `${assetAddress}.${assetContractName}::${assetName}`,
+    },
+    {
+      type: 'ft-postcondition',
+      address: `${postConditionAddress}.${contractName}`,
+      condition: 'eq',
+      amount: 1,
+      asset: `${assetAddress}.${assetContractName}::${assetName}`,
+    },
+    {
+      type: 'nft-postcondition',
+      address: postConditionAddress,
+      condition: 'not-sent',
+      asset: `${assetAddress}.${assetContractName}::${assetName}`,
+      assetId: bufferCVFromString(tokenAssetName),
+    },
+    {
+      type: 'nft-postcondition',
+      address: `${postConditionAddress}.${contractName}`,
+      condition: 'sent',
+      asset: `${assetAddress}.${assetContractName}::${assetName}`,
+      assetId: bufferCVFromString(tokenAssetName),
+    },
   ];
 
   const transaction = await makeContractCall({
@@ -2121,25 +2128,27 @@ describe(getNonce.name, () => {
 test('Post-conditions with amount larger than 8 bytes throw an error', () => {
   const amount = BigInt('0xffffffffffffffff') + 1n;
 
-  const stxPc = createSTXPostCondition(
-    'SP34EBMKMRR6SXX65GRKJ1FHEXV7AGHJ2D8ASQ5M3',
-    FungibleConditionCode.Equal,
-    amount
-  );
-
-  const fungiblePc = createFungiblePostCondition(
-    'SP34EBMKMRR6SXX65GRKJ1FHEXV7AGHJ2D8ASQ5M3',
-    FungibleConditionCode.Equal,
+  const stxPc: StxPostCondition = {
+    type: 'stx-postcondition',
+    address: 'SP34EBMKMRR6SXX65GRKJ1FHEXV7AGHJ2D8ASQ5M3',
+    condition: 'eq',
     amount,
-    'SP34EBMKMRR6SXX65GRKJ1FHEXV7AGHJ2D8ASQ5M3.token::frank'
-  );
+  };
+
+  const fungiblePc: FungiblePostCondition = {
+    type: 'ft-postcondition',
+    address: 'SP34EBMKMRR6SXX65GRKJ1FHEXV7AGHJ2D8ASQ5M3',
+    condition: 'eq',
+    amount,
+    asset: 'SP34EBMKMRR6SXX65GRKJ1FHEXV7AGHJ2D8ASQ5M3.token::frank',
+  };
 
   expect(() => {
-    serializePostConditionBytes(stxPc);
+    serializePostConditionBytes(postConditionToWire(stxPc));
   }).toThrowError('The post-condition amount may not be larger than 8 bytes');
 
   expect(() => {
-    serializePostConditionBytes(fungiblePc);
+    serializePostConditionBytes(postConditionToWire(fungiblePc));
   }).toThrowError('The post-condition amount may not be larger than 8 bytes');
 });
 

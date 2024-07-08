@@ -1110,14 +1110,14 @@ test('pox address to btc address', () => {
   vectors.forEach(item => {
     const clarityValue: TupleCV = {
       type: ClarityType.Tuple,
-      data: {
+      value: {
         version: {
           type: ClarityType.Buffer,
-          buffer: new Uint8Array([item.version]),
+          value: bytesToHex(new Uint8Array([item.version])),
         },
         hashbytes: {
           type: ClarityType.Buffer,
-          buffer: item.hashBytes,
+          value: bytesToHex(item.hashBytes),
         },
       },
     };

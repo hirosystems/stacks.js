@@ -1,16 +1,13 @@
 import { utf8ToBytes } from '@stacks/common';
 import { STACKS_TESTNET } from '@stacks/network';
 import {
-  FungibleConditionCode,
-  NonFungibleConditionCode,
+  NonFungiblePostCondition,
+  StxPostCondition,
   bufferCV,
   bufferCVFromString,
-  createNonFungiblePostCondition,
-  createSTXPostCondition,
   falseCV,
   hash160,
   noneCV,
-  parseAssetString,
   publicKeyToAddress,
   responseErrorCV,
   responseOkCV,
@@ -317,11 +314,12 @@ test('preorderNamespace', async () => {
   });
 
   const bnsFunctionName = 'namespace-preorder';
-  const burnSTXPostCondition = createSTXPostCondition(
-    publicKeyToAddress(network.addressVersion.singleSig, publicKey),
-    FungibleConditionCode.Equal,
-    stxToBurn
-  );
+  const burnSTXPostCondition: StxPostCondition = {
+    type: 'stx-postcondition',
+    address: publicKeyToAddress(network.addressVersion.singleSig, publicKey),
+    condition: 'eq',
+    amount: stxToBurn,
+  };
   const expectedBNSContractCallOptions = {
     contractAddress: STACKS_TESTNET.bootAddress,
     contractName: BNS_CONTRACT_NAME,
@@ -537,11 +535,12 @@ test('preorderName', async () => {
   });
 
   const bnsFunctionName = 'name-preorder';
-  const burnSTXPostCondition = createSTXPostCondition(
-    publicKeyToAddress(network.addressVersion.singleSig, publicKey),
-    FungibleConditionCode.Equal,
-    stxToBurn
-  );
+  const burnSTXPostCondition: StxPostCondition = {
+    type: 'stx-postcondition',
+    address: publicKeyToAddress(network.addressVersion.singleSig, publicKey),
+    condition: 'eq',
+    amount: stxToBurn,
+  };
   const expectedBNSContractCallOptions = {
     contractAddress: STACKS_TESTNET.bootAddress,
     contractName: BNS_CONTRACT_NAME,
@@ -680,24 +679,26 @@ test('transferName', async () => {
   const bnsFunctionName = 'name-transfer';
 
   const { namespace, name } = decodeFQN(fullyQualifiedName);
-  const nameTransferPostConditionOne = createNonFungiblePostCondition(
-    publicKeyToAddress(network.addressVersion.singleSig, publicKey),
-    NonFungibleConditionCode.Sends,
-    parseAssetString(`${network.bootAddress}.bns::names`),
-    tupleCV({
+  const nameTransferPostConditionOne: NonFungiblePostCondition = {
+    type: 'nft-postcondition',
+    address: publicKeyToAddress(network.addressVersion.singleSig, publicKey),
+    condition: 'sent',
+    asset: `${network.bootAddress}.bns::names`,
+    assetId: tupleCV({
       name: bufferCVFromString(name),
       namespace: bufferCVFromString(namespace),
-    })
-  );
-  const nameTransferPostConditionTwo = createNonFungiblePostCondition(
-    newOwnerAddress,
-    NonFungibleConditionCode.DoesNotSend,
-    parseAssetString(`${network.bootAddress}.bns::names`),
-    tupleCV({
+    }),
+  };
+  const nameTransferPostConditionTwo: NonFungiblePostCondition = {
+    type: 'nft-postcondition',
+    address: newOwnerAddress,
+    condition: 'not-sent',
+    asset: `${network.bootAddress}.bns::names`,
+    assetId: tupleCV({
       name: bufferCVFromString(name),
       namespace: bufferCVFromString(namespace),
-    })
-  );
+    }),
+  };
   const expectedBNSContractCallOptions = {
     contractAddress: STACKS_TESTNET.bootAddress,
     contractName: BNS_CONTRACT_NAME,
@@ -747,24 +748,26 @@ test('transferName optionalArguments', async () => {
   const bnsFunctionName = 'name-transfer';
 
   const { namespace, name } = decodeFQN(fullyQualifiedName);
-  const nameTransferPostConditionOne = createNonFungiblePostCondition(
-    publicKeyToAddress(network.addressVersion.singleSig, publicKey),
-    NonFungibleConditionCode.Sends,
-    parseAssetString(`${network.bootAddress}.bns::names`),
-    tupleCV({
+  const nameTransferPostConditionOne: NonFungiblePostCondition = {
+    type: 'nft-postcondition',
+    address: publicKeyToAddress(network.addressVersion.singleSig, publicKey),
+    condition: 'sent',
+    asset: `${network.bootAddress}.bns::names`,
+    assetId: tupleCV({
       name: bufferCVFromString(name),
       namespace: bufferCVFromString(namespace),
-    })
-  );
-  const nameTransferPostConditionTwo = createNonFungiblePostCondition(
-    newOwnerAddress,
-    NonFungibleConditionCode.DoesNotSend,
-    parseAssetString(`${network.bootAddress}.bns::names`),
-    tupleCV({
+    }),
+  };
+  const nameTransferPostConditionTwo: NonFungiblePostCondition = {
+    type: 'nft-postcondition',
+    address: newOwnerAddress,
+    condition: 'not-sent',
+    asset: `${network.bootAddress}.bns::names`,
+    assetId: tupleCV({
       name: bufferCVFromString(name),
       namespace: bufferCVFromString(namespace),
-    })
-  );
+    }),
+  };
   const expectedBNSContractCallOptions = {
     contractAddress: STACKS_TESTNET.bootAddress,
     contractName: BNS_CONTRACT_NAME,
@@ -852,11 +855,12 @@ test('renewName', async () => {
   const bnsFunctionName = 'name-renewal';
 
   const { namespace, name } = decodeFQN(fullyQualifiedName);
-  const burnSTXPostCondition = createSTXPostCondition(
-    publicKeyToAddress(network.addressVersion.singleSig, publicKey),
-    FungibleConditionCode.Equal,
-    stxToBurn
-  );
+  const burnSTXPostCondition: StxPostCondition = {
+    type: 'stx-postcondition',
+    address: publicKeyToAddress(network.addressVersion.singleSig, publicKey),
+    condition: 'eq',
+    amount: stxToBurn,
+  };
   const expectedBNSContractCallOptions = {
     contractAddress: STACKS_TESTNET.bootAddress,
     contractName: BNS_CONTRACT_NAME,
@@ -907,11 +911,12 @@ test('renewName optionalArguments', async () => {
   const bnsFunctionName = 'name-renewal';
 
   const { namespace, name } = decodeFQN(fullyQualifiedName);
-  const burnSTXPostCondition = createSTXPostCondition(
-    publicKeyToAddress(network.addressVersion.singleSig, publicKey),
-    FungibleConditionCode.Equal,
-    stxToBurn
-  );
+  const burnSTXPostCondition: StxPostCondition = {
+    type: 'stx-postcondition',
+    address: publicKeyToAddress(network.addressVersion.singleSig, publicKey),
+    condition: 'eq',
+    amount: stxToBurn,
+  };
   const expectedBNSContractCallOptions = {
     contractAddress: STACKS_TESTNET.bootAddress,
     contractName: BNS_CONTRACT_NAME,
