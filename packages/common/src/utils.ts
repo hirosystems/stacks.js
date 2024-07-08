@@ -313,9 +313,8 @@ export function getGlobalObjects<K extends Extract<keyof Window, string>>(
   }
   return result;
 }
-// After removing bn.js library provide backward compatibility for users passing bn.js instance
-type BN = import('bn.js'); // Type only import from @types/bn.js
-export type IntegerType = number | string | bigint | Uint8Array | BN;
+
+export type IntegerType = number | string | bigint | Uint8Array;
 
 export function intToBytes(value: IntegerType, signed: boolean, byteLength: number): Uint8Array {
   return bigIntToBytes(intToBigInt(value, signed), byteLength);
@@ -371,15 +370,6 @@ export function intToBigInt(value: IntegerType, signed: boolean): bigint {
     } else {
       return BigInt(`0x${bytesToHex(parsedValue)}`);
     }
-  }
-  // After removing bn.js library provide backward compatibility for users passing bn.js instance
-  // For backward compatibility with bn.js check if it's a bn.js instance
-  if (
-    parsedValue != null &&
-    typeof parsedValue === 'object' &&
-    parsedValue.constructor.name === 'BN'
-  ) {
-    return BigInt(parsedValue.toString());
   }
   throw new TypeError(
     `Invalid value type. Must be a number, bigint, integer-string, hex-string, or Uint8Array.`
