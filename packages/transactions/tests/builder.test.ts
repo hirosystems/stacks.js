@@ -371,7 +371,9 @@ test('Make Multi-Sig STX token transfer', async () => {
     publicKeys: pubKeyStrings,
   });
   const signer = new TransactionSigner(transaction);
+  expect(signer.sigHash).toBe(transaction.signBegin());
   signer.signOrigin(privKeys[0]);
+  expect(signer.sigHash).not.toBe(transaction.signBegin());
   signer.signOrigin(privKeys[1]);
   signer.appendOrigin(pubKeys[2]);
   expect(() => transaction.verifyOrigin()).not.toThrow();
@@ -2522,11 +2524,17 @@ describe('multi-sig', () => {
       const signer = new TransactionSigner(tx);
 
       // sign in reverse order
+      expect(signer.sigHash).toBe(tx.signBegin());
       signer.signOrigin(pk3);
+      expect(signer.sigHash).toBe(tx.signBegin());
       signer.signOrigin(pk2);
+      expect(signer.sigHash).toBe(tx.signBegin());
       signer.appendOrigin(createStacksPublicKey(privateKeyToPublic(pk1)));
+      expect(signer.sigHash).toBe(tx.signBegin());
 
       if (isSingleSig(tx.auth.spendingCondition)) throw 'type error';
+
+      expect(signer.sigHash).toBe(tx.signBegin()); // sighash doesn't change for non-sequential multisig
 
       // todo: a `finalize` method would be nice to do this for us
       // we'll manually need to fix the order (for now)

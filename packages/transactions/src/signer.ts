@@ -1,6 +1,7 @@
 import { PrivateKey } from '@stacks/common';
 import {
   SpendingConditionOpts,
+  isNonSequentialMultiSig,
   isSequentialMultiSig,
   isSingleSig,
   nextVerification,
@@ -39,16 +40,19 @@ export class TransactionSigner {
       }
 
       spendingCondition.fields.forEach(field => {
-        if (field.contents.type === StacksMessageType.MessageSignature) {
-          const signature = field.contents;
-          const nextVerify = nextVerification(
-            this.sigHash,
-            transaction.auth.authType,
-            spendingCondition.fee,
-            spendingCondition.nonce,
-            PubKeyEncoding.Compressed, // always compressed for multisig
-            signature
-          );
+        if (field.contents.type !== StacksMessageType.MessageSignature) return;
+
+        const signature = field.contents;
+        const nextVerify = nextVerification(
+          this.sigHash,
+          transaction.auth.authType,
+          spendingCondition.fee,
+          spendingCondition.nonce,
+          PubKeyEncoding.Compressed, // always compressed for multisig
+          signature
+        );
+
+        if (!isNonSequentialMultiSig(spendingCondition.hashMode)) {
           this.sigHash = nextVerify.nextSigHash;
         }
       });
