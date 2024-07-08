@@ -1,16 +1,14 @@
 import {
-  isSameOriginAbsoluteUrl,
-  isLaterVersion,
-  intToHex,
-  hexToBytes,
+  bigIntToBytes,
   bytesToHex,
   fromTwos,
+  hexToBytes,
+  intToHex,
+  isLaterVersion,
+  isSameOriginAbsoluteUrl,
   toTwos,
-  bigIntToBytes,
-  intToBigInt,
   validateHash256,
 } from '../src';
-import BN from 'bn.js';
 
 test('isLaterVersion', () => {
   expect(isLaterVersion('', '1.1.0')).toEqual(false);
@@ -156,16 +154,6 @@ test('toTwos', () => {
       BigInt(256)
     ).toString(16)
   ).toEqual('8000000000000000000000000000000000000000000000000000000000000000');
-});
-
-test('Should accept bn.js instance', () => {
-  const value = '123456';
-  const bn = new BN(value);
-  // After removing bn.js library verify backward compatibility for users passing bn.js instance
-  // Should not break if bn.js instance is passed
-  const nativeBigInt = intToBigInt(bn, false);
-
-  expect(nativeBigInt.toString()).toEqual(value);
 });
 
 describe(validateHash256, () => {

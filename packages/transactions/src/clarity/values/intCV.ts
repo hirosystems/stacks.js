@@ -19,7 +19,7 @@ const MIN_I128 = BigInt('-170141183460469231731687303715884105728'); // (-2 ** 1
  * ```
  *  import { intCV } from '@stacks/transactions';
  *
- *  const value = intCV('100'); // parameter any of type: number | string | bigint | Uint8Array | BN
+ *  const value = intCV('100'); // parameter any of type: number | string | bigint | Uint8Array
  *  // { type: 'int', value: 100n }
  * ```
  *
@@ -47,7 +47,7 @@ export const intCV = (value: IntegerType): IntCV => {
  * ```
  *  import { uintCV } from '@stacks/transactions';
  *
- *  const value = uintCV('100'); // parameter any of type: number | string | bigint | Uint8Array | BN
+ *  const value = uintCV('100'); // parameter any of type: number | string | bigint | Uint8Array
  *  // { type: 'uint', value: 100n }
  * ```
  *
