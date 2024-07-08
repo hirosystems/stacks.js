@@ -72,10 +72,10 @@ test.each(BTC_ADDRESS_CASES)(
     expect(decoded.data).toHaveLength(expectedLength);
 
     const tuple = poxAddressToTuple(address);
-    expect(tuple.data['version'].buffer).toHaveLength(1);
-    expect(tuple.data['version'].buffer[0]).toBe(expectedVersion);
-    expect(tuple.data['hashbytes'].buffer).toEqual(hexToBytes(expectedHash));
-    expect(tuple.data['hashbytes'].buffer).toHaveLength(expectedLength);
+    expect(hexToBytes(tuple.value['version'].value)).toHaveLength(1);
+    expect(hexToBytes(tuple.value['version'].value)[0]).toBe(expectedVersion);
+    expect(tuple.value['hashbytes'].value).toEqual(expectedHash);
+    expect(hexToBytes(tuple.value['hashbytes'].value)).toHaveLength(expectedLength);
   }
 );
 

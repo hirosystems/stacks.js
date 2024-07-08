@@ -1,16 +1,7 @@
 import {
-  createSTXPostCondition,
-  createFungiblePostCondition,
-  createNonFungiblePostCondition,
-} from '../src/postcondition';
-
-import {
   STXPostConditionWire,
   FungiblePostConditionWire,
   NonFungiblePostConditionWire,
-  createAsset,
-  createStandardPrincipal,
-  createContractPrincipal,
   ContractPrincipalWire,
 } from '../src/postcondition-types';
 import { addressToString } from '../src/common';
@@ -26,23 +17,28 @@ import {
 import { serializeDeserialize } from './macros';
 
 import { bufferCVFromString, BufferCV } from '../src/clarity';
-import { bytesToUtf8 } from '@stacks/common';
+import { bytesToUtf8, hexToBytes } from '@stacks/common';
+import { postConditionToWire } from '../src/postcondition';
 
 test('STX post condition serialization and deserialization', () => {
   const postConditionType = PostConditionType.STX;
 
   const address = 'SP2JXKMSH007NPYAQHKJPQMAQYAD90NQGTVJVQ02B';
-  const sp = createStandardPrincipal(address);
 
   const conditionCode = FungibleConditionCode.GreaterEqual;
   const amount = 1000000;
 
-  const postCondition = createSTXPostCondition(sp, conditionCode, amount);
+  const postCondition = postConditionToWire({
+    type: 'stx-postcondition',
+    address,
+    condition: 'gte',
+    amount,
+  });
 
-  const deserialized = serializeDeserialize(
+  const deserialized: STXPostConditionWire = serializeDeserialize(
     postCondition,
     StacksWireType.PostCondition
-  ) as STXPostConditionWire;
+  );
   expect(deserialized.conditionType).toBe(postConditionType);
   expect(deserialized.principal.prefix).toBe(PostConditionPrincipalId.Standard);
   expect(addressToString(deserialized.principal.address)).toBe(address);
@@ -54,7 +50,6 @@ test('Fungible post condition serialization and deserialization', () => {
   const postConditionType = PostConditionType.Fungible;
 
   const address = 'SP2JXKMSH007NPYAQHKJPQMAQYAD90NQGTVJVQ02B';
-  const principal = createStandardPrincipal(address);
 
   const conditionCode = FungibleConditionCode.GreaterEqual;
   const amount = 1000000;
@@ -62,9 +57,14 @@ test('Fungible post condition serialization and deserialization', () => {
   const assetAddress = 'SP2ZP4GJDZJ1FDHTQ963F0292PE9J9752TZJ68F21';
   const assetContractName = 'contract_name';
   const assetName = 'asset_name';
-  const info = createAsset(assetAddress, assetContractName, assetName);
 
-  const postCondition = createFungiblePostCondition(principal, conditionCode, amount, info);
+  const postCondition = postConditionToWire({
+    type: 'ft-postcondition',
+    address,
+    condition: 'gte',
+    amount,
+    asset: `${assetAddress}.${assetContractName}::${assetName}`,
+  });
 
   const deserialized = serializeDeserialize(
     postCondition,
@@ -85,23 +85,22 @@ test('Non-fungible post condition serialization and deserialization', () => {
 
   const address = 'SP2JXKMSH007NPYAQHKJPQMAQYAD90NQGTVJVQ02B';
   const contractName = 'contract-name';
-  const principal = createContractPrincipal(address, contractName);
 
   const conditionCode = NonFungibleConditionCode.DoesNotSend;
 
   const assetAddress = 'SP2ZP4GJDZJ1FDHTQ963F0292PE9J9752TZJ68F21';
   const assetContractName = 'contract_name';
   const assetName = 'asset_name';
-  const info = createAsset(assetAddress, assetContractName, assetName);
 
   const nftAssetName = 'nft_asset_name';
 
-  const postCondition = createNonFungiblePostCondition(
-    principal,
-    conditionCode,
-    info,
-    bufferCVFromString(nftAssetName)
-  );
+  const postCondition = postConditionToWire({
+    type: 'nft-postcondition',
+    address: `${address}.${contractName}`,
+    condition: 'not-sent',
+    asset: `${assetAddress}.${assetContractName}::${assetName}`,
+    assetId: bufferCVFromString(nftAssetName),
+  });
 
   const deserialized = serializeDeserialize(
     postCondition,
@@ -115,7 +114,7 @@ test('Non-fungible post condition serialization and deserialization', () => {
   expect(addressToString(deserialized.asset.address)).toBe(assetAddress);
   expect(deserialized.asset.contractName.content).toBe(assetContractName);
   expect(deserialized.asset.assetName.content).toBe(assetName);
-  expect(bytesToUtf8((deserialized.assetName as BufferCV).buffer)).toEqual(nftAssetName);
+  expect(bytesToUtf8(hexToBytes((deserialized.assetName as BufferCV).value))).toEqual(nftAssetName);
 });
 
 test('Non-fungible post condition with string IDs serialization and deserialization', () => {
@@ -132,12 +131,13 @@ test('Non-fungible post condition with string IDs serialization and deserializat
 
   const nftAssetName = 'nft_asset_name';
 
-  const postCondition = createNonFungiblePostCondition(
-    `${address}.${contractName}`,
-    conditionCode,
-    `${assetAddress}.${assetContractName}::${assetName}`,
-    bufferCVFromString(nftAssetName)
-  );
+  const postCondition = postConditionToWire({
+    type: 'nft-postcondition',
+    address: `${address}.${contractName}`,
+    condition: 'not-sent',
+    asset: `${assetAddress}.${assetContractName}::${assetName}`,
+    assetId: bufferCVFromString(nftAssetName),
+  });
 
   const deserialized = serializeDeserialize(
     postCondition,
@@ -151,5 +151,5 @@ test('Non-fungible post condition with string IDs serialization and deserializat
   expect(addressToString(deserialized.asset.address)).toBe(assetAddress);
   expect(deserialized.asset.contractName.content).toBe(assetContractName);
   expect(deserialized.asset.assetName.content).toBe(assetName);
-  expect(bytesToUtf8((deserialized.assetName as BufferCV).buffer)).toEqual(nftAssetName);
+  expect(bytesToUtf8(hexToBytes((deserialized.assetName as BufferCV).value))).toEqual(nftAssetName);
 });

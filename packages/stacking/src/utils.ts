@@ -1,6 +1,6 @@
 import { sha256 } from '@noble/hashes/sha256';
 import { bech32, bech32m } from '@scure/base';
-import { IntegerType, PrivateKey, bigIntToBytes } from '@stacks/common';
+import { IntegerType, PrivateKey, bigIntToBytes, hexToBytes } from '@stacks/common';
 import {
   base58CheckDecode,
   base58CheckEncode,
@@ -142,26 +142,29 @@ export function decodeBtcAddress(btcAddress: string): {
   }
 }
 
-export function extractPoxAddressFromClarityValue(poxAddrClarityValue: ClarityValue) {
+export function extractPoxAddressFromClarityValue(poxAddrClarityValue: ClarityValue): {
+  version: number;
+  hashBytes: Uint8Array;
+} {
   const clarityValue = poxAddrClarityValue as TupleCV;
-  if (clarityValue.type !== ClarityType.Tuple || !clarityValue.data) {
+  if (clarityValue.type !== ClarityType.Tuple || !clarityValue.value) {
     throw new Error('Invalid argument, expected ClarityValue to be a TupleCV');
   }
-  if (!('version' in clarityValue.data) || !('hashbytes' in clarityValue.data)) {
+  if (!('version' in clarityValue.value) || !('hashbytes' in clarityValue.value)) {
     throw new Error(
       'Invalid argument, expected Clarity tuple value to contain `version` and `hashbytes` keys'
     );
   }
-  const versionCV = clarityValue.data['version'] as BufferCV;
-  const hashBytesCV = clarityValue.data['hashbytes'] as BufferCV;
+  const versionCV = clarityValue.value['version'] as BufferCV;
+  const hashBytesCV = clarityValue.value['hashbytes'] as BufferCV;
   if (versionCV.type !== ClarityType.Buffer || hashBytesCV.type !== ClarityType.Buffer) {
     throw new Error(
       'Invalid argument, expected Clarity tuple value to contain `version` and `hashbytes` buffers'
     );
   }
   return {
-    version: versionCV.buffer[0],
-    hashBytes: hashBytesCV.buffer,
+    version: hexToBytes(versionCV.value)[0],
+    hashBytes: hexToBytes(hashBytesCV.value),
   };
 }
 

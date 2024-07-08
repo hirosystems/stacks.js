@@ -90,11 +90,7 @@ export {
  * ```
  */
 export * as Pc from './pc';
-export {
-  createFungiblePostCondition,
-  createNonFungiblePostCondition,
-  createSTXPostCondition,
-} from './postcondition';
+export * from './postcondition';
 export * from './postcondition-types';
 export * from './signature';
 export * from './signer';

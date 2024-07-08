@@ -1,4 +1,4 @@
-import { utf8ToBytes } from '@stacks/common';
+import { bytesToHex, utf8ToBytes } from '@stacks/common';
 import { ClarityType } from '../constants';
 import { BufferCV } from '../types';
 
@@ -29,7 +29,7 @@ export const bufferCV = (buffer: Uint8Array): BufferCV => {
     throw new Error('Cannot construct clarity buffer that is greater than 1MB');
   }
 
-  return { type: ClarityType.Buffer, buffer };
+  return { type: ClarityType.Buffer, value: bytesToHex(buffer) };
 };
 
 /**
