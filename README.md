@@ -2,14 +2,14 @@
 
 > [!IMPORTANT]
 > Looking for Nakamoto updates?
-> Use version `6.13.0` or later to test the latest nakamoto changes.
-> e.g., `npm install @stacks/stacking@6.13.0`
+> Use version `6.16.0` or later to test the latest nakamoto changes.
+> e.g., `npm install @stacks/stacking@6.16.0`
 
 Welcome to the Stacks.js repository, your one-stop solution for working with the Stacks blockchain using JavaScript/TypeScript. This repository nests a collection of packages designed to provide you with the essential building blocks to work with the [Stacks blockchain](https://www.stacks.co/what-is-stacks) from JavaScript/TypeScript.
 
 ## Packages
 
-For installation instructions and usage guidelines, refer to the respective `README`` in each package directory.
+For installation instructions and usage guidelines, refer to the respective `README` in each package directory.
 
 ### Connecting Wallets
 
