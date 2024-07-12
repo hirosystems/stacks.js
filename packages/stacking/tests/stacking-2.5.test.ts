@@ -1,8 +1,8 @@
 import { getPublicKeyFromPrivate, publicKeyToBtcAddress } from '@stacks/encryption';
-import { makeRandomPrivKey } from '@stacks/transactions';
-import { StackingClient } from '../src';
-import { V2_POX_REGTEST_POX_4, setApiMocks } from './apiMockingHelpers';
 import { STACKS_MOCKNET } from '@stacks/network/src';
+import { makeRandomPrivKey } from '@stacks/transactions';
+import { V2_POX_REGTEST_POX_4, setApiMocks } from '../../internal/src';
+import { StackingClient } from '../src';
 
 beforeEach(() => {
   jest.resetModules();
