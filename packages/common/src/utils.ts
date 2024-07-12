@@ -4,6 +4,7 @@ import { Logger } from './logger';
  *  @ignore
  */
 export const BLOCKSTACK_HANDLER = 'blockstack';
+// todo: `next` get rid of all this blockstack stuff
 
 /**
  * Time

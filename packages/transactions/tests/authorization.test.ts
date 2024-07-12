@@ -1,21 +1,18 @@
+import { bytesToHex, concatArray } from '@stacks/common';
+import { createMessageSignature, createTransactionAuthField } from '../src';
+import { BytesReader } from '../src/BytesReader';
 import {
+  SingleSigSpendingCondition,
+  SponsoredAuthorization,
+  StandardAuthorization,
   createMultiSigSpendingCondition,
   createSingleSigSpendingCondition,
   deserializeSpendingCondition,
   emptyMessageSignature,
   serializeAuthorization,
   serializeSpendingCondition,
-  SingleSigSpendingCondition,
-  SponsoredAuthorization,
-  StandardAuthorization,
 } from '../src/authorization';
-import { createMessageSignature } from '../src/common';
-import { createTransactionAuthField } from '../src/signature';
-
 import { AddressHashMode, AuthType, PubKeyEncoding } from '../src/constants';
-
-import { bytesToHex, concatArray } from '@stacks/common';
-import { BytesReader } from '../src/bytesReader';
 import { createStacksPublicKey, signWithKey } from '../src/keys';
 
 test('ECDSA recoverable signature', () => {

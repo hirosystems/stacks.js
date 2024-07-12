@@ -1,6 +1,7 @@
 import { bytesToHex, hexToBytes } from '@stacks/common';
 import { DEFAULT_CHAIN_ID, TransactionVersion } from '@stacks/network';
 import fetchMock from 'jest-fetch-mock';
+import { BytesReader } from '../src/BytesReader';
 import {
   MultiSigSpendingCondition,
   SingleSigSpendingCondition,
@@ -10,7 +11,6 @@ import {
   createSponsoredAuth,
   createStandardAuth,
 } from '../src/authorization';
-import { BytesReader } from '../src/bytesReader';
 import { contractPrincipalCV, standardPrincipalCV } from '../src/clarity';
 import {
   AddressHashMode,
@@ -25,12 +25,17 @@ import {
   publicKeyToHex,
   serializePublicKeyBytes,
 } from '../src/keys';
+
 import {
   CoinbasePayloadToAltRecipient,
+  Pc,
+  STXPostConditionWire,
   TokenTransferPayloadWire,
+  createLPList,
+  createStandardPrincipal,
   createTokenTransferPayload,
-} from '../src/payload';
-import { STXPostConditionWire, createStandardPrincipal } from '../src/postcondition-types';
+} from '../src';
+import { postConditionToWire } from '../src/postcondition';
 import { TransactionSigner } from '../src/signer';
 import {
   StacksTransaction,
@@ -38,9 +43,6 @@ import {
   serializeTransaction,
   transactionToHex,
 } from '../src/transaction';
-import { createLPList } from '../src/types';
-import { postConditionToWire } from '../src/postcondition';
-import { Pc } from '../src';
 
 beforeEach(() => {
   fetchMock.resetMocks();

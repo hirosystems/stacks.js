@@ -30,24 +30,25 @@ import {
   TransactionVersion,
 } from '@stacks/network';
 import { c32address } from 'c32check';
-import { BytesReader } from './bytesReader';
-import {
-  addressFromVersionHash,
-  addressHashModeToVersion,
-  addressToString,
-  createMessageSignature,
-  MessageSignatureWire,
-} from './common';
+import { addressHashModeToVersion } from './address';
+import { BytesReader } from './BytesReader';
 import {
   AddressHashMode,
   AddressVersion,
   COMPRESSED_PUBKEY_LENGTH_BYTES,
   PubKeyEncoding,
-  StacksWireType,
   UNCOMPRESSED_PUBKEY_LENGTH_BYTES,
 } from './constants';
-import { StructuredDataSignatureWire } from './message-types';
 import { hash160, hashP2PKH } from './utils';
+import {
+  addressFromVersionHash,
+  addressToString,
+  createMessageSignature,
+  MessageSignatureWire,
+  PublicKeyWire,
+  StacksWireType,
+  StructuredDataSignatureWire,
+} from './wire';
 
 /**
  * To use secp256k1.signSync set utils.hmacSha256Sync to a function using noble-hashes
@@ -61,11 +62,6 @@ utils.hmacSha256Sync = (key: Uint8Array, ...msgs: Uint8Array[]) => {
   msgs.forEach(msg => h.update(msg));
   return h.digest();
 };
-
-export interface PublicKeyWire {
-  readonly type: StacksWireType.PublicKey;
-  readonly data: Uint8Array;
-}
 
 /** Creates a P2PKH address string from the given private key and tx version. */
 export function getAddressFromPrivateKey(

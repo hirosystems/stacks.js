@@ -8,6 +8,7 @@ import {
   PrivateKey,
   writeUInt16BE,
 } from '@stacks/common';
+import { BytesReader } from './BytesReader';
 import {
   AddressHashMode,
   AuthType,
@@ -15,11 +16,7 @@ import {
   PubKeyEncoding,
   RECOVERABLE_ECDSA_SIG_LENGTH_BYTES,
   SingleSigHashMode,
-  StacksWireType,
 } from './constants';
-
-import { BytesReader } from './bytesReader';
-import { MessageSignatureWire } from './common';
 import { DeserializationError, SigningError, VerificationError } from './errors';
 import {
   createStacksPublicKey,
@@ -27,21 +24,21 @@ import {
   publicKeyFromSignatureVrs,
   publicKeyIsCompressed,
   signWithKey,
-  PublicKeyWire,
 } from './keys';
-import {
-  deserializeMessageSignatureBytes,
-  serializeMessageSignatureBytes,
-  TransactionAuthFieldWire,
-} from './signature';
+import { cloneDeep, leftPadHex, txidFromData } from './utils';
 import {
   addressFromPublicKeys,
   createEmptyAddress,
   createLPList,
   deserializeLPListBytes,
+  deserializeMessageSignatureBytes,
+  MessageSignatureWire,
+  PublicKeyWire,
   serializeLPListBytes,
-} from './types';
-import { cloneDeep, leftPadHex, txidFromData } from './utils';
+  serializeMessageSignatureBytes,
+  StacksWireType,
+  TransactionAuthFieldWire,
+} from './wire';
 
 export function emptyMessageSignature(): MessageSignatureWire {
   return {
