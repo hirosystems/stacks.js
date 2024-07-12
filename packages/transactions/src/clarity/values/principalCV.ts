@@ -1,6 +1,11 @@
 import { utf8ToBytes } from '@stacks/common';
-import { AddressWire, addressToString } from '../../common';
-import { LengthPrefixedStringWire, createAddress, createLPString } from '../../postcondition-types';
+import {
+  AddressWire,
+  LengthPrefixedStringWire,
+  addressToString,
+  createAddress,
+  createLPString,
+} from '../../wire';
 import { ClarityType } from '../constants';
 import { ContractPrincipalCV, PrincipalCV, StandardPrincipalCV } from '../types';
 

@@ -30,17 +30,20 @@ import {
 import { ClarityAbi, validateContractCall } from './contract-abi';
 import { estimateFee, getAbi, getNonce } from './fetch';
 import { createStacksPublicKey, privateKeyToPublic, publicKeyToAddress } from './keys';
-import {
-  createContractCallPayload,
-  createSmartContractPayload,
-  createTokenTransferPayload,
-} from './payload';
-import { PostCondition, PostConditionWire, createAddress } from './postcondition-types';
+import { postConditionToWire } from './postcondition';
+import { PostCondition } from './postcondition-types';
 import { TransactionSigner } from './signer';
 import { StacksTransaction } from './transaction';
-import { addressFromPublicKeys, createLPList } from './types';
 import { defaultApiFromNetwork, omit } from './utils';
-import { postConditionToWire } from './postcondition';
+import {
+  PostConditionWire,
+  addressFromPublicKeys,
+  createAddress,
+  createContractCallPayload,
+  createLPList,
+  createSmartContractPayload,
+  createTokenTransferPayload,
+} from './wire';
 
 /** @deprecated Not used internally */
 export interface MultiSigOptions {

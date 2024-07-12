@@ -6,11 +6,11 @@ import {
   isSingleSig,
   nextVerification,
 } from './authorization';
-import { AddressHashMode, AuthType, PubKeyEncoding, StacksWireType } from './constants';
+import { AddressHashMode, AuthType, PubKeyEncoding } from './constants';
 import { SigningError } from './errors';
-import { PublicKeyWire } from './keys';
 import { StacksTransaction } from './transaction';
 import { cloneDeep } from './utils';
+import { PublicKeyWire, StacksWireType } from './wire';
 
 // todo: get rid of signer and combine with transaction class? could reduce code and complexity by calculating sighash newly each sign and append.
 export class TransactionSigner {

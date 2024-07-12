@@ -7,7 +7,7 @@ import {
   hexToBytes,
   intToBigInt,
   writeUInt32BE,
-} from '@stacks/common';
+} from '@stacks/common/src';
 import {
   ChainId,
   DEFAULT_CHAIN_ID,
@@ -16,6 +16,8 @@ import {
   TransactionVersion,
   whenTransactionVersion,
 } from '@stacks/network';
+import { serializePayloadBytes } from '.';
+import { BytesReader } from './BytesReader';
 import {
   Authorization,
   MultiSigSpendingCondition,
@@ -31,7 +33,6 @@ import {
   setSponsorNonce,
   verifyOrigin,
 } from './authorization';
-import { BytesReader } from './bytesReader';
 import {
   AddressHashMode,
   AnchorMode,
@@ -40,25 +41,23 @@ import {
   PostConditionMode,
   PubKeyEncoding,
   RECOVERABLE_ECDSA_SIG_LENGTH_BYTES,
-  StacksWireType,
   anchorModeFrom,
 } from './constants';
 import { SerializationError, SigningError } from './errors';
-import { PublicKeyWire, privateKeyIsCompressed, publicKeyIsCompressed } from './keys';
-import {
-  PayloadWire,
-  PayloadInput,
-  deserializePayloadBytes,
-  serializePayloadBytes,
-} from './payload';
-import { createTransactionAuthField } from './signature';
+import { privateKeyIsCompressed, publicKeyIsCompressed } from './keys';
+import { cloneDeep, txidFromData } from './utils';
 import {
   LengthPrefixedList,
+  PayloadInput,
+  PayloadWire,
+  PublicKeyWire,
+  StacksWireType,
   createLPList,
+  createTransactionAuthField,
   deserializeLPListBytes,
+  deserializePayloadBytes,
   serializeLPListBytes,
-} from './types';
-import { cloneDeep, txidFromData } from './utils';
+} from './wire';
 
 export class StacksTransaction {
   version: TransactionVersion;

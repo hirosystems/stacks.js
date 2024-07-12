@@ -1,24 +1,21 @@
 import {
-  STXPostConditionWire,
-  FungiblePostConditionWire,
-  NonFungiblePostConditionWire,
-  ContractPrincipalWire,
-} from '../src/postcondition-types';
-import { addressToString } from '../src/common';
-
-import {
   PostConditionType,
   FungibleConditionCode,
   NonFungibleConditionCode,
-  StacksWireType,
   PostConditionPrincipalId,
 } from '../src/constants';
-
 import { serializeDeserialize } from './macros';
-
 import { bufferCVFromString, BufferCV } from '../src/clarity';
 import { bytesToUtf8, hexToBytes } from '@stacks/common';
 import { postConditionToWire } from '../src/postcondition';
+import {
+  ContractPrincipalWire,
+  FungiblePostConditionWire,
+  NonFungiblePostConditionWire,
+  STXPostConditionWire,
+  StacksWireType,
+  addressToString,
+} from '../src';
 
 test('STX post condition serialization and deserialization', () => {
   const postConditionType = PostConditionType.STX;

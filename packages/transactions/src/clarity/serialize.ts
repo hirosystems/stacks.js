@@ -1,32 +1,36 @@
 import {
+  asciiToBytes,
+  bigIntToBytes,
+  bytesToHex,
   concatArray,
   concatBytes,
-  bigIntToBytes,
-  toTwos,
-  writeUInt32BE,
-  utf8ToBytes,
-  asciiToBytes,
-  bytesToHex,
   hexToBytes,
+  toTwos,
+  utf8ToBytes,
+  writeUInt32BE,
 } from '@stacks/common';
-import { serializeAddressBytes, serializeLPStringBytes } from '../types';
-import { createAddress, createLPString } from '../postcondition-types';
 import {
   BooleanCV,
-  OptionalCV,
   BufferCV,
-  IntCV,
-  UIntCV,
-  StandardPrincipalCV,
-  ContractPrincipalCV,
-  ResponseCV,
   ClarityValue,
+  ContractPrincipalCV,
+  IntCV,
+  OptionalCV,
+  ResponseCV,
+  StandardPrincipalCV,
+  UIntCV,
 } from '.';
-import { ClarityType, clarityTypeToByte } from './constants';
-import { SerializationError } from '../errors';
 import { CLARITY_INT_BYTE_SIZE, CLARITY_INT_SIZE } from '../constants';
-import { ListCV, StringAsciiCV, StringUtf8CV, TupleCV } from './types';
+import { SerializationError } from '../errors';
 import { parseContractId } from '../utils';
+import {
+  createAddress,
+  createLPString,
+  serializeAddressBytes,
+  serializeLPStringBytes,
+} from '../wire';
+import { ClarityType, clarityTypeToByte } from './constants';
+import { ListCV, StringAsciiCV, StringUtf8CV, TupleCV } from './types';
 
 function bytesWithTypeID(typeId: ClarityType, bytes: Uint8Array): Uint8Array {
   return concatArray([clarityTypeToByte(typeId), bytes]);

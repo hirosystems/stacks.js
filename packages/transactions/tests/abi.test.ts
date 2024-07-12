@@ -1,6 +1,7 @@
 import { utf8ToBytes } from '@stacks/common';
 import { readFileSync } from 'fs';
 import path from 'path';
+import { createContractCallPayload } from '../src';
 import {
   bufferCVFromString,
   contractPrincipalCV,
@@ -25,7 +26,6 @@ import {
   parseToCV,
   validateContractCall,
 } from '../src/contract-abi';
-import { createContractCallPayload } from '../src/payload';
 
 const TEST_ABI: ClarityAbi = JSON.parse(
   readFileSync(path.join(__dirname, './abi/test-abi.json')).toString()
