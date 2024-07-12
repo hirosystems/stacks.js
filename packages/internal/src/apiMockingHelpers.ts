@@ -1,7 +1,7 @@
 import { Configuration, TransactionsApi } from '@stacks/blockchain-api-client';
 import { STACKS_TESTNET } from '@stacks/network';
 import { MockResponseInitFunction } from 'jest-fetch-mock';
-import { StackingClient } from '../src';
+import { StackingClient } from '../../stacking/src';
 import { StacksNodeApi } from '@stacks/api';
 
 // NOTES
@@ -93,7 +93,7 @@ export async function waitForTx(txId: string, apiUrl = 'http://localhost:3999') 
 export async function waitForBlock(burnBlockId: number, client?: StackingClient) {
   if (isMocking()) return;
 
-  const api = new StacksNodeApi({ url: 'http://localhost:3999' });
+  const api = { url: 'http://localhost:3999' };
   client = client ?? new StackingClient({ address: '', network: STACKS_TESTNET, api });
 
   let current: number;
