@@ -10,7 +10,6 @@ import { deriveDefaultUrl } from '@stacks/network';
 import { ClarityValue, NoneCV, deserializeCV, serializeCV } from './clarity';
 import { ClarityAbi } from './contract-abi';
 import { NoEstimateAvailableError } from './errors';
-import { serializePayloadBytes } from './payload';
 import {
   StacksTransaction,
   deriveNetworkFromTx,
@@ -24,6 +23,7 @@ import {
   TxBroadcastResultRejected,
 } from './types';
 import { cvToHex, defaultApiFromNetwork, parseReadOnlyResponse } from './utils';
+import { serializePayloadBytes } from './wire';
 
 export const BROADCAST_PATH = '/v2/transactions';
 export const TRANSFER_FEE_ESTIMATE_PATH = '/v2/fees/transfer';

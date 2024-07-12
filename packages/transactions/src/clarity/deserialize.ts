@@ -1,26 +1,26 @@
+import { bytesToAscii, bytesToUtf8, hexToBytes } from '@stacks/common';
 import {
-  ClarityWireType,
   ClarityValue,
-  intCV,
-  uintCV,
+  ClarityWireType,
   bufferCV,
-  trueCV,
-  falseCV,
-  standardPrincipalCVFromAddress,
   contractPrincipalCVFromAddress,
-  responseOkCV,
-  responseErrorCV,
+  falseCV,
+  intCV,
+  listCV,
   noneCV,
+  responseErrorCV,
+  responseOkCV,
   someCV,
+  standardPrincipalCVFromAddress,
   stringAsciiCV,
   stringUtf8CV,
+  trueCV,
   tupleCV,
-  listCV,
+  uintCV,
 } from '.';
-import { BytesReader as BytesReader } from '../bytesReader';
-import { deserializeAddressBytes, deserializeLPStringBytes } from '../types';
+import { BytesReader } from '../BytesReader';
 import { DeserializationError } from '../errors';
-import { bytesToAscii, bytesToUtf8, hexToBytes } from '@stacks/common';
+import { deserializeAddressBytes, deserializeLPStringBytes } from '../wire';
 
 /**
  * Deserializes clarity value to clarity type

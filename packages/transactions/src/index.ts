@@ -1,3 +1,4 @@
+export { BytesReader } from './BytesReader';
 export * from './authorization';
 export {
   Authorization,
@@ -8,7 +9,22 @@ export {
   isSingleSig,
 } from './authorization';
 export * from './builders';
-export { BytesReader } from './bytesReader';
+export * from './clarity';
+export * from './constants';
+export * from './contract-abi';
+export * from './fetch';
+export * from './keys';
+export * from './postcondition';
+export * from './postcondition-types';
+export * from './signer';
+export * from './structuredDataSignature';
+export * from './transaction';
+export * from './types';
+export * from './utils';
+
+export * from './address';
+export * from './wire';
+
 /**
  * ### `Cl.` Clarity Value Namespace
  * The `Cl` namespace is provided as a convenience to build/parse Clarity Value objects.
@@ -52,27 +68,7 @@ export { BytesReader } from './bytesReader';
  * ```
  */
 export * as Cl from './cl';
-export * from './clarity';
-export * from './common';
-export * from './constants';
-export * from './contract-abi';
-export * from './keys';
-export {
-  CoinbasePayloadWire,
-  CoinbasePayloadToAltRecipient,
-  ContractCallPayload,
-  PoisonPayloadWire,
-  SmartContractPayloadWire,
-  TokenTransferPayloadWire,
-  VersionedSmartContractPayloadWire,
-  isCoinbasePayload,
-  isContractCallPayload,
-  isPoisonPayload,
-  isSmartContractPayload,
-  isTokenTransferPayload,
-  serializePayload,
-  serializePayloadBytes,
-} from './payload';
+
 /**
  * ### `Pc.` Post Condition Builder
  * @beta Interface may be subject to change in future releases.
@@ -90,13 +86,3 @@ export {
  * ```
  */
 export * as Pc from './pc';
-export * from './postcondition';
-export * from './postcondition-types';
-export * from './signature';
-export * from './signer';
-export * from './structuredDataSignature';
-export * from './transaction';
-export * from './types';
-export * from './message-types';
-export * from './utils';
-export * from './fetch';
