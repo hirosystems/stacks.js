@@ -22,6 +22,7 @@ import {
   validateContractCall,
 } from '@stacks/transactions';
 import fetchMock from 'jest-fetch-mock';
+import { V2_POX_REGTEST_POX_3, setApiMocks } from '../../internal/src';
 import { StackingClient } from '../src';
 import { PoXAddressVersion, StackingErrors } from '../src/constants';
 import {
@@ -31,7 +32,6 @@ import {
   signPox4SignatureHash,
   verifyPox4SignatureHash,
 } from '../src/utils';
-import { V2_POX_REGTEST_POX_3, setApiMocks } from './apiMockingHelpers';
 
 const poxInfo = {
   contract_id: 'ST000000000000000000002AMW42H.pox-3',
