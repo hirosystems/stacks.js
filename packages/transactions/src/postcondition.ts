@@ -1,18 +1,11 @@
 import { FungibleConditionCode, NonFungibleConditionCode, PostConditionType } from './constants';
+import { PostCondition } from './postcondition-types';
 import {
-  FungiblePostCondition,
-  NonFungiblePostCondition,
-  PostCondition,
-  StxPostCondition,
-} from './postcondition-types';
-import {
-  FungiblePostConditionWire,
-  NonFungiblePostConditionWire,
   PostConditionWire,
-  STXPostConditionWire,
   StacksWireType,
   parseAssetString,
   parsePrincipalString,
+  serializePostCondition,
 } from './wire';
 
 const FUNGIBLE_COMPARATOR_MAPPING = {
@@ -29,14 +22,7 @@ const NON_FUNGIBLE_COMPARATOR_MAPPING = {
 };
 
 /** @ignore */
-export function postConditionToWire(postcondition: StxPostCondition): STXPostConditionWire;
-export function postConditionToWire(
-  postcondition: FungiblePostCondition
-): FungiblePostConditionWire;
-export function postConditionToWire(
-  postcondition: NonFungiblePostCondition
-): NonFungiblePostConditionWire;
-export function postConditionToWire<T extends PostCondition>(postcondition: T): PostConditionWire {
+export function postConditionToWire(postcondition: PostCondition): PostConditionWire {
   switch (postcondition.type) {
     case 'stx-postcondition':
       return {
@@ -67,4 +53,27 @@ export function postConditionToWire<T extends PostCondition>(postcondition: T): 
     default:
       throw new Error('Invalid post condition type');
   }
+}
+
+/**
+ * Convert a post condition to a hex string
+ * @param postcondition - The post condition object to convert
+ * @returns The hex string representation of the post condition
+ *
+ * @example
+ * ```ts
+ * import { postConditionToHex } from '@stacks/transactions';
+ *
+ * const hex = postConditionToHex({
+ *   type: 'stx-postcondition',
+ *   address: 'ST00000000000000000002Q6VF78',
+ *   condition: 'eq',
+ *   amount: '1000000000000000000',
+ * });
+ * ```
+ * @see {@link StxPostCondition}, {@link FungiblePostCondition}, {@link NonFungiblePostCondition}
+ */
+export function postConditionToHex(postcondition: PostCondition): string {
+  const wire = postConditionToWire(postcondition);
+  return serializePostCondition(wire);
 }
