@@ -19,12 +19,7 @@ import {
   FungibleConditionCode,
   PostConditionMode,
 } from '../src/constants';
-import {
-  createStacksPublicKey,
-  privateKeyToPublic,
-  publicKeyToHex,
-  serializePublicKeyBytes,
-} from '../src/keys';
+import { createStacksPublicKey, privateKeyToPublic, publicKeyToHex } from '../src/keys';
 
 import {
   CoinbasePayloadToAltRecipient,
@@ -34,6 +29,7 @@ import {
   createLPList,
   createStandardPrincipal,
   createTokenTransferPayload,
+  serializePublicKeyBytes,
 } from '../src';
 import { postConditionToWire } from '../src/postcondition';
 import { TransactionSigner } from '../src/signer';
