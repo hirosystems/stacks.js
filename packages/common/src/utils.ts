@@ -321,6 +321,7 @@ export function intToBytes(value: IntegerType, signed: boolean, byteLength: numb
   return bigIntToBytes(intToBigInt(value, signed), byteLength);
 }
 
+//todo: add default param to `signed` (should only be needed in rare use-cases, not typical users) `next`
 export function intToBigInt(value: IntegerType, signed: boolean): bigint {
   let parsedValue = value;
 
