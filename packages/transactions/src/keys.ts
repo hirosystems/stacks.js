@@ -9,11 +9,9 @@ import {
 } from '@noble/secp256k1';
 import {
   bytesToHex,
-  concatArray,
   hexToBigInt,
   hexToBytes,
   intToHex,
-  isInstance,
   parseRecoverableSignatureVrs,
   PRIVATE_KEY_COMPRESSED_LENGTH,
   PrivateKey,
@@ -31,14 +29,7 @@ import {
 } from '@stacks/network';
 import { c32address } from 'c32check';
 import { addressHashModeToVersion } from './address';
-import { BytesReader } from './BytesReader';
-import {
-  AddressHashMode,
-  AddressVersion,
-  COMPRESSED_PUBKEY_LENGTH_BYTES,
-  PubKeyEncoding,
-  UNCOMPRESSED_PUBKEY_LENGTH_BYTES,
-} from './constants';
+import { AddressHashMode, AddressVersion, PubKeyEncoding } from './constants';
 import { hash160, hashP2PKH } from './utils';
 import {
   addressFromVersionHash,
@@ -124,21 +115,37 @@ export function privateKeyToHex(publicKey: PublicKey): string {
 }
 export const publicKeyToHex = privateKeyToHex;
 
+/**
+ * Checks if a private key is compressed
+ *
+ * @example
+ * ```ts
+ * isPrivateKeyCompressed('64879bd015b0fbc19a798040b399b59c3c756cc79eaa9d24d18e66106ad7ee4801'); // true
+ * isPrivateKeyCompressed('64879bd015b0fbc19a798040b399b59c3c756cc79eaa9d24d18e66106ad7ee48'); // false
+ * ```
+ */
+export const isPrivateKeyCompressed = privateKeyIsCompressed;
+
+/** @deprecated Use {@link isPrivateKeyCompressed} instead */
 export function privateKeyIsCompressed(privateKey: PrivateKey): boolean {
   const length = typeof privateKey === 'string' ? privateKey.length / 2 : privateKey.byteLength;
   return length === PRIVATE_KEY_COMPRESSED_LENGTH;
 }
 
+/**
+ * Checks if a public key is compressed
+ *
+ * @example
+ * ```ts
+ * isPublicKeyCompressed('0367b23680c33a3adc784b80952f9bba83169d84c6567f49c9a92f7cc9c9b6f61b'); // true
+ * isPublicKeyCompressed('04171ee91c13f2007bd22c3280987d113e9ffdb2f10631783473899868e67dcdb876f2be26558ea1d4194a96a3707aff085c96a643d43e02c0e9e67c5d47a7dac6'); // false
+ * ```
+ */
+export const isPublicKeyCompressed = publicKeyIsCompressed;
+
+/** @deprecated Use {@link isPublicKeyCompressed} instead */
 export function publicKeyIsCompressed(publicKey: PublicKey): boolean {
   return !publicKeyToHex(publicKey).startsWith('04');
-}
-
-export function serializePublicKey(key: PublicKeyWire): string {
-  return bytesToHex(serializePublicKeyBytes(key));
-}
-/** @ignore */
-export function serializePublicKeyBytes(key: PublicKeyWire): Uint8Array {
-  return key.data.slice();
 }
 
 /**
@@ -153,26 +160,30 @@ export function privateKeyToPublic(privateKey: PrivateKey): string {
   return bytesToHex(nobleGetPublicKey(privateKey.slice(0, 32), isCompressed));
 }
 
+/**
+ * Compresses a public key
+ *
+ * @example
+ * ```ts
+ * compressPublicKey('04171ee91c13f2007bd22c3280987d113e9ffdb2f10631783473899868e67dcdb876f2be26558ea1d4194a96a3707aff085c96a643d43e02c0e9e67c5d47a7dac6');
+ * // '0367b23680c33a3adc784b80952f9bba83169d84c6567f49c9a92f7cc9c9b6f61b'
+ * ```
+ */
 export function compressPublicKey(publicKey: PublicKey): string {
   return Point.fromHex(publicKeyToHex(publicKey)).toHex(true);
 }
 
+/**
+ * Uncompresses a public key
+ *
+ * @example
+ * ```ts
+ * uncompressPublicKey('0367b23680c33a3adc784b80952f9bba83169d84c6567f49c9a92f7cc9c9b6f61b');
+ * // '04171ee91c13f2007bd22c3280987d113e9ffdb2f10631783473899868e67dcdb876f2be26558ea1d4194a96a3707aff085c96a643d43e02c0e9e67c5d47a7dac6'
+ * ```
+ */
 export function uncompressPublicKey(publicKey: PublicKey): string {
   return Point.fromHex(publicKeyToHex(publicKey)).toHex(false);
-}
-
-export function deserializePublicKey(serialized: string): PublicKeyWire {
-  return deserializePublicKeyBytes(hexToBytes(serialized));
-}
-/** @ignore */
-export function deserializePublicKeyBytes(serialized: Uint8Array | BytesReader): PublicKeyWire {
-  const bytesReader = isInstance(serialized, BytesReader)
-    ? serialized
-    : new BytesReader(serialized);
-  const fieldId = bytesReader.readUInt8();
-  const keyLength =
-    fieldId === 4 ? UNCOMPRESSED_PUBKEY_LENGTH_BYTES : COMPRESSED_PUBKEY_LENGTH_BYTES;
-  return createStacksPublicKey(concatArray([fieldId, bytesReader.readBytes(keyLength)]));
 }
 
 // todo: double-check for deduplication, rename!

@@ -2,10 +2,11 @@ import { TransactionVersion } from '@stacks/network';
 import { c32address } from 'c32check';
 import { addressHashModeToVersion } from '../address';
 import { AddressHashMode, AddressVersion, PayloadType } from '../constants';
-import { publicKeyIsCompressed, serializePublicKeyBytes } from '../keys';
+import { publicKeyIsCompressed } from '../keys';
 import { AssetString } from '../types';
 import { hashP2PKH, hashP2SH, hashP2WPKH, hashP2WSH } from '../utils';
 import { createAsset, createContractPrincipal, createStandardPrincipal } from './create';
+import { serializePublicKeyBytes } from './serialization';
 import {
   AddressWire,
   AssetWire,
