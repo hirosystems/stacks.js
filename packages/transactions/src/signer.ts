@@ -1,4 +1,4 @@
-import { PrivateKey } from '@stacks/common';
+import { PrivateKey, PublicKey } from '@stacks/common';
 import {
   SpendingConditionOpts,
   isNonSequentialMultiSig,
@@ -11,6 +11,7 @@ import { SigningError } from './errors';
 import { StacksTransaction } from './transaction';
 import { cloneDeep } from './utils';
 import { PublicKeyWire, StacksWireType } from './wire';
+import { createStacksPublicKey } from './keys';
 
 // todo: get rid of signer and combine with transaction class? could reduce code and complexity by calculating sighash newly each sign and append.
 export class TransactionSigner {
@@ -116,7 +117,14 @@ export class TransactionSigner {
     }
   }
 
-  appendOrigin(publicKey: PublicKeyWire) {
+  appendOrigin(publicKey: PublicKey): void;
+  appendOrigin(publicKey: PublicKeyWire): void;
+  appendOrigin(publicKey: PublicKey | PublicKeyWire): void {
+    const wire =
+      typeof publicKey === 'object' && 'type' in publicKey
+        ? publicKey
+        : createStacksPublicKey(publicKey);
+
     if (this.checkOverlap && this.originDone) {
       throw Error('Cannot append public key to origin after sponsor key');
     }
@@ -128,7 +136,7 @@ export class TransactionSigner {
       throw new Error('"transaction.auth.spendingCondition" is undefined');
     }
 
-    this.transaction.appendPubkey(publicKey);
+    this.transaction.appendPubkey(wire);
   }
 
   signSponsor(privateKey: PrivateKey) {
