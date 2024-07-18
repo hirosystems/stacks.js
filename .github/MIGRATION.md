@@ -4,6 +4,7 @@
   - [Breaking Changes](#breaking-changes)
   - [Stacks Network](#stacks-network)
     - [Impacts](#impacts)
+  - [Fetch Methods](#fetch-methods)
   - [StacksNodeApi](#stacksnodeapi)
   - [StacksNetwork to StacksNodeApi](#stacksnetwork-to-stacksnodeapi)
   - [Clarity Representation](#clarity-representation)
@@ -32,6 +33,7 @@
 ### Breaking Changes
 
 - The `@stacks/network` `new StacksNetwork()` objects were removed. Instead `@stacks/network` now exports the objects `STACKS_MAINNET`, `STACKS_TESNET`, and `STACKS_DEVNET`, which are static (and shouldn't be changed for most use-cases). [Read more...](#stacks-network)
+- Most `fetch` (aka networking) methods were renamed to indicate they send HTTP requests. The new methods are named `fetchXyz` and are compatible with the old `Xyz` interfaces. [Read more...](#fetch-methods)
 - The `ClarityType` enum was replaced by a human-readable version. The previous (wire format compatible) enum is still available as `ClarityWireType`. [Read more...](#clarity-representation)
 - The previous post-conditions types and `create..` methods were replaced with a human-readable representation. [Read more...](#post-conditions)
 - `StacksTransaction.serialize` and other `serializeXyz` methods were changed to return `string` (hex-encoded) instead of `Uint8Array`. Compatible `serializeXzyBytes` methods were added to ease the migration. [Read more...](#serialize-methods)
@@ -61,6 +63,21 @@ import { STACKS_DEVNET } from '@stacks/network';
 
 - @stacks/bns: `BnsContractAddress` was removed, since `.bootAddress` is now a part of the network objects.
 - @stacks/transactions: `AddressVersion` was moved to `@stacks/network`.
+
+### Fetch Methods
+
+The following methods were renamed:
+
+- `estimateFee` → `fetchFeeEstimate`
+- `estimateTransfer` → `fetchFeeEstimateTransfer`
+- `estimateTransaction` → `fetchFeeEstimateTransaction`
+- `getAbi` → `fetchAbi`
+- `getNonce` → `fetchNonce`
+- `getContractMapEntry` → `fetchContractMapEntry`
+- `callReadOnlyFunction` → `fetchCallReadOnlyFunction`
+
+`broadcastTransaction` wasn't renamed to highlight the uniqueness of the method.
+Namely, the node/API it is sent to will "broadcast" the transaction to the mempool.
 
 ### StacksNodeApi
 

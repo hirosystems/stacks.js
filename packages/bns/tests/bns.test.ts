@@ -32,14 +32,14 @@ test('canRegisterName true', async () => {
   const trueFunctionCallResponse = responseOkCV(trueCV());
   const notRandomAddress = 'SPF0324DSC4K505TP6A8C7GAK4R95E38TGNZP7RE';
 
-  const callReadOnlyFunction = jest.fn().mockResolvedValue(trueFunctionCallResponse);
+  const fetchCallReadOnlyFunction = jest.fn().mockResolvedValue(trueFunctionCallResponse);
   const getAddressFromPrivateKey = jest.fn().mockReturnValue(notRandomAddress);
 
   const network = STACKS_TESTNET;
 
   jest.mock('@stacks/transactions', () => ({
     ...jest.requireActual('@stacks/transactions'),
-    callReadOnlyFunction,
+    fetchCallReadOnlyFunction,
     getAddressFromPrivateKey,
   }));
 
@@ -61,8 +61,8 @@ test('canRegisterName true', async () => {
   };
 
   expect(result).toEqual(true);
-  expect(callReadOnlyFunction).toHaveBeenCalledTimes(1);
-  expect(callReadOnlyFunction).toHaveBeenCalledWith(expectedReadOnlyFunctionCallOptions);
+  expect(fetchCallReadOnlyFunction).toHaveBeenCalledTimes(1);
+  expect(fetchCallReadOnlyFunction).toHaveBeenCalledWith(expectedReadOnlyFunctionCallOptions);
 });
 
 test('canRegisterName false', async () => {
@@ -71,14 +71,14 @@ test('canRegisterName false', async () => {
   const falseFunctionCallResponse = responseOkCV(falseCV());
   const notRandomAddress = 'SPF0324DSC4K505TP6A8C7GAK4R95E38TGNZP7RE';
 
-  const callReadOnlyFunction = jest.fn().mockResolvedValue(falseFunctionCallResponse);
+  const fetchCallReadOnlyFunction = jest.fn().mockResolvedValue(falseFunctionCallResponse);
   const getAddressFromPrivateKey = jest.fn().mockReturnValue(notRandomAddress);
 
   const network = STACKS_TESTNET;
 
   jest.mock('@stacks/transactions', () => ({
     ...jest.requireActual('@stacks/transactions'),
-    callReadOnlyFunction,
+    fetchCallReadOnlyFunction,
     getAddressFromPrivateKey,
   }));
 
@@ -100,8 +100,8 @@ test('canRegisterName false', async () => {
   };
 
   expect(result).toEqual(false);
-  expect(callReadOnlyFunction).toHaveBeenCalledTimes(1);
-  expect(callReadOnlyFunction).toHaveBeenCalledWith(expectedReadOnlyFunctionCallOptions);
+  expect(fetchCallReadOnlyFunction).toHaveBeenCalledTimes(1);
+  expect(fetchCallReadOnlyFunction).toHaveBeenCalledWith(expectedReadOnlyFunctionCallOptions);
 });
 
 test('canRegisterName error', async () => {
@@ -110,14 +110,14 @@ test('canRegisterName error', async () => {
   const errorFunctionCallResponse = responseErrorCV(bufferCV(utf8ToBytes('error')));
   const notRandomAddress = 'SPF0324DSC4K505TP6A8C7GAK4R95E38TGNZP7RE';
 
-  const callReadOnlyFunction = jest.fn().mockResolvedValue(errorFunctionCallResponse);
+  const fetchCallReadOnlyFunction = jest.fn().mockResolvedValue(errorFunctionCallResponse);
   const getAddressFromPrivateKey = jest.fn().mockReturnValue(notRandomAddress);
 
   const network = STACKS_TESTNET;
 
   jest.mock('@stacks/transactions', () => ({
     ...jest.requireActual('@stacks/transactions'),
-    callReadOnlyFunction,
+    fetchCallReadOnlyFunction,
     getAddressFromPrivateKey,
   }));
 
@@ -139,8 +139,8 @@ test('canRegisterName error', async () => {
   };
 
   expect(result).toEqual(false);
-  expect(callReadOnlyFunction).toHaveBeenCalledTimes(1);
-  expect(callReadOnlyFunction).toHaveBeenCalledWith(expectedReadOnlyFunctionCallOptions);
+  expect(fetchCallReadOnlyFunction).toHaveBeenCalledTimes(1);
+  expect(fetchCallReadOnlyFunction).toHaveBeenCalledWith(expectedReadOnlyFunctionCallOptions);
 });
 
 test('getNamespacePrice', async () => {
@@ -149,14 +149,14 @@ test('getNamespacePrice', async () => {
   const address = 'SPF0324DSC4K505TP6A8C7GAK4R95E38TGNZP7RE';
 
   const namespacePriceResponse = responseOkCV(uintCV(10));
-  const callReadOnlyFunction = jest.fn().mockResolvedValue(namespacePriceResponse);
+  const fetchCallReadOnlyFunction = jest.fn().mockResolvedValue(namespacePriceResponse);
   const getAddressFromPrivateKey = jest.fn().mockReturnValue(address);
 
   const network = STACKS_TESTNET;
 
   jest.mock('@stacks/transactions', () => ({
     ...jest.requireActual('@stacks/transactions'),
-    callReadOnlyFunction,
+    fetchCallReadOnlyFunction,
     getAddressFromPrivateKey,
   }));
 
@@ -175,8 +175,8 @@ test('getNamespacePrice', async () => {
   };
 
   expect(result.toString()).toEqual('10');
-  expect(callReadOnlyFunction).toHaveBeenCalledTimes(1);
-  expect(callReadOnlyFunction).toHaveBeenCalledWith(expectedReadOnlyFunctionCallOptions);
+  expect(fetchCallReadOnlyFunction).toHaveBeenCalledTimes(1);
+  expect(fetchCallReadOnlyFunction).toHaveBeenCalledWith(expectedReadOnlyFunctionCallOptions);
 });
 
 test('getNamespacePrice error', async () => {
@@ -185,14 +185,14 @@ test('getNamespacePrice error', async () => {
   const address = 'SPF0324DSC4K505TP6A8C7GAK4R95E38TGNZP7RE';
 
   const errorResponse = responseErrorCV(uintCV(1001));
-  const callReadOnlyFunction = jest.fn().mockResolvedValue(errorResponse);
+  const fetchCallReadOnlyFunction = jest.fn().mockResolvedValue(errorResponse);
   const getAddressFromPrivateKey = jest.fn().mockReturnValue(address);
 
   const network = STACKS_TESTNET;
 
   jest.mock('@stacks/transactions', () => ({
     ...jest.requireActual('@stacks/transactions'),
-    callReadOnlyFunction,
+    fetchCallReadOnlyFunction,
     getAddressFromPrivateKey,
   }));
 
@@ -210,8 +210,8 @@ test('getNamespacePrice error', async () => {
   };
 
   await expect(getNamespacePrice({ namespace, network })).rejects.toEqual(new Error('u1001'));
-  expect(callReadOnlyFunction).toHaveBeenCalledTimes(1);
-  expect(callReadOnlyFunction).toHaveBeenCalledWith(expectedReadOnlyFunctionCallOptions);
+  expect(fetchCallReadOnlyFunction).toHaveBeenCalledTimes(1);
+  expect(fetchCallReadOnlyFunction).toHaveBeenCalledWith(expectedReadOnlyFunctionCallOptions);
 });
 
 test('getNamePrice', async () => {
@@ -222,14 +222,14 @@ test('getNamePrice', async () => {
   const address = 'SPF0324DSC4K505TP6A8C7GAK4R95E38TGNZP7RE';
 
   const namePriceResponse = responseOkCV(uintCV(10));
-  const callReadOnlyFunction = jest.fn().mockResolvedValue(namePriceResponse);
+  const fetchCallReadOnlyFunction = jest.fn().mockResolvedValue(namePriceResponse);
   const getAddressFromPrivateKey = jest.fn().mockReturnValue(address);
 
   const network = STACKS_TESTNET;
 
   jest.mock('@stacks/transactions', () => ({
     ...jest.requireActual('@stacks/transactions'),
-    callReadOnlyFunction,
+    fetchCallReadOnlyFunction,
     getAddressFromPrivateKey,
   }));
 
@@ -248,8 +248,8 @@ test('getNamePrice', async () => {
   };
 
   expect(result.toString()).toEqual('10');
-  expect(callReadOnlyFunction).toHaveBeenCalledTimes(1);
-  expect(callReadOnlyFunction).toHaveBeenCalledWith(expectedReadOnlyFunctionCallOptions);
+  expect(fetchCallReadOnlyFunction).toHaveBeenCalledTimes(1);
+  expect(fetchCallReadOnlyFunction).toHaveBeenCalledWith(expectedReadOnlyFunctionCallOptions);
 });
 
 test('getNamePrice error', async () => {
@@ -260,14 +260,14 @@ test('getNamePrice error', async () => {
   const address = 'SPF0324DSC4K505TP6A8C7GAK4R95E38TGNZP7RE';
 
   const namePriceResponse = responseErrorCV(uintCV(2001));
-  const callReadOnlyFunction = jest.fn().mockResolvedValue(namePriceResponse);
+  const fetchCallReadOnlyFunction = jest.fn().mockResolvedValue(namePriceResponse);
   const getAddressFromPrivateKey = jest.fn().mockReturnValue(address);
 
   const network = STACKS_TESTNET;
 
   jest.mock('@stacks/transactions', () => ({
     ...jest.requireActual('@stacks/transactions'),
-    callReadOnlyFunction,
+    fetchCallReadOnlyFunction,
     getAddressFromPrivateKey,
   }));
 
@@ -285,8 +285,8 @@ test('getNamePrice error', async () => {
   };
 
   await expect(getNamePrice({ fullyQualifiedName, network })).rejects.toEqual(new Error('u2001'));
-  expect(callReadOnlyFunction).toHaveBeenCalledTimes(1);
-  expect(callReadOnlyFunction).toHaveBeenCalledWith(expectedReadOnlyFunctionCallOptions);
+  expect(fetchCallReadOnlyFunction).toHaveBeenCalledTimes(1);
+  expect(fetchCallReadOnlyFunction).toHaveBeenCalledWith(expectedReadOnlyFunctionCallOptions);
 });
 
 test('preorderNamespace', async () => {

@@ -11,8 +11,8 @@ import {
   UnsignedContractCallOptions,
   bufferCV,
   bufferCVFromString,
-  callReadOnlyFunction,
   cvToString,
+  fetchCallReadOnlyFunction,
   getAddressFromPrivateKey,
   getCVTypeString,
   hash160,
@@ -85,7 +85,7 @@ export interface BnsReadOnlyOptions {
 async function callReadOnlyBnsFunction(
   options: BnsReadOnlyOptions & ApiParam
 ): Promise<ClarityValue> {
-  return callReadOnlyFunction({
+  return fetchCallReadOnlyFunction({
     contractAddress: options.network.bootAddress,
     contractName: BNS_CONTRACT_NAME,
     functionName: options.functionName,
