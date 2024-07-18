@@ -200,11 +200,11 @@ test('check stacking eligibility true', async () => {
   const network = STACKS_TESTNET;
 
   const functionCallResponse = responseOkCV(trueCV());
-  const callReadOnlyFunction = jest.fn().mockResolvedValue(functionCallResponse);
+  const fetchCallReadOnlyFunction = jest.fn().mockResolvedValue(functionCallResponse);
 
   jest.mock('@stacks/transactions', () => ({
     ...jest.requireActual('@stacks/transactions'),
-    callReadOnlyFunction,
+    fetchCallReadOnlyFunction,
   }));
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const { StackingClient } = require('../src'); // needed for jest.mock module
@@ -241,11 +241,11 @@ test('check stacking eligibility false bad cycles', async () => {
 
   const expectedErrorString = StackingErrors[StackingErrors.ERR_STACKING_INVALID_LOCK_PERIOD];
   const functionCallResponse = responseErrorCV(intCV(2));
-  const callReadOnlyFunction = jest.fn().mockResolvedValue(functionCallResponse);
+  const fetchCallReadOnlyFunction = jest.fn().mockResolvedValue(functionCallResponse);
 
   jest.mock('@stacks/transactions', () => ({
     ...jest.requireActual('@stacks/transactions'),
-    callReadOnlyFunction,
+    fetchCallReadOnlyFunction,
   }));
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const { StackingClient } = require('../src'); // needed for jest.mock module
@@ -786,11 +786,11 @@ test('get stacking status', async () => {
     })
   );
 
-  const callReadOnlyFunction = jest.fn().mockResolvedValue(functionCallResponse);
+  const fetchCallReadOnlyFunction = jest.fn().mockResolvedValue(functionCallResponse);
 
   jest.mock('@stacks/transactions', () => ({
     ...jest.requireActual('@stacks/transactions'),
-    callReadOnlyFunction,
+    fetchCallReadOnlyFunction,
   }));
 
   fetchMock.mockResponse(request => {
@@ -823,8 +823,8 @@ test('get stacking status', async () => {
     api: client.api,
   };
 
-  expect(callReadOnlyFunction).toHaveBeenCalledTimes(1);
-  expect(callReadOnlyFunction).toHaveBeenCalledWith(expectedReadOnlyFunctionCallOptions);
+  expect(fetchCallReadOnlyFunction).toHaveBeenCalledTimes(1);
+  expect(fetchCallReadOnlyFunction).toHaveBeenCalledWith(expectedReadOnlyFunctionCallOptions);
 
   expect(stackingStatus.stacked).toEqual(true);
   expect(stackingStatus.details.first_reward_cycle).toEqual(firstRewardCycle);

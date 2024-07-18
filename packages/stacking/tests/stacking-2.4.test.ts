@@ -1,7 +1,5 @@
 import { StacksNodeApi } from '@stacks/api';
 import { hexToBytes } from '@stacks/common';
-import { STACKS_MAINNET, STACKS_TESTNET } from '@stacks/network';
-import { ContractCallPayload, deserializeTransaction, getNonce } from '@stacks/transactions';
 import {
   MOCK_EMPTY_ACCOUNT,
   MOCK_FULL_ACCOUNT,
@@ -14,6 +12,8 @@ import {
   waitForCycle,
   waitForTx,
 } from '@stacks/internal';
+import { STACKS_MAINNET, STACKS_TESTNET } from '@stacks/network';
+import { ContractCallPayload, deserializeTransaction, fetchNonce } from '@stacks/transactions';
 import { StackingClient, decodeBtcAddress } from '../src';
 import { PoxOperationPeriod } from '../src/constants';
 import { BTC_ADDRESS_CASES } from './utils.test';
@@ -697,7 +697,7 @@ describe('delegated stacking', () => {
     poxInfo = await clientPool.getPoxInfo();
 
     // Manual nonce setting is required for multiple transactions in the same block
-    let noncePool = await getNonce({ address: poolAddress, api });
+    let noncePool = await fetchNonce({ address: poolAddress, api });
 
     // Pool stacks for stacker A
     const stackAPool = await clientPool.delegateStackStx({
@@ -847,7 +847,7 @@ describe('delegated stacking', () => {
     poxInfo = await clientPool.getPoxInfo();
 
     // Manual nonce setting is required for multiple transactions in the same block
-    let noncePool = await getNonce({ address: poolAddress, api });
+    let noncePool = await fetchNonce({ address: poolAddress, api });
 
     // Pool stacks for stacker A (stacks all 3/4)
     const stackAPool = await clientPool.delegateStackStx({

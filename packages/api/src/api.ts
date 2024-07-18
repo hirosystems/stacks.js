@@ -20,9 +20,9 @@ import {
   StacksTransaction,
   TxBroadcastResult,
   broadcastTransaction,
-  estimateTransaction,
-  getAbi,
-  getNonce,
+  fetchAbi,
+  fetchFeeEstimateTransaction,
+  fetchNonce,
 } from '@stacks/transactions';
 import {
   BaseErrorResponse,
@@ -79,7 +79,7 @@ export class StacksNodeApi {
    * @return A promise that resolves to a bigint of the next nonce
    */
   getNonce = async (address: string): Promise<bigint> => {
-    return getNonce({ address, api: this });
+    return fetchNonce({ address, api: this });
   };
 
   /**
@@ -94,7 +94,7 @@ export class StacksNodeApi {
     payload: Hex,
     estimatedLength?: number
   ): Promise<[FeeEstimation, FeeEstimation, FeeEstimation]> => {
-    return estimateTransaction({ payload, estimatedLength, api: this });
+    return fetchFeeEstimateTransaction({ payload, estimatedLength, api: this });
   };
 
   /**
@@ -103,7 +103,7 @@ export class StacksNodeApi {
    */
   getAbi = async (contract: ContractIdString): Promise<ClarityAbi> => {
     const [contractAddress, contractName] = contract.split('.');
-    return getAbi({ contractAddress, contractName, api: this });
+    return fetchAbi({ contractAddress, contractName, api: this });
   };
 
   /** Get stacks node info */

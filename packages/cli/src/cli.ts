@@ -6,17 +6,17 @@ import { bytesToHex, HIRO_MAINNET_URL, HIRO_TESTNET_URL } from '@stacks/common';
 import {
   ACCOUNT_PATH,
   broadcastTransaction,
-  callReadOnlyFunction,
   Cl,
   ClarityAbi,
   ClarityValue,
   ContractCallPayload,
   cvToJSON,
   cvToString,
-  estimateTransaction,
   estimateTransactionByteLength,
-  estimateTransfer,
-  getAbi,
+  fetchAbi,
+  fetchCallReadOnlyFunction,
+  fetchFeeEstimateTransaction,
+  fetchFeeEstimateTransfer,
   getAddressFromPrivateKey,
   makeContractCall,
   makeContractDeploy,
@@ -717,7 +717,7 @@ async function sendTokens(network: CLINetworkAdapter, args: string[]): Promise<s
   const tx: StacksTransaction = await makeSTXTokenTransfer(options);
 
   if (estimateOnly) {
-    return estimateTransfer({ transaction: tx, api }).then(cost => {
+    return fetchFeeEstimateTransfer({ transaction: tx, api }).then(cost => {
       return cost.toString(10);
     });
   }
@@ -775,7 +775,7 @@ async function contractDeploy(network: CLINetworkAdapter, args: string[]): Promi
   const tx = await makeContractDeploy(options);
 
   if (estimateOnly) {
-    return estimateTransaction({
+    return fetchFeeEstimateTransaction({
       payload: serializePayload(tx.payload),
       estimatedLength: estimateTransactionByteLength(tx),
     }).then(costs => costs[1].fee.toString(10));
@@ -825,7 +825,7 @@ async function contractFunctionCall(network: CLINetworkAdapter, args: string[]):
   let abiArgs: ClarityFunctionArg[];
   let functionArgs: ClarityValue[] = [];
 
-  return getAbi({ contractAddress, contractName, api })
+  return fetchAbi({ contractAddress, contractName, api })
     .then(responseAbi => {
       abi = responseAbi;
       const filtered = abi.functions.filter(fn => fn.name === functionName);
@@ -861,7 +861,7 @@ async function contractFunctionCall(network: CLINetworkAdapter, args: string[]):
       }
 
       if (estimateOnly) {
-        return estimateTransaction({
+        return fetchFeeEstimateTransaction({
           payload: serializePayload(tx.payload),
           estimatedLength: estimateTransactionByteLength(tx),
         }).then(costs => costs[1].fee.toString(10));
@@ -911,7 +911,7 @@ async function readOnlyContractFunctionCall(
   let abiArgs: ClarityFunctionArg[];
   let functionArgs: ClarityValue[] = [];
 
-  return getAbi({ contractAddress, contractName, api })
+  return fetchAbi({ contractAddress, contractName, api })
     .then(responseAbi => {
       abi = responseAbi;
       const filtered = abi.functions.filter(fn => fn.name === functionName);
@@ -935,7 +935,7 @@ async function readOnlyContractFunctionCall(
         network: api.network,
       };
 
-      return callReadOnlyFunction(options);
+      return fetchCallReadOnlyFunction(options);
     })
     .then(returnValue => {
       return cvToString(returnValue);

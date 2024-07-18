@@ -34,8 +34,8 @@ import {
   UIntCV,
   broadcastTransaction,
   bufferCV,
-  callReadOnlyFunction,
   cvToString,
+  fetchCallReadOnlyFunction,
   getFee,
   makeContractCall,
   noneCV,
@@ -422,7 +422,7 @@ export class StackingClient {
   /** Get PoX address from reward set by index (if it exists) */
   async getRewardSet(options: RewardSetOptions): Promise<RewardSetInfo | undefined> {
     const [contractAddress, contractName] = this.parseContractId(options?.contractId);
-    const result = await callReadOnlyFunction({
+    const result = await fetchCallReadOnlyFunction({
       api: this.api,
       senderAddress: this.address,
       contractAddress,
@@ -533,7 +533,7 @@ export class StackingClient {
         const address = poxAddressToTuple(poxAddress);
         const [contractAddress, contractName] = this.parseContractId(poxInfo.contract_id);
 
-        return callReadOnlyFunction({
+        return fetchCallReadOnlyFunction({
           api: this.api,
           contractName,
           contractAddress,
@@ -1380,7 +1380,7 @@ export class StackingClient {
     const account = await this.getAccountStatus();
     const functionName = 'get-stacker-info';
 
-    return callReadOnlyFunction({
+    return fetchCallReadOnlyFunction({
       contractAddress,
       contractName,
       functionName,
@@ -1429,7 +1429,7 @@ export class StackingClient {
     const [contractAddress, contractName] = this.parseContractId(poxInfo.contract_id);
     const functionName = 'get-delegation-info';
 
-    return callReadOnlyFunction({
+    return fetchCallReadOnlyFunction({
       contractAddress,
       contractName,
       functionName,
@@ -1509,7 +1509,7 @@ export class StackingClient {
       uintCV(authId),
     ];
 
-    return callReadOnlyFunction({
+    return fetchCallReadOnlyFunction({
       contractAddress,
       contractName,
       functionName,
