@@ -226,6 +226,23 @@ export function signMessageHashRsv({
 }
 
 /**
+ * Convert a private key to a single-sig address.
+ * @returns A Stacks address string (encoded with c32check)
+ * @example
+ * ```
+ * const address = privateKeyToAddress("73a2f291df5a8ce3ceb668a25ac7af45639513af7596d710ddf59f64f484fd2801");
+ * // SP10J81WVGVB3M4PHQN4Q4G0R8586TBJH948RESDR
+ * ```
+ */
+export function privateKeyToAddress(
+  privateKey: PrivateKey,
+  network?: StacksNetworkName | StacksNetwork
+): string {
+  const publicKey = privateKeyToPublic(privateKey);
+  return publicKeyToAddressSingleSig(publicKey, network);
+}
+
+/**
  * Convert a public key to an address.
  * @returns A Stacks address string (encoded with c32check)
  * @example Public key to address

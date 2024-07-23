@@ -25,6 +25,8 @@ export * from './utils';
 export * from './address';
 export * from './wire';
 
+export * from './namespaces';
+
 /**
  * ### `Cl.` Clarity Value Namespace
  * The `Cl` namespace is provided as a convenience to build/parse Clarity Value objects.
