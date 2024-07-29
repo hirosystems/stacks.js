@@ -63,6 +63,7 @@ import {
   LengthPrefixedStringWire,
   MemoStringWire,
   MessageSignatureWire,
+  OriginPrincipalWire,
   PayloadInput,
   PayloadWire,
   PostConditionPrincipalWire,
@@ -173,7 +174,12 @@ export function serializePrincipal(principal: PostConditionPrincipalWire): strin
 export function serializePrincipalBytes(principal: PostConditionPrincipalWire): Uint8Array {
   const bytesArray = [];
   bytesArray.push(principal.prefix);
-  bytesArray.push(serializeAddressBytes(principal.address));
+  if (
+    principal.prefix === PostConditionPrincipalId.Standard ||
+    principal.prefix === PostConditionPrincipalId.Contract
+  ) {
+    bytesArray.push(serializeAddressBytes(principal.address));
+  }
   if (principal.prefix === PostConditionPrincipalId.Contract) {
     bytesArray.push(serializeLPStringBytes(principal.contractName));
   }
@@ -193,6 +199,9 @@ export function deserializePrincipalBytes(
   const prefix = bytesReader.readUInt8Enum(PostConditionPrincipalId, n => {
     throw new DeserializationError(`Unexpected Principal payload type: ${n}`);
   });
+  if (prefix === PostConditionPrincipalId.Origin) {
+    return { type: StacksWireType.Principal, prefix } as OriginPrincipalWire;
+  }
   const address = deserializeAddressBytes(bytesReader);
   if (prefix === PostConditionPrincipalId.Standard) {
     return { type: StacksWireType.Principal, prefix, address } as StandardPrincipalWire;
