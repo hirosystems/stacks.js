@@ -405,4 +405,16 @@ describe('pc -- post condition builder', () => {
       });
     });
   });
+
+  describe('origin principal', () => {
+    test('origin string representation', () => {
+      const pc = Pc.origin().willSendEq(12_345).ustx();
+      expect(pc).toEqual({
+        type: 'stx-postcondition',
+        address: 'origin',
+        condition: 'eq',
+        amount: '12345',
+      });
+    });
+  });
 });
