@@ -1,4 +1,9 @@
-import { FungibleConditionCode, NonFungibleConditionCode, PostConditionType } from './constants';
+import {
+  FungibleConditionCode,
+  NonFungibleConditionCode,
+  PostConditionPrincipalId,
+  PostConditionType,
+} from './constants';
 import { PostCondition } from './postcondition-types';
 import {
   PostConditionWire,
@@ -28,7 +33,10 @@ export function postConditionToWire(postcondition: PostCondition): PostCondition
       return {
         type: StacksWireType.PostCondition,
         conditionType: PostConditionType.STX,
-        principal: parsePrincipalString(postcondition.address),
+        principal:
+          postcondition.address === 'origin'
+            ? { type: StacksWireType.Principal, prefix: PostConditionPrincipalId.Origin }
+            : parsePrincipalString(postcondition.address),
         conditionCode: FUNGIBLE_COMPARATOR_MAPPING[postcondition.condition],
         amount: BigInt(postcondition.amount),
       };
@@ -36,7 +44,10 @@ export function postConditionToWire(postcondition: PostCondition): PostCondition
       return {
         type: StacksWireType.PostCondition,
         conditionType: PostConditionType.Fungible,
-        principal: parsePrincipalString(postcondition.address),
+        principal:
+          postcondition.address === 'origin'
+            ? { type: StacksWireType.Principal, prefix: PostConditionPrincipalId.Origin }
+            : parsePrincipalString(postcondition.address),
         conditionCode: FUNGIBLE_COMPARATOR_MAPPING[postcondition.condition],
         amount: BigInt(postcondition.amount),
         asset: parseAssetString(postcondition.asset),
@@ -45,7 +56,10 @@ export function postConditionToWire(postcondition: PostCondition): PostCondition
       return {
         type: StacksWireType.PostCondition,
         conditionType: PostConditionType.NonFungible,
-        principal: parsePrincipalString(postcondition.address),
+        principal:
+          postcondition.address === 'origin'
+            ? { type: StacksWireType.Principal, prefix: PostConditionPrincipalId.Origin }
+            : parsePrincipalString(postcondition.address),
         conditionCode: NON_FUNGIBLE_COMPARATOR_MAPPING[postcondition.condition],
         asset: parseAssetString(postcondition.asset),
         assetName: postcondition.assetId,

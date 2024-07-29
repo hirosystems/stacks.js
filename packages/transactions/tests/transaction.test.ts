@@ -115,6 +115,7 @@ test('STX token transfer transaction serialization and deserialization', () => {
   expect(deserialized.postConditions.values.length).toBe(1);
 
   const deserializedPostCondition = deserialized.postConditions.values[0] as STXPostConditionWire;
+  if (!('address' in deserializedPostCondition.principal)) throw TypeError;
   expect(deserializedPostCondition.principal.address).toStrictEqual(recipient.address);
   expect(deserializedPostCondition.conditionCode).toBe(FungibleConditionCode.GreaterEqual);
   expect(deserializedPostCondition.amount.toString()).toBe('0');
@@ -190,6 +191,7 @@ test('STX token transfer transaction fee setting', () => {
 
   const deserializedPostCondition = postSetFeeDeserialized.postConditions
     .values[0] as STXPostConditionWire;
+  if (!('address' in deserializedPostCondition.principal)) throw TypeError;
   expect(deserializedPostCondition.principal.address).toStrictEqual(recipient.address);
   expect(deserializedPostCondition.conditionCode).toBe(FungibleConditionCode.GreaterEqual);
   expect(deserializedPostCondition.amount.toString()).toBe('0');
