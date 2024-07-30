@@ -68,6 +68,7 @@ export enum PayloadType {
 export enum ClarityVersion {
   Clarity1 = 1,
   Clarity2 = 2,
+  Clarity3 = 3,
 }
 
 /**
