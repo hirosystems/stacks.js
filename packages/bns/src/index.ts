@@ -1,19 +1,17 @@
-import { ApiParam, IntegerType, utf8ToBytes } from '@stacks/common';
+import { ApiParam, IntegerType, intToBigInt, utf8ToBytes } from '@stacks/common';
 import { StacksNetwork } from '@stacks/network';
 import {
   ClarityType,
   ClarityValue,
-  FungibleConditionCode,
-  NonFungibleConditionCode,
-  PostConditionWire,
+  NonFungiblePostCondition,
+  PostCondition,
   ResponseErrorCV,
   StacksTransaction,
+  StxPostCondition,
   UnsignedContractCallOptions,
   bufferCV,
   bufferCVFromString,
   callReadOnlyFunction,
-  createNonFungiblePostCondition,
-  createSTXPostCondition,
   cvToString,
   getAddressFromPrivateKey,
   getCVTypeString,
@@ -21,7 +19,6 @@ import {
   makeRandomPrivKey,
   makeUnsignedContractCall,
   noneCV,
-  parseAssetString,
   publicKeyToAddress,
   someCV,
   standardPrincipalCV,
@@ -60,7 +57,7 @@ export interface BnsContractCallOptions {
   functionArgs: ClarityValue[];
   publicKey: string;
   network: StacksNetwork;
-  postConditions?: PostConditionWire[];
+  postConditions?: PostCondition[];
 }
 
 async function makeBnsContractCall(options: BnsContractCallOptions): Promise<StacksTransaction> {
@@ -186,7 +183,7 @@ export async function getNamespacePrice({
   }).then((responseCV: ClarityValue) => {
     if (responseCV.type === ClarityType.ResponseOk) {
       if (responseCV.value.type === ClarityType.Int || responseCV.value.type === ClarityType.UInt) {
-        return responseCV.value.value;
+        return BigInt(responseCV.value.value);
       } else {
         throw new Error('Response did not contain a number');
       }
@@ -241,7 +238,7 @@ export async function getNamePrice({
   }).then((responseCV: ClarityValue) => {
     if (responseCV.type === ClarityType.ResponseOk) {
       if (responseCV.value.type === ClarityType.Int || responseCV.value.type === ClarityType.UInt) {
-        return responseCV.value.value;
+        return BigInt(responseCV.value.value);
       } else {
         throw new Error('Response did not contain a number');
       }
@@ -290,11 +287,12 @@ export async function buildPreorderNamespaceTx({
   const saltedNamespaceBytes = utf8ToBytes(`${namespace}${salt}`);
   const hashedSaltedNamespace = hash160(saltedNamespaceBytes);
 
-  const burnSTXPostCondition = createSTXPostCondition(
-    publicKeyToAddress(network.addressVersion.singleSig, publicKey),
-    FungibleConditionCode.Equal,
-    stxToBurn
-  );
+  const burnSTXPostCondition: StxPostCondition = {
+    type: 'stx-postcondition',
+    address: publicKeyToAddress(network.addressVersion.singleSig, publicKey),
+    condition: 'eq',
+    amount: intToBigInt(stxToBurn, true),
+  };
 
   return makeBnsContractCall({
     functionName: bnsFunctionName,
@@ -513,11 +511,12 @@ export async function buildPreorderNameTx({
   const saltedNamesBytes = utf8ToBytes(`${fullyQualifiedName}${salt}`);
   const hashedSaltedName = hash160(saltedNamesBytes);
 
-  const burnSTXPostCondition = createSTXPostCondition(
-    publicKeyToAddress(network.addressVersion.singleSig, publicKey),
-    FungibleConditionCode.Equal,
-    stxToBurn
-  );
+  const burnSTXPostCondition: StxPostCondition = {
+    type: 'stx-postcondition',
+    address: publicKeyToAddress(network.addressVersion.singleSig, publicKey),
+    condition: 'eq',
+    amount: intToBigInt(stxToBurn, true),
+  };
 
   return makeBnsContractCall({
     functionName: bnsFunctionName,
@@ -682,24 +681,26 @@ export async function buildTransferNameTx({
     standardPrincipalCV(newOwnerAddress),
     zonefile ? someCV(bufferCV(getZonefileHash(zonefile))) : noneCV(),
   ];
-  const postConditionSender = createNonFungiblePostCondition(
-    publicKeyToAddress(network.addressVersion.singleSig, publicKey),
-    NonFungibleConditionCode.Sends,
-    parseAssetString(`${network.bootAddress}.bns::names`),
-    tupleCV({
+  const postConditionSender: NonFungiblePostCondition = {
+    type: 'nft-postcondition',
+    address: publicKeyToAddress(network.addressVersion.singleSig, publicKey),
+    condition: 'sent',
+    asset: `${network.bootAddress}.bns::names`,
+    assetId: tupleCV({
       name: bufferCVFromString(name),
       namespace: bufferCVFromString(namespace),
-    })
-  );
-  const postConditionReceiver = createNonFungiblePostCondition(
-    newOwnerAddress,
-    NonFungibleConditionCode.DoesNotSend,
-    parseAssetString(`${network.bootAddress}.bns::names`),
-    tupleCV({
+    }),
+  };
+  const postConditionReceiver: NonFungiblePostCondition = {
+    type: 'nft-postcondition',
+    address: newOwnerAddress,
+    condition: 'not-sent',
+    asset: `${network.bootAddress}.bns::names`,
+    assetId: tupleCV({
       name: bufferCVFromString(name),
       namespace: bufferCVFromString(namespace),
-    })
-  );
+    }),
+  };
 
   return makeBnsContractCall({
     functionName: bnsFunctionName,
@@ -802,11 +803,12 @@ export async function buildRenewNameTx({
     newOwnerAddress ? someCV(standardPrincipalCV(newOwnerAddress)) : noneCV(),
     zonefile ? someCV(bufferCV(getZonefileHash(zonefile))) : noneCV(),
   ];
-  const burnSTXPostCondition = createSTXPostCondition(
-    publicKeyToAddress(network.addressVersion.singleSig, publicKey),
-    FungibleConditionCode.Equal,
-    stxToBurn
-  );
+  const burnSTXPostCondition: StxPostCondition = {
+    type: 'stx-postcondition',
+    address: publicKeyToAddress(network.addressVersion.singleSig, publicKey),
+    condition: 'eq',
+    amount: intToBigInt(stxToBurn, true),
+  };
 
   return makeBnsContractCall({
     functionName: bnsFunctionName,

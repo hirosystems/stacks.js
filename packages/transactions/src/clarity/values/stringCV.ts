@@ -21,7 +21,7 @@ import { StringAsciiCV, StringUtf8CV } from '../types';
  * {@link https://github.com/hirosystems/stacks.js/blob/main/packages/transactions/tests/clarity.test.ts | clarity test cases for more examples}
  */
 export const stringAsciiCV = (data: string): StringAsciiCV => {
-  return { type: ClarityType.StringASCII, data };
+  return { type: ClarityType.StringASCII, value: data };
 };
 
 /**
@@ -44,7 +44,7 @@ export const stringAsciiCV = (data: string): StringAsciiCV => {
  * {@link https://github.com/hirosystems/stacks.js/blob/main/packages/transactions/tests/clarity.test.ts | clarity test cases for more examples}
  */
 export const stringUtf8CV = (data: string): StringUtf8CV => {
-  return { type: ClarityType.StringUTF8, data };
+  return { type: ClarityType.StringUTF8, value: data };
 };
 
 /**

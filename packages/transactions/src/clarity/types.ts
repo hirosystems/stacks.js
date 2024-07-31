@@ -1,5 +1,4 @@
-import { AddressWire } from '../common';
-import { LengthPrefixedStringWire } from '../postcondition-types';
+import { ContractIdString } from '../types';
 import { ClarityValue } from './clarityValue';
 import { ClarityType } from './constants';
 
@@ -15,22 +14,22 @@ export interface FalseCV {
 
 export interface BufferCV {
   readonly type: ClarityType.Buffer;
-  readonly buffer: Uint8Array;
+  readonly value: string;
 }
 
 export interface IntCV {
   readonly type: ClarityType.Int;
-  readonly value: bigint;
+  readonly value: bigint | number | string;
 }
 
 export interface UIntCV {
   readonly type: ClarityType.UInt;
-  readonly value: bigint;
+  readonly value: bigint | number | string;
 }
 
 export interface ListCV<T extends ClarityValue = ClarityValue> {
   type: ClarityType.List;
-  list: T[];
+  value: T[];
 }
 
 export type OptionalCV<T extends ClarityValue = ClarityValue> = NoneCV | SomeCV<T>;
@@ -48,13 +47,12 @@ export type PrincipalCV = StandardPrincipalCV | ContractPrincipalCV;
 
 export interface StandardPrincipalCV {
   readonly type: ClarityType.PrincipalStandard;
-  readonly address: AddressWire;
+  readonly value: string;
 }
 
 export interface ContractPrincipalCV {
   readonly type: ClarityType.PrincipalContract;
-  readonly address: AddressWire;
-  readonly contractName: LengthPrefixedStringWire;
+  readonly value: ContractIdString;
 }
 
 export type ResponseCV = ResponseErrorCV | ResponseOkCV;
@@ -71,17 +69,17 @@ export interface ResponseOkCV<T extends ClarityValue = ClarityValue> {
 
 export interface StringAsciiCV {
   readonly type: ClarityType.StringASCII;
-  readonly data: string;
+  readonly value: string;
 }
 
 export interface StringUtf8CV {
   readonly type: ClarityType.StringUTF8;
-  readonly data: string;
+  readonly value: string;
 }
 
 export type TupleData<T extends ClarityValue = ClarityValue> = { [key: string]: T };
 
 export interface TupleCV<T extends TupleData = TupleData> {
   type: ClarityType.Tuple;
-  data: T;
+  value: T;
 }

@@ -21,5 +21,5 @@ import { ListCV } from '../types';
  * {@link https://github.com/hirosystems/stacks.js/blob/main/packages/transactions/tests/clarity.test.ts | clarity test cases for more examples}
  */
 export function listCV<T extends ClarityValue = ClarityValue>(values: T[]): ListCV<T> {
-  return { type: ClarityType.List, list: values };
+  return { type: ClarityType.List, value: values };
 }

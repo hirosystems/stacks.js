@@ -1,5 +1,3 @@
-import { IntegerType, intToBigInt } from '@stacks/common';
-import { ClarityValue } from './clarity';
 import {
   FungibleConditionCode,
   NonFungibleConditionCode,
@@ -7,76 +5,68 @@ import {
   StacksWireType,
 } from './constants';
 import {
-  AssetString,
-  AssetWire,
+  FungiblePostCondition,
   FungiblePostConditionWire,
+  NonFungiblePostCondition,
   NonFungiblePostConditionWire,
-  PostConditionPrincipalWire,
+  PostCondition,
+  PostConditionWire,
   STXPostConditionWire,
+  StxPostCondition,
   parseAssetString,
   parsePrincipalString,
 } from './postcondition-types';
 
-export function createSTXPostCondition(
-  principal: string | PostConditionPrincipalWire,
-  conditionCode: FungibleConditionCode,
-  amount: IntegerType
-): STXPostConditionWire {
-  if (typeof principal === 'string') {
-    principal = parsePrincipalString(principal);
-  }
+const FUNGIBLE_COMPARATOR_MAPPING = {
+  eq: FungibleConditionCode.Equal,
+  gt: FungibleConditionCode.Greater,
+  lt: FungibleConditionCode.Less,
+  gte: FungibleConditionCode.GreaterEqual,
+  lte: FungibleConditionCode.LessEqual,
+};
 
-  return {
-    type: StacksWireType.PostCondition,
-    conditionType: PostConditionType.STX,
-    principal,
-    conditionCode,
-    amount: intToBigInt(amount, false),
-  };
-}
+const NON_FUNGIBLE_COMPARATOR_MAPPING = {
+  sent: NonFungibleConditionCode.Sends,
+  'not-sent': NonFungibleConditionCode.DoesNotSend,
+};
 
-export function createFungiblePostCondition(
-  principal: string | PostConditionPrincipalWire,
-  conditionCode: FungibleConditionCode,
-  amount: IntegerType,
-  asset: AssetString | AssetWire
-): FungiblePostConditionWire {
-  if (typeof principal === 'string') {
-    principal = parsePrincipalString(principal);
+/** @ignore */
+export function postConditionToWire(postcondition: StxPostCondition): STXPostConditionWire;
+export function postConditionToWire(
+  postcondition: FungiblePostCondition
+): FungiblePostConditionWire;
+export function postConditionToWire(
+  postcondition: NonFungiblePostCondition
+): NonFungiblePostConditionWire;
+export function postConditionToWire<T extends PostCondition>(postcondition: T): PostConditionWire {
+  switch (postcondition.type) {
+    case 'stx-postcondition':
+      return {
+        type: StacksWireType.PostCondition,
+        conditionType: PostConditionType.STX,
+        principal: parsePrincipalString(postcondition.address),
+        conditionCode: FUNGIBLE_COMPARATOR_MAPPING[postcondition.condition],
+        amount: BigInt(postcondition.amount),
+      };
+    case 'ft-postcondition':
+      return {
+        type: StacksWireType.PostCondition,
+        conditionType: PostConditionType.Fungible,
+        principal: parsePrincipalString(postcondition.address),
+        conditionCode: FUNGIBLE_COMPARATOR_MAPPING[postcondition.condition],
+        amount: BigInt(postcondition.amount),
+        asset: parseAssetString(postcondition.asset),
+      };
+    case 'nft-postcondition':
+      return {
+        type: StacksWireType.PostCondition,
+        conditionType: PostConditionType.NonFungible,
+        principal: parsePrincipalString(postcondition.address),
+        conditionCode: NON_FUNGIBLE_COMPARATOR_MAPPING[postcondition.condition],
+        asset: parseAssetString(postcondition.asset),
+        assetName: postcondition.assetId,
+      };
+    default:
+      throw new Error('Invalid post condition type');
   }
-  if (typeof asset === 'string') {
-    asset = parseAssetString(asset);
-  }
-
-  return {
-    type: StacksWireType.PostCondition,
-    conditionType: PostConditionType.Fungible,
-    principal,
-    conditionCode,
-    amount: intToBigInt(amount, false),
-    asset: asset,
-  };
-}
-
-export function createNonFungiblePostCondition(
-  principal: string | PostConditionPrincipalWire,
-  conditionCode: NonFungibleConditionCode,
-  asset: AssetString | AssetWire,
-  assetName: ClarityValue
-): NonFungiblePostConditionWire {
-  if (typeof principal === 'string') {
-    principal = parsePrincipalString(principal);
-  }
-  if (typeof asset === 'string') {
-    asset = parseAssetString(asset);
-  }
-
-  return {
-    type: StacksWireType.PostCondition,
-    conditionType: PostConditionType.NonFungible,
-    principal,
-    conditionCode,
-    asset: asset,
-    assetName,
-  };
 }

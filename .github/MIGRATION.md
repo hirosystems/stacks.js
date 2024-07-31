@@ -7,6 +7,7 @@
   - [StacksNodeApi](#stacksnodeapi)
   - [StacksNetwork to StacksNodeApi](#stacksnetwork-to-stacksnodeapi)
   - [Clarity Representation](#clarity-representation)
+  - [Post-conditions](#post-conditions)
   - [`serialize` methods](#serialize-methods)
   - [Asset Helper Methods](#asset-helper-methods)
   - [CLI](#cli)
@@ -31,7 +32,8 @@
 ### Breaking Changes
 
 - The `@stacks/network` `new StacksNetwork()` objects were removed. Instead `@stacks/network` now exports the objects `STACKS_MAINNET`, `STACKS_TESNET`, and `STACKS_DEVNET`, which are static (and shouldn't be changed for most use-cases). [Read more...](#stacks-network)
-- The `ClarityType` enum was replaced by a readable version. The previous (wire format compatible) enum is still available as `ClarityWireType`. [Read more...](#clarity-representation)
+- The `ClarityType` enum was replaced by a human-readable version. The previous (wire format compatible) enum is still available as `ClarityWireType`. [Read more...](#clarity-representation)
+- The previous post-conditions types and `create..` methods were replaced with a human-readable representation. [Read more...](#post-conditions)
 - `StacksTransaction.serialize` and other `serializeXyz` methods were changed to return `string` (hex-encoded) instead of `Uint8Array`. Compatible `serializeXzyBytes` methods were added to ease the migration. [Read more...](#serialize-methods)
 - The `AssetInfo` type was renamed to `Asset` for accuracy. The `Asset` helper methods were also renamed to to remove the `Info` suffix. [Read more...](#asset-helper-methods)
 - Remove legacy CLI methods. [Read more...](#cli)
@@ -158,6 +160,41 @@ For `bigint` values, the type of the `value` property is a now `string`, for bet
 -  list: [ ... ],
 +  value: [ ... ],
 }
+```
+
+### Post-conditions
+
+The old `PostCondition` type was renamed to `PostConditionWire`.
+A new human-readable `PostCondition` type was introduced in its place.
+
+Below is an example of the new `PostCondition` types.
+
+```ts
+// STX post-condition
+const stxPostCondition: StxPostCondition = {
+  type: 'stx-postcondition',
+  address: 'SP2JXKMSH007NPYAQHKJPQMAQYAD90NQGTVJVQ02B',
+  condition: 'gte',
+  amount: '100',
+};
+
+// Fungible token post-condition
+const ftPostCondition: FungiblePostCondition = {
+  type: 'ft-postcondition',
+  address: 'SP2JXKMSH007NPYAQHKJPQMAQYAD90NQGTVJVQ02B',
+  condition: 'eq',
+  amount: '100',
+  asset: 'SP3D6PV2ACBPEKYJTCMH7HEN02KP87QSP8KTEH335.my-ft-token::my-token',
+};
+
+// Non-fungible token post-condition
+const nftPostCondition: NonFungiblePostCondition = {
+  type: 'nft-postcondition',
+  address: 'SP2JXKMSH007NPYAQHKJPQMAQYAD90NQGTVJVQ02B',
+  condition: 'sent',
+  asset: 'SP3D6PV2ACBPEKYJTCMH7HEN02KP87QSP8KTEH335.my-nft::my-asset',
+  assetId: Cl.uint(602),
+};
 ```
 
 ### `serialize` methods

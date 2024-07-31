@@ -10,23 +10,60 @@ import { c32addressDecode } from 'c32check';
 import { AddressWire } from './common';
 import { ClarityValue } from './clarity';
 import { exceedsMaxLengthBytes } from './utils';
+import { AssetString } from './types';
 
-/**
- * A contract identifier string given as `<address>.<contract-name>`
- */
-export type ContractIdString = `${string}.${string}`;
+// Wallet SIP Post Condition Types
 
-/**
- * An asset name string given as `<contract-id>::<token-name>` aka `<contract-address>.<contract-name>::<token-name>`
- */
-export type AssetString = `${ContractIdString}::${string}`;
+export type FungibleComparator = 'eq' | 'gt' | 'gte' | 'lt' | 'lte';
 
+export interface StxPostCondition {
+  type: 'stx-postcondition';
+  /** Address sending the STX (principal `address` or `contract-id`) */
+  address: string;
+  /** Comparator to check the amount to be sent (`eq`, `gt`, `gte`, `lt`, `lte`) */
+  condition: `${FungibleComparator}`;
+  /** `BigInt` compatible amount to be checked in post-condition */
+  amount: string | bigint | number;
+}
+
+export type FungiblePostCondition = {
+  type: 'ft-postcondition';
+  /** Address sending the asset (principal `address` or `contract-id`) */
+  address: string;
+  /** Comparator to check the amount to be sent (`eq`, `gt`, `gte`, `lt`, `lte`) */
+  condition: `${FungibleComparator}`;
+  /** Asset to be sent (given as a string `<contract-id>::<token-name>`) */
+  asset: AssetString;
+  /** `BigInt` compatible amount to be checked in post-condition */
+  amount: string | bigint | number;
+};
+
+export type NonFungibleComparator = 'sent' | 'not-sent';
+
+export type NonFungiblePostCondition = {
+  type: 'nft-postcondition';
+  /** Address sending the asset (principal `address` or `contract-id`) */
+  address: string;
+  /** Comparator to check the amount to be sent (`sent`, `not-sent`) */
+  condition: `${NonFungibleComparator}`;
+  /** Asset to be sent (given as a string `<contract-id>::<token-name>`) */
+  asset: AssetString;
+  /** Clarity value that identifies the token instance */
+  assetId: ClarityValue;
+};
+
+export type PostCondition = StxPostCondition | FungiblePostCondition | NonFungiblePostCondition;
+
+// Wire Format Post Condition Types
+
+/** @ignore */
 export interface StandardPrincipalWire {
   readonly type: StacksWireType.Principal;
   readonly prefix: PostConditionPrincipalId.Standard;
   readonly address: AddressWire;
 }
 
+/** @ignore */
 export interface ContractPrincipalWire {
   readonly type: StacksWireType.Principal;
   readonly prefix: PostConditionPrincipalId.Contract;
@@ -34,6 +71,7 @@ export interface ContractPrincipalWire {
   readonly contractName: LengthPrefixedStringWire;
 }
 
+/** @ignore */
 export interface LengthPrefixedStringWire {
   readonly type: StacksWireType.LengthPrefixedString;
   readonly content: string;
@@ -41,6 +79,7 @@ export interface LengthPrefixedStringWire {
   readonly maxLengthBytes: number;
 }
 
+/** @ignore */
 export interface AssetWire {
   readonly type: StacksWireType.Asset;
   readonly address: AddressWire;
@@ -48,6 +87,7 @@ export interface AssetWire {
   readonly assetName: LengthPrefixedStringWire;
 }
 
+/** @ignore */
 export interface STXPostConditionWire {
   readonly type: StacksWireType.PostCondition;
   readonly conditionType: PostConditionType.STX;
@@ -56,6 +96,7 @@ export interface STXPostConditionWire {
   readonly amount: bigint;
 }
 
+/** @ignore */
 export interface FungiblePostConditionWire {
   readonly type: StacksWireType.PostCondition;
   readonly conditionType: PostConditionType.Fungible;
@@ -65,6 +106,7 @@ export interface FungiblePostConditionWire {
   readonly asset: AssetWire;
 }
 
+/** @ignore */
 export interface NonFungiblePostConditionWire {
   readonly type: StacksWireType.PostCondition;
   readonly conditionType: PostConditionType.NonFungible;
@@ -76,13 +118,16 @@ export interface NonFungiblePostConditionWire {
   readonly assetName: ClarityValue;
 }
 
+/** @ignore */
 export type PostConditionWire =
   | STXPostConditionWire
   | FungiblePostConditionWire
   | NonFungiblePostConditionWire;
 
+/** @ignore */
 export type PostConditionPrincipalWire = StandardPrincipalWire | ContractPrincipalWire;
 
+/** @ignore */
 export function parseAssetString(id: AssetString): AssetWire {
   const [assetAddress, assetContractName, assetTokenName] = id.split(/\.|::/);
   const asset = createAsset(assetAddress, assetContractName, assetTokenName);
@@ -99,6 +144,7 @@ export function createLPString(
   lengthPrefixBytes: number,
   maxLengthBytes: number
 ): LengthPrefixedStringWire;
+/** @ignore */
 export function createLPString(
   content: string,
   lengthPrefixBytes?: number,
@@ -117,6 +163,7 @@ export function createLPString(
   };
 }
 
+/** @ignore */
 export function createAsset(
   addressString: string,
   contractName: string,
@@ -130,6 +177,7 @@ export function createAsset(
   };
 }
 
+/** @ignore */
 export function createAddress(c32AddressString: string): AddressWire {
   const addressData = c32addressDecode(c32AddressString);
   return {
@@ -144,6 +192,7 @@ export function createAddress(c32AddressString: string): AddressWire {
  * @param principalString - String in the format `{address}.{contractName}`
  * @example "SP13N5TE1FBBGRZD1FCM49QDGN32WAXM2E5F8WT2G.example-contract"
  * @example "SP13N5TE1FBBGRZD1FCM49QDGN32WAXM2E5F8WT2G"
+ * @ignore
  */
 export function parsePrincipalString(
   principalString: string
@@ -156,6 +205,7 @@ export function parsePrincipalString(
   }
 }
 
+/** @ignore */
 export function createContractPrincipal(
   addressString: string,
   contractName: string
@@ -170,6 +220,7 @@ export function createContractPrincipal(
   };
 }
 
+/** @ignore */
 export function createStandardPrincipal(addressString: string): StandardPrincipalWire {
   const addr = createAddress(addressString);
   return {

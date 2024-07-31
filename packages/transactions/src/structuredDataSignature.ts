@@ -18,12 +18,12 @@ const hash256BytesLength = 32;
 function isDomain(value: ClarityValue): boolean {
   if (value.type !== ClarityType.Tuple) return false;
   // Check that the tuple has at least 'name', 'version' and 'chain-id'
-  if (!['name', 'version', 'chain-id'].every(key => key in value.data)) return false;
+  if (!['name', 'version', 'chain-id'].every(key => key in value.value)) return false;
   // Check each key is of the right type
-  if (!['name', 'version'].every(key => value.data[key].type === ClarityType.StringASCII))
+  if (!['name', 'version'].every(key => value.value[key].type === ClarityType.StringASCII))
     return false;
 
-  if (value.data['chain-id'].type !== ClarityType.UInt) return false;
+  if (value.value['chain-id'].type !== ClarityType.UInt) return false;
   return true;
 }
 
@@ -86,6 +86,7 @@ export function signStructuredData({
     messageHash: structuredDataHash,
     privateKey,
   });
+  // todo: `next` reduce wrapped signature type
   return {
     data,
     type: StacksWireType.StructuredDataSignature,
