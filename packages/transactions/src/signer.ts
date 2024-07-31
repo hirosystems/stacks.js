@@ -8,7 +8,7 @@ import {
 } from './authorization';
 import { AddressHashMode, AuthType, PubKeyEncoding, StacksWireType } from './constants';
 import { SigningError } from './errors';
-import { StacksPublicKey } from './keys';
+import { PublicKeyWire } from './keys';
 import { StacksTransaction } from './transaction';
 import { cloneDeep } from './utils';
 
@@ -116,7 +116,7 @@ export class TransactionSigner {
     }
   }
 
-  appendOrigin(publicKey: StacksPublicKey) {
+  appendOrigin(publicKey: PublicKeyWire) {
     if (this.checkOverlap && this.originDone) {
       throw Error('Cannot append public key to origin after sponsor key');
     }

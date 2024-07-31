@@ -58,13 +58,13 @@ export * from './constants';
 export * from './contract-abi';
 export * from './keys';
 export {
-  CoinbasePayload,
+  CoinbasePayloadWire,
   CoinbasePayloadToAltRecipient,
   ContractCallPayload,
-  PoisonPayload,
-  SmartContractPayload,
-  TokenTransferPayload,
-  VersionedSmartContractPayload,
+  PoisonPayloadWire,
+  SmartContractPayloadWire,
+  TokenTransferPayloadWire,
+  VersionedSmartContractPayloadWire,
   isCoinbasePayload,
   isContractCallPayload,
   isPoisonPayload,

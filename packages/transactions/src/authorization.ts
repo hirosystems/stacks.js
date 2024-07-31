@@ -19,7 +19,7 @@ import {
 } from './constants';
 
 import { BytesReader } from './bytesReader';
-import { MessageSignature } from './common';
+import { MessageSignatureWire } from './common';
 import { DeserializationError, SigningError, VerificationError } from './errors';
 import {
   createStacksPublicKey,
@@ -27,12 +27,12 @@ import {
   publicKeyFromSignatureVrs,
   publicKeyIsCompressed,
   signWithKey,
-  StacksPublicKey,
+  PublicKeyWire,
 } from './keys';
 import {
   deserializeMessageSignatureBytes,
   serializeMessageSignatureBytes,
-  TransactionAuthField,
+  TransactionAuthFieldWire,
 } from './signature';
 import {
   addressFromPublicKeys,
@@ -43,7 +43,7 @@ import {
 } from './types';
 import { cloneDeep, leftPadHex, txidFromData } from './utils';
 
-export function emptyMessageSignature(): MessageSignature {
+export function emptyMessageSignature(): MessageSignatureWire {
   return {
     type: StacksWireType.MessageSignature,
     data: bytesToHex(new Uint8Array(RECOVERABLE_ECDSA_SIG_LENGTH_BYTES)),
@@ -56,7 +56,7 @@ export interface SingleSigSpendingCondition {
   nonce: bigint;
   fee: bigint;
   keyEncoding: PubKeyEncoding;
-  signature: MessageSignature;
+  signature: MessageSignatureWire;
 }
 
 export interface SingleSigSpendingConditionOpts
@@ -70,7 +70,7 @@ export interface MultiSigSpendingCondition {
   signer: string;
   nonce: bigint;
   fee: bigint;
-  fields: TransactionAuthField[];
+  fields: TransactionAuthFieldWire[];
   signaturesRequired: number;
 }
 
@@ -280,7 +280,7 @@ export function deserializeMultiSigSpendingCondition(
   const fee = BigInt('0x' + bytesToHex(bytesReader.readBytes(8)));
 
   const fields = deserializeLPListBytes(bytesReader, StacksWireType.TransactionAuthField)
-    .values as TransactionAuthField[];
+    .values as TransactionAuthFieldWire[];
 
   let haveUncompressed = false;
   let numSigs = 0;
@@ -371,8 +371,8 @@ export function makeSigHashPreSign(
 
 function makeSigHashPostSign(
   curSigHash: string,
-  pubKey: StacksPublicKey,
-  signature: MessageSignature
+  pubKey: PublicKeyWire,
+  signature: MessageSignatureWire
 ): string {
   // new hash combines the previous hash and all the new data this signature will add.  This
   // includes:
@@ -401,7 +401,7 @@ export function nextSignature(
   nonce: IntegerType,
   privateKey: PrivateKey
 ): {
-  nextSig: MessageSignature;
+  nextSig: MessageSignatureWire;
   nextSigHash: string;
 } {
   const sigHashPreSign = makeSigHashPreSign(curSigHash, authType, fee, nonce);
@@ -422,7 +422,7 @@ export function nextVerification(
   fee: IntegerType,
   nonce: IntegerType,
   pubKeyEncoding: PubKeyEncoding,
-  signature: MessageSignature
+  signature: MessageSignatureWire
 ) {
   const sigHashPreSign = makeSigHashPreSign(initialSigHash, authType, fee, nonce);
 
@@ -498,8 +498,7 @@ function verifyMultiSig(
   initialSigHash: string,
   authType: AuthType
 ): string {
-  const publicKeys: StacksPublicKey[] = [];
-
+  const publicKeys: PublicKeyWire[] = [];
   let curSigHash = initialSigHash;
   let haveUncompressed = false;
   let numSigs = 0;
