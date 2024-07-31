@@ -44,7 +44,7 @@ import {
   anchorModeFrom,
 } from './constants';
 import { SerializationError, SigningError } from './errors';
-import { privateKeyIsCompressed, publicKeyIsCompressed } from './keys';
+import { createStacksPublicKey, privateKeyIsCompressed, publicKeyIsCompressed } from './keys';
 import { cloneDeep, txidFromData } from './utils';
 import {
   LengthPrefixedList,
@@ -58,6 +58,7 @@ import {
   deserializePayloadBytes,
   serializeLPListBytes,
 } from './wire';
+import { PublicKey } from '@stacks/common';
 
 export class StacksTransaction {
   version: TransactionVersion;
@@ -136,14 +137,33 @@ export class StacksTransaction {
     }
   }
 
-  appendPubkey(publicKey: PublicKeyWire) {
+  /**
+   * Append a public key to the spending-condition of the transaction
+   *
+   * @param publicKey - the public key to append
+   * @example
+   * ```ts
+   * import { makeSTXTokenTransfer } from '@stacks/transactions';
+   *
+   * const transaction = makeSTXTokenTransfer({ ... });
+   * transaction.appendPubkey('034f355bdcb7cc0af728..24c0e585c5e89ac788521e0');
+   * ```
+   */
+  appendPubkey(publicKey: PublicKey): void;
+  appendPubkey(publicKey: PublicKeyWire): void;
+  appendPubkey(publicKey: PublicKey | PublicKeyWire): void {
+    const wire =
+      typeof publicKey === 'object' && 'type' in publicKey
+        ? publicKey
+        : createStacksPublicKey(publicKey);
+
     const cond = this.auth.spendingCondition;
     if (cond && !isSingleSig(cond)) {
-      const compressed = publicKeyIsCompressed(publicKey.data);
+      const compressed = publicKeyIsCompressed(wire.data);
       cond.fields.push(
         createTransactionAuthField(
           compressed ? PubKeyEncoding.Compressed : PubKeyEncoding.Uncompressed,
-          publicKey
+          wire
         )
       );
     } else {
