@@ -63,7 +63,7 @@ test('Length prefixed list serialization and deserialization', () => {
 test('C32 address hash mode - testnet P2PKH', () => {
   const address = addressToString(
     addressFromHashMode(
-      AddressHashMode.SerializeP2PKH,
+      AddressHashMode.P2PKH,
       STACKS_TESTNET,
       'c22d24fec5d06e539c551e732a5ba88997761ba0'
     )
@@ -75,7 +75,7 @@ test('C32 address hash mode - testnet P2PKH', () => {
 test('C32 address hash mode - mainnet P2PKH', () => {
   const address = addressToString(
     addressFromHashMode(
-      AddressHashMode.SerializeP2PKH,
+      AddressHashMode.P2PKH,
       STACKS_MAINNET,
       'b976e9f5d6181e40bed7fa589142dfcf2fb28d8e'
     )
@@ -87,7 +87,7 @@ test('C32 address hash mode - mainnet P2PKH', () => {
 test('C32 address hash mode - mainnet P2SH', () => {
   const address = addressToString(
     addressFromHashMode(
-      AddressHashMode.SerializeP2SH,
+      AddressHashMode.P2SH,
       STACKS_MAINNET,
       '55011fc38a7e12f7d00496aef7a1c4b6dfeba81b'
     )
@@ -99,7 +99,7 @@ test('C32 address hash mode - mainnet P2SH', () => {
 test('C32 address hash mode - testnet P2SH', () => {
   const address = addressToString(
     addressFromHashMode(
-      AddressHashMode.SerializeP2SH,
+      AddressHashMode.P2SH,
       STACKS_TESTNET,
       '55011fc38a7e12f7d00496aef7a1c4b6dfeba81b'
     )
@@ -111,7 +111,7 @@ test('C32 address hash mode - testnet P2SH', () => {
 test('C32 address hash mode - mainnet P2WSH', () => {
   const address = addressToString(
     addressFromHashMode(
-      AddressHashMode.SerializeP2WSH,
+      AddressHashMode.P2WSH,
       STACKS_MAINNET,
       '55011fc38a7e12f7d00496aef7a1c4b6dfeba81b'
     )
@@ -123,7 +123,7 @@ test('C32 address hash mode - mainnet P2WSH', () => {
 test('C32 address hash mode - testnet P2WSH', () => {
   const address = addressToString(
     addressFromHashMode(
-      AddressHashMode.SerializeP2WSH,
+      AddressHashMode.P2WSH,
       STACKS_TESTNET,
       '55011fc38a7e12f7d00496aef7a1c4b6dfeba81b'
     )
@@ -199,11 +199,11 @@ test('Public keys to address hash', () => {
     let hashMode;
 
     if (!fixture.segwit) {
-      if (fixture.numRequired === 1) hashMode = AddressHashMode.SerializeP2PKH;
-      else hashMode = AddressHashMode.SerializeP2SH;
+      if (fixture.numRequired === 1) hashMode = AddressHashMode.P2PKH;
+      else hashMode = AddressHashMode.P2SH;
     } else {
-      if (fixture.numRequired === 1) hashMode = AddressHashMode.SerializeP2WPKH;
-      else hashMode = AddressHashMode.SerializeP2WSH;
+      if (fixture.numRequired === 1) hashMode = AddressHashMode.P2WPKH;
+      else hashMode = AddressHashMode.P2WSH;
     }
 
     const address = addressFromPublicKeys(
