@@ -194,6 +194,12 @@ export interface TenureChangePayloadWire {
 }
 
 /** @ignore */
+export interface OriginPrincipalWire {
+  readonly type: StacksWireType.Principal;
+  readonly prefix: PostConditionPrincipalId.Origin;
+}
+
+/** @ignore */
 export interface StandardPrincipalWire {
   readonly type: StacksWireType.Principal;
   readonly prefix: PostConditionPrincipalId.Standard;
@@ -262,7 +268,10 @@ export type PostConditionWire =
   | NonFungiblePostConditionWire;
 
 /** @ignore */
-export type PostConditionPrincipalWire = StandardPrincipalWire | ContractPrincipalWire;
+export type PostConditionPrincipalWire =
+  | OriginPrincipalWire
+  | StandardPrincipalWire
+  | ContractPrincipalWire;
 
 export interface TransactionAuthFieldWire {
   type: StacksWireType.TransactionAuthField;

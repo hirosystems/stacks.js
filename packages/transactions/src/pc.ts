@@ -45,6 +45,21 @@ export function principal(principal: AddressString | ContractIdString) {
 }
 
 /**
+ * ### `Pc.` Post Condition Builder
+ * @beta Interface may be subject to change in future releases.
+ * @returns A partial post condition builder, which can be chained into a final post condition.
+ * @example
+ * ```
+ * import { Pc } from '@stacks/transactions';
+ * Pc.origin().willSendEq(10000).ustx();
+ * Pc.origin().willSendGte(2000).ft();
+ * ```
+ */
+export function origin() {
+  return new PartialPcWithPrincipal('origin');
+}
+
+/**
  * Not meant to be used directly. Start from `Pc.principal(…)` instead.
  */
 class PartialPcWithPrincipal {
@@ -202,7 +217,7 @@ class PartialPcFtWithCode {
  */
 class PartialPcNftWithCode {
   constructor(
-    private principal: string,
+    private address: string,
     private code: NonFungibleComparator
   ) {}
 
@@ -234,7 +249,7 @@ class PartialPcNftWithCode {
 
     return {
       type: 'nft-postcondition',
-      address: this.principal,
+      address: this.address,
       condition: this.code,
       asset: `${contractAddress}.${contractName}::${tokenName}`,
       assetId,
