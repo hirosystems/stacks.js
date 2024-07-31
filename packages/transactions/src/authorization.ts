@@ -99,7 +99,7 @@ export function createSpendingCondition(
 ) {
   if ('publicKey' in options) {
     return createSingleSigSpendingCondition(
-      AddressHashMode.SerializeP2PKH,
+      AddressHashMode.P2PKH,
       options.publicKey,
       options.nonce,
       options.fee
@@ -107,7 +107,7 @@ export function createSpendingCondition(
   }
   // multi-sig
   return createMultiSigSpendingCondition(
-    AddressHashMode.SerializeP2SH,
+    AddressHashMode.P2SH,
     options.numSignatures,
     options.publicKeys,
     options.nonce,
@@ -178,14 +178,14 @@ export function isSingleSig(
 
 /** @internal */
 export function isSequentialMultiSig(hashMode: AddressHashMode): boolean {
-  return hashMode === AddressHashMode.SerializeP2SH || hashMode === AddressHashMode.SerializeP2WSH;
+  return hashMode === AddressHashMode.P2SH || hashMode === AddressHashMode.P2WSH;
 }
 
 /** @internal */
 export function isNonSequentialMultiSig(hashMode: AddressHashMode): boolean {
   return (
-    hashMode === AddressHashMode.SerializeP2SHNonSequential ||
-    hashMode === AddressHashMode.SerializeP2WSHNonSequential
+    hashMode === AddressHashMode.P2SHNonSequential ||
+    hashMode === AddressHashMode.P2WSHNonSequential
   );
 }
 
@@ -252,7 +252,7 @@ export function deserializeSingleSigSpendingCondition(
   const keyEncoding = bytesReader.readUInt8Enum(PubKeyEncoding, n => {
     throw new DeserializationError(`Could not parse ${n} as PubKeyEncoding`);
   });
-  if (hashMode === AddressHashMode.SerializeP2WPKH && keyEncoding != PubKeyEncoding.Compressed) {
+  if (hashMode === AddressHashMode.P2WPKH && keyEncoding != PubKeyEncoding.Compressed) {
     throw new DeserializationError(
       'Failed to parse singlesig spending condition: incomaptible hash mode and key encoding'
     );
@@ -304,8 +304,7 @@ export function deserializeMultiSigSpendingCondition(
 
   if (
     haveUncompressed &&
-    (hashMode === AddressHashMode.SerializeP2WSH ||
-      hashMode === AddressHashMode.SerializeP2WSHNonSequential)
+    (hashMode === AddressHashMode.P2WSH || hashMode === AddressHashMode.P2WSHNonSequential)
   ) {
     throw new VerificationError('Uncompressed keys are not allowed in this hash mode');
   }
@@ -332,7 +331,7 @@ export function deserializeSpendingCondition(bytesReader: BytesReader): Spending
     throw new DeserializationError(`Could not parse ${n} as AddressHashMode`);
   });
 
-  if (hashMode === AddressHashMode.SerializeP2PKH || hashMode === AddressHashMode.SerializeP2WPKH) {
+  if (hashMode === AddressHashMode.P2PKH || hashMode === AddressHashMode.P2WPKH) {
     return deserializeSingleSigSpendingCondition(hashMode, bytesReader);
   } else {
     return deserializeMultiSigSpendingCondition(hashMode, bytesReader);
@@ -436,12 +435,7 @@ export function nextVerification(
 }
 
 function newInitialSigHash(): SpendingCondition {
-  const spendingCondition = createSingleSigSpendingCondition(
-    AddressHashMode.SerializeP2PKH,
-    '',
-    0,
-    0
-  );
+  const spendingCondition = createSingleSigSpendingCondition(AddressHashMode.P2PKH, '', 0, 0);
   spendingCondition.signer = createEmptyAddress().hash160;
   spendingCondition.keyEncoding = PubKeyEncoding.Compressed;
   spendingCondition.signature = emptyMessageSignature();
@@ -537,8 +531,8 @@ function verifyMultiSig(
 
   if (
     haveUncompressed &&
-    (condition.hashMode === AddressHashMode.SerializeP2WSH ||
-      condition.hashMode === AddressHashMode.SerializeP2WSHNonSequential)
+    (condition.hashMode === AddressHashMode.P2WSH ||
+      condition.hashMode === AddressHashMode.P2WSHNonSequential)
   )
     throw new VerificationError('Uncompressed keys are not allowed in this hash mode');
 
@@ -585,7 +579,7 @@ export function createSponsoredAuth(
     spendingCondition,
     sponsorSpendingCondition: sponsorSpendingCondition
       ? sponsorSpendingCondition
-      : createSingleSigSpendingCondition(AddressHashMode.SerializeP2PKH, '0'.repeat(66), 0, 0),
+      : createSingleSigSpendingCondition(AddressHashMode.P2PKH, '0'.repeat(66), 0, 0),
   };
 }
 

@@ -17,7 +17,7 @@ export function addressHashModeToVersion(
 ): AddressVersion {
   network = networkFrom(network ?? STACKS_MAINNET);
   switch (hashMode) {
-    case AddressHashMode.SerializeP2PKH:
+    case AddressHashMode.P2PKH:
       switch (network.transactionVersion) {
         case TransactionVersion.Mainnet:
           return AddressVersion.MainnetSingleSig;
@@ -28,11 +28,11 @@ export function addressHashModeToVersion(
             `Unexpected transactionVersion ${network.transactionVersion} for hashMode ${hashMode}`
           );
       }
-    case AddressHashMode.SerializeP2SH:
-    case AddressHashMode.SerializeP2SHNonSequential:
-    case AddressHashMode.SerializeP2WPKH:
-    case AddressHashMode.SerializeP2WSH:
-    case AddressHashMode.SerializeP2WSHNonSequential:
+    case AddressHashMode.P2SH:
+    case AddressHashMode.P2SHNonSequential:
+    case AddressHashMode.P2WPKH:
+    case AddressHashMode.P2WSH:
+    case AddressHashMode.P2WSHNonSequential:
       switch (network.transactionVersion) {
         case TransactionVersion.Mainnet:
           return AddressVersion.MainnetMultiSig;

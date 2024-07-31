@@ -15,6 +15,7 @@
   - [Triplesec](#triplesec)
   - [Advanced: WireType](#advanced-wiretype)
   - [Advanced: Signed BigInt](#advanced-signed-bigint)
+  - [Advanced: Refactorings](#advanced-refactorings)
 - [Stacks.js (\<=4.x.x) → (5.x.x)](#stacksjs-4xx--5xx)
   - [Breaking Changes](#breaking-changes-1)
     - [Buffer to Uint8Array](#buffer-to-uint8array)
@@ -43,6 +44,7 @@
 - Disable legacy `triplesec` mnemonic encryption support. [Read more...](#triplesec)
 - **Advanced:** Rename `MessageType` and related concepts to `WireType`. [Read more...](#advanced-wiretype)
 - **Advanced:** Removes two's complement compatibilty from `intToBigInt` parser method. [Read more...](#advanced-signed-bigint)
+- **Advanced:** Refactorings and less visible updates. [Read more...](#advanced-refactorings)
 
 ### Stacks Network
 
@@ -305,6 +307,10 @@ More types were renamed to indicate use for serialization to _wire-format_:
 
 The `intToBigInt` method no longer supports two's complement signed integers and removed the `signed` boolean parameter.
 This likely was a misunderstood and unused feature.
+
+### Advanced: Refactorings
+
+- `AddressHashMode`: The `Serialize` prefixes were removed for brevity.
 
 ## Stacks.js (&lt;=4.x.x) → (5.x.x)
 

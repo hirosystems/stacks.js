@@ -345,7 +345,7 @@ test('Make Multi-Sig STX token transfer', async () => {
   const memo = 'test memo';
 
   const authType = AuthType.Standard;
-  const addressHashMode = AddressHashMode.SerializeP2SH;
+  const addressHashMode = AddressHashMode.P2SH;
 
   const privKeys = [
     '6d430bb91222408e7706c9001cfaeb91b08c2be6d5ac95779ab52c6b431950e001',
@@ -421,7 +421,7 @@ test('Should deserialize partially signed multi-Sig STX token transfer', async (
   const memo = 'test memo';
 
   const authType = AuthType.Standard;
-  const addressHashMode = AddressHashMode.SerializeP2SH;
+  const addressHashMode = AddressHashMode.P2SH;
 
   const privKeys = [
     '6d430bb91222408e7706c9001cfaeb91b08c2be6d5ac95779ab52c6b431950e001',
@@ -540,7 +540,7 @@ test('Make Multi-Sig STX token transfer with two transaction signers', async () 
   const memo = 'test memo';
 
   const authType = AuthType.Standard;
-  const addressHashMode = AddressHashMode.SerializeP2SH;
+  const addressHashMode = AddressHashMode.P2SH;
 
   const privKeys = [
     '6d430bb91222408e7706c9001cfaeb91b08c2be6d5ac95779ab52c6b431950e001',
@@ -755,7 +755,7 @@ test('Make smart contract deploy unsigned', async () => {
   const nonce = 0;
 
   const authType = AuthType.Standard;
-  const addressHashMode = AddressHashMode.SerializeP2PKH;
+  const addressHashMode = AddressHashMode.P2PKH;
   const transaction = await makeUnsignedContractDeploy({
     contractName,
     codeBody,
@@ -815,7 +815,7 @@ test('Make smart contract deploy signed', async () => {
   const nonce = 0;
 
   const authType = AuthType.Standard;
-  const addressHashMode = AddressHashMode.SerializeP2PKH;
+  const addressHashMode = AddressHashMode.P2PKH;
   const transaction = await makeContractDeploy({
     contractName,
     codeBody,
@@ -1385,7 +1385,7 @@ test('Make sponsored STX token transfer', async () => {
   const sponsorNonce = 55;
 
   const authType = AuthType.Sponsored;
-  const addressHashMode = AddressHashMode.SerializeP2PKH;
+  const addressHashMode = AddressHashMode.P2PKH;
 
   const transaction = await makeSTXTokenTransfer({
     recipient,
@@ -1509,7 +1509,7 @@ test('Make sponsored STX token transfer with sponsor fee estimate', async () => 
   const sponsorNonce = 55;
 
   const authType = AuthType.Sponsored;
-  const addressHashMode = AddressHashMode.SerializeP2PKH;
+  const addressHashMode = AddressHashMode.P2PKH;
 
   const transaction = await makeSTXTokenTransfer({
     recipient,
@@ -1648,7 +1648,7 @@ test('Make sponsored contract deploy with sponsor fee estimate', async () => {
   const sponsorFee = 4000;
 
   const authType = AuthType.Sponsored;
-  const addressHashMode = AddressHashMode.SerializeP2PKH;
+  const addressHashMode = AddressHashMode.P2PKH;
 
   const transaction = await makeContractDeploy({
     contractName,
@@ -1705,7 +1705,7 @@ test('Make sponsored contract call with sponsor nonce fetch', async () => {
   const sponsorNonce = 55;
 
   const authType = AuthType.Sponsored;
-  const addressHashMode = AddressHashMode.SerializeP2PKH;
+  const addressHashMode = AddressHashMode.P2PKH;
 
   const transaction = await makeContractCall({
     contractAddress,
@@ -2592,14 +2592,14 @@ describe('multi-sig', () => {
 
     const address = addressFromPublicKeys(
       0 as any, // only used for hash, so version doesn't matter
-      AddressHashMode.SerializeP2SHNonSequential,
+      AddressHashMode.P2SHNonSequential,
       2,
       publicKeys.map(createStacksPublicKey)
     );
 
     const addressSorted = addressFromPublicKeys(
       0 as any, // only used for hash, so version doesn't matter
-      AddressHashMode.SerializeP2SHNonSequential,
+      AddressHashMode.P2SHNonSequential,
       2,
       publicKeys.slice().sort().map(createStacksPublicKey)
     );

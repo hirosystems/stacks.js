@@ -368,7 +368,7 @@ export function deriveNetworkFromTx(transaction: StacksTransaction) {
 export function estimateTransactionByteLength(transaction: StacksTransaction): number {
   const hashMode = transaction.auth.spendingCondition.hashMode;
   // List of Multi-sig transaction hash modes
-  const multiSigHashModes = [AddressHashMode.SerializeP2SH, AddressHashMode.SerializeP2WSH];
+  const multiSigHashModes = [AddressHashMode.P2SH, AddressHashMode.P2WSH];
 
   // Check if its a Multi-sig transaction
   if (multiSigHashModes.includes(hashMode)) {

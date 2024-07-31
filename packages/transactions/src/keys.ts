@@ -67,7 +67,7 @@ export function getAddressFromPublicKey(
 ): string {
   network = networkFrom(network ?? STACKS_MAINNET);
   publicKey = typeof publicKey === 'string' ? hexToBytes(publicKey) : publicKey;
-  const addrVer = addressHashModeToVersion(AddressHashMode.SerializeP2PKH, network);
+  const addrVer = addressHashModeToVersion(AddressHashMode.P2PKH, network);
   const addr = addressFromVersionHash(addrVer, hashP2PKH(publicKey));
   const addrString = addressToString(addr);
   return addrString;
