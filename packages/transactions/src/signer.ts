@@ -93,8 +93,8 @@ export class TransactionSigner {
 
     const spendingCondition = this.transaction.auth.spendingCondition;
     if (
-      spendingCondition.hashMode === AddressHashMode.SerializeP2SH ||
-      spendingCondition.hashMode === AddressHashMode.SerializeP2WSH
+      spendingCondition.hashMode === AddressHashMode.P2SH ||
+      spendingCondition.hashMode === AddressHashMode.P2WSH
     ) {
       // only check oversign on legacy multisig modes
       if (

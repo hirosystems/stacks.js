@@ -31,16 +31,16 @@ export function addressFromPublicKeys(
     throw Error('Invalid number of public keys');
   }
 
-  if (hashMode === AddressHashMode.SerializeP2PKH || hashMode === AddressHashMode.SerializeP2WPKH) {
+  if (hashMode === AddressHashMode.P2PKH || hashMode === AddressHashMode.P2WPKH) {
     if (publicKeys.length !== 1 || numSigs !== 1) {
       throw Error('Invalid number of public keys or signatures');
     }
   }
 
   if (
-    hashMode === AddressHashMode.SerializeP2WPKH ||
-    hashMode === AddressHashMode.SerializeP2WSH ||
-    hashMode === AddressHashMode.SerializeP2WSHNonSequential
+    hashMode === AddressHashMode.P2WPKH ||
+    hashMode === AddressHashMode.P2WSH ||
+    hashMode === AddressHashMode.P2WSHNonSequential
   ) {
     if (!publicKeys.map(p => p.data).every(publicKeyIsCompressed)) {
       throw Error('Public keys must be compressed for segwit');
@@ -48,18 +48,18 @@ export function addressFromPublicKeys(
   }
 
   switch (hashMode) {
-    case AddressHashMode.SerializeP2PKH:
+    case AddressHashMode.P2PKH:
       return addressFromVersionHash(version, hashP2PKH(publicKeys[0].data));
-    case AddressHashMode.SerializeP2WPKH:
+    case AddressHashMode.P2WPKH:
       return addressFromVersionHash(version, hashP2WPKH(publicKeys[0].data));
-    case AddressHashMode.SerializeP2SH:
-    case AddressHashMode.SerializeP2SHNonSequential:
+    case AddressHashMode.P2SH:
+    case AddressHashMode.P2SHNonSequential:
       return addressFromVersionHash(
         version,
         hashP2SH(numSigs, publicKeys.map(serializePublicKeyBytes))
       );
-    case AddressHashMode.SerializeP2WSH:
-    case AddressHashMode.SerializeP2WSHNonSequential:
+    case AddressHashMode.P2WSH:
+    case AddressHashMode.P2WSHNonSequential:
       return addressFromVersionHash(
         version,
         hashP2WSH(numSigs, publicKeys.map(serializePublicKeyBytes))

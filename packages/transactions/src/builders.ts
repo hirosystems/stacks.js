@@ -138,7 +138,7 @@ export async function makeUnsignedSTXTokenTransfer(
   if ('publicKey' in options) {
     // single-sig
     spendingCondition = createSingleSigSpendingCondition(
-      AddressHashMode.SerializeP2PKH,
+      AddressHashMode.P2PKH,
       options.publicKey,
       options.nonce,
       options.fee
@@ -146,8 +146,8 @@ export async function makeUnsignedSTXTokenTransfer(
   } else {
     // multi-sig
     const hashMode = options.useNonSequentialMultiSig
-      ? AddressHashMode.SerializeP2SHNonSequential
-      : AddressHashMode.SerializeP2SH;
+      ? AddressHashMode.P2SHNonSequential
+      : AddressHashMode.P2SH;
 
     const publicKeys = options.address
       ? sortPublicKeysForAddress(
@@ -344,7 +344,7 @@ export async function makeUnsignedContractDeploy(
   if ('publicKey' in options) {
     // single-sig
     spendingCondition = createSingleSigSpendingCondition(
-      AddressHashMode.SerializeP2PKH,
+      AddressHashMode.P2PKH,
       options.publicKey,
       options.nonce,
       options.fee
@@ -352,8 +352,8 @@ export async function makeUnsignedContractDeploy(
   } else {
     // multi-sig
     const hashMode = options.useNonSequentialMultiSig
-      ? AddressHashMode.SerializeP2SHNonSequential
-      : AddressHashMode.SerializeP2SH;
+      ? AddressHashMode.P2SHNonSequential
+      : AddressHashMode.P2SH;
 
     const publicKeys = options.address
       ? sortPublicKeysForAddress(
@@ -501,7 +501,7 @@ export async function makeUnsignedContractCall(
   if ('publicKey' in options) {
     // single-sig
     spendingCondition = createSingleSigSpendingCondition(
-      AddressHashMode.SerializeP2PKH,
+      AddressHashMode.P2PKH,
       options.publicKey,
       options.nonce,
       options.fee
@@ -509,8 +509,8 @@ export async function makeUnsignedContractCall(
   } else {
     // multi-sig
     const hashMode = options.useNonSequentialMultiSig
-      ? AddressHashMode.SerializeP2SHNonSequential
-      : AddressHashMode.SerializeP2SH;
+      ? AddressHashMode.P2SHNonSequential
+      : AddressHashMode.P2SH;
 
     const publicKeys = options.address
       ? sortPublicKeysForAddress(
@@ -643,7 +643,7 @@ export async function sponsorTransaction(
   const defaultOptions = {
     fee: 0 as IntegerType,
     sponsorNonce: 0 as IntegerType,
-    sponsorAddressHashmode: AddressHashMode.SerializeP2PKH as SingleSigHashMode,
+    sponsorAddressHashmode: AddressHashMode.P2PKH as SingleSigHashMode,
     network: defaultNetwork,
   };
 

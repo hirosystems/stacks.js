@@ -59,7 +59,7 @@ test('STX token transfer transaction serialization and deserialization', () => {
 
   const payload = createTokenTransferPayload(recipientCV, amount, memo);
 
-  const addressHashMode = AddressHashMode.SerializeP2PKH;
+  const addressHashMode = AddressHashMode.P2PKH;
   const nonce = 0;
   const fee = 0;
   const pubKey = '03ef788b3830c00abe8f64f62dc32fc863bc0b2cafeb073b6c8e1c7657d9c2c3ab';
@@ -140,7 +140,7 @@ test('STX token transfer transaction fee setting', () => {
 
   const payload = createTokenTransferPayload(recipientCV, amount, memo);
 
-  const addressHashMode = AddressHashMode.SerializeP2PKH;
+  const addressHashMode = AddressHashMode.P2PKH;
   const nonce = 0;
   const fee = 0;
   const pubKey = '03ef788b3830c00abe8f64f62dc32fc863bc0b2cafeb073b6c8e1c7657d9c2c3ab';
@@ -202,7 +202,7 @@ test('STX token transfer transaction fee setting', () => {
 });
 
 test('STX token transfer transaction multi-sig serialization and deserialization', () => {
-  const addressHashMode = AddressHashMode.SerializeP2SH;
+  const addressHashMode = AddressHashMode.P2SH;
   const nonce = 0;
   const fee = 0;
 
@@ -284,17 +284,17 @@ test('STX token transfer transaction multi-sig uncompressed keys serialization a
   const pubKeyStrings = pubKeys.map(serializePublicKeyBytes).map(publicKeyToHex);
 
   expect(() =>
-    createMultiSigSpendingCondition(AddressHashMode.SerializeP2WSH, 2, pubKeyStrings, nonce, fee)
+    createMultiSigSpendingCondition(AddressHashMode.P2WSH, 2, pubKeyStrings, nonce, fee)
   ).toThrowError('Public keys must be compressed for segwit');
 
   const spendingCondition = createMultiSigSpendingCondition(
-    AddressHashMode.SerializeP2SH, // will be replaced in the next step
+    AddressHashMode.P2SH, // will be replaced in the next step
     2,
     pubKeyStrings,
     nonce,
     fee
   );
-  spendingCondition.hashMode = AddressHashMode.SerializeP2WSH;
+  spendingCondition.hashMode = AddressHashMode.P2WSH;
 
   const originAuth = createStandardAuth(spendingCondition);
   const originAddress = originAuth.spendingCondition?.signer;
@@ -338,7 +338,7 @@ test('Sponsored STX token transfer transaction serialization and deserialization
 
   const payload = createTokenTransferPayload(recipientCV, amount, memo);
 
-  const addressHashMode = AddressHashMode.SerializeP2PKH;
+  const addressHashMode = AddressHashMode.P2PKH;
   const nonce = 0;
   const sponsorNonce = 123;
   const fee = 0;
