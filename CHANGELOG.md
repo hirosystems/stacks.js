@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.17.0](https://github.com/hirosystems/stacks.js/compare/v6.16.1...v6.17.0) (2024-07-31)
+
+
+### Features
+
+* add clarity3 in clarityversion enum ([525c3ff](https://github.com/hirosystems/stacks.js/commit/525c3ff95d9554b25781c20d755be47f76f69556))
+
+
+
 ## [6.16.1](https://github.com/hirosystems/stacks.js/compare/v6.16.0...v6.16.1) (2024-07-02)
 
 
