@@ -2,7 +2,7 @@ import {
   AddressHashMode,
   AddressVersion,
   RECOVERABLE_ECDSA_SIG_LENGTH_BYTES,
-  StacksMessageType,
+  StacksWireType,
 } from './constants';
 
 import { c32address } from 'c32check';
@@ -10,13 +10,13 @@ import { hexToBytes } from '@stacks/common';
 import { TransactionVersion } from '@stacks/network';
 
 export interface Address {
-  readonly type: StacksMessageType.Address;
+  readonly type: StacksWireType.Address;
   readonly version: AddressVersion;
   readonly hash160: string;
 }
 
 export interface MessageSignature {
-  readonly type: StacksMessageType.MessageSignature;
+  readonly type: StacksWireType.MessageSignature;
   data: string;
 }
 
@@ -27,7 +27,7 @@ export function createMessageSignature(signature: string): MessageSignature {
   }
 
   return {
-    type: StacksMessageType.MessageSignature,
+    type: StacksWireType.MessageSignature,
     data: signature,
   };
 }
@@ -74,7 +74,7 @@ export function addressHashModeToVersion(
 }
 
 export function addressFromVersionHash(version: AddressVersion, hash: string): Address {
-  return { type: StacksMessageType.Address, version, hash160: hash };
+  return { type: StacksWireType.Address, version, hash160: hash };
 }
 
 export function addressToString(address: Address): string {

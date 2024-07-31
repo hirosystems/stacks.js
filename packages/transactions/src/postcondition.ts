@@ -4,7 +4,7 @@ import {
   FungibleConditionCode,
   NonFungibleConditionCode,
   PostConditionType,
-  StacksMessageType,
+  StacksWireType,
 } from './constants';
 import {
   Asset,
@@ -27,7 +27,7 @@ export function createSTXPostCondition(
   }
 
   return {
-    type: StacksMessageType.PostCondition,
+    type: StacksWireType.PostCondition,
     conditionType: PostConditionType.STX,
     principal,
     conditionCode,
@@ -49,7 +49,7 @@ export function createFungiblePostCondition(
   }
 
   return {
-    type: StacksMessageType.PostCondition,
+    type: StacksWireType.PostCondition,
     conditionType: PostConditionType.Fungible,
     principal,
     conditionCode,
@@ -72,7 +72,7 @@ export function createNonFungiblePostCondition(
   }
 
   return {
-    type: StacksMessageType.PostCondition,
+    type: StacksWireType.PostCondition,
     conditionType: PostConditionType.NonFungible,
     principal,
     conditionCode,

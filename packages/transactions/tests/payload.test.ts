@@ -7,7 +7,7 @@ import {
   standardPrincipalCV,
   trueCV,
 } from '../src/clarity';
-import { ClarityVersion, StacksMessageType } from '../src/constants';
+import { ClarityVersion, StacksWireType } from '../src/constants';
 import {
   CoinbasePayload,
   CoinbasePayloadToAltRecipient,
@@ -35,7 +35,7 @@ test('STX token transfer payload serialization and deserialization', () => {
 
   const deserialized = serializeDeserialize(
     payload,
-    StacksMessageType.Payload
+    StacksWireType.Payload
   ) as TokenTransferPayload;
   expect(deserialized.payloadType).toBe(payload.payloadType);
   expect(deserialized.recipient).toEqual(recipient);
@@ -53,7 +53,7 @@ test('STX token transfer payload (to contract addr)  serialization and deseriali
 
   const deserialized = serializeDeserialize(
     payload,
-    StacksMessageType.Payload
+    StacksWireType.Payload
   ) as TokenTransferPayload;
   expect(deserialized.payloadType).toBe(payload.payloadType);
   expect(deserialized.recipient).toEqual(recipient);
@@ -68,7 +68,7 @@ test('STX token transfer payload (with contract principal string) serialization 
 
   const deserialized = serializeDeserialize(
     payload,
-    StacksMessageType.Payload
+    StacksWireType.Payload
   ) as TokenTransferPayload;
   expect(deserialized.payloadType).toBe(payload.payloadType);
   expect(principalToString(deserialized.recipient)).toEqual(recipient);
@@ -83,7 +83,7 @@ test('STX token transfer payload (with address principal string) serialization a
 
   const deserialized = serializeDeserialize(
     payload,
-    StacksMessageType.Payload
+    StacksWireType.Payload
   ) as TokenTransferPayload;
   expect(deserialized.payloadType).toBe(payload.payloadType);
   expect(principalToString(deserialized.recipient)).toEqual(recipient);
@@ -98,10 +98,7 @@ test('Contract call payload serialization and deserialization', () => {
 
   const payload = createContractCallPayload(contractAddress, contractName, functionName, args);
 
-  const deserialized = serializeDeserialize(
-    payload,
-    StacksMessageType.Payload
-  ) as ContractCallPayload;
+  const deserialized = serializeDeserialize(payload, StacksWireType.Payload) as ContractCallPayload;
   expect(deserialized).toEqual(payload);
 });
 
@@ -122,7 +119,7 @@ test('Smart contract payload serialization and deserialization', () => {
 
   const deserialized = serializeDeserialize(
     payload,
-    StacksMessageType.Payload
+    StacksWireType.Payload
   ) as SmartContractPayload;
   expect(deserialized.contractName.content).toBe(contractName);
   expect(deserialized.codeBody.content).toBe(codeBody);
@@ -145,7 +142,7 @@ test('Versioned smart contract payload serialization and deserialization', () =>
 
   const deserialized = serializeDeserialize(
     payload,
-    StacksMessageType.Payload
+    StacksWireType.Payload
   ) as VersionedSmartContractPayload;
   expect(deserialized.clarityVersion).toBe(2);
   expect(deserialized.contractName.content).toBe(contractName);
@@ -157,7 +154,7 @@ test('Coinbase payload serialization and deserialization', () => {
 
   const payload = createCoinbasePayload(coinbaseBuffer);
 
-  const deserialized = serializeDeserialize(payload, StacksMessageType.Payload) as CoinbasePayload;
+  const deserialized = serializeDeserialize(payload, StacksWireType.Payload) as CoinbasePayload;
   expect(deserialized.coinbaseBytes).toEqual(coinbaseBuffer);
 });
 
@@ -169,7 +166,7 @@ test('Coinbase to standard principal recipient payload serialization and deseria
 
   const deserialized = serializeDeserialize(
     payload,
-    StacksMessageType.Payload
+    StacksWireType.Payload
   ) as CoinbasePayloadToAltRecipient;
   expect(deserialized.coinbaseBytes).toEqual(coinbaseBuffer);
   expect(deserialized.recipient).toEqual(standardRecipient);
@@ -186,7 +183,7 @@ test('Coinbase to contract principal recipient payload serialization and deseria
 
   const deserialized = serializeDeserialize(
     payload,
-    StacksMessageType.Payload
+    StacksWireType.Payload
   ) as CoinbasePayloadToAltRecipient;
   expect(deserialized.coinbaseBytes).toEqual(coinbaseBuffer);
   expect(deserialized.recipient).toEqual(contractRecipient);
@@ -211,10 +208,7 @@ test('serialize/deserialize tenure change payload', () => {
     publicKeyHash
   );
 
-  const deserialized = serializeDeserialize(
-    payload,
-    StacksMessageType.Payload
-  ) as TenureChangePayload;
+  const deserialized = serializeDeserialize(payload, StacksWireType.Payload) as TenureChangePayload;
   expect(deserialized).toEqual(payload);
 });
 

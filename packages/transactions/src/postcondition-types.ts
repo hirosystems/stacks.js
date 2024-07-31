@@ -4,7 +4,7 @@ import {
   NonFungibleConditionCode,
   PostConditionPrincipalId,
   PostConditionType,
-  StacksMessageType,
+  StacksWireType,
 } from './constants';
 import { c32addressDecode } from 'c32check';
 import { Address } from './common';
@@ -22,34 +22,34 @@ export type ContractIdString = `${string}.${string}`;
 export type AssetString = `${ContractIdString}::${string}`;
 
 export interface StandardPrincipal {
-  readonly type: StacksMessageType.Principal;
+  readonly type: StacksWireType.Principal;
   readonly prefix: PostConditionPrincipalId.Standard;
   readonly address: Address;
 }
 
 export interface ContractPrincipal {
-  readonly type: StacksMessageType.Principal;
+  readonly type: StacksWireType.Principal;
   readonly prefix: PostConditionPrincipalId.Contract;
   readonly address: Address;
   readonly contractName: LengthPrefixedString;
 }
 
 export interface LengthPrefixedString {
-  readonly type: StacksMessageType.LengthPrefixedString;
+  readonly type: StacksWireType.LengthPrefixedString;
   readonly content: string;
   readonly lengthPrefixBytes: number;
   readonly maxLengthBytes: number;
 }
 
 export interface Asset {
-  readonly type: StacksMessageType.Asset;
+  readonly type: StacksWireType.Asset;
   readonly address: Address;
   readonly contractName: LengthPrefixedString;
   readonly assetName: LengthPrefixedString;
 }
 
 export interface STXPostCondition {
-  readonly type: StacksMessageType.PostCondition;
+  readonly type: StacksWireType.PostCondition;
   readonly conditionType: PostConditionType.STX;
   readonly principal: PostConditionPrincipal;
   readonly conditionCode: FungibleConditionCode;
@@ -57,7 +57,7 @@ export interface STXPostCondition {
 }
 
 export interface FungiblePostCondition {
-  readonly type: StacksMessageType.PostCondition;
+  readonly type: StacksWireType.PostCondition;
   readonly conditionType: PostConditionType.Fungible;
   readonly principal: PostConditionPrincipal;
   readonly conditionCode: FungibleConditionCode;
@@ -66,7 +66,7 @@ export interface FungiblePostCondition {
 }
 
 export interface NonFungiblePostCondition {
-  readonly type: StacksMessageType.PostCondition;
+  readonly type: StacksWireType.PostCondition;
   readonly conditionType: PostConditionType.NonFungible;
   readonly principal: PostConditionPrincipal;
   readonly conditionCode: NonFungibleConditionCode;
@@ -104,7 +104,7 @@ export function createLPString(
     throw new Error(`String length exceeds maximum bytes ${maxLength}`);
   }
   return {
-    type: StacksMessageType.LengthPrefixedString,
+    type: StacksWireType.LengthPrefixedString,
     content,
     lengthPrefixBytes: prefixLength,
     maxLengthBytes: maxLength,
@@ -113,7 +113,7 @@ export function createLPString(
 
 export function createAsset(addressString: string, contractName: string, assetName: string): Asset {
   return {
-    type: StacksMessageType.Asset,
+    type: StacksWireType.Asset,
     address: createAddress(addressString),
     contractName: createLPString(contractName),
     assetName: createLPString(assetName),
@@ -123,7 +123,7 @@ export function createAsset(addressString: string, contractName: string, assetNa
 export function createAddress(c32AddressString: string): Address {
   const addressData = c32addressDecode(c32AddressString);
   return {
-    type: StacksMessageType.Address,
+    type: StacksWireType.Address,
     version: addressData[0],
     hash160: addressData[1],
   };
@@ -153,7 +153,7 @@ export function createContractPrincipal(
   const addr = createAddress(addressString);
   const name = createLPString(contractName);
   return {
-    type: StacksMessageType.Principal,
+    type: StacksWireType.Principal,
     prefix: PostConditionPrincipalId.Contract,
     address: addr,
     contractName: name,
@@ -163,7 +163,7 @@ export function createContractPrincipal(
 export function createStandardPrincipal(addressString: string): StandardPrincipal {
   const addr = createAddress(addressString);
   return {
-    type: StacksMessageType.Principal,
+    type: StacksWireType.Principal,
     prefix: PostConditionPrincipalId.Standard,
     address: addr,
   };
