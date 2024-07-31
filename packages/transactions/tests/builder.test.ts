@@ -1,7 +1,7 @@
 import {
   HIRO_MAINNET_URL,
   HIRO_TESTNET_URL,
-  PRIVATE_KEY_COMPRESSED_LENGTH,
+  PRIVATE_KEY_BYTES_COMPRESSED,
   bytesToHex,
   bytesToUtf8,
   createApiKeyMiddleware,
@@ -98,6 +98,7 @@ import {
   transactionToHex,
 } from '../src/transaction';
 import { cloneDeep, randomBytes } from '../src/utils';
+import { compressPrivateKey } from '../../encryption/src';
 
 function setSignature(
   unsignedTransaction: StacksTransaction,
@@ -2351,10 +2352,8 @@ describe('multi-sig', () => {
   describe('working non-sequential multi-sig', () => {
     const pk1 = makeRandomPrivKey();
     const pk2 = makeRandomPrivKey();
-    const pk3 = bytesToHex(randomBytes(32)) + '01';
-    const pk4 = bytesToHex(randomBytes(32)) + '01';
-
-    // todo: add compressPrivateKey helper `next`
+    const pk3 = compressPrivateKey(makeRandomPrivKey());
+    const pk4 = compressPrivateKey(makeRandomPrivKey());
 
     const CASES = [
       { signers: [pk1, pk2, pk3], signing: [pk1, pk2], required: 2 },
@@ -2458,7 +2457,7 @@ describe('multi-sig', () => {
           );
         });
         tx.auth.spendingCondition.fields[fieldIdx] = createTransactionAuthField(
-          hexToBytes(signerKey).byteLength === PRIVATE_KEY_COMPRESSED_LENGTH
+          hexToBytes(signerKey).byteLength === PRIVATE_KEY_BYTES_COMPRESSED
             ? PubKeyEncoding.Compressed
             : PubKeyEncoding.Uncompressed,
           createMessageSignature(nextSig)
