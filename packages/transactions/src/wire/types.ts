@@ -281,8 +281,7 @@ export interface TransactionAuthFieldWire {
 
 export type TransactionAuthFieldContentsWire = PublicKeyWire | MessageSignatureWire;
 
-// todo: `next` refactor to match wire format more precisely eg https://github.com/jbencin/sips/blob/sip-02x-non-sequential-multisig-transactions/sips/sip-02x/sip-02x-non-sequential-multisig-transactions.md
-//  "A spending authorization field is encoded as follows:" ...
+/** @see {@link AuthFieldType} */
 export interface TransactionAuthFieldWire {
   type: StacksWireType.TransactionAuthField;
   pubKeyEncoding: PubKeyEncoding;
