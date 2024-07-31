@@ -517,14 +517,13 @@ export function hexToBytes(hex: string): Uint8Array {
     throw new TypeError(`hexToBytes: expected string, got ${typeof hex}`);
   }
 
-  // todo: add use `without0x` from current `next` to replace duplicate trimming code
-  hex = hex.startsWith('0x') || hex.startsWith('0X') ? hex.slice(2) : hex; // remove 0x prefix
+  hex = without0x(hex);
+  hex = hex.length % 2 ? `0${hex}` : hex; // left pad with a zero if odd length
 
-  const paddedHex = hex.length % 2 ? `0${hex}` : hex; // left pad with a zero if odd length
-  const array = new Uint8Array(paddedHex.length / 2);
+  const array = new Uint8Array(hex.length / 2);
   for (let i = 0; i < array.length; i++) {
     const j = i * 2;
-    const hexByte = paddedHex.slice(j, j + 2);
+    const hexByte = hex.slice(j, j + 2);
     const byte = Number.parseInt(hexByte, 16);
     if (Number.isNaN(byte) || byte < 0) throw new Error('Invalid byte sequence');
     array[i] = byte;
