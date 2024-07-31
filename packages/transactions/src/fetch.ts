@@ -100,7 +100,7 @@ async function _getNonceApi({
  * @param opts.api - Optional API info (`.url` & `.fetch`) used for fetch call
  * @return A promise that resolves to an integer
  */
-export async function getNonce({
+export async function fetchNonce({
   address,
   api: apiOpt,
 }: {
@@ -128,7 +128,7 @@ export async function getNonce({
 }
 
 /**
- * @deprecated Use the new {@link estimateTransaction} function instead.
+ * @deprecated Use the new {@link fetchFeeEstimateTransaction} function instead.
  *
  * Estimate the total transaction fee in microstacks for a token transfer
  *
@@ -137,7 +137,7 @@ export async function getNonce({
  * @param opts.api - Optional API info (`.url` & `.fetch`) used for fetch call
  * @return A promise that resolves to number of microstacks per byte
  */
-export async function estimateTransfer({
+export async function fetchFeeEstimateTransfer({
   transaction: txOpt,
   api: apiOpt,
 }: {
@@ -178,7 +178,7 @@ export async function estimateTransfer({
  * @param opts.api - Optional API info (`.url` & `.fetch`) used for fetch call
  * @return A promise that resolves to FeeEstimate
  */
-export async function estimateTransaction({
+export async function fetchFeeEstimateTransaction({
   payload,
   estimatedLength,
   api: apiOpt,
@@ -217,13 +217,13 @@ export async function estimateTransaction({
 }
 
 /**
- * Estimates the fee using {@link estimateTransaction}, but retries to estimate
- * with {@link estimateTransfer} as a fallback if does not get an estimation due
+ * Estimates the fee using {@link fetchFeeEstimateTransaction}, but retries to estimate
+ * with {@link fetchFeeEstimateTransfer} as a fallback if does not get an estimation due
  * to the {@link NoEstimateAvailableError} error.
  * @param opts.transaction - The transaction to estimate fees for
  * @param opts.api - Optional API info (`.url` & `.fetch`) used for fetch call
  */
-export async function estimateFee({
+export async function fetchFeeEstimate({
   transaction: txOpt,
   api: apiOpt,
 }: {
@@ -241,7 +241,7 @@ export async function estimateFee({
   try {
     const estimatedLength = estimateTransactionByteLength(txOpt);
     return (
-      await estimateTransaction({
+      await fetchFeeEstimateTransaction({
         payload: bytesToHex(serializePayloadBytes(txOpt.payload)),
         estimatedLength,
         api,
@@ -249,7 +249,7 @@ export async function estimateFee({
     )[1].fee;
   } catch (error) {
     if (!(error instanceof NoEstimateAvailableError)) throw error;
-    return await estimateTransfer({ transaction: txOpt, api });
+    return await fetchFeeEstimateTransfer({ transaction: txOpt, api });
   }
 }
 
@@ -260,7 +260,7 @@ export async function estimateFee({
  * @param opts.api - Optional API info (`.url` & `.fetch`) used for fetch call
  * @returns A promise that resolves to a ClarityAbi if the operation succeeds
  */
-export async function getAbi({
+export async function fetchAbi({
   contractAddress: address,
   contractName: name,
   api: apiOpt,
@@ -294,7 +294,7 @@ export async function getAbi({
  * @return Returns an object with a status bool (okay) and a result string that
  * is a serialized clarity value in hex format.
  */
-export async function callReadOnlyFunction({
+export async function fetchCallReadOnlyFunction({
   contractName,
   contractAddress,
   functionName,
@@ -347,7 +347,7 @@ export async function callReadOnlyFunction({
  * @returns Promise that resolves to a ClarityValue if the operation succeeds.
  * Resolves to NoneCV if the map does not contain the given key, if the map does not exist, or if the contract prinicipal does not exist
  */
-export async function getContractMapEntry<T extends ClarityValue = ClarityValue>({
+export async function fetchContractMapEntry<T extends ClarityValue = ClarityValue>({
   contractAddress,
   contractName,
   mapName,

@@ -28,7 +28,7 @@ import {
   SingleSigHashMode,
 } from './constants';
 import { ClarityAbi, validateContractCall } from './contract-abi';
-import { estimateFee, getAbi, getNonce } from './fetch';
+import { fetchFeeEstimate, fetchAbi, fetchNonce } from './fetch';
 import { createStacksPublicKey, privateKeyToPublic, publicKeyToAddress } from './keys';
 import { postConditionToWire } from './postcondition';
 import { PostCondition } from './postcondition-types';
@@ -182,14 +182,14 @@ export async function makeUnsignedSTXTokenTransfer(
   );
 
   if (txOptions.fee == null) {
-    const fee = await estimateFee({ transaction, api: options.api });
+    const fee = await fetchFeeEstimate({ transaction, api: options.api });
     transaction.setFee(fee);
   }
 
   if (txOptions.nonce == null) {
     const addressVersion = network.addressVersion.singleSig;
     const address = c32address(addressVersion, transaction.auth.spendingCondition!.signer);
-    const txNonce = await getNonce({ address, api: options.api });
+    const txNonce = await fetchNonce({ address, api: options.api });
     transaction.setNonce(txNonce);
   }
 
@@ -396,14 +396,14 @@ export async function makeUnsignedContractDeploy(
   );
 
   if (txOptions.fee === undefined || txOptions.fee === null) {
-    const fee = await estimateFee({ transaction, api: options.api });
+    const fee = await fetchFeeEstimate({ transaction, api: options.api });
     transaction.setFee(fee);
   }
 
   if (txOptions.nonce === undefined || txOptions.nonce === null) {
     const addressVersion = network.addressVersion.singleSig;
     const address = c32address(addressVersion, transaction.auth.spendingCondition!.signer);
-    const txNonce = await getNonce({ address, api: options.api });
+    const txNonce = await fetchNonce({ address, api: options.api });
     transaction.setNonce(txNonce);
   }
 
@@ -483,7 +483,7 @@ export async function makeUnsignedContractCall(
     let abi: ClarityAbi;
     if (typeof options.validateWithAbi === 'boolean') {
       if (options?.network) {
-        abi = await getAbi({ ...options });
+        abi = await fetchAbi({ ...options });
       } else {
         throw new Error('Network option must be provided in order to validate with ABI');
       }
@@ -550,14 +550,14 @@ export async function makeUnsignedContractCall(
   );
 
   if (txOptions.fee === undefined || txOptions.fee === null) {
-    const fee = await estimateFee({ transaction, api: options.api });
+    const fee = await fetchFeeEstimate({ transaction, api: options.api });
     transaction.setFee(fee);
   }
 
   if (txOptions.nonce === undefined || txOptions.nonce === null) {
     const addressVersion = network.addressVersion.singleSig;
     const address = c32address(addressVersion, transaction.auth.spendingCondition!.signer);
-    const txNonce = await getNonce({ address, api: options.api });
+    const txNonce = await fetchNonce({ address, api: options.api });
     transaction.setNonce(txNonce);
   }
 
@@ -660,7 +660,7 @@ export async function sponsorTransaction(
       case PayloadType.SmartContract:
       case PayloadType.VersionedSmartContract:
       case PayloadType.ContractCall:
-        txFee = BigInt(await estimateFee({ ...options }));
+        txFee = BigInt(await fetchFeeEstimate({ ...options }));
         break;
       default:
         throw new Error(
@@ -676,7 +676,7 @@ export async function sponsorTransaction(
   if (sponsorOptions.sponsorNonce == null) {
     const addressVersion = network.addressVersion.singleSig;
     const address = publicKeyToAddress(addressVersion, sponsorPubKey);
-    const sponsorNonce = await getNonce({ address, api: options.api });
+    const sponsorNonce = await fetchNonce({ address, api: options.api });
     options.sponsorNonce = sponsorNonce;
   }
 

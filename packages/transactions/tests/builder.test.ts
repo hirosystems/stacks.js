@@ -28,15 +28,15 @@ import {
   addressFromPublicKeys,
   addressToString,
   broadcastTransaction,
-  callReadOnlyFunction,
+  fetchCallReadOnlyFunction,
   createMessageSignature,
   createStacksPublicKey,
   createTokenTransferPayload,
   createTransactionAuthField,
-  estimateFee,
-  estimateTransaction,
-  getContractMapEntry,
-  getNonce,
+  fetchFeeEstimate,
+  fetchFeeEstimateTransaction,
+  fetchContractMapEntry,
+  fetchNonce,
   postConditionToWire,
   privateKeyToPublic,
   publicKeyIsCompressed,
@@ -131,8 +131,8 @@ test('API key middleware - get nonce', async () => {
   fetchMock.mockRejectOnce();
   fetchMock.mockOnce(`{"balance": "0", "nonce": "123"}`);
 
-  const fetchNonce = await getNonce({ address, api });
-  expect(fetchNonce).toBe(123n);
+  const fetchedNonce = await fetchNonce({ address, api });
+  expect(fetchedNonce).toBe(123n);
   expect(fetchMock.mock.calls.length).toEqual(2);
   expect(fetchMock.mock.calls[1][0]).toEqual(
     'https://api.mainnet.hiro.so/v2/accounts/STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6?proof=0'
@@ -1139,7 +1139,7 @@ test('Estimate transaction transfer fee', async () => {
   fetchMock.mockOnce(mockedResponse);
 
   const mainnet = {}; // default
-  const resultEstimateFee = await estimateTransaction({
+  const resultEstimateFee = await fetchFeeEstimateTransaction({
     payload: bytesToHex(serializePayloadBytes(transaction.payload)),
     estimatedLength: transactionByteLength,
     api: mainnet,
@@ -1148,7 +1148,7 @@ test('Estimate transaction transfer fee', async () => {
   fetchMock.mockOnce(mockedResponse);
 
   const testnet = { url: HIRO_TESTNET_URL };
-  const resultEstimateFee2 = await estimateTransaction({
+  const resultEstimateFee2 = await fetchFeeEstimateTransaction({
     payload: bytesToHex(serializePayloadBytes(transaction.payload)),
     estimatedLength: transactionByteLength,
     api: testnet,
@@ -1208,7 +1208,7 @@ test('Estimate transaction fee fallback', async () => {
   fetchMock.once('1');
 
   const testnet = { url: HIRO_TESTNET_URL };
-  const resultEstimateFee = await estimateFee({ transaction, api: testnet });
+  const resultEstimateFee = await fetchFeeEstimate({ transaction, api: testnet });
   expect(resultEstimateFee).toBe(201n);
 
   // http://localhost:3999/v2/fees/transaction
@@ -1220,7 +1220,7 @@ test('Estimate transaction fee fallback', async () => {
   // http://localhost:3999/v2/fees/transfer
   fetchMock.once('2'); // double
 
-  const doubleRate = await estimateFee({ transaction, api: testnet });
+  const doubleRate = await fetchFeeEstimate({ transaction, api: testnet });
   expect(doubleRate).toBe(402n);
 
   expect(fetchMock.mock.calls.length).toEqual(6);
@@ -1348,7 +1348,7 @@ test('Make STX token transfer with fetch account nonce', async () => {
 
   fetchMock.mockRejectOnce();
   fetchMock.mockOnce(`{"balance":"0", "nonce":${nonce}}`);
-  const fetchNonce = await getNonce({
+  const fetchedNonce = await fetchNonce({
     address,
     api: { url: HIRO_TESTNET_URL },
   });
@@ -1368,7 +1368,7 @@ test('Make STX token transfer with fetch account nonce', async () => {
   expect(fetchMock.mock.calls.length).toEqual(4);
   expect(fetchMock.mock.calls[1][0]).toEqual(EXPECTED_ACCOUNT_URL);
   expect(fetchMock.mock.calls[3][0]).toEqual(EXPECTED_ACCOUNT_URL);
-  expect(fetchNonce.toString()).toEqual(nonce.toString());
+  expect(fetchedNonce.toString()).toEqual(nonce.toString());
   expect(transaction.auth.spendingCondition?.nonce?.toString()).toEqual(nonce.toString());
 });
 
@@ -2035,7 +2035,7 @@ test('Call read-only function', async () => {
   const apiUrl = `${api.url}${READONLY_FUNCTION_CALL_PATH}/${contractAddress}/kv-store/get-value%3F`; // uri encoded
   fetchMock.mockOnce(`{"okay": true, "result": "0x${serializeCV(mockResult)}"}`);
 
-  const result = await callReadOnlyFunction(options);
+  const result = await fetchCallReadOnlyFunction(options);
 
   expect(fetchMock.mock.calls.length).toEqual(1);
   expect(fetchMock.mock.calls[0][0]).toEqual(apiUrl);
@@ -2047,7 +2047,7 @@ test('Get contract map entry - success', async () => {
   const mockResult = uintCV(mockValue);
   fetchMock.mockOnce(`{"data": "0x${serializeCV(mockResult)}"}`);
 
-  const result = await getContractMapEntry<UIntCV>({
+  const result = await fetchContractMapEntry<UIntCV>({
     contractAddress: 'SPSCWDV3RKV5ZRN1FQD84YE1NQFEDJ9R1F4DYQ11',
     contractName: 'newyorkcitycoin-core-v2',
     mapName: 'UserIds',
@@ -2066,7 +2066,7 @@ test('Get contract map entry - no match', async () => {
   const mockResult = noneCV();
   fetchMock.mockOnce(`{"data": "0x${serializeCVBytes(mockResult)}"}`);
 
-  const result = await getContractMapEntry({
+  const result = await fetchContractMapEntry({
     contractAddress: 'SPSCWDV3RKV5ZRN1FQD84YE1NQFEDJ9R1F4DYQ11',
     contractName: 'newyorkcitycoin-core-v2',
     mapName: 'UserIds',
@@ -2078,7 +2078,7 @@ test('Get contract map entry - no match', async () => {
   expect(result.type).toBe(ClarityType.OptionalNone);
 });
 
-describe(getNonce.name, () => {
+describe(fetchNonce.name, () => {
   test('without API', async () => {
     const nonce = 123n;
     const address = 'STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6';
@@ -2087,7 +2087,7 @@ describe(getNonce.name, () => {
     fetchMock.mockOnce(`{"balance":"0", "nonce":${nonce}}`);
 
     await expect(
-      getNonce({
+      fetchNonce({
         address,
         api: {
           url: HIRO_TESTNET_URL,
@@ -2111,7 +2111,7 @@ describe(getNonce.name, () => {
     );
 
     await expect(
-      getNonce({
+      fetchNonce({
         address,
         api: {
           url: HIRO_TESTNET_URL,
