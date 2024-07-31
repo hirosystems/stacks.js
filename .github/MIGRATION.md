@@ -32,7 +32,7 @@
 
 - The `@stacks/network` `new StacksNetwork()` objects were removed. Instead `@stacks/network` now exports the objects `STACKS_MAINNET`, `STACKS_TESNET`, and `STACKS_DEVNET`, which are static (and shouldn't be changed for most use-cases). [Read more...](#stacks-network)
 - The `ClarityType` enum was replaced by a readable version. The previous (wire format compatible) enum is still available as `ClarityWireType`. [Read more...](#clarity-representation)
-- The `serializeXyz` methods were changed to return `string` (hex-encoded) instead of `Uint8Array`. Compatible `serializeXzyBytes` methods were added to ease the migration. [Read more...](#serialize-methods)
+- `StacksTransaction.serialize` and other `serializeXyz` methods were changed to return `string` (hex-encoded) instead of `Uint8Array`. Compatible `serializeXzyBytes` methods were added to ease the migration. [Read more...](#serialize-methods)
 - The `AssetInfo` type was renamed to `Asset` for accuracy. The `Asset` helper methods were also renamed to to remove the `Info` suffix. [Read more...](#asset-helper-methods)
 - Remove legacy CLI methods. [Read more...](#cli)
 - Disable legacy `triplesec` mnemonic encryption support. [Read more...](#triplesec)
@@ -162,9 +162,13 @@ For `bigint` values, the type of the `value` property is a now `string`, for bet
 
 ### `serialize` methods
 
-Existing methods now use hex-encoded strings instead of `Uint8Array`s.
+Existing methods now take or return **hex-encoded strings** _instead_ of `Uint8Array`s.
+
+> If you were already converting returned bytes to hex-strings in your code, you can now skip the conversion step — hex-strings are the new default.
+
 For easier migrating, renaming the following methods is possible to keep the previous behavior:
 
+- `StacksTransaction.serialize` → `StacksTransaction.serializeBytes`
 - `serializeCV` → `serializeCVBytes`
 - `serializeAddress` → `serializeAddressBytes`
 - `deserializeAddress` → `deserializeAddressBytes`
