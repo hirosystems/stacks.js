@@ -229,10 +229,10 @@ describe('SIP018 test vectors', () => {
       domain,
       privateKey,
     });
-    expect(computedSignature.data).toEqual(expectedSignature);
+    expect(computedSignature).toEqual(expectedSignature);
     // Verify signature
     const isSignatureVerified = verifyMessageSignatureRsv({
-      signature: computedSignature.data,
+      signature: computedSignature,
       message: hexToBytes(messageHash),
       publicKey,
     });
@@ -260,11 +260,11 @@ test('verifyMessageSignature works for both legacy/current and future message si
   const publicKey = publicKeyFromSignatureRsv(encodedMessageHash, signature);
   const publicKeyAlt = publicKeyFromSignatureRsv(encodedMessageHashAlt, signatureAlt);
 
-  expect(verifyMessageSignatureRsv({ message, signature: signature.data, publicKey })).toBe(true);
+  expect(verifyMessageSignatureRsv({ message, signature, publicKey })).toBe(true);
   expect(
     verifyMessageSignatureRsv({
       message,
-      signature: signatureAlt.data,
+      signature: signatureAlt,
       publicKey: publicKeyAlt,
     })
   ).toBe(true);

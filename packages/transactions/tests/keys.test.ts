@@ -118,7 +118,7 @@ test('signWithKey', () => {
   expect(messageHash).toBe(expectedMessageHash);
 
   const signature = signWithKey(privateKey, messageHash);
-  expect(signature.data).toBe(expectedSignatureVrs);
+  expect(signature).toBe(expectedSignatureVrs);
 });
 
 test('signMessageHashRsv', () => {
@@ -139,7 +139,7 @@ test('signMessageHashRsv', () => {
   expect(messageHash).toBe(expectedMessageHash);
 
   const signature = signMessageHashRsv({ privateKey, messageHash });
-  expect(signature.data).toBe(expectedSignatureRsv);
+  expect(signature).toBe(expectedSignatureRsv);
 });
 
 test('noble sign message', () => {
@@ -152,7 +152,7 @@ test('noble sign message', () => {
   const messageHash = bytesToHex(sha256('greetings from noble'));
   expect(messageHash).toBe(expectedMessageHash);
 
-  const signatureRsv = signMessageHashRsv({ privateKey, messageHash }).data;
+  const signatureRsv = signMessageHashRsv({ privateKey, messageHash });
   const signatureVrs = signatureRsvToVrs(signatureRsv);
 
   const { r: signatureR, s: signatureS } = parseRecoverableSignatureVrs(signatureVrs);
