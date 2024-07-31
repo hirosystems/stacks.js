@@ -1,14 +1,24 @@
 import {
+  IntegerType,
+  PrivateKey,
   bytesToHex,
   concatArray,
   hexToBytes,
-  IntegerType,
   intToBigInt,
-  PRIVATE_KEY_COMPRESSED_LENGTH,
   writeUInt32BE,
 } from '@stacks/common';
 import {
+  ChainId,
+  DEFAULT_CHAIN_ID,
+  STACKS_MAINNET,
+  STACKS_TESTNET,
+  TransactionVersion,
+  whenTransactionVersion,
+} from '@stacks/network';
+import {
   Authorization,
+  MultiSigSpendingCondition,
+  SpendingConditionOpts,
   deserializeAuthorization,
   intoInitialSighashAuth,
   isSingleSig,
@@ -18,33 +28,35 @@ import {
   setNonce,
   setSponsor,
   setSponsorNonce,
-  SpendingConditionOpts,
   verifyOrigin,
 } from './authorization';
 import { BytesReader } from './bytesReader';
 import {
+  AddressHashMode,
   AnchorMode,
-  anchorModeFromNameOrValue,
   AnchorModeName,
   AuthType,
-  ChainID,
-  DEFAULT_CHAIN_ID,
-  PayloadType,
   PostConditionMode,
   PubKeyEncoding,
+  RECOVERABLE_ECDSA_SIG_LENGTH_BYTES,
   StacksMessageType,
-  TransactionVersion,
+  anchorModeFrom,
 } from './constants';
 import { SerializationError, SigningError } from './errors';
-import { isCompressed, StacksPrivateKey, StacksPublicKey } from './keys';
-import { deserializePayload, Payload, PayloadInput, serializePayload } from './payload';
+import { StacksPublicKey, privateKeyIsCompressed, publicKeyIsCompressed } from './keys';
+import { Payload, PayloadInput, deserializePayloadBytes, serializePayloadBytes } from './payload';
 import { createTransactionAuthField } from './signature';
-import { createLPList, deserializeLPList, LengthPrefixedList, serializeLPList } from './types';
+import {
+  LengthPrefixedList,
+  createLPList,
+  deserializeLPListBytes,
+  serializeLPListBytes,
+} from './types';
 import { cloneDeep, txidFromData } from './utils';
 
 export class StacksTransaction {
   version: TransactionVersion;
-  chainId: ChainID;
+  chainId: ChainId;
   auth: Authorization;
   anchorMode: AnchorMode;
   payload: Payload;
@@ -58,7 +70,7 @@ export class StacksTransaction {
     postConditions?: LengthPrefixedList,
     postConditionMode?: PostConditionMode,
     anchorMode?: AnchorModeName | AnchorMode,
-    chainId?: ChainID
+    chainId?: ChainId
   ) {
     this.version = version;
     this.auth = auth;
@@ -74,25 +86,7 @@ export class StacksTransaction {
     this.postConditionMode = postConditionMode ?? PostConditionMode.Deny;
     this.postConditions = postConditions ?? createLPList([]);
 
-    if (anchorMode) {
-      this.anchorMode = anchorModeFromNameOrValue(anchorMode);
-    } else {
-      switch (payload.payloadType) {
-        case PayloadType.Coinbase:
-        case PayloadType.CoinbaseToAltRecipient:
-        case PayloadType.NakamotoCoinbase:
-        case PayloadType.PoisonMicroblock:
-        case PayloadType.TenureChange:
-          this.anchorMode = AnchorMode.OnChainOnly;
-          break;
-        case PayloadType.ContractCall:
-        case PayloadType.SmartContract:
-        case PayloadType.VersionedSmartContract:
-        case PayloadType.TokenTransfer:
-          this.anchorMode = AnchorMode.Any;
-          break;
-      }
-    }
+    this.anchorMode = anchorModeFrom(anchorMode ?? AnchorMode.Any);
   }
 
   /** @deprecated Does NOT mutate transaction, but rather returns the hash of the transaction with a cleared initial authorization */
@@ -113,7 +107,7 @@ export class StacksTransaction {
     return verifyOrigin(this.auth, this.verifyBegin());
   }
 
-  signNextOrigin(sigHash: string, privateKey: StacksPrivateKey): string {
+  signNextOrigin(sigHash: string, privateKey: PrivateKey): string {
     if (this.auth.spendingCondition === undefined) {
       throw new Error('"auth.spendingCondition" is undefined');
     }
@@ -123,7 +117,7 @@ export class StacksTransaction {
     return this.signAndAppend(this.auth.spendingCondition, sigHash, AuthType.Standard, privateKey);
   }
 
-  signNextSponsor(sigHash: string, privateKey: StacksPrivateKey): string {
+  signNextSponsor(sigHash: string, privateKey: PrivateKey): string {
     if (this.auth.authType === AuthType.Sponsored) {
       return this.signAndAppend(
         this.auth.sponsorSpendingCondition,
@@ -139,7 +133,7 @@ export class StacksTransaction {
   appendPubkey(publicKey: StacksPublicKey) {
     const cond = this.auth.spendingCondition;
     if (cond && !isSingleSig(cond)) {
-      const compressed = isCompressed(publicKey);
+      const compressed = publicKeyIsCompressed(publicKey.data);
       cond.fields.push(
         createTransactionAuthField(
           compressed ? PubKeyEncoding.Compressed : PubKeyEncoding.Uncompressed,
@@ -158,7 +152,7 @@ export class StacksTransaction {
     condition: SpendingConditionOpts,
     curSigHash: string,
     authType: AuthType,
-    privateKey: StacksPrivateKey
+    privateKey: PrivateKey
   ): string {
     const { nextSig, nextSigHash } = nextSignature(
       curSigHash,
@@ -170,11 +164,10 @@ export class StacksTransaction {
     if (isSingleSig(condition)) {
       condition.signature = nextSig;
     } else {
+      const compressed = privateKeyIsCompressed(privateKey);
       condition.fields.push(
         createTransactionAuthField(
-          privateKey.data.byteLength === PRIVATE_KEY_COMPRESSED_LENGTH
-            ? PubKeyEncoding.Compressed
-            : PubKeyEncoding.Uncompressed,
+          compressed ? PubKeyEncoding.Compressed : PubKeyEncoding.Uncompressed,
           nextSig
         )
       );
@@ -253,8 +246,8 @@ export class StacksTransaction {
     bytesArray.push(serializeAuthorization(this.auth));
     bytesArray.push(this.anchorMode);
     bytesArray.push(this.postConditionMode);
-    bytesArray.push(serializeLPList(this.postConditions));
-    bytesArray.push(serializePayload(this.payload));
+    bytesArray.push(serializeLPListBytes(this.postConditions));
+    bytesArray.push(serializePayloadBytes(this.payload));
 
     return concatArray(bytesArray);
   }
@@ -287,8 +280,8 @@ export function deserializeTransaction(tx: string | Uint8Array | BytesReader) {
   const postConditionMode = bytesReader.readUInt8Enum(PostConditionMode, n => {
     throw new Error(`Could not parse ${n} as PostConditionMode`);
   });
-  const postConditions = deserializeLPList(bytesReader, StacksMessageType.PostCondition);
-  const payload = deserializePayload(bytesReader);
+  const postConditions = deserializeLPListBytes(bytesReader, StacksMessageType.PostCondition);
+  const payload = deserializePayloadBytes(bytesReader);
 
   return new StacksTransaction(
     version,
@@ -299,6 +292,52 @@ export function deserializeTransaction(tx: string | Uint8Array | BytesReader) {
     anchorMode,
     chainId
   );
+}
+
+/** @ignore */
+export function deriveNetworkFromTx(transaction: StacksTransaction) {
+  return whenTransactionVersion(transaction.version)({
+    [TransactionVersion.Mainnet]: STACKS_MAINNET,
+    [TransactionVersion.Testnet]: STACKS_TESTNET,
+  });
+}
+
+/**
+ * Estimates transaction byte length
+ * Context:
+ * 1) Multi-sig transaction byte length increases by adding signatures
+ *    which causes the incorrect fee estimation because the fee value is set while creating unsigned transaction
+ * 2) Single-sig transaction byte length remain same due to empty message signature which allocates the space for signature
+ * @param {transaction} - StacksTransaction object to be estimated
+ * @return {number} Estimated transaction byte length
+ */
+export function estimateTransactionByteLength(transaction: StacksTransaction): number {
+  const hashMode = transaction.auth.spendingCondition.hashMode;
+  // List of Multi-sig transaction hash modes
+  const multiSigHashModes = [AddressHashMode.SerializeP2SH, AddressHashMode.SerializeP2WSH];
+
+  // Check if its a Multi-sig transaction
+  if (multiSigHashModes.includes(hashMode)) {
+    const multiSigSpendingCondition: MultiSigSpendingCondition = transaction.auth
+      .spendingCondition as MultiSigSpendingCondition;
+
+    // Find number of existing signatures if the transaction is signed or partially signed
+    const existingSignatures = multiSigSpendingCondition.fields.filter(
+      field => field.contents.type === StacksMessageType.MessageSignature
+    ).length; // existingSignatures will be 0 if its a unsigned transaction
+
+    // Estimate total signature bytes size required for this multi-sig transaction
+    // Formula: totalSignatureLength = (signaturesRequired - existingSignatures) * (SIG_LEN_BYTES + 1 byte for type of signature)
+    const totalSignatureLength =
+      (multiSigSpendingCondition.signaturesRequired - existingSignatures) *
+      (RECOVERABLE_ECDSA_SIG_LENGTH_BYTES + 1);
+
+    return transaction.serialize().byteLength + totalSignatureLength;
+  } else {
+    // Single-sig transaction
+    // Signature space already allocated by empty message signature
+    return transaction.serialize().byteLength;
+  }
 }
 
 /**

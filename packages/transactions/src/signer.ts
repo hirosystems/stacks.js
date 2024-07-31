@@ -1,15 +1,16 @@
-import { StacksTransaction } from './transaction';
-import { StacksPrivateKey, StacksPublicKey } from './keys';
+import { PrivateKey } from '@stacks/common';
 import {
+  SpendingConditionOpts,
   isNonSequentialMultiSig,
   isSequentialMultiSig,
   isSingleSig,
   nextVerification,
-  SpendingConditionOpts,
 } from './authorization';
-import { cloneDeep } from './utils';
 import { AddressHashMode, AuthType, PubKeyEncoding, StacksMessageType } from './constants';
 import { SigningError } from './errors';
+import { StacksPublicKey } from './keys';
+import { StacksTransaction } from './transaction';
+import { cloneDeep } from './utils';
 
 // todo: get rid of signer and combine with transaction class? could reduce code and complexity by calculating sighash newly each sign and append.
 export class TransactionSigner {
@@ -77,7 +78,7 @@ export class TransactionSigner {
     return signer;
   }
 
-  signOrigin(privateKey: StacksPrivateKey) {
+  signOrigin(privateKey: PrivateKey) {
     if (this.checkOverlap && this.originDone) {
       throw new SigningError('Cannot sign origin after sponsor key');
     }
@@ -130,7 +131,7 @@ export class TransactionSigner {
     this.transaction.appendPubkey(publicKey);
   }
 
-  signSponsor(privateKey: StacksPrivateKey) {
+  signSponsor(privateKey: PrivateKey) {
     if (this.transaction.auth === undefined) {
       throw new SigningError('"transaction.auth" is undefined');
     }

@@ -1,7 +1,17 @@
 # Migration Guides
 
-- [Stacks.js (\<=4.x.x) → (5.x.x)](#stacksjs-4xx--5xx)
+- [Stacks.js (\>=5.x.x) → (7.x.x)](#stacksjs-5xx--7xx)
   - [Breaking Changes](#breaking-changes)
+  - [Stacks Network](#stacks-network)
+  - [StacksNodeApi](#stacksnodeapi)
+  - [StacksNetwork to StacksNodeApi](#stacksnetwork-to-stacksnodeapi)
+  - [Clarity Representation](#clarity-representation)
+  - [`serialize` methods](#serialize-methods)
+  - [Asset Helper Methods](#asset-helper-methods)
+  - [CLI](#cli)
+  - [Triplesec](#triplesec)
+- [Stacks.js (\<=4.x.x) → (5.x.x)](#stacksjs-4xx--5xx)
+  - [Breaking Changes](#breaking-changes-1)
     - [Buffer to Uint8Array](#buffer-to-uint8array)
     - [Message Signing Prefix](#message-signing-prefix)
 - [blockstack.js → Stacks.js (1.x.x)](#blockstackjs--stacksjs-1xx)
@@ -13,6 +23,180 @@
   - [Encryption](#encryption)
     - [Using blockstack.js](#using-blockstackjs-2)
     - [Using @stacks/encryption or @stacks/auth](#using-stacksencryption-or-stacksauth)
+
+## Stacks.js (&gt;=5.x.x) → (7.x.x)
+
+### Breaking Changes
+
+- The `@stacks/network` `new StacksNetwork()` objects were removed. Instead `@stacks/network` now exports the objects `STACKS_MAINNET`, `STACKS_TESNET`, and `STACKS_DEVNET`, which are static (and shouldn't be changed for most use-cases). [Read more...](#stacks-network)
+- The `ClarityType` enum was replaced by a readable version. The previous (wire format compatible) enum is still available as `ClarityWireType`. [Read more...](#clarity-representation)
+- The `serializeXyz` methods were changed to return `string` (hex-encoded) instead of `Uint8Array`. Compatible `serializeXzyBytes` methods were added to ease the migration. [Read more...](#serialize-methods)
+- The `AssetInfo` type was renamed to `Asset` for accuracy. The `Asset` helper methods were also renamed to to remove the `Info` suffix. [Read more...](#asset-helper-methods)
+- Remove legacy CLI methods. [Read more...](#cli)
+- Disable legacy `triplesec` mnemonic encryption support. [Read more...](#triplesec)
+
+### Stacks Network
+
+From now on "network" objects are static (aka constants) and don't require instantiation.
+
+The `@stacks/network` package exports the following network objects:
+
+- `STACKS_MAINNET`
+- `STACKS_TESTNET`
+- `STACKS_DEVNET`
+- `STACKS_MOCKNET` (alias for `STACKS_DEVNET`)
+
+```ts
+import { STACKS_MAINNET } from '@stacks/network';
+import { STACKS_TESTNET } from '@stacks/network';
+import { STACKS_DEVNET } from '@stacks/network';
+```
+
+### StacksNodeApi
+
+The new `StacksNodeApi` class lets you interact with a Stacks node or API.
+
+<!-- todo: will be renamed to Client in a followup PR -->
+
+```ts
+import { StacksNodeApi } from '@stacks/transactions';
+
+const api = new StacksNodeApi();
+await api.broadcastTx(txHex);
+```
+
+### StacksNetwork to StacksNodeApi
+
+Stacks network objects are now exported by the `@stacks/common` package.
+They are used to specify network settings for other functions and don't require instantiation (like the `@stacks/network` approach did).
+
+```ts
+import { STACKS_MAINNET } from '@stacks/transactions';
+```
+
+After importing the network object (e.g. `STACKS_MAINNET` here), you can use it in other functions like so:
+
+```ts
+// todo: update more functions, show example
+```
+
+For easing the transition, the functions which depended on a network instance now accept an `api` parameter.
+The `api` parameter can be an instance of `StacksNodeApi` or any object containing a `url` and `fetch` property.
+
+- The `url` property should be a string containing the base URL of the Stacks node you want to use.
+- The `fetch` property can be any (fetch)[https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API] compatible function.
+
+The following diffs show examples of how to migrate to the new pattern.
+
+```diff
+import { makeSTXTokenTransfer } from '@stacks/transactions';
+
+- import { StacksTestnet } from '@stacks/network';
++ import { STACKS_TESTNET } from '@stacks/network';
+
+const transaction = await makeSTXTokenTransfer({
+  // ...
+- network: new StacksTestnet(),
++ network: STACKS_TESTNET,
+});
+```
+
+> [!NOTE]
+> String literal network names are still supported.
+
+```diff
+const transaction = await makeSTXTokenTransfer({
+  // ...
+- network: new StacksTestnet(),
++ network: 'testnet',
+});
+```
+
+> [!NOTE]
+> Custom URLs and fetch functions are still supported via the `api` parameter.
+
+```diff
+const transaction = await makeSTXTokenTransfer({
+  // ...
+- network: new StacksTestnet({ url: "mynode-optional.com", fetchFn: myFetch }), // optional options
++ network: STACKS_TESTNET,
++ api: { url: "mynode-optional.com", fetch: myFetch } // optional params
+});
+```
+
+### Clarity Representation
+
+The `ClarityType` enum was replaced by a readable version.
+The previous (wire format compatible) enum is still available as `ClarityWireType`.
+These types are considered somewhat internal and shouldn't cause breaking changes for most use-cases.
+
+The property holding the value of the data type is now called `value` in all cases.
+Previously, there was a mix of `value`, `list`, `buffer` etc.
+For `bigint` values, the type of the `value` property is a now `string`, for better serialization compatibility.
+
+```diff
+{
+-  type: 1,
++  type: "uint",
+-  value: 12n,
++  value: "12",
+}
+```
+
+```diff
+{
+-  type: 11,
++  type: "list",
+-  list: [ ... ],
++  value: [ ... ],
+}
+```
+
+### `serialize` methods
+
+Existing methods now use hex-encoded strings instead of `Uint8Array`s.
+For easier migrating, renaming the following methods is possible to keep the previous behavior:
+
+- `serializeCV` → `serializeCVBytes`
+- `serializeAddress` → `serializeAddressBytes`
+- `deserializeAddress` → `deserializeAddressBytes`
+- `serializeLPList` → `serializeLPListBytes`
+- `deserializeLPList` → `deserializeLPListBytes`
+- `serializeLPString` → `serializeLPStringBytes`
+- `deserializeLPString` → `deserializeLPStringBytes`
+- `serializePayload` → `serializePayloadBytes`
+- `deserializePayload` → `deserializePayloadBytes`
+- `serializePublicKey` → `serializePublicKeyBytes`
+- `deserializePublicKey` → `deserializePublicKeyBytes`
+- `serializeStacksMessage` → `serializeStacksMessageBytes`
+- `deserializeStacksMessage` → `deserializeStacksMessageBytes`
+- `serializeMemoString` → `serializeMemoStringBytes`
+- `deserializeMemoString` → `deserializeMemoStringBytes`
+- `serializeTransactionAuthField` → `serializeTransactionAuthFieldBytes`
+- `deserializeTransactionAuthField` → `deserializeTransactionAuthFieldBytes`
+- `serializeMessageSignature` → `serializeMessageSignatureBytes`
+- `deserializeMessageSignature` → `deserializeMessageSignatureBytes`
+- `serializePostCondition` → `serializePostConditionBytes`
+- `deserializePostCondition` → `deserializePostConditionBytes`
+
+### Asset Helper Methods
+
+The following interfaces and methods were renamed:
+
+- `AssetInfo` → `Asset`
+- `StacksMessageType.AssetInfo` → `StacksMessageType.Asset`
+- `createAssetInfo` → `createAsset`
+- `parseAssetInfoString` → `parseAssetString`
+
+### CLI
+
+- Removed the `authenticator` method for legacy Blockstack authentication.
+
+### Triplesec
+
+Support for encrypting/decrypting mnemonics with `triplesec` was removed.
+This impacts the methods: `decrypt`, `decryptMnemonic`, and `decryptLegacy`.
+Make sure to update your code to if mnemonics are stored somewhere encrypted using the legacy method.
 
 ## Stacks.js (&lt;=4.x.x) → (5.x.x)
 

@@ -14,8 +14,11 @@ import {
 } from '@stacks/encryption';
 import { getAddressFromDID } from './dids';
 import {
-  BLOCKSTACK_DEFAULT_GAIA_HUB_URL,
+  createFetchFn,
+  FetchFn,
+  GAIA_URL,
   getGlobalObject,
+  HIRO_MAINNET_URL,
   InvalidStateError,
   isLaterVersion,
   Logger,
@@ -27,7 +30,6 @@ import { extractProfile } from '@stacks/profile';
 import { AuthScope, DEFAULT_PROFILE } from './constants';
 
 import { UserData } from './userData';
-import { createFetchFn, FetchFn, StacksMainnet } from '@stacks/network';
 import { protocolEchoReplyDetection } from './protocolEchoDetection';
 
 /**
@@ -225,8 +227,7 @@ export class UserSession {
     // let nameLookupURL;
     let coreNode = this.appConfig && this.appConfig.coreNode;
     if (!coreNode) {
-      const network = new StacksMainnet();
-      coreNode = network.bnsLookupUrl;
+      coreNode = HIRO_MAINNET_URL;
     }
 
     const tokenPayload = decodeToken(authResponseToken).payload;
@@ -277,7 +278,7 @@ export class UserSession {
         );
       }
     }
-    let hubUrl = BLOCKSTACK_DEFAULT_GAIA_HUB_URL;
+    let hubUrl = GAIA_URL;
     let gaiaAssociationToken: string;
     if (
       isLaterVersion(tokenPayload.version as string, '1.2.0') &&

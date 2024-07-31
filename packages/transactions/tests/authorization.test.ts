@@ -16,15 +16,14 @@ import { AddressHashMode, AuthType, PubKeyEncoding } from '../src/constants';
 
 import { bytesToHex, concatArray } from '@stacks/common';
 import { BytesReader } from '../src/bytesReader';
-import { createStacksPrivateKey, createStacksPublicKey, signWithKey } from '../src/keys';
+import { createStacksPublicKey, signWithKey } from '../src/keys';
 
 test('ECDSA recoverable signature', () => {
-  const privKeyString = 'edf9aee84d9b7abc145504dde6726c64f369d37ee34ded868fabd876c26570bc';
+  const privKey = 'edf9aee84d9b7abc145504dde6726c64f369d37ee34ded868fabd876c26570bc';
   const messagetoSign = 'eec72e6cd1ce0ac1dd1a0c260f099a8fc72498c80b3447f962fd5d39a3d70921';
   const correctSignature =
     '019901d8b1d67a7b853dc473d0609508ab2519ec370eabfef460aa0fd9234660' +
     '787970968562da9de8b024a7f36f946b2fdcbf39b2f59247267a9d72730f19276b';
-  const privKey = createStacksPrivateKey(privKeyString);
   const messageSignature = signWithKey(privKey, messagetoSign);
   expect(messageSignature.data).toBe(correctSignature);
 });
@@ -708,7 +707,7 @@ test('Single sig P2WPKH spending condition', () => {
   spP2WPKHCompressed.signer = '11'.repeat(20);
 
   // prettier-ignore
-  let spendingConditionP2WpkhCompressedBytes = [
+  const spendingConditionP2WpkhCompressedBytes = [
     // hash mode
     AddressHashMode.SerializeP2WPKH,
     // signer

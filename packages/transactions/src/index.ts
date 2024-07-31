@@ -8,7 +8,7 @@ export {
   isSingleSig,
 } from './authorization';
 export * from './builders';
-export { BytesReader as BytesReader } from './bytesReader';
+export { BytesReader } from './bytesReader';
 /**
  * ### `Cl.` Clarity Value Namespace
  * The `Cl` namespace is provided as a convenience to build/parse Clarity Value objects.
@@ -71,6 +71,7 @@ export {
   isSmartContractPayload,
   isTokenTransferPayload,
   serializePayload,
+  serializePayloadBytes,
 } from './payload';
 /**
  * ### `Pc.` Post Condition Builder
@@ -98,7 +99,8 @@ export * from './postcondition-types';
 export * from './signature';
 export * from './signer';
 export * from './structuredDataSignature';
-export { StacksTransaction, deserializeTransaction } from './transaction';
+export * from './transaction';
 export * from './types';
 export * from './message-types';
 export * from './utils';
+export * from './fetch';

@@ -2,21 +2,10 @@ import { utf8ToBytes } from '@stacks/common';
 import { Address, addressToString } from '../../common';
 import { LengthPrefixedString, createAddress, createLPString } from '../../postcondition-types';
 import { ClarityType } from '../constants';
+import { ContractPrincipalCV, PrincipalCV, StandardPrincipalCV } from '../types';
 
-type PrincipalCV = StandardPrincipalCV | ContractPrincipalCV;
-
-interface StandardPrincipalCV {
-  readonly type: ClarityType.PrincipalStandard;
-  readonly address: Address;
-}
-
-interface ContractPrincipalCV {
-  readonly type: ClarityType.PrincipalContract;
-  readonly address: Address;
-  readonly contractName: LengthPrefixedString;
-}
 /** Returns a string in the format `address` or `address.contract-name` from a principal (standard or contract) */
-function principalToString(principal: PrincipalCV): string {
+export function principalToString(principal: PrincipalCV): string {
   if (principal.type === ClarityType.PrincipalStandard) {
     return addressToString(principal.address);
   } else if (principal.type === ClarityType.PrincipalContract) {
@@ -27,7 +16,7 @@ function principalToString(principal: PrincipalCV): string {
   }
 }
 
-function principalCV(principal: string): PrincipalCV {
+export function principalCV(principal: string): PrincipalCV {
   if (principal.includes('.')) {
     const [address, contractName] = principal.split('.');
     return contractPrincipalCV(address, contractName);
@@ -46,13 +35,13 @@ function principalCV(principal: string): PrincipalCV {
  *  import { standardPrincipalCV } from '@stacks/transactions';
  *
  *  const addr = standardPrincipalCV('SP2JXKMSH007NPYAQHKJPQMAQYAD90NQGTVJVQ02B');
- *  // { type: 5, address: { type: 0, version: 22, hash160: 'a5d9d331000f5b79578ce56bd157f29a9056f0d6' } }
+ *  // { type: 'address', address: { type: 0, version: 22, hash160: 'a5d9d331000f5b79578ce56bd157f29a9056f0d6' } }
  * ```
  *
  * @see
  * {@link https://github.com/hirosystems/stacks.js/blob/main/packages/transactions/tests/clarity.test.ts | clarity test cases for more examples}
  */
-function standardPrincipalCV(addressString: string): StandardPrincipalCV {
+export function standardPrincipalCV(addressString: string): StandardPrincipalCV {
   const addr = createAddress(addressString);
   return { type: ClarityType.PrincipalStandard, address: addr };
 }
@@ -73,13 +62,13 @@ function standardPrincipalCV(addressString: string): StandardPrincipalCV {
  *  };
  *
  *  const principalCV = standardPrincipalCVFromAddress(address);
- *  // { type: 5, address: { type: 0, version: 22, hash160: 'a5d9d331000f5b79578ce56bd157f29a9056f0d6' } }
+ *  // { type: 'address', address: { type: 0, version: 22, hash160: 'a5d9d331000f5b79578ce56bd157f29a9056f0d6' } }
  * ```
  *
  * @see
  * {@link https://github.com/hirosystems/stacks.js/blob/main/packages/transactions/tests/clarity.test.ts | clarity test cases for more examples}
  */
-function standardPrincipalCVFromAddress(address: Address): StandardPrincipalCV {
+export function standardPrincipalCVFromAddress(address: Address): StandardPrincipalCV {
   return { type: ClarityType.PrincipalStandard, address };
 }
 
@@ -94,13 +83,16 @@ function standardPrincipalCVFromAddress(address: Address): StandardPrincipalCV {
  *  import { contractPrincipalCV } from '@stacks/transactions';
  *
  *  const contractAddress = contractPrincipalCV('SP2JXKMSH007NPYAQHKJPQMAQYAD90NQGTVJVQ02B', 'test');
- *  // { type: 6, address: { type: 0, version: 22, hash160: 'a5d9d331000f5b79578ce56bd157f29a9056f0d6' }, contractName: { type: 2, content: 'test', lengthPrefixBytes: 1, maxLengthBytes: 128 } }
+ *  // { type: 'contract', address: { type: 0, version: 22, hash160: 'a5d9d331000f5b79578ce56bd157f29a9056f0d6' }, contractName: { type: 2, content: 'test', lengthPrefixBytes: 1, maxLengthBytes: 128 } }
  * ```
  *
  * @see
  * {@link https://github.com/hirosystems/stacks.js/blob/main/packages/transactions/tests/clarity.test.ts | clarity test cases for more examples}
  */
-function contractPrincipalCV(addressString: string, contractName: string): ContractPrincipalCV {
+export function contractPrincipalCV(
+  addressString: string,
+  contractName: string
+): ContractPrincipalCV {
   const addr = createAddress(addressString);
   const lengthPrefixedContractName = createLPString(contractName);
   return contractPrincipalCVFromAddress(addr, lengthPrefixedContractName);
@@ -118,13 +110,13 @@ function contractPrincipalCV(addressString: string, contractName: string): Contr
  *
  *  const contractAddressCV = contractPrincipalCVFromAddress(createAddress('SP2JXKMSH007NPYAQHKJPQMAQYAD90NQGTVJVQ02B'), createLPString('test'));
  *
- *  // { type: 6, address: { type: 0, version: 22, hash160: 'a5d9d331000f5b79578ce56bd157f29a9056f0d6' }, contractName: { type: 2, content: 'test', lengthPrefixBytes: 1, maxLengthBytes: 128 } }
+ *  // { type: 'contract', address: { type: 0, version: 22, hash160: 'a5d9d331000f5b79578ce56bd157f29a9056f0d6' }, contractName: { type: 2, content: 'test', lengthPrefixBytes: 1, maxLengthBytes: 128 } }
  * ```
  *
  * @see
  * {@link https://github.com/hirosystems/stacks.js/blob/main/packages/transactions/tests/clarity.test.ts | clarity test cases for more examples}
  */
-function contractPrincipalCVFromAddress(
+export function contractPrincipalCVFromAddress(
   address: Address,
   contractName: LengthPrefixedString
 ): ContractPrincipalCV {
@@ -134,7 +126,7 @@ function contractPrincipalCVFromAddress(
   return { type: ClarityType.PrincipalContract, address, contractName };
 }
 
-function contractPrincipalCVFromStandard(
+export function contractPrincipalCVFromStandard(
   sp: StandardPrincipalCV,
   contractName: string
 ): ContractPrincipalCV {
@@ -145,16 +137,3 @@ function contractPrincipalCVFromStandard(
     contractName: lengthPrefixedContractName,
   };
 }
-
-export {
-  PrincipalCV,
-  StandardPrincipalCV,
-  ContractPrincipalCV,
-  principalCV,
-  principalToString,
-  standardPrincipalCV,
-  standardPrincipalCVFromAddress,
-  contractPrincipalCV,
-  contractPrincipalCVFromAddress,
-  contractPrincipalCVFromStandard,
-};

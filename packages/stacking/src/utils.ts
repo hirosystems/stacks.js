@@ -1,6 +1,6 @@
 import { sha256 } from '@noble/hashes/sha256';
 import { bech32, bech32m } from '@scure/base';
-import { IntegerType, bigIntToBytes } from '@stacks/common';
+import { IntegerType, PrivateKey, bigIntToBytes } from '@stacks/common';
 import {
   base58CheckDecode,
   base58CheckEncode,
@@ -12,7 +12,6 @@ import {
   ClarityType,
   ClarityValue,
   OptionalCV,
-  StacksPrivateKey,
   TupleCV,
   bufferCV,
   encodeStructuredData,
@@ -431,7 +430,7 @@ export function signPox4SignatureHash({
   privateKey,
   maxAmount,
   authId,
-}: Pox4SignatureOptions & { privateKey: StacksPrivateKey }) {
+}: Pox4SignatureOptions & { privateKey: PrivateKey }) {
   return signStructuredData({
     ...pox4SignatureMessage({ topic, poxAddress, rewardCycle, period, network, maxAmount, authId }),
     privateKey,

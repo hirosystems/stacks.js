@@ -11,10 +11,11 @@ import {
   noneCV,
   someCV,
   standardPrincipalCV,
+  stringAsciiCV,
+  stringUtf8CV,
   trueCV,
   uintCV,
 } from './clarity';
-import { stringAsciiCV, stringUtf8CV } from './clarity/types/stringCV';
 import { NotImplementedError } from './errors';
 import { ContractCallPayload } from './payload';
 import { cloneDeep } from './utils';

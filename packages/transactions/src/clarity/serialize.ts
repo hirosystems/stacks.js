@@ -6,8 +6,9 @@ import {
   writeUInt32BE,
   utf8ToBytes,
   asciiToBytes,
+  bytesToHex,
 } from '@stacks/common';
-import { serializeAddress, serializeLPString } from '../types';
+import { serializeAddressBytes, serializeLPStringBytes } from '../types';
 import { createLPString } from '../postcondition-types';
 import {
   BooleanCV,
@@ -18,29 +19,26 @@ import {
   StandardPrincipalCV,
   ContractPrincipalCV,
   ResponseCV,
-  ListCV,
-  TupleCV,
   ClarityValue,
 } from '.';
-import { ClarityType } from './constants';
-
+import { ClarityType, clarityTypeToByte } from './constants';
 import { SerializationError } from '../errors';
-import { StringAsciiCV, StringUtf8CV } from './types/stringCV';
 import { CLARITY_INT_BYTE_SIZE, CLARITY_INT_SIZE } from '../constants';
+import { ListCV, StringAsciiCV, StringUtf8CV, TupleCV } from './types';
 
 function bytesWithTypeID(typeId: ClarityType, bytes: Uint8Array): Uint8Array {
-  return concatArray([typeId, bytes]);
+  return concatArray([clarityTypeToByte(typeId), bytes]);
 }
 
 function serializeBoolCV(value: BooleanCV): Uint8Array {
-  return new Uint8Array([value.type]);
+  return new Uint8Array([clarityTypeToByte(value.type)]);
 }
 
 function serializeOptionalCV(cv: OptionalCV): Uint8Array {
   if (cv.type === ClarityType.OptionalNone) {
-    return new Uint8Array([cv.type]);
+    return new Uint8Array([clarityTypeToByte(cv.type)]);
   } else {
-    return bytesWithTypeID(cv.type, serializeCV(cv.value));
+    return bytesWithTypeID(cv.type, serializeCVBytes(cv.value));
   }
 }
 
@@ -61,18 +59,18 @@ function serializeUIntCV(cv: UIntCV): Uint8Array {
 }
 
 function serializeStandardPrincipalCV(cv: StandardPrincipalCV): Uint8Array {
-  return bytesWithTypeID(cv.type, serializeAddress(cv.address));
+  return bytesWithTypeID(cv.type, serializeAddressBytes(cv.address));
 }
 
 function serializeContractPrincipalCV(cv: ContractPrincipalCV): Uint8Array {
   return bytesWithTypeID(
     cv.type,
-    concatBytes(serializeAddress(cv.address), serializeLPString(cv.contractName))
+    concatBytes(serializeAddressBytes(cv.address), serializeLPStringBytes(cv.contractName))
   );
 }
 
 function serializeResponseCV(cv: ResponseCV) {
-  return bytesWithTypeID(cv.type, serializeCV(cv.value));
+  return bytesWithTypeID(cv.type, serializeCVBytes(cv.value));
 }
 
 function serializeListCV(cv: ListCV) {
@@ -83,7 +81,7 @@ function serializeListCV(cv: ListCV) {
   bytesArray.push(length);
 
   for (const value of cv.list) {
-    const serializedValue = serializeCV(value);
+    const serializedValue = serializeCVBytes(value);
     bytesArray.push(serializedValue);
   }
 
@@ -101,9 +99,9 @@ function serializeTupleCV(cv: TupleCV) {
 
   for (const key of lexicographicOrder) {
     const nameWithLength = createLPString(key);
-    bytesArray.push(serializeLPString(nameWithLength));
+    bytesArray.push(serializeLPStringBytes(nameWithLength));
 
-    const serializedValue = serializeCV(cv.data[key]);
+    const serializedValue = serializeCVBytes(cv.data[key]);
     bytesArray.push(serializedValue);
   }
 
@@ -132,25 +130,23 @@ function serializeStringUtf8CV(cv: StringUtf8CV) {
 }
 
 /**
- * Serializes clarity value to Uint8Array
- *
- * @param {ClarityValue} value to be converted to bytes
- *
- * @returns {Uint8Array} returns the bytes
- *
+ * Serializes clarity value to hex
  * @example
  * ```
  *  import { intCV, serializeCV } from '@stacks/transactions';
  *
  *  const serialized = serializeCV(intCV(100)); // Similarly works for other clarity types as well like listCV, booleanCV ...
- *
- *  // <Uint8Array 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 64>
+ *  // '0000000000000000000000000000000064'
  * ```
  *
  * @see
  * {@link https://github.com/hirosystems/stacks.js/blob/main/packages/transactions/tests/clarity.test.ts | clarity test cases for more examples}
  */
-export function serializeCV(value: ClarityValue): Uint8Array {
+export function serializeCV(value: ClarityValue): string {
+  return bytesToHex(serializeCVBytes(value));
+}
+/** @ignore */
+export function serializeCVBytes(value: ClarityValue): Uint8Array {
   switch (value.type) {
     case ClarityType.BoolTrue:
     case ClarityType.BoolFalse:

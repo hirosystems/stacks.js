@@ -1,28 +1,20 @@
-import { bytesToHex } from '@stacks/common';
-import * as bitcoin from 'bitcoinjs-lib';
-import * as blockstack from 'blockstack';
-import cors from 'cors';
-import * as crypto from 'crypto';
-import * as fs from 'fs';
-import * as process from 'process';
-import * as winston from 'winston';
-
 import * as scureBip39 from '@scure/bip39';
 import { wordlist } from '@scure/bip39/wordlists/english';
+import { StacksNodeApi } from '@stacks/api';
 import { buildPreorderNameTx, buildRegisterNameTx } from '@stacks/bns';
-import { StacksMainnet, StacksTestnet } from '@stacks/network';
+import { bytesToHex, HIRO_MAINNET_URL, HIRO_TESTNET_URL } from '@stacks/common';
 import {
-  AnchorMode,
+  ACCOUNT_PATH,
   broadcastTransaction,
   callReadOnlyFunction,
+  Cl,
   ClarityAbi,
   ClarityValue,
   ContractCallPayload,
-  SignedContractDeployOptions,
-  createStacksPrivateKey,
+  cvToJSON,
   cvToString,
-  estimateContractDeploy,
-  estimateContractFunctionCall,
+  estimateTransaction,
+  estimateTransactionByteLength,
   estimateTransfer,
   getAbi,
   getAddressFromPrivateKey,
@@ -30,24 +22,27 @@ import {
   makeContractDeploy,
   makeSTXTokenTransfer,
   PostConditionMode,
-  pubKeyfromPrivKey,
-  publicKeyToString,
+  privateKeyToPublic,
   ReadOnlyFunctionOptions,
+  serializePayload,
   SignedContractCallOptions,
+  SignedContractDeployOptions,
   SignedTokenTransferOptions,
   signWithKey,
   StacksTransaction,
   TransactionSigner,
-  TransactionVersion,
   TxBroadcastResult,
   validateContractCall,
-  Cl,
-  cvToJSON,
 } from '@stacks/transactions';
-import express from 'express';
+import * as bitcoin from 'bitcoinjs-lib';
+import * as blockstack from 'blockstack';
+import * as crypto from 'crypto';
+import * as fs from 'fs';
 import { prompt } from 'inquirer';
 import fetch from 'node-fetch';
 import * as path from 'path';
+import * as process from 'process';
+import * as winston from 'winston';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const c32check = require('c32check');
@@ -75,10 +70,10 @@ import {
 
 import {
   checkArgs,
+  CLI_ARGS,
   CLIOptAsBool,
   CLIOptAsString,
   CLIOptAsStringArray,
-  CLI_ARGS,
   DEFAULT_CONFIG_PATH,
   DEFAULT_CONFIG_TESTNET_PATH,
   getCLIOpts,
@@ -92,7 +87,7 @@ import {
 
 import { decryptBackupPhrase, encryptBackupPhrase } from './encrypt';
 
-import { CLINetworkAdapter, CLI_NETWORK_OPTS, getNetwork, NameInfoType } from './network';
+import { CLI_NETWORK_OPTS, CLINetworkAdapter, getNetwork, NameInfoType } from './network';
 
 import { gaiaAuth, gaiaConnect, gaiaUploadProfileAll, getGaiaAddressFromProfile } from './data';
 
@@ -117,20 +112,26 @@ import {
 } from './utils';
 
 import {
+  deriveDefaultUrl,
+  STACKS_MAINNET,
+  STACKS_TESTNET,
+  TransactionVersion,
+} from '@stacks/network';
+import {
   generateNewAccount,
   generateWallet,
   getAppPrivateKey,
   restoreWalletAccounts,
 } from '@stacks/wallet-sdk';
-import { handleAuth, handleSignIn } from './auth';
 import { getMaxIDSearchIndex, getPrivateKeyAddress, setMaxIDSearchIndex } from './common';
+
 // global CLI options
 let txOnly = false;
 let estimateOnly = false;
 let safetyChecks = true;
 let receiveFeesPeriod = 52595;
 let gracePeriod = 5000;
-let noExit = false;
+const noExit = false;
 
 let BLOCKSTACK_TEST = !!process.env.BLOCKSTACK_TEST;
 
@@ -337,7 +338,7 @@ async function getStacksWalletKey(network: CLINetworkAdapter, args: string[]): P
 async function migrateSubdomains(network: CLINetworkAdapter, args: string[]): Promise<string> {
   const mnemonic: string = await getBackupPhrase(args[0]); // args[0] is the cli argument for mnemonic
   const baseWallet = await generateWallet({ secretKey: mnemonic, password: '' });
-  const _network = network.isMainnet() ? new StacksMainnet() : new StacksTestnet();
+  const _network = network.isMainnet() ? STACKS_MAINNET : STACKS_TESTNET;
   const wallet = await restoreWalletAccounts({
     wallet: baseWallet,
     gaiaHubUrl: 'https://hub.blockstack.org',
@@ -366,7 +367,7 @@ async function migrateSubdomains(network: CLINetworkAdapter, args: string[]): Pr
 
     console.log(`Finding subdomains for data-key address '${dataKeyAddress}'`);
     const namesResponse = await fetch(
-      `${_network.coreApiUrl}/v1/addresses/stacks/${dataKeyAddress}`
+      `${deriveDefaultUrl(_network)}/v1/addresses/stacks/${dataKeyAddress}`
     );
     const namesJson = await namesResponse.json();
 
@@ -384,7 +385,7 @@ async function migrateSubdomains(network: CLINetworkAdapter, args: string[]): Pr
       // Alerts the user to any subdomains that can't be migrated to these wallet-key-derived addresses
       // Given collision with existing usernames owned by them
       const namesResponse = await fetch(
-        `${_network.coreApiUrl}/v1/addresses/stacks/${walletKeyAddress}`
+        `${deriveDefaultUrl(_network)}/v1/addresses/stacks/${walletKeyAddress}`
       );
       const existingNames = await namesResponse.json();
       if (existingNames.names?.includes(subdomain)) {
@@ -393,7 +394,7 @@ async function migrateSubdomains(network: CLINetworkAdapter, args: string[]): Pr
       }
 
       // Validate user owns the subdomain
-      const nameInfo = await fetch(`${_network.coreApiUrl}/v1/names/${subdomain}`);
+      const nameInfo = await fetch(`${deriveDefaultUrl(_network)}/v1/names/${subdomain}`);
       const nameInfoJson = await nameInfo.json();
       console.log('Subdomain Info: ', nameInfoJson);
       if (nameInfoJson.address !== dataKeyAddress) {
@@ -439,7 +440,7 @@ async function migrateSubdomains(network: CLINetworkAdapter, args: string[]): Pr
        * ********************************************************************************
        */
       const hash = crypto.createHash('sha256').update(textToSign).digest('hex');
-      const sig = signWithKey(createStacksPrivateKey(account.dataPrivateKey), hash);
+      const sig = signWithKey(account.dataPrivateKey, hash);
 
       // https://docs.stacks.co/build-apps/references/bns#subdomain-lifecycle
       subDomainOp.signature = sig.data;
@@ -520,11 +521,9 @@ function balance(network: CLINetworkAdapter, args: string[]): Promise<string> {
   }
 
   // temporary hack to use network config from stacks-transactions lib
-  const txNetwork = network.isMainnet()
-    ? new StacksMainnet({ url: network.legacyNetwork.blockstackAPIUrl })
-    : new StacksTestnet({ url: network.legacyNetwork.blockstackAPIUrl });
+  const url = network.isMainnet() ? HIRO_MAINNET_URL : HIRO_TESTNET_URL;
 
-  return fetch(txNetwork.getAccountApiUrl(address))
+  return fetch(`${url}${ACCOUNT_PATH}/${address}?proof=0`)
     .then(response => {
       if (response.status === 404) {
         return Promise.reject({
@@ -703,9 +702,7 @@ async function sendTokens(network: CLINetworkAdapter, args: string[]): Promise<s
   }
 
   // temporary hack to use network config from stacks-transactions lib
-  const txNetwork = network.isMainnet()
-    ? new StacksMainnet({ url: network.legacyNetwork.blockstackAPIUrl })
-    : new StacksTestnet({ url: network.legacyNetwork.blockstackAPIUrl });
+  const api = new StacksNodeApi({ network: network.isMainnet() ? STACKS_MAINNET : STACKS_TESTNET });
 
   const options: SignedTokenTransferOptions = {
     recipient: recipientAddress,
@@ -714,14 +711,13 @@ async function sendTokens(network: CLINetworkAdapter, args: string[]): Promise<s
     fee,
     nonce,
     memo,
-    network: txNetwork,
-    anchorMode: AnchorMode.Any,
+    network: api.network,
   };
 
   const tx: StacksTransaction = await makeSTXTokenTransfer(options);
 
   if (estimateOnly) {
-    return estimateTransfer(tx, txNetwork).then(cost => {
+    return estimateTransfer({ transaction: tx, api }).then(cost => {
       return cost.toString(10);
     });
   }
@@ -730,14 +726,14 @@ async function sendTokens(network: CLINetworkAdapter, args: string[]): Promise<s
     return Promise.resolve(bytesToHex(tx.serialize()));
   }
 
-  return broadcastTransaction(tx, txNetwork)
+  return broadcastTransaction({ transaction: tx, api })
     .then((response: TxBroadcastResult) => {
       if (response.hasOwnProperty('error')) {
         return response;
       }
       return {
         txid: `0x${tx.txid()}`,
-        transaction: generateExplorerTxPageUrl(tx.txid(), txNetwork),
+        transaction: generateExplorerTxPageUrl(tx.txid(), api.network),
       };
     })
     .catch(error => {
@@ -764,9 +760,7 @@ async function contractDeploy(network: CLINetworkAdapter, args: string[]): Promi
   const source = fs.readFileSync(sourceFile).toString();
 
   // temporary hack to use network config from stacks-transactions lib
-  const txNetwork = network.isMainnet()
-    ? new StacksMainnet({ url: network.legacyNetwork.blockstackAPIUrl })
-    : new StacksTestnet({ url: network.legacyNetwork.blockstackAPIUrl });
+  const api = new StacksNodeApi({ network: network.isMainnet() ? STACKS_MAINNET : STACKS_TESTNET });
 
   const options: SignedContractDeployOptions = {
     contractName,
@@ -774,31 +768,31 @@ async function contractDeploy(network: CLINetworkAdapter, args: string[]): Promi
     senderKey: privateKey,
     fee,
     nonce,
-    network: txNetwork,
+    network: api.network,
     postConditionMode: PostConditionMode.Allow,
-    anchorMode: AnchorMode.Any,
   };
 
   const tx = await makeContractDeploy(options);
 
   if (estimateOnly) {
-    return estimateContractDeploy(tx, txNetwork).then(cost => {
-      return cost.toString(10);
-    });
+    return estimateTransaction({
+      payload: serializePayload(tx.payload),
+      estimatedLength: estimateTransactionByteLength(tx),
+    }).then(costs => costs[1].fee.toString(10));
   }
 
   if (txOnly) {
     return Promise.resolve(bytesToHex(tx.serialize()));
   }
 
-  return broadcastTransaction(tx, txNetwork)
+  return broadcastTransaction({ transaction: tx })
     .then(response => {
       if (response.hasOwnProperty('error')) {
         return response;
       }
       return {
         txid: `0x${tx.txid()}`,
-        transaction: generateExplorerTxPageUrl(tx.txid(), txNetwork),
+        transaction: generateExplorerTxPageUrl(tx.txid(), api.network),
       };
     })
     .catch(error => {
@@ -825,15 +819,13 @@ async function contractFunctionCall(network: CLINetworkAdapter, args: string[]):
   const privateKey = args[5];
 
   // temporary hack to use network config from stacks-transactions lib
-  const txNetwork = network.isMainnet()
-    ? new StacksMainnet({ url: network.legacyNetwork.blockstackAPIUrl })
-    : new StacksTestnet({ url: network.legacyNetwork.blockstackAPIUrl });
+  const api = new StacksNodeApi({ network: network.isMainnet() ? STACKS_MAINNET : STACKS_TESTNET });
 
   let abi: ClarityAbi;
   let abiArgs: ClarityFunctionArg[];
   let functionArgs: ClarityValue[] = [];
 
-  return getAbi(contractAddress, contractName, txNetwork)
+  return getAbi({ contractAddress, contractName, api })
     .then(responseAbi => {
       abi = responseAbi;
       const filtered = abi.functions.filter(fn => fn.name === functionName);
@@ -856,9 +848,9 @@ async function contractFunctionCall(network: CLINetworkAdapter, args: string[]):
         senderKey: privateKey,
         fee,
         nonce,
-        network: txNetwork,
+        network: api.network,
         postConditionMode: PostConditionMode.Allow,
-        anchorMode: AnchorMode.Any,
+        api,
       };
 
       return makeContractCall(options);
@@ -869,23 +861,24 @@ async function contractFunctionCall(network: CLINetworkAdapter, args: string[]):
       }
 
       if (estimateOnly) {
-        return estimateContractFunctionCall(tx, txNetwork).then(cost => {
-          return cost.toString(10);
-        });
+        return estimateTransaction({
+          payload: serializePayload(tx.payload),
+          estimatedLength: estimateTransactionByteLength(tx),
+        }).then(costs => costs[1].fee.toString(10));
       }
 
       if (txOnly) {
         return Promise.resolve(bytesToHex(tx.serialize()));
       }
 
-      return broadcastTransaction(tx, txNetwork)
+      return broadcastTransaction({ transaction: tx, api })
         .then(response => {
           if (response.hasOwnProperty('error')) {
             return response;
           }
           return {
             txid: `0x${tx.txid()}`,
-            transaction: generateExplorerTxPageUrl(tx.txid(), txNetwork),
+            transaction: generateExplorerTxPageUrl(tx.txid(), api.network),
           };
         })
         .catch(error => {
@@ -912,15 +905,13 @@ async function readOnlyContractFunctionCall(
   const senderAddress = args[3];
 
   // temporary hack to use network config from stacks-transactions lib
-  const txNetwork = network.isMainnet()
-    ? new StacksMainnet({ url: network.legacyNetwork.blockstackAPIUrl })
-    : new StacksTestnet({ url: network.legacyNetwork.blockstackAPIUrl });
+  const api = new StacksNodeApi({ network: network.isMainnet() ? STACKS_MAINNET : STACKS_TESTNET });
 
   let abi: ClarityAbi;
   let abiArgs: ClarityFunctionArg[];
   let functionArgs: ClarityValue[] = [];
 
-  return getAbi(contractAddress, contractName, txNetwork)
+  return getAbi({ contractAddress, contractName, api })
     .then(responseAbi => {
       abi = responseAbi;
       const filtered = abi.functions.filter(fn => fn.name === functionName);
@@ -941,7 +932,7 @@ async function readOnlyContractFunctionCall(
         functionName,
         functionArgs,
         senderAddress,
-        network: txNetwork,
+        network: api.network,
       };
 
       return callReadOnlyFunction(options);
@@ -1559,60 +1550,6 @@ function addressConvert(network: CLINetworkAdapter, args: string[]): Promise<str
 }
 
 /*
- * Run an authentication daemon on a given port.
- * args:
- * @gaiaHubUrl (string) the write endpoint of your app Gaia hub, where app data will be stored
- * @mnemonic (string) your 12-word phrase, optionally encrypted.  If encrypted, then
- * a password will be prompted.
- * @profileGaiaHubUrl (string) the write endpoint of your profile Gaia hub, where your profile
- *   will be stored (optional)
- * @port (number) the port to listen on (optional)
- */
-function authDaemon(network: CLINetworkAdapter, args: string[]): Promise<string> {
-  const gaiaHubUrl = args[0];
-  const mnemonicOrCiphertext = args[1];
-  let port = 3000; // default port
-  let profileGaiaHub = gaiaHubUrl;
-
-  if (args.length > 2 && !!args[2]) {
-    profileGaiaHub = args[2];
-  }
-
-  if (args.length > 3 && !!args[3]) {
-    port = parseInt(args[3]);
-  }
-
-  if (port < 0 || port > 65535) {
-    return Promise.resolve().then(() => JSONStringify({ error: 'Invalid port' }));
-  }
-
-  const mnemonicPromise = getBackupPhrase(mnemonicOrCiphertext);
-
-  return mnemonicPromise
-    .then((mnemonic: string) => {
-      noExit = true;
-
-      // load up all of our identity addresses, profiles, profile URLs, and Gaia connections
-      const authServer = express();
-      authServer.use(cors());
-
-      authServer.get(/^\/auth\/*$/, (req: express.Request, res: express.Response) => {
-        void handleAuth(network, mnemonic, gaiaHubUrl, profileGaiaHub, port, req, res);
-      });
-
-      authServer.get(/^\/signin\/*$/, (req: express.Request, res: express.Response) => {
-        void handleSignIn(network, mnemonic, gaiaHubUrl, profileGaiaHub, req, res);
-      });
-
-      authServer.listen(port, () => console.log(`Authentication server started on ${port}`));
-      return 'Press Ctrl+C to exit';
-    })
-    .catch((e: Error) => {
-      return JSONStringify({ error: e.message });
-    });
-}
-
-/*
  * Encrypt a backup phrase
  * args:
  * @backup_phrase (string) the 12-word phrase to encrypt
@@ -1697,11 +1634,12 @@ function decryptMnemonic(network: CLINetworkAdapter, args: string[]): Promise<st
     });
 }
 
-async function stackingStatus(network: CLINetworkAdapter, args: string[]): Promise<string> {
-  const stxAddress = args[0];
+async function stackingStatus(_network: CLINetworkAdapter, args: string[]): Promise<string> {
+  const address = args[0];
 
-  const txNetwork = network.isMainnet() ? new StacksMainnet() : new StacksTestnet();
-  const stacker = new StackingClient(stxAddress, txNetwork);
+  const network = _network.isMainnet() ? STACKS_MAINNET : STACKS_TESTNET;
+  const api = new StacksNodeApi({ network });
+  const stacker = new StackingClient({ address, network, api });
 
   return stacker
     .getStatus()
@@ -1726,24 +1664,24 @@ async function stackingStatus(network: CLINetworkAdapter, args: string[]): Promi
     });
 }
 
-async function canStack(network: CLINetworkAdapter, args: string[]): Promise<string> {
+async function canStack(_network: CLINetworkAdapter, args: string[]): Promise<string> {
   const amount = BigInt(args[0]);
   const cycles = Number(args[1]);
   const poxAddress = args[2];
   const stxAddress = args[3];
 
-  const txNetwork = network.isMainnet() ? new StacksMainnet() : new StacksTestnet();
+  const network = _network.isMainnet() ? STACKS_MAINNET : STACKS_TESTNET;
+  const api = new StacksNodeApi({ network });
+  const stacker = new StackingClient({ address: stxAddress, network, api });
 
   const apiConfig = new Configuration({
-    basePath: txNetwork.coreApiUrl,
+    basePath: api.url,
   });
   const accounts = new AccountsApi(apiConfig);
 
   const balancePromise = accounts.getAccountBalance({
     principal: stxAddress,
   });
-
-  const stacker = new StackingClient(stxAddress, txNetwork);
 
   const poxInfoPromise = stacker.getPoxInfo();
 
@@ -1777,7 +1715,7 @@ async function canStack(network: CLINetworkAdapter, args: string[]): Promise<str
     });
 }
 
-async function stack(network: CLINetworkAdapter, args: string[]): Promise<string> {
+async function stack(_network: CLINetworkAdapter, args: string[]): Promise<string> {
   const amount = BigInt(args[0]);
   const cycles = Number(args[1]);
   const poxAddress = args[2];
@@ -1794,21 +1732,21 @@ async function stack(network: CLINetworkAdapter, args: string[]): Promise<string
   //   nonce = new BN(args[5]);
   // }
 
-  const txNetwork = network.isMainnet() ? new StacksMainnet() : new StacksTestnet();
-  const txVersion = txNetwork.isMainnet() ? TransactionVersion.Mainnet : TransactionVersion.Testnet;
+  const network = _network.isMainnet() ? STACKS_MAINNET : STACKS_TESTNET;
+  const api = new StacksNodeApi({ network });
 
   const apiConfig = new Configuration({
-    basePath: txNetwork.coreApiUrl,
+    basePath: api.url,
   });
   const accounts = new AccountsApi(apiConfig);
 
-  const stxAddress = getAddressFromPrivateKey(privateKey, txVersion);
+  const stxAddress = getAddressFromPrivateKey(privateKey, api.network.transactionVersion);
 
   const balancePromise = accounts.getAccountBalance({
     principal: stxAddress,
   });
 
-  const stacker = new StackingClient(stxAddress, txNetwork);
+  const stacker = new StackingClient({ address: stxAddress, network, api });
 
   const poxInfoPromise = stacker.getPoxInfo();
 
@@ -1848,12 +1786,12 @@ async function stack(network: CLINetworkAdapter, args: string[]): Promise<string
       });
     })
     .then((response: TxBroadcastResult) => {
-      if (response.hasOwnProperty('error')) {
+      if ('error' in response) {
         return response;
       }
       return {
         txid: `0x${response.txid}`,
-        transaction: generateExplorerTxPageUrl(response.txid, txNetwork),
+        transaction: generateExplorerTxPageUrl(response.txid, api.network),
       };
     })
     .catch(error => {
@@ -1866,28 +1804,29 @@ async function register(network: CLINetworkAdapter, args: string[]): Promise<str
   const privateKey = args[1];
   const salt = args[2];
   const zonefile = args[3];
-  const publicKey = publicKeyToString(pubKeyfromPrivKey(privateKey));
-  const txNetwork = network.isMainnet() ? new StacksMainnet() : new StacksTestnet();
+  const publicKey = privateKeyToPublic(privateKey);
+
+  const api = new StacksNodeApi({ network: network.isMainnet() ? STACKS_MAINNET : STACKS_TESTNET });
 
   const unsignedTransaction = await buildRegisterNameTx({
     fullyQualifiedName,
     publicKey,
     salt,
     zonefile,
-    network: txNetwork,
+    network: api.network,
   });
 
   const signer = new TransactionSigner(unsignedTransaction);
-  signer.signOrigin(createStacksPrivateKey(privateKey));
+  signer.signOrigin(privateKey);
 
-  return broadcastTransaction(signer.transaction, txNetwork)
+  return broadcastTransaction({ transaction: signer.transaction, api })
     .then((response: TxBroadcastResult) => {
       if (response.hasOwnProperty('error')) {
         return response;
       }
       return {
         txid: `0x${response.txid}`,
-        transaction: generateExplorerTxPageUrl(response.txid, txNetwork),
+        transaction: generateExplorerTxPageUrl(response.txid, api.network),
       };
     })
     .catch(error => {
@@ -1900,28 +1839,29 @@ async function preorder(network: CLINetworkAdapter, args: string[]): Promise<str
   const privateKey = args[1];
   const salt = args[2];
   const stxToBurn = args[3];
-  const publicKey = publicKeyToString(pubKeyfromPrivKey(privateKey));
-  const txNetwork = network.isMainnet() ? new StacksMainnet() : new StacksTestnet();
+  const publicKey = privateKeyToPublic(privateKey);
+
+  const api = new StacksNodeApi({ network: network.isMainnet() ? STACKS_MAINNET : STACKS_TESTNET });
 
   const unsignedTransaction = await buildPreorderNameTx({
     fullyQualifiedName,
     publicKey,
     salt,
     stxToBurn,
-    network: txNetwork,
+    network: api.network,
   });
 
   const signer = new TransactionSigner(unsignedTransaction);
-  signer.signOrigin(createStacksPrivateKey(privateKey));
+  signer.signOrigin(privateKey);
 
-  return broadcastTransaction(signer.transaction, txNetwork)
+  return broadcastTransaction({ transaction: signer.transaction, api })
     .then((response: TxBroadcastResult) => {
       if (response.hasOwnProperty('error')) {
         return response;
       }
       return {
         txid: `0x${response.txid}`,
-        transaction: generateExplorerTxPageUrl(response.txid, txNetwork),
+        transaction: generateExplorerTxPageUrl(response.txid, api.network),
       };
     })
     .catch(error => {
@@ -1944,10 +1884,7 @@ function faucetCall(_: CLINetworkAdapter, args: string[]): Promise<string> {
     .then((faucetTx: any) => {
       return JSONStringify({
         txid: faucetTx.txId!,
-        transaction: generateExplorerTxPageUrl(
-          faucetTx.txId!.replace(/^0x/, ''),
-          new StacksTestnet()
-        ),
+        transaction: generateExplorerTxPageUrl(faucetTx.txId!.replace(/^0x/, ''), STACKS_TESTNET),
       });
     })
     .catch((error: any) => error.toString());
@@ -2010,8 +1947,6 @@ type CommandFunction = (network: CLINetworkAdapter, args: string[]) => Promise<s
  * Global set of commands
  */
 const COMMANDS: Record<string, CommandFunction> = {
-  authenticator: authDaemon,
-  // 'announce': announce,
   balance: balance,
   can_stack: canStack,
   call_contract_func: contractFunctionCall,
@@ -2104,8 +2039,8 @@ export function CLIMain() {
     const configPath = CLIOptAsString(opts, 'c')
       ? CLIOptAsString(opts, 'c')
       : testnet
-      ? DEFAULT_CONFIG_TESTNET_PATH
-      : DEFAULT_CONFIG_PATH;
+        ? DEFAULT_CONFIG_TESTNET_PATH
+        : DEFAULT_CONFIG_PATH;
 
     const namespaceBurnAddr = CLIOptAsString(opts, 'B');
     const feeRate = CLIOptAsString(opts, 'F') ? parseInt(CLIOptAsString(opts, 'F')!) : 0;

@@ -15,9 +15,8 @@ import {
   SomeCV,
   TrueCV,
   FalseCV,
+  principalToString,
 } from '.';
-
-import { principalToString } from './types/principalCV';
 import { ClarityType } from './constants';
 import { asciiToBytes, bytesToAscii, bytesToHex, utf8ToBytes } from '@stacks/common';
 

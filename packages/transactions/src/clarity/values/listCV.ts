@@ -1,10 +1,6 @@
 import { ClarityValue } from '../clarityValue';
 import { ClarityType } from '../constants';
-
-interface ListCV<T extends ClarityValue = ClarityValue> {
-  type: ClarityType.List;
-  list: T[];
-}
+import { ListCV } from '../types';
 
 /**
  * Create list of clarity types
@@ -18,14 +14,12 @@ interface ListCV<T extends ClarityValue = ClarityValue> {
  *  import { listCV, intCV } from '@stacks/transactions';
  *
  *  const list = listCV([intCV(1), intCV(2), intCV(3), intCV(-4)]);
- *  // { type: 11, list: [ { type: 0, value: 1n }, { type: 0, value: 2n }, { type: 0, value: 3n }, { type: 0, value: -4n } ] }
+ *  // { type: 'list', list: [ { type: 0, value: 1n }, { type: 0, value: 2n }, { type: 0, value: 3n }, { type: 0, value: -4n } ] }
  * ```
  *
  * @see
  * {@link https://github.com/hirosystems/stacks.js/blob/main/packages/transactions/tests/clarity.test.ts | clarity test cases for more examples}
  */
-function listCV<T extends ClarityValue = ClarityValue>(values: T[]): ListCV<T> {
+export function listCV<T extends ClarityValue = ClarityValue>(values: T[]): ListCV<T> {
   return { type: ClarityType.List, list: values };
 }
-
-export { ListCV, listCV };
