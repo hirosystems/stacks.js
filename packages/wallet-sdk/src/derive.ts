@@ -186,14 +186,14 @@ const selectUsernameForAccount = async (
   // try to find existing usernames owned by stx derivation path
   if (opts.network) {
     const stxPrivateKey = deriveStxPrivateKey(opts);
-    const address = getAddressFromPrivateKey(stxPrivateKey, opts.network.transactionVersion);
+    const address = getAddressFromPrivateKey(stxPrivateKey, opts.network);
     let username = await fetchFirstName({ address, api });
     if (username) {
       return { username, derivationType: DerivationType.Wallet };
     } else {
       // try to find existing usernames owned by data derivation path
       const dataPrivateKey = deriveDataPrivateKey(opts);
-      const address = getAddressFromPrivateKey(dataPrivateKey, opts.network.transactionVersion);
+      const address = getAddressFromPrivateKey(dataPrivateKey, opts.network);
       username = await fetchFirstName({ address, api });
       if (username) {
         return { username, derivationType: DerivationType.Data };
@@ -220,7 +220,7 @@ export const fetchUsernameForAccountByDerivationType = async (
   // try to find existing usernames owned by given derivation path
   const selectedNetwork = opts.network ? networkFrom(opts.network) : STACKS_MAINNET;
   const privateKey = derivePrivateKeyByType(opts);
-  const address = getAddressFromPrivateKey(privateKey, selectedNetwork.transactionVersion);
+  const address = getAddressFromPrivateKey(privateKey, selectedNetwork);
   const username = await fetchFirstName({ address, api });
   return { username };
 };

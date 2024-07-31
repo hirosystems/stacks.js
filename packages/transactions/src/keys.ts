@@ -20,13 +20,7 @@ import {
   signatureRsvToVrs,
   signatureVrsToRsv,
 } from '@stacks/common';
-import {
-  networkFrom,
-  STACKS_MAINNET,
-  StacksNetwork,
-  StacksNetworkName,
-  TransactionVersion,
-} from '@stacks/network';
+import { networkFrom, STACKS_MAINNET, StacksNetwork, StacksNetworkName } from '@stacks/network';
 import { c32address } from 'c32check';
 import { addressHashModeToVersion } from './address';
 import { AddressHashMode, AddressVersion, PubKeyEncoding } from './constants';
@@ -58,21 +52,22 @@ utils.hmacSha256Sync = (key: Uint8Array, ...msgs: Uint8Array[]) => {
 export function getAddressFromPrivateKey(
   /** Private key bytes or hex string */
   privateKey: PrivateKey,
-  transactionVersion = TransactionVersion.Mainnet
+  network?: StacksNetworkName | StacksNetwork
 ): string {
+  network = networkFrom(network ?? STACKS_MAINNET);
   const publicKey = privateKeyToPublic(privateKey);
-  return getAddressFromPublicKey(publicKey, transactionVersion);
+  return getAddressFromPublicKey(publicKey, network);
 }
 
-// todo: use network as last parameter instead of txversion param. next refactor
 /** Creates a P2PKH address string from the given public key and tx version. */
 export function getAddressFromPublicKey(
   /** Public key bytes or hex string */
   publicKey: PublicKey,
-  transactionVersion = TransactionVersion.Mainnet
+  network?: StacksNetworkName | StacksNetwork
 ): string {
+  network = networkFrom(network ?? STACKS_MAINNET);
   publicKey = typeof publicKey === 'string' ? hexToBytes(publicKey) : publicKey;
-  const addrVer = addressHashModeToVersion(AddressHashMode.SerializeP2PKH, transactionVersion);
+  const addrVer = addressHashModeToVersion(AddressHashMode.SerializeP2PKH, network);
   const addr = addressFromVersionHash(addrVer, hashP2PKH(publicKey));
   const addrString = addressToString(addr);
   return addrString;

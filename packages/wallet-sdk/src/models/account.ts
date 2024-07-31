@@ -20,7 +20,7 @@ import {
   fetchProfileFromUrl,
   signAndUploadProfile,
 } from './profile';
-import { TransactionVersion } from '@stacks/network';
+import { STACKS_MAINNET, STACKS_TESTNET, TransactionVersion } from '@stacks/network';
 
 export const getStxAddress = ({
   account,
@@ -29,7 +29,10 @@ export const getStxAddress = ({
   account: Account;
   transactionVersion?: TransactionVersion;
 }): string => {
-  return getAddressFromPrivateKey(account.stxPrivateKey, transactionVersion);
+  return getAddressFromPrivateKey(
+    account.stxPrivateKey,
+    transactionVersion == TransactionVersion.Mainnet ? STACKS_MAINNET : STACKS_TESTNET // todo: refactor for `next` wallet update
+  );
 };
 
 /**

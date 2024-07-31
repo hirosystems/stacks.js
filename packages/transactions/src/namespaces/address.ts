@@ -106,3 +106,5 @@ export const fromPrivateKey = privateKeyToAddress;
  * ```
  */
 export const fromPublicKey = publicKeyToAddressSingleSig;
+
+// todo: add `fromPublicKeys` for multi-sig
