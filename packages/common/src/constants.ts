@@ -7,8 +7,7 @@ export const GAIA_URL = 'https://hub.blockstack.org';
 // todo: deduplicate magic variables
 
 /** @ignore internal */
-export const PRIVATE_KEY_COMPRESSED_LENGTH = 33;
-// todo: `next` make length consts more consistent in naming
+export const PRIVATE_KEY_BYTES_COMPRESSED = 33;
 
 /** @ignore internal */
-export const PRIVATE_KEY_UNCOMPRESSED_LENGTH = 32;
+export const PRIVATE_KEY_BYTES_UNCOMPRESSED = 32;

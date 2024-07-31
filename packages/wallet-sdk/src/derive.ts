@@ -242,13 +242,13 @@ export const derivePrivateKeyByType = ({
 export const deriveStxPrivateKey = ({ rootNode, index }: { rootNode: HDKey; index: number }) => {
   const childKey = rootNode.derive(STX_DERIVATION_PATH).deriveChild(index);
   assertIsTruthy(childKey.privateKey);
-  return bytesToHex(compressPrivateKey(childKey.privateKey));
+  return compressPrivateKey(childKey.privateKey);
 };
 
 export const deriveDataPrivateKey = ({ rootNode, index }: { rootNode: HDKey; index: number }) => {
   const childKey = rootNode.derive(DATA_DERIVATION_PATH).deriveChild(index + HARDENED_OFFSET);
   assertIsTruthy(childKey.privateKey);
-  return bytesToHex(compressPrivateKey(childKey.privateKey));
+  return compressPrivateKey(childKey.privateKey);
 };
 
 export const deriveAccount = ({

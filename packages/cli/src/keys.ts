@@ -6,7 +6,6 @@ const c32check = require('c32check');
 
 import { HDKey } from '@scure/bip32';
 import * as scureBip39 from '@scure/bip39';
-import { bytesToHex } from '@stacks/common';
 
 import {
   compressPrivateKey,
@@ -152,7 +151,7 @@ export async function getStacksWalletKeyInfo(
   const child = master.derive(derivationPath);
   const pubkey = Buffer.from(child.publicKey!);
   const privkeyBuffer = Buffer.from(child.privateKey!);
-  const privkey = bytesToHex(compressPrivateKey(privkeyBuffer));
+  const privkey = compressPrivateKey(privkeyBuffer);
   const wifVersion = network.isTestnet() ? BITCOIN_WIF_TESTNET : BITCOIN_WIF;
   const walletImportFormat = wif.encode(wifVersion, privkeyBuffer, true);
 

@@ -2,7 +2,7 @@ import { hmac } from '@noble/hashes/hmac';
 import { sha256 } from '@noble/hashes/sha256';
 import { getPublicKey as nobleGetPublicKey, signSync, utils } from '@noble/secp256k1';
 import {
-  PRIVATE_KEY_COMPRESSED_LENGTH,
+  PRIVATE_KEY_BYTES_COMPRESSED,
   PrivateKey,
   bytesToHex,
   concatBytes,
@@ -13,6 +13,7 @@ import {
 import base58 from 'bs58';
 import { hashRipemd160 } from './hashRipemd160';
 import { hashSha256Sync } from './sha2Hash';
+import { privateKeyToHex } from '../../transactions/src';
 
 const BITCOIN_PUBKEYHASH = 0x00;
 
@@ -122,10 +123,10 @@ export function isValidPrivateKey(privateKey: PrivateKey): boolean {
 /**
  * @ignore
  */
-export function compressPrivateKey(privateKey: PrivateKey): Uint8Array {
-  const privateKeyBytes = privateKeyToBytes(privateKey);
+export function compressPrivateKey(privateKey: PrivateKey): string {
+  privateKey = privateKeyToHex(privateKey);
 
-  return privateKeyBytes.length == PRIVATE_KEY_COMPRESSED_LENGTH
-    ? privateKeyBytes // leave compressed
-    : concatBytes(privateKeyBytes, new Uint8Array([1])); // compress
+  return privateKey.length == PRIVATE_KEY_BYTES_COMPRESSED * 2
+    ? privateKey // leave compressed
+    : `${privateKey}01`; // compress
 }
