@@ -53,6 +53,7 @@ import {
   PublicKeyWire,
   StacksWireType,
   createLPList,
+  createMessageSignature,
   createTransactionAuthField,
   deserializeLPListBytes,
   deserializePayloadBytes,
@@ -188,13 +189,13 @@ export class StacksTransaction {
       privateKey
     );
     if (isSingleSig(condition)) {
-      condition.signature = nextSig;
+      condition.signature = createMessageSignature(nextSig);
     } else {
       const compressed = privateKeyIsCompressed(privateKey);
       condition.fields.push(
         createTransactionAuthField(
           compressed ? PubKeyEncoding.Compressed : PubKeyEncoding.Uncompressed,
-          nextSig
+          createMessageSignature(nextSig)
         )
       );
     }

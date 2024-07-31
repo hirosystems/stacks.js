@@ -1,4 +1,4 @@
-import { ApiParam, IntegerType, intToBigInt, utf8ToBytes } from '@stacks/common';
+import { ApiParam, IntegerType, PublicKey, intToBigInt, utf8ToBytes } from '@stacks/common';
 import { StacksNetwork } from '@stacks/network';
 import {
   ClarityType,
@@ -55,7 +55,7 @@ export interface PriceFunction {
 export interface BnsContractCallOptions {
   functionName: string;
   functionArgs: ClarityValue[];
-  publicKey: string;
+  publicKey: PublicKey;
   network: StacksNetwork;
   postConditions?: PostCondition[];
 }
@@ -480,7 +480,7 @@ export interface PreorderNameOptions {
   /** amount of STX to burn for the registration */
   stxToBurn: IntegerType;
   /** the private key to sign the transaction */
-  publicKey: string;
+  publicKey: PublicKey;
   /** the Stacks blockchain network to use */
   network: StacksNetwork;
 }
@@ -541,7 +541,7 @@ export interface RegisterNameOptions {
   fullyQualifiedName: string;
   salt: string;
   zonefile: string;
-  publicKey: string;
+  publicKey: PublicKey;
   network: StacksNetwork;
 }
 

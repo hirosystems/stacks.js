@@ -438,7 +438,7 @@ export function signPox4SignatureHash({
   return signStructuredData({
     ...pox4SignatureMessage({ topic, poxAddress, rewardCycle, period, network, maxAmount, authId }),
     privateKey,
-  }).data;
+  });
 }
 
 /**
