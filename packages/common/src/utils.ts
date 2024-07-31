@@ -317,64 +317,40 @@ export function getGlobalObjects<K extends Extract<keyof Window, string>>(
 
 export type IntegerType = number | string | bigint | Uint8Array;
 
-export function intToBytes(value: IntegerType, signed: boolean, byteLength: number): Uint8Array {
-  return bigIntToBytes(intToBigInt(value, signed), byteLength);
+export function intToBytes(value: IntegerType, byteLength: number): Uint8Array {
+  return bigIntToBytes(intToBigInt(value), byteLength);
 }
 
-//todo: add default param to `signed` (should only be needed in rare use-cases, not typical users) `next`
-export function intToBigInt(value: IntegerType, signed: boolean): bigint {
-  let parsedValue = value;
-
-  if (typeof parsedValue === 'number') {
-    if (!Number.isInteger(parsedValue)) {
+/**
+ * Converts an integer-compatible value to a bigint
+ * @param value - The value to convert to a bigint
+ * @returns The bigint representation of the value
+ *
+ * @example
+ * ```ts
+ * intToBigInt(123); // 123n
+ * intToBigInt('0xbeef'); // 48879n
+ * ```
+ */
+export function intToBigInt(value: IntegerType): bigint {
+  if (typeof value === 'bigint') return value;
+  if (typeof value === 'string') return BigInt(value);
+  if (typeof value === 'number') {
+    if (!Number.isInteger(value)) {
       throw new RangeError(`Invalid value. Values of type 'number' must be an integer.`);
     }
-    if (parsedValue > Number.MAX_SAFE_INTEGER) {
+    if (value > Number.MAX_SAFE_INTEGER) {
       throw new RangeError(
         `Invalid value. Values of type 'number' must be less than or equal to ${Number.MAX_SAFE_INTEGER}. For larger values, try using a BigInt instead.`
       );
     }
-    return BigInt(parsedValue);
+    return BigInt(value);
   }
-  if (typeof parsedValue === 'string') {
-    // If hex string then convert to bytes then fall through to the bytes condition
-    if (parsedValue.toLowerCase().startsWith('0x')) {
-      // Trim '0x' hex-prefix
-      let hex = parsedValue.slice(2);
 
-      // Allow odd-length strings like `0xf` -- some libs output these, or even just `0x${num.toString(16)}`
-      hex = hex.padStart(hex.length + (hex.length % 2), '0');
+  if (isInstance(value, Uint8Array)) return BigInt(`0x${bytesToHex(value)}`);
 
-      parsedValue = hexToBytes(hex);
-    } else {
-      try {
-        return BigInt(parsedValue);
-      } catch (error) {
-        if (error instanceof SyntaxError) {
-          throw new RangeError(`Invalid value. String integer '${parsedValue}' is not finite.`);
-        }
-      }
-    }
-  }
-  if (typeof parsedValue === 'bigint') {
-    return parsedValue;
-  }
-  if (parsedValue instanceof Uint8Array) {
-    if (signed) {
-      // Allow byte arrays smaller than 128-bits to be passed.
-      // This allows positive signed ints like `0x08` (8) or negative signed
-      // ints like `0xf8` (-8) to be passed without having to pad to 16 bytes.
-      const bn = fromTwos(
-        BigInt(`0x${bytesToHex(parsedValue)}`),
-        BigInt(parsedValue.byteLength * 8)
-      );
-      return BigInt(bn.toString());
-    } else {
-      return BigInt(`0x${bytesToHex(parsedValue)}`);
-    }
-  }
   throw new TypeError(
-    `Invalid value type. Must be a number, bigint, integer-string, hex-string, or Uint8Array.`
+    `intToBigInt: Invalid value type. Must be a number, bigint, BigInt-compatible string, or Uint8Array.`
   );
 }
 
@@ -414,7 +390,7 @@ export function hexToBigInt(hex: string): bigint {
  * @ignore
  */
 export function intToHex(integer: IntegerType, lengthBytes = 8): string {
-  const value = typeof integer === 'bigint' ? integer : intToBigInt(integer, false);
+  const value = typeof integer === 'bigint' ? integer : intToBigInt(integer);
   return value.toString(16).padStart(lengthBytes * 2, '0');
 }
 
@@ -463,9 +439,14 @@ function nthBit(value: bigint, n: bigint) {
   return value & (BigInt(1) << n);
 }
 
+/** @internal */
+export function bytesToTwosBigInt(bytes: Uint8Array): bigint {
+  return fromTwos(BigInt(`0x${bytesToHex(bytes)}`), BigInt(bytes.byteLength * 8));
+}
+
 /**
  * Converts from two's complement to signed number
- * @ignore
+ * @internal
  */
 export function fromTwos(value: bigint, width: bigint) {
   if (nthBit(value, width - BigInt(1))) {

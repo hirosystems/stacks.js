@@ -93,7 +93,7 @@ export function createTokenTransferPayload(
     type: StacksWireType.Payload,
     payloadType: PayloadType.TokenTransfer,
     recipient,
-    amount: intToBigInt(amount, false),
+    amount: intToBigInt(amount),
     memo: memo ?? createMemoString(''),
   };
 }

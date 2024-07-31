@@ -1,4 +1,10 @@
-import { IntegerType, intToBigInt } from '@stacks/common';
+import {
+  IntegerType,
+  bytesToTwosBigInt,
+  hexToBytes,
+  intToBigInt,
+  isInstance,
+} from '@stacks/common';
 import { ClarityType } from '../constants';
 import { IntCV, UIntCV } from '../types';
 
@@ -27,7 +33,15 @@ const MIN_I128 = BigInt('-170141183460469231731687303715884105728'); // (-2 ** 1
  * {@link https://github.com/hirosystems/stacks.js/blob/main/packages/transactions/tests/clarity.test.ts | clarity test cases for more examples}
  */
 export const intCV = (value: IntegerType): IntCV => {
-  const bigInt = intToBigInt(value, true);
+  // ensure compatibility with twos-complement encoded hex-strings
+  if (typeof value === 'string' && value.toLowerCase().startsWith('0x')) {
+    value = bytesToTwosBigInt(hexToBytes(value));
+  }
+
+  // ensure compatibility with twos-complement encoded byte arrays
+  if (isInstance(value, Uint8Array)) value = bytesToTwosBigInt(value);
+
+  const bigInt = intToBigInt(value);
   if (bigInt > MAX_I128) {
     throw new RangeError(`Cannot construct clarity integer from value greater than ${MAX_I128}`);
   } else if (bigInt < MIN_I128) {
@@ -55,7 +69,7 @@ export const intCV = (value: IntegerType): IntCV => {
  * {@link https://github.com/hirosystems/stacks.js/blob/main/packages/transactions/tests/clarity.test.ts | clarity test cases for more examples}
  */
 export const uintCV = (value: IntegerType): UIntCV => {
-  const bigInt = intToBigInt(value, false);
+  const bigInt = intToBigInt(value);
   if (bigInt < MIN_U128) {
     throw new RangeError('Cannot construct unsigned clarity integer from negative value');
   } else if (bigInt > MAX_U128) {

@@ -291,7 +291,7 @@ export async function buildPreorderNamespaceTx({
     type: 'stx-postcondition',
     address: publicKeyToAddress(network.addressVersion.singleSig, publicKey),
     condition: 'eq',
-    amount: intToBigInt(stxToBurn, true),
+    amount: intToBigInt(stxToBurn),
   };
 
   return makeBnsContractCall({
@@ -515,7 +515,7 @@ export async function buildPreorderNameTx({
     type: 'stx-postcondition',
     address: publicKeyToAddress(network.addressVersion.singleSig, publicKey),
     condition: 'eq',
-    amount: intToBigInt(stxToBurn, true),
+    amount: intToBigInt(stxToBurn),
   };
 
   return makeBnsContractCall({
@@ -807,7 +807,7 @@ export async function buildRenewNameTx({
     type: 'stx-postcondition',
     address: publicKeyToAddress(network.addressVersion.singleSig, publicKey),
     condition: 'eq',
-    amount: intToBigInt(stxToBurn, true),
+    amount: intToBigInt(stxToBurn),
   };
 
   return makeBnsContractCall({

@@ -1,4 +1,4 @@
-import { bytesToAscii, bytesToUtf8, hexToBytes } from '@stacks/common';
+import { bytesToAscii, bytesToTwosBigInt, bytesToUtf8, hexToBytes } from '@stacks/common';
 import {
   ClarityValue,
   ClarityWireType,
@@ -59,7 +59,7 @@ export function deserializeCV<T extends ClarityValue = ClarityValue>(
 
   switch (type) {
     case ClarityWireType.int:
-      return intCV(bytesReader.readBytes(16)) as T;
+      return intCV(bytesToTwosBigInt(bytesReader.readBytes(16))) as T;
 
     case ClarityWireType.uint:
       return uintCV(bytesReader.readBytes(16)) as T;

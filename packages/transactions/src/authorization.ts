@@ -135,8 +135,8 @@ export function createSingleSigSpendingCondition(
   return {
     hashMode,
     signer,
-    nonce: intToBigInt(nonce, false),
-    fee: intToBigInt(fee, false),
+    nonce: intToBigInt(nonce),
+    fee: intToBigInt(fee),
     keyEncoding,
     signature: emptyMessageSignature(),
   };
@@ -162,8 +162,8 @@ export function createMultiSigSpendingCondition(
   return {
     hashMode,
     signer,
-    nonce: intToBigInt(nonce, false),
-    fee: intToBigInt(fee, false),
+    nonce: intToBigInt(nonce),
+    fee: intToBigInt(fee),
     fields: [],
     signaturesRequired: numSigs,
   };
@@ -213,8 +213,8 @@ export function serializeSingleSigSpendingCondition(
   const bytesArray = [
     condition.hashMode,
     hexToBytes(condition.signer),
-    intToBytes(condition.nonce, false, 8),
-    intToBytes(condition.fee, false, 8),
+    intToBytes(condition.nonce, 8),
+    intToBytes(condition.fee, 8),
     condition.keyEncoding as number,
     serializeMessageSignatureBytes(condition.signature),
   ];
@@ -227,8 +227,8 @@ export function serializeMultiSigSpendingCondition(
   const bytesArray = [
     condition.hashMode,
     hexToBytes(condition.signer),
-    intToBytes(condition.nonce, false, 8),
-    intToBytes(condition.fee, false, 8),
+    intToBytes(condition.nonce, 8),
+    intToBytes(condition.fee, 8),
   ];
 
   const fields = createLPList(condition.fields);
@@ -356,8 +356,8 @@ export function makeSigHashPreSign(
   const sigHash =
     curSigHash +
     bytesToHex(new Uint8Array([authType])) +
-    bytesToHex(intToBytes(fee, false, 8)) +
-    bytesToHex(intToBytes(nonce, false, 8));
+    bytesToHex(intToBytes(fee, 8)) +
+    bytesToHex(intToBytes(nonce, 8));
 
   if (hexToBytes(sigHash).byteLength !== hashLength) {
     throw Error('Invalid signature hash length');
@@ -620,13 +620,13 @@ export function setFee(auth: Authorization, amount: IntegerType): Authorization 
     case AuthType.Standard:
       const spendingCondition = {
         ...auth.spendingCondition,
-        fee: intToBigInt(amount, false),
+        fee: intToBigInt(amount),
       };
       return { ...auth, spendingCondition };
     case AuthType.Sponsored:
       const sponsorSpendingCondition = {
         ...auth.sponsorSpendingCondition,
-        fee: intToBigInt(amount, false),
+        fee: intToBigInt(amount),
       };
       return { ...auth, sponsorSpendingCondition };
   }
@@ -644,7 +644,7 @@ export function getFee(auth: Authorization): bigint {
 export function setNonce(auth: Authorization, nonce: IntegerType): Authorization {
   const spendingCondition = {
     ...auth.spendingCondition,
-    nonce: intToBigInt(nonce, false),
+    nonce: intToBigInt(nonce),
   };
 
   return {
@@ -656,7 +656,7 @@ export function setNonce(auth: Authorization, nonce: IntegerType): Authorization
 export function setSponsorNonce(auth: SponsoredAuthorization, nonce: IntegerType): Authorization {
   const sponsorSpendingCondition = {
     ...auth.sponsorSpendingCondition,
-    nonce: intToBigInt(nonce, false),
+    nonce: intToBigInt(nonce),
   };
 
   return {
@@ -671,8 +671,8 @@ export function setSponsor(
 ): Authorization {
   const sc = {
     ...sponsorSpendingCondition,
-    nonce: intToBigInt(sponsorSpendingCondition.nonce, false),
-    fee: intToBigInt(sponsorSpendingCondition.fee, false),
+    nonce: intToBigInt(sponsorSpendingCondition.nonce),
+    fee: intToBigInt(sponsorSpendingCondition.fee),
   };
 
   return {

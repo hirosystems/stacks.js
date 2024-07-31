@@ -27,7 +27,7 @@ export { verify as verifySignature } from '@noble/secp256k1';
 export const randomBytes = (bytesLength?: number): Uint8Array => utils.randomBytes(bytesLength);
 
 export const leftPadHex = (hexString: string): string =>
-  hexString.length % 2 == 0 ? hexString : `0${hexString}`;
+  hexString.length % 2 ? `0${hexString}` : hexString;
 
 export const leftPadHexToLength = (hexString: string, length: number): string =>
   hexString.padStart(length, '0');

@@ -223,7 +223,7 @@ describe('Clarity Types', () => {
 
       expect(() => intCV(NaN)).toThrowError(RangeError);
       expect(() => intCV(Infinity)).toThrowError(RangeError);
-      expect(() => intCV('3.1415')).toThrowError(RangeError);
+      expect(() => intCV('3.1415')).toThrowError(SyntaxError);
       expect(() => intCV(3.1415)).toThrowError(RangeError);
       expect(() => intCV(10000000000000000000000000000000)).toThrowError(RangeError);
     });
