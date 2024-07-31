@@ -25,6 +25,7 @@ import {
 import {
   AuthFieldType,
   COINBASE_BYTES_LENGTH,
+  COMPRESSED_PUBKEY_LENGTH_BYTES,
   ClarityVersion,
   FungibleConditionCode,
   MEMO_MAX_LENGTH_BYTES,
@@ -35,16 +36,11 @@ import {
   PubKeyEncoding,
   RECOVERABLE_ECDSA_SIG_LENGTH_BYTES,
   TenureChangeCause,
+  UNCOMPRESSED_PUBKEY_LENGTH_BYTES,
   VRF_PROOF_BYTES_LENGTH,
 } from '../constants';
 import { DeserializationError, SerializationError } from '../errors';
-import {
-  compressPublicKey,
-  createStacksPublicKey,
-  deserializePublicKeyBytes,
-  serializePublicKeyBytes,
-  uncompressPublicKey,
-} from '../keys';
+import { compressPublicKey, createStacksPublicKey, uncompressPublicKey } from '../keys';
 import { rightPadHexToLength } from '../utils';
 import {
   createCoinbasePayload,
@@ -71,6 +67,7 @@ import {
   PayloadWire,
   PostConditionPrincipalWire,
   PostConditionWire,
+  PublicKeyWire,
   StacksWire,
   StacksWireType,
   StandardPrincipalWire,
@@ -697,4 +694,26 @@ export function serializeTransactionAuthFieldBytes(field: TransactionAuthFieldWi
   }
 
   return concatArray(bytesArray);
+}
+
+export function serializePublicKey(key: PublicKeyWire): string {
+  return bytesToHex(serializePublicKeyBytes(key));
+}
+/** @ignore */
+export function serializePublicKeyBytes(key: PublicKeyWire): Uint8Array {
+  return key.data.slice();
+}
+
+export function deserializePublicKey(serialized: string): PublicKeyWire {
+  return deserializePublicKeyBytes(hexToBytes(serialized));
+}
+/** @ignore */
+export function deserializePublicKeyBytes(serialized: Uint8Array | BytesReader): PublicKeyWire {
+  const bytesReader = isInstance(serialized, BytesReader)
+    ? serialized
+    : new BytesReader(serialized);
+  const fieldId = bytesReader.readUInt8();
+  const keyLength =
+    fieldId === 4 ? UNCOMPRESSED_PUBKEY_LENGTH_BYTES : COMPRESSED_PUBKEY_LENGTH_BYTES;
+  return createStacksPublicKey(concatArray([fieldId, bytesReader.readBytes(keyLength)]));
 }
