@@ -14,6 +14,7 @@
   - [CLI](#cli)
   - [Triplesec](#triplesec)
   - [Advanced: WireType](#advanced-wiretype)
+  - [Advanced: Signed BigInt](#advanced-signed-bigint)
 - [Stacks.js (\<=4.x.x) → (5.x.x)](#stacksjs-4xx--5xx)
   - [Breaking Changes](#breaking-changes-1)
     - [Buffer to Uint8Array](#buffer-to-uint8array)
@@ -41,6 +42,7 @@
 - Remove legacy CLI methods. [Read more...](#cli)
 - Disable legacy `triplesec` mnemonic encryption support. [Read more...](#triplesec)
 - **Advanced:** Rename `MessageType` and related concepts to `WireType`. [Read more...](#advanced-wiretype)
+- **Advanced:** Removes two's complement compatibilty from `intToBigInt` parser method. [Read more...](#advanced-signed-bigint)
 
 ### Stacks Network
 
@@ -298,6 +300,11 @@ More types were renamed to indicate use for serialization to _wire-format_:
 - `TenureChangePayload` → `TenureChangePayloadWire`
 - `StandardPrincipal` → `StandardPrincipalWire`
 - `ContractPrincipal` → `ContractPrincipalWire`
+
+### Advanced: Signed BigInt
+
+The `intToBigInt` method no longer supports two's complement signed integers and removed the `signed` boolean parameter.
+This likely was a misunderstood and unused feature.
 
 ## Stacks.js (&lt;=4.x.x) → (5.x.x)
 

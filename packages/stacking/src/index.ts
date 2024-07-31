@@ -1544,9 +1544,7 @@ export class StackingClient {
    */
   modifyLockTxFee({ tx, amountMicroStx }: { tx: StacksTransaction; amountMicroStx: IntegerType }) {
     const fee = getFee(tx.auth);
-    (tx.payload as ContractCallPayload).functionArgs[0] = uintCV(
-      intToBigInt(amountMicroStx, false) - fee
-    );
+    (tx.payload as ContractCallPayload).functionArgs[0] = uintCV(intToBigInt(amountMicroStx) - fee);
     return tx;
   }
 
