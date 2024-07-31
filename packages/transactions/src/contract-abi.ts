@@ -17,8 +17,8 @@ import {
   uintCV,
 } from './clarity';
 import { NotImplementedError } from './errors';
-import { ContractCallPayload } from './payload';
 import { cloneDeep } from './utils';
+import { ContractCallPayload } from './wire';
 
 // From https://github.com/blockstack/stacks-blockchain-sidecar/blob/master/src/event-stream/contract-abi.ts
 

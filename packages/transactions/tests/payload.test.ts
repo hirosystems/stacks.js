@@ -1,12 +1,11 @@
 import { bytesToHex, utf8ToBytes } from '@stacks/common';
-import { randomBytes } from '../src';
-import { contractPrincipalCV, falseCV, standardPrincipalCV, trueCV } from '../src/clarity';
-import { ClarityVersion, StacksWireType } from '../src/constants';
 import {
-  CoinbasePayloadWire,
+  ClarityVersion,
   CoinbasePayloadToAltRecipient,
+  CoinbasePayloadWire,
   ContractCallPayload,
   SmartContractPayloadWire,
+  StacksWireType,
   TenureChangeCause,
   TenureChangePayloadWire,
   TokenTransferPayloadWire,
@@ -17,8 +16,10 @@ import {
   createTenureChangePayload,
   createTokenTransferPayload,
   deserializePayload,
+  randomBytes,
   serializePayload,
-} from '../src/payload';
+} from '../src';
+import { contractPrincipalCV, falseCV, standardPrincipalCV, trueCV } from '../src/clarity';
 import { serializeDeserialize } from './macros';
 
 test('STX token transfer payload serialization and deserialization', () => {

@@ -1,21 +1,19 @@
-import {
-  FungibleConditionCode,
-  NonFungibleConditionCode,
-  PostConditionType,
-  StacksWireType,
-} from './constants';
+import { FungibleConditionCode, NonFungibleConditionCode, PostConditionType } from './constants';
 import {
   FungiblePostCondition,
-  FungiblePostConditionWire,
   NonFungiblePostCondition,
-  NonFungiblePostConditionWire,
   PostCondition,
+  StxPostCondition,
+} from './postcondition-types';
+import {
+  FungiblePostConditionWire,
+  NonFungiblePostConditionWire,
   PostConditionWire,
   STXPostConditionWire,
-  StxPostCondition,
+  StacksWireType,
   parseAssetString,
   parsePrincipalString,
-} from './postcondition-types';
+} from './wire';
 
 const FUNGIBLE_COMPARATOR_MAPPING = {
   eq: FungibleConditionCode.Equal,

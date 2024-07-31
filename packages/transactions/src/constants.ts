@@ -11,32 +11,6 @@ export const COMPRESSED_PUBKEY_LENGTH_BYTES = 32;
 export const UNCOMPRESSED_PUBKEY_LENGTH_BYTES = 64;
 export const MEMO_MAX_LENGTH_BYTES = 34;
 
-// todo: add explicit enum values
-/**
- * The type of message that is being serialized.
- * Used internally for serializing and deserializing messages.
- */
-export enum StacksWireType {
-  Address,
-  Principal,
-  LengthPrefixedString,
-  MemoString,
-  Asset,
-  PostCondition,
-  PublicKey,
-  LengthPrefixedList,
-  Payload,
-  MessageSignature,
-  StructuredDataSignature,
-  TransactionAuthField,
-}
-
-type WhenWireTypeMap<T> = Record<StacksWireType, T>;
-
-export function whenWireType(wireType: StacksWireType) {
-  return <T>(wireTypeMap: WhenWireTypeMap<T>): T => wireTypeMap[wireType];
-}
-
 /**
  * The type of transaction (payload) that is being serialized.
  * Used internally for serializing and deserializing transactions.
@@ -215,6 +189,20 @@ export enum AssetType {
   STX = 0x00,
   Fungible = 0x01,
   NonFungible = 0x02,
+}
+
+export enum TenureChangeCause {
+  /** A valid winning block-commit */
+  BlockFound = 0,
+  /** The next burnchain block is taking too long, so extend the runtime budget */
+  Extended = 1,
+}
+
+export enum AuthFieldType {
+  PublicKeyCompressed = 0x00,
+  PublicKeyUncompressed = 0x01,
+  SignatureCompressed = 0x02,
+  SignatureUncompressed = 0x03,
 }
 
 // todo: refactor this, if only used in one place, just use a string

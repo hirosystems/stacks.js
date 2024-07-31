@@ -174,7 +174,7 @@ const blocktimeInfo = {
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const poxAbi = require('./poxAbi.json');
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const { createContractCallPayload } = require('../../transactions/src/payload.ts'); // not exported currently
+const { createContractCallPayload } = require('../../transactions/src/wire/create.ts');
 
 // testing helper method
 function isPoxAbiValid(opts: SignedContractCallOptions | ReadOnlyFunctionOptions): boolean {

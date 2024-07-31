@@ -1,6 +1,10 @@
-import { StacksWire, serializeStacksWireBytes, deserializeStacksWireBytes } from '../src/types';
-import { BytesReader } from '../src/bytesReader';
-import { StacksWireType } from '../src/constants';
+import {
+  StacksWire,
+  StacksWireType,
+  deserializeStacksWireBytes,
+  serializeStacksWireBytes,
+} from '../src';
+import { BytesReader } from '../src/BytesReader';
 
 export function serializeDeserialize<V extends StacksWire, T extends StacksWireType>(
   value: V,

@@ -1,25 +1,24 @@
+import { TransactionVersion } from '@stacks/network';
 import {
-  createLPList,
-  serializeStacksWireBytes,
-  deserializeLPListBytes,
-  addressFromHashMode,
-  LengthPrefixedList,
-  addressFromPublicKeys,
-} from '../src/types';
-import {
-  LengthPrefixedStringWire,
+  AddressWire,
   AssetWire,
-  createLPString,
+  LengthPrefixedList,
+  LengthPrefixedStringWire,
+  StacksWireType,
+  addressFromHashMode,
+  addressFromPublicKeys,
+  addressToString,
   createAddress,
   createAsset,
-} from '../src/postcondition-types';
-import { AddressWire, addressToString } from '../src/common';
-import { AddressHashMode, StacksWireType } from '../src/constants';
-
-import { serializeDeserialize } from './macros';
-import { BytesReader } from '../src/bytesReader';
+  createLPList,
+  createLPString,
+  deserializeLPListBytes,
+  serializeStacksWireBytes,
+} from '../src';
+import { BytesReader } from '../src/BytesReader';
+import { AddressHashMode } from '../src/constants';
 import { createStacksPublicKey } from '../src/keys';
-import { TransactionVersion } from '@stacks/network';
+import { serializeDeserialize } from './macros';
 
 test('Length prefixed strings serialization and deserialization', () => {
   const testString = 'test message string';
