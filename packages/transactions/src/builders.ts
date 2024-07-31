@@ -730,8 +730,7 @@ function mutatingSignAppendMultiSig(
       signer.signOrigin(signerKey);
     } else {
       // or append the public key (which did not sign here)
-      // todo: remove wrapper type here as well `next`
-      signer.appendOrigin(createStacksPublicKey(publicKey));
+      signer.appendOrigin(publicKey);
     }
   }
 }
