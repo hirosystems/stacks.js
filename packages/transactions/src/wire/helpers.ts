@@ -1,6 +1,4 @@
-import { TransactionVersion } from '@stacks/network';
 import { c32address } from 'c32check';
-import { addressHashModeToVersion } from '../address';
 import { AddressHashMode, AddressVersion, PayloadType } from '../constants';
 import { publicKeyIsCompressed } from '../keys';
 import { AssetString } from '../types';
@@ -21,15 +19,6 @@ import {
   StandardPrincipalWire,
   TokenTransferPayloadWire,
 } from './types';
-
-export function addressFromHashMode(
-  hashMode: AddressHashMode,
-  txVersion: TransactionVersion,
-  data: string
-): AddressWire {
-  const version = addressHashModeToVersion(hashMode, txVersion);
-  return addressFromVersionHash(version, data);
-}
 
 export function addressFromPublicKeys(
   version: AddressVersion,

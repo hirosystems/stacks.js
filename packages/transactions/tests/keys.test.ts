@@ -13,7 +13,7 @@ import {
   signatureRsvToVrs,
   utf8ToBytes,
 } from '@stacks/common';
-import { AddressVersion, STACKS_TESTNET, TransactionVersion } from '@stacks/network';
+import { AddressVersion, STACKS_TESTNET } from '@stacks/network';
 import { ec as EC } from 'elliptic';
 import {
   PubKeyEncoding,
@@ -75,10 +75,10 @@ test('Stacks public key and private keys', () => {
     'SPZG6BAY4JVR9RNAB1HY92B7Q208ZYY4HZEA9PX5'
   );
 
-  expect(getAddressFromPrivateKey(privKey, TransactionVersion.Testnet)).toBe(
+  expect(getAddressFromPrivateKey(privKey, STACKS_TESTNET)).toBe(
     'STZG6BAY4JVR9RNAB1HY92B7Q208ZYY4HZG8ZXFM'
   );
-  expect(getAddressFromPrivateKey(hexToBytes(privKey), TransactionVersion.Testnet)).toBe(
+  expect(getAddressFromPrivateKey(hexToBytes(privKey), STACKS_TESTNET)).toBe(
     'STZG6BAY4JVR9RNAB1HY92B7Q208ZYY4HZG8ZXFM'
   );
 
@@ -87,10 +87,10 @@ test('Stacks public key and private keys', () => {
     'SPZG6BAY4JVR9RNAB1HY92B7Q208ZYY4HZEA9PX5'
   );
 
-  expect(getAddressFromPublicKey(pubKeyString, TransactionVersion.Testnet)).toBe(
+  expect(getAddressFromPublicKey(pubKeyString, STACKS_TESTNET)).toBe(
     'STZG6BAY4JVR9RNAB1HY92B7Q208ZYY4HZG8ZXFM'
   );
-  expect(getAddressFromPublicKey(hexToBytes(pubKeyString), TransactionVersion.Testnet)).toBe(
+  expect(getAddressFromPublicKey(hexToBytes(pubKeyString), STACKS_TESTNET)).toBe(
     'STZG6BAY4JVR9RNAB1HY92B7Q208ZYY4HZG8ZXFM'
   );
 

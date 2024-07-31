@@ -1,5 +1,5 @@
 import { bytesToHex, concatBytes, equals, utf8ToBytes } from '@stacks/common';
-import { TransactionVersion } from '@stacks/network';
+import { STACKS_TESTNET } from '@stacks/network';
 import { getAddressFromPublicKey } from '@stacks/transactions';
 import { verifyMessageSignatureRsv } from '../src/ec';
 import { decodeMessage, encodeMessage, hashMessage } from '../src/messageSignature';
@@ -79,5 +79,5 @@ test('message signing complete flow', () => {
     })
   ).toBe(true);
 
-  expect(getAddressFromPublicKey(publicKey, TransactionVersion.Testnet)).toBe(address);
+  expect(getAddressFromPublicKey(publicKey, STACKS_TESTNET)).toBe(address);
 });
