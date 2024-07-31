@@ -91,6 +91,14 @@ import { CLI_NETWORK_OPTS, CLINetworkAdapter, getNetwork, NameInfoType } from '.
 
 import { gaiaAuth, gaiaConnect, gaiaUploadProfileAll, getGaiaAddressFromProfile } from './data';
 
+import { deriveDefaultUrl, STACKS_MAINNET, STACKS_TESTNET } from '@stacks/network';
+import {
+  generateNewAccount,
+  generateWallet,
+  getAppPrivateKey,
+  restoreWalletAccounts,
+} from '@stacks/wallet-sdk';
+import { getMaxIDSearchIndex, getPrivateKeyAddress, setMaxIDSearchIndex } from './common';
 import {
   canonicalPrivateKey,
   ClarityFunctionArg,
@@ -110,20 +118,6 @@ import {
   SubdomainOp,
   subdomainOpToZFPieces,
 } from './utils';
-
-import {
-  deriveDefaultUrl,
-  STACKS_MAINNET,
-  STACKS_TESTNET,
-  TransactionVersion,
-} from '@stacks/network';
-import {
-  generateNewAccount,
-  generateWallet,
-  getAppPrivateKey,
-  restoreWalletAccounts,
-} from '@stacks/wallet-sdk';
-import { getMaxIDSearchIndex, getPrivateKeyAddress, setMaxIDSearchIndex } from './common';
 
 // global CLI options
 let txOnly = false;
@@ -272,7 +266,7 @@ async function getAppKeys(network: CLINetworkAdapter, args: string[]): Promise<s
   const privateKey = getAppPrivateKey({ account, appDomain });
   const address = getAddressFromPrivateKey(
     privateKey,
-    network.isMainnet() ? TransactionVersion.Mainnet : TransactionVersion.Testnet
+    network.isMainnet() ? STACKS_MAINNET : STACKS_TESTNET
   );
 
   return JSON.stringify({ keyInfo: { privateKey, address } });
@@ -360,10 +354,8 @@ async function migrateSubdomains(network: CLINetworkAdapter, args: string[]): Pr
   for (const account of accounts) {
     console.log('\nAccount:', account);
 
-    const txVersion = network.isMainnet() ? TransactionVersion.Mainnet : TransactionVersion.Testnet;
-
-    const dataKeyAddress = getAddressFromPrivateKey(account.dataPrivateKey, txVersion); // source
-    const walletKeyAddress = getAddressFromPrivateKey(account.stxPrivateKey, txVersion); // target
+    const dataKeyAddress = getAddressFromPrivateKey(account.dataPrivateKey, _network); // source
+    const walletKeyAddress = getAddressFromPrivateKey(account.stxPrivateKey, _network); // target
 
     console.log(`Finding subdomains for data-key address '${dataKeyAddress}'`);
     const namesResponse = await fetch(
@@ -1740,7 +1732,7 @@ async function stack(_network: CLINetworkAdapter, args: string[]): Promise<strin
   });
   const accounts = new AccountsApi(apiConfig);
 
-  const stxAddress = getAddressFromPrivateKey(privateKey, api.network.transactionVersion);
+  const stxAddress = getAddressFromPrivateKey(privateKey, network);
 
   const balancePromise = accounts.getAccountBalance({
     principal: stxAddress,

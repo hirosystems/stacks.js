@@ -1,12 +1,13 @@
-import { TransactionVersion } from '@stacks/network';
+import { STACKS_MAINNET, STACKS_TESTNET, StacksNetwork } from '@stacks/network';
 import {
   AddressWire,
   AssetWire,
   LengthPrefixedList,
   LengthPrefixedStringWire,
   StacksWireType,
-  addressFromHashMode,
   addressFromPublicKeys,
+  addressFromVersionHash,
+  addressHashModeToVersion,
   addressToString,
   createAddress,
   createAsset,
@@ -63,7 +64,7 @@ test('C32 address hash mode - testnet P2PKH', () => {
   const address = addressToString(
     addressFromHashMode(
       AddressHashMode.SerializeP2PKH,
-      TransactionVersion.Testnet,
+      STACKS_TESTNET,
       'c22d24fec5d06e539c551e732a5ba88997761ba0'
     )
   );
@@ -75,7 +76,7 @@ test('C32 address hash mode - mainnet P2PKH', () => {
   const address = addressToString(
     addressFromHashMode(
       AddressHashMode.SerializeP2PKH,
-      TransactionVersion.Mainnet,
+      STACKS_MAINNET,
       'b976e9f5d6181e40bed7fa589142dfcf2fb28d8e'
     )
   );
@@ -87,7 +88,7 @@ test('C32 address hash mode - mainnet P2SH', () => {
   const address = addressToString(
     addressFromHashMode(
       AddressHashMode.SerializeP2SH,
-      TransactionVersion.Mainnet,
+      STACKS_MAINNET,
       '55011fc38a7e12f7d00496aef7a1c4b6dfeba81b'
     )
   );
@@ -99,7 +100,7 @@ test('C32 address hash mode - testnet P2SH', () => {
   const address = addressToString(
     addressFromHashMode(
       AddressHashMode.SerializeP2SH,
-      TransactionVersion.Testnet,
+      STACKS_TESTNET,
       '55011fc38a7e12f7d00496aef7a1c4b6dfeba81b'
     )
   );
@@ -111,7 +112,7 @@ test('C32 address hash mode - mainnet P2WSH', () => {
   const address = addressToString(
     addressFromHashMode(
       AddressHashMode.SerializeP2WSH,
-      TransactionVersion.Mainnet,
+      STACKS_MAINNET,
       '55011fc38a7e12f7d00496aef7a1c4b6dfeba81b'
     )
   );
@@ -123,7 +124,7 @@ test('C32 address hash mode - testnet P2WSH', () => {
   const address = addressToString(
     addressFromHashMode(
       AddressHashMode.SerializeP2WSH,
-      TransactionVersion.Testnet,
+      STACKS_TESTNET,
       '55011fc38a7e12f7d00496aef7a1c4b6dfeba81b'
     )
   );
@@ -214,3 +215,15 @@ test('Public keys to address hash', () => {
     expect(address.hash160).toBe(fixture.result);
   }
 });
+
+// helpers
+
+/** @internal */
+function addressFromHashMode(
+  hashMode: AddressHashMode,
+  network: StacksNetwork,
+  data: string
+): AddressWire {
+  const version = addressHashModeToVersion(hashMode, network);
+  return addressFromVersionHash(version, data);
+}
