@@ -50,7 +50,7 @@ export class TransactionSigner {
           spendingCondition.fee,
           spendingCondition.nonce,
           PubKeyEncoding.Compressed, // always compressed for multisig
-          signature
+          signature.data
         );
 
         if (!isNonSequentialMultiSig(spendingCondition.hashMode)) {

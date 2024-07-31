@@ -1,4 +1,4 @@
-import { ApiOpts, ApiParam, IntegerType } from '@stacks/common';
+import { ApiOpts, ApiParam, IntegerType, PrivateKey, PublicKey } from '@stacks/common';
 import {
   STACKS_MAINNET,
   STACKS_TESTNET,
@@ -28,8 +28,14 @@ import {
   SingleSigHashMode,
 } from './constants';
 import { ClarityAbi, validateContractCall } from './contract-abi';
-import { fetchFeeEstimate, fetchAbi, fetchNonce } from './fetch';
-import { createStacksPublicKey, privateKeyToPublic, publicKeyToAddress } from './keys';
+import { fetchAbi, fetchFeeEstimate, fetchNonce } from './fetch';
+import {
+  createStacksPublicKey,
+  privateKeyToHex,
+  privateKeyToPublic,
+  publicKeyToAddress,
+  publicKeyToHex,
+} from './keys';
 import { postConditionToWire } from './postcondition';
 import { PostCondition } from './postcondition-types';
 import { TransactionSigner } from './signer';
@@ -56,7 +62,7 @@ export interface UnsignedMultiSigOptions {
   /** The minimum required signatures N (in a N of M multi-sig) */
   numSignatures: number;
   /** The M public-keys (in a N of M multi-sig), which together form the address of the multi-sig account */
-  publicKeys: string[];
+  publicKeys: PublicKey[];
   /**
    * The `address` of the multi-sig account.
    * - If NOT provided, the public-key order is taken AS IS.
@@ -69,7 +75,7 @@ export interface UnsignedMultiSigOptions {
 }
 
 export type SignedMultiSigOptions = UnsignedMultiSigOptions & {
-  signerKeys: string[];
+  signerKeys: PrivateKey[];
 };
 
 /**
@@ -95,11 +101,11 @@ export type TokenTransferOptions = {
 } & ApiParam;
 
 export interface UnsignedTokenTransferOptions extends TokenTransferOptions {
-  publicKey: string;
+  publicKey: PublicKey;
 }
 
 export interface SignedTokenTransferOptions extends TokenTransferOptions {
-  senderKey: string;
+  senderKey: PrivateKey;
 }
 
 export type UnsignedMultiSigTokenTransferOptions = TokenTransferOptions & UnsignedMultiSigOptions;
@@ -151,12 +157,12 @@ export async function makeUnsignedSTXTokenTransfer(
 
     const publicKeys = options.address
       ? sortPublicKeysForAddress(
-          options.publicKeys,
+          options.publicKeys.map(publicKeyToHex),
           options.numSignatures,
           hashMode,
           createAddress(options.address).hash160
         )
-      : options.publicKeys;
+      : options.publicKeys.map(publicKeyToHex);
 
     spendingCondition = createMultiSigSpendingCondition(
       hashMode,
@@ -226,8 +232,8 @@ export async function makeSTXTokenTransfer(
 
     mutatingSignAppendMultiSig(
       transaction,
-      txOptions.publicKeys.slice(),
-      txOptions.signerKeys,
+      txOptions.publicKeys.map(publicKeyToHex).slice(),
+      txOptions.signerKeys.map(privateKeyToHex),
       txOptions.address
     );
 
@@ -262,11 +268,11 @@ export interface BaseContractDeployOptions {
 
 export interface UnsignedContractDeployOptions extends BaseContractDeployOptions {
   /** a hex string of the public key of the transaction sender */
-  publicKey: string;
+  publicKey: PublicKey;
 }
 
 export interface SignedContractDeployOptions extends BaseContractDeployOptions {
-  senderKey: string;
+  senderKey: PrivateKey;
 }
 
 /** @deprecated Use {@link SignedContractDeployOptions} or {@link UnsignedContractDeployOptions} instead. */
@@ -307,8 +313,8 @@ export async function makeContractDeploy(
 
     mutatingSignAppendMultiSig(
       transaction,
-      txOptions.publicKeys.slice(),
-      txOptions.signerKeys,
+      txOptions.publicKeys.map(publicKeyToHex).slice(),
+      txOptions.signerKeys.map(privateKeyToHex),
       txOptions.address
     );
 
@@ -357,12 +363,12 @@ export async function makeUnsignedContractDeploy(
 
     const publicKeys = options.address
       ? sortPublicKeysForAddress(
-          options.publicKeys,
+          options.publicKeys.map(publicKeyToHex),
           options.numSignatures,
           hashMode,
           createAddress(options.address).hash160
         )
-      : options.publicKeys;
+      : options.publicKeys.map(publicKeyToHex);
 
     spendingCondition = createMultiSigSpendingCondition(
       hashMode,
@@ -440,11 +446,11 @@ export interface ContractCallOptions {
 }
 
 export interface UnsignedContractCallOptions extends ContractCallOptions {
-  publicKey: string;
+  publicKey: PrivateKey;
 }
 
 export interface SignedContractCallOptions extends ContractCallOptions {
-  senderKey: string;
+  senderKey: PublicKey;
 }
 
 export type UnsignedMultiSigContractCallOptions = ContractCallOptions & UnsignedMultiSigOptions;
@@ -514,12 +520,12 @@ export async function makeUnsignedContractCall(
 
     const publicKeys = options.address
       ? sortPublicKeysForAddress(
-          options.publicKeys,
+          options.publicKeys.map(publicKeyToHex),
           options.numSignatures,
           hashMode,
           createAddress(options.address).hash160
         )
-      : options.publicKeys;
+      : options.publicKeys.map(publicKeyToHex);
 
     spendingCondition = createMultiSigSpendingCondition(
       hashMode,
@@ -594,8 +600,8 @@ export async function makeContractCall(
 
     mutatingSignAppendMultiSig(
       transaction,
-      txOptions.publicKeys.slice(),
-      txOptions.signerKeys,
+      txOptions.publicKeys.map(publicKeyToHex).slice(),
+      txOptions.signerKeys.map(privateKeyToHex),
       txOptions.address
     );
 
@@ -610,7 +616,7 @@ export interface SponsorOptionsOpts {
   /** the origin-signed transaction */
   transaction: StacksTransaction;
   /** the sponsor's private key */
-  sponsorPrivateKey: string;
+  sponsorPrivateKey: PrivateKey;
   /** the transaction fee amount to sponsor */
   fee?: IntegerType;
   /** the nonce of the sponsor account */

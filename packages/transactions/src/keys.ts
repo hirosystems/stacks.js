@@ -25,15 +25,7 @@ import { c32address } from 'c32check';
 import { addressHashModeToVersion } from './address';
 import { AddressHashMode, AddressVersion, PubKeyEncoding } from './constants';
 import { hash160, hashP2PKH } from './utils';
-import {
-  addressFromVersionHash,
-  addressToString,
-  createMessageSignature,
-  MessageSignatureWire,
-  PublicKeyWire,
-  StacksWireType,
-  StructuredDataSignatureWire,
-} from './wire';
+import { addressFromVersionHash, addressToString, PublicKeyWire, StacksWireType } from './wire';
 
 /**
  * To use secp256k1.signSync set utils.hmacSha256Sync to a function using noble-hashes
@@ -83,10 +75,10 @@ export function createStacksPublicKey(publicKey: PublicKey): PublicKeyWire {
 
 export function publicKeyFromSignatureVrs(
   messageHash: string,
-  messageSignature: MessageSignatureWire | StructuredDataSignatureWire,
+  messageSignature: string,
   pubKeyEncoding = PubKeyEncoding.Compressed
 ): string {
-  const parsedSignature = parseRecoverableSignatureVrs(messageSignature.data);
+  const parsedSignature = parseRecoverableSignatureVrs(messageSignature);
   const signature = new Signature(hexToBigInt(parsedSignature.r), hexToBigInt(parsedSignature.s));
   const point = Point.fromSignature(messageHash, signature, parsedSignature.recoveryId);
   const compressed = pubKeyEncoding === PubKeyEncoding.Compressed;
@@ -95,12 +87,12 @@ export function publicKeyFromSignatureVrs(
 
 export function publicKeyFromSignatureRsv(
   messageHash: string,
-  messageSignature: MessageSignatureWire | StructuredDataSignatureWire,
+  messageSignature: string,
   pubKeyEncoding = PubKeyEncoding.Compressed
 ): string {
   return publicKeyFromSignatureVrs(
     messageHash,
-    { ...messageSignature, data: signatureRsvToVrs(messageSignature.data) },
+    signatureRsvToVrs(messageSignature),
     pubKeyEncoding
   );
 }
@@ -148,8 +140,7 @@ export function publicKeyIsCompressed(publicKey: PublicKey): boolean {
  * Allows for "compressed" and "uncompressed" private keys.
  * > Matches legacy `pubKeyfromPrivKey`, `getPublic` function behavior
  */
-export function privateKeyToPublic(privateKey: PrivateKey): string {
-  // todo: improve return result type `next`
+export function privateKeyToPublic(privateKey: PrivateKey): PublicKey {
   privateKey = privateKeyToBytes(privateKey);
   const isCompressed = privateKeyIsCompressed(privateKey);
   return bytesToHex(nobleGetPublicKey(privateKey.slice(0, 32), isCompressed));
@@ -190,7 +181,7 @@ export function makeRandomPrivKey(): string {
  * @deprecated The Clarity compatible {@link signMessageHashRsv} is preferred, but differs in signature format
  * @returns A recoverable signature (in VRS order)
  */
-export function signWithKey(privateKey: PrivateKey, messageHash: string): MessageSignatureWire {
+export function signWithKey(privateKey: PrivateKey, messageHash: string): string {
   privateKey = privateKeyToBytes(privateKey);
   const [rawSignature, recoveryId] = signSync(messageHash, privateKey.slice(0, 32), {
     canonical: true,
@@ -200,8 +191,7 @@ export function signWithKey(privateKey: PrivateKey, messageHash: string): Messag
     throw new Error('No signature recoveryId received');
   }
   const recoveryIdHex = intToHex(recoveryId, 1);
-  const recoverableSignatureString = recoveryIdHex + Signature.fromHex(rawSignature).toCompactHex(); // V + RS
-  return createMessageSignature(recoverableSignatureString);
+  return recoveryIdHex + Signature.fromHex(rawSignature).toCompactHex(); // V + RS
 }
 
 /**
@@ -215,9 +205,8 @@ export function signMessageHashRsv({
 }: {
   messageHash: string;
   privateKey: PrivateKey;
-}): MessageSignatureWire {
-  const messageSignature = signWithKey(privateKey, messageHash);
-  return { ...messageSignature, data: signatureVrsToRsv(messageSignature.data) };
+}): string {
+  return signatureVrsToRsv(signWithKey(privateKey, messageHash));
 }
 
 /**

@@ -22,7 +22,7 @@ test('ECDSA recoverable signature', () => {
     '019901d8b1d67a7b853dc473d0609508ab2519ec370eabfef460aa0fd9234660' +
     '787970968562da9de8b024a7f36f946b2fdcbf39b2f59247267a9d72730f19276b';
   const messageSignature = signWithKey(privKey, messagetoSign);
-  expect(messageSignature.data).toBe(correctSignature);
+  expect(messageSignature).toBe(correctSignature);
 });
 
 test('Single spending condition serialization and deserialization', () => {

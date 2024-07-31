@@ -435,7 +435,7 @@ async function migrateSubdomains(network: CLINetworkAdapter, args: string[]): Pr
       const sig = signWithKey(account.dataPrivateKey, hash);
 
       // https://docs.stacks.co/build-apps/references/bns#subdomain-lifecycle
-      subDomainOp.signature = sig.data;
+      subDomainOp.signature = sig;
 
       payload.subdomains_list.push(subDomainOp);
     }
