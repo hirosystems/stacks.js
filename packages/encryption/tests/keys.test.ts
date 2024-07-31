@@ -1,8 +1,8 @@
 import { utils } from '@noble/secp256k1';
 import {
+  PRIVATE_KEY_BYTES_UNCOMPRESSED,
   bytesToHex,
   hexToBytes,
-  PRIVATE_KEY_UNCOMPRESSED_LENGTH,
   utf8ToBytes,
 } from '@stacks/common';
 import { address, ECPair, networks } from 'bitcoinjs-lib';
@@ -24,7 +24,7 @@ test('makeECPrivateKey', () => {
 
   expect(privateKey).toBeTruthy();
   expect(typeof privateKey).toEqual('string');
-  expect(privateKey.length).toEqual(PRIVATE_KEY_UNCOMPRESSED_LENGTH * 2);
+  expect(privateKey.length).toEqual(PRIVATE_KEY_BYTES_UNCOMPRESSED * 2);
   expect(utils.isValidPrivateKey(privateKey)).toBeTruthy();
 });
 
@@ -115,7 +115,7 @@ describe(compressPrivateKey, () => {
     const privateKeyCompressed =
       '00cdce6b5f87d38f2a830cae0da82162e1b487f07c5affa8130f01fe1a2a25fb01';
 
-    expect(compressPrivateKey(privateKeyCompressed)).toEqual(hexToBytes(privateKeyCompressed));
+    expect(compressPrivateKey(privateKeyCompressed)).toEqual(privateKeyCompressed);
   });
 
   it('compresses uncompressed key', () => {
@@ -123,6 +123,6 @@ describe(compressPrivateKey, () => {
     const privateKeyCompressed =
       '00cdce6b5f87d38f2a830cae0da82162e1b487f07c5affa8130f01fe1a2a25fb01';
 
-    expect(compressPrivateKey(privateKey)).toEqual(hexToBytes(privateKeyCompressed));
+    expect(compressPrivateKey(privateKey)).toEqual(privateKeyCompressed);
   });
 });

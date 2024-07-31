@@ -13,7 +13,7 @@ import {
   hexToBytes,
   intToHex,
   parseRecoverableSignatureVrs,
-  PRIVATE_KEY_COMPRESSED_LENGTH,
+  PRIVATE_KEY_BYTES_COMPRESSED,
   PrivateKey,
   privateKeyToBytes,
   PublicKey,
@@ -116,7 +116,7 @@ export const isPrivateKeyCompressed = privateKeyIsCompressed;
 /** @deprecated Use {@link isPrivateKeyCompressed} instead */
 export function privateKeyIsCompressed(privateKey: PrivateKey): boolean {
   const length = typeof privateKey === 'string' ? privateKey.length / 2 : privateKey.byteLength;
-  return length === PRIVATE_KEY_COMPRESSED_LENGTH;
+  return length === PRIVATE_KEY_BYTES_COMPRESSED;
 }
 
 /**
