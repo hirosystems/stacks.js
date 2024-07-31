@@ -394,7 +394,7 @@ export function serializePostConditionBytes(postCondition: PostConditionWire): U
     // SIP-005: Maximal length of amount is 8 bytes
     if (postCondition.amount > BigInt('0xffffffffffffffff'))
       throw new SerializationError('The post-condition amount may not be larger than 8 bytes');
-    bytesArray.push(intToBytes(postCondition.amount, false, 8));
+    bytesArray.push(intToBytes(postCondition.amount, 8));
   }
 
   return concatArray(bytesArray);
@@ -474,7 +474,7 @@ export function serializePayloadBytes(payload: PayloadInput): Uint8Array {
   switch (payload.payloadType) {
     case PayloadType.TokenTransfer:
       bytesArray.push(serializeCVBytes(payload.recipient));
-      bytesArray.push(intToBytes(payload.amount, false, 8));
+      bytesArray.push(intToBytes(payload.amount, 8));
       bytesArray.push(serializeStacksWireBytes(payload.memo));
       break;
     case PayloadType.ContractCall:
@@ -541,7 +541,7 @@ export function deserializePayloadBytes(serialized: Uint8Array | BytesReader): P
   switch (payloadType) {
     case PayloadType.TokenTransfer:
       const recipient = deserializeCV(bytesReader) as PrincipalCV;
-      const amount = intToBigInt(bytesReader.readBytes(8), false);
+      const amount = intToBigInt(bytesReader.readBytes(8));
       const memo = deserializeMemoStringBytes(bytesReader);
       return createTokenTransferPayload(recipient, amount, memo);
     case PayloadType.ContractCall:

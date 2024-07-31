@@ -186,7 +186,7 @@ class PartialPcFtWithCode {
       type: 'stx-postcondition',
       address: this.address,
       condition: this.code,
-      amount: intToBigInt(this.amount, true).toString(),
+      amount: intToBigInt(this.amount).toString(),
     };
   }
 
@@ -206,7 +206,7 @@ class PartialPcFtWithCode {
       type: 'ft-postcondition',
       address: this.address,
       condition: this.code,
-      amount: intToBigInt(this.amount, true).toString(),
+      amount: intToBigInt(this.amount).toString(),
       asset: `${contractId}::${tokenName}`,
     };
   }

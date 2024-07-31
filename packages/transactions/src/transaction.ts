@@ -83,7 +83,7 @@ export class StacksTransaction {
     if ('amount' in payload) {
       this.payload = {
         ...payload,
-        amount: intToBigInt(payload.amount, false),
+        amount: intToBigInt(payload.amount),
       };
     } else {
       this.payload = payload;
