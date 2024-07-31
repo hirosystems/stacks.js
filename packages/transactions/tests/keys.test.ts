@@ -13,7 +13,7 @@ import {
   signatureRsvToVrs,
   utf8ToBytes,
 } from '@stacks/common';
-import { AddressVersion, TransactionVersion } from '@stacks/network';
+import { AddressVersion, STACKS_TESTNET, TransactionVersion } from '@stacks/network';
 import { ec as EC } from 'elliptic';
 import {
   PubKeyEncoding,
@@ -24,6 +24,7 @@ import {
   getAddressFromPrivateKey,
   getAddressFromPublicKey,
   makeRandomPrivKey,
+  privateKeyToAddress,
   privateKeyToHex,
   privateKeyToPublic,
   publicKeyFromSignatureRsv,
@@ -328,5 +329,17 @@ describe(publicKeyToAddress.name, () => {
     const publicKey = '03ef788b3830c00abe8f64f62dc32fc863bc0b2cafeb073b6c8e1c7657d9c2c3ab';
     const address = publicKeyToAddress(AddressVersion.MainnetSingleSig, publicKey);
     expect(address).toBe('SPAW66WC3G8WA5F28JVNG1NTRJ6H76E7EN5H6QQD');
+  });
+});
+
+describe(privateKeyToAddress.name, () => {
+  it('should return the correct single-sig address', () => {
+    const privateKey = '73a2f291df5a8ce3ceb668a25ac7af45639513af7596d710ddf59f64f484fd2801';
+
+    const address = privateKeyToAddress(privateKey);
+    expect(address).toBe('SP10J81WVGVB3M4PHQN4Q4G0R8586TBJH948RESDR');
+
+    const addressTestnet = privateKeyToAddress(privateKey, STACKS_TESTNET);
+    expect(addressTestnet).toBe('ST10J81WVGVB3M4PHQN4Q4G0R8586TBJH94CGRESQ');
   });
 });
