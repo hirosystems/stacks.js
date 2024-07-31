@@ -1,7 +1,6 @@
 import { utf8ToBytes } from '@stacks/common';
-import { ChainId, STACKS_TESTNET, StacksNetwork } from '@stacks/network';
+import { STACKS_TESTNET } from '@stacks/network';
 import {
-  AddressVersion,
   FungibleConditionCode,
   NonFungibleConditionCode,
   bufferCV,
@@ -22,25 +21,13 @@ import {
   uintCV,
 } from '@stacks/transactions';
 import fetchMock from 'jest-fetch-mock';
-import { BNS_CONTRACT_NAME, BnsContractAddress, PriceFunction } from '../src';
+import { BNS_CONTRACT_NAME, PriceFunction } from '../src';
 import { decodeFQN, getZonefileHash } from '../src/utils';
 
 beforeEach(() => {
   fetchMock.resetMocks();
   jest.resetModules();
 });
-
-function getBnsContractAddress(network: StacksNetwork) {
-  if (network.chainId === ChainId.Mainnet) return BnsContractAddress.mainnet;
-  else if (network.chainId == ChainId.Testnet) return BnsContractAddress.testnet;
-  else throw new Error(`Unexpected ChainID: ${network.chainId}`);
-}
-
-function getAddressVersion(network: StacksNetwork) {
-  return network.chainId === ChainId.Mainnet
-    ? AddressVersion.MainnetSingleSig
-    : AddressVersion.TestnetSingleSig;
-}
 
 test('canRegisterName true', async () => {
   const fullyQualifiedName = 'test.id';
@@ -65,7 +52,7 @@ test('canRegisterName true', async () => {
   const bnsFunctionName = 'can-name-be-registered';
 
   const expectedReadOnlyFunctionCallOptions = {
-    contractAddress: BnsContractAddress.testnet,
+    contractAddress: STACKS_TESTNET.bootAddress,
     contractName: BNS_CONTRACT_NAME,
     functionName: bnsFunctionName,
     functionArgs: [
@@ -104,7 +91,7 @@ test('canRegisterName false', async () => {
   const bnsFunctionName = 'can-name-be-registered';
 
   const expectedReadOnlyFunctionCallOptions = {
-    contractAddress: BnsContractAddress.testnet,
+    contractAddress: STACKS_TESTNET.bootAddress,
     contractName: BNS_CONTRACT_NAME,
     functionName: bnsFunctionName,
     functionArgs: [
@@ -143,7 +130,7 @@ test('canRegisterName error', async () => {
   const bnsFunctionName = 'can-name-be-registered';
 
   const expectedReadOnlyFunctionCallOptions = {
-    contractAddress: BnsContractAddress.testnet,
+    contractAddress: STACKS_TESTNET.bootAddress,
     contractName: BNS_CONTRACT_NAME,
     functionName: bnsFunctionName,
     functionArgs: [
@@ -182,7 +169,7 @@ test('getNamespacePrice', async () => {
   const bnsFunctionName = 'get-namespace-price';
 
   const expectedReadOnlyFunctionCallOptions = {
-    contractAddress: BnsContractAddress.testnet,
+    contractAddress: STACKS_TESTNET.bootAddress,
     contractName: BNS_CONTRACT_NAME,
     functionName: bnsFunctionName,
     senderAddress: address,
@@ -217,7 +204,7 @@ test('getNamespacePrice error', async () => {
   const bnsFunctionName = 'get-namespace-price';
 
   const expectedReadOnlyFunctionCallOptions = {
-    contractAddress: BnsContractAddress.testnet,
+    contractAddress: STACKS_TESTNET.bootAddress,
     contractName: BNS_CONTRACT_NAME,
     functionName: bnsFunctionName,
     senderAddress: address,
@@ -255,7 +242,7 @@ test('getNamePrice', async () => {
   const bnsFunctionName = 'get-name-price';
 
   const expectedReadOnlyFunctionCallOptions = {
-    contractAddress: BnsContractAddress.testnet,
+    contractAddress: STACKS_TESTNET.bootAddress,
     contractName: BNS_CONTRACT_NAME,
     functionName: bnsFunctionName,
     senderAddress: address,
@@ -292,7 +279,7 @@ test('getNamePrice error', async () => {
   const bnsFunctionName = 'get-name-price';
 
   const expectedReadOnlyFunctionCallOptions = {
-    contractAddress: BnsContractAddress.testnet,
+    contractAddress: STACKS_TESTNET.bootAddress,
     contractName: BNS_CONTRACT_NAME,
     functionName: bnsFunctionName,
     senderAddress: address,
@@ -331,12 +318,12 @@ test('preorderNamespace', async () => {
 
   const bnsFunctionName = 'namespace-preorder';
   const burnSTXPostCondition = createSTXPostCondition(
-    publicKeyToAddress(getAddressVersion(network), publicKey),
+    publicKeyToAddress(network.addressVersion.singleSig, publicKey),
     FungibleConditionCode.Equal,
     stxToBurn
   );
   const expectedBNSContractCallOptions = {
-    contractAddress: BnsContractAddress.testnet,
+    contractAddress: STACKS_TESTNET.bootAddress,
     contractName: BNS_CONTRACT_NAME,
     functionName: bnsFunctionName,
     functionArgs: [bufferCV(hash160(utf8ToBytes(`${namespace}${salt}`))), uintCV(stxToBurn)],
@@ -404,7 +391,7 @@ test('revealNamespace', async () => {
   const bnsFunctionName = 'namespace-reveal';
 
   const expectedBNSContractCallOptions = {
-    contractAddress: BnsContractAddress.testnet,
+    contractAddress: STACKS_TESTNET.bootAddress,
     contractName: BNS_CONTRACT_NAME,
     functionName: bnsFunctionName,
     functionArgs: [
@@ -471,7 +458,7 @@ test('importName', async () => {
   const bnsFunctionName = 'name-import';
 
   const expectedBNSContractCallOptions = {
-    contractAddress: BnsContractAddress.testnet,
+    contractAddress: STACKS_TESTNET.bootAddress,
     contractName: BNS_CONTRACT_NAME,
     functionName: bnsFunctionName,
     functionArgs: [
@@ -512,7 +499,7 @@ test('readyNamespace', async () => {
   const bnsFunctionName = 'namespace-ready';
 
   const expectedBNSContractCallOptions = {
-    contractAddress: BnsContractAddress.testnet,
+    contractAddress: STACKS_TESTNET.bootAddress,
     contractName: BNS_CONTRACT_NAME,
     functionName: bnsFunctionName,
     functionArgs: [bufferCVFromString(namespace)],
@@ -551,12 +538,12 @@ test('preorderName', async () => {
 
   const bnsFunctionName = 'name-preorder';
   const burnSTXPostCondition = createSTXPostCondition(
-    publicKeyToAddress(getAddressVersion(network), publicKey),
+    publicKeyToAddress(network.addressVersion.singleSig, publicKey),
     FungibleConditionCode.Equal,
     stxToBurn
   );
   const expectedBNSContractCallOptions = {
-    contractAddress: BnsContractAddress.testnet,
+    contractAddress: STACKS_TESTNET.bootAddress,
     contractName: BNS_CONTRACT_NAME,
     functionName: bnsFunctionName,
     functionArgs: [
@@ -602,7 +589,7 @@ test('registerName', async () => {
   const { namespace, name } = decodeFQN(fullyQualifiedName);
 
   const expectedBNSContractCallOptions = {
-    contractAddress: BnsContractAddress.testnet,
+    contractAddress: STACKS_TESTNET.bootAddress,
     contractName: BNS_CONTRACT_NAME,
     functionName: bnsFunctionName,
     functionArgs: [
@@ -647,7 +634,7 @@ test('updateName', async () => {
   const { namespace, name } = decodeFQN(fullyQualifiedName);
 
   const expectedBNSContractCallOptions = {
-    contractAddress: BnsContractAddress.testnet,
+    contractAddress: STACKS_TESTNET.bootAddress,
     contractName: BNS_CONTRACT_NAME,
     functionName: bnsFunctionName,
     functionArgs: [
@@ -694,9 +681,9 @@ test('transferName', async () => {
 
   const { namespace, name } = decodeFQN(fullyQualifiedName);
   const nameTransferPostConditionOne = createNonFungiblePostCondition(
-    publicKeyToAddress(getAddressVersion(network), publicKey),
+    publicKeyToAddress(network.addressVersion.singleSig, publicKey),
     NonFungibleConditionCode.Sends,
-    parseAssetString(`${getBnsContractAddress(network)}.bns::names`),
+    parseAssetString(`${network.bootAddress}.bns::names`),
     tupleCV({
       name: bufferCVFromString(name),
       namespace: bufferCVFromString(namespace),
@@ -705,14 +692,14 @@ test('transferName', async () => {
   const nameTransferPostConditionTwo = createNonFungiblePostCondition(
     newOwnerAddress,
     NonFungibleConditionCode.DoesNotSend,
-    parseAssetString(`${getBnsContractAddress(network)}.bns::names`),
+    parseAssetString(`${network.bootAddress}.bns::names`),
     tupleCV({
       name: bufferCVFromString(name),
       namespace: bufferCVFromString(namespace),
     })
   );
   const expectedBNSContractCallOptions = {
-    contractAddress: BnsContractAddress.testnet,
+    contractAddress: STACKS_TESTNET.bootAddress,
     contractName: BNS_CONTRACT_NAME,
     functionName: bnsFunctionName,
     functionArgs: [
@@ -761,9 +748,9 @@ test('transferName optionalArguments', async () => {
 
   const { namespace, name } = decodeFQN(fullyQualifiedName);
   const nameTransferPostConditionOne = createNonFungiblePostCondition(
-    publicKeyToAddress(getAddressVersion(network), publicKey),
+    publicKeyToAddress(network.addressVersion.singleSig, publicKey),
     NonFungibleConditionCode.Sends,
-    parseAssetString(`${getBnsContractAddress(network)}.bns::names`),
+    parseAssetString(`${network.bootAddress}.bns::names`),
     tupleCV({
       name: bufferCVFromString(name),
       namespace: bufferCVFromString(namespace),
@@ -772,14 +759,14 @@ test('transferName optionalArguments', async () => {
   const nameTransferPostConditionTwo = createNonFungiblePostCondition(
     newOwnerAddress,
     NonFungibleConditionCode.DoesNotSend,
-    parseAssetString(`${getBnsContractAddress(network)}.bns::names`),
+    parseAssetString(`${network.bootAddress}.bns::names`),
     tupleCV({
       name: bufferCVFromString(name),
       namespace: bufferCVFromString(namespace),
     })
   );
   const expectedBNSContractCallOptions = {
-    contractAddress: BnsContractAddress.testnet,
+    contractAddress: STACKS_TESTNET.bootAddress,
     contractName: BNS_CONTRACT_NAME,
     functionName: bnsFunctionName,
     functionArgs: [
@@ -823,7 +810,7 @@ test('revokeName', async () => {
   const { namespace, name } = decodeFQN(fullyQualifiedName);
 
   const expectedBNSContractCallOptions = {
-    contractAddress: BnsContractAddress.testnet,
+    contractAddress: STACKS_TESTNET.bootAddress,
     contractName: BNS_CONTRACT_NAME,
     functionName: bnsFunctionName,
     functionArgs: [bufferCVFromString(namespace), bufferCVFromString(name)],
@@ -866,12 +853,12 @@ test('renewName', async () => {
 
   const { namespace, name } = decodeFQN(fullyQualifiedName);
   const burnSTXPostCondition = createSTXPostCondition(
-    publicKeyToAddress(getAddressVersion(network), publicKey),
+    publicKeyToAddress(network.addressVersion.singleSig, publicKey),
     FungibleConditionCode.Equal,
     stxToBurn
   );
   const expectedBNSContractCallOptions = {
-    contractAddress: BnsContractAddress.testnet,
+    contractAddress: STACKS_TESTNET.bootAddress,
     contractName: BNS_CONTRACT_NAME,
     functionName: bnsFunctionName,
     functionArgs: [
@@ -921,12 +908,12 @@ test('renewName optionalArguments', async () => {
 
   const { namespace, name } = decodeFQN(fullyQualifiedName);
   const burnSTXPostCondition = createSTXPostCondition(
-    publicKeyToAddress(getAddressVersion(network), publicKey),
+    publicKeyToAddress(network.addressVersion.singleSig, publicKey),
     FungibleConditionCode.Equal,
     stxToBurn
   );
   const expectedBNSContractCallOptions = {
-    contractAddress: BnsContractAddress.testnet,
+    contractAddress: STACKS_TESTNET.bootAddress,
     contractName: BNS_CONTRACT_NAME,
     functionName: bnsFunctionName,
     functionArgs: [
