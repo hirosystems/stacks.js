@@ -2578,7 +2578,7 @@ describe('multi-sig', () => {
       signer.signOrigin(signers.get(pub)!);
     }
 
-    signer.appendOrigin(createStacksPublicKey(missingSigner!));
+    signer.appendOrigin(missingSigner!);
 
     expect(() => tx.verifyOrigin()).not.toThrow();
   });
