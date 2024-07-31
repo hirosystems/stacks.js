@@ -420,7 +420,7 @@ describe('Subdomain Migration', () => {
     const hash = crypto.createHash('sha256').update(textToSign).digest('hex');
     const sig = signWithKey(privateKey, hash);
 
-    subDomainOp.signature = sig.data; // Assign signature to subDomainOp
+    subDomainOp.signature = sig; // Assign signature to subDomainOp
 
     // Verify that the generated signature is valid
     const pubKey = publicKeyFromSignatureVrs(hash, sig);

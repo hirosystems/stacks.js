@@ -578,7 +578,7 @@ test('Make Multi-Sig STX token transfer with two transaction signers', async () 
   const compressed1 = privKeys[0].endsWith('01');
   const field1 = createTransactionAuthField(
     compressed1 ? PubKeyEncoding.Compressed : PubKeyEncoding.Uncompressed,
-    sig1
+    createMessageSignature(sig1)
   );
   signer.signOrigin(privKeys[0]);
 
@@ -599,7 +599,7 @@ test('Make Multi-Sig STX token transfer with two transaction signers', async () 
   const compressed2 = privKeys[1].endsWith('01');
   const field2 = createTransactionAuthField(
     compressed2 ? PubKeyEncoding.Compressed : PubKeyEncoding.Uncompressed,
-    sig2
+    createMessageSignature(sig2)
   );
 
   const compressedPub = publicKeyIsCompressed(pubKeys[2].data);
@@ -2396,9 +2396,7 @@ describe('multi-sig', () => {
 
       const signingSigs = new Set(
         // deduplicate
-        signing.map(
-          sk => nextSignature(tx.signBegin(), tx.auth.authType, 1_000n, 2n, sk).nextSig.data
-        )
+        signing.map(sk => nextSignature(tx.signBegin(), tx.auth.authType, 1_000n, 2n, sk).nextSig)
       );
       expect(signingSigs.size).toBe(signatures.length);
       expect(Array.from(signingSigs)).toEqual(expect.arrayContaining(signatures));
@@ -2463,7 +2461,7 @@ describe('multi-sig', () => {
           hexToBytes(signerKey).byteLength === PRIVATE_KEY_COMPRESSED_LENGTH
             ? PubKeyEncoding.Compressed
             : PubKeyEncoding.Uncompressed,
-          nextSig
+          createMessageSignature(nextSig)
         );
 
         serialized = transactionToHex(tx);

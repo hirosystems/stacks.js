@@ -6,6 +6,7 @@ import {
   intToBigInt,
   intToBytes,
   PrivateKey,
+  PublicKey,
   writeUInt16BE,
 } from '@stacks/common';
 import { BytesReader } from './BytesReader';
@@ -117,7 +118,7 @@ export function createSpendingCondition(
 
 export function createSingleSigSpendingCondition(
   hashMode: SingleSigHashMode,
-  pubKey: string,
+  pubKey: PublicKey,
   nonce: IntegerType,
   fee: IntegerType
 ): SingleSigSpendingCondition {
@@ -365,11 +366,8 @@ export function makeSigHashPreSign(
   return txidFromData(hexToBytes(sigHash));
 }
 
-function makeSigHashPostSign(
-  curSigHash: string,
-  pubKey: PublicKeyWire,
-  signature: MessageSignatureWire
-): string {
+/** @internal */
+function makeSigHashPostSign(curSigHash: string, pubKey: PublicKeyWire, signature: string): string {
   // new hash combines the previous hash and all the new data this signature will add.  This
   // includes:
   // * the public key compression flag
@@ -380,7 +378,7 @@ function makeSigHashPostSign(
     ? PubKeyEncoding.Compressed
     : PubKeyEncoding.Uncompressed;
 
-  const sigHash = curSigHash + leftPadHex(pubKeyEncoding.toString(16)) + signature.data;
+  const sigHash = curSigHash + leftPadHex(pubKeyEncoding.toString(16)) + signature;
 
   const sigHashBytes = hexToBytes(sigHash);
   if (sigHashBytes.byteLength > hashLength) {
@@ -397,7 +395,7 @@ export function nextSignature(
   nonce: IntegerType,
   privateKey: PrivateKey
 ): {
-  nextSig: MessageSignatureWire;
+  nextSig: string;
   nextSigHash: string;
 } {
   const sigHashPreSign = makeSigHashPreSign(curSigHash, authType, fee, nonce);
@@ -418,7 +416,7 @@ export function nextVerification(
   fee: IntegerType,
   nonce: IntegerType,
   pubKeyEncoding: PubKeyEncoding,
-  signature: MessageSignatureWire
+  signature: string
 ) {
   const sigHashPreSign = makeSigHashPreSign(initialSigHash, authType, fee, nonce);
 
@@ -465,7 +463,7 @@ function verifySingleSig(
     condition.fee,
     condition.nonce,
     condition.keyEncoding,
-    condition.signature
+    condition.signature.data
   );
 
   // address version arg doesn't matter for signer hash generation
@@ -508,7 +506,7 @@ function verifyMultiSig(
           condition.fee,
           condition.nonce,
           field.pubKeyEncoding,
-          field.contents
+          field.contents.data
         );
 
         if (isSequentialMultiSig(condition.hashMode)) {
