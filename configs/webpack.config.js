@@ -65,6 +65,7 @@ module.exports = {
       '@stacks/storage': '@stacks/storage/dist/esm',
       '@stacks/transactions': '@stacks/transactions/dist/esm',
       '@stacks/wallet-sdk': '@stacks/wallet-sdk/dist/esm',
+      '@stacks/rpc-client': '@stacks/rpc-client/dist/esm',
     },
     // fallback: is set in package config
   },

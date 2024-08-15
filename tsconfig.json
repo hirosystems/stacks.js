@@ -14,7 +14,8 @@
       "@stacks/stacking": ["packages/stacking/src"],
       "@stacks/storage": ["packages/storage/src"],
       "@stacks/transactions": ["packages/transactions/src"],
-      "@stacks/wallet-sdk": ["packages/wallet-sdk/src"]
+      "@stacks/wallet-sdk": ["packages/wallet-sdk/src"],
+      "@stacks/rpc-client": ["packages/rpc-client/src"]
     }
   },
   "exclude": ["**/node_modules", "**/dist"],
@@ -33,7 +34,8 @@
       "packages/keychain",
       "packages/profile",
       "packages/storage",
-      "packages/wallet-sdk"
+      "packages/wallet-sdk",
+      "packages/rpc-client"
     ],
     "json": "docs/docs.json",
     "out": "docs",

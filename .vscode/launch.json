@@ -39,7 +39,7 @@
       "request": "launch",
       "name": "Jest: common",
       "cwd": "${workspaceFolder}/packages/common",
-      "program": "./node_modules/.bin/jest",
+      "program": "../../node_modules/.bin/jest",
       "args": [
         "--runInBand"
       ],
@@ -61,7 +61,7 @@
       "request": "launch",
       "name": "Jest: keychain",
       "cwd": "${workspaceFolder}/packages/keychain",
-      "program": "./node_modules/.bin/jest",
+      "program": "../../node_modules/.bin/jest",
       "args": [
         "--runInBand"
       ],
@@ -72,7 +72,7 @@
       "request": "launch",
       "name": "Jest: network",
       "cwd": "${workspaceFolder}/packages/network",
-      "program": "./node_modules/.bin/jest",
+      "program": "../../node_modules/.bin/jest",
       "args": [
         "--runInBand"
       ],
@@ -83,7 +83,7 @@
       "request": "launch",
       "name": "Jest: profile",
       "cwd": "${workspaceFolder}/packages/profile",
-      "program": "./node_modules/.bin/jest",
+      "program": "../../node_modules/.bin/jest",
       "args": [
         "--runInBand"
       ],
@@ -94,7 +94,7 @@
       "request": "launch",
       "name": "Jest: stacking",
       "cwd": "${workspaceFolder}/packages/stacking",
-      "program": "./node_modules/.bin/jest",
+      "program": "../../node_modules/.bin/jest",
       "args": [
         "--runInBand"
       ],
@@ -105,7 +105,7 @@
       "request": "launch",
       "name": "Jest: storage",
       "cwd": "${workspaceFolder}/packages/storage",
-      "program": "./node_modules/.bin/jest",
+      "program": "../../node_modules/.bin/jest",
       "args": [
         "--runInBand"
       ],
@@ -119,6 +119,18 @@
       "program": "./node_modules/.bin/jest",
       "args": [
         "--runInBand"
+      ],
+      "console": "integratedTerminal"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Jest: rpc-client",
+      "cwd": "${workspaceFolder}/packages/rpc-client",
+      "program": "../../node_modules/.bin/jest",
+      "args": [
+        "--runInBand",
+        "--testTimeout=3600000",
       ],
       "console": "integratedTerminal"
     },
