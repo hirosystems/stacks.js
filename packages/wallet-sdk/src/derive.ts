@@ -3,7 +3,7 @@
 import { HDKey } from '@scure/bip32';
 import { getNameInfo } from '@stacks/auth';
 import { ApiParam, bytesToHex, defaultApiLike, utf8ToBytes } from '@stacks/common';
-import { compressPrivateKey, createSha2Hash } from '@stacks/encryption';
+import { createSha2Hash } from '@stacks/encryption';
 import {
   STACKS_MAINNET,
   StacksNetwork,
@@ -11,7 +11,7 @@ import {
   deriveDefaultUrl,
   networkFrom,
 } from '@stacks/network';
-import { getAddressFromPrivateKey } from '@stacks/transactions';
+import { compressPrivateKey, getAddressFromPrivateKey } from '@stacks/transactions';
 import { Account, HARDENED_OFFSET, WalletKeys } from './models/common';
 import { fetchFirstName } from './usernames';
 import { assertIsTruthy } from './utils';

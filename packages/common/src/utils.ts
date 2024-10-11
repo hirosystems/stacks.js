@@ -439,7 +439,7 @@ function nthBit(value: bigint, n: bigint) {
   return value & (BigInt(1) << n);
 }
 
-/** @internal */
+/** @ignore */
 export function bytesToTwosBigInt(bytes: Uint8Array): bigint {
   return fromTwos(BigInt(`0x${bytesToHex(bytes)}`), BigInt(bytes.byteLength * 8));
 }

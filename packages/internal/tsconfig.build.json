@@ -7,5 +7,13 @@
     "tsBuildInfoFile": "./tsconfig.build.tsbuildinfo",
     "composite": true
   },
+  "references": [
+    {
+      "path": "../api/tsconfig.build.json"
+    },
+    {
+      "path": "../stacking/tsconfig.build.json"
+    }
+  ],
   "include": ["src/**/*"]
 }

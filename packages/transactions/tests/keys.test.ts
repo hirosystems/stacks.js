@@ -18,6 +18,7 @@ import { ec as EC } from 'elliptic';
 import {
   PubKeyEncoding,
   StacksWireType,
+  compressPrivateKey,
   compressPublicKey,
   createStacksPublicKey,
   encodeStructuredData,
@@ -341,5 +342,22 @@ describe(privateKeyToAddress.name, () => {
 
     const addressTestnet = privateKeyToAddress(privateKey, STACKS_TESTNET);
     expect(addressTestnet).toBe('ST10J81WVGVB3M4PHQN4Q4G0R8586TBJH94CGRESQ');
+  });
+});
+
+describe(compressPrivateKey, () => {
+  it('does not change already compressed key', () => {
+    const privateKeyCompressed =
+      '00cdce6b5f87d38f2a830cae0da82162e1b487f07c5affa8130f01fe1a2a25fb01';
+
+    expect(compressPrivateKey(privateKeyCompressed)).toEqual(privateKeyCompressed);
+  });
+
+  it('compresses uncompressed key', () => {
+    const privateKey = '00cdce6b5f87d38f2a830cae0da82162e1b487f07c5affa8130f01fe1a2a25fb';
+    const privateKeyCompressed =
+      '00cdce6b5f87d38f2a830cae0da82162e1b487f07c5affa8130f01fe1a2a25fb01';
+
+    expect(compressPrivateKey(privateKey)).toEqual(privateKeyCompressed);
   });
 });

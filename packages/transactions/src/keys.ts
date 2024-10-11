@@ -210,6 +210,17 @@ export function signMessageHashRsv({
 }
 
 /**
+ * @ignore
+ */
+export function compressPrivateKey(privateKey: PrivateKey): string {
+  privateKey = privateKeyToHex(privateKey);
+
+  return privateKey.length == PRIVATE_KEY_BYTES_COMPRESSED * 2
+    ? privateKey // leave compressed
+    : `${privateKey}01`; // compress
+}
+
+/**
  * Convert a private key to a single-sig address.
  * @returns A Stacks address string (encoded with c32check)
  * @example

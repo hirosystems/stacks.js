@@ -2,7 +2,6 @@ import { hmac } from '@noble/hashes/hmac';
 import { sha256 } from '@noble/hashes/sha256';
 import { getPublicKey as nobleGetPublicKey, signSync, utils } from '@noble/secp256k1';
 import {
-  PRIVATE_KEY_BYTES_COMPRESSED,
   PrivateKey,
   bytesToHex,
   concatBytes,
@@ -13,7 +12,6 @@ import {
 import base58 from 'bs58';
 import { hashRipemd160 } from './hashRipemd160';
 import { hashSha256Sync } from './sha2Hash';
-import { privateKeyToHex } from '../../transactions/src';
 
 const BITCOIN_PUBKEYHASH = 0x00;
 
@@ -111,22 +109,4 @@ export function ecSign(messageHash: Uint8Array, privateKey: PrivateKey) {
   return signSync(messageHash, privateKeyToBytes(privateKey).slice(0, 32), {
     der: false,
   });
-}
-
-/**
- * @ignore
- */
-export function isValidPrivateKey(privateKey: PrivateKey): boolean {
-  return utils.isValidPrivateKey(privateKeyToBytes(privateKey));
-}
-
-/**
- * @ignore
- */
-export function compressPrivateKey(privateKey: PrivateKey): string {
-  privateKey = privateKeyToHex(privateKey);
-
-  return privateKey.length == PRIVATE_KEY_BYTES_COMPRESSED * 2
-    ? privateKey // leave compressed
-    : `${privateKey}01`; // compress
 }
