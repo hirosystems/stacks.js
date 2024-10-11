@@ -1,14 +1,5 @@
 import { ClarityType } from '../constants';
-
-interface StringAsciiCV {
-  readonly type: ClarityType.StringASCII;
-  readonly data: string;
-}
-
-interface StringUtf8CV {
-  readonly type: ClarityType.StringUTF8;
-  readonly data: string;
-}
+import { StringAsciiCV, StringUtf8CV } from '../types';
 
 /**
  * Converts ClarityValue to stringAsciiCV
@@ -23,14 +14,14 @@ interface StringUtf8CV {
  *
  *  const stringAscii = stringAsciiCV('test');
  *
- *  // { type: 13, data: 'hello' }
+ *  // { type: 'ascii', data: 'hello' }
  * ```
  *
  * @see
  * {@link https://github.com/hirosystems/stacks.js/blob/main/packages/transactions/tests/clarity.test.ts | clarity test cases for more examples}
  */
-const stringAsciiCV = (data: string): StringAsciiCV => {
-  return { type: ClarityType.StringASCII, data };
+export const stringAsciiCV = (data: string): StringAsciiCV => {
+  return { type: ClarityType.StringASCII, value: data };
 };
 
 /**
@@ -46,20 +37,23 @@ const stringAsciiCV = (data: string): StringAsciiCV => {
  *
  *  const stringUTF8 = stringUtf8CV('test');
  *
- *  // { type: 13, data: 'hello' }
+ *  // { type: 'utf8', data: 'hello' }
  * ```
  *
  * @see
  * {@link https://github.com/hirosystems/stacks.js/blob/main/packages/transactions/tests/clarity.test.ts | clarity test cases for more examples}
  */
-const stringUtf8CV = (data: string): StringUtf8CV => {
-  return { type: ClarityType.StringUTF8, data };
+export const stringUtf8CV = (data: string): StringUtf8CV => {
+  return { type: ClarityType.StringUTF8, value: data };
 };
 
 /**
  * @ignore
  */
-const stringCV = (data: string, encoding: 'ascii' | 'utf8'): StringAsciiCV | StringUtf8CV => {
+export const stringCV = (
+  data: string,
+  encoding: 'ascii' | 'utf8'
+): StringAsciiCV | StringUtf8CV => {
   switch (encoding) {
     case 'ascii':
       return stringAsciiCV(data);
@@ -67,5 +61,3 @@ const stringCV = (data: string, encoding: 'ascii' | 'utf8'): StringAsciiCV | Str
       return stringUtf8CV(data);
   }
 };
-
-export { StringAsciiCV, StringUtf8CV, stringAsciiCV, stringUtf8CV, stringCV };

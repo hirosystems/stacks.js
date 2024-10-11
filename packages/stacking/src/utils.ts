@@ -1,18 +1,17 @@
 import { sha256 } from '@noble/hashes/sha256';
 import { bech32, bech32m } from '@scure/base';
-import { IntegerType, bigIntToBytes } from '@stacks/common';
+import { IntegerType, PrivateKey, bigIntToBytes, hexToBytes } from '@stacks/common';
 import {
   base58CheckDecode,
   base58CheckEncode,
   verifyMessageSignatureRsv,
 } from '@stacks/encryption';
-import { StacksNetwork, StacksNetworkName, StacksNetworks } from '@stacks/network';
+import { StacksNetwork, StacksNetworkName, StacksNetworks, networkFrom } from '@stacks/network';
 import {
   BufferCV,
   ClarityType,
   ClarityValue,
   OptionalCV,
-  StacksPrivateKey,
   TupleCV,
   bufferCV,
   encodeStructuredData,
@@ -143,26 +142,29 @@ export function decodeBtcAddress(btcAddress: string): {
   }
 }
 
-export function extractPoxAddressFromClarityValue(poxAddrClarityValue: ClarityValue) {
+export function extractPoxAddressFromClarityValue(poxAddrClarityValue: ClarityValue): {
+  version: number;
+  hashBytes: Uint8Array;
+} {
   const clarityValue = poxAddrClarityValue as TupleCV;
-  if (clarityValue.type !== ClarityType.Tuple || !clarityValue.data) {
+  if (clarityValue.type !== ClarityType.Tuple || !clarityValue.value) {
     throw new Error('Invalid argument, expected ClarityValue to be a TupleCV');
   }
-  if (!('version' in clarityValue.data) || !('hashbytes' in clarityValue.data)) {
+  if (!('version' in clarityValue.value) || !('hashbytes' in clarityValue.value)) {
     throw new Error(
       'Invalid argument, expected Clarity tuple value to contain `version` and `hashbytes` keys'
     );
   }
-  const versionCV = clarityValue.data['version'] as BufferCV;
-  const hashBytesCV = clarityValue.data['hashbytes'] as BufferCV;
+  const versionCV = clarityValue.value['version'] as BufferCV;
+  const hashBytesCV = clarityValue.value['hashbytes'] as BufferCV;
   if (versionCV.type !== ClarityType.Buffer || hashBytesCV.type !== ClarityType.Buffer) {
     throw new Error(
       'Invalid argument, expected Clarity tuple value to contain `version` and `hashbytes` buffers'
     );
   }
   return {
-    version: versionCV.buffer[0],
-    hashBytes: hashBytesCV.buffer,
+    version: hexToBytes(versionCV.value)[0],
+    hashBytes: hexToBytes(hashBytesCV.value),
   };
 }
 
@@ -318,6 +320,7 @@ export function poxAddressToBtcAddress(
   network: StacksNetworkName
 ): string;
 export function poxAddressToBtcAddress(...args: any[]): string {
+  // todo: allow these helpers to take a bitcoin network instead of a stacks network, once we have a concept of bitcoin networks in the codebase
   if (typeof args[0] === 'number') return _poxAddressToBtcAddress_Values(args[0], args[1], args[2]);
   return _poxAddressToBtcAddress_ClarityValue(args[0], args[1]);
 }
@@ -412,7 +415,7 @@ export interface Pox4SignatureOptions {
   rewardCycle: number;
   /** lock period (in cycles) */
   period: number;
-  network: StacksNetwork;
+  network: StacksNetworkName | StacksNetwork;
   /** Maximum amount of uSTX that can be locked during this function call */
   maxAmount: IntegerType;
   /** Random integer to prevent signature re-use */
@@ -431,11 +434,11 @@ export function signPox4SignatureHash({
   privateKey,
   maxAmount,
   authId,
-}: Pox4SignatureOptions & { privateKey: StacksPrivateKey }) {
+}: Pox4SignatureOptions & { privateKey: PrivateKey }) {
   return signStructuredData({
     ...pox4SignatureMessage({ topic, poxAddress, rewardCycle, period, network, maxAmount, authId }),
     privateKey,
-  }).data;
+  });
 }
 
 /**
@@ -473,10 +476,11 @@ export function pox4SignatureMessage({
   poxAddress,
   rewardCycle,
   period: lockPeriod,
-  network,
+  network: networkOrName,
   maxAmount,
   authId,
 }: Pox4SignatureOptions) {
+  const network = networkFrom(networkOrName);
   const message = tupleCV({
     'pox-addr': poxAddressToTuple(poxAddress),
     'reward-cycle': uintCV(rewardCycle),

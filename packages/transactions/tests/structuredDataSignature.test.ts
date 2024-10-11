@@ -2,7 +2,7 @@ import { sha256 } from '@noble/hashes/sha256';
 import { asciiToBytes, bytesToHex, hexToBytes } from '@stacks/common';
 import { verifyMessageSignatureRsv } from '@stacks/encryption';
 import { standardPrincipalCV, stringAsciiCV, trueCV, tupleCV, uintCV } from '../src/clarity';
-import { createStacksPrivateKey, publicKeyFromSignatureRsv, signMessageHashRsv } from '../src/keys';
+import { publicKeyFromSignatureRsv, signMessageHashRsv } from '../src/keys';
 import {
   decodeStructuredDataSignature,
   encodeStructuredData,
@@ -212,7 +212,7 @@ describe('SIP018 test vectors', () => {
   });
 
   test('Message signing', () => {
-    const privateKeyString = '753b7cc01a1a2e86221266a154af739463fce51219d97e4f856cd7200c3bd2a601';
+    const privateKey = '753b7cc01a1a2e86221266a154af739463fce51219d97e4f856cd7200c3bd2a601';
     const publicKey = '0390a5cac7c33fda49f70bc1b0866fa0ba7a9440d9de647fecb8132ceb76a94dfa';
     // const address = 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM';
     const domain = tupleCV({
@@ -224,16 +224,15 @@ describe('SIP018 test vectors', () => {
     const messageHash = '1bfdab6d4158313ce34073fbb8d6b0fc32c154d439def12247a0f44bb2225259';
     const expectedSignature =
       '8b94e45701d857c9f1d1d70e8b2ca076045dae4920fb0160be0642a68cd78de072ab527b5c5277a593baeb2a8b657c216b99f7abb5d14af35b4bf12ba6460ba401';
-    const privateKey = createStacksPrivateKey(privateKeyString);
     const computedSignature = signStructuredData({
       message,
       domain,
       privateKey,
     });
-    expect(computedSignature.data).toEqual(expectedSignature);
+    expect(computedSignature).toEqual(expectedSignature);
     // Verify signature
     const isSignatureVerified = verifyMessageSignatureRsv({
-      signature: computedSignature.data,
+      signature: computedSignature,
       message: hexToBytes(messageHash),
       publicKey,
     });
@@ -251,21 +250,21 @@ test('verifyMessageSignature works for both legacy/current and future message si
 
   const signature = signMessageHashRsv({
     messageHash: encodedMessageHash,
-    privateKey: createStacksPrivateKey(privateKey),
+    privateKey,
   });
   const signatureAlt = signMessageHashRsv({
     messageHash: encodedMessageHashAlt,
-    privateKey: createStacksPrivateKey(privateKey),
+    privateKey,
   });
 
   const publicKey = publicKeyFromSignatureRsv(encodedMessageHash, signature);
   const publicKeyAlt = publicKeyFromSignatureRsv(encodedMessageHashAlt, signatureAlt);
 
-  expect(verifyMessageSignatureRsv({ message, signature: signature.data, publicKey })).toBe(true);
+  expect(verifyMessageSignatureRsv({ message, signature, publicKey })).toBe(true);
   expect(
     verifyMessageSignatureRsv({
       message,
-      signature: signatureAlt.data,
+      signature: signatureAlt,
       publicKey: publicKeyAlt,
     })
   ).toBe(true);

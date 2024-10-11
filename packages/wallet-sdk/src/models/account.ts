@@ -10,8 +10,8 @@ import {
   hashSha256Sync,
   publicKeyToBtcAddress,
 } from '@stacks/encryption';
-import { createFetchFn, FetchFn } from '@stacks/network';
-import { getAddressFromPrivateKey, TransactionVersion } from '@stacks/transactions';
+import { createFetchFn, FetchFn } from '@stacks/common';
+import { getAddressFromPrivateKey } from '@stacks/transactions';
 import { connectToGaiaHubWithConfig, getHubInfo, makeGaiaAssociationToken } from '../utils';
 import { Account, HARDENED_OFFSET } from './common';
 import {
@@ -20,6 +20,7 @@ import {
   fetchProfileFromUrl,
   signAndUploadProfile,
 } from './profile';
+import { STACKS_MAINNET, STACKS_TESTNET, TransactionVersion } from '@stacks/network';
 
 export const getStxAddress = ({
   account,
@@ -28,7 +29,10 @@ export const getStxAddress = ({
   account: Account;
   transactionVersion?: TransactionVersion;
 }): string => {
-  return getAddressFromPrivateKey(account.stxPrivateKey, transactionVersion);
+  return getAddressFromPrivateKey(
+    account.stxPrivateKey,
+    transactionVersion == TransactionVersion.Mainnet ? STACKS_MAINNET : STACKS_TESTNET // todo: refactor for `next` wallet update
+  );
 };
 
 /**

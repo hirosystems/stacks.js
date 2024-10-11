@@ -4,6 +4,7 @@ import { Logger } from './logger';
  *  @ignore
  */
 export const BLOCKSTACK_HANDLER = 'blockstack';
+// todo: `next` get rid of all this blockstack stuff
 
 /**
  * Time
@@ -313,76 +314,43 @@ export function getGlobalObjects<K extends Extract<keyof Window, string>>(
   }
   return result;
 }
-// After removing bn.js library provide backward compatibility for users passing bn.js instance
-type BN = import('bn.js'); // Type only import from @types/bn.js
-export type IntegerType = number | string | bigint | Uint8Array | BN;
 
-export function intToBytes(value: IntegerType, signed: boolean, byteLength: number): Uint8Array {
-  return bigIntToBytes(intToBigInt(value, signed), byteLength);
+export type IntegerType = number | string | bigint | Uint8Array;
+
+export function intToBytes(value: IntegerType, byteLength: number): Uint8Array {
+  return bigIntToBytes(intToBigInt(value), byteLength);
 }
 
-export function intToBigInt(value: IntegerType, signed: boolean): bigint {
-  let parsedValue = value;
-
-  if (typeof parsedValue === 'number') {
-    if (!Number.isInteger(parsedValue)) {
+/**
+ * Converts an integer-compatible value to a bigint
+ * @param value - The value to convert to a bigint
+ * @returns The bigint representation of the value
+ *
+ * @example
+ * ```ts
+ * intToBigInt(123); // 123n
+ * intToBigInt('0xbeef'); // 48879n
+ * ```
+ */
+export function intToBigInt(value: IntegerType): bigint {
+  if (typeof value === 'bigint') return value;
+  if (typeof value === 'string') return BigInt(value);
+  if (typeof value === 'number') {
+    if (!Number.isInteger(value)) {
       throw new RangeError(`Invalid value. Values of type 'number' must be an integer.`);
     }
-    if (parsedValue > Number.MAX_SAFE_INTEGER) {
+    if (value > Number.MAX_SAFE_INTEGER) {
       throw new RangeError(
         `Invalid value. Values of type 'number' must be less than or equal to ${Number.MAX_SAFE_INTEGER}. For larger values, try using a BigInt instead.`
       );
     }
-    return BigInt(parsedValue);
+    return BigInt(value);
   }
-  if (typeof parsedValue === 'string') {
-    // If hex string then convert to bytes then fall through to the bytes condition
-    if (parsedValue.toLowerCase().startsWith('0x')) {
-      // Trim '0x' hex-prefix
-      let hex = parsedValue.slice(2);
 
-      // Allow odd-length strings like `0xf` -- some libs output these, or even just `0x${num.toString(16)}`
-      hex = hex.padStart(hex.length + (hex.length % 2), '0');
+  if (isInstance(value, Uint8Array)) return BigInt(`0x${bytesToHex(value)}`);
 
-      parsedValue = hexToBytes(hex);
-    } else {
-      try {
-        return BigInt(parsedValue);
-      } catch (error) {
-        if (error instanceof SyntaxError) {
-          throw new RangeError(`Invalid value. String integer '${parsedValue}' is not finite.`);
-        }
-      }
-    }
-  }
-  if (typeof parsedValue === 'bigint') {
-    return parsedValue;
-  }
-  if (parsedValue instanceof Uint8Array) {
-    if (signed) {
-      // Allow byte arrays smaller than 128-bits to be passed.
-      // This allows positive signed ints like `0x08` (8) or negative signed
-      // ints like `0xf8` (-8) to be passed without having to pad to 16 bytes.
-      const bn = fromTwos(
-        BigInt(`0x${bytesToHex(parsedValue)}`),
-        BigInt(parsedValue.byteLength * 8)
-      );
-      return BigInt(bn.toString());
-    } else {
-      return BigInt(`0x${bytesToHex(parsedValue)}`);
-    }
-  }
-  // After removing bn.js library provide backward compatibility for users passing bn.js instance
-  // For backward compatibility with bn.js check if it's a bn.js instance
-  if (
-    parsedValue != null &&
-    typeof parsedValue === 'object' &&
-    parsedValue.constructor.name === 'BN'
-  ) {
-    return BigInt(parsedValue.toString());
-  }
   throw new TypeError(
-    `Invalid value type. Must be a number, bigint, integer-string, hex-string, or Uint8Array.`
+    `intToBigInt: Invalid value type. Must be a number, bigint, BigInt-compatible string, or Uint8Array.`
   );
 }
 
@@ -390,7 +358,18 @@ export function intToBigInt(value: IntegerType, signed: boolean): bigint {
  * Adds a `0x` prefix to a string if it does not already have one.
  */
 export function with0x(value: string): string {
-  return value.startsWith('0x') ? value : `0x${value}`;
+  return /^0x/i.test(value) // startsWith('0x') case insensitive
+    ? value
+    : `0x${value}`;
+}
+
+/**
+ * Removes the `0x` prefix of a string if it has one.
+ */
+export function without0x(value: string): string {
+  return /^0x/i.test(value) // startsWith('0x') case insensitive
+    ? value.slice(2)
+    : value;
 }
 
 /**
@@ -411,7 +390,7 @@ export function hexToBigInt(hex: string): bigint {
  * @ignore
  */
 export function intToHex(integer: IntegerType, lengthBytes = 8): string {
-  const value = typeof integer === 'bigint' ? integer : intToBigInt(integer, false);
+  const value = typeof integer === 'bigint' ? integer : intToBigInt(integer);
   return value.toString(16).padStart(lengthBytes * 2, '0');
 }
 
@@ -460,9 +439,14 @@ function nthBit(value: bigint, n: bigint) {
   return value & (BigInt(1) << n);
 }
 
+/** @ignore */
+export function bytesToTwosBigInt(bytes: Uint8Array): bigint {
+  return fromTwos(BigInt(`0x${bytesToHex(bytes)}`), BigInt(bytes.byteLength * 8));
+}
+
 /**
  * Converts from two's complement to signed number
- * @ignore
+ * @internal
  */
 export function fromTwos(value: bigint, width: bigint) {
   if (nthBit(value, width - BigInt(1))) {
@@ -514,14 +498,13 @@ export function hexToBytes(hex: string): Uint8Array {
     throw new TypeError(`hexToBytes: expected string, got ${typeof hex}`);
   }
 
-  // todo: add use `without0x` from current `next` to replace duplicate trimming code
-  hex = hex.startsWith('0x') || hex.startsWith('0X') ? hex.slice(2) : hex; // remove 0x prefix
+  hex = without0x(hex);
+  hex = hex.length % 2 ? `0${hex}` : hex; // left pad with a zero if odd length
 
-  const paddedHex = hex.length % 2 ? `0${hex}` : hex; // left pad with a zero if odd length
-  const array = new Uint8Array(paddedHex.length / 2);
+  const array = new Uint8Array(hex.length / 2);
   for (let i = 0; i < array.length; i++) {
     const j = i * 2;
-    const hexByte = paddedHex.slice(j, j + 2);
+    const hexByte = hex.slice(j, j + 2);
     const byte = Number.parseInt(hexByte, 16);
     if (Number.isNaN(byte) || byte < 0) throw new Error('Invalid byte sequence');
     array[i] = byte;
@@ -623,6 +606,15 @@ export function concatArray(elements: (Uint8Array | number[] | number)[]) {
  * Better `instanceof` check for types in different environments
  * @ignore
  */
-export function isInstance(object: any, type: any) {
-  return object instanceof type || object?.constructor?.name?.toLowerCase() === type.name;
+export function isInstance<T>(object: any, clazz: { new (...args: any[]): T }): object is T {
+  return object instanceof clazz || object?.constructor?.name?.toLowerCase() === clazz.name;
+}
+
+/**
+ * Checks whether a string is a valid hex string, and has a length of 64 characters.
+ */
+export function validateHash256(hex: string): boolean {
+  hex = without0x(hex);
+  if (hex.length !== 64) return false;
+  return /^[0-9a-fA-F]+$/.test(hex);
 }

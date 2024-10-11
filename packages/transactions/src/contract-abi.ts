@@ -11,13 +11,14 @@ import {
   noneCV,
   someCV,
   standardPrincipalCV,
+  stringAsciiCV,
+  stringUtf8CV,
   trueCV,
   uintCV,
 } from './clarity';
-import { stringAsciiCV, stringUtf8CV } from './clarity/types/stringCV';
 import { NotImplementedError } from './errors';
-import { ContractCallPayload } from './payload';
 import { cloneDeep } from './utils';
+import { ContractCallPayload } from './wire';
 
 // From https://github.com/blockstack/stacks-blockchain-sidecar/blob/master/src/event-stream/contract-abi.ts
 
@@ -299,17 +300,17 @@ function matchType(cv: ClarityValue, abiType: ClarityAbiType): boolean {
     case ClarityType.Buffer:
       return (
         union.id === ClarityAbiTypeId.ClarityAbiTypeBuffer &&
-        union.type.buffer.length >= cv.buffer.length
+        union.type.buffer.length >= Math.ceil(cv.value.length / 2)
       );
     case ClarityType.StringASCII:
       return (
         union.id === ClarityAbiTypeId.ClarityAbiTypeStringAscii &&
-        union.type['string-ascii'].length >= cv.data.length
+        union.type['string-ascii'].length >= cv.value.length
       );
     case ClarityType.StringUTF8:
       return (
         union.id === ClarityAbiTypeId.ClarityAbiTypeStringUtf8 &&
-        union.type['string-utf8'].length >= cv.data.length
+        union.type['string-utf8'].length >= cv.value.length
       );
     case ClarityType.OptionalNone:
       return (
@@ -341,12 +342,12 @@ function matchType(cv: ClarityValue, abiType: ClarityAbiType): boolean {
     case ClarityType.List:
       return (
         union.id == ClarityAbiTypeId.ClarityAbiTypeList &&
-        union.type.list.length >= cv.list.length &&
-        cv.list.every(val => matchType(val, union.type.list.type))
+        union.type.list.length >= cv.value.length &&
+        cv.value.every(val => matchType(val, union.type.list.type))
       );
     case ClarityType.Tuple:
       if (union.id == ClarityAbiTypeId.ClarityAbiTypeTuple) {
-        const tuple = cloneDeep(cv.data);
+        const tuple = cloneDeep(cv.value);
         for (let i = 0; i < union.type.tuple.length; i++) {
           const abiTupleEntry = union.type.tuple[i];
           const key = abiTupleEntry.name;

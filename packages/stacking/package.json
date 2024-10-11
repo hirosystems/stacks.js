@@ -22,6 +22,7 @@
   "dependencies": {
     "@noble/hashes": "1.1.5",
     "@scure/base": "1.1.1",
+    "@stacks/api": "file:../api",
     "@stacks/common": "^6.16.0",
     "@stacks/encryption": "^6.16.1",
     "@stacks/network": "^6.16.0",
@@ -31,6 +32,7 @@
   },
   "devDependencies": {
     "@stacks/blockchain-api-client": "^7.3.0",
+    "@stacks/internal": "file:../internal",
     "jest-fetch-mock": "^3.0.3",
     "process": "^0.11.10",
     "rimraf": "^3.0.2",

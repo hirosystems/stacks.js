@@ -1,14 +1,28 @@
 import {
+  Hex,
+  IntegerType,
+  PrivateKey,
+  PublicKey,
   bytesToHex,
   concatArray,
   hexToBytes,
-  IntegerType,
   intToBigInt,
-  PRIVATE_KEY_COMPRESSED_LENGTH,
   writeUInt32BE,
 } from '@stacks/common';
 import {
+  ChainId,
+  DEFAULT_CHAIN_ID,
+  STACKS_MAINNET,
+  STACKS_TESTNET,
+  TransactionVersion,
+  whenTransactionVersion,
+} from '@stacks/network';
+import { serializePayloadBytes } from '.';
+import { BytesReader } from './BytesReader';
+import {
   Authorization,
+  MultiSigSpendingCondition,
+  SpendingConditionOpts,
   deserializeAuthorization,
   intoInitialSighashAuth,
   isSingleSig,
@@ -18,39 +32,45 @@ import {
   setNonce,
   setSponsor,
   setSponsorNonce,
-  SpendingConditionOpts,
   verifyOrigin,
 } from './authorization';
-import { BytesReader } from './bytesReader';
 import {
+  AddressHashMode,
   AnchorMode,
-  anchorModeFromNameOrValue,
   AnchorModeName,
   AuthType,
-  ChainID,
-  DEFAULT_CHAIN_ID,
-  PayloadType,
   PostConditionMode,
   PubKeyEncoding,
-  StacksMessageType,
-  TransactionVersion,
+  RECOVERABLE_ECDSA_SIG_LENGTH_BYTES,
+  anchorModeFrom,
 } from './constants';
 import { SerializationError, SigningError } from './errors';
-import { isCompressed, StacksPrivateKey, StacksPublicKey } from './keys';
-import { deserializePayload, Payload, PayloadInput, serializePayload } from './payload';
-import { createTransactionAuthField } from './signature';
-import { createLPList, deserializeLPList, LengthPrefixedList, serializeLPList } from './types';
+import { createStacksPublicKey, privateKeyIsCompressed, publicKeyIsCompressed } from './keys';
 import { cloneDeep, txidFromData } from './utils';
+import {
+  LengthPrefixedList,
+  PayloadInput,
+  PayloadWire,
+  PublicKeyWire,
+  StacksWireType,
+  createLPList,
+  createMessageSignature,
+  createTransactionAuthField,
+  deserializeLPListBytes,
+  deserializePayloadBytes,
+  serializeLPListBytes,
+} from './wire';
 
 export class StacksTransaction {
   version: TransactionVersion;
-  chainId: ChainID;
+  chainId: ChainId;
   auth: Authorization;
   anchorMode: AnchorMode;
-  payload: Payload;
+  payload: PayloadWire;
   postConditionMode: PostConditionMode;
   postConditions: LengthPrefixedList;
 
+  // todo: next: change to opts object with `network` opt
   constructor(
     version: TransactionVersion,
     auth: Authorization,
@@ -58,14 +78,14 @@ export class StacksTransaction {
     postConditions?: LengthPrefixedList,
     postConditionMode?: PostConditionMode,
     anchorMode?: AnchorModeName | AnchorMode,
-    chainId?: ChainID
+    chainId?: ChainId
   ) {
     this.version = version;
     this.auth = auth;
     if ('amount' in payload) {
       this.payload = {
         ...payload,
-        amount: intToBigInt(payload.amount, false),
+        amount: intToBigInt(payload.amount),
       };
     } else {
       this.payload = payload;
@@ -74,25 +94,7 @@ export class StacksTransaction {
     this.postConditionMode = postConditionMode ?? PostConditionMode.Deny;
     this.postConditions = postConditions ?? createLPList([]);
 
-    if (anchorMode) {
-      this.anchorMode = anchorModeFromNameOrValue(anchorMode);
-    } else {
-      switch (payload.payloadType) {
-        case PayloadType.Coinbase:
-        case PayloadType.CoinbaseToAltRecipient:
-        case PayloadType.NakamotoCoinbase:
-        case PayloadType.PoisonMicroblock:
-        case PayloadType.TenureChange:
-          this.anchorMode = AnchorMode.OnChainOnly;
-          break;
-        case PayloadType.ContractCall:
-        case PayloadType.SmartContract:
-        case PayloadType.VersionedSmartContract:
-        case PayloadType.TokenTransfer:
-          this.anchorMode = AnchorMode.Any;
-          break;
-      }
-    }
+    this.anchorMode = anchorModeFrom(anchorMode ?? AnchorMode.Any);
   }
 
   /** @deprecated Does NOT mutate transaction, but rather returns the hash of the transaction with a cleared initial authorization */
@@ -113,7 +115,7 @@ export class StacksTransaction {
     return verifyOrigin(this.auth, this.verifyBegin());
   }
 
-  signNextOrigin(sigHash: string, privateKey: StacksPrivateKey): string {
+  signNextOrigin(sigHash: string, privateKey: PrivateKey): string {
     if (this.auth.spendingCondition === undefined) {
       throw new Error('"auth.spendingCondition" is undefined');
     }
@@ -123,7 +125,7 @@ export class StacksTransaction {
     return this.signAndAppend(this.auth.spendingCondition, sigHash, AuthType.Standard, privateKey);
   }
 
-  signNextSponsor(sigHash: string, privateKey: StacksPrivateKey): string {
+  signNextSponsor(sigHash: string, privateKey: PrivateKey): string {
     if (this.auth.authType === AuthType.Sponsored) {
       return this.signAndAppend(
         this.auth.sponsorSpendingCondition,
@@ -136,14 +138,33 @@ export class StacksTransaction {
     }
   }
 
-  appendPubkey(publicKey: StacksPublicKey) {
+  /**
+   * Append a public key to the spending-condition of the transaction
+   *
+   * @param publicKey - the public key to append
+   * @example
+   * ```ts
+   * import { makeSTXTokenTransfer } from '@stacks/transactions';
+   *
+   * const transaction = makeSTXTokenTransfer({ ... });
+   * transaction.appendPubkey('034f355bdcb7cc0af728..24c0e585c5e89ac788521e0');
+   * ```
+   */
+  appendPubkey(publicKey: PublicKey): void;
+  appendPubkey(publicKey: PublicKeyWire): void;
+  appendPubkey(publicKey: PublicKey | PublicKeyWire): void {
+    const wire =
+      typeof publicKey === 'object' && 'type' in publicKey
+        ? publicKey
+        : createStacksPublicKey(publicKey);
+
     const cond = this.auth.spendingCondition;
     if (cond && !isSingleSig(cond)) {
-      const compressed = isCompressed(publicKey);
+      const compressed = publicKeyIsCompressed(wire.data);
       cond.fields.push(
         createTransactionAuthField(
           compressed ? PubKeyEncoding.Compressed : PubKeyEncoding.Uncompressed,
-          publicKey
+          wire
         )
       );
     } else {
@@ -158,7 +179,7 @@ export class StacksTransaction {
     condition: SpendingConditionOpts,
     curSigHash: string,
     authType: AuthType,
-    privateKey: StacksPrivateKey
+    privateKey: PrivateKey
   ): string {
     const { nextSig, nextSigHash } = nextSignature(
       curSigHash,
@@ -168,14 +189,13 @@ export class StacksTransaction {
       privateKey
     );
     if (isSingleSig(condition)) {
-      condition.signature = nextSig;
+      condition.signature = createMessageSignature(nextSig);
     } else {
+      const compressed = privateKeyIsCompressed(privateKey);
       condition.fields.push(
         createTransactionAuthField(
-          privateKey.data.byteLength === PRIVATE_KEY_COMPRESSED_LENGTH
-            ? PubKeyEncoding.Compressed
-            : PubKeyEncoding.Uncompressed,
-          nextSig
+          compressed ? PubKeyEncoding.Compressed : PubKeyEncoding.Uncompressed,
+          createMessageSignature(nextSig)
         )
       );
     }
@@ -184,7 +204,7 @@ export class StacksTransaction {
   }
 
   txid(): string {
-    const serialized = this.serialize();
+    const serialized = this.serializeBytes();
     return txidFromData(serialized);
   }
 
@@ -227,7 +247,35 @@ export class StacksTransaction {
     this.auth = setSponsorNonce(this.auth, nonce);
   }
 
-  serialize(): Uint8Array {
+  /**
+   * Serialize a transaction to a hex string (byte representation)
+   *
+   * @returns A hex string of the serialized transaction
+   * @example
+   * ```ts
+   * import { makeSTXTokenTransfer } from '@stacks/transactions';
+   *
+   * const transaction = makeSTXTokenTransfer({ ... });
+   * const hex = transaction.serialize();
+   * ```
+   */
+  serialize(): Hex {
+    return bytesToHex(this.serializeBytes());
+  }
+
+  /**
+   * Serialize a transaction to bytes
+   *
+   * @returns A Uint8Array of the serialized transaction
+   * @example
+   * ```ts
+   * import { makeSTXTokenTransfer } from '@stacks/transactions';
+   *
+   * const transaction = makeSTXTokenTransfer({ ... });
+   * const bytes = transaction.serializeBytes();
+   * ```
+   */
+  serializeBytes(): Uint8Array {
     if (this.version === undefined) {
       throw new SerializationError('"version" is undefined');
     }
@@ -253,8 +301,8 @@ export class StacksTransaction {
     bytesArray.push(serializeAuthorization(this.auth));
     bytesArray.push(this.anchorMode);
     bytesArray.push(this.postConditionMode);
-    bytesArray.push(serializeLPList(this.postConditions));
-    bytesArray.push(serializePayload(this.payload));
+    bytesArray.push(serializeLPListBytes(this.postConditions));
+    bytesArray.push(serializePayloadBytes(this.payload));
 
     return concatArray(bytesArray);
   }
@@ -287,8 +335,8 @@ export function deserializeTransaction(tx: string | Uint8Array | BytesReader) {
   const postConditionMode = bytesReader.readUInt8Enum(PostConditionMode, n => {
     throw new Error(`Could not parse ${n} as PostConditionMode`);
   });
-  const postConditions = deserializeLPList(bytesReader, StacksMessageType.PostCondition);
-  const payload = deserializePayload(bytesReader);
+  const postConditions = deserializeLPListBytes(bytesReader, StacksWireType.PostCondition);
+  const payload = deserializePayloadBytes(bytesReader);
 
   return new StacksTransaction(
     version,
@@ -301,25 +349,89 @@ export function deserializeTransaction(tx: string | Uint8Array | BytesReader) {
   );
 }
 
+/** @ignore */
+export function deriveNetworkFromTx(transaction: StacksTransaction) {
+  return whenTransactionVersion(transaction.version)({
+    [TransactionVersion.Mainnet]: STACKS_MAINNET,
+    [TransactionVersion.Testnet]: STACKS_TESTNET,
+  });
+}
+
+/**
+ * Estimates transaction byte length
+ * Context:
+ * 1) Multi-sig transaction byte length increases by adding signatures
+ *    which causes the incorrect fee estimation because the fee value is set while creating unsigned transaction
+ * 2) Single-sig transaction byte length remain same due to empty message signature which allocates the space for signature
+ * @param {transaction} - StacksTransaction object to be estimated
+ * @return {number} Estimated transaction byte length
+ */
+export function estimateTransactionByteLength(transaction: StacksTransaction): number {
+  const hashMode = transaction.auth.spendingCondition.hashMode;
+  // List of Multi-sig transaction hash modes
+  const multiSigHashModes = [AddressHashMode.P2SH, AddressHashMode.P2WSH];
+
+  // Check if its a Multi-sig transaction
+  if (multiSigHashModes.includes(hashMode)) {
+    const multiSigSpendingCondition: MultiSigSpendingCondition = transaction.auth
+      .spendingCondition as MultiSigSpendingCondition;
+
+    // Find number of existing signatures if the transaction is signed or partially signed
+    const existingSignatures = multiSigSpendingCondition.fields.filter(
+      field => field.contents.type === StacksWireType.MessageSignature
+    ).length; // existingSignatures will be 0 if its a unsigned transaction
+
+    // Estimate total signature bytes size required for this multi-sig transaction
+    // Formula: totalSignatureLength = (signaturesRequired - existingSignatures) * (SIG_LEN_BYTES + 1 byte for type of signature)
+    const totalSignatureLength =
+      (multiSigSpendingCondition.signaturesRequired - existingSignatures) *
+      (RECOVERABLE_ECDSA_SIG_LENGTH_BYTES + 1);
+
+    return transaction.serializeBytes().byteLength + totalSignatureLength;
+  } else {
+    // Single-sig transaction
+    // Signature space already allocated by empty message signature
+    return transaction.serializeBytes().byteLength;
+  }
+}
+
 /**
  * Alias for `transaction.serialize()`
  *
- * Serializes a transaction to bytes.
+ * Serializes a transaction to a hex string.
  *
  * @example
  * ```ts
  * import { makeSTXTokenTransfer, serializeTransaction } from '@stacks/transactions';
  *
  * const transaction = makeSTXTokenTransfer({ ... });
- * const bytes = serializeTransaction(transaction);
+ * const hex = serializeTransaction(transaction);
  * ```
  */
-export function serializeTransaction(transaction: StacksTransaction): Uint8Array {
-  // todo: refactor to hex instead of bytes for `next` release
+export function serializeTransaction(transaction: StacksTransaction): Hex {
   return transaction.serialize();
 }
 
 /**
+ * Alias for `transaction.serializeBytes()`
+ *
+ * Serializes a transaction to bytes.
+ *
+ * @example
+ * ```ts
+ * import { makeSTXTokenTransfer, serializeTransactionBytes } from '@stacks/transactions';
+ *
+ * const transaction = makeSTXTokenTransfer({ ... });
+ * const bytes = serializeTransactionBytes(transaction);
+ * ```
+ */
+export function serializeTransactionBytes(transaction: StacksTransaction): Uint8Array {
+  return transaction.serializeBytes();
+}
+
+/**
+ * Alias for `transaction.serialize()`
+ *
  * Serializes a transaction to a hex string.
  *
  * @example
@@ -331,5 +443,5 @@ export function serializeTransaction(transaction: StacksTransaction): Uint8Array
  * ```
  */
 export function transactionToHex(transaction: StacksTransaction): string {
-  return bytesToHex(transaction.serialize());
+  return transaction.serialize();
 }
