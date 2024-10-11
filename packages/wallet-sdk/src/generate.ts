@@ -19,13 +19,24 @@ import { bytesToHex } from '@stacks/common';
 
 export type AllowedKeyEntropyBits = 128 | 256;
 
-export const generateSecretKey = (entropy: AllowedKeyEntropyBits = 256) => {
-  const secretKey = generateMnemonic(wordlist, entropy);
-  return secretKey;
-};
+/**
+ * Generate a random 12 or 24 word mnemonic phrase.
+ *
+ * @example
+ * ```ts
+ * const phrase = randomSeedPhrase();
+ * // "warrior volume sport ... figure cake since"
+ * ```
+ */
+export function randomSeedPhrase(entropy: AllowedKeyEntropyBits = 256): string {
+  return generateMnemonic(wordlist, entropy);
+}
+
+/** @deprecated Use {@link randomSeedPhrase} instead */
+export const generateSecretKey = randomSeedPhrase;
 
 /**
- * Generate a new [[Wallet]].
+ * Generate a new {@link Wallet}.
  * @param secretKey A 12 or 24 word mnemonic phrase. Must be a valid bip39 mnemonic.
  * @param password A password used to encrypt the wallet
  */
