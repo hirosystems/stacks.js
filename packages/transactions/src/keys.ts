@@ -172,9 +172,20 @@ export function uncompressPublicKey(publicKey: PublicKey): string {
   return Point.fromHex(publicKeyToHex(publicKey)).toHex(false);
 }
 
-// todo: double-check for deduplication, rename!
-export function makeRandomPrivKey(): string {
-  return bytesToHex(utils.randomPrivateKey());
+/** @deprecated Use {@link randomPrivateKey} instead */
+export const makeRandomPrivKey = randomPrivateKey;
+
+/**
+ * Generate a random private key (compressed)
+ *
+ * @example
+ * ```ts
+ * const privateKey = randomPrivateKey();
+ * // 'f5a31c1268a1e37d4edaa05c7d11183c5fbfdcdc48aae36ea4d8cd5cb709932801'
+ * ```
+ */
+export function randomPrivateKey(): string {
+  return compressPrivateKey(utils.randomPrivateKey());
 }
 
 /**

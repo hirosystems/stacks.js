@@ -68,8 +68,8 @@ test('Stacks public key and private keys', () => {
 
   expect(privateKeyToPublic(privKey)).toBe(pubKeyString);
 
-  const randomKey = makeRandomPrivKey(); // defaults to uncompressed (i.e. no 01 suffix)
-  expect(privateKeyToHex(randomKey).length).toEqual(64);
+  const randomKey = makeRandomPrivKey(); // defaults to compressed (i.e. with 01 suffix)
+  expect(privateKeyToHex(randomKey).length).toEqual(66);
 
   expect(getAddressFromPrivateKey(privKey)).toBe('SPZG6BAY4JVR9RNAB1HY92B7Q208ZYY4HZEA9PX5');
   expect(getAddressFromPrivateKey(hexToBytes(privKey))).toBe(
