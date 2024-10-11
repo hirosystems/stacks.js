@@ -323,6 +323,7 @@ This likely was a misunderstood and unused feature.
 
 - `AddressHashMode`: The `Serialize` prefixes were removed for brevity.
 - `makeRandomPrivKey` was renamed to `randomPrivateKey` and now returns a compressed private key.
+- `generateSecretKey` was renamed to `randomSeedPhrase`.
 
 ## Stacks.js (&lt;=4.x.x) → (5.x.x)
 
