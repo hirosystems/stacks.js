@@ -8,6 +8,7 @@
   },
   "devDependencies": {
     "@stacks/api": "^6.9.0",
+    "@stacks/stacking": "^6.9.0",
     "@stacks/blockchain-api-client": "^7.12.0",
     "@stacks/network": "^6.16.0",
     "jest-fetch-mock": "^3.0.3"

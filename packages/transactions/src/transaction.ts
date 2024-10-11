@@ -2,12 +2,13 @@ import {
   Hex,
   IntegerType,
   PrivateKey,
+  PublicKey,
   bytesToHex,
   concatArray,
   hexToBytes,
   intToBigInt,
   writeUInt32BE,
-} from '@stacks/common/src';
+} from '@stacks/common';
 import {
   ChainId,
   DEFAULT_CHAIN_ID,
@@ -59,7 +60,6 @@ import {
   deserializePayloadBytes,
   serializeLPListBytes,
 } from './wire';
-import { PublicKey } from '@stacks/common';
 
 export class StacksTransaction {
   version: TransactionVersion;

@@ -5,12 +5,11 @@ import {
   hexToBytes,
   utf8ToBytes,
 } from '@stacks/common';
-import { address, ECPair, networks } from 'bitcoinjs-lib';
+import { ECPair, address, networks } from 'bitcoinjs-lib';
 import bs58check from 'bs58check';
 import { SECP256K1Client } from 'jsontokens';
 import {
   base58Encode,
-  compressPrivateKey,
   ecSign,
   getPublicKeyFromPrivate,
   hashSha256Sync,
@@ -108,21 +107,4 @@ test('ecSign', () => {
   const signature = ecSign(digest, privateKey);
 
   expect(bytesToHex(signature)).toEqual(signatureHex);
-});
-
-describe(compressPrivateKey, () => {
-  it('does not change already compressed key', () => {
-    const privateKeyCompressed =
-      '00cdce6b5f87d38f2a830cae0da82162e1b487f07c5affa8130f01fe1a2a25fb01';
-
-    expect(compressPrivateKey(privateKeyCompressed)).toEqual(privateKeyCompressed);
-  });
-
-  it('compresses uncompressed key', () => {
-    const privateKey = '00cdce6b5f87d38f2a830cae0da82162e1b487f07c5affa8130f01fe1a2a25fb';
-    const privateKeyCompressed =
-      '00cdce6b5f87d38f2a830cae0da82162e1b487f07c5affa8130f01fe1a2a25fb01';
-
-    expect(compressPrivateKey(privateKey)).toEqual(privateKeyCompressed);
-  });
 });

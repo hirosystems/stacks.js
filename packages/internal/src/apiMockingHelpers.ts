@@ -1,7 +1,7 @@
 import { Configuration, TransactionsApi } from '@stacks/blockchain-api-client';
 import { STACKS_TESTNET } from '@stacks/network';
 import { MockResponseInitFunction } from 'jest-fetch-mock';
-import { StackingClient } from '../../stacking/src';
+import { StackingClient } from '@stacks/stacking';
 import { StacksNodeApi } from '@stacks/api';
 
 // NOTES

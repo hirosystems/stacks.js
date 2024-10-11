@@ -88,7 +88,7 @@ import {
   PubKeyEncoding,
   TxRejectedReason,
 } from '../src/constants';
-import { makeRandomPrivKey } from '../src/keys';
+import { compressPrivateKey, makeRandomPrivKey } from '../src/keys';
 import { FungiblePostCondition, PostCondition, StxPostCondition } from '../src/postcondition-types';
 import { TransactionSigner } from '../src/signer';
 import {
@@ -98,7 +98,6 @@ import {
   transactionToHex,
 } from '../src/transaction';
 import { cloneDeep, randomBytes } from '../src/utils';
-import { compressPrivateKey } from '../../encryption/src';
 
 function setSignature(
   unsignedTransaction: StacksTransaction,

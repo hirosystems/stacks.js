@@ -6,12 +6,8 @@ import { InstanceDataStore, LocalStorageStore, SessionDataStore } from './sessio
 import { decodeToken } from 'jsontokens';
 import { verifyAuthResponse } from './verification';
 import * as authMessages from './messages';
-import {
-  decryptContent,
-  encryptContent,
-  EncryptContentOptions,
-  isValidPrivateKey,
-} from '@stacks/encryption';
+import { utils } from '@noble/secp256k1';
+import { decryptContent, encryptContent, EncryptContentOptions } from '@stacks/encryption';
 import { getAddressFromDID } from './dids';
 import {
   createFetchFn,
@@ -254,7 +250,7 @@ export class UserSession {
             )) as string;
           } catch (e) {
             Logger.warn('Failed decryption of appPrivateKey, will try to use as given');
-            if (!isValidPrivateKey(tokenPayload.private_key as string)) {
+            if (!utils.isValidPrivateKey(tokenPayload.private_key as string)) {
               throw new LoginFailedError(
                 'Failed decrypting appPrivateKey. Usually means' +
                   ' that the transit key has changed during login.'
