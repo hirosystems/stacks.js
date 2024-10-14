@@ -2,7 +2,6 @@ import { Configuration, TransactionsApi } from '@stacks/blockchain-api-client';
 import { STACKS_TESTNET } from '@stacks/network';
 import { MockResponseInitFunction } from 'jest-fetch-mock';
 import { StackingClient } from '@stacks/stacking';
-import { StacksNodeApi } from '@stacks/api';
 
 // NOTES
 // Capture traffic via the fetchWrapper
@@ -93,8 +92,13 @@ export async function waitForTx(txId: string, apiUrl = 'http://localhost:3999') 
 export async function waitForBlock(burnBlockId: number, client?: StackingClient) {
   if (isMocking()) return;
 
-  const api = { url: 'http://localhost:3999' };
-  client = client ?? new StackingClient({ address: '', network: STACKS_TESTNET, api });
+  client =
+    client ??
+    new StackingClient({
+      address: '',
+      network: STACKS_TESTNET,
+      client: { baseUrl: 'http://localhost:3999' },
+    });
 
   let current: number;
   for (let i = 1; i <= MAX_ITERATIONS; i++) {
@@ -117,8 +121,13 @@ export async function waitForBlock(burnBlockId: number, client?: StackingClient)
 export async function waitForCycle(cycleId: number, client?: StackingClient) {
   if (isMocking()) return;
 
-  const api = new StacksNodeApi({ url: 'http://localhost:3999' });
-  client = client ?? new StackingClient({ address: '', network: STACKS_TESTNET, api });
+  client =
+    client ??
+    new StackingClient({
+      address: '',
+      network: STACKS_TESTNET,
+      client: { baseUrl: 'http://localhost:3999' },
+    });
 
   let current: number;
   for (let i = 1; i <= MAX_ITERATIONS; i++) {
