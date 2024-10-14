@@ -91,7 +91,7 @@ export function defaultUrlFromNetwork(network?: StacksNetwork | StacksNetworkNam
 
 /** @ignore */
 export const defaultClientOptsFromNetwork = (
-  network: StacksNetworkName | StacksNetwork,
+  network?: StacksNetworkName | StacksNetwork,
   override?: ClientOpts
 ): Required<ClientOpts> => {
   return Object.assign(

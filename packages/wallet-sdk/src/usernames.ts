@@ -1,13 +1,15 @@
-import { ApiParam, defaultApiLike } from '@stacks/common';
+import { ClientParam, defaultClientOpts } from '@stacks/common';
 
 export const fetchFirstName = async (
   opts: {
     address: string;
-  } & ApiParam
+  } & ClientParam
 ): Promise<string | undefined> => {
-  const api = defaultApiLike(opts.api);
+  const client = defaultClientOpts(opts.client);
   try {
-    const namesResponse = await api.fetch(`${api.url}/v1/addresses/stacks/${opts.address}`);
+    const namesResponse = await client.fetch(
+      `${client.baseUrl}/v1/addresses/stacks/${opts.address}`
+    );
     const namesJson = await namesResponse.json();
     if ((namesJson.names.length || 0) > 0) {
       return namesJson.names[0];

@@ -6,8 +6,7 @@
     - [Impacts](#impacts)
   - [Fetch Methods](#fetch-methods)
   - [Reducing Wrapper Types](#reducing-wrapper-types)
-  - [StacksNodeApi](#stacksnodeapi)
-  - [StacksNetwork to StacksNodeApi](#stacksnetwork-to-stacksnodeapi)
+  - [Stacks Network](#stacks-network-1)
   - [Clarity Representation](#clarity-representation)
   - [Post-conditions](#post-conditions)
   - [`serialize` methods](#serialize-methods)
@@ -94,20 +93,7 @@ This breaks the signatures of many functions:
 - `signMessageHashRsv`, `signWithKey` now return the message signature as a `string` directly.
 - `nextSignature`, `nextVerification`, `publicKeyFromSignatureVrs`, `publicKeyFromSignatureRsv` now take in the message signature as a `string`.
 
-### StacksNodeApi
-
-The new `StacksNodeApi` class lets you interact with a Stacks node or API.
-
-<!-- todo: will be renamed to Client in a followup PR -->
-
-```ts
-import { StacksNodeApi } from '@stacks/transactions';
-
-const api = new StacksNodeApi();
-await api.broadcastTx(txHex);
-```
-
-### StacksNetwork to StacksNodeApi
+### Stacks Network
 
 Stacks network objects are now exported by the `@stacks/common` package.
 They are used to specify network settings for other functions and don't require instantiation (like the `@stacks/network` approach did).
@@ -118,14 +104,12 @@ import { STACKS_MAINNET } from '@stacks/transactions';
 
 After importing the network object (e.g. `STACKS_MAINNET` here), you can use it in other functions like so:
 
-```ts
-// todo: update more functions, show example
-```
+<!-- todo: update more functions, show examples -->
 
-For easing the transition, the functions which depended on a network instance now accept an `api` parameter.
-The `api` parameter can be an instance of `StacksNodeApi` or any object containing a `url` and `fetch` property.
+For easing the transition, the functions which depended on a network instance now accept an `client` parameter.
+The `client` parameter can be any object containing a `baseUrl` and `fetch` property.
 
-- The `url` property should be a string containing the base URL of the Stacks node you want to use.
+- The `baseUrl` property should be a string containing the base URL of the Stacks node you want to use.
 - The `fetch` property can be any (fetch)[https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API] compatible function.
 
 The following diffs show examples of how to migrate to the new pattern.
@@ -144,7 +128,7 @@ const transaction = await makeSTXTokenTransfer({
 ```
 
 > [!NOTE]
-> String literal network names are still supported.
+> String literal network names are still supported and the recommended way to specify the network.
 
 ```diff
 const transaction = await makeSTXTokenTransfer({
@@ -155,14 +139,14 @@ const transaction = await makeSTXTokenTransfer({
 ```
 
 > [!NOTE]
-> Custom URLs and fetch functions are still supported via the `api` parameter.
+> Custom URLs and fetch functions are still supported via the `client` parameter.
 
 ```diff
 const transaction = await makeSTXTokenTransfer({
   // ...
 - network: new StacksTestnet({ url: "mynode-optional.com", fetchFn: myFetch }), // optional options
 + network: STACKS_TESTNET,
-+ api: { url: "mynode-optional.com", fetch: myFetch } // optional params
++ client: { baseUrl: "mynode-optional.com", fetch: myFetch } // optional params
 });
 ```
 
