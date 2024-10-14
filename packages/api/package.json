@@ -1,4 +1,5 @@
 {
+  "private": true,
   "name": "@stacks/api",
   "version": "6.9.0",
   "description": "Javascript library for interacting with the Stacks Blockchain Node and API.",

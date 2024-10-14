@@ -9,6 +9,6 @@ describe('setting StacksApi URL', () => {
     { network: STACKS_DEVNET, url: DEVNET_URL },
   ])('the api class determines the correct url for each network object', ({ network, url }) => {
     const api = new StacksNodeApi({ network });
-    expect(api.url).toEqual(url);
+    expect(api.baseUrl).toEqual(url);
   });
 });
