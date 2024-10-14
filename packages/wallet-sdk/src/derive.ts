@@ -2,13 +2,13 @@
 // Secure, audited & minimal implementation of BIP32 hierarchical deterministic (HD) wallets.
 import { HDKey } from '@scure/bip32';
 import { getNameInfo } from '@stacks/auth';
-import { ApiParam, bytesToHex, defaultApiLike, utf8ToBytes } from '@stacks/common';
+import { ClientParam, bytesToHex, utf8ToBytes } from '@stacks/common';
 import { createSha2Hash } from '@stacks/encryption';
 import {
   STACKS_MAINNET,
   StacksNetwork,
   StacksNetworkName,
-  defaultUrlFromNetwork,
+  defaultClientOptsFromNetwork,
   networkFrom,
 } from '@stacks/network';
 import { compressPrivateKey, getAddressFromPrivateKey } from '@stacks/transactions';
@@ -179,22 +179,22 @@ const selectUsernameForAccount = async (
     rootNode: HDKey;
     index: number;
     network?: StacksNetwork;
-  } & ApiParam
+  } & ClientParam
 ): Promise<{ username: string | undefined; derivationType: DerivationType }> => {
-  const api = defaultApiLike({ ...{ url: defaultUrlFromNetwork(opts.network) }, ...opts.api });
+  const client = defaultClientOptsFromNetwork(opts.network, opts.client);
 
   // try to find existing usernames owned by stx derivation path
   if (opts.network) {
     const stxPrivateKey = deriveStxPrivateKey(opts);
     const address = getAddressFromPrivateKey(stxPrivateKey, opts.network);
-    let username = await fetchFirstName({ address, api });
+    let username = await fetchFirstName({ address, client });
     if (username) {
       return { username, derivationType: DerivationType.Wallet };
     } else {
       // try to find existing usernames owned by data derivation path
       const dataPrivateKey = deriveDataPrivateKey(opts);
       const address = getAddressFromPrivateKey(dataPrivateKey, opts.network);
-      username = await fetchFirstName({ address, api });
+      username = await fetchFirstName({ address, client });
       if (username) {
         return { username, derivationType: DerivationType.Data };
       }
@@ -211,17 +211,17 @@ export const fetchUsernameForAccountByDerivationType = async (
     index: number;
     derivationType: DerivationType.Wallet | DerivationType.Data;
     network?: StacksNetworkName | StacksNetwork;
-  } & ApiParam
+  } & ClientParam
 ): Promise<{
   username: string | undefined;
 }> => {
-  const api = defaultApiLike({ ...{ url: defaultUrlFromNetwork(opts.network) }, ...opts.api });
+  const client = defaultClientOptsFromNetwork(opts.network, opts.client);
 
   // try to find existing usernames owned by given derivation path
   const selectedNetwork = opts.network ? networkFrom(opts.network) : STACKS_MAINNET;
   const privateKey = derivePrivateKeyByType(opts);
   const address = getAddressFromPrivateKey(privateKey, selectedNetwork);
-  const username = await fetchFirstName({ address, api });
+  const username = await fetchFirstName({ address, client });
   return { username };
 };
 
