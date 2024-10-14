@@ -4,7 +4,7 @@ import { resolveZoneFileToProfile } from '@stacks/profile';
 export interface ProfileLookupOptions {
   username: string;
   zoneFileLookupURL?: string;
-  api?: ClientOpts;
+  client?: ClientOpts;
 }
 
 /**
@@ -21,21 +21,21 @@ export function lookupProfile(options: ProfileLookupOptions): Promise<Record<str
     return Promise.reject(new Error('No username provided'));
   }
 
-  const api = defaultClientOpts(options.api);
+  const client = defaultClientOpts(options.client);
 
   let lookupPromise;
   if (options.zoneFileLookupURL) {
     const url = `${options.zoneFileLookupURL.replace(/\/$/, '')}/${options.username}`;
-    lookupPromise = api.fetch(url).then(response => response.json());
+    lookupPromise = client.fetch(url).then(response => response.json());
   } else {
-    lookupPromise = getNameInfo({ name: options.username, client: api });
+    lookupPromise = getNameInfo({ name: options.username, client: client });
   }
   return lookupPromise.then((responseJSON: any) => {
     if (responseJSON.hasOwnProperty('zonefile') && responseJSON.hasOwnProperty('address')) {
       return resolveZoneFileToProfile({
         zoneFile: responseJSON.zonefile,
         publicKeyOrAddress: responseJSON.address,
-        client: api,
+        client,
       });
     } else {
       throw new Error(

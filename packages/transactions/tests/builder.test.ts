@@ -126,12 +126,12 @@ test('API key middleware - get nonce', async () => {
 
   const apiKey = '1234-my-api-key-example';
   const fetch = createFetchFn(createApiKeyMiddleware({ apiKey }));
-  const api = { fetch };
+  const client = { fetch };
 
   fetchMock.mockRejectOnce();
   fetchMock.mockOnce(`{"balance": "0", "nonce": "123"}`);
 
-  const fetchedNonce = await fetchNonce({ address, client: api });
+  const fetchedNonce = await fetchNonce({ address, client });
   expect(fetchedNonce).toBe(123n);
   expect(fetchMock.mock.calls.length).toEqual(2);
   expect(fetchMock.mock.calls[1][0]).toEqual(
@@ -1147,7 +1147,7 @@ test('Estimate transaction transfer fee', async () => {
 
   fetchMock.mockOnce(mockedResponse);
 
-  const testnet = { url: HIRO_TESTNET_URL };
+  const testnet = { baseUrl: HIRO_TESTNET_URL };
   const resultEstimateFee2 = await fetchFeeEstimateTransaction({
     payload: bytesToHex(serializePayloadBytes(transaction.payload)),
     estimatedLength: transactionByteLength,
@@ -1176,7 +1176,7 @@ test('Estimate transaction transfer fee', async () => {
 test('Estimate transaction fee fallback', async () => {
   const privateKey = 'cb3df38053d132895220b9ce471f6b676db5b9bf0b4adefb55f2118ece2478df01';
   const poolAddress = 'ST11NJTTKGVT6D1HY4NJRVQWMQM7TVAR091EJ8P2Y';
-  const api = { url: 'http://localhost:3999' };
+  const client = { baseUrl: 'http://localhost:3999' };
 
   // http://localhost:3999/v2/fees/transaction
   fetchMock.once(
@@ -1195,7 +1195,7 @@ test('Estimate transaction fee fallback', async () => {
     functionArgs: [uintCV(100_000), principalCV(poolAddress), noneCV(), noneCV()],
     nonce: 1,
     network: STACKS_TESTNET,
-    client: api,
+    client,
   });
 
   // http://localhost:3999/v2/fees/transaction
@@ -1207,7 +1207,7 @@ test('Estimate transaction fee fallback', async () => {
   // http://localhost:3999/v2/fees/transfer
   fetchMock.once('1');
 
-  const testnet = { url: HIRO_TESTNET_URL };
+  const testnet = { baseUrl: HIRO_TESTNET_URL };
   const resultEstimateFee = await fetchFeeEstimate({ transaction, client: testnet });
   expect(resultEstimateFee).toBe(201n);
 
@@ -1503,7 +1503,7 @@ test('Make sponsored STX token transfer with sponsor fee estimate', async () => 
   const nonce = 2;
   const senderKey = 'edf9aee84d9b7abc145504dde6726c64f369d37ee34ded868fabd876c26570bc01';
   const memo = 'test memo';
-  const api = { url: HIRO_MAINNET_URL };
+  const client = { baseUrl: HIRO_MAINNET_URL };
 
   const sponsorKey = '9888d734e6e80a943a6544159e31d6c7e342f695ec867d549c569fa0028892d401';
   const sponsorNonce = 55;
@@ -1558,7 +1558,7 @@ test('Make sponsored STX token transfer with sponsor fee estimate', async () => 
   const sponsorSignedTx = await sponsorTransaction(sponsorOptions);
 
   expect(fetchMock.mock.calls.length).toEqual(1);
-  expect(fetchMock.mock.calls[0][0]).toEqual(`${api.url}${TRANSACTION_FEE_ESTIMATE_PATH}`);
+  expect(fetchMock.mock.calls[0][0]).toEqual(`${client.baseUrl}${TRANSACTION_FEE_ESTIMATE_PATH}`);
 
   const sponsorSignedTxSerialized = sponsorSignedTx.serializeBytes();
 
@@ -1589,7 +1589,7 @@ test('Make sponsored STX token transfer with set tx fee', async () => {
   const nonce = 0;
   const senderKey = '8ca861519c4fa4a08de4beaa41688f60a24b575a976cf84099f38dc099a6d74401';
   // const senderAddress = 'ST2HTEQF50SW4X8077F8RSR8WCT57QG166TVG0GCE';
-  const api = { url: HIRO_TESTNET_URL };
+  const client = { baseUrl: HIRO_TESTNET_URL };
 
   const sponsorKey = '9888d734e6e80a943a6544159e31d6c7e342f695ec867d549c569fa0028892d401';
   // const sponsorAddress = 'ST2TPJ3NEZ63MMJ8AY9S45HZ10QSH51YF93GE89GQ';
@@ -1603,7 +1603,7 @@ test('Make sponsored STX token transfer with set tx fee', async () => {
     fee,
     nonce,
     sponsored: true,
-    client: api,
+    client,
   });
 
   const sponsorOptions = {
@@ -1640,7 +1640,7 @@ test('Make sponsored contract deploy with sponsor fee estimate', async () => {
   const senderKey = '8ca861519c4fa4a08de4beaa41688f60a24b575a976cf84099f38dc099a6d74401';
   const fee = 0;
   const nonce = 0;
-  const api = { url: HIRO_TESTNET_URL };
+  const client = { baseUrl: HIRO_TESTNET_URL };
 
   const sponsorKey = '9888d734e6e80a943a6544159e31d6c7e342f695ec867d549c569fa0028892d401';
   // const sponsorAddress = 'ST2TPJ3NEZ63MMJ8AY9S45HZ10QSH51YF93GE89GQ';
@@ -1657,7 +1657,7 @@ test('Make sponsored contract deploy with sponsor fee estimate', async () => {
     fee,
     nonce,
     sponsored: true,
-    api,
+    client,
   });
 
   const sponsorOptions = {
@@ -1762,7 +1762,7 @@ test('Transaction broadcast success', async () => {
   const senderKey = 'edf9aee84d9b7abc145504dde6726c64f369d37ee34ded868fabd876c26570bc01';
   const memo = 'test memo';
 
-  const api = { url: HIRO_MAINNET_URL };
+  const client = { baseUrl: HIRO_MAINNET_URL };
 
   const transaction = await makeSTXTokenTransfer({
     recipient,
@@ -1776,10 +1776,10 @@ test('Transaction broadcast success', async () => {
   const txid = transaction.txid();
   fetchMock.mockOnce(`"${txid}"`);
 
-  const response: TxBroadcastResult = await broadcastTransaction({ transaction, client: api });
+  const response: TxBroadcastResult = await broadcastTransaction({ transaction, client });
 
   expect(fetchMock.mock.calls.length).toEqual(1);
-  expect(fetchMock.mock.calls[0][0]).toEqual(`${api.url}${BROADCAST_PATH}`);
+  expect(fetchMock.mock.calls[0][0]).toEqual(`${client.baseUrl}${BROADCAST_PATH}`);
   expect(fetchMock.mock.calls[0][1]?.body).toEqual(
     JSON.stringify({ tx: bytesToHex(transaction.serializeBytes()) })
   );
@@ -2019,7 +2019,7 @@ test('Call read-only function', async () => {
   const contractName = 'kv-store';
   const functionName = 'get-value?';
   const buffer = bufferCVFromString('foo');
-  const api = { url: HIRO_TESTNET_URL };
+  const client = { baseUrl: HIRO_TESTNET_URL };
   const senderAddress = 'ST2F4BK4GZH6YFBNHYDDGN4T1RKBA7DA1BJZPJEJJ';
   const mockResult = bufferCVFromString('test');
 
@@ -2029,10 +2029,10 @@ test('Call read-only function', async () => {
     functionName,
     functionArgs: [buffer],
     senderAddress,
-    api,
+    client,
   };
 
-  const apiUrl = `${api.url}${READONLY_FUNCTION_CALL_PATH}/${contractAddress}/kv-store/get-value%3F`; // uri encoded
+  const apiUrl = `${client.baseUrl}${READONLY_FUNCTION_CALL_PATH}/${contractAddress}/kv-store/get-value%3F`; // uri encoded
   fetchMock.mockOnce(`{"okay": true, "result": "0x${serializeCV(mockResult)}"}`);
 
   const result = await fetchCallReadOnlyFunction(options);

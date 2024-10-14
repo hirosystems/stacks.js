@@ -13,7 +13,7 @@ describe('pox-4', () => {
   test('verify-signer-key-sig', async () => {
     const network = STACKS_MOCKNET;
     const address = 'STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6';
-    const client = new StackingClient({ address, network, api: { url: 'localhost:3999' } });
+    const client = new StackingClient({ address, network, client: { baseUrl: 'localhost:3999' } });
 
     const signerPrivateKey = makeRandomPrivKey();
     const signerKey = getPublicKeyFromPrivate(signerPrivateKey);
