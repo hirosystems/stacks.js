@@ -1,12 +1,11 @@
+import { ClientOpts, IntegerType, PrivateKey, hexToBytes, intToBigInt } from '@stacks/common';
 import {
-  ClientOpts,
-  IntegerType,
-  PrivateKey,
-  defaultClientOpts,
-  hexToBytes,
-  intToBigInt,
-} from '@stacks/common';
-import { ChainId, StacksNetwork, StacksNetworkName, networkFrom } from '@stacks/network';
+  ChainId,
+  StacksNetwork,
+  StacksNetworkName,
+  defaultClientOptsFromNetwork,
+  networkFrom,
+} from '@stacks/network';
 import {
   BurnchainRewardListResponse,
   BurnchainRewardSlotHolderListResponse,
@@ -342,7 +341,7 @@ export class StackingClient {
   }) {
     this.address = opts.address;
     this.network = networkFrom(opts.network);
-    this.client = defaultClientOpts(opts.client);
+    this.client = defaultClientOptsFromNetwork(this.network, opts.client);
   }
 
   get baseUrl() {
@@ -353,17 +352,17 @@ export class StackingClient {
     return this.client.fetch;
   }
 
-  /** @deprecated alias of StacksNodeApi.getCoreInfo, kept for backwards compatibility */
+  /** @deprecated Kept for backwards compatibility, may be removed in the future */
   getCoreInfo(): Promise<V2CoreInfoResponse> {
     return this.client.fetch(`${this.client.baseUrl}/v2/info`).then(res => res.json());
   }
 
-  /** @deprecated alias of StacksNodeApi.getPoxInfo, kept for backwards compatibility */
+  /** @deprecated Kept for backwards compatibility, may be removed in the future */
   getPoxInfo(): Promise<V2PoxInfoResponse> {
     return this.client.fetch(`${this.client.baseUrl}/v2/pox`).then(res => res.json());
   }
 
-  /** @deprecated alias of StacksNodeApi.getTargetBlockTime, kept for backwards compatibility */
+  /** @deprecated Kept for backwards compatibility, may be removed in the future */
   async getTargetBlockTime(): Promise<number> {
     const res = await this.client
       .fetch(`${this.client.baseUrl}/extended/v1/info/network_block_times`)
