@@ -1,4 +1,4 @@
-import { ApiParam, IntegerType, PublicKey, intToBigInt, utf8ToBytes } from '@stacks/common';
+import { ClientParam, IntegerType, PublicKey, intToBigInt, utf8ToBytes } from '@stacks/common';
 import { StacksNetwork } from '@stacks/network';
 import {
   ClarityType,
@@ -83,7 +83,7 @@ export interface BnsReadOnlyOptions {
 }
 
 async function callReadOnlyBnsFunction(
-  options: BnsReadOnlyOptions & ApiParam
+  options: BnsReadOnlyOptions & ClientParam
 ): Promise<ClarityValue> {
   return fetchCallReadOnlyFunction({
     contractAddress: options.network.bootAddress,
@@ -91,7 +91,7 @@ async function callReadOnlyBnsFunction(
     functionName: options.functionName,
     senderAddress: options.senderAddress,
     functionArgs: options.functionArgs,
-    api: options.api,
+    client: options.client,
   });
 }
 

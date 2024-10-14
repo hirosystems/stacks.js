@@ -51,16 +51,19 @@ export async function fetchWrapper(input: RequestInfo, init?: RequestInit): Prom
 
 export type FetchFn = (url: string, init?: RequestInit) => Promise<Response>;
 
-/** @ignore Internally used for letting networking functions specify "API" options */
-export type ApiOpts = {
-  url?: string;
+/**
+ * @ignore Internally used for letting networking functions specify "API" options.
+ * Should be compatible with the `client`s created by the API and RPC packages.
+ */
+export type ClientOpts = {
+  baseUrl?: string;
   fetch?: FetchFn;
 };
 
 /** @ignore Internally used for letting networking functions specify "API" options */
-export type ApiParam = {
+export type ClientParam = {
   /** Optional API object (for `.url` and `.fetch`) used for API/Node, defaults to use mainnet */
-  api?: ApiOpts;
+  client?: ClientOpts;
 };
 
 export interface RequestContext {
@@ -190,11 +193,11 @@ export function createFetchFn(...args: any[]): FetchFn {
   return fetchFn;
 }
 
-/** @ignore Creates a API-like object, which can be used without circular dependencies */
-export function defaultApiLike(opts?: { url?: string; fetch?: FetchFn }) {
+/** @ignore Creates a client-like object, which can be used without circular dependencies */
+export function defaultClientOpts(opts?: { baseUrl?: string; fetch?: FetchFn }) {
   return {
     // todo: do we want network here as well?
-    url: opts?.url ?? HIRO_MAINNET_URL,
+    baseUrl: opts?.baseUrl ?? HIRO_MAINNET_URL,
     fetch: opts?.fetch ?? createFetchFn(),
   };
 }
