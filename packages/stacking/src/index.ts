@@ -1,24 +1,18 @@
 import {
-  BaseErrorResponse,
-  ContractVersionResponse,
-  PaginationOptions,
-  StacksNodeApi,
-  V2PoxInfoResponse,
-} from '@stacks/api';
-import {
-  ApiOpts,
+  ClientOpts,
   IntegerType,
   PrivateKey,
+  defaultClientOpts,
   hexToBytes,
   intToBigInt,
-  isInstance,
 } from '@stacks/common';
-import { StacksNetwork, StacksNetworkName, networkFrom } from '@stacks/network';
+import { ChainId, StacksNetwork, StacksNetworkName, networkFrom } from '@stacks/network';
 import {
   BurnchainRewardListResponse,
   BurnchainRewardSlotHolderListResponse,
   BurnchainRewardsTotal,
 } from '@stacks/stacks-blockchain-api-types';
+import type { ContractIdString } from '@stacks/transactions';
 import {
   BufferCV,
   ClarityType,
@@ -338,54 +332,82 @@ export class StackingClient {
   public address: string;
   public network: StacksNetwork;
 
-  public api: StacksNodeApi;
+  public client: Required<ClientOpts>;
 
   // todo: make more constructor opts optional
   constructor(opts: {
     address: string;
     network: StacksNetworkName | StacksNetwork;
-    api?: StacksNodeApi | ApiOpts;
+    client?: ClientOpts;
   }) {
     this.address = opts.address;
     this.network = networkFrom(opts.network);
-    this.api = isInstance(opts.api, StacksNodeApi)
-      ? opts.api
-      : new StacksNodeApi({ url: opts.api?.url, fetch: opts.api?.fetch, network: opts.network });
+    this.client = defaultClientOpts(opts.client);
+  }
+
+  get baseUrl() {
+    return this.client.baseUrl;
+  }
+
+  get fetch() {
+    return this.client.fetch;
   }
 
   /** @deprecated alias of StacksNodeApi.getCoreInfo, kept for backwards compatibility */
-  getCoreInfo() {
-    return this.api.getInfo();
+  getCoreInfo(): Promise<V2CoreInfoResponse> {
+    return this.client.fetch(`${this.client.baseUrl}/v2/info`).then(res => res.json());
   }
 
   /** @deprecated alias of StacksNodeApi.getPoxInfo, kept for backwards compatibility */
-  getPoxInfo() {
-    return this.api.getPoxInfo();
+  getPoxInfo(): Promise<V2PoxInfoResponse> {
+    return this.client.fetch(`${this.client.baseUrl}/v2/pox`).then(res => res.json());
   }
 
   /** @deprecated alias of StacksNodeApi.getTargetBlockTime, kept for backwards compatibility */
-  getTargetBlockTime() {
-    return this.api.getTargetBlockTime();
+  async getTargetBlockTime(): Promise<number> {
+    const res = await this.client
+      .fetch(`${this.client.baseUrl}/extended/v1/info/network_block_times`)
+      .then((res: any): V1InfoBlockTimesResponse => res.json());
+
+    if (this.network.chainId === ChainId.Mainnet) return res.mainnet.target_block_time;
+    return res.testnet.target_block_time;
   }
 
   /** Get account status */
   async getAccountStatus(): Promise<any> {
-    return this.api.getAccountInfo(this.address);
+    // todo: add types for response
+    return this.client
+      .fetch(`${this.client.baseUrl}/v2/accounts/${this.address}?proof=0`)
+      .then(res => res.json())
+      .then(json => {
+        json.balance = BigInt(json.balance);
+        json.locked = BigInt(json.locked);
+        return json;
+      });
   }
 
   /** Get account balance */
   async getAccountBalance(): Promise<bigint> {
-    return this.api.getAccountInfo(this.address).then(a => a.balance);
+    return this.getAccountStatus().then(a => a.balance);
   }
 
   /** Get extended account balances */
-  async getAccountExtendedBalances() {
-    return this.api.getExtendedAccountBalances(this.address);
+  async getAccountExtendedBalances(): Promise<ExtendedAccountBalances> {
+    return this.client
+      .fetch(`${this.client.baseUrl}/extended/v1/address/${this.address}/balances`)
+      .then(res => res.json())
+      .then(json => {
+        json.stx.balance = BigInt(json.stx.balance);
+        json.stx.total_sent = BigInt(json.stx.total_sent);
+        json.stx.total_received = BigInt(json.stx.total_received);
+        json.stx.locked = BigInt(json.stx.locked);
+        return json;
+      });
   }
 
   /** Get account balance of locked tokens */
   async getAccountBalanceLocked(): Promise<bigint> {
-    return this.api.getAccountInfo(this.address).then(a => a.locked);
+    return this.getAccountStatus().then(a => a.locked);
   }
 
   /** Get reward cycle duration in seconds */
@@ -402,28 +424,40 @@ export class StackingClient {
 
   /** Get the total burnchain rewards total for the set address */
   async getRewardsTotalForBtcAddress(): Promise<BurnchainRewardsTotal | BaseErrorResponse> {
-    return this.api.getExtendedBtcRewardsTotal(this.address);
+    return this.client
+      .fetch(`${this.client.baseUrl}/extended/v1/burnchain/rewards/${this.address}/total`)
+      .then(res => res.json())
+      .then(json => {
+        json.reward_amount = BigInt(json.reward_amount);
+        return json;
+      });
   }
 
   /** Get burnchain rewards for the set address */
   async getRewardsForBtcAddress(
     options?: PaginationOptions
   ): Promise<BurnchainRewardListResponse | BaseErrorResponse> {
-    return this.api.getExtendedBtcRewards(this.address, options);
+    let url = `${this.client.baseUrl}/extended/v1/burnchain/rewards/${this.address}`;
+    if (options) url += `?limit=${options.limit}&offset=${options.offset}`;
+
+    return this.client.fetch(url).then(res => res.json());
   }
 
   /** Get burnchain rewards holders for the set address */
   async getRewardHoldersForBtcAddress(
     options?: PaginationOptions
   ): Promise<BurnchainRewardSlotHolderListResponse | BaseErrorResponse> {
-    return this.api.getExtendedBtcRewardHolders(this.address, options);
+    let url = `${this.client.baseUrl}/extended/v1/burnchain/reward_slot_holders/${this.address}`;
+    if (options) url += `?limit=${options.limit}&offset=${options.offset}`;
+
+    return this.client.fetch(url).then(res => res.json());
   }
 
   /** Get PoX address from reward set by index (if it exists) */
   async getRewardSet(options: RewardSetOptions): Promise<RewardSetInfo | undefined> {
     const [contractAddress, contractName] = this.parseContractId(options?.contractId);
     const result = await fetchCallReadOnlyFunction({
-      api: this.api,
+      client: this.client,
       senderAddress: this.address,
       contractAddress,
       contractName,
@@ -534,7 +568,7 @@ export class StackingClient {
         const [contractAddress, contractName] = this.parseContractId(poxInfo.contract_id);
 
         return fetchCallReadOnlyFunction({
-          api: this.api,
+          client: this.client,
           contractName,
           contractAddress,
           functionName: 'can-stack-stx',
@@ -604,7 +638,7 @@ export class StackingClient {
       ...renamePrivateKey(txOptions),
     });
 
-    return broadcastTransaction({ transaction: tx, api: this.api });
+    return broadcastTransaction({ transaction: tx, client: this.client });
   }
 
   /**
@@ -650,7 +684,7 @@ export class StackingClient {
       ...renamePrivateKey(txOptions),
     });
 
-    return broadcastTransaction({ transaction: tx, api: this.api });
+    return broadcastTransaction({ transaction: tx, client: this.client });
   }
 
   /**
@@ -691,7 +725,7 @@ export class StackingClient {
       ...renamePrivateKey(txOptions),
     });
 
-    return broadcastTransaction({ transaction: tx, api: this.api });
+    return broadcastTransaction({ transaction: tx, client: this.client });
   }
 
   /**
@@ -728,7 +762,7 @@ export class StackingClient {
       ...renamePrivateKey(txOptions),
     });
 
-    return broadcastTransaction({ transaction: tx, api: this.api });
+    return broadcastTransaction({ transaction: tx, client: this.client });
   }
 
   /**
@@ -765,7 +799,7 @@ export class StackingClient {
       ...renamePrivateKey(txOptions),
     });
 
-    return broadcastTransaction({ transaction: tx, api: this.api });
+    return broadcastTransaction({ transaction: tx, client: this.client });
   }
 
   /**
@@ -796,7 +830,7 @@ export class StackingClient {
       ...renamePrivateKey(txOptions),
     });
 
-    return broadcastTransaction({ transaction: tx, api: this.api });
+    return broadcastTransaction({ transaction: tx, client: this.client });
   }
 
   /**
@@ -826,7 +860,7 @@ export class StackingClient {
       ...renamePrivateKey(txOptions),
     });
 
-    return broadcastTransaction({ transaction: tx, api: this.api });
+    return broadcastTransaction({ transaction: tx, client: this.client });
   }
 
   /**
@@ -861,7 +895,7 @@ export class StackingClient {
       ...renamePrivateKey(txOptions),
     });
 
-    return broadcastTransaction({ transaction: tx, api: this.api });
+    return broadcastTransaction({ transaction: tx, client: this.client });
   }
 
   /**
@@ -909,7 +943,7 @@ export class StackingClient {
       ...renamePrivateKey(txOptions),
     });
 
-    return broadcastTransaction({ transaction: tx, api: this.api });
+    return broadcastTransaction({ transaction: tx, client: this.client });
   }
 
   /**
@@ -948,7 +982,7 @@ export class StackingClient {
       ...renamePrivateKey(txOptions),
     });
 
-    return broadcastTransaction({ transaction: tx, api: this.api });
+    return broadcastTransaction({ transaction: tx, client: this.client });
   }
 
   /**
@@ -976,7 +1010,7 @@ export class StackingClient {
       ...renamePrivateKey(arg),
     });
 
-    return broadcastTransaction({ transaction: tx, api: this.api });
+    return broadcastTransaction({ transaction: tx, client: this.client });
   }
 
   getStackOptions({
@@ -1018,7 +1052,7 @@ export class StackingClient {
     }
 
     const callOptions: ContractCallOptions = {
-      api: this.api,
+      client: this.client,
       contractAddress,
       contractName,
       functionName: 'stack-stx',
@@ -1059,7 +1093,7 @@ export class StackingClient {
     }
 
     const callOptions: ContractCallOptions = {
-      api: this.api,
+      client: this.client,
       contractAddress,
       contractName,
       functionName: 'stack-extend',
@@ -1097,7 +1131,7 @@ export class StackingClient {
     }
 
     const callOptions: ContractCallOptions = {
-      api: this.api,
+      client: this.client,
       contractAddress,
       contractName,
       functionName: 'stack-increase',
@@ -1124,7 +1158,7 @@ export class StackingClient {
     const address = poxAddress ? someCV(poxAddressToTuple(poxAddress)) : noneCV();
     const [contractAddress, contractName] = this.parseContractId(contract);
     const callOptions: ContractCallOptions = {
-      api: this.api,
+      client: this.client,
       contractAddress,
       contractName,
       functionName: 'delegate-stx',
@@ -1159,7 +1193,7 @@ export class StackingClient {
     const [contractAddress, contractName] = this.parseContractId(contract);
 
     const callOptions: ContractCallOptions = {
-      api: this.api,
+      client: this.client,
       contractAddress,
       contractName,
       functionName: 'delegate-stack-stx',
@@ -1192,7 +1226,7 @@ export class StackingClient {
     const [contractAddress, contractName] = this.parseContractId(contract);
 
     const callOptions: ContractCallOptions = {
-      api: this.api,
+      client: this.client,
       contractAddress,
       contractName,
       functionName: 'delegate-stack-extend',
@@ -1218,7 +1252,7 @@ export class StackingClient {
     const address = poxAddressToTuple(poxAddress);
     const [contractAddress, contractName] = this.parseContractId(contract);
     const callOptions: ContractCallOptions = {
-      api: this.api,
+      client: this.client,
       contractAddress,
       contractName,
       functionName: 'delegate-stack-increase',
@@ -1260,7 +1294,7 @@ export class StackingClient {
     }
 
     const callOptions: ContractCallOptions = {
-      api: this.api,
+      client: this.client,
       contractAddress,
       contractName,
       functionName: 'stack-aggregation-commit',
@@ -1303,7 +1337,7 @@ export class StackingClient {
     }
 
     const callOptions: ContractCallOptions = {
-      api: this.api,
+      client: this.client,
       contractAddress,
       contractName,
       functionName: 'stack-aggregation-increase',
@@ -1344,7 +1378,7 @@ export class StackingClient {
     }
 
     const callOptions: ContractCallOptions = {
-      api: this.api,
+      client: this.client,
       contractAddress,
       contractName,
       functionName: 'stack-aggregation-commit-indexed',
@@ -1358,7 +1392,7 @@ export class StackingClient {
   getRevokeDelegateStxOptions(contract: string) {
     const [contractAddress, contractName] = this.parseContractId(contract);
     const callOptions: ContractCallOptions = {
-      api: this.api,
+      client: this.client,
       contractAddress,
       contractName,
       functionName: 'revoke-delegate-stx',
@@ -1386,7 +1420,7 @@ export class StackingClient {
       functionName,
       senderAddress: this.address,
       functionArgs: [principalCV(this.address)],
-      api: this.api,
+      client: this.client,
     }).then((responseCV: ClarityValue) => {
       if (responseCV.type === ClarityType.OptionalSome) {
         const someCV = responseCV;
@@ -1435,7 +1469,7 @@ export class StackingClient {
       functionName,
       functionArgs: [principalCV(this.address)],
       senderAddress: this.address,
-      api: this.api,
+      client: this.client,
     }).then((responseCV: ClarityValue) => {
       if (responseCV.type === ClarityType.OptionalSome) {
         const tupleCV = responseCV.value as TupleCV;
@@ -1515,7 +1549,7 @@ export class StackingClient {
       functionName,
       functionArgs,
       senderAddress: this.address,
-      api: this.api,
+      client: this.client,
     }).then(responseCV => responseCV.type === ClarityType.ResponseOk);
   }
 
@@ -1610,4 +1644,105 @@ function renamePrivateKey(txOptions: BaseTxOptions) {
     nonce?: IntegerType;
     senderKey: string;
   };
+}
+
+/** @beta @ignore Type export subject to change*/
+export interface V2CoreInfoResponse {
+  burn_block_height: number;
+  stable_pox_consensus: string;
+}
+
+/** @beta @ignore Type export subject to change*/
+export interface CycleInfoResponse {
+  id: number;
+  min_threshold_ustx: number;
+  stacked_ustx: number;
+  is_pox_active: boolean;
+}
+
+/** @beta @ignore Type export subject to change*/
+export interface ContractVersionResponse {
+  contract_id: ContractIdString;
+  activation_burnchain_block_height: number;
+  first_reward_cycle_id: number;
+}
+
+/** @beta @ignore Type export subject to change*/
+export interface V2PoxInfoResponse {
+  contract_id: string;
+  contract_versions: ContractVersionResponse[];
+  current_burnchain_block_height?: number;
+  first_burnchain_block_height: number;
+  min_amount_ustx: string;
+  next_reward_cycle_in: number;
+  prepare_cycle_length: number;
+  prepare_phase_block_length: number;
+  rejection_fraction: number;
+  rejection_votes_left_required: number;
+  reward_cycle_id: number;
+  reward_cycle_length: number;
+  reward_phase_block_length: number;
+  reward_slots: number;
+  current_cycle: CycleInfoResponse;
+  next_cycle: CycleInfoResponse & {
+    min_increment_ustx: number;
+    prepare_phase_start_block_height: number;
+    blocks_until_prepare_phase: number;
+    reward_phase_start_block_height: number;
+    blocks_until_reward_phase: number;
+    ustx_until_pox_rejection: number;
+  };
+}
+
+/** @beta @ignore Type export subject to change*/
+export interface V1InfoBlockTimesResponse {
+  mainnet: {
+    target_block_time: number;
+  };
+  testnet: {
+    target_block_time: number;
+  };
+}
+
+/** @beta @ignore Type export subject to change*/
+export interface ExtendedAccountBalancesResponse {
+  stx: {
+    balance: string;
+    total_sent: string;
+    total_received: string;
+    locked: string;
+    lock_tx_id: string;
+    lock_height: number;
+    burnchain_lock_height: number;
+    burnchain_unlock_height: number;
+  };
+  fungible_tokens: any;
+  non_fungible_tokens: any;
+}
+
+/** @beta @ignore Type export subject to change*/
+export interface ExtendedAccountBalances {
+  stx: {
+    balance: bigint;
+    total_sent: bigint;
+    total_received: bigint;
+    locked: bigint;
+    lock_tx_id: string;
+    lock_height: number;
+    burnchain_lock_height: number;
+    burnchain_unlock_height: number;
+  };
+  fungible_tokens: any;
+  non_fungible_tokens: any;
+}
+
+/** @beta @ignore Type export subject to change*/
+export interface PaginationOptions {
+  limit: number;
+  offset: number;
+}
+
+/** @beta @ignore Type export subject to change*/
+export interface BaseErrorResponse {
+  error: string;
 }

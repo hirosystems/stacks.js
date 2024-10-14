@@ -91,7 +91,7 @@ import { CLI_NETWORK_OPTS, CLINetworkAdapter, getNetwork, NameInfoType } from '.
 
 import { gaiaAuth, gaiaConnect, gaiaUploadProfileAll, getGaiaAddressFromProfile } from './data';
 
-import { deriveDefaultUrl, STACKS_MAINNET, STACKS_TESTNET } from '@stacks/network';
+import { defaultUrlFromNetwork, STACKS_MAINNET, STACKS_TESTNET } from '@stacks/network';
 import {
   generateNewAccount,
   generateWallet,
@@ -359,7 +359,7 @@ async function migrateSubdomains(network: CLINetworkAdapter, args: string[]): Pr
 
     console.log(`Finding subdomains for data-key address '${dataKeyAddress}'`);
     const namesResponse = await fetch(
-      `${deriveDefaultUrl(_network)}/v1/addresses/stacks/${dataKeyAddress}`
+      `${defaultUrlFromNetwork(_network)}/v1/addresses/stacks/${dataKeyAddress}`
     );
     const namesJson = await namesResponse.json();
 
@@ -377,7 +377,7 @@ async function migrateSubdomains(network: CLINetworkAdapter, args: string[]): Pr
       // Alerts the user to any subdomains that can't be migrated to these wallet-key-derived addresses
       // Given collision with existing usernames owned by them
       const namesResponse = await fetch(
-        `${deriveDefaultUrl(_network)}/v1/addresses/stacks/${walletKeyAddress}`
+        `${defaultUrlFromNetwork(_network)}/v1/addresses/stacks/${walletKeyAddress}`
       );
       const existingNames = await namesResponse.json();
       if (existingNames.names?.includes(subdomain)) {
@@ -386,7 +386,7 @@ async function migrateSubdomains(network: CLINetworkAdapter, args: string[]): Pr
       }
 
       // Validate user owns the subdomain
-      const nameInfo = await fetch(`${deriveDefaultUrl(_network)}/v1/names/${subdomain}`);
+      const nameInfo = await fetch(`${defaultUrlFromNetwork(_network)}/v1/names/${subdomain}`);
       const nameInfoJson = await nameInfo.json();
       console.log('Subdomain Info: ', nameInfoJson);
       if (nameInfoJson.address !== dataKeyAddress) {

@@ -2,18 +2,10 @@ import { ripemd160 } from '@noble/hashes/ripemd160';
 import { sha256 } from '@noble/hashes/sha256';
 import { sha512_256 } from '@noble/hashes/sha512';
 import { utils } from '@noble/secp256k1';
-import {
-  ApiOpts,
-  bytesToHex,
-  concatArray,
-  concatBytes,
-  createFetchFn,
-  utf8ToBytes,
-} from '@stacks/common';
+import { bytesToHex, concatArray, concatBytes, utf8ToBytes } from '@stacks/common';
 import { c32addressDecode } from 'c32check';
 import lodashCloneDeep from 'lodash.clonedeep';
 import { ClarityValue, deserializeCV, serializeCV } from './clarity';
-import { StacksNetwork, deriveDefaultUrl, StacksNetworkName } from '@stacks/network';
 import { ContractIdString } from './types';
 
 // Export verify as utility method for signature verification
@@ -202,21 +194,6 @@ export const validateStacksAddress = (address: string): boolean => {
   } catch (e) {
     return false;
   }
-};
-
-/** @internal */
-export const defaultApiFromNetwork = (
-  network: StacksNetworkName | StacksNetwork,
-  override?: ApiOpts
-): Required<ApiOpts> => {
-  return Object.assign(
-    {},
-    {
-      url: deriveDefaultUrl(network),
-      fetch: createFetchFn(),
-    },
-    override
-  );
 };
 
 /** @internal */

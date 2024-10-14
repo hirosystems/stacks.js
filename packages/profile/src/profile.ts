@@ -22,7 +22,7 @@ import { makeZoneFile, parseZoneFile } from 'zone-file';
 // @ts-ignore
 import * as inspector from 'schema-inspector';
 
-import { ApiParam, Logger, defaultApiLike } from '@stacks/common';
+import { ClientParam, Logger, defaultClientOpts } from '@stacks/common';
 import { PublicPersonProfile } from './types';
 
 const schemaDefinition: { [key: string]: any } = {
@@ -340,9 +340,9 @@ export function resolveZoneFileToProfile(
   opts: {
     zoneFile: any;
     publicKeyOrAddress: string;
-  } & ApiParam
+  } & ClientParam
 ): Promise<Record<string, any>> {
-  const api = defaultApiLike(opts.api);
+  const api = defaultClientOpts(opts.client);
 
   return new Promise((resolve, reject) => {
     let zoneFileJson = null;

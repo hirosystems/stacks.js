@@ -1,4 +1,10 @@
-import { DEVNET_URL, HIRO_MAINNET_URL, HIRO_TESTNET_URL } from '@stacks/common';
+import {
+  ClientOpts,
+  DEVNET_URL,
+  HIRO_MAINNET_URL,
+  HIRO_TESTNET_URL,
+  createFetchFn,
+} from '@stacks/common';
 import { AddressVersion, ChainId, PeerNetworkId, TransactionVersion } from './constants';
 
 export interface StacksNetwork {
@@ -71,7 +77,7 @@ export function networkFrom(network: StacksNetworkName | StacksNetwork) {
 }
 
 /** @ignore */
-export function deriveDefaultUrl(network?: StacksNetwork | StacksNetworkName) {
+export function defaultUrlFromNetwork(network?: StacksNetwork | StacksNetworkName) {
   if (!network) return HIRO_MAINNET_URL; // default to mainnet if no network is given
 
   network = networkFrom(network);
@@ -82,3 +88,18 @@ export function deriveDefaultUrl(network?: StacksNetwork | StacksNetworkName) {
       ? DEVNET_URL // default to devnet if magicBytes are devnet
       : HIRO_TESTNET_URL;
 }
+
+/** @ignore */
+export const defaultClientOptsFromNetwork = (
+  network: StacksNetworkName | StacksNetwork,
+  override?: ClientOpts
+): Required<ClientOpts> => {
+  return Object.assign(
+    {},
+    {
+      baseUrl: defaultUrlFromNetwork(network),
+      fetch: createFetchFn(),
+    },
+    override
+  );
+};

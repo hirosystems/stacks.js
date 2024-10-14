@@ -8,7 +8,7 @@ import {
   STACKS_MAINNET,
   StacksNetwork,
   StacksNetworkName,
-  deriveDefaultUrl,
+  defaultUrlFromNetwork,
   networkFrom,
 } from '@stacks/network';
 import { compressPrivateKey, getAddressFromPrivateKey } from '@stacks/transactions';
@@ -181,7 +181,7 @@ const selectUsernameForAccount = async (
     network?: StacksNetwork;
   } & ApiParam
 ): Promise<{ username: string | undefined; derivationType: DerivationType }> => {
-  const api = defaultApiLike({ ...{ url: deriveDefaultUrl(opts.network) }, ...opts.api });
+  const api = defaultApiLike({ ...{ url: defaultUrlFromNetwork(opts.network) }, ...opts.api });
 
   // try to find existing usernames owned by stx derivation path
   if (opts.network) {
@@ -215,7 +215,7 @@ export const fetchUsernameForAccountByDerivationType = async (
 ): Promise<{
   username: string | undefined;
 }> => {
-  const api = defaultApiLike({ ...{ url: deriveDefaultUrl(opts.network) }, ...opts.api });
+  const api = defaultApiLike({ ...{ url: defaultUrlFromNetwork(opts.network) }, ...opts.api });
 
   // try to find existing usernames owned by given derivation path
   const selectedNetwork = opts.network ? networkFrom(opts.network) : STACKS_MAINNET;
