@@ -1,8 +1,14 @@
 import { sha256 } from '@noble/hashes/sha256';
-import { StacksNodeApi } from '@stacks/api';
-import { HIRO_TESTNET_URL, bigIntToBytes, bytesToHex, hexToBytes } from '@stacks/common';
+import {
+  HIRO_TESTNET_URL,
+  bigIntToBytes,
+  bytesToHex,
+  defaultClientOpts,
+  hexToBytes,
+} from '@stacks/common';
 import { base58CheckDecode, getPublicKeyFromPrivate } from '@stacks/encryption';
-import { STACKS_MAINNET, STACKS_TESTNET } from '@stacks/network';
+import { V2_POX_REGTEST_POX_3, setApiMocks } from '@stacks/internal';
+import { STACKS_MAINNET, STACKS_TESTNET, defaultUrlFromNetwork } from '@stacks/network';
 import {
   ClarityType,
   ReadOnlyFunctionOptions,
@@ -22,7 +28,6 @@ import {
   validateContractCall,
 } from '@stacks/transactions';
 import fetchMock from 'jest-fetch-mock';
-import { V2_POX_REGTEST_POX_3, setApiMocks } from '../../internal/src';
 import { StackingClient } from '../src';
 import { PoXAddressVersion, StackingErrors } from '../src/constants';
 import {
@@ -336,14 +341,25 @@ test('stack stx', async () => {
     validateWithAbi: true,
     network,
     senderKey: privateKey,
-    client,
+    client: expect.objectContaining({
+      baseUrl: defaultUrlFromNetwork(network),
+    }),
   };
 
   expect(fetchMock.mock.calls[0][0]).toEqual(`${HIRO_TESTNET_URL}/v2/pox`);
   expect(makeContractCall).toHaveBeenCalledTimes(1);
-  expect(makeContractCall).toHaveBeenCalledWith(expectedContractCallOptions);
+  expect(makeContractCall).toHaveBeenCalledWith(
+    expect.objectContaining(expectedContractCallOptions)
+  );
   expect(broadcastTransaction).toHaveBeenCalledTimes(1);
-  expect(broadcastTransaction).toHaveBeenCalledWith({ transaction, client });
+  expect(broadcastTransaction).toHaveBeenCalledWith(
+    expect.objectContaining({
+      transaction,
+      client: expect.objectContaining({
+        baseUrl: defaultUrlFromNetwork(network),
+      }),
+    })
+  );
   expect(stackingResults).toEqual(broadcastResponse);
   expect(isPoxAbiValid(expectedContractCallOptions)).toBe(true);
 });
@@ -408,14 +424,25 @@ test('delegate stx', async () => {
     validateWithAbi: true,
     network,
     senderKey: privateKey,
-    client,
+    client: expect.objectContaining({
+      baseUrl: defaultUrlFromNetwork(network),
+    }),
   };
 
   expect(fetchMock.mock.calls[0][0]).toEqual(`${HIRO_TESTNET_URL}/v2/pox`);
   expect(makeContractCall).toHaveBeenCalledTimes(1);
-  expect(makeContractCall).toHaveBeenCalledWith(expectedContractCallOptions);
+  expect(makeContractCall).toHaveBeenCalledWith(
+    expect.objectContaining(expectedContractCallOptions)
+  );
   expect(broadcastTransaction).toHaveBeenCalledTimes(1);
-  expect(broadcastTransaction).toHaveBeenCalledWith({ transaction, client });
+  expect(broadcastTransaction).toHaveBeenCalledWith(
+    expect.objectContaining({
+      transaction,
+      client: expect.objectContaining({
+        baseUrl: defaultUrlFromNetwork(network),
+      }),
+    })
+  );
   expect(delegateResults).toEqual(broadcastResponse);
   expect(isPoxAbiValid(expectedContractCallOptions)).toBe(true);
 });
@@ -472,14 +499,25 @@ test('delegate stx with empty optional parameters', async () => {
     validateWithAbi: true,
     network,
     senderKey: privateKey,
-    client,
+    client: expect.objectContaining({
+      baseUrl: defaultUrlFromNetwork(network),
+    }),
   };
 
   expect(fetchMock.mock.calls[0][0]).toEqual(`${HIRO_TESTNET_URL}/v2/pox`);
   expect(makeContractCall).toHaveBeenCalledTimes(1);
-  expect(makeContractCall).toHaveBeenCalledWith(expectedContractCallOptions);
+  expect(makeContractCall).toHaveBeenCalledWith(
+    expect.objectContaining(expectedContractCallOptions)
+  );
   expect(broadcastTransaction).toHaveBeenCalledTimes(1);
-  expect(broadcastTransaction).toHaveBeenCalledWith({ transaction, client });
+  expect(broadcastTransaction).toHaveBeenCalledWith(
+    expect.objectContaining({
+      transaction,
+      client: expect.objectContaining({
+        baseUrl: defaultUrlFromNetwork(network),
+      }),
+    })
+  );
   expect(delegateResults).toEqual(broadcastResponse);
   expect(isPoxAbiValid(expectedContractCallOptions)).toBe(true);
 });
@@ -555,14 +593,25 @@ test('delegate stack stx with one delegator', async () => {
     validateWithAbi: true,
     network,
     senderKey: privateKey,
-    client,
+    client: expect.objectContaining({
+      baseUrl: defaultUrlFromNetwork(network),
+    }),
   };
 
   expect(fetchMock.mock.calls[0][0]).toEqual(`${HIRO_TESTNET_URL}/v2/pox`);
   expect(makeContractCall).toHaveBeenCalledTimes(1);
-  expect(makeContractCall).toHaveBeenCalledWith(expectedContractCallOptions);
+  expect(makeContractCall).toHaveBeenCalledWith(
+    expect.objectContaining(expectedContractCallOptions)
+  );
   expect(broadcastTransaction).toHaveBeenCalledTimes(1);
-  expect(broadcastTransaction).toHaveBeenCalledWith({ transaction, client });
+  expect(broadcastTransaction).toHaveBeenCalledWith(
+    expect.objectContaining({
+      transaction,
+      client: expect.objectContaining({
+        baseUrl: defaultUrlFromNetwork(network),
+      }),
+    })
+  );
   expect(delegateResults).toEqual(broadcastResponse);
   expect(isPoxAbiValid(expectedContractCallOptions)).toBe(true);
 });
@@ -641,14 +690,25 @@ test('delegate stack stx with set nonce', async () => {
     network,
     senderKey: privateKey,
     nonce,
-    client,
+    client: expect.objectContaining({
+      baseUrl: defaultUrlFromNetwork(network),
+    }),
   };
 
   expect(fetchMock.mock.calls[0][0]).toEqual(`${HIRO_TESTNET_URL}/v2/pox`);
   expect(makeContractCall).toHaveBeenCalledTimes(1);
-  expect(makeContractCall).toHaveBeenCalledWith(expectedContractCallOptions);
+  expect(makeContractCall).toHaveBeenCalledWith(
+    expect.objectContaining(expectedContractCallOptions)
+  );
   expect(broadcastTransaction).toHaveBeenCalledTimes(1);
-  expect(broadcastTransaction).toHaveBeenCalledWith({ transaction, client });
+  expect(broadcastTransaction).toHaveBeenCalledWith(
+    expect.objectContaining({
+      transaction,
+      client: expect.objectContaining({
+        baseUrl: defaultUrlFromNetwork(network),
+      }),
+    })
+  );
   expect(delegateResults).toEqual(broadcastResponse);
   expect(isPoxAbiValid(expectedContractCallOptions)).toBe(true);
 });
@@ -704,14 +764,25 @@ test('delegator commit', async () => {
     validateWithAbi: true,
     network,
     senderKey: privateKey,
-    client,
+    client: expect.objectContaining({
+      baseUrl: defaultUrlFromNetwork(network),
+    }),
   };
 
   expect(fetchMock.mock.calls[0][0]).toEqual(`${HIRO_TESTNET_URL}/v2/pox`);
   expect(makeContractCall).toHaveBeenCalledTimes(1);
-  expect(makeContractCall).toHaveBeenCalledWith(expectedContractCallOptions);
+  expect(makeContractCall).toHaveBeenCalledWith(
+    expect.objectContaining(expectedContractCallOptions)
+  );
   expect(broadcastTransaction).toHaveBeenCalledTimes(1);
-  expect(broadcastTransaction).toHaveBeenCalledWith({ transaction, client });
+  expect(broadcastTransaction).toHaveBeenCalledWith(
+    expect.objectContaining({
+      transaction,
+      client: expect.objectContaining({
+        baseUrl: defaultUrlFromNetwork(network),
+      }),
+    })
+  );
   expect(delegateResults).toEqual(broadcastResponse);
   expect(isPoxAbiValid(expectedContractCallOptions)).toBe(true);
 });
@@ -753,14 +824,25 @@ test('revoke delegate stx', async () => {
     validateWithAbi: true,
     network,
     senderKey: privateKey,
-    client,
+    client: expect.objectContaining({
+      baseUrl: defaultUrlFromNetwork(network),
+    }),
   };
 
   expect(fetchMock.mock.calls[0][0]).toEqual(`${HIRO_TESTNET_URL}/v2/pox`);
   expect(makeContractCall).toHaveBeenCalledTimes(1);
-  expect(makeContractCall).toHaveBeenCalledWith(expectedContractCallOptions);
+  expect(makeContractCall).toHaveBeenCalledWith(
+    expect.objectContaining(expectedContractCallOptions)
+  );
   expect(broadcastTransaction).toHaveBeenCalledTimes(1);
-  expect(broadcastTransaction).toHaveBeenCalledWith({ transaction, client });
+  expect(broadcastTransaction).toHaveBeenCalledWith(
+    expect.objectContaining({
+      transaction,
+      client: expect.objectContaining({
+        baseUrl: defaultUrlFromNetwork(network),
+      }),
+    })
+  );
   expect(revokeDelegateResults).toEqual(broadcastResponse);
   expect(isPoxAbiValid(expectedContractCallOptions)).toBe(true);
 });
@@ -820,11 +902,15 @@ test('get stacking status', async () => {
     functionName: 'get-stacker-info',
     functionArgs: [standardPrincipalCV(address)],
     senderAddress: address,
-    client,
+    client: expect.objectContaining({
+      baseUrl: defaultUrlFromNetwork(network),
+    }),
   };
 
   expect(fetchCallReadOnlyFunction).toHaveBeenCalledTimes(1);
-  expect(fetchCallReadOnlyFunction).toHaveBeenCalledWith(expectedReadOnlyFunctionCallOptions);
+  expect(fetchCallReadOnlyFunction).toHaveBeenCalledWith(
+    expect.objectContaining(expectedReadOnlyFunctionCallOptions)
+  );
 
   expect(stackingStatus.stacked).toEqual(true);
   expect(stackingStatus.details.first_reward_cycle).toEqual(firstRewardCycle);
@@ -1146,8 +1232,11 @@ test('client operations with contract principal stacker', () => {
 });
 
 test('getSecondsUntilStackingDeadline', async () => {
-  const api = new StacksNodeApi({ url: 'http://localhost:3999' });
-  const client = new StackingClient({ address: '', network: STACKS_MAINNET, api });
+  const client = new StackingClient({
+    address: '',
+    network: STACKS_MAINNET,
+    client: defaultClientOpts({ baseUrl: 'http://localhost:3999' }),
+  });
 
   setApiMocks({
     '/extended/v1/info/network_block_times': `{"testnet":{"target_block_time":120},"mainnet":{"target_block_time":600}}`,

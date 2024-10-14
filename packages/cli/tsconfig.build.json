@@ -9,9 +9,6 @@
   },
   "references": [
     {
-      "path": "../api/tsconfig.build.json"
-    },
-    {
       "path": "../auth/tsconfig.build.json"
     },
     {
