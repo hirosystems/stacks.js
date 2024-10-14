@@ -21,7 +21,7 @@ test('fetchFn is used in network requests', async () => {
   const txid = transaction.txid();
   fetchMock.mockOnce(`"${txid}"`);
 
-  await broadcastTransaction({ transaction, api });
+  await broadcastTransaction({ transaction, client: api });
 
   expect((fetchMock.mock.calls[0][1]?.headers as Headers)?.get('x-api-key')).toContain(apiKey);
 });

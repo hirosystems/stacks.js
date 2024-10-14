@@ -57,7 +57,7 @@ test('canRegisterName true', async () => {
       bufferCV(utf8ToBytes(fullyQualifiedName.split('.')[0])),
     ],
     senderAddress: notRandomAddress,
-    api: undefined,
+    client: undefined,
   };
 
   expect(result).toEqual(true);
@@ -96,7 +96,7 @@ test('canRegisterName false', async () => {
       bufferCV(utf8ToBytes(fullyQualifiedName.split('.')[0])),
     ],
     senderAddress: notRandomAddress,
-    api: undefined,
+    client: undefined,
   };
 
   expect(result).toEqual(false);
@@ -135,7 +135,7 @@ test('canRegisterName error', async () => {
       bufferCV(utf8ToBytes(fullyQualifiedName.split('.')[0])),
     ],
     senderAddress: notRandomAddress,
-    api: undefined,
+    client: undefined,
   };
 
   expect(result).toEqual(false);
@@ -171,7 +171,7 @@ test('getNamespacePrice', async () => {
     functionName: bnsFunctionName,
     senderAddress: address,
     functionArgs: [bufferCVFromString(namespace)],
-    api: undefined,
+    client: undefined,
   };
 
   expect(result.toString()).toEqual('10');
@@ -206,7 +206,7 @@ test('getNamespacePrice error', async () => {
     functionName: bnsFunctionName,
     senderAddress: address,
     functionArgs: [bufferCVFromString(namespace)],
-    api: undefined,
+    client: undefined,
   };
 
   await expect(getNamespacePrice({ namespace, network })).rejects.toEqual(new Error('u1001'));
@@ -244,7 +244,7 @@ test('getNamePrice', async () => {
     functionName: bnsFunctionName,
     senderAddress: address,
     functionArgs: [bufferCVFromString(namespace), bufferCVFromString(name)],
-    api: undefined,
+    client: undefined,
   };
 
   expect(result.toString()).toEqual('10');
@@ -281,7 +281,7 @@ test('getNamePrice error', async () => {
     functionName: bnsFunctionName,
     senderAddress: address,
     functionArgs: [bufferCVFromString(namespace), bufferCVFromString(name)],
-    api: undefined,
+    client: undefined,
   };
 
   await expect(getNamePrice({ fullyQualifiedName, network })).rejects.toEqual(new Error('u2001'));

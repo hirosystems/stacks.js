@@ -1,10 +1,10 @@
-import { ApiOpts, ApiParam, defaultApiLike } from '@stacks/common';
+import { ClientOpts, ClientParam, defaultClientOpts } from '@stacks/common';
 import { resolveZoneFileToProfile } from '@stacks/profile';
 
 export interface ProfileLookupOptions {
   username: string;
   zoneFileLookupURL?: string;
-  api?: ApiOpts;
+  api?: ClientOpts;
 }
 
 /**
@@ -21,21 +21,21 @@ export function lookupProfile(options: ProfileLookupOptions): Promise<Record<str
     return Promise.reject(new Error('No username provided'));
   }
 
-  const api = defaultApiLike(options.api);
+  const api = defaultClientOpts(options.api);
 
   let lookupPromise;
   if (options.zoneFileLookupURL) {
     const url = `${options.zoneFileLookupURL.replace(/\/$/, '')}/${options.username}`;
     lookupPromise = api.fetch(url).then(response => response.json());
   } else {
-    lookupPromise = getNameInfo({ name: options.username, api });
+    lookupPromise = getNameInfo({ name: options.username, client: api });
   }
   return lookupPromise.then((responseJSON: any) => {
     if (responseJSON.hasOwnProperty('zonefile') && responseJSON.hasOwnProperty('address')) {
       return resolveZoneFileToProfile({
         zoneFile: responseJSON.zonefile,
         publicKeyOrAddress: responseJSON.address,
-        api,
+        client: api,
       });
     } else {
       throw new Error(
@@ -49,11 +49,11 @@ export function getNameInfo(
   opts: {
     /** Fully qualified name */
     name: string;
-  } & ApiParam
+  } & ClientParam
 ) {
-  const api = defaultApiLike(opts.api);
+  const api = defaultClientOpts(opts.client);
 
-  const nameLookupURL = `${api.url}/v1/names/${opts.name}`;
+  const nameLookupURL = `${api.baseUrl}/v1/names/${opts.name}`;
   return api
     .fetch(nameLookupURL)
     .then((resp: any) => {

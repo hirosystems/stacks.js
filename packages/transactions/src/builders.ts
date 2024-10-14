@@ -1,10 +1,11 @@
-import { ApiOpts, ApiParam, IntegerType, PrivateKey, PublicKey } from '@stacks/common';
+import { ClientOpts, ClientParam, IntegerType, PrivateKey, PublicKey } from '@stacks/common';
 import {
   STACKS_MAINNET,
   STACKS_TESTNET,
   StacksNetwork,
   StacksNetworkName,
   TransactionVersion,
+  defaultClientOptsFromNetwork,
   networkFrom,
   whenTransactionVersion,
 } from '@stacks/network';
@@ -40,7 +41,7 @@ import { postConditionToWire } from './postcondition';
 import { PostCondition } from './postcondition-types';
 import { TransactionSigner } from './signer';
 import { StacksTransaction } from './transaction';
-import { defaultApiFromNetwork, omit } from './utils';
+import { omit } from './utils';
 import {
   PostConditionWire,
   addressFromPublicKeys,
@@ -98,7 +99,7 @@ export type TokenTransferOptions = {
   memo?: string;
   /** set to true if another account is sponsoring the transaction (covering the transaction fee) */
   sponsored?: boolean;
-} & ApiParam;
+} & ClientParam;
 
 export interface UnsignedTokenTransferOptions extends TokenTransferOptions {
   publicKey: PublicKey;
@@ -133,7 +134,7 @@ export async function makeUnsignedSTXTokenTransfer(
   };
 
   const options = Object.assign(defaultOptions, txOptions);
-  options.api = defaultApiFromNetwork(options.network, txOptions.api);
+  options.client = defaultClientOptsFromNetwork(options.network, txOptions.client);
 
   const payload = createTokenTransferPayload(options.recipient, options.amount, options.memo);
 
@@ -188,14 +189,14 @@ export async function makeUnsignedSTXTokenTransfer(
   );
 
   if (txOptions.fee == null) {
-    const fee = await fetchFeeEstimate({ transaction, api: options.api });
+    const fee = await fetchFeeEstimate({ transaction, client: options.client });
     transaction.setFee(fee);
   }
 
   if (txOptions.nonce == null) {
     const addressVersion = network.addressVersion.singleSig;
     const address = c32address(addressVersion, transaction.auth.spendingCondition!.signer);
-    const txNonce = await fetchNonce({ address, api: options.api });
+    const txNonce = await fetchNonce({ address, client: options.client });
     transaction.setNonce(txNonce);
   }
 
@@ -256,7 +257,7 @@ export interface BaseContractDeployOptions {
   /** the network that the transaction will ultimately be broadcast to */
   network?: StacksNetworkName | StacksNetwork;
   /** the node/API used for estimating fee & nonce (using the `api.fetchFn` */
-  api?: ApiOpts;
+  api?: ClientOpts;
   /** the post condition mode, specifying whether or not post-conditions must fully cover all
    * transfered assets */
   postConditionMode?: PostConditionMode;
@@ -335,7 +336,7 @@ export async function makeUnsignedContractDeploy(
   };
 
   const options = Object.assign(defaultOptions, txOptions);
-  options.api = defaultApiFromNetwork(options.network, txOptions.api);
+  options.api = defaultClientOptsFromNetwork(options.network, txOptions.api);
 
   const payload = createSmartContractPayload(
     options.contractName,
@@ -402,14 +403,14 @@ export async function makeUnsignedContractDeploy(
   );
 
   if (txOptions.fee === undefined || txOptions.fee === null) {
-    const fee = await fetchFeeEstimate({ transaction, api: options.api });
+    const fee = await fetchFeeEstimate({ transaction, client: options.api });
     transaction.setFee(fee);
   }
 
   if (txOptions.nonce === undefined || txOptions.nonce === null) {
     const addressVersion = network.addressVersion.singleSig;
     const address = c32address(addressVersion, transaction.auth.spendingCondition!.signer);
-    const txNonce = await fetchNonce({ address, api: options.api });
+    const txNonce = await fetchNonce({ address, client: options.api });
     transaction.setNonce(txNonce);
   }
 
@@ -432,7 +433,7 @@ export interface ContractCallOptions {
   /** the Stacks blockchain network that will ultimately be used to broadcast this transaction */
   network?: StacksNetworkName | StacksNetwork;
   /** the node/API used for estimating fee & nonce (using the `api.fetchFn` */
-  api?: ApiOpts;
+  client?: ClientOpts;
   /** the post condition mode, specifying whether or not post-conditions must fully cover all
    * transfered assets */
   postConditionMode?: PostConditionMode;
@@ -476,7 +477,7 @@ export async function makeUnsignedContractCall(
   };
 
   const options = Object.assign(defaultOptions, txOptions);
-  options.api = defaultApiFromNetwork(options.network, txOptions.api);
+  options.client = defaultClientOptsFromNetwork(options.network, txOptions.client);
 
   const payload = createContractCallPayload(
     options.contractAddress,
@@ -556,14 +557,14 @@ export async function makeUnsignedContractCall(
   );
 
   if (txOptions.fee === undefined || txOptions.fee === null) {
-    const fee = await fetchFeeEstimate({ transaction, api: options.api });
+    const fee = await fetchFeeEstimate({ transaction, client: options.client });
     transaction.setFee(fee);
   }
 
   if (txOptions.nonce === undefined || txOptions.nonce === null) {
     const addressVersion = network.addressVersion.singleSig;
     const address = c32address(addressVersion, transaction.auth.spendingCondition!.signer);
-    const txNonce = await fetchNonce({ address, api: options.api });
+    const txNonce = await fetchNonce({ address, client: options.client });
     transaction.setNonce(txNonce);
   }
 
@@ -626,7 +627,7 @@ export interface SponsorOptionsOpts {
   /** the Stacks blockchain network that this transaction will ultimately be broadcast to */
   network?: StacksNetworkName | StacksNetwork;
   /** the node/API used for estimating fee & nonce (using the `api.fetchFn` */
-  api?: ApiOpts;
+  api?: ClientOpts;
 }
 
 /**
@@ -654,7 +655,7 @@ export async function sponsorTransaction(
   };
 
   const options = Object.assign(defaultOptions, sponsorOptions);
-  options.api = defaultApiFromNetwork(options.network, sponsorOptions.api);
+  options.api = defaultClientOptsFromNetwork(options.network, sponsorOptions.api);
 
   const network = networkFrom(options.network);
   const sponsorPubKey = privateKeyToPublic(options.sponsorPrivateKey);
@@ -682,7 +683,7 @@ export async function sponsorTransaction(
   if (sponsorOptions.sponsorNonce == null) {
     const addressVersion = network.addressVersion.singleSig;
     const address = publicKeyToAddress(addressVersion, sponsorPubKey);
-    const sponsorNonce = await fetchNonce({ address, api: options.api });
+    const sponsorNonce = await fetchNonce({ address, client: options.api });
     options.sponsorNonce = sponsorNonce;
   }
 

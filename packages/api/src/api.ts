@@ -4,7 +4,7 @@ import {
   StacksNetwork,
   StacksNetworkName,
   TransactionVersion,
-  deriveDefaultUrl,
+  defaultUrlFromNetwork,
   networkFrom,
 } from '@stacks/network';
 import {
@@ -34,24 +34,24 @@ import {
 } from './types';
 
 export class StacksNodeApi {
-  public url: string;
+  public baseUrl: string;
   public fetch: FetchFn;
 
   public network: StacksNetwork;
 
   constructor({
-    url,
+    baseUrl,
     fetch,
     network = STACKS_MAINNET,
   }: {
     /** The base API/node URL for the network fetch calls */
-    url?: string;
+    baseUrl?: string;
     /** Stacks network object (defaults to {@link STACKS_MAINNET}) */
     network?: StacksNetworkName | StacksNetwork;
     /** An optional custom fetch function to override default behaviors */
     fetch?: FetchFn;
   } = {}) {
-    this.url = url ?? deriveDefaultUrl(network);
+    this.baseUrl = baseUrl ?? defaultUrlFromNetwork(network);
     this.fetch = fetch ?? createFetchFn();
     this.network = networkFrom(network);
   }
@@ -70,7 +70,7 @@ export class StacksNodeApi {
     attachment?: Uint8Array | string
   ): Promise<TxBroadcastResult> => {
     // todo: should we use a opts object instead of positional args here?
-    return broadcastTransaction({ transaction, attachment, api: this });
+    return broadcastTransaction({ transaction, attachment, client: this });
   };
 
   /**
@@ -79,7 +79,7 @@ export class StacksNodeApi {
    * @return A promise that resolves to a bigint of the next nonce
    */
   getNonce = async (address: string): Promise<bigint> => {
-    return fetchNonce({ address, api: this });
+    return fetchNonce({ address, client: this });
   };
 
   /**
@@ -94,7 +94,7 @@ export class StacksNodeApi {
     payload: Hex,
     estimatedLength?: number
   ): Promise<[FeeEstimation, FeeEstimation, FeeEstimation]> => {
-    return fetchFeeEstimateTransaction({ payload, estimatedLength, api: this });
+    return fetchFeeEstimateTransaction({ payload, estimatedLength, client: this });
   };
 
   /**
@@ -103,22 +103,22 @@ export class StacksNodeApi {
    */
   getAbi = async (contract: ContractIdString): Promise<ClarityAbi> => {
     const [contractAddress, contractName] = contract.split('.');
-    return fetchAbi({ contractAddress, contractName, api: this });
+    return fetchAbi({ contractAddress, contractName, client: this });
   };
 
   /** Get stacks node info */
   getInfo(): Promise<V2InfoResponse> {
-    return this.fetch(`${this.url}/v2/info`).then(res => res.json());
+    return this.fetch(`${this.baseUrl}/v2/info`).then(res => res.json());
   }
 
   /** Get stacks node pox info */
   getPoxInfo(): Promise<V2PoxInfoResponse> {
-    return this.fetch(`${this.url}/v2/pox`).then(res => res.json());
+    return this.fetch(`${this.baseUrl}/v2/pox`).then(res => res.json());
   }
 
   /** Get stacks node target block time */
   async getTargetBlockTime() {
-    const res = await this.fetch(`${this.url}/extended/v1/info/network_block_times`).then(
+    const res = await this.fetch(`${this.baseUrl}/extended/v1/info/network_block_times`).then(
       (res: any): V1InfoBlockTimesResponse => res.json()
     );
 
@@ -129,7 +129,7 @@ export class StacksNodeApi {
   /** Get account status */
   async getAccountInfo(address: string) {
     // todo: add types for response
-    return this.fetch(`${this.url}/v2/accounts/${address}?proof=0`)
+    return this.fetch(`${this.baseUrl}/v2/accounts/${address}?proof=0`)
       .then(res => res.json())
       .then(json => {
         json.balance = BigInt(json.balance);
@@ -140,7 +140,7 @@ export class StacksNodeApi {
 
   /** Get extended account balances */
   async getExtendedAccountBalances(address: string): Promise<ExtendedAccountBalances> {
-    return this.fetch(`${this.url}/extended/v1/address/${address}/balances`)
+    return this.fetch(`${this.baseUrl}/extended/v1/address/${address}/balances`)
       .then(res => res.json())
       .then(json => {
         json.stx.balance = BigInt(json.stx.balance);
@@ -156,7 +156,7 @@ export class StacksNodeApi {
     /** BTC or STX address */
     address: string
   ): Promise<BurnchainRewardsTotal | BaseErrorResponse> {
-    return this.fetch(`${this.url}/extended/v1/burnchain/rewards/${address}/total`)
+    return this.fetch(`${this.baseUrl}/extended/v1/burnchain/rewards/${address}/total`)
       .then(res => res.json())
       .then(json => {
         json.reward_amount = BigInt(json.reward_amount);
@@ -170,7 +170,7 @@ export class StacksNodeApi {
     address: string,
     options?: PaginationOptions
   ): Promise<BurnchainRewardListResponse | BaseErrorResponse> {
-    let url = `${this.url}/extended/v1/burnchain/rewards/${address}`;
+    let url = `${this.baseUrl}/extended/v1/burnchain/rewards/${address}`;
     if (options) url += `?limit=${options.limit}&offset=${options.offset}`;
 
     return this.fetch(url).then(res => res.json());
@@ -182,7 +182,7 @@ export class StacksNodeApi {
     address: string,
     options?: PaginationOptions
   ): Promise<BurnchainRewardSlotHolderListResponse | BaseErrorResponse> {
-    let url = `${this.url}/extended/v1/burnchain/reward_slot_holders/${address}`;
+    let url = `${this.baseUrl}/extended/v1/burnchain/reward_slot_holders/${address}`;
     if (options) url += `?limit=${options.limit}&offset=${options.offset}`;
 
     return this.fetch(url).then(res => res.json());
@@ -193,7 +193,7 @@ export class StacksNodeApi {
     // todo: (contractAddress: string, contractName: string, dataVarName: string) overload?
     // todo: cleanup address/contract identifies types
     const contractPath = contract.replace('.', '/');
-    const url = `${this.url}/v2/data_var/${contractPath}/${dataVarName}?proof=0`;
+    const url = `${this.baseUrl}/v2/data_var/${contractPath}/${dataVarName}?proof=0`;
     return this.fetch(url)
       .then(res => res.json())
       .then(json => ({
