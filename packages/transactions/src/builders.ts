@@ -6,6 +6,7 @@ import {
   StacksTestnet,
   FetchFn,
   createFetchFn,
+  HIRO_TESTNET_DEFAULT,
 } from '@stacks/network';
 import { c32address } from 'c32check';
 import {
@@ -138,6 +139,13 @@ export async function getNetworkChainID(network: StacksNetwork, useDefaultOnErro
     console.warn(`Error fetching network chain ID from ${url}`, error);
     return network.chainId;
   }
+}
+
+function isNetworkCustomTestnet(network: StacksNetwork) {
+  return (
+    network.version !== TransactionVersion.Mainnet &&
+    new URL(network.coreApiUrl).host !== new URL(HIRO_TESTNET_DEFAULT).host
+  );
 }
 
 /**
@@ -775,8 +783,8 @@ export async function makeUnsignedSTXTokenTransfer(
     transaction.setNonce(txNonce);
   }
 
-  // Lookup chain ID for testnet networks
-  if (network.version !== TransactionVersion.Mainnet) {
+  // Lookup chain ID for (non-primary) testnet networks
+  if (isNetworkCustomTestnet(network)) {
     transaction.chainId = await getNetworkChainID(network);
   }
 
@@ -1053,11 +1061,10 @@ export async function makeUnsignedContractDeploy(
     transaction.setNonce(txNonce);
   }
 
-  // Lookup chain ID for testnet networks
-  if (network.version !== TransactionVersion.Mainnet) {
+  // Lookup chain ID for (non-primary) testnet networks
+  if (isNetworkCustomTestnet(network)) {
     transaction.chainId = await getNetworkChainID(network);
   }
-
 
   return transaction;
 }
@@ -1272,8 +1279,8 @@ export async function makeUnsignedContractCall(
     transaction.setNonce(txNonce);
   }
 
-  // Lookup chain ID for testnet networks
-  if (network.version !== TransactionVersion.Mainnet) {
+  // Lookup chain ID for (non-primary) testnet networks
+  if (isNetworkCustomTestnet(network)) {
     transaction.chainId = await getNetworkChainID(network);
   }
 
