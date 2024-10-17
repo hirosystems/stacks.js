@@ -1,4 +1,5 @@
 import {
+  ChainID,
   PRIVATE_KEY_COMPRESSED_LENGTH,
   bytesToHex,
   bytesToUtf8,
@@ -330,6 +331,47 @@ test('Make STX token transfer with testnet string name', async () => {
     '0000000000000000';
 
   expect(serialized).toBe(tx);
+});
+
+test('Make STX token transfer with custom testnet (lookup network chainID)', async () => {
+  const nonce = 123;
+  const recipient = standardPrincipalCV('SP3FGQ8Z7JY9BWYZ5WM53E0M9NK7WHJF0691NZ159');
+  const amount = 12345;
+  const fee = 0;
+  const senderKey = 'cb3df38053d132895220b9ce471f6b676db5b9bf0b4adefb55f2118ece2478df01';
+  const senderAddress = 'STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6';
+  const memo = 'test memo';
+  const network = new StacksTestnet({ url: 'https://my-custom-testnet.example' });
+  const apiUrl = network.getAccountApiUrl(senderAddress);
+
+  fetchMock.mockRejectOnce();
+  fetchMock.mockOnce(`{"balance":"0", "nonce":${nonce}}`);
+
+  const fetchNonce = await getNonce(senderAddress, network);
+
+  fetchMock.mockRejectOnce();
+  fetchMock.mockOnce(`{"balance":"0", "nonce":${nonce}}`);
+
+  // http://localhost:3999/v2/info
+  fetchMock.once(JSON.stringify({ network_id: 0x1234 }));
+
+  const transaction = await makeSTXTokenTransfer({
+    recipient,
+    amount,
+    senderKey,
+    fee,
+    memo,
+    network,
+    anchorMode: AnchorMode.Any,
+  });
+
+  expect(fetchMock.mock.calls.length).toEqual(5);
+  expect(fetchMock.mock.calls[1][0]).toEqual(apiUrl);
+  expect(fetchMock.mock.calls[3][0]).toEqual(apiUrl);
+  expect(fetchMock.mock.calls[4][0]).toEqual(network.getInfoUrl());
+  expect(fetchNonce.toString()).toEqual(nonce.toString());
+  expect(transaction.auth.spendingCondition?.nonce?.toString()).toEqual(nonce.toString());
+  expect(transaction.chainId).toEqual(0x1234);
 });
 
 test('Throws making STX token transder with invalid network name', async () => {
@@ -1242,6 +1284,9 @@ test('Estimate transaction fee fallback', async () => {
   // http://localhost:3999/v2/fees/transfer
   fetchMock.once('1');
 
+  // http://localhost:3999/v2/info
+  fetchMock.once(JSON.stringify({ network_id: ChainID.Testnet }));
+
   const tx = await makeContractCall({
     senderKey: privateKey,
     contractAddress: 'ST000000000000000000002AMW42H',
@@ -1291,7 +1336,7 @@ test('Estimate transaction fee fallback', async () => {
   const doubleRate = await estimateTransactionFeeWithFallback(tx, testnet);
   expect(doubleRate).toBe(402n);
 
-  expect(fetchMock.mock.calls.length).toEqual(8);
+  expect(fetchMock.mock.calls.length).toEqual(9);
 });
 
 test('Single-sig transaction byte length must include signature', async () => {
