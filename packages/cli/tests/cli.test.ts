@@ -24,7 +24,7 @@ import {
   WalletKeyInfoResult,
 } from './derivation-path/keychain';
 import * as fixtures from './fixtures/cli.fixture';
-import { bytesToHex } from '@stacks/common';
+import { bytesToHex, ChainID } from '@stacks/common';
 
 const TEST_ABI: ClarityAbi = JSON.parse(
   readFileSync(path.join(__dirname, './abi/test-abi.json')).toString()
@@ -111,7 +111,9 @@ describe('Contract function call', () => {
     // @ts-ignore
     inquirer.prompt = jest.fn().mockResolvedValue(contractInputArg);
 
-    fetchMock.once(JSON.stringify(TEST_ABI)).once('success');
+    fetchMock.once(JSON.stringify(TEST_ABI));
+    fetchMock.once(JSON.stringify({ network_id: ChainID.Testnet }));
+    fetchMock.once('success');
 
     const txid = '0x6c764e276b500babdac6cec159667f4b68938d31eee82419473a418222af7d5d';
     const result = await contractFunctionCall(testnetNetwork, args);
@@ -132,7 +134,9 @@ describe('Contract function call', () => {
     // @ts-ignore
     inquirer.prompt = jest.fn().mockResolvedValue(contractInputArg);
 
-    fetchMock.once(JSON.stringify(TEST_ABI)).once('success');
+    fetchMock.once(JSON.stringify(TEST_ABI));
+    fetchMock.once(JSON.stringify({ network_id: ChainID.Testnet }));
+    fetchMock.once('success');
 
     const txid = '0x97f41dfa44a5833acd9ca30ffe31d7137623c0e31a5c6467daeed8e61a03f51c';
     const result = await contractFunctionCall(testnetNetwork, args);
@@ -153,7 +157,9 @@ describe('Contract function call', () => {
     // @ts-ignore
     inquirer.prompt = jest.fn().mockResolvedValue(contractInputArg);
 
-    fetchMock.once(JSON.stringify(TEST_ABI)).once('success');
+    fetchMock.once(JSON.stringify(TEST_ABI));
+    fetchMock.once(JSON.stringify({ network_id: ChainID.Testnet }));
+    fetchMock.once('success');
 
     const txid = '0x5fc468f21345c5ecaf1c007fce9630d9a79ec1945ed8652cc3c42fb542e35fe2';
     const result = await contractFunctionCall(testnetNetwork, args);
@@ -178,7 +184,9 @@ describe('Contract function call', () => {
     // @ts-ignore
     inquirer.prompt = jest.fn().mockResolvedValue(contractInputArg);
 
-    fetchMock.once(JSON.stringify(TEST_ABI)).once('success');
+    fetchMock.once(JSON.stringify(TEST_ABI));
+    fetchMock.once(JSON.stringify({ network_id: ChainID.Testnet }));
+    fetchMock.once('success');
 
     const txid = '0x94b1cfab79555b8c6725f19e4fcd6268934d905578a3e8ef7a1e542b931d3676';
     const result = await contractFunctionCall(testnetNetwork, args);
@@ -201,7 +209,9 @@ describe('Contract function call', () => {
     // @ts-ignore
     inquirer.prompt = jest.fn().mockResolvedValue(contractInputArg);
 
-    fetchMock.once(JSON.stringify(TEST_ABI)).once('success');
+    fetchMock.once(JSON.stringify(TEST_ABI));
+    fetchMock.once(JSON.stringify({ network_id: ChainID.Testnet }));
+    fetchMock.once('success');
 
     const txid = '0x6b6cd5bfb44c46a68090f0c5f659e9cc02518eafab67b0b740e1e77a55bbf284';
     const result = await contractFunctionCall(testnetNetwork, args);
@@ -286,6 +296,7 @@ describe('BNS', () => {
     fetchMock.mockOnce(mockedResponse);
     fetchMock.mockRejectOnce();
     fetchMock.mockOnce(JSON.stringify({ nonce: 1000 }));
+    fetchMock.mockOnce(JSON.stringify({ network_id: ChainID.Testnet }));
     fetchMock.mockOnce(JSON.stringify('success'));
 
     const txResult = await register(testnetNetwork, args);
@@ -306,6 +317,7 @@ describe('BNS', () => {
     fetchMock.mockOnce(mockedResponse);
     fetchMock.mockRejectOnce();
     fetchMock.mockOnce(JSON.stringify({ nonce: 1000 }));
+    fetchMock.mockOnce(JSON.stringify({ network_id: ChainID.Testnet }));
     fetchMock.mockOnce(JSON.stringify('success'));
 
     const txResult = await preorder(testnetNetwork, args);

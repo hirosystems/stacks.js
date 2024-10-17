@@ -1,4 +1,5 @@
 import {
+  ChainID,
   PRIVATE_KEY_COMPRESSED_LENGTH,
   bytesToHex,
   bytesToUtf8,
@@ -1242,6 +1243,9 @@ test('Estimate transaction fee fallback', async () => {
   // http://localhost:3999/v2/fees/transfer
   fetchMock.once('1');
 
+  // http://localhost:3999/v2/info
+  fetchMock.once(JSON.stringify({ network_id: ChainID.Testnet }));
+
   const tx = await makeContractCall({
     senderKey: privateKey,
     contractAddress: 'ST000000000000000000002AMW42H',
@@ -1291,7 +1295,7 @@ test('Estimate transaction fee fallback', async () => {
   const doubleRate = await estimateTransactionFeeWithFallback(tx, testnet);
   expect(doubleRate).toBe(402n);
 
-  expect(fetchMock.mock.calls.length).toEqual(8);
+  expect(fetchMock.mock.calls.length).toEqual(9);
 });
 
 test('Single-sig transaction byte length must include signature', async () => {
@@ -1427,6 +1431,9 @@ test('Make STX token transfer with fetch account nonce', async () => {
   fetchMock.mockRejectOnce();
   fetchMock.mockOnce(`{"balance":"0", "nonce":${nonce}}`);
 
+  // http://localhost:3999/v2/info
+  fetchMock.once(JSON.stringify({ network_id: ChainID.Testnet }));
+
   const transaction = await makeSTXTokenTransfer({
     recipient,
     amount,
@@ -1437,9 +1444,10 @@ test('Make STX token transfer with fetch account nonce', async () => {
     anchorMode: AnchorMode.Any,
   });
 
-  expect(fetchMock.mock.calls.length).toEqual(4);
+  expect(fetchMock.mock.calls.length).toEqual(5);
   expect(fetchMock.mock.calls[1][0]).toEqual(apiUrl);
   expect(fetchMock.mock.calls[3][0]).toEqual(apiUrl);
+  expect(fetchMock.mock.calls[4][0]).toEqual(network.getInfoUrl());
   expect(fetchNonce.toString()).toEqual(nonce.toString());
   expect(transaction.auth.spendingCondition?.nonce?.toString()).toEqual(nonce.toString());
 });
@@ -1670,6 +1678,9 @@ test('Make sponsored STX token transfer with set tx fee', async () => {
   const sponsorNonce = 0;
   const sponsorFee = 500;
 
+  // http://localhost:3999/v2/info
+  fetchMock.once(JSON.stringify({ network_id: ChainID.Testnet }));
+
   const transaction = await makeSTXTokenTransfer({
     recipient,
     amount,
@@ -1695,7 +1706,7 @@ test('Make sponsored STX token transfer with set tx fee', async () => {
   const bytesReader = new BytesReader(sponsorSignedTxSerialized);
   const deserializedSponsorTx = deserializeTransaction(bytesReader);
 
-  expect(fetchMock.mock.calls.length).toEqual(0);
+  expect(fetchMock.mock.calls.length).toEqual(1);
   expect(deserializedSponsorTx.auth.spendingCondition!.nonce!.toString()).toBe(nonce.toString());
   expect(deserializedSponsorTx.auth.spendingCondition!.fee!.toString()).toBe(fee.toString());
 
@@ -1725,6 +1736,9 @@ test('Make sponsored contract deploy with sponsor fee estimate', async () => {
   const authType = AuthType.Sponsored;
   const addressHashMode = AddressHashMode.SerializeP2PKH;
 
+  // http://localhost:3999/v2/info
+  fetchMock.once(JSON.stringify({ network_id: ChainID.Testnet }));
+
   const transaction = await makeContractDeploy({
     contractName,
     codeBody,
@@ -1745,7 +1759,7 @@ test('Make sponsored contract deploy with sponsor fee estimate', async () => {
 
   const sponsorSignedTx = await sponsorTransaction(sponsorOptions);
 
-  expect(fetchMock.mock.calls.length).toEqual(0);
+  expect(fetchMock.mock.calls.length).toEqual(1);
 
   const sponsorSignedTxSerialized = sponsorSignedTx.serialize();
 
@@ -1784,6 +1798,9 @@ test('Make sponsored contract call with sponsor nonce fetch', async () => {
   const authType = AuthType.Sponsored;
   const addressHashMode = AddressHashMode.SerializeP2PKH;
 
+  // http://localhost:3999/v2/info
+  fetchMock.once(JSON.stringify({ network_id: ChainID.Testnet }));
+
   const transaction = await makeContractCall({
     contractAddress,
     contractName,
@@ -1808,8 +1825,8 @@ test('Make sponsored contract call with sponsor nonce fetch', async () => {
 
   const sponsorSignedTx = await sponsorTransaction(sponsorOptions);
 
-  expect(fetchMock.mock.calls.length).toEqual(2);
-  expect(fetchMock.mock.calls[1][0]).toEqual(network.getAccountApiUrl(sponsorAddress));
+  expect(fetchMock.mock.calls.length).toEqual(3);
+  expect(fetchMock.mock.calls[2][0]).toEqual(network.getAccountApiUrl(sponsorAddress));
 
   const sponsorSignedTxSerialized = sponsorSignedTx.serialize();
 
@@ -1883,6 +1900,9 @@ test('Transaction broadcast success with string network name', async () => {
 });
 
 test('Transaction broadcast success with network detection', async () => {
+  // http://localhost:3999/v2/info
+  fetchMock.once(JSON.stringify({ network_id: ChainID.Testnet }));
+
   const transaction = await makeSTXTokenTransfer({
     recipient: standardPrincipalCV('SP3FGQ8Z7JY9BWYZ5WM53E0M9NK7WHJF0691NZ159'),
     amount: 12345,
@@ -1898,9 +1918,9 @@ test('Transaction broadcast success with network detection', async () => {
 
   const response: TxBroadcastResult = await broadcastTransaction(transaction);
 
-  expect(fetchMock.mock.calls.length).toEqual(1);
-  expect(fetchMock.mock.calls[0][0]).toEqual(new StacksTestnet().getBroadcastApiUrl());
-  expect(fetchMock.mock.calls[0][1]?.body).toEqual(transaction.serialize());
+  expect(fetchMock.mock.calls.length).toEqual(2);
+  expect(fetchMock.mock.calls[1][0]).toEqual(new StacksTestnet().getBroadcastApiUrl());
+  expect(fetchMock.mock.calls[1][1]?.body).toEqual(transaction.serialize());
   expect(response as TxBroadcastResultOk).toEqual({ txid: 'success' });
 });
 
@@ -2018,6 +2038,9 @@ test('Make contract-call with network ABI validation', async () => {
   const abi = fs.readFileSync('./tests/abi/kv-store-abi.json').toString();
   fetchMock.mockOnce(abi);
 
+  // http://localhost:3999/v2/info
+  fetchMock.once(JSON.stringify({ network_id: ChainID.Testnet }));
+
   await makeContractCall({
     contractAddress,
     contractName,
@@ -2032,7 +2055,7 @@ test('Make contract-call with network ABI validation', async () => {
     anchorMode: AnchorMode.Any,
   });
 
-  expect(fetchMock.mock.calls.length).toEqual(1);
+  expect(fetchMock.mock.calls.length).toEqual(2);
   expect(fetchMock.mock.calls[0][0]).toEqual(network.getAbiApiUrl(contractAddress, contractName));
 });
 
