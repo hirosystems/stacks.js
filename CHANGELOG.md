@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.17.0](https://github.com/hirosystems/stacks.js/compare/v6.16.1...v6.17.0) (2024-10-17)
+
+
+### Features
+
+* add clarity3 in clarityversion enum ([525c3ff](https://github.com/hirosystems/stacks.js/commit/525c3ff95d9554b25781c20d755be47f76f69556))
+
+
+### Bug Fixes
+
+* allow read-only headers in fetch ([3c19b93](https://github.com/hirosystems/stacks.js/commit/3c19b9311b7af02a8832937c411b6f461cb3b624))
+
+
+
 ## [6.16.1](https://github.com/hirosystems/stacks.js/compare/v6.16.0...v6.16.1) (2024-07-02)
 
 
