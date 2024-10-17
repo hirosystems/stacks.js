@@ -108,9 +108,11 @@ export function createApiKeyMiddleware({
       const reqUrl = new URL(context.url);
       if (!hostMatches(reqUrl.host, host)) return; // Skip middleware if host does not match pattern
 
-      const headers = new Headers(context.init.headers);
+      const headers =
+        context.init.headers instanceof Headers
+          ? context.init.headers
+          : (context.init.headers = new Headers(context.init.headers));
       headers.set(httpHeader, apiKey);
-      context.init.headers = headers;
     },
   };
 }
