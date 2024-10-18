@@ -15,7 +15,7 @@ import {
   SignedContractCallOptions,
   TupleCV,
   bufferCV,
-  encodeStructuredData,
+  encodeStructuredDataBytes,
   intCV,
   noneCV,
   responseErrorCV,
@@ -1317,7 +1317,7 @@ test('correctly generates pox-4 message hash', () => {
   const fixture = 'ec5b88aa81a96a6983c26cdba537a13d253425348ffc0ba6b07130869b025a2d';
 
   const hash = sha256(
-    encodeStructuredData(
+    encodeStructuredDataBytes(
       pox4SignatureMessage({
         poxAddress: poxAddress,
         topic,

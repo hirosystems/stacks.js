@@ -21,7 +21,7 @@ import {
   compressPrivateKey,
   compressPublicKey,
   createStacksPublicKey,
-  encodeStructuredData,
+  encodeStructuredDataBytes,
   getAddressFromPrivateKey,
   getAddressFromPublicKey,
   makeRandomPrivKey,
@@ -235,7 +235,7 @@ test('Retrieve public key from SIP-018 signature', () => {
   });
 
   // get expected message hex from structured data
-  const expectedMessage = encodeStructuredData({
+  const expectedMessage = encodeStructuredDataBytes({
     message: messageCV,
     domain,
   });
