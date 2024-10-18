@@ -46,9 +46,9 @@ export function standardPrincipalCV(addressString: string): StandardPrincipalCV 
  *
  * @example
  * ```
- *  import { standardPrincipalCVFromAddress, AddressWire  } from '@stacks/transactions';
+ *  import { standardPrincipalCVFromAddress, Address  } from '@stacks/transactions';
  *
- *  const address: AddressWire = {
+ *  const address: Address = {
  *    type: 0,
  *    version: 22,
  *    hash160: 'a5d9d331000f5b79578ce56bd157f29a9056f0d6'
