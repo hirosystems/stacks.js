@@ -1,5 +1,5 @@
 import { sha256 } from '@noble/hashes/sha256';
-import { PrivateKey, bytesToHex, concatBytes, utf8ToBytes } from '@stacks/common';
+import { PrivateKey, bytesToHex, concatBytes, hexToBytes } from '@stacks/common';
 import { ClarityType, ClarityValue, serializeCVBytes } from './clarity';
 import { signMessageHashRsv } from './keys';
 
@@ -7,7 +7,11 @@ import { signMessageHashRsv } from './keys';
 // > asciiToBytes('SIP018')
 export const STRUCTURED_DATA_PREFIX = new Uint8Array([0x53, 0x49, 0x50, 0x30, 0x31, 0x38]);
 
-export function hashStructuredData(structuredData: ClarityValue): Uint8Array {
+export function hashStructuredData(structuredData: ClarityValue): string {
+  return bytesToHex(sha256(serializeCVBytes(structuredData)));
+}
+
+export function hashStructuredDataBytes(structuredData: ClarityValue): Uint8Array {
   return sha256(serializeCVBytes(structuredData));
 }
 
@@ -25,34 +29,49 @@ function isDomain(value: ClarityValue): boolean {
   return true;
 }
 
-export function encodeStructuredData({
+export function encodeStructuredData(opts: {
+  message: ClarityValue;
+  domain: ClarityValue;
+}): string {
+  const bytes = encodeStructuredDataBytes(opts);
+  return bytesToHex(bytes);
+}
+
+export function encodeStructuredDataBytes({
   message,
   domain,
 }: {
   message: ClarityValue;
   domain: ClarityValue;
 }): Uint8Array {
-  const structuredDataHash: Uint8Array = hashStructuredData(message);
+  const structuredDataHash: Uint8Array = hashStructuredDataBytes(message);
   if (!isDomain(domain)) {
     throw new Error(
       "domain parameter must be a valid domain of type TupleCV with keys 'name', 'version', 'chain-id' with respective types StringASCII, StringASCII, UInt"
     );
   }
-  const domainHash: Uint8Array = hashStructuredData(domain);
+  const domainHash: Uint8Array = hashStructuredDataBytes(domain);
 
   return concatBytes(STRUCTURED_DATA_PREFIX, domainHash, structuredDataHash);
 }
 
-export type DecodedStructuredData = {
+export function decodeStructuredDataSignature(signature: string | Uint8Array): {
+  domainHash: string;
+  messageHash: string;
+} {
+  const bytes = decodeStructuredDataSignatureBytes(signature);
+  return {
+    domainHash: bytesToHex(bytes.domainHash),
+    messageHash: bytesToHex(bytes.messageHash),
+  };
+}
+
+export function decodeStructuredDataSignatureBytes(signature: string | Uint8Array): {
   domainHash: Uint8Array;
   messageHash: Uint8Array;
-};
-
-export function decodeStructuredDataSignature(
-  signature: string | Uint8Array
-): DecodedStructuredData {
+} {
   const encodedMessageBytes: Uint8Array =
-    typeof signature === 'string' ? utf8ToBytes(signature) : signature;
+    typeof signature === 'string' ? hexToBytes(signature) : signature;
   const domainHash = encodedMessageBytes.slice(
     STRUCTURED_DATA_PREFIX.length,
     STRUCTURED_DATA_PREFIX.length + hash256BytesLength
@@ -78,7 +97,7 @@ export function signStructuredData({
   domain: ClarityValue;
   privateKey: PrivateKey;
 }): string {
-  const structuredDataHash = bytesToHex(sha256(encodeStructuredData({ message, domain })));
+  const structuredDataHash = bytesToHex(sha256(encodeStructuredDataBytes({ message, domain })));
 
   return signMessageHashRsv({
     messageHash: structuredDataHash,

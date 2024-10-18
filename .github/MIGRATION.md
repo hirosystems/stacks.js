@@ -305,6 +305,9 @@ This likely was a misunderstood and unused feature.
 
 ### Advanced: Refactorings
 
+- `encodeStructuredData` now returns a hex-encoded string instead of a Uint8Array (use `encodeStructuredDataBytes` if you need the raw bytes).
+- `decodeStructuredDataSignature` now returns a hex-encoded string instead of a Uint8Array (use `decodeStructuredDataSignatureBytes` if you need the raw bytes). Also fixes a bug that previously tried to parse input strings as UTF-8 bytes instead of hex-encoded strings.
+- `hashStructuredData` now returns a hex-encoded string instead of a Uint8Array (use `hashStructuredDataBytes` if you need the raw bytes).
 - `AddressHashMode`: The `Serialize` prefixes were removed for brevity.
 - `makeRandomPrivKey` was renamed to `randomPrivateKey` and now returns a compressed private key.
 - `generateSecretKey` was renamed to `randomSeedPhrase`.
