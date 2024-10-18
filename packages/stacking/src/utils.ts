@@ -14,7 +14,7 @@ import {
   OptionalCV,
   TupleCV,
   bufferCV,
-  encodeStructuredData,
+  encodeStructuredDataBytes,
   signStructuredData,
   stringAsciiCV,
   tupleCV,
@@ -458,7 +458,7 @@ export function verifyPox4SignatureHash({
 }: Pox4SignatureOptions & { publicKey: string; signature: string }) {
   return verifyMessageSignatureRsv({
     message: sha256(
-      encodeStructuredData(
+      encodeStructuredDataBytes(
         pox4SignatureMessage({ topic, poxAddress, rewardCycle, period, network, maxAmount, authId })
       )
     ),

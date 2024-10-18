@@ -4,11 +4,14 @@ import { verifyMessageSignatureRsv } from '@stacks/encryption';
 import { standardPrincipalCV, stringAsciiCV, trueCV, tupleCV, uintCV } from '../src/clarity';
 import { publicKeyFromSignatureRsv, signMessageHashRsv } from '../src/keys';
 import {
-  decodeStructuredDataSignature,
-  encodeStructuredData,
-  hashStructuredData,
-  signStructuredData,
   STRUCTURED_DATA_PREFIX,
+  decodeStructuredDataSignature,
+  decodeStructuredDataSignatureBytes,
+  encodeStructuredData,
+  encodeStructuredDataBytes,
+  hashStructuredData,
+  hashStructuredDataBytes,
+  signStructuredData,
 } from '../src/structuredDataSignature';
 
 const chainIds = {
@@ -49,6 +52,15 @@ describe('encodeStructuredData / decodeStructuredDataSignature', () => {
     },
   ];
   test.each(inputs)('encoding / decoding', ({ message, domain }) => {
+    // encode message and domain bytes
+    const domainHashBytes = hashStructuredDataBytes(domain);
+    const messageHashBytes = hashStructuredDataBytes(message);
+    const encodedBytes = encodeStructuredDataBytes({ message, domain });
+    const { domainHash: decodedDomainHashBytes, messageHash: decodedMessageHashBytes } =
+      decodeStructuredDataSignatureBytes(encodedBytes);
+    expect(decodedDomainHashBytes).toEqual(domainHashBytes);
+    expect(decodedMessageHashBytes).toEqual(messageHashBytes);
+
     // encode message and domain
     const domainHash = hashStructuredData(domain);
     const messageHash = hashStructuredData(message);
@@ -191,7 +203,7 @@ describe('SIP018 test vectors', () => {
   ];
 
   test.each(inputs)('Structured data hashing', ({ input, expected }) => {
-    expect(bytesToHex(hashStructuredData(input))).toEqual(expected);
+    expect(bytesToHex(hashStructuredDataBytes(input))).toEqual(expected);
   });
 
   test('Message hashing', () => {
@@ -206,7 +218,7 @@ describe('SIP018 test vectors', () => {
 
     const message = stringAsciiCV('Hello World');
     const expectedMessageHash = '1bfdab6d4158313ce34073fbb8d6b0fc32c154d439def12247a0f44bb2225259';
-    expect(bytesToHex(sha256(encodeStructuredData({ message, domain })))).toEqual(
+    expect(bytesToHex(sha256(encodeStructuredDataBytes({ message, domain })))).toEqual(
       expectedMessageHash
     );
   });
