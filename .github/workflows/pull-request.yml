@@ -64,7 +64,7 @@ jobs:
       - name: Publish to npm (next/nakamoto)
         run: |
           git reset --hard
-          npx lerna publish --canary --force-publish --preid $BRANCH --dist-tag $BRANCH --no-verify-access --no-push --no-git-tag-version --yes
+          npx lerna publish --canary major --force-publish --preid $BRANCH --dist-tag $BRANCH --no-verify-access --no-push --no-git-tag-version --yes
         if: ${{ (github.head_ref || github.ref_name) == 'nakamoto' || (github.head_ref || github.ref_name) == 'next' }}
         env:
           BRANCH: ${{ github.head_ref || github.ref_name }}
