@@ -1,12 +1,14 @@
-import { StacksNetwork } from '@stacks/network';
+import { ClientParam, defaultClientOpts } from '@stacks/common';
 
 export const fetchFirstName = async (
-  address: string,
-  network: StacksNetwork
+  opts: {
+    address: string;
+  } & ClientParam
 ): Promise<string | undefined> => {
+  const client = defaultClientOpts(opts.client);
   try {
-    const namesResponse = await network.fetchFn(
-      `${network.bnsLookupUrl}/v1/addresses/stacks/${address}`
+    const namesResponse = await client.fetch(
+      `${client.baseUrl}/v1/addresses/stacks/${opts.address}`
     );
     const namesJson = await namesResponse.json();
     if ((namesJson.names.length || 0) > 0) {

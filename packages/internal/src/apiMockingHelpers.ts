@@ -1,7 +1,7 @@
 import { Configuration, TransactionsApi } from '@stacks/blockchain-api-client';
-import { StacksTestnet } from '@stacks/network';
+import { STACKS_TESTNET } from '@stacks/network';
 import { MockResponseInitFunction } from 'jest-fetch-mock';
-import { PoxInfo, StackingClient } from '../src';
+import { StackingClient } from '@stacks/stacking';
 
 // NOTES
 // Capture traffic via the fetchWrapper
@@ -92,12 +92,18 @@ export async function waitForTx(txId: string, apiUrl = 'http://localhost:3999') 
 export async function waitForBlock(burnBlockId: number, client?: StackingClient) {
   if (isMocking()) return;
 
-  client = client ?? new StackingClient('', new StacksTestnet({ url: 'http://localhost:3999' }));
+  client =
+    client ??
+    new StackingClient({
+      address: '',
+      network: STACKS_TESTNET,
+      client: { baseUrl: 'http://localhost:3999' },
+    });
 
   let current: number;
   for (let i = 1; i <= MAX_ITERATIONS; i++) {
     try {
-      const poxInfo = (await client.getPoxInfo()) as PoxInfo;
+      const poxInfo = await client.getPoxInfo();
       current = poxInfo?.current_burnchain_block_height as number;
       if (current && current >= burnBlockId) {
         console.log(`→ block ${current} reached`);
@@ -115,12 +121,18 @@ export async function waitForBlock(burnBlockId: number, client?: StackingClient)
 export async function waitForCycle(cycleId: number, client?: StackingClient) {
   if (isMocking()) return;
 
-  client = client ?? new StackingClient('', new StacksTestnet({ url: 'http://localhost:3999' }));
+  client =
+    client ??
+    new StackingClient({
+      address: '',
+      network: STACKS_TESTNET,
+      client: { baseUrl: 'http://localhost:3999' },
+    });
 
   let current: number;
   for (let i = 1; i <= MAX_ITERATIONS; i++) {
     try {
-      const poxInfo = (await client.getPoxInfo()) as PoxInfo;
+      const poxInfo = await client.getPoxInfo();
       current = poxInfo?.reward_cycle_id;
       if (current && current >= cycleId) {
         console.log(`→ cycle ${current} reached`);
@@ -171,7 +183,5 @@ export function getFetchMockBroadcast() {
   const broadcast = (Array.from(fetchMock.mock.calls) as any)
     .reverse()
     .find((m: any) => m[0].endsWith('/transactions'));
-  return {
-    body: broadcast[1].body,
-  };
+  return JSON.parse(broadcast[1].body);
 }

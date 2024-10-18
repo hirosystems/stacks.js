@@ -1,15 +1,6 @@
 import { ClarityValue } from '../clarityValue';
 import { ClarityType } from '../constants';
-type OptionalCV<T extends ClarityValue = ClarityValue> = NoneCV | SomeCV<T>;
-
-interface NoneCV {
-  readonly type: ClarityType.OptionalNone;
-}
-
-interface SomeCV<T extends ClarityValue = ClarityValue> {
-  readonly type: ClarityType.OptionalSome;
-  readonly value: T;
-}
+import { NoneCV, OptionalCV } from '../types';
 
 /**
  * Create a null clarity type
@@ -21,13 +12,13 @@ interface SomeCV<T extends ClarityValue = ClarityValue> {
  *  import { noneCV } from '@stacks/transactions';
  *
  *  const value = noneCV();
- *  // { type: 9 }
+ *  // { type: 'none' }
  * ```
  *
  * @see
  * {@link https://github.com/hirosystems/stacks.js/blob/main/packages/transactions/tests/clarity.test.ts | clarity test cases for more examples}
  */
-function noneCV(): NoneCV {
+export function noneCV(): NoneCV {
   return { type: ClarityType.OptionalNone };
 }
 
@@ -43,22 +34,16 @@ function noneCV(): NoneCV {
  *  import { someCV, trueCV } from '@stacks/transactions';
  *
  *  const value = someCV(trueCV());
- *  // { type: 10, value: { type: 3 } }
+ *  // { type: 'some', value: { type: 'true' } }
  * ```
  *
  * @see
  * {@link https://github.com/hirosystems/stacks.js/blob/main/packages/transactions/tests/clarity.test.ts | clarity test cases for more examples}
  */
-function someCV<T extends ClarityValue = ClarityValue>(value: T): OptionalCV<T> {
+export function someCV<T extends ClarityValue = ClarityValue>(value: T): OptionalCV<T> {
   return { type: ClarityType.OptionalSome, value };
 }
 
-function optionalCVOf<T extends ClarityValue = ClarityValue>(value?: T): OptionalCV<T> {
-  if (value) {
-    return someCV(value);
-  } else {
-    return noneCV();
-  }
+export function optionalCVOf<T extends ClarityValue = ClarityValue>(value?: T): OptionalCV<T> {
+  return value ? someCV(value) : noneCV();
 }
-
-export { OptionalCV, NoneCV, SomeCV, noneCV, someCV, optionalCVOf };

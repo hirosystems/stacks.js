@@ -9,7 +9,7 @@ import {
   noneCV,
   responseErrorCV,
   responseOkCV,
-  serializeCV,
+  serializeCVBytes,
   someCV,
   standardPrincipalCV,
   stringAsciiCV,
@@ -19,6 +19,7 @@ import {
 } from './clarity';
 
 export { prettyPrint, stringify } from './clarity/prettyPrint';
+
 export { parse } from './clarity/parser';
 
 // todo: https://github.com/hirosystems/clarinet/issues/786
@@ -116,7 +117,6 @@ export const contractPrincipal = contractPrincipalCV;
  * @see {@link serialize}, {@link deserialize}
  */
 export const standardPrincipal = standardPrincipalCV;
-// todo: add .principal method that detects `.` inside string for both standard and contract principals
 
 // Sequences ///////////////////////////////////////////////////////////////////
 /**
@@ -270,7 +270,7 @@ export const tuple = tupleCV;
 /**
  * `Cl.serialize` — Serializes a Clarity JS object to the equivalent hex-encoded representation
  *
- * Alias for {@link serializeCV}
+ * Alias for {@link serializeCVBytes}
  * @example
  * ```
  * import { Cl } from '@stacks/transactions';
@@ -278,7 +278,7 @@ export const tuple = tupleCV;
  * ```
  * @see {@link deserialize}
  */
-export const serialize = serializeCV;
+export const serialize = serializeCVBytes;
 /**
  * `Cl.deserialize` — Deserializes a hex string to the equivalent Clarity JS object
  *

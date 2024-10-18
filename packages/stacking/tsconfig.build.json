@@ -21,7 +21,5 @@
       "path": "../transactions/tsconfig.build.json"
     }
   ],
-  "include": [
-    "src/**/*"
-  ]
+  "include": ["src/**/*"]
 }
