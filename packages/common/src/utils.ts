@@ -2,6 +2,7 @@ import { Logger } from './logger';
 
 /**
  *  @ignore
+ * @deprecated
  */
 export const BLOCKSTACK_HANDLER = 'blockstack';
 // todo: `next` get rid of all this blockstack stuff
@@ -10,6 +11,7 @@ export const BLOCKSTACK_HANDLER = 'blockstack';
  * Time
  * @private
  * @ignore
+ * @deprecated
  */
 export function nextYear() {
   return new Date(new Date().setFullYear(new Date().getFullYear() + 1));
@@ -19,6 +21,7 @@ export function nextYear() {
  * Time
  * @private
  * @ignore
+ * @deprecated
  */
 export function nextMonth() {
   return new Date(new Date().setMonth(new Date().getMonth() + 1));
@@ -28,6 +31,7 @@ export function nextMonth() {
  * Time
  * @private
  * @ignore
+ * @deprecated
  */
 export function nextHour() {
   return new Date(new Date().setHours(new Date().getHours() + 1));
@@ -36,6 +40,7 @@ export function nextHour() {
 /**
  * Converts megabytes to bytes. Returns 0 if the input is not a finite number.
  * @ignore
+ * @deprecated
  */
 export function megabytesToBytes(megabytes: number): number {
   if (!Number.isFinite(megabytes)) {
@@ -48,6 +53,7 @@ export function megabytesToBytes(megabytes: number): number {
  * Calculate the AES-CBC ciphertext output byte length a given input length.
  * AES has a fixed block size of 16-bytes regardless key size.
  * @ignore
+ * @deprecated
  */
 export function getAesCbcOutputLength(inputByteLength: number) {
   // AES-CBC block mode rounds up to the next block size.
@@ -60,6 +66,7 @@ export function getAesCbcOutputLength(inputByteLength: number) {
  * This is equivalent to the byte length when the string is ASCII or UTF8-8
  * encoded.
  * @param number
+ * @deprecated
  */
 export function getBase64OutputLength(inputByteLength: number) {
   const encodedLength = Math.ceil(inputByteLength / 3) * 4;
@@ -70,8 +77,8 @@ export function getBase64OutputLength(inputByteLength: number) {
  * Query Strings
  * @private
  * @ignore
+ * @deprecated
  */
-
 export function updateQueryStringParameter(uri: string, key: string, value: string) {
   const re = new RegExp(`([?&])${key}=.*?(&|$)`, 'i');
   const separator = uri.indexOf('?') !== -1 ? '&' : '?';
@@ -89,8 +96,8 @@ export function updateQueryStringParameter(uri: string, key: string, value: stri
  * @returns {bool} iff v1 >= v2
  * @private
  * @ignore
+ * @deprecated
  */
-
 export function isLaterVersion(v1: string, v2: string) {
   if (v1 === undefined || v1 === '') {
     v1 = '0.0.0';
@@ -118,6 +125,7 @@ export function isLaterVersion(v1: string, v2: string) {
  * UUIDs
  * @private
  * @ignore
+ * @deprecated
  */
 export function makeUUID4() {
   let d = new Date().getTime();
@@ -138,6 +146,7 @@ export function makeUUID4() {
  * @return {Boolean} true if they pass the same origin check
  * @private
  * @ignore
+ * @deprecated
  */
 export function isSameOriginAbsoluteUrl(uri1: string, uri2: string) {
   try {
@@ -197,6 +206,7 @@ export function getGlobalScope(): Window {
   );
 }
 
+/** @deprecated */
 function getAPIUsageErrorMessage(
   scopeObject: unknown,
   apiName: string,
@@ -315,8 +325,18 @@ export function getGlobalObjects<K extends Extract<keyof Window, string>>(
   return result;
 }
 
+/** Different Integer representations */
 export type IntegerType = number | string | bigint | Uint8Array;
 
+/**
+ * Converts an integer-compatible value to a Uint8Array (given a byte length)
+ * @example
+ * ```ts
+ * import { intToBytes } from "@stacks/common";
+ * console.log(intToBytes(560, 4));
+ * // Uint8Array(4) [ 0, 0, 2, 48 ]
+ * ```
+ */
 export function intToBytes(value: IntegerType, byteLength: number): Uint8Array {
   return bigIntToBytes(intToBigInt(value), byteLength);
 }
@@ -387,16 +407,14 @@ export function hexToBigInt(hex: string): bigint {
 
 /**
  * Converts IntegerType to hex string
- * @ignore
  */
-export function intToHex(integer: IntegerType, lengthBytes = 8): string {
+export function intToHex(integer: IntegerType, byteLength = 8): string {
   const value = typeof integer === 'bigint' ? integer : intToBigInt(integer);
-  return value.toString(16).padStart(lengthBytes * 2, '0');
+  return value.toString(16).padStart(byteLength * 2, '0');
 }
 
 /**
  * Converts hex string to integer
- * @ignore
  */
 export function hexToInt(hex: string): number {
   return parseInt(hex, 16);
