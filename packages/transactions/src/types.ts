@@ -1,4 +1,4 @@
-import { StacksNetwork, StacksNetworkName } from '@stacks/network';
+import { NetworkClientParam } from '@stacks/network';
 import { ClarityValue } from './clarity';
 
 /**
@@ -183,13 +183,11 @@ export interface FeeEstimateResponse {
  * @param {StacksNetwork} network - the Stacks blockchain network this transaction is destined for
  * @param {String} senderAddress - the c32check address of the sender
  */
-export interface ReadOnlyFunctionOptions {
+export type ReadOnlyFunctionOptions = {
   contractName: string;
   contractAddress: string;
   functionName: string;
   functionArgs: ClarityValue[];
-  /** the network that the contract which contains the function is deployed to */
-  network?: StacksNetworkName | StacksNetwork;
   /** address of the sender */
   senderAddress: string;
-}
+} & NetworkClientParam;

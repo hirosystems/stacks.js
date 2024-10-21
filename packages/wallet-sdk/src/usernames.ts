@@ -1,11 +1,13 @@
-import { ClientParam, defaultClientOpts } from '@stacks/common';
+import { clientFromNetwork, networkFrom } from '@stacks/network';
+import { NetworkClientParam } from '@stacks/network/src';
 
 export const fetchFirstName = async (
   opts: {
     address: string;
-  } & ClientParam
+  } & NetworkClientParam
 ): Promise<string | undefined> => {
-  const client = defaultClientOpts(opts.client);
+  const network = networkFrom(opts.network ?? 'mainnet');
+  const client = Object.assign({}, clientFromNetwork(network), opts.client);
   try {
     const namesResponse = await client.fetch(
       `${client.baseUrl}/v1/addresses/stacks/${opts.address}`

@@ -1,9 +1,9 @@
 import { ClientOpts, IntegerType, PrivateKey, hexToBytes, intToBigInt } from '@stacks/common';
 import {
   ChainId,
+  NetworkClientParam,
   StacksNetwork,
-  StacksNetworkName,
-  defaultClientOptsFromNetwork,
+  clientFromNetwork,
   networkFrom,
 } from '@stacks/network';
 import {
@@ -334,14 +334,10 @@ export class StackingClient {
   public client: Required<ClientOpts>;
 
   // todo: make more constructor opts optional
-  constructor(opts: {
-    address: string;
-    network: StacksNetworkName | StacksNetwork;
-    client?: ClientOpts;
-  }) {
+  constructor(opts: { address: string } & NetworkClientParam) {
     this.address = opts.address;
-    this.network = networkFrom(opts.network);
-    this.client = defaultClientOptsFromNetwork(this.network, opts.client);
+    this.network = networkFrom(opts.network ?? 'mainnet');
+    this.client = Object.assign({}, clientFromNetwork(this.network), opts.client);
   }
 
   get baseUrl() {

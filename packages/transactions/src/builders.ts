@@ -1,13 +1,9 @@
-import { ClientOpts, ClientParam, IntegerType, PrivateKey, PublicKey } from '@stacks/common';
+import { IntegerType, PrivateKey, PublicKey } from '@stacks/common';
 import {
+  NetworkClientParam,
   STACKS_MAINNET,
-  STACKS_TESTNET,
-  StacksNetwork,
-  StacksNetworkName,
-  TransactionVersion,
-  defaultClientOptsFromNetwork,
+  clientFromNetwork,
   networkFrom,
-  whenTransactionVersion,
 } from '@stacks/network';
 import { c32address } from 'c32check';
 import {
@@ -40,7 +36,7 @@ import {
 import { postConditionToWire } from './postcondition';
 import { PostCondition } from './postcondition-types';
 import { TransactionSigner } from './signer';
-import { StacksTransaction } from './transaction';
+import { StacksTransaction, deriveNetworkFromTx } from './transaction';
 import { omit } from './utils';
 import {
   PostConditionWire,
@@ -93,13 +89,11 @@ export type TokenTransferOptions = {
   fee?: IntegerType;
   /** the transaction nonce, which must be increased monotonically with each new transaction */
   nonce?: IntegerType;
-  /** the network that the transaction will ultimately be broadcast to */
-  network?: StacksNetworkName | StacksNetwork;
   /** an arbitrary string to include in the transaction, must be less than 34 bytes */
   memo?: string;
   /** set to true if another account is sponsoring the transaction (covering the transaction fee) */
   sponsored?: boolean;
-} & ClientParam;
+} & NetworkClientParam;
 
 export interface UnsignedTokenTransferOptions extends TokenTransferOptions {
   publicKey: PublicKey;
@@ -134,11 +128,10 @@ export async function makeUnsignedSTXTokenTransfer(
   };
 
   const options = Object.assign(defaultOptions, txOptions);
-  options.client = defaultClientOptsFromNetwork(options.network, txOptions.client);
+  options.network = networkFrom(options.network);
+  options.client = Object.assign({}, clientFromNetwork(options.network), txOptions.client);
 
   const payload = createTokenTransferPayload(options.recipient, options.amount, options.memo);
-
-  const network = networkFrom(options.network);
 
   let spendingCondition: SpendingCondition | null = null;
 
@@ -179,24 +172,24 @@ export async function makeUnsignedSTXTokenTransfer(
     : createStandardAuth(spendingCondition);
 
   const transaction = new StacksTransaction(
-    network.transactionVersion,
+    options.network.transactionVersion,
     authorization,
     payload,
     undefined, // no post conditions on STX transfers (see SIP-005)
     undefined, // no post conditions on STX transfers (see SIP-005)
     AnchorMode.Any,
-    network.chainId
+    options.network.chainId
   );
 
   if (txOptions.fee == null) {
-    const fee = await fetchFeeEstimate({ transaction, client: options.client });
+    const fee = await fetchFeeEstimate({ transaction, ...options });
     transaction.setFee(fee);
   }
 
   if (txOptions.nonce == null) {
-    const addressVersion = network.addressVersion.singleSig;
+    const addressVersion = options.network.addressVersion.singleSig;
     const address = c32address(addressVersion, transaction.auth.spendingCondition!.signer);
-    const txNonce = await fetchNonce({ address, client: options.client });
+    const txNonce = await fetchNonce({ address, ...options });
     transaction.setNonce(txNonce);
   }
 
@@ -245,7 +238,7 @@ export async function makeSTXTokenTransfer(
 /**
  * Contract deploy transaction options
  */
-export interface BaseContractDeployOptions {
+export type BaseContractDeployOptions = {
   clarityVersion?: ClarityVersion;
   contractName: string;
   /** the Clarity code to be deployed */
@@ -254,10 +247,6 @@ export interface BaseContractDeployOptions {
   fee?: IntegerType;
   /** the transaction nonce, which must be increased monotonically with each new transaction */
   nonce?: IntegerType;
-  /** the network that the transaction will ultimately be broadcast to */
-  network?: StacksNetworkName | StacksNetwork;
-  /** the node/API used for estimating fee & nonce (using the `api.fetchFn` */
-  client?: ClientOpts;
   /** the post condition mode, specifying whether or not post-conditions must fully cover all
    * transfered assets */
   postConditionMode?: PostConditionMode;
@@ -265,7 +254,7 @@ export interface BaseContractDeployOptions {
   postConditions?: PostConditionWire[];
   /** set to true if another account is sponsoring the transaction (covering the transaction fee) */
   sponsored?: boolean;
-}
+} & NetworkClientParam;
 
 export interface UnsignedContractDeployOptions extends BaseContractDeployOptions {
   /** a hex string of the public key of the transaction sender */
@@ -336,15 +325,14 @@ export async function makeUnsignedContractDeploy(
   };
 
   const options = Object.assign(defaultOptions, txOptions);
-  options.client = defaultClientOptsFromNetwork(options.network, txOptions.client);
+  options.network = networkFrom(options.network);
+  options.client = Object.assign({}, clientFromNetwork(options.network), txOptions.client);
 
   const payload = createSmartContractPayload(
     options.contractName,
     options.codeBody,
     options.clarityVersion
   );
-
-  const network = networkFrom(options.network);
 
   let spendingCondition: SpendingCondition | null = null;
 
@@ -393,24 +381,24 @@ export async function makeUnsignedContractDeploy(
   const lpPostConditions = createLPList(postConditions);
 
   const transaction = new StacksTransaction(
-    network.transactionVersion,
+    options.network.transactionVersion,
     authorization,
     payload,
     lpPostConditions,
     options.postConditionMode,
     AnchorMode.Any,
-    network.chainId
+    options.network.chainId
   );
 
   if (txOptions.fee === undefined || txOptions.fee === null) {
-    const fee = await fetchFeeEstimate({ transaction, client: options.client });
+    const fee = await fetchFeeEstimate({ transaction, ...options });
     transaction.setFee(fee);
   }
 
   if (txOptions.nonce === undefined || txOptions.nonce === null) {
-    const addressVersion = network.addressVersion.singleSig;
+    const addressVersion = options.network.addressVersion.singleSig;
     const address = c32address(addressVersion, transaction.auth.spendingCondition!.signer);
-    const txNonce = await fetchNonce({ address, client: options.client });
+    const txNonce = await fetchNonce({ address, ...options });
     transaction.setNonce(txNonce);
   }
 
@@ -420,7 +408,7 @@ export async function makeUnsignedContractDeploy(
 /**
  * Contract function call transaction options
  */
-export interface ContractCallOptions {
+export type ContractCallOptions = {
   /** the Stacks address of the contract */
   contractAddress: string;
   contractName: string;
@@ -430,10 +418,6 @@ export interface ContractCallOptions {
   fee?: IntegerType;
   /** the transaction nonce, which must be increased monotonically with each new transaction */
   nonce?: IntegerType;
-  /** the Stacks blockchain network that will ultimately be used to broadcast this transaction */
-  network?: StacksNetworkName | StacksNetwork;
-  /** the node/API used for estimating fee & nonce (using the `api.fetchFn` */
-  client?: ClientOpts;
   /** the post condition mode, specifying whether or not post-conditions must fully cover all
    * transfered assets */
   postConditionMode?: PostConditionMode;
@@ -444,7 +428,7 @@ export interface ContractCallOptions {
   validateWithAbi?: boolean | ClarityAbi;
   /** set to true if another account is sponsoring the transaction (covering the transaction fee) */
   sponsored?: boolean;
-}
+} & NetworkClientParam;
 
 export interface UnsignedContractCallOptions extends ContractCallOptions {
   publicKey: PrivateKey;
@@ -477,7 +461,8 @@ export async function makeUnsignedContractCall(
   };
 
   const options = Object.assign(defaultOptions, txOptions);
-  options.client = defaultClientOptsFromNetwork(options.network, txOptions.client);
+  options.network = networkFrom(options.network);
+  options.client = Object.assign({}, clientFromNetwork(options.network), options.client);
 
   const payload = createContractCallPayload(
     options.contractAddress,
@@ -500,8 +485,6 @@ export async function makeUnsignedContractCall(
 
     validateContractCall(payload, abi);
   }
-
-  const network = networkFrom(options.network);
 
   let spendingCondition: SpendingCondition | null = null;
 
@@ -547,24 +530,24 @@ export async function makeUnsignedContractCall(
   const lpPostConditions = createLPList(postConditions);
 
   const transaction = new StacksTransaction(
-    network.transactionVersion,
+    options.network.transactionVersion,
     authorization,
     payload,
     lpPostConditions,
     options.postConditionMode,
     AnchorMode.Any,
-    network.chainId
+    options.network.chainId
   );
 
   if (txOptions.fee === undefined || txOptions.fee === null) {
-    const fee = await fetchFeeEstimate({ transaction, client: options.client });
+    const fee = await fetchFeeEstimate({ transaction, ...options });
     transaction.setFee(fee);
   }
 
   if (txOptions.nonce === undefined || txOptions.nonce === null) {
-    const addressVersion = network.addressVersion.singleSig;
+    const addressVersion = options.network.addressVersion.singleSig;
     const address = c32address(addressVersion, transaction.auth.spendingCondition!.signer);
-    const txNonce = await fetchNonce({ address, client: options.client });
+    const txNonce = await fetchNonce({ address, ...options });
     transaction.setNonce(txNonce);
   }
 
@@ -613,7 +596,7 @@ export async function makeContractCall(
 /**
  * Sponsored transaction options
  */
-export interface SponsorOptionsOpts {
+export type SponsorOptionsOpts = {
   /** the origin-signed transaction */
   transaction: StacksTransaction;
   /** the sponsor's private key */
@@ -624,11 +607,7 @@ export interface SponsorOptionsOpts {
   sponsorNonce?: IntegerType;
   /** the hashmode of the sponsor's address */
   sponsorAddressHashmode?: AddressHashMode;
-  /** the Stacks blockchain network that this transaction will ultimately be broadcast to */
-  network?: StacksNetworkName | StacksNetwork;
-  /** the node/API used for estimating fee & nonce (using the `api.fetchFn` */
-  client?: ClientOpts;
-}
+} & NetworkClientParam;
 
 /**
  * Constructs and signs a sponsored transaction as the sponsor
@@ -642,22 +621,17 @@ export interface SponsorOptionsOpts {
 export async function sponsorTransaction(
   sponsorOptions: SponsorOptionsOpts
 ): Promise<StacksTransaction> {
-  const defaultNetwork = whenTransactionVersion(sponsorOptions.transaction.version)({
-    [TransactionVersion.Mainnet]: STACKS_MAINNET,
-    [TransactionVersion.Testnet]: STACKS_TESTNET,
-  }); // detect network from transaction version
-
   const defaultOptions = {
     fee: 0 as IntegerType,
     sponsorNonce: 0 as IntegerType,
     sponsorAddressHashmode: AddressHashMode.P2PKH as SingleSigHashMode,
-    network: defaultNetwork,
+    network: deriveNetworkFromTx(sponsorOptions.transaction),
   };
 
   const options = Object.assign(defaultOptions, sponsorOptions);
-  options.client = defaultClientOptsFromNetwork(options.network, sponsorOptions.client);
+  options.network = networkFrom(options.network);
+  options.client = Object.assign({}, clientFromNetwork(options.network), options.client);
 
-  const network = networkFrom(options.network);
   const sponsorPubKey = privateKeyToPublic(options.sponsorPrivateKey);
 
   if (sponsorOptions.fee == null) {
@@ -681,9 +655,9 @@ export async function sponsorTransaction(
   }
 
   if (sponsorOptions.sponsorNonce == null) {
-    const addressVersion = network.addressVersion.singleSig;
+    const addressVersion = options.network.addressVersion.singleSig;
     const address = publicKeyToAddress(addressVersion, sponsorPubKey);
-    const sponsorNonce = await fetchNonce({ address, client: options.client });
+    const sponsorNonce = await fetchNonce({ address, ...options });
     options.sponsorNonce = sponsorNonce;
   }
 
