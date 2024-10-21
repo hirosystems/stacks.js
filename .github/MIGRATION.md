@@ -2,13 +2,12 @@
 
 - [Stacks.js (\>=5.x.x) → (7.x.x)](#stacksjs-5xx--7xx)
   - [Breaking Changes](#breaking-changes)
+  - [Reducing Wrapper Types](#reducing-wrapper-types)
   - [Stacks Network](#stacks-network)
     - [Impacts](#impacts)
-  - [Fetch Methods](#fetch-methods)
-  - [Reducing Wrapper Types](#reducing-wrapper-types)
-  - [Stacks Network](#stacks-network-1)
   - [Clarity Representation](#clarity-representation)
   - [Post-conditions](#post-conditions)
+  - [Fetch Methods](#fetch-methods)
   - [`serialize` methods](#serialize-methods)
   - [Asset Helper Methods](#asset-helper-methods)
   - [CLI](#cli)
@@ -47,6 +46,15 @@
 - **Advanced:** Removes two's complement compatibilty from `intToBigInt` parser method. [Read more...](#advanced-signed-bigint)
 - **Advanced:** Refactorings and less visible updates. [Read more...](#advanced-refactorings)
 
+### Reducing Wrapper Types
+
+With this release we are aiming to reduce unnecessary "wrapper" types, which are used in the internals of the codebase, but shouldn't be pushed onto the user/developer.
+
+This breaks the signatures of many functions:
+
+- `signMessageHashRsv`, `signWithKey` now return the message signature as a `string` directly.
+- `nextSignature`, `nextVerification`, `publicKeyFromSignatureVrs`, `publicKeyFromSignatureRsv` now take in the message signature as a `string`.
+
 ### Stacks Network
 
 From now on "network" objects are static (aka constants) and don't require instantiation.
@@ -62,51 +70,26 @@ The `@stacks/network` package exports the following network objects:
 import { STACKS_MAINNET } from '@stacks/network';
 import { STACKS_TESTNET } from '@stacks/network';
 import { STACKS_DEVNET } from '@stacks/network';
+
+console.log(STACKS_MAINNET);
+// {
+//   chainId: 1,
+//   transactionVersion: 0,
+//   peerNetworkId: 385875968,
+//   magicBytes: 'X2',
+//   bootAddress: 'SP000000000000000000002Q6VF78',
+//   addressVersion: { singleSig: 22, multiSig: 20 },
+//   client: { baseUrl: 'https://api.mainnet.hiro.so' }
+// }
 ```
 
-#### Impacts
+After importing the network object (e.g. `STACKS_MAINNET` here), you can use it in other functions as the `network` parameter.
+Most of the time it's easier to just set the `network` parameter to a string literal (`'mainnet'`, `'testnet'`, or `'devnet'`).
 
-- @stacks/bns: `BnsContractAddress` was removed, since `.bootAddress` is now a part of the network objects.
-- @stacks/transactions: `AddressVersion` was moved to `@stacks/network`.
+As part of the network object, the `client` property was added.
+This contains a `baseUrl` property and can optionally contain a `fetch` property.
 
-### Fetch Methods
-
-The following methods were renamed:
-
-- `estimateFee` → `fetchFeeEstimate`
-- `estimateTransfer` → `fetchFeeEstimateTransfer`
-- `estimateTransaction` → `fetchFeeEstimateTransaction`
-- `getAbi` → `fetchAbi`
-- `getNonce` → `fetchNonce`
-- `getContractMapEntry` → `fetchContractMapEntry`
-- `callReadOnlyFunction` → `fetchCallReadOnlyFunction`
-
-`broadcastTransaction` wasn't renamed to highlight the uniqueness of the method.
-Namely, the node/API it is sent to will "broadcast" the transaction to the mempool.
-
-### Reducing Wrapper Types
-
-With this release we are aiming to reduce unnecessary "wrapper" types, which are used in the internals of the codebase, but shouldn't be pushed onto the user/developer.
-
-This breaks the signatures of many functions:
-
-- `signMessageHashRsv`, `signWithKey` now return the message signature as a `string` directly.
-- `nextSignature`, `nextVerification`, `publicKeyFromSignatureVrs`, `publicKeyFromSignatureRsv` now take in the message signature as a `string`.
-
-### Stacks Network
-
-Stacks network objects are now exported by the `@stacks/common` package.
-They are used to specify network settings for other functions and don't require instantiation (like the `@stacks/network` approach did).
-
-```ts
-import { STACKS_MAINNET } from '@stacks/transactions';
-```
-
-After importing the network object (e.g. `STACKS_MAINNET` here), you can use it in other functions like so:
-
-<!-- todo: update more functions, show examples -->
-
-For easing the transition, the functions which depended on a network instance now accept an `client` parameter.
+For easing the transition, the functions which depended on a network instance now accept an optional `client` parameter.
 The `client` parameter can be any object containing a `baseUrl` and `fetch` property.
 
 - The `baseUrl` property should be a string containing the base URL of the Stacks node you want to use.
@@ -139,7 +122,7 @@ const transaction = await makeSTXTokenTransfer({
 ```
 
 > [!NOTE]
-> Custom URLs and fetch functions are still supported via the `client` parameter.
+> Custom URLs and fetch functions are still supported via the `client` parameter or via `network.client`.
 
 ```diff
 const transaction = await makeSTXTokenTransfer({
@@ -149,6 +132,22 @@ const transaction = await makeSTXTokenTransfer({
 + client: { baseUrl: "mynode-optional.com", fetch: myFetch } // optional params
 });
 ```
+
+```diff
+const transaction = await makeSTXTokenTransfer({
+  // ...
+- network: new StacksTestnet({ url: "mynode-optional.com", fetchFn: myFetch }), // optional options
++ network: {
++  ...STACKS_TESTNET,
++  client: { baseUrl: "mynode-optional.com", fetch: myFetch } // optional params
++ },
+});
+```
+
+#### Impacts
+
+- @stacks/bns: `BnsContractAddress` was removed, since `.bootAddress` is now a part of the network objects.
+- @stacks/transactions: `AddressVersion` was moved to `@stacks/network`.
 
 ### Clarity Representation
 
@@ -212,6 +211,21 @@ const nftPostCondition: NonFungiblePostCondition = {
   assetId: Cl.uint(602),
 };
 ```
+
+### Fetch Methods
+
+The following methods were renamed:
+
+- `estimateFee` → `fetchFeeEstimate`
+- `estimateTransfer` → `fetchFeeEstimateTransfer`
+- `estimateTransaction` → `fetchFeeEstimateTransaction`
+- `getAbi` → `fetchAbi`
+- `getNonce` → `fetchNonce`
+- `getContractMapEntry` → `fetchContractMapEntry`
+- `callReadOnlyFunction` → `fetchCallReadOnlyFunction`
+
+`broadcastTransaction` wasn't renamed to highlight the uniqueness of the method.
+Namely, the node/API it is sent to will "broadcast" the transaction to the mempool.
 
 ### `serialize` methods
 
