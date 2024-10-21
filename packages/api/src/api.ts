@@ -1,5 +1,6 @@
 import { FetchFn, Hex, createFetchFn } from '@stacks/common';
 import {
+  NetworkParam,
   STACKS_MAINNET,
   StacksNetwork,
   StacksNetworkName,
@@ -46,11 +47,9 @@ export class StacksNodeApi {
   }: {
     /** The base API/node URL for the network fetch calls */
     baseUrl?: string;
-    /** Stacks network object (defaults to {@link STACKS_MAINNET}) */
-    network?: StacksNetworkName | StacksNetwork;
     /** An optional custom fetch function to override default behaviors */
     fetch?: FetchFn;
-  } = {}) {
+  } & NetworkParam = {}) {
     this.baseUrl = baseUrl ?? defaultUrlFromNetwork(network);
     this.fetch = fetch ?? createFetchFn();
     this.network = networkFrom(network);
@@ -67,10 +66,10 @@ export class StacksNodeApi {
    */
   broadcastTransaction = async (
     transaction: StacksTransaction,
-    attachment?: Uint8Array | string
+    attachment?: Uint8Array | string,
+    network?: StacksNetworkName | StacksNetwork
   ): Promise<TxBroadcastResult> => {
-    // todo: should we use a opts object instead of positional args here?
-    return broadcastTransaction({ transaction, attachment, client: this });
+    return broadcastTransaction({ transaction, attachment, network });
   };
 
   /**

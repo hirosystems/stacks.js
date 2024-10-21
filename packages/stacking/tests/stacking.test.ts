@@ -1,11 +1,5 @@
 import { sha256 } from '@noble/hashes/sha256';
-import {
-  HIRO_TESTNET_URL,
-  bigIntToBytes,
-  bytesToHex,
-  defaultClientOpts,
-  hexToBytes,
-} from '@stacks/common';
+import { HIRO_TESTNET_URL, bigIntToBytes, bytesToHex, hexToBytes } from '@stacks/common';
 import { base58CheckDecode, getPublicKeyFromPrivate } from '@stacks/encryption';
 import { V2_POX_REGTEST_POX_3, setApiMocks } from '@stacks/internal';
 import { STACKS_MAINNET, STACKS_TESTNET, defaultUrlFromNetwork } from '@stacks/network';
@@ -1235,7 +1229,7 @@ test('getSecondsUntilStackingDeadline', async () => {
   const client = new StackingClient({
     address: '',
     network: STACKS_MAINNET,
-    client: defaultClientOpts({ baseUrl: 'http://localhost:3999' }),
+    client: { baseUrl: 'http://localhost:3999' },
   });
 
   setApiMocks({
