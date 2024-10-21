@@ -306,7 +306,7 @@ function _poxAddressToBtcAddress_ClarityValue(
 export function poxAddressToBtcAddress(
   version: number,
   hashBytes: Uint8Array,
-  network: StacksNetworkName
+  network: StacksNetworkName // todo: allow NetworkParam in the future (minor)
 ): string;
 /**
  * Converts a PoX address to a Bitcoin address.

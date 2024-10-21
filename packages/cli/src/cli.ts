@@ -90,12 +90,7 @@ import { CLI_NETWORK_OPTS, CLINetworkAdapter, getNetwork, NameInfoType } from '.
 
 import { gaiaAuth, gaiaConnect, gaiaUploadProfileAll, getGaiaAddressFromProfile } from './data';
 
-import {
-  defaultClientOptsFromNetwork,
-  defaultUrlFromNetwork,
-  STACKS_MAINNET,
-  STACKS_TESTNET,
-} from '@stacks/network';
+import { defaultUrlFromNetwork, STACKS_MAINNET, STACKS_TESTNET } from '@stacks/network';
 import {
   generateNewAccount,
   generateWallet,
@@ -698,7 +693,6 @@ async function sendTokens(_network: CLINetworkAdapter, args: string[]): Promise<
   }
 
   const network = _network.isMainnet() ? STACKS_MAINNET : STACKS_TESTNET;
-  const client = defaultClientOptsFromNetwork(network);
 
   const options: SignedTokenTransferOptions = {
     recipient: recipientAddress,
@@ -713,7 +707,7 @@ async function sendTokens(_network: CLINetworkAdapter, args: string[]): Promise<
   const tx: StacksTransaction = await makeSTXTokenTransfer(options);
 
   if (estimateOnly) {
-    return fetchFeeEstimateTransfer({ transaction: tx, client }).then(cost => {
+    return fetchFeeEstimateTransfer({ transaction: tx, network }).then(cost => {
       return cost.toString(10);
     });
   }
@@ -722,7 +716,7 @@ async function sendTokens(_network: CLINetworkAdapter, args: string[]): Promise<
     return Promise.resolve(tx.serialize());
   }
 
-  return broadcastTransaction({ transaction: tx, client })
+  return broadcastTransaction({ transaction: tx, network })
     .then((response: TxBroadcastResult) => {
       if (response.hasOwnProperty('error')) {
         return response;
@@ -815,13 +809,12 @@ async function contractFunctionCall(_network: CLINetworkAdapter, args: string[])
 
   // temporary hack to use network config from stacks-transactions lib
   const network = _network.isMainnet() ? STACKS_MAINNET : STACKS_TESTNET;
-  const client = defaultClientOptsFromNetwork(network);
 
   let abi: ClarityAbi;
   let abiArgs: ClarityFunctionArg[];
   let functionArgs: ClarityValue[] = [];
 
-  return fetchAbi({ contractAddress, contractName, client })
+  return fetchAbi({ contractAddress, contractName, network })
     .then(responseAbi => {
       abi = responseAbi;
       const filtered = abi.functions.filter(fn => fn.name === functionName);
@@ -846,7 +839,6 @@ async function contractFunctionCall(_network: CLINetworkAdapter, args: string[])
         nonce,
         network,
         postConditionMode: PostConditionMode.Allow,
-        client,
       };
 
       return makeContractCall(options);
@@ -867,7 +859,7 @@ async function contractFunctionCall(_network: CLINetworkAdapter, args: string[])
         return Promise.resolve(tx.serialize());
       }
 
-      return broadcastTransaction({ transaction: tx, client })
+      return broadcastTransaction({ transaction: tx, network })
         .then(response => {
           if (response.hasOwnProperty('error')) {
             return response;
@@ -901,13 +893,12 @@ async function readOnlyContractFunctionCall(
   const senderAddress = args[3];
 
   const network = _network.isMainnet() ? STACKS_MAINNET : STACKS_TESTNET;
-  const client = defaultClientOptsFromNetwork(network);
 
   let abi: ClarityAbi;
   let abiArgs: ClarityFunctionArg[];
   let functionArgs: ClarityValue[] = [];
 
-  return fetchAbi({ contractAddress, contractName, client })
+  return fetchAbi({ contractAddress, contractName, network })
     .then(responseAbi => {
       abi = responseAbi;
       const filtered = abi.functions.filter(fn => fn.name === functionName);
@@ -1634,8 +1625,7 @@ async function stackingStatus(_network: CLINetworkAdapter, args: string[]): Prom
   const address = args[0];
 
   const network = _network.isMainnet() ? STACKS_MAINNET : STACKS_TESTNET;
-  const client = defaultClientOptsFromNetwork(network);
-  const stacker = new StackingClient({ address, network, client });
+  const stacker = new StackingClient({ address, network });
 
   return stacker
     .getStatus()
@@ -1667,11 +1657,10 @@ async function canStack(_network: CLINetworkAdapter, args: string[]): Promise<st
   const stxAddress = args[3];
 
   const network = _network.isMainnet() ? STACKS_MAINNET : STACKS_TESTNET;
-  const client = defaultClientOptsFromNetwork(network);
-  const stacker = new StackingClient({ address: stxAddress, network, client });
+  const stacker = new StackingClient({ address: stxAddress, network });
 
   const apiConfig = new Configuration({
-    basePath: client.baseUrl,
+    basePath: network.client.baseUrl,
   });
   const accounts = new AccountsApi(apiConfig);
 
@@ -1729,10 +1718,9 @@ async function stack(_network: CLINetworkAdapter, args: string[]): Promise<strin
   // }
 
   const network = _network.isMainnet() ? STACKS_MAINNET : STACKS_TESTNET;
-  const client = defaultClientOptsFromNetwork(network);
 
   const apiConfig = new Configuration({
-    basePath: client.baseUrl,
+    basePath: network.client.baseUrl,
   });
   const accounts = new AccountsApi(apiConfig);
 
@@ -1742,7 +1730,7 @@ async function stack(_network: CLINetworkAdapter, args: string[]): Promise<strin
     principal: stxAddress,
   });
 
-  const stacker = new StackingClient({ address: stxAddress, network, client });
+  const stacker = new StackingClient({ address: stxAddress, network });
 
   const poxInfoPromise = stacker.getPoxInfo();
 
@@ -1803,7 +1791,6 @@ async function register(_network: CLINetworkAdapter, args: string[]): Promise<st
   const publicKey = privateKeyToPublic(privateKey);
 
   const network = _network.isMainnet() ? STACKS_MAINNET : STACKS_TESTNET;
-  const client = defaultClientOptsFromNetwork(network);
 
   const unsignedTransaction = await buildRegisterNameTx({
     fullyQualifiedName,
@@ -1816,7 +1803,7 @@ async function register(_network: CLINetworkAdapter, args: string[]): Promise<st
   const signer = new TransactionSigner(unsignedTransaction);
   signer.signOrigin(privateKey);
 
-  return broadcastTransaction({ transaction: signer.transaction, client })
+  return broadcastTransaction({ transaction: signer.transaction, network })
     .then((response: TxBroadcastResult) => {
       if (response.hasOwnProperty('error')) {
         return response;
@@ -1839,7 +1826,6 @@ async function preorder(_network: CLINetworkAdapter, args: string[]): Promise<st
   const publicKey = privateKeyToPublic(privateKey);
 
   const network = _network.isMainnet() ? STACKS_MAINNET : STACKS_TESTNET;
-  const client = defaultClientOptsFromNetwork(network);
 
   const unsignedTransaction = await buildPreorderNameTx({
     fullyQualifiedName,
@@ -1852,7 +1838,7 @@ async function preorder(_network: CLINetworkAdapter, args: string[]): Promise<st
   const signer = new TransactionSigner(unsignedTransaction);
   signer.signOrigin(privateKey);
 
-  return broadcastTransaction({ transaction: signer.transaction, client })
+  return broadcastTransaction({ transaction: signer.transaction, network })
     .then((response: TxBroadcastResult) => {
       if (response.hasOwnProperty('error')) {
         return response;

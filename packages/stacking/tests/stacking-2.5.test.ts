@@ -1,5 +1,5 @@
 import { getPublicKeyFromPrivate, publicKeyToBtcAddress } from '@stacks/encryption';
-import { STACKS_MOCKNET } from '@stacks/network/src';
+import { STACKS_MOCKNET } from '@stacks/network';
 import { makeRandomPrivKey } from '@stacks/transactions';
 import { V2_POX_REGTEST_POX_4, setApiMocks } from '../../internal/src';
 import { StackingClient } from '../src';

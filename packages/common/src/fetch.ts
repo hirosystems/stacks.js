@@ -1,7 +1,4 @@
-// Define a default request options and allow modification using getters, setters
-
-import { HIRO_MAINNET_URL } from './constants';
-
+// Define default request options and allow modification using getters, setters
 // Reference: https://developer.mozilla.org/en-US/docs/Web/API/Request/Request
 const defaultFetchOpts: RequestInit = {
   // By default referrer value will be client:origin: above reference link
@@ -55,16 +52,16 @@ export type FetchFn = (url: string, init?: RequestInit) => Promise<Response>;
  * @ignore Internally used for letting networking functions specify "API" options.
  * Should be compatible with the `client`s created by the API and RPC packages.
  */
-export type ClientOpts = {
+export interface ClientOpts {
   baseUrl?: string;
   fetch?: FetchFn;
-};
+}
 
 /** @ignore Internally used for letting networking functions specify "API" options */
-export type ClientParam = {
-  /** Optional API object (for `.url` and `.fetch`) used for API/Node, defaults to use mainnet */
+export interface ClientParam {
+  /** Optional API object (for `.baseUrl` and `.fetch`) used for API/Node, defaults to use mainnet */
   client?: ClientOpts;
-};
+}
 
 export interface RequestContext {
   fetch: FetchFn;
@@ -195,11 +192,10 @@ export function createFetchFn(...args: any[]): FetchFn {
   return fetchFn;
 }
 
-/** @ignore Creates a client-like object, which can be used without circular dependencies */
-export function defaultClientOpts(opts?: { baseUrl?: string; fetch?: FetchFn }) {
-  return {
-    // todo: do we want network here as well?
-    baseUrl: opts?.baseUrl ?? HIRO_MAINNET_URL,
-    fetch: opts?.fetch ?? createFetchFn(),
-  };
-}
+// /** @ignore Creates a client-like object, which can be used without circular dependencies */
+// export function defaultClientOpts(opts?: { baseUrl?: string; fetch?: FetchFn }) {
+//   return {
+//     baseUrl: opts?.baseUrl ?? HIRO_MAINNET_URL,
+//     fetch: opts?.fetch ?? createFetchFn(),
+//   };
+// }
