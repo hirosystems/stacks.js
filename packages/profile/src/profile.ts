@@ -22,7 +22,9 @@ import { makeZoneFile, parseZoneFile } from 'zone-file';
 // @ts-ignore
 import * as inspector from 'schema-inspector';
 
-import { ClientParam, Logger, defaultClientOpts } from '@stacks/common';
+import { Logger } from '@stacks/common';
+import { networkFrom } from '@stacks/network';
+import { NetworkClientParam, clientFromNetwork } from '@stacks/network/src';
 import { PublicPersonProfile } from './types';
 
 const schemaDefinition: { [key: string]: any } = {
@@ -340,9 +342,10 @@ export function resolveZoneFileToProfile(
   opts: {
     zoneFile: any;
     publicKeyOrAddress: string;
-  } & ClientParam
+  } & NetworkClientParam
 ): Promise<Record<string, any>> {
-  const api = defaultClientOpts(opts.client);
+  const network = networkFrom(opts.network ?? 'mainnet');
+  const client = Object.assign({}, clientFromNetwork(network), opts.client);
 
   return new Promise((resolve, reject) => {
     let zoneFileJson = null;
@@ -367,7 +370,7 @@ export function resolveZoneFileToProfile(
     }
 
     if (tokenFileUrl) {
-      api
+      client
         .fetch(tokenFileUrl)
         .then(response => response.text())
         .then(responseText => JSON.parse(responseText))

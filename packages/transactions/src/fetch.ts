@@ -1,12 +1,5 @@
-import {
-  ClientParam,
-  bytesToHex,
-  createFetchFn,
-  defaultClientOpts,
-  validateHash256,
-  with0x,
-} from '@stacks/common';
-import { defaultClientOptsFromNetwork, defaultUrlFromNetwork } from '@stacks/network';
+import { bytesToHex, validateHash256, with0x } from '@stacks/common';
+import { NetworkClientParam, clientFromNetwork, networkFrom } from '@stacks/network';
 import { ClarityValue, NoneCV, deserializeCV, serializeCV } from './clarity';
 import { ClarityAbi } from './contract-abi';
 import { NoEstimateAvailableError } from './errors';
@@ -43,13 +36,14 @@ export const MAP_ENTRY_PATH = '/v2/map_entry';
 export async function broadcastTransaction({
   transaction: txOpt,
   attachment: attachOpt,
-  client: apiOpt,
+  network: _network,
+  client: _client,
 }: {
   /** The transaction to broadcast */
   transaction: StacksTransaction;
   /** Optional attachment in bytes or encoded as a hex string */
   attachment?: Uint8Array | string;
-} & ClientParam): Promise<TxBroadcastResult> {
+} & NetworkClientParam): Promise<TxBroadcastResult> {
   const tx = txOpt.serialize();
   const attachment = attachOpt
     ? typeof attachOpt === 'string'
@@ -63,9 +57,10 @@ export async function broadcastTransaction({
     body: JSON.stringify(json),
   };
 
-  const api = defaultClientOptsFromNetwork(deriveNetworkFromTx(txOpt), apiOpt);
-  const url = `${api.baseUrl}${BROADCAST_PATH}`;
-  const response = await api.fetch(url, options);
+  const network = _network ?? deriveNetworkFromTx(txOpt);
+  const client = Object.assign({}, clientFromNetwork(networkFrom(network)), _client);
+  const url = `${client.baseUrl}${BROADCAST_PATH}`;
+  const response = await client.fetch(url, options);
 
   if (!response.ok) {
     try {
@@ -85,11 +80,12 @@ export async function broadcastTransaction({
 /** @internal */
 async function _getNonceApi({
   address,
-  client: apiOpt,
-}: { address: string } & ClientParam): Promise<bigint> {
-  const api = defaultClientOpts(apiOpt);
-  const url = `${api.baseUrl}/extended/v1/address/${address}/nonces`;
-  const response = await api.fetch(url);
+  network = 'mainnet',
+  client: _client,
+}: { address: string } & NetworkClientParam): Promise<bigint> {
+  const client = Object.assign({}, clientFromNetwork(networkFrom(network)), _client);
+  const url = `${client.baseUrl}/extended/v1/address/${address}/nonces`;
+  const response = await client.fetch(url);
   const result = await response.json();
   return BigInt(result.possible_next_nonce);
 }
@@ -100,21 +96,21 @@ async function _getNonceApi({
  * @param opts.api - Optional API info (`.url` & `.fetch`) used for fetch call
  * @return A promise that resolves to an integer
  */
-export async function fetchNonce({
-  address,
-  client: apiOpt,
-}: {
-  /** The Stacks address to look up the next nonce for */
-  address: string;
-} & ClientParam): Promise<bigint> {
+export async function fetchNonce(
+  opts: {
+    /** The Stacks address to look up the next nonce for */
+    address: string;
+  } & NetworkClientParam
+): Promise<bigint> {
   // Try API first
   try {
-    return await _getNonceApi({ address, client: apiOpt });
+    return await _getNonceApi(opts);
   } catch (e) {}
 
-  const api = defaultClientOpts(apiOpt);
-  const url = `${api.baseUrl}${ACCOUNT_PATH}/${address}?proof=0`;
-  const response = await api.fetch(url);
+  const network = networkFrom(opts.network ?? 'mainnet');
+  const client = Object.assign({}, clientFromNetwork(network), opts.client);
+  const url = `${client.baseUrl}${ACCOUNT_PATH}/${opts.address}?proof=0`;
+  const response = await client.fetch(url);
 
   if (!response.ok) {
     const msg = await response.text().catch(() => '');
@@ -139,21 +135,17 @@ export async function fetchNonce({
  */
 export async function fetchFeeEstimateTransfer({
   transaction: txOpt,
-  client: apiOpt,
+  network: _network,
+  client: _client,
 }: {
   /** The token transfer transaction to estimate fees for */
   transaction: StacksTransaction;
-} & ClientParam): Promise<bigint> {
-  const api = Object.assign(
-    {},
-    {
-      url: defaultUrlFromNetwork(deriveNetworkFromTx(txOpt)),
-      fetch: createFetchFn(),
-    },
-    apiOpt
-  );
-  const url = `${api.baseUrl}${TRANSFER_FEE_ESTIMATE_PATH}`;
-  const response = await api.fetch(url, {
+} & NetworkClientParam): Promise<bigint> {
+  const network = _network ?? deriveNetworkFromTx(txOpt);
+  const client = Object.assign({}, clientFromNetwork(networkFrom(network)), _client);
+
+  const url = `${client.baseUrl}${TRANSFER_FEE_ESTIMATE_PATH}`;
+  const response = await client.fetch(url, {
     headers: { Accept: 'application/text' },
   });
 
@@ -181,11 +173,12 @@ export async function fetchFeeEstimateTransfer({
 export async function fetchFeeEstimateTransaction({
   payload,
   estimatedLength,
-  client: apiOpt,
+  network = 'mainnet',
+  client: _client,
 }: {
   payload: string;
   estimatedLength?: number;
-} & ClientParam): Promise<[FeeEstimation, FeeEstimation, FeeEstimation]> {
+} & NetworkClientParam): Promise<[FeeEstimation, FeeEstimation, FeeEstimation]> {
   const json = {
     transaction_payload: payload,
     estimated_len: estimatedLength,
@@ -196,9 +189,9 @@ export async function fetchFeeEstimateTransaction({
     body: JSON.stringify(json),
   };
 
-  const api = defaultClientOpts(apiOpt);
-  const url = `${api.baseUrl}${TRANSACTION_FEE_ESTIMATE_PATH}`;
-  const response = await api.fetch(url, options);
+  const client = Object.assign({}, clientFromNetwork(networkFrom(network)), _client);
+  const url = `${client.baseUrl}${TRANSACTION_FEE_ESTIMATE_PATH}`;
+  const response = await client.fetch(url, options);
 
   if (!response.ok) {
     const body = await response.json().catch(() => ({}));
@@ -225,18 +218,13 @@ export async function fetchFeeEstimateTransaction({
  */
 export async function fetchFeeEstimate({
   transaction: txOpt,
-  client: apiOpt,
+  network: _network,
+  client: _client,
 }: {
   transaction: StacksTransaction;
-} & ClientParam): Promise<bigint | number> {
-  const api = Object.assign(
-    {},
-    {
-      url: defaultUrlFromNetwork(deriveNetworkFromTx(txOpt)),
-      fetch: createFetchFn(),
-    },
-    apiOpt
-  );
+} & NetworkClientParam): Promise<bigint | number> {
+  const network = _network ?? deriveNetworkFromTx(txOpt);
+  const client = Object.assign({}, clientFromNetwork(networkFrom(network)), _client);
 
   try {
     const estimatedLength = estimateTransactionByteLength(txOpt);
@@ -244,12 +232,13 @@ export async function fetchFeeEstimate({
       await fetchFeeEstimateTransaction({
         payload: bytesToHex(serializePayloadBytes(txOpt.payload)),
         estimatedLength,
-        client: api,
+        network,
+        client,
       })
     )[1].fee;
   } catch (error) {
     if (!(error instanceof NoEstimateAvailableError)) throw error;
-    return await fetchFeeEstimateTransfer({ transaction: txOpt, client: api });
+    return await fetchFeeEstimateTransfer({ transaction: txOpt, network });
   }
 }
 
@@ -263,14 +252,15 @@ export async function fetchFeeEstimate({
 export async function fetchAbi({
   contractAddress: address,
   contractName: name,
-  client: apiOpt,
+  network = 'mainnet',
+  client: _client,
 }: {
   contractAddress: string;
   contractName: string;
-} & ClientParam): Promise<ClarityAbi> {
-  const api = defaultClientOpts(apiOpt);
-  const url = `${api.baseUrl}${CONTRACT_ABI_PATH}/${address}/${name}`;
-  const response = await api.fetch(url);
+} & NetworkClientParam): Promise<ClarityAbi> {
+  const client = Object.assign({}, clientFromNetwork(networkFrom(network)), _client);
+  const url = `${client.baseUrl}${CONTRACT_ABI_PATH}/${address}/${name}`;
+  const response = await client.fetch(url);
 
   if (!response.ok) {
     const msg = await response.text().catch(() => '');
@@ -300,7 +290,8 @@ export async function fetchCallReadOnlyFunction({
   functionName,
   functionArgs,
   senderAddress,
-  client: apiOpt,
+  network = 'mainnet',
+  client: _client,
 }: {
   contractName: string;
   contractAddress: string;
@@ -308,7 +299,7 @@ export async function fetchCallReadOnlyFunction({
   functionArgs: ClarityValue[];
   /** address of the sender */
   senderAddress: string;
-} & ClientParam): Promise<ClarityValue> {
+} & NetworkClientParam): Promise<ClarityValue> {
   const json = {
     sender: senderAddress,
     arguments: functionArgs.map(arg => cvToHex(arg)),
@@ -323,9 +314,9 @@ export async function fetchCallReadOnlyFunction({
 
   const name = encodeURIComponent(functionName);
 
-  const api = defaultClientOpts(apiOpt);
-  const url = `${api.baseUrl}${READONLY_FUNCTION_CALL_PATH}/${contractAddress}/${contractName}/${name}`;
-  const response = await api.fetch(url, options);
+  const client = Object.assign({}, clientFromNetwork(networkFrom(network)), _client);
+  const url = `${client.baseUrl}${READONLY_FUNCTION_CALL_PATH}/${contractAddress}/${contractName}/${name}`;
+  const response = await client.fetch(url, options);
 
   if (!response.ok) {
     const msg = await response.text().catch(() => '');
@@ -352,13 +343,14 @@ export async function fetchContractMapEntry<T extends ClarityValue = ClarityValu
   contractName,
   mapName,
   mapKey,
-  client: apiOpt,
+  network = 'mainnet',
+  client: _client,
 }: {
   contractAddress: string;
   contractName: string;
   mapName: string;
   mapKey: ClarityValue;
-} & ClientParam): Promise<T | NoneCV> {
+} & NetworkClientParam): Promise<T | NoneCV> {
   const keyHex = with0x(serializeCV(mapKey));
 
   const options = {
@@ -370,9 +362,9 @@ export async function fetchContractMapEntry<T extends ClarityValue = ClarityValu
     body: JSON.stringify(keyHex), // endpoint expects a JSON string atom (quote wrapped string)
   };
 
-  const api = defaultClientOpts(apiOpt);
-  const url = `${api.baseUrl}${MAP_ENTRY_PATH}/${contractAddress}/${contractName}/${mapName}?proof=0`;
-  const response = await api.fetch(url, options);
+  const client = Object.assign({}, clientFromNetwork(networkFrom(network)), _client);
+  const url = `${client.baseUrl}${MAP_ENTRY_PATH}/${contractAddress}/${contractName}/${mapName}?proof=0`;
+  const response = await client.fetch(url, options);
 
   if (!response.ok) {
     const msg = await response.text().catch(() => '');
@@ -387,7 +379,7 @@ export async function fetchContractMapEntry<T extends ClarityValue = ClarityValu
       `Error fetching map entry for map "${mapName}" in contract "${contractName}" at address ${contractAddress}, using map key "${keyHex}". Response ${
         response.status
       }: ${response.statusText}. Attempted to fetch ${
-        api.baseUrl
+        client.baseUrl
       } and failed with the response: "${JSON.stringify(json)}"`
     );
   }

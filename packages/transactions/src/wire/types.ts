@@ -71,7 +71,7 @@ export interface LengthPrefixedList {
 export interface AddressWire {
   readonly type: StacksWireType.Address;
   readonly version: AddressVersion;
-  readonly hash160: string;
+  readonly hash160: string; // todo: next rename to `hash` or `bytes` or `data`
 }
 
 export interface MessageSignatureWire {

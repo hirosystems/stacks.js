@@ -1,10 +1,9 @@
-import { ClientOpts, ClientParam, defaultClientOpts } from '@stacks/common';
+import { NetworkClientParam, clientFromNetwork, networkFrom } from '@stacks/network';
 import { resolveZoneFileToProfile } from '@stacks/profile';
 
 export interface ProfileLookupOptions {
   username: string;
   zoneFileLookupURL?: string;
-  client?: ClientOpts;
 }
 
 /**
@@ -16,19 +15,22 @@ export interface ProfileLookupOptions {
  * blockstack.js [[getNameInfo]] function.
  * @returns {Promise} that resolves to a profile object
  */
-export function lookupProfile(options: ProfileLookupOptions): Promise<Record<string, any>> {
+export function lookupProfile(
+  options: ProfileLookupOptions & NetworkClientParam
+): Promise<Record<string, any>> {
   if (!options.username) {
     return Promise.reject(new Error('No username provided'));
   }
 
-  const client = defaultClientOpts(options.client);
+  const network = networkFrom(options.network ?? 'mainnet');
+  const client = Object.assign({}, clientFromNetwork(network), options.client);
 
   let lookupPromise;
   if (options.zoneFileLookupURL) {
     const url = `${options.zoneFileLookupURL.replace(/\/$/, '')}/${options.username}`;
     lookupPromise = client.fetch(url).then(response => response.json());
   } else {
-    lookupPromise = getNameInfo({ name: options.username, client: client });
+    lookupPromise = getNameInfo({ name: options.username });
   }
   return lookupPromise.then((responseJSON: any) => {
     if (responseJSON.hasOwnProperty('zonefile') && responseJSON.hasOwnProperty('address')) {
@@ -49,12 +51,13 @@ export function getNameInfo(
   opts: {
     /** Fully qualified name */
     name: string;
-  } & ClientParam
+  } & NetworkClientParam
 ) {
-  const api = defaultClientOpts(opts.client);
+  const network = networkFrom(opts.network ?? 'mainnet');
+  const client = Object.assign({}, clientFromNetwork(network), opts.client);
 
-  const nameLookupURL = `${api.baseUrl}/v1/names/${opts.name}`;
-  return api
+  const nameLookupURL = `${client.baseUrl}/v1/names/${opts.name}`;
+  return client
     .fetch(nameLookupURL)
     .then((resp: any) => {
       if (resp.status === 404) {

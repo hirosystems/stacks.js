@@ -2,13 +2,13 @@
 // Secure, audited & minimal implementation of BIP32 hierarchical deterministic (HD) wallets.
 import { HDKey } from '@scure/bip32';
 import { getNameInfo } from '@stacks/auth';
-import { ClientParam, bytesToHex, utf8ToBytes } from '@stacks/common';
+import { bytesToHex, utf8ToBytes } from '@stacks/common';
 import { createSha2Hash } from '@stacks/encryption';
 import {
-  STACKS_MAINNET,
+  NetworkClientParam,
+  NetworkParam,
   StacksNetwork,
-  StacksNetworkName,
-  defaultClientOptsFromNetwork,
+  clientFromNetwork,
   networkFrom,
 } from '@stacks/network';
 import { compressPrivateKey, getAddressFromPrivateKey } from '@stacks/transactions';
@@ -113,8 +113,7 @@ export const selectStxDerivation = async ({
   username?: string;
   rootNode: HDKey;
   index: number;
-  network?: StacksNetworkName | StacksNetwork;
-}): Promise<{ username: string | undefined; stxDerivationType: DerivationType }> => {
+} & NetworkParam): Promise<{ username: string | undefined; stxDerivationType: DerivationType }> => {
   if (network) network = networkFrom(network);
 
   if (username) {
@@ -178,10 +177,10 @@ const selectUsernameForAccount = async (
   opts: {
     rootNode: HDKey;
     index: number;
-    network?: StacksNetwork;
-  } & ClientParam
+  } & NetworkClientParam
 ): Promise<{ username: string | undefined; derivationType: DerivationType }> => {
-  const client = defaultClientOptsFromNetwork(opts.network, opts.client);
+  const network = networkFrom(opts.network ?? 'mainnet');
+  const client = Object.assign({}, clientFromNetwork(network), opts.client);
 
   // try to find existing usernames owned by stx derivation path
   if (opts.network) {
@@ -210,17 +209,16 @@ export const fetchUsernameForAccountByDerivationType = async (
     rootNode: HDKey;
     index: number;
     derivationType: DerivationType.Wallet | DerivationType.Data;
-    network?: StacksNetworkName | StacksNetwork;
-  } & ClientParam
+  } & NetworkClientParam
 ): Promise<{
   username: string | undefined;
 }> => {
-  const client = defaultClientOptsFromNetwork(opts.network, opts.client);
+  const network = networkFrom(opts.network ?? 'mainnet');
+  const client = Object.assign({}, clientFromNetwork(network), opts.client);
 
   // try to find existing usernames owned by given derivation path
-  const selectedNetwork = opts.network ? networkFrom(opts.network) : STACKS_MAINNET;
   const privateKey = derivePrivateKeyByType(opts);
-  const address = getAddressFromPrivateKey(privateKey, selectedNetwork);
+  const address = getAddressFromPrivateKey(privateKey, network);
   const username = await fetchFirstName({ address, client });
   return { username };
 };

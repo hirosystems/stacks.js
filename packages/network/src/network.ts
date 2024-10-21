@@ -1,13 +1,15 @@
 import {
   ClientOpts,
   DEVNET_URL,
+  FetchFn,
   HIRO_MAINNET_URL,
   HIRO_TESTNET_URL,
   createFetchFn,
 } from '@stacks/common';
 import { AddressVersion, ChainId, PeerNetworkId, TransactionVersion } from './constants';
+import { ClientParam } from '@stacks/common';
 
-export interface StacksNetwork {
+export type StacksNetwork = {
   chainId: number;
   transactionVersion: number; // todo: txVersion better?
   peerNetworkId: number;
@@ -18,7 +20,17 @@ export interface StacksNetwork {
     multiSig: number;
   };
   // todo: add check32 character bytes string
+  client: {
+    baseUrl: string; // URL is always required
+    fetch?: FetchFn; // fetch is optional and will be created by default in fetch helpers
+  };
+};
+
+export interface NetworkParam {
+  network?: StacksNetworkName | StacksNetwork;
 }
+
+export type NetworkClientParam = NetworkParam & ClientParam;
 
 export const STACKS_MAINNET: StacksNetwork = {
   chainId: ChainId.Mainnet,
@@ -30,6 +42,7 @@ export const STACKS_MAINNET: StacksNetwork = {
     singleSig: AddressVersion.MainnetSingleSig,
     multiSig: AddressVersion.MainnetMultiSig,
   },
+  client: { baseUrl: HIRO_MAINNET_URL },
 };
 
 export const STACKS_TESTNET: StacksNetwork = {
@@ -42,19 +55,37 @@ export const STACKS_TESTNET: StacksNetwork = {
     singleSig: AddressVersion.TestnetSingleSig,
     multiSig: AddressVersion.TestnetMultiSig,
   },
+  client: { baseUrl: HIRO_TESTNET_URL },
 };
 
 export const STACKS_DEVNET: StacksNetwork = {
-  ...STACKS_TESTNET,
+  ...STACKS_TESTNET, // todo: ensure deep copy
+  addressVersion: { ...STACKS_TESTNET.addressVersion }, // deep copy
   magicBytes: 'id', // todo: comment bytes version of magic bytes
+  client: { baseUrl: DEVNET_URL },
 };
-export const STACKS_MOCKNET: StacksNetwork = { ...STACKS_DEVNET };
+
+export const STACKS_MOCKNET: StacksNetwork = {
+  ...STACKS_DEVNET,
+  addressVersion: { ...STACKS_DEVNET.addressVersion }, // deep copy
+  client: { ...STACKS_DEVNET.client }, // deep copy
+};
 
 /** @ignore internal */
 export const StacksNetworks = ['mainnet', 'testnet', 'devnet', 'mocknet'] as const;
 /** The enum-style names of different common Stacks networks */
 export type StacksNetworkName = (typeof StacksNetworks)[number];
 
+/**
+ * Returns the default network for a given name
+ * @example
+ * ```ts
+ * networkFromName('mainnet') // same as STACKS_MAINNET
+ * networkFromName('testnet') // same as STACKS_TESTNET
+ * networkFromName('devnet') // same as STACKS_DEVNET
+ * networkFromName('mocknet') // same as STACKS_MOCKNET
+ * ```
+ */
 export function networkFromName(name: StacksNetworkName) {
   switch (name) {
     case 'mainnet':
@@ -77,7 +108,7 @@ export function networkFrom(network: StacksNetworkName | StacksNetwork) {
 }
 
 /** @ignore */
-export function defaultUrlFromNetwork(network?: StacksNetwork | StacksNetworkName) {
+export function defaultUrlFromNetwork(network?: StacksNetworkName | StacksNetwork) {
   if (!network) return HIRO_MAINNET_URL; // default to mainnet if no network is given
 
   network = networkFrom(network);
@@ -89,17 +120,13 @@ export function defaultUrlFromNetwork(network?: StacksNetwork | StacksNetworkNam
       : HIRO_TESTNET_URL;
 }
 
-/** @ignore */
-export const defaultClientOptsFromNetwork = (
-  network?: StacksNetworkName | StacksNetwork,
-  override?: ClientOpts
-): Required<ClientOpts> => {
-  return Object.assign(
-    {},
-    {
-      baseUrl: defaultUrlFromNetwork(network),
-      fetch: createFetchFn(),
-    },
-    override
-  );
-};
+/**
+ * Returns the client of a network, creating a new fetch function if none is available
+ */
+export function clientFromNetwork(network: StacksNetwork): Required<ClientOpts> {
+  if (network.client.fetch) return network.client as Required<ClientOpts>;
+  return {
+    ...network.client,
+    fetch: createFetchFn(),
+  };
+}

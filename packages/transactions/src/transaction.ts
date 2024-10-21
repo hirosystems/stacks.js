@@ -351,6 +351,7 @@ export function deserializeTransaction(tx: string | Uint8Array | BytesReader) {
 
 /** @ignore */
 export function deriveNetworkFromTx(transaction: StacksTransaction) {
+  // todo: maybe add as renamed public method
   return whenTransactionVersion(transaction.version)({
     [TransactionVersion.Mainnet]: STACKS_MAINNET,
     [TransactionVersion.Testnet]: STACKS_TESTNET,

@@ -1,4 +1,4 @@
-import { defaultClientOpts, hexToBytes } from '@stacks/common';
+import { hexToBytes } from '@stacks/common';
 import {
   MOCK_EMPTY_ACCOUNT,
   MOCK_FULL_ACCOUNT,
@@ -55,7 +55,7 @@ describe('2.4 activation', () => {
     const client = new StackingClient({
       address: '',
       network: STACKS_TESTNET,
-      client: defaultClientOpts({ baseUrl: API_URL }),
+      client: { baseUrl: API_URL },
     });
 
     const poxInfo = await client.getPoxInfo();
@@ -82,7 +82,7 @@ test('in period 3, pox-3 stacking works', async () => {
   const client = new StackingClient({
     address,
     network: STACKS_TESTNET,
-    client: defaultClientOpts({ baseUrl: API_URL }),
+    client: { baseUrl: API_URL },
   });
 
   setApiMocks({
@@ -130,7 +130,7 @@ describe('stacking eligibility', () => {
     const client = new StackingClient({
       address,
       network: STACKS_TESTNET,
-      client: defaultClientOpts({ baseUrl: API_URL }),
+      client: { baseUrl: API_URL },
     });
 
     const cycles = 1;
@@ -152,7 +152,7 @@ describe('stacking eligibility', () => {
     const client = new StackingClient({
       address,
       network: STACKS_TESTNET,
-      client: defaultClientOpts({ baseUrl: API_URL }),
+      client: { baseUrl: API_URL },
     });
 
     const cycles = 1;
@@ -176,7 +176,7 @@ describe('normal stacking', () => {
     const client = new StackingClient({
       address,
       network: STACKS_TESTNET,
-      client: defaultClientOpts({ baseUrl: API_URL }),
+      client: { baseUrl: API_URL },
     });
 
     setApiMocks({
@@ -216,7 +216,7 @@ describe('normal stacking', () => {
     const client = new StackingClient({
       address,
       network: STACKS_TESTNET,
-      client: defaultClientOpts({ baseUrl: API_URL }),
+      client: { baseUrl: API_URL },
     });
 
     setApiMocks({
@@ -274,7 +274,7 @@ describe('normal stacking', () => {
     const client = new StackingClient({
       address,
       network: STACKS_TESTNET,
-      client: defaultClientOpts({ baseUrl: API_URL }),
+      client: { baseUrl: API_URL },
     });
 
     setApiMocks({
@@ -331,7 +331,7 @@ describe('delegated stacking', () => {
     const client = new StackingClient({
       address,
       network: STACKS_TESTNET,
-      client: defaultClientOpts({ baseUrl: API_URL }),
+      client: { baseUrl: API_URL },
     });
 
     setApiMocks({
@@ -376,7 +376,7 @@ describe('delegated stacking', () => {
     const client = new StackingClient({
       address,
       network: STACKS_TESTNET,
-      client: defaultClientOpts({ baseUrl: API_URL }),
+      client: { baseUrl: API_URL },
     });
 
     setApiMocks({
@@ -420,7 +420,7 @@ describe('delegated stacking', () => {
     const client = new StackingClient({
       address,
       network: STACKS_TESTNET,
-      client: defaultClientOpts({ baseUrl: API_URL }),
+      client: { baseUrl: API_URL },
     });
     const delegatorClient = new StackingClient({
       address: delegatorAddress,
@@ -489,7 +489,7 @@ describe('delegated stacking', () => {
     const client = new StackingClient({
       address,
       network: STACKS_TESTNET,
-      client: defaultClientOpts({ baseUrl: API_URL }),
+      client: { baseUrl: API_URL },
     });
     const delegatorClient = new StackingClient({
       address: delegatorAddress,
@@ -580,7 +580,7 @@ describe('delegated stacking', () => {
     const client = new StackingClient({
       address,
       network: STACKS_TESTNET,
-      client: defaultClientOpts({ baseUrl: API_URL }),
+      client: { baseUrl: API_URL },
     });
     const delegatorClient = new StackingClient({
       address: delegatorAddress,
@@ -667,7 +667,7 @@ describe('delegated stacking', () => {
     // * The pool commits a total stacking amount (covering all of its stackers)
     //   * This is required for a pools pox-address to be "commited" into the reward-set
 
-    const client = defaultClientOpts({ baseUrl: API_URL });
+    const client = { baseUrl: API_URL };
 
     const stackerAKey = 'cb3df38053d132895220b9ce471f6b676db5b9bf0b4adefb55f2118ece2478df01';
     const stackerAAddress = 'STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6';
@@ -832,7 +832,7 @@ describe('delegated stacking', () => {
     // * The pool realizes the mistake and increases the amount to all of its stackers' funds
     //   * This will only work if the reward cycle anchor block hasn't been reached yet!
 
-    const clientOpts = defaultClientOpts({ baseUrl: API_URL });
+    const clientOpts = { baseUrl: API_URL };
 
     const stackerAKey = 'cb3df38053d132895220b9ce471f6b676db5b9bf0b4adefb55f2118ece2478df01';
     const stackerAAddress = 'STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6';
@@ -1021,7 +1021,7 @@ describe('btc addresses', () => {
       const client = new StackingClient({
         address,
         network: STACKS_TESTNET,
-        client: defaultClientOpts({ baseUrl: API_URL }),
+        client: { baseUrl: API_URL },
       });
 
       setApiMocks({
