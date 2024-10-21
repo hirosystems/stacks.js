@@ -23,8 +23,7 @@ import { makeZoneFile, parseZoneFile } from 'zone-file';
 import * as inspector from 'schema-inspector';
 
 import { Logger } from '@stacks/common';
-import { networkFrom } from '@stacks/network';
-import { NetworkClientParam, clientFromNetwork } from '@stacks/network/src';
+import { NetworkClientParam, clientFromNetwork, networkFrom } from '@stacks/network';
 import { PublicPersonProfile } from './types';
 
 const schemaDefinition: { [key: string]: any } = {

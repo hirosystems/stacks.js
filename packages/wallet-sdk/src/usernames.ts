@@ -1,5 +1,4 @@
-import { clientFromNetwork, networkFrom } from '@stacks/network';
-import { NetworkClientParam } from '@stacks/network/src';
+import { NetworkClientParam, clientFromNetwork, networkFrom } from '@stacks/network';
 
 export const fetchFirstName = async (
   opts: {
