@@ -6,6 +6,7 @@ import {
   StacksTestnet,
   FetchFn,
   createFetchFn,
+  HIRO_TESTNET_DEFAULT,
 } from '@stacks/network';
 import { c32address } from 'c32check';
 import {
@@ -114,6 +115,37 @@ export async function getNonce(
   const responseText = await response.text();
   const result = JSON.parse(responseText) as { nonce: string };
   return BigInt(result.nonce);
+}
+
+/**
+ * Fetch the network chain ID from a given network. Typically used for looking up the chain ID for a non-default testnet network.
+ * @param useDefaultOnError - If the network fetch fails then return the default chain ID already specifed in the `network` arg.
+ */
+export async function getNetworkChainID(network: StacksNetwork, useDefaultOnError = true) {
+  const url = network.getInfoUrl();
+  try {
+    const response = await network.fetchFn(url);
+    if (!response.ok) {
+      const msg = await response.text().catch(() => '');
+      throw new Error(`Bad response status ${response.status} ${response.statusText}: "${msg}"`);
+    }
+    const responseJson: { network_id: number } = await response.json();
+    return responseJson.network_id;
+  } catch (error) {
+    if (!useDefaultOnError) {
+      throw error;
+    }
+    // log error and return default nework chain ID
+    console.warn(`Error fetching network chain ID from ${url}`, error);
+    return network.chainId;
+  }
+}
+
+function isNetworkCustomTestnet(network: StacksNetwork) {
+  return (
+    network.version !== TransactionVersion.Mainnet &&
+    new URL(network.coreApiUrl).host !== new URL(HIRO_TESTNET_DEFAULT).host
+  );
 }
 
 /**
@@ -751,6 +783,11 @@ export async function makeUnsignedSTXTokenTransfer(
     transaction.setNonce(txNonce);
   }
 
+  // Lookup chain ID for (non-primary) testnet networks
+  if (isNetworkCustomTestnet(network)) {
+    transaction.chainId = await getNetworkChainID(network);
+  }
+
   return transaction;
 }
 
@@ -1024,6 +1061,11 @@ export async function makeUnsignedContractDeploy(
     transaction.setNonce(txNonce);
   }
 
+  // Lookup chain ID for (non-primary) testnet networks
+  if (isNetworkCustomTestnet(network)) {
+    transaction.chainId = await getNetworkChainID(network);
+  }
+
   return transaction;
 }
 
@@ -1235,6 +1277,11 @@ export async function makeUnsignedContractCall(
     const senderAddress = c32address(addressVersion, transaction.auth.spendingCondition!.signer);
     const txNonce = await getNonce(senderAddress, network);
     transaction.setNonce(txNonce);
+  }
+
+  // Lookup chain ID for (non-primary) testnet networks
+  if (isNetworkCustomTestnet(network)) {
+    transaction.chainId = await getNetworkChainID(network);
   }
 
   return transaction;
