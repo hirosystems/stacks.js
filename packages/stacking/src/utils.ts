@@ -277,7 +277,7 @@ function _poxAddressToBtcAddress_Values(
 ): string {
   if (!StacksNetworks.includes(network)) throw new Error('Invalid network.');
 
-  hash = typeof hash === 'string' ? hexToBytes(hash) : hash;
+  if (typeof hash === 'string') hash = hexToBytes(hash);
 
   switch (version) {
     case PoXAddressVersion.P2PKH:

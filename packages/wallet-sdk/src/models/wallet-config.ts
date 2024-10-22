@@ -3,6 +3,7 @@ import { GaiaHubConfig, connectToGaiaHub, uploadToGaiaHub } from '@stacks/storag
 import { decryptContent, encryptContent, getPublicKeyFromPrivate } from '@stacks/encryption';
 import { createFetchFn, FetchFn } from '@stacks/common';
 
+/** @deprecated */
 export interface ConfigApp {
   origin: string;
   scopes: string[];
@@ -11,6 +12,7 @@ export interface ConfigApp {
   name: string;
 }
 
+/** @deprecated */
 export interface ConfigAccount {
   username?: string;
   apps: {
@@ -18,6 +20,7 @@ export interface ConfigAccount {
   };
 }
 
+/** @deprecated */
 export interface WalletConfig {
   accounts: ConfigAccount[];
   meta?: {
@@ -25,6 +28,7 @@ export interface WalletConfig {
   };
 }
 
+/** @deprecated  */
 export const createWalletGaiaConfig = async ({
   gaiaHubUrl,
   wallet,
@@ -107,6 +111,7 @@ export const updateWalletConfig = async ({
   return walletConfig;
 };
 
+/** @deprecated */
 export function makeWalletConfig(wallet: Wallet): WalletConfig {
   return {
     accounts: wallet.accounts.map(account => ({
@@ -116,6 +121,7 @@ export function makeWalletConfig(wallet: Wallet): WalletConfig {
   };
 }
 
+/** @deprecated */
 export const encryptWalletConfig = async ({
   wallet,
   walletConfig,
@@ -128,6 +134,7 @@ export const encryptWalletConfig = async ({
   return encrypted;
 };
 
+/** @deprecated */
 export const updateWalletConfigWithApp = async ({
   wallet,
   account,
