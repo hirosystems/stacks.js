@@ -326,6 +326,7 @@ This likely was a misunderstood and unused feature.
 - `makeRandomPrivKey` was renamed to `randomPrivateKey` and now returns a compressed private key.
 - `generateSecretKey` was renamed to `randomSeedPhrase`.
 - `nextYear`, `nextMonth`, `nextHour`, `makeUUID4`, `updateQueryStringParameter`, `getAesCbcOutputLength`, `getAPIUsageErrorMessage`, `isSameOriginAbsoluteUrl`, `isLaterVersion`, `getBase64OutputLength`, were marked as deprecated.
+- `encrypt` and `decrypt` in `@stacks/wallet-sdk` (aliases of `encryptMnemonic` and `decryptMnemonic` in the `@stacks/encryption` package respectively) were removed.
 
 ## Stacks.js (&lt;=4.x.x) → (5.x.x)
 

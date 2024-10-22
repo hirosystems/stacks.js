@@ -1,6 +1,7 @@
 import { utf8ToBytes } from '@stacks/common';
 import { hash160 } from '@stacks/transactions';
 
+/** @ignore */
 export function decodeFQN(fqdn: string): {
   name: string;
   namespace: string;
@@ -20,4 +21,5 @@ export function decodeFQN(fqdn: string): {
   };
 }
 
+/** @ignore */
 export const getZonefileHash = (zonefile: string) => hash160(utf8ToBytes(zonefile));
