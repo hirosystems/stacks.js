@@ -319,6 +319,10 @@ This likely was a misunderstood and unused feature.
 
 ### Advanced: Refactorings
 
+- The `StacksTransaction` was renamed to `StacksTransactionWire` and its class constructor was updated to take in an options object instead of individual parameters. In the future a new `StacksTransaction` may be introduced to replace it, with more human-readable properties.
+- `postConditionMode` now also accepts string literals: `'deny'`, `'allow'` (in addition to the imported `PostConditionMode` enum).
+- `anchorMode` and related items were deprecated, since they no longer change behavior on-chain.
+- `pubKeyfromPrivKey` was renamed `privateKeyToPublic`
 - `encodeStructuredData` now returns a hex-encoded string instead of a Uint8Array (use `encodeStructuredDataBytes` if you need the raw bytes).
 - `decodeStructuredDataSignature` now returns a hex-encoded string instead of a Uint8Array (use `decodeStructuredDataSignatureBytes` if you need the raw bytes). Also fixes a bug that previously tried to parse input strings as UTF-8 bytes instead of hex-encoded strings.
 - `hashStructuredData` now returns a hex-encoded string instead of a Uint8Array (use `hashStructuredDataBytes` if you need the raw bytes).
@@ -327,6 +331,10 @@ This likely was a misunderstood and unused feature.
 - `generateSecretKey` was renamed to `randomSeedPhrase`.
 - `nextYear`, `nextMonth`, `nextHour`, `makeUUID4`, `updateQueryStringParameter`, `getAesCbcOutputLength`, `getAPIUsageErrorMessage`, `isSameOriginAbsoluteUrl`, `isLaterVersion`, `getBase64OutputLength`, were marked as deprecated.
 - `encrypt` and `decrypt` in `@stacks/wallet-sdk` (aliases of `encryptMnemonic` and `decryptMnemonic` in the `@stacks/encryption` package respectively) were removed.
+- `makeECPrivateKey` in `@stacks/encryption` was deprecated, use `randomPrivateKey` instead.
+- `makeSigHashPreSign` was renamed to `sigHashPreSign` and marked as internal.
+- `makeSigHashPostSign` was renamed to `sigHashPostSign` and marked as internal.
+- `@stacks/wallet-sdk` `WalletConfig` types and helpers were marked as deprecated.
 
 ## Stacks.js (&lt;=4.x.x) → (5.x.x)
 

@@ -339,7 +339,8 @@ export function deserializeSpendingCondition(bytesReader: BytesReader): Spending
   }
 }
 
-export function makeSigHashPreSign(
+/** @ignore */
+export function sigHashPreSign(
   curSigHash: string,
   authType: AuthType,
   fee: IntegerType,
@@ -367,7 +368,7 @@ export function makeSigHashPreSign(
 }
 
 /** @internal */
-function makeSigHashPostSign(curSigHash: string, pubKey: PublicKeyWire, signature: string): string {
+function sigHashPostSign(curSigHash: string, pubKey: PublicKeyWire, signature: string): string {
   // new hash combines the previous hash and all the new data this signature will add.  This
   // includes:
   // * the public key compression flag
@@ -398,11 +399,11 @@ export function nextSignature(
   nextSig: string;
   nextSigHash: string;
 } {
-  const sigHashPreSign = makeSigHashPreSign(curSigHash, authType, fee, nonce);
+  const sigHashPre = sigHashPreSign(curSigHash, authType, fee, nonce);
 
-  const signature = signWithKey(privateKey, sigHashPreSign);
+  const signature = signWithKey(privateKey, sigHashPre);
   const publicKey = createStacksPublicKey(privateKeyToPublic(privateKey));
-  const nextSigHash = makeSigHashPostSign(sigHashPreSign, publicKey, signature);
+  const nextSigHash = sigHashPostSign(sigHashPre, publicKey, signature);
 
   return {
     nextSig: signature,
@@ -418,13 +419,13 @@ export function nextVerification(
   pubKeyEncoding: PubKeyEncoding,
   signature: string
 ) {
-  const sigHashPreSign = makeSigHashPreSign(initialSigHash, authType, fee, nonce);
+  const sigHashPre = sigHashPreSign(initialSigHash, authType, fee, nonce);
 
   const publicKey = createStacksPublicKey(
-    publicKeyFromSignatureVrs(sigHashPreSign, signature, pubKeyEncoding)
+    publicKeyFromSignatureVrs(sigHashPre, signature, pubKeyEncoding)
   );
 
-  const nextSigHash = makeSigHashPostSign(sigHashPreSign, publicKey, signature);
+  const nextSigHash = sigHashPostSign(sigHashPre, publicKey, signature);
 
   return {
     pubKey: publicKey,

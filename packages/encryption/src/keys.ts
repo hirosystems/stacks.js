@@ -30,6 +30,7 @@ utils.hmacSha256Sync = (key: Uint8Array, ...msgs: Uint8Array[]) => {
 
 /**
  * @ignore
+ * @deprecated Use `randomPrivateKey` instead.
  */
 export function makeECPrivateKey() {
   return bytesToHex(utils.randomPrivateKey());
