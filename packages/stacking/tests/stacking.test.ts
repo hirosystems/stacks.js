@@ -1184,7 +1184,7 @@ test('pox address to btc address', () => {
     expect(btcAddress).toBe(item.expectedBtcAddr);
     const decodedAddress = decodeBtcAddress(btcAddress);
     expect(decodedAddress.version).toBe(item.version);
-    expect(bytesToHex(decodedAddress.data)).toBe(bytesToHex(item.hashBytes));
+    expect(decodedAddress.data).toBe(bytesToHex(item.hashBytes));
   });
 
   vectors.forEach(item => {
@@ -1205,7 +1205,7 @@ test('pox address to btc address', () => {
     expect(btcAddress).toBe(item.expectedBtcAddr);
     const decodedAddress = decodeBtcAddress(btcAddress);
     expect(decodedAddress.version).toBe(item.version);
-    expect(bytesToHex(decodedAddress.data)).toBe(bytesToHex(item.hashBytes));
+    expect(decodedAddress.data).toBe(bytesToHex(item.hashBytes));
   });
 });
 

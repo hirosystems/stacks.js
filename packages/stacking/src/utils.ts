@@ -1,6 +1,6 @@
 import { sha256 } from '@noble/hashes/sha256';
 import { bech32, bech32m } from '@scure/base';
-import { IntegerType, PrivateKey, bigIntToBytes, hexToBytes } from '@stacks/common';
+import { IntegerType, PrivateKey, bigIntToBytes, bytesToHex, hexToBytes } from '@stacks/common';
 import {
   base58CheckDecode,
   base58CheckEncode,
@@ -79,6 +79,7 @@ function nativeAddressToSegwitVersion(
   );
 }
 
+/** @ignore */
 function bech32Decode(btcAddress: string) {
   const { words: bech32Words } = bech32.decode(btcAddress);
   const witnessVersion = bech32Words[0];
@@ -92,6 +93,7 @@ function bech32Decode(btcAddress: string) {
   };
 }
 
+/** @ignore */
 function bech32MDecode(btcAddress: string) {
   const { words: bech32MWords } = bech32m.decode(btcAddress);
   const witnessVersion = bech32MWords[0];
@@ -105,6 +107,7 @@ function bech32MDecode(btcAddress: string) {
   };
 }
 
+/** @ignore */
 function decodeNativeSegwitBtcAddress(btcAddress: string): {
   witnessVersion: number;
   data: Uint8Array;
@@ -117,6 +120,14 @@ function decodeNativeSegwitBtcAddress(btcAddress: string): {
 }
 
 export function decodeBtcAddress(btcAddress: string): {
+  version: PoXAddressVersion;
+  data: string;
+} {
+  const { version, data } = decodeBtcAddressBytes(btcAddress);
+  return { version, data: bytesToHex(data) };
+}
+
+export function decodeBtcAddressBytes(btcAddress: string): {
   version: PoXAddressVersion;
   data: Uint8Array;
 } {
@@ -233,7 +244,7 @@ export function getErrorString(error: StackingErrors): string {
  * @returns The converted PoX address as a tuple of version and hashbytes.
  */
 export function poxAddressToTuple(poxAddress: string) {
-  const { version, data } = decodeBtcAddress(poxAddress);
+  const { version, data } = decodeBtcAddressBytes(poxAddress);
   const versionBuff = bufferCV(bigIntToBytes(BigInt(version), 1));
   const hashBuff = bufferCV(data);
   return tupleCV({
@@ -261,10 +272,12 @@ function legacyHashModeToBtcAddressVersion(
 
 function _poxAddressToBtcAddress_Values(
   version: number,
-  hashBytes: Uint8Array,
+  hash: string | Uint8Array,
   network: StacksNetworkName
 ): string {
   if (!StacksNetworks.includes(network)) throw new Error('Invalid network.');
+
+  hash = typeof hash === 'string' ? hexToBytes(hash) : hash;
 
   switch (version) {
     case PoXAddressVersion.P2PKH:
@@ -272,15 +285,15 @@ function _poxAddressToBtcAddress_Values(
     case PoXAddressVersion.P2SHP2WPKH:
     case PoXAddressVersion.P2SHP2WSH: {
       const btcAddrVersion = legacyHashModeToBtcAddressVersion(version, network);
-      return base58CheckEncode(btcAddrVersion, hashBytes);
+      return base58CheckEncode(btcAddrVersion, hash);
     }
     case PoXAddressVersion.P2WPKH:
     case PoXAddressVersion.P2WSH: {
-      const words = bech32.toWords(hashBytes);
+      const words = bech32.toWords(hash);
       return bech32.encode(SegwitPrefix[network], [SEGWIT_V0, ...words]);
     }
     case PoXAddressVersion.P2TR: {
-      const words = bech32m.toWords(hashBytes);
+      const words = bech32m.toWords(hash);
       return bech32m.encode(SegwitPrefix[network], [SEGWIT_V1, ...words]);
     }
   }
@@ -299,13 +312,13 @@ function _poxAddressToBtcAddress_ClarityValue(
  * Converts a PoX address to a Bitcoin address.
  *
  * @param version - The version of the PoX address (as a single number, not a Uint8array).
- * @param hashBytes - The hash bytes of the PoX address.
+ * @param hash - The hash bytes of the PoX address.
  * @param network - The network the PoX address is on.
  * @returns The corresponding Bitcoin address.
  */
 export function poxAddressToBtcAddress(
   version: number,
-  hashBytes: Uint8Array,
+  hash: string | Uint8Array,
   network: StacksNetworkName // todo: allow NetworkParam in the future (minor)
 ): string;
 /**

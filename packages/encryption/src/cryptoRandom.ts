@@ -8,5 +8,5 @@ import { utils } from '@noble/secp256k1';
  */
 export const randomBytes = (bytesLength: number = 32): Uint8Array => utils.randomBytes(bytesLength);
 
-/** Optional function to generate cryptographically secure random bytes */
+/** @deprecated @ignore */
 export type GetRandomBytes = (count: number) => Uint8Array;

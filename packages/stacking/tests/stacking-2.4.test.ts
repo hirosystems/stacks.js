@@ -13,7 +13,7 @@ import {
 } from '@stacks/internal';
 import { STACKS_MAINNET, STACKS_TESTNET } from '@stacks/network';
 import { ContractCallPayload, deserializeTransaction, fetchNonce } from '@stacks/transactions';
-import { StackingClient, decodeBtcAddress } from '../src';
+import { StackingClient, decodeBtcAddress, decodeBtcAddressBytes } from '../src';
 import { PoxOperationPeriod } from '../src/constants';
 import { BTC_ADDRESS_CASES } from './utils.test';
 
@@ -817,7 +817,7 @@ describe('delegated stacking', () => {
     expect(rewardSet).toBeDefined();
     expect(rewardSet?.total_ustx).toBe(FULL_AMOUNT);
     expect(rewardSet?.pox_address.version[0]).toEqual(decodeBtcAddress(poolPoxAddress).version);
-    expect(rewardSet?.pox_address.hashbytes).toEqual(decodeBtcAddress(poolPoxAddress).data);
+    expect(rewardSet?.pox_address.hashbytes).toEqual(decodeBtcAddressBytes(poolPoxAddress).data);
   });
 
   test('delegator stacks for multiple stackers in a pool, then increases commitment (requires >= pox-2)', async () => {
@@ -1007,7 +1007,7 @@ describe('delegated stacking', () => {
     expect(rewardSet).toBeDefined();
     expect(rewardSet?.total_ustx).toBe(AMOUNT_75 * 2n); // 1.5x the FULL_AMOUNT (aka everything the stackers stacked together)
     expect(rewardSet?.pox_address.version[0]).toEqual(decodeBtcAddress(poolPoxAddress).version);
-    expect(rewardSet?.pox_address.hashbytes).toEqual(decodeBtcAddress(poolPoxAddress).data);
+    expect(rewardSet?.pox_address.hashbytes).toEqual(decodeBtcAddressBytes(poolPoxAddress).data);
   });
 });
 
