@@ -11,11 +11,11 @@ import { wordlist } from '@scure/bip39/wordlists/english';
 // https://github.com/paulmillr/scure-bip32
 // Secure, audited & minimal implementation of BIP32 hierarchical deterministic (HD) wallets.
 import { HDKey } from '@scure/bip32';
-import { Wallet, getRootNode } from './models/common';
-import { encrypt } from './encryption';
-import { deriveAccount, deriveWalletKeys } from './derive';
-import { DerivationType } from '.';
 import { bytesToHex } from '@stacks/common';
+import { encryptMnemonic } from '@stacks/encryption';
+import { DerivationType } from '.';
+import { deriveAccount, deriveWalletKeys } from './derive';
+import { Wallet, getRootNode } from './models/common';
 
 export type AllowedKeyEntropyBits = 128 | 256;
 
@@ -47,7 +47,7 @@ export const generateWallet = async ({
   secretKey: string;
   password: string;
 }): Promise<Wallet> => {
-  const ciphertextBytes = await encrypt(secretKey, password);
+  const ciphertextBytes = await encryptMnemonic(secretKey, password);
   const encryptedSecretKey = bytesToHex(ciphertextBytes);
 
   const rootPrivateKey = await mnemonicToSeed(secretKey);

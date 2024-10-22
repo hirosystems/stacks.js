@@ -203,7 +203,7 @@ function isValidPublicKey(pub: string): {
 /**
  * Hex encodes a 32-byte bigint instance.
  * The result string is zero padded and always 64 characters in length.
- * @ignore @internal
+ * @ignore @internal @deprecated
  */
 export function getHexFromBN(bnInput: bigint): string {
   const hexOut = bnInput.toString(16);
@@ -221,7 +221,7 @@ export function getHexFromBN(bnInput: bigint): string {
 
 /**
  * Converts to zero padded 32 bytes
- * @ignore
+ * @ignore @deprecated
  */
 export function getBytesFromBN(bnInput: bigint): Uint8Array {
   // todo: remove method?
