@@ -238,27 +238,16 @@ For easier migrating, renaming the following methods is possible to keep the pre
 - `StacksTransaction.serialize` → `StacksTransaction.serializeBytes`
 - `serializeCV` → `serializeCVBytes`
 - `serializeAddress` → `serializeAddressBytes`
-- `deserializeAddress` → `deserializeAddressBytes`
 - `serializeLPList` → `serializeLPListBytes`
-- `deserializeLPList` → `deserializeLPListBytes`
 - `serializeLPString` → `serializeLPStringBytes`
-- `deserializeLPString` → `deserializeLPStringBytes`
 - `serializePayload` → `serializePayloadBytes`
-- `deserializePayload` → `deserializePayloadBytes`
 - `serializePublicKey` → `serializePublicKeyBytes`
-- `deserializePublicKey` → `deserializePublicKeyBytes`
 - `serializeStacksMessage` → `serializeStacksMessageBytes`
-- `deserializeStacksMessage` → `deserializeStacksMessageBytes`
 - `serializeMemoString` → `serializeMemoStringBytes`
-- `deserializeMemoString` → `deserializeMemoStringBytes`
 - `serializeTransactionAuthField` → `serializeTransactionAuthFieldBytes`
-- `deserializeTransactionAuthField` → `deserializeTransactionAuthFieldBytes`
 - `serializeMessageSignature` → `serializeMessageSignatureBytes`
-- `deserializeMessageSignature` → `deserializeMessageSignatureBytes`
 - `serializePostCondition` → `serializePostConditionBytes`
-- `deserializePostCondition` → `deserializePostConditionBytes`
 - `serializeStacksMessage` → `serializeStacksWireBytes`
-- `deserializeStacksMessage` → `deserializeStacksWireBytes`
 
 ### Asset Helper Methods
 
@@ -287,7 +276,6 @@ This is only used for advanced serialization use-cases internally and should not
 - `StacksMessage` → `StacksWire`
 - `StacksMessageType` → `StacksWireType`
 - `serializeStacksMessage` → `serializeStacksWireBytes`
-- `deserializeStacksMessage` → `deserializeStacksWireBytes`
 
 More types were renamed to indicate use for serialization to _wire-format_:
 

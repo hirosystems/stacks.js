@@ -108,35 +108,35 @@ export function serializeStacksWireBytes(wire: StacksWire): Uint8Array {
 }
 
 /** @internal */
-export function deserializeStacksWireBytes(
-  bytesReader: BytesReader,
+export function deserializeStacksWire(
+  bytesReader: string | Uint8Array | BytesReader,
   type: StacksWireType,
   listType?: StacksWireType
 ): StacksWire {
   switch (type) {
     case StacksWireType.Address:
-      return deserializeAddressBytes(bytesReader);
+      return deserializeAddress(bytesReader);
     case StacksWireType.Principal:
-      return deserializePrincipalBytes(bytesReader);
+      return deserializePrincipal(bytesReader);
     case StacksWireType.LengthPrefixedString:
-      return deserializeLPStringBytes(bytesReader);
+      return deserializeLPString(bytesReader);
     case StacksWireType.MemoString:
-      return deserializeMemoStringBytes(bytesReader);
+      return deserializeMemoString(bytesReader);
     case StacksWireType.Asset:
-      return deserializeAssetBytes(bytesReader);
+      return deserializeAsset(bytesReader);
     case StacksWireType.PostCondition:
-      return deserializePostConditionBytes(bytesReader);
+      return deserializePostCondition(bytesReader);
     case StacksWireType.PublicKey:
-      return deserializePublicKeyBytes(bytesReader);
+      return deserializePublicKey(bytesReader);
     case StacksWireType.Payload:
-      return deserializePayloadBytes(bytesReader);
+      return deserializePayload(bytesReader);
     case StacksWireType.LengthPrefixedList:
       if (!listType) {
         throw new DeserializationError('No list type specified');
       }
-      return deserializeLPListBytes(bytesReader, listType);
+      return deserializeLPList(bytesReader, listType);
     case StacksWireType.MessageSignature:
-      return deserializeMessageSignatureBytes(bytesReader);
+      return deserializeMessageSignature(bytesReader);
     default:
       throw new Error('Could not recognize StacksWireType');
   }
@@ -153,11 +153,8 @@ export function serializeAddressBytes(address: AddressWire): Uint8Array {
   return concatArray(bytesArray);
 }
 
-export function deserializeAddress(serialized: string): AddressWire {
-  return deserializeAddressBytes(hexToBytes(serialized));
-}
 /** @internal */
-export function deserializeAddressBytes(serialized: Uint8Array | BytesReader): AddressWire {
+export function deserializeAddress(serialized: string | Uint8Array | BytesReader): AddressWire {
   const bytesReader = isInstance(serialized, BytesReader)
     ? serialized
     : new BytesReader(serialized);
@@ -186,12 +183,9 @@ export function serializePrincipalBytes(principal: PostConditionPrincipalWire): 
   return concatArray(bytesArray);
 }
 
-export function deserializePrincipal(serialized: string): PostConditionPrincipalWire {
-  return deserializePrincipalBytes(hexToBytes(serialized));
-}
 /** @internal */
-export function deserializePrincipalBytes(
-  serialized: Uint8Array | BytesReader
+export function deserializePrincipal(
+  serialized: string | Uint8Array | BytesReader
 ): PostConditionPrincipalWire {
   const bytesReader = isInstance(serialized, BytesReader)
     ? serialized
@@ -202,11 +196,11 @@ export function deserializePrincipalBytes(
   if (prefix === PostConditionPrincipalId.Origin) {
     return { type: StacksWireType.Principal, prefix } as OriginPrincipalWire;
   }
-  const address = deserializeAddressBytes(bytesReader);
+  const address = deserializeAddress(bytesReader);
   if (prefix === PostConditionPrincipalId.Standard) {
     return { type: StacksWireType.Principal, prefix, address } as StandardPrincipalWire;
   }
-  const contractName = deserializeLPStringBytes(bytesReader);
+  const contractName = deserializeLPString(bytesReader);
   return {
     type: StacksWireType.Principal,
     prefix,
@@ -228,16 +222,9 @@ export function serializeLPStringBytes(lps: LengthPrefixedStringWire): Uint8Arra
   return concatArray(bytesArray);
 }
 
-export function deserializeLPString(
-  serialized: string,
-  prefixBytes?: number,
-  maxLength?: number
-): LengthPrefixedStringWire {
-  return deserializeLPStringBytes(hexToBytes(serialized), prefixBytes, maxLength);
-}
 /** @internal */
-export function deserializeLPStringBytes(
-  serialized: Uint8Array | BytesReader,
+export function deserializeLPString(
+  serialized: string | Uint8Array | BytesReader,
   prefixBytes?: number,
   maxLength?: number
 ): LengthPrefixedStringWire {
@@ -262,11 +249,10 @@ export function serializeMemoStringBytes(memoString: MemoStringWire): Uint8Array
   return concatArray(bytesArray);
 }
 
-export function deserializeMemoString(serialized: string): MemoStringWire {
-  return deserializeMemoStringBytes(hexToBytes(serialized));
-}
 /** @internal */
-export function deserializeMemoStringBytes(serialized: Uint8Array | BytesReader): MemoStringWire {
+export function deserializeMemoString(
+  serialized: string | Uint8Array | BytesReader
+): MemoStringWire {
   const bytesReader = isInstance(serialized, BytesReader)
     ? serialized
     : new BytesReader(serialized);
@@ -287,19 +273,16 @@ export function serializeAssetBytes(info: AssetWire): Uint8Array {
   return concatArray(bytesArray);
 }
 
-export function deserializeAsset(serialized: string): AssetWire {
-  return deserializeAssetBytes(hexToBytes(serialized));
-}
 /** @internal */
-export function deserializeAssetBytes(serialized: Uint8Array | BytesReader): AssetWire {
+export function deserializeAsset(serialized: string | Uint8Array | BytesReader): AssetWire {
   const bytesReader = isInstance(serialized, BytesReader)
     ? serialized
     : new BytesReader(serialized);
   return {
     type: StacksWireType.Asset,
-    address: deserializeAddressBytes(bytesReader),
-    contractName: deserializeLPStringBytes(bytesReader),
-    assetName: deserializeLPStringBytes(bytesReader),
+    address: deserializeAddress(bytesReader),
+    contractName: deserializeLPString(bytesReader),
+    assetName: deserializeLPString(bytesReader),
   };
 }
 
@@ -317,19 +300,12 @@ export function serializeLPListBytes(lpList: LengthPrefixedList): Uint8Array {
   return concatArray(bytesArray);
 }
 
-// todo: `next` refactor for inversion of control
-export function deserializeLPList(
-  serialized: string,
-  type: StacksWireType,
-  lengthPrefixBytes?: number
-): LengthPrefixedList {
-  return deserializeLPListBytes(hexToBytes(serialized), type, lengthPrefixBytes);
-}
 /** @internal */
-export function deserializeLPListBytes(
-  serialized: Uint8Array | BytesReader,
+export function deserializeLPList(
+  serialized: string | Uint8Array | BytesReader,
   type: StacksWireType,
   lengthPrefixBytes?: number
+  // todo: `next` refactor for inversion of control
 ): LengthPrefixedList {
   const bytesReader = isInstance(serialized, BytesReader)
     ? serialized
@@ -340,25 +316,25 @@ export function deserializeLPListBytes(
   for (let index = 0; index < length; index++) {
     switch (type) {
       case StacksWireType.Address:
-        l.push(deserializeAddressBytes(bytesReader));
+        l.push(deserializeAddress(bytesReader));
         break;
       case StacksWireType.LengthPrefixedString:
-        l.push(deserializeLPStringBytes(bytesReader));
+        l.push(deserializeLPString(bytesReader));
         break;
       case StacksWireType.MemoString:
-        l.push(deserializeMemoStringBytes(bytesReader));
+        l.push(deserializeMemoString(bytesReader));
         break;
       case StacksWireType.Asset:
-        l.push(deserializeAssetBytes(bytesReader));
+        l.push(deserializeAsset(bytesReader));
         break;
       case StacksWireType.PostCondition:
-        l.push(deserializePostConditionBytes(bytesReader));
+        l.push(deserializePostCondition(bytesReader));
         break;
       case StacksWireType.PublicKey:
-        l.push(deserializePublicKeyBytes(bytesReader));
+        l.push(deserializePublicKey(bytesReader));
         break;
       case StacksWireType.TransactionAuthField:
-        l.push(deserializeTransactionAuthFieldBytes(bytesReader));
+        l.push(deserializeTransactionAuthField(bytesReader));
         break;
     }
   }
@@ -400,12 +376,9 @@ export function serializePostConditionBytes(postCondition: PostConditionWire): U
   return concatArray(bytesArray);
 }
 
-export function deserializePostCondition(serialized: string): PostConditionWire {
-  return deserializePostConditionBytes(hexToBytes(serialized));
-}
 /** @internal */
-export function deserializePostConditionBytes(
-  serialized: Uint8Array | BytesReader
+export function deserializePostCondition(
+  serialized: string | Uint8Array | BytesReader
 ): PostConditionWire {
   const bytesReader = isInstance(serialized, BytesReader)
     ? serialized
@@ -414,7 +387,7 @@ export function deserializePostConditionBytes(
     throw new DeserializationError(`Could not read ${n} as PostConditionType`);
   });
 
-  const principal = deserializePrincipalBytes(bytesReader);
+  const principal = deserializePrincipal(bytesReader);
 
   let conditionCode;
   let asset;
@@ -433,7 +406,7 @@ export function deserializePostConditionBytes(
         amount,
       };
     case PostConditionType.Fungible:
-      asset = deserializeAssetBytes(bytesReader);
+      asset = deserializeAsset(bytesReader);
       conditionCode = bytesReader.readUInt8Enum(FungibleConditionCode, n => {
         throw new DeserializationError(`Could not read ${n} as FungibleConditionCode`);
       });
@@ -447,7 +420,7 @@ export function deserializePostConditionBytes(
         asset: asset,
       };
     case PostConditionType.NonFungible:
-      asset = deserializeAssetBytes(bytesReader);
+      asset = deserializeAsset(bytesReader);
       const assetName = deserializeCV(bytesReader);
       conditionCode = bytesReader.readUInt8Enum(NonFungibleConditionCode, n => {
         throw new DeserializationError(`Could not read ${n} as FungibleConditionCode`);
@@ -457,7 +430,7 @@ export function deserializePostConditionBytes(
         conditionType: PostConditionType.NonFungible,
         principal,
         conditionCode,
-        asset: asset,
+        asset,
         assetName,
       };
   }
@@ -526,11 +499,8 @@ export function serializePayloadBytes(payload: PayloadInput): Uint8Array {
   return concatArray(bytesArray);
 }
 
-export function deserializePayload(serialized: string): PayloadWire {
-  return deserializePayloadBytes(hexToBytes(serialized));
-}
 /** @ignore */
-export function deserializePayloadBytes(serialized: Uint8Array | BytesReader): PayloadWire {
+export function deserializePayload(serialized: string | Uint8Array | BytesReader): PayloadWire {
   const bytesReader = isInstance(serialized, BytesReader)
     ? serialized
     : new BytesReader(serialized);
@@ -542,12 +512,12 @@ export function deserializePayloadBytes(serialized: Uint8Array | BytesReader): P
     case PayloadType.TokenTransfer:
       const recipient = deserializeCV(bytesReader) as PrincipalCV;
       const amount = intToBigInt(bytesReader.readBytes(8));
-      const memo = deserializeMemoStringBytes(bytesReader);
+      const memo = deserializeMemoString(bytesReader);
       return createTokenTransferPayload(recipient, amount, memo);
     case PayloadType.ContractCall:
-      const contractAddress = deserializeAddressBytes(bytesReader);
-      const contractCallName = deserializeLPStringBytes(bytesReader);
-      const functionName = deserializeLPStringBytes(bytesReader);
+      const contractAddress = deserializeAddress(bytesReader);
+      const contractCallName = deserializeLPString(bytesReader);
+      const functionName = deserializeLPString(bytesReader);
       const functionArgs: ClarityValue[] = [];
       const numberOfArgs = bytesReader.readUInt32BE();
       for (let i = 0; i < numberOfArgs; i++) {
@@ -561,16 +531,16 @@ export function deserializePayloadBytes(serialized: Uint8Array | BytesReader): P
         functionArgs
       );
     case PayloadType.SmartContract:
-      const smartContractName = deserializeLPStringBytes(bytesReader);
-      const codeBody = deserializeLPStringBytes(bytesReader, 4, 100_000);
+      const smartContractName = deserializeLPString(bytesReader);
+      const codeBody = deserializeLPString(bytesReader, 4, 100_000);
       return createSmartContractPayload(smartContractName, codeBody);
 
     case PayloadType.VersionedSmartContract: {
       const clarityVersion = bytesReader.readUInt8Enum(ClarityVersion, n => {
         throw new Error(`Cannot recognize ClarityVersion: ${n}`);
       });
-      const smartContractName = deserializeLPStringBytes(bytesReader);
-      const codeBody = deserializeLPStringBytes(bytesReader, 4, 100_000);
+      const smartContractName = deserializeLPString(bytesReader);
+      const codeBody = deserializeLPString(bytesReader, 4, 100_000);
       return createSmartContractPayload(smartContractName, codeBody, clarityVersion);
     }
     case PayloadType.PoisonMicroblock:
@@ -613,12 +583,9 @@ export function deserializePayloadBytes(serialized: Uint8Array | BytesReader): P
   }
 }
 
-export function deserializeMessageSignature(serialized: string): MessageSignatureWire {
-  return deserializeMessageSignatureBytes(hexToBytes(serialized));
-}
 /** @ignore */
-export function deserializeMessageSignatureBytes(
-  serialized: Uint8Array | BytesReader
+export function deserializeMessageSignature(
+  serialized: string | Uint8Array | BytesReader
 ): MessageSignatureWire {
   const bytesReader = isInstance(serialized, BytesReader)
     ? serialized
@@ -628,12 +595,9 @@ export function deserializeMessageSignatureBytes(
   );
 }
 
-export function deserializeTransactionAuthField(serialized: string): TransactionAuthFieldWire {
-  return deserializeTransactionAuthFieldBytes(hexToBytes(serialized));
-}
 /** @ignore */
-export function deserializeTransactionAuthFieldBytes(
-  serialized: Uint8Array | BytesReader
+export function deserializeTransactionAuthField(
+  serialized: string | Uint8Array | BytesReader
 ): TransactionAuthFieldWire {
   const bytesReader = isInstance(serialized, BytesReader)
     ? serialized
@@ -646,22 +610,22 @@ export function deserializeTransactionAuthFieldBytes(
     case AuthFieldType.PublicKeyCompressed:
       return createTransactionAuthField(
         PubKeyEncoding.Compressed,
-        deserializePublicKeyBytes(bytesReader)
+        deserializePublicKey(bytesReader)
       );
     case AuthFieldType.PublicKeyUncompressed:
       return createTransactionAuthField(
         PubKeyEncoding.Uncompressed,
-        createStacksPublicKey(uncompressPublicKey(deserializePublicKeyBytes(bytesReader).data))
+        createStacksPublicKey(uncompressPublicKey(deserializePublicKey(bytesReader).data))
       );
     case AuthFieldType.SignatureCompressed:
       return createTransactionAuthField(
         PubKeyEncoding.Compressed,
-        deserializeMessageSignatureBytes(bytesReader)
+        deserializeMessageSignature(bytesReader)
       );
     case AuthFieldType.SignatureUncompressed:
       return createTransactionAuthField(
         PubKeyEncoding.Uncompressed,
-        deserializeMessageSignatureBytes(bytesReader)
+        deserializeMessageSignature(bytesReader)
       );
     default:
       throw new Error(`Unknown auth field type: ${JSON.stringify(authFieldType)}`);
@@ -713,11 +677,8 @@ export function serializePublicKeyBytes(key: PublicKeyWire): Uint8Array {
   return key.data.slice();
 }
 
-export function deserializePublicKey(serialized: string): PublicKeyWire {
-  return deserializePublicKeyBytes(hexToBytes(serialized));
-}
 /** @ignore */
-export function deserializePublicKeyBytes(serialized: Uint8Array | BytesReader): PublicKeyWire {
+export function deserializePublicKey(serialized: string | Uint8Array | BytesReader): PublicKeyWire {
   const bytesReader = isInstance(serialized, BytesReader)
     ? serialized
     : new BytesReader(serialized);
