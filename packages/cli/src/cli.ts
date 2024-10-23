@@ -28,7 +28,7 @@ import {
   SignedContractDeployOptions,
   SignedTokenTransferOptions,
   signWithKey,
-  StacksTransaction,
+  StacksTransactionWire,
   TransactionSigner,
   TxBroadcastResult,
   validateContractCall,
@@ -704,7 +704,7 @@ async function sendTokens(_network: CLINetworkAdapter, args: string[]): Promise<
     network,
   };
 
-  const tx: StacksTransaction = await makeSTXTokenTransfer(options);
+  const tx: StacksTransactionWire = await makeSTXTokenTransfer(options);
 
   if (estimateOnly) {
     return fetchFeeEstimateTransfer({ transaction: tx, network }).then(cost => {
@@ -758,7 +758,7 @@ async function contractDeploy(_network: CLINetworkAdapter, args: string[]): Prom
     fee,
     nonce,
     network,
-    postConditionMode: PostConditionMode.Allow,
+    postConditionMode: 'allow',
   };
 
   const tx = await makeContractDeploy(options);

@@ -236,18 +236,22 @@ Existing methods now take or return **hex-encoded strings** _instead_ of `Uint8A
 For easier migrating, renaming the following methods is possible to keep the previous behavior:
 
 - `StacksTransaction.serialize` → `StacksTransaction.serializeBytes`
-- `serializeCV` → `serializeCVBytes`
 - `serializeAddress` → `serializeAddressBytes`
+- `serializeAuthorization` → `serializeAuthorizationBytes`
+- `serializeCV` → `serializeCVBytes`
 - `serializeLPList` → `serializeLPListBytes`
 - `serializeLPString` → `serializeLPStringBytes`
-- `serializePayload` → `serializePayloadBytes`
-- `serializePublicKey` → `serializePublicKeyBytes`
-- `serializeStacksMessage` → `serializeStacksMessageBytes`
 - `serializeMemoString` → `serializeMemoStringBytes`
-- `serializeTransactionAuthField` → `serializeTransactionAuthFieldBytes`
 - `serializeMessageSignature` → `serializeMessageSignatureBytes`
+- `serializeMultiSigSpendingCondition` → `serializeMultiSigSpendingConditionBytes`
+- `serializePayload` → `serializePayloadBytes`
 - `serializePostCondition` → `serializePostConditionBytes`
+- `serializePublicKey` → `serializePublicKeyBytes`
+- `serializeSingleSigSpendingCondition` → `serializeSingleSigSpendingConditionBytes`
+- `serializeSpendingCondition` → `serializeSpendingConditionBytes`
+- `serializeStacksMessage` → `serializeStacksMessageBytes`
 - `serializeStacksMessage` → `serializeStacksWireBytes`
+- `serializeTransactionAuthField` → `serializeTransactionAuthFieldBytes`
 
 ### Asset Helper Methods
 

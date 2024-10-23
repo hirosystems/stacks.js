@@ -40,3 +40,5 @@ export type NonFungiblePostCondition = {
 };
 
 export type PostCondition = StxPostCondition | FungiblePostCondition | NonFungiblePostCondition;
+
+export type PostConditionModeName = 'allow' | 'deny';

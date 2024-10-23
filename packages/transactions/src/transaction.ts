@@ -28,7 +28,7 @@ import {
   intoInitialSighashAuth,
   isSingleSig,
   nextSignature,
-  serializeAuthorization,
+  serializeAuthorizationBytes,
   setFee,
   setNonce,
   setSponsor,
@@ -60,7 +60,7 @@ import {
   serializeLPListBytes,
 } from './wire';
 
-export class StacksTransaction {
+export class StacksTransactionWire {
   transactionVersion: TransactionVersion;
   chainId: ChainId;
   auth: Authorization;
@@ -74,8 +74,8 @@ export class StacksTransaction {
   constructor({
     auth,
     payload,
-    postConditions,
-    postConditionMode,
+    postConditions = createLPList([]),
+    postConditionMode = PostConditionMode.Deny,
     transactionVersion,
     chainId,
     /** The network is only used if `transactionVersion` or `chainId` are not provided */
@@ -103,8 +103,8 @@ export class StacksTransaction {
       this.payload = payload;
     }
 
-    this.postConditionMode = postConditionMode ?? PostConditionMode.Deny;
-    this.postConditions = postConditions ?? createLPList([]);
+    this.postConditionMode = postConditionMode;
+    this.postConditions = postConditions;
 
     this.anchorMode = AnchorMode.Any;
   }
@@ -307,7 +307,7 @@ export class StacksTransaction {
     const chainIdBytes = new Uint8Array(4);
     writeUInt32BE(chainIdBytes, this.chainId, 0);
     bytesArray.push(chainIdBytes);
-    bytesArray.push(serializeAuthorization(this.auth));
+    bytesArray.push(serializeAuthorizationBytes(this.auth));
     bytesArray.push(this.anchorMode);
     bytesArray.push(this.postConditionMode);
     bytesArray.push(serializeLPListBytes(this.postConditions));
@@ -336,7 +336,7 @@ export function deserializeTransaction(tx: string | Uint8Array | BytesReader) {
   const postConditions = deserializeLPList(bytesReader, StacksWireType.PostCondition);
   const payload = deserializePayload(bytesReader);
 
-  const transaction = new StacksTransaction({
+  const transaction = new StacksTransactionWire({
     transactionVersion,
     chainId,
     auth,
@@ -349,7 +349,7 @@ export function deserializeTransaction(tx: string | Uint8Array | BytesReader) {
 }
 
 /** @ignore */
-export function deriveNetworkFromTx(transaction: StacksTransaction) {
+export function deriveNetworkFromTx(transaction: StacksTransactionWire) {
   // todo: maybe add as renamed public method
   return whenTransactionVersion(transaction.transactionVersion)({
     [TransactionVersion.Mainnet]: STACKS_MAINNET,
@@ -366,7 +366,7 @@ export function deriveNetworkFromTx(transaction: StacksTransaction) {
  * @param {transaction} - StacksTransaction object to be estimated
  * @return {number} Estimated transaction byte length
  */
-export function estimateTransactionByteLength(transaction: StacksTransaction): number {
+export function estimateTransactionByteLength(transaction: StacksTransactionWire): number {
   const hashMode = transaction.auth.spendingCondition.hashMode;
   // List of Multi-sig transaction hash modes
   const multiSigHashModes = [AddressHashMode.P2SH, AddressHashMode.P2WSH];
@@ -408,7 +408,7 @@ export function estimateTransactionByteLength(transaction: StacksTransaction): n
  * const hex = serializeTransaction(transaction);
  * ```
  */
-export function serializeTransaction(transaction: StacksTransaction): Hex {
+export function serializeTransaction(transaction: StacksTransactionWire): Hex {
   return transaction.serialize();
 }
 
@@ -425,7 +425,7 @@ export function serializeTransaction(transaction: StacksTransaction): Hex {
  * const bytes = serializeTransactionBytes(transaction);
  * ```
  */
-export function serializeTransactionBytes(transaction: StacksTransaction): Uint8Array {
+export function serializeTransactionBytes(transaction: StacksTransactionWire): Uint8Array {
   return transaction.serializeBytes();
 }
 
@@ -442,6 +442,6 @@ export function serializeTransactionBytes(transaction: StacksTransaction): Uint8
  * const hex = transactionToHex(transaction);
  * ```
  */
-export function transactionToHex(transaction: StacksTransaction): string {
+export function transactionToHex(transaction: StacksTransactionWire): string {
   return transaction.serialize();
 }

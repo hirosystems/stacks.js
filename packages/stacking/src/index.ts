@@ -21,7 +21,7 @@ import {
   OptionalCV,
   PrincipalCV,
   ResponseErrorCV,
-  StacksTransaction,
+  StacksTransactionWire,
   TupleCV,
   TxBroadcastResult,
   UIntCV,
@@ -1569,9 +1569,15 @@ export class StackingClient {
   /**
    * Adjust microstacks amount for locking after taking into account transaction fees
    *
-   * @returns {StacksTransaction} that resolves to a transaction object if the operation succeeds
+   * @returns {StacksTransactionWire} that resolves to a transaction object if the operation succeeds
    */
-  modifyLockTxFee({ tx, amountMicroStx }: { tx: StacksTransaction; amountMicroStx: IntegerType }) {
+  modifyLockTxFee({
+    tx,
+    amountMicroStx,
+  }: {
+    tx: StacksTransactionWire;
+    amountMicroStx: IntegerType;
+  }) {
     const fee = getFee(tx.auth);
     (tx.payload as ContractCallPayload).functionArgs[0] = uintCV(intToBigInt(amountMicroStx) - fee);
     return tx;
