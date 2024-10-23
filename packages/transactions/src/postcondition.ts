@@ -11,7 +11,7 @@ import {
   StacksWireType,
   parseAssetString,
   parsePrincipalString,
-  serializePostCondition,
+  serializePostConditionWire,
 } from './wire';
 
 const FUNGIBLE_COMPARATOR_MAPPING = {
@@ -90,7 +90,7 @@ export function postConditionToWire(postcondition: PostCondition): PostCondition
  */
 export function postConditionToHex(postcondition: PostCondition): string {
   const wire = postConditionToWire(postcondition);
-  return serializePostCondition(wire);
+  return serializePostConditionWire(wire);
 }
 
 /** @internal */

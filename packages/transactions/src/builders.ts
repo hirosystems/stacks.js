@@ -248,7 +248,7 @@ export type BaseContractDeployOptions = {
    * transfered assets */
   postConditionMode?: PostConditionModeName | PostConditionMode;
   /** a list of post conditions to add to the transaction */
-  postConditions?: PostConditionWire[];
+  postConditions?: PostCondition[] | PostConditionWire[];
   /** set to true if another account is sponsoring the transaction (covering the transaction fee) */
   sponsored?: boolean;
 } & NetworkClientParam;
@@ -370,12 +370,10 @@ export async function makeUnsignedContractDeploy(
     ? createSponsoredAuth(spendingCondition)
     : createStandardAuth(spendingCondition);
 
-  const postConditions: PostConditionWire[] = [];
-  if (options.postConditions && options.postConditions.length > 0) {
-    options.postConditions.forEach(postCondition => {
-      postConditions.push(postCondition);
-    });
-  }
+  const postConditions: PostConditionWire[] = (options.postConditions ?? []).map(pc => {
+    if (typeof pc.type === 'string') return postConditionToWire(pc);
+    return pc;
+  });
   const lpPostConditions = createLPList(postConditions);
 
   const transaction = new StacksTransactionWire({
@@ -522,9 +520,10 @@ export async function makeUnsignedContractCall(
     ? createSponsoredAuth(spendingCondition)
     : createStandardAuth(spendingCondition);
 
-  const postConditions = (options.postConditions ?? []).map(
-    postConditionToWire as (post: PostCondition) => PostConditionWire
-  );
+  const postConditions: PostConditionWire[] = (options.postConditions ?? []).map(pc => {
+    if (typeof pc.type === 'string') return postConditionToWire(pc);
+    return pc;
+  });
   const lpPostConditions = createLPList(postConditions);
 
   const transaction = new StacksTransactionWire({
