@@ -9,7 +9,7 @@ import {
   hexToBytes,
   utf8ToBytes,
 } from '@stacks/common';
-import { STACKS_MAINNET, STACKS_TESTNET, TransactionVersion } from '@stacks/network';
+import { STACKS_MAINNET, STACKS_TESTNET } from '@stacks/network';
 import * as fs from 'fs';
 import fetchMock from 'jest-fetch-mock';
 import {
@@ -28,14 +28,14 @@ import {
   addressFromPublicKeys,
   addressToString,
   broadcastTransaction,
-  fetchCallReadOnlyFunction,
   createMessageSignature,
   createStacksPublicKey,
   createTokenTransferPayload,
   createTransactionAuthField,
+  fetchCallReadOnlyFunction,
+  fetchContractMapEntry,
   fetchFeeEstimate,
   fetchFeeEstimateTransaction,
-  fetchContractMapEntry,
   fetchNonce,
   postConditionToWire,
   privateKeyToPublic,
@@ -1436,8 +1436,11 @@ test('Make sponsored STX token transfer', async () => {
     sponsorFee
   );
   const authorization = createSponsoredAuth(baseSpendingCondition, sponsorSpendingCondition);
-  const transactionVersion = TransactionVersion.Mainnet;
-  const sponsoredTransaction = new StacksTransaction(transactionVersion, authorization, payload);
+  const sponsoredTransaction = new StacksTransaction({
+    network: STACKS_MAINNET,
+    auth: authorization,
+    payload,
+  });
 
   const signer = new TransactionSigner(sponsoredTransaction);
   signer.signOrigin(senderKey);

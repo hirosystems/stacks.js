@@ -72,7 +72,7 @@ const AnchorModeMap = {
   [AnchorMode.Any]: AnchorMode.Any,
 };
 
-/** @ignore */
+/** @ignore @deprecated Block anchor modes don't exist on-chain anymore. */
 export function anchorModeFrom(mode: AnchorModeName | AnchorMode): AnchorMode {
   if (mode in AnchorModeMap) return AnchorModeMap[mode];
   throw new Error(`Invalid anchor mode "${mode}", must be one of: ${AnchorModeNames.join(', ')}`);

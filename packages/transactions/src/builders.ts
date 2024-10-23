@@ -17,7 +17,6 @@ import {
 import { ClarityValue, PrincipalCV } from './clarity';
 import {
   AddressHashMode,
-  AnchorMode,
   ClarityVersion,
   MultiSigHashMode,
   PayloadType,
@@ -171,15 +170,13 @@ export async function makeUnsignedSTXTokenTransfer(
     ? createSponsoredAuth(spendingCondition)
     : createStandardAuth(spendingCondition);
 
-  const transaction = new StacksTransaction(
-    options.network.transactionVersion,
-    authorization,
+  const transaction = new StacksTransaction({
+    transactionVersion: options.network.transactionVersion,
+    chainId: options.network.chainId,
+    auth: authorization,
     payload,
-    undefined, // no post conditions on STX transfers (see SIP-005)
-    undefined, // no post conditions on STX transfers (see SIP-005)
-    AnchorMode.Any,
-    options.network.chainId
-  );
+    // no post conditions on STX transfers (see SIP-005)
+  });
 
   if (txOptions.fee == null) {
     const fee = await fetchFeeEstimate({ transaction, ...options });
@@ -380,15 +377,14 @@ export async function makeUnsignedContractDeploy(
   }
   const lpPostConditions = createLPList(postConditions);
 
-  const transaction = new StacksTransaction(
-    options.network.transactionVersion,
-    authorization,
+  const transaction = new StacksTransaction({
+    transactionVersion: options.network.transactionVersion,
+    chainId: options.network.chainId,
+    auth: authorization,
     payload,
-    lpPostConditions,
-    options.postConditionMode,
-    AnchorMode.Any,
-    options.network.chainId
-  );
+    postConditions: lpPostConditions,
+    postConditionMode: options.postConditionMode,
+  });
 
   if (txOptions.fee === undefined || txOptions.fee === null) {
     const fee = await fetchFeeEstimate({ transaction, ...options });
@@ -529,15 +525,14 @@ export async function makeUnsignedContractCall(
   );
   const lpPostConditions = createLPList(postConditions);
 
-  const transaction = new StacksTransaction(
-    options.network.transactionVersion,
-    authorization,
+  const transaction = new StacksTransaction({
+    transactionVersion: options.network.transactionVersion,
+    chainId: options.network.chainId,
+    auth: authorization,
     payload,
-    lpPostConditions,
-    options.postConditionMode,
-    AnchorMode.Any,
-    options.network.chainId
-  );
+    postConditions: lpPostConditions,
+    postConditionMode: options.postConditionMode,
+  });
 
   if (txOptions.fee === undefined || txOptions.fee === null) {
     const fee = await fetchFeeEstimate({ transaction, ...options });
