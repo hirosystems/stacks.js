@@ -5,8 +5,8 @@ import {
   PublicKey,
   bytesToHex,
   concatArray,
-  hexToBytes,
   intToBigInt,
+  isInstance,
   writeUInt32BE,
 } from '@stacks/common';
 import {
@@ -56,8 +56,8 @@ import {
   createLPList,
   createMessageSignature,
   createTransactionAuthField,
-  deserializeLPListBytes,
-  deserializePayloadBytes,
+  deserializeLPList,
+  deserializePayload,
   serializeLPListBytes,
 } from './wire';
 
@@ -312,18 +312,7 @@ export class StacksTransaction {
  * @param tx hex string or bytes of serialized transaction
  */
 export function deserializeTransaction(tx: string | Uint8Array | BytesReader) {
-  let bytesReader: BytesReader; // todo: add readerFrom method
-  if (typeof tx === 'string') {
-    if (tx.slice(0, 2).toLowerCase() === '0x') {
-      bytesReader = new BytesReader(hexToBytes(tx.slice(2)));
-    } else {
-      bytesReader = new BytesReader(hexToBytes(tx));
-    }
-  } else if (tx instanceof Uint8Array) {
-    bytesReader = new BytesReader(tx);
-  } else {
-    bytesReader = tx;
-  }
+  const bytesReader = isInstance(tx, BytesReader) ? tx : new BytesReader(tx);
   const version = bytesReader.readUInt8Enum(TransactionVersion, n => {
     throw new Error(`Could not parse ${n} as TransactionVersion`);
   });
@@ -335,8 +324,8 @@ export function deserializeTransaction(tx: string | Uint8Array | BytesReader) {
   const postConditionMode = bytesReader.readUInt8Enum(PostConditionMode, n => {
     throw new Error(`Could not parse ${n} as PostConditionMode`);
   });
-  const postConditions = deserializeLPListBytes(bytesReader, StacksWireType.PostCondition);
-  const payload = deserializePayloadBytes(bytesReader);
+  const postConditions = deserializeLPList(bytesReader, StacksWireType.PostCondition);
+  const payload = deserializePayload(bytesReader);
 
   return new StacksTransaction(
     version,

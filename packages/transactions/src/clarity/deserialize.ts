@@ -20,7 +20,7 @@ import {
 } from '.';
 import { BytesReader } from '../BytesReader';
 import { DeserializationError } from '../errors';
-import { deserializeAddressBytes, deserializeLPStringBytes } from '../wire';
+import { deserializeAddress, deserializeLPString } from '../wire';
 
 /**
  * Deserializes clarity value to clarity type
@@ -75,12 +75,12 @@ export function deserializeCV<T extends ClarityValue = ClarityValue>(
       return falseCV() as T;
 
     case ClarityWireType.address:
-      const sAddress = deserializeAddressBytes(bytesReader);
+      const sAddress = deserializeAddress(bytesReader);
       return standardPrincipalCVFromAddress(sAddress) as T;
 
     case ClarityWireType.contract:
-      const cAddress = deserializeAddressBytes(bytesReader);
-      const contractName = deserializeLPStringBytes(bytesReader);
+      const cAddress = deserializeAddress(bytesReader);
+      const contractName = deserializeLPString(bytesReader);
       return contractPrincipalCVFromAddress(cAddress, contractName) as T;
 
     case ClarityWireType.ok:
@@ -107,7 +107,7 @@ export function deserializeCV<T extends ClarityValue = ClarityValue>(
       const tupleLength = bytesReader.readUInt32BE();
       const tupleContents: { [key: string]: ClarityValue } = {};
       for (let i = 0; i < tupleLength; i++) {
-        const clarityName = deserializeLPStringBytes(bytesReader).content;
+        const clarityName = deserializeLPString(bytesReader).content;
         if (clarityName === undefined) {
           throw new DeserializationError('"content" is undefined');
         }
