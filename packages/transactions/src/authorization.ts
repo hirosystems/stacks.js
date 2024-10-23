@@ -210,6 +210,13 @@ function clearCondition(condition: SpendingConditionOpts): SpendingCondition {
 
 export function serializeSingleSigSpendingCondition(
   condition: SingleSigSpendingConditionOpts
+): string {
+  return bytesToHex(serializeSingleSigSpendingConditionBytes(condition));
+}
+
+/** @internal */
+export function serializeSingleSigSpendingConditionBytes(
+  condition: SingleSigSpendingConditionOpts
 ): Uint8Array {
   const bytesArray = [
     condition.hashMode,
@@ -223,6 +230,13 @@ export function serializeSingleSigSpendingCondition(
 }
 
 export function serializeMultiSigSpendingCondition(
+  condition: MultiSigSpendingConditionOpts
+): string {
+  return bytesToHex(serializeMultiSigSpendingConditionBytes(condition));
+}
+
+/** @internal */
+export function serializeMultiSigSpendingConditionBytes(
   condition: MultiSigSpendingConditionOpts
 ): Uint8Array {
   const bytesArray = [
@@ -320,11 +334,14 @@ export function deserializeMultiSigSpendingCondition(
   };
 }
 
-export function serializeSpendingCondition(condition: SpendingConditionOpts): Uint8Array {
-  if (isSingleSig(condition)) {
-    return serializeSingleSigSpendingCondition(condition);
-  }
-  return serializeMultiSigSpendingCondition(condition);
+export function serializeSpendingCondition(condition: SpendingConditionOpts): string {
+  return bytesToHex(serializeSpendingConditionBytes(condition));
+}
+
+/** @internal */
+export function serializeSpendingConditionBytes(condition: SpendingConditionOpts): Uint8Array {
+  if (isSingleSig(condition)) return serializeSingleSigSpendingConditionBytes(condition);
+  return serializeMultiSigSpendingConditionBytes(condition);
 }
 
 export function deserializeSpendingCondition(bytesReader: BytesReader): SpendingCondition {
@@ -674,17 +691,22 @@ export function setSponsor(
   };
 }
 
-export function serializeAuthorization(auth: Authorization): Uint8Array {
+export function serializeAuthorization(auth: Authorization): string {
+  return bytesToHex(serializeAuthorizationBytes(auth));
+}
+
+/** @internal */
+export function serializeAuthorizationBytes(auth: Authorization): Uint8Array {
   const bytesArray = [];
   bytesArray.push(auth.authType);
 
   switch (auth.authType) {
     case AuthType.Standard:
-      bytesArray.push(serializeSpendingCondition(auth.spendingCondition));
+      bytesArray.push(serializeSpendingConditionBytes(auth.spendingCondition));
       break;
     case AuthType.Sponsored:
-      bytesArray.push(serializeSpendingCondition(auth.spendingCondition));
-      bytesArray.push(serializeSpendingCondition(auth.sponsorSpendingCondition));
+      bytesArray.push(serializeSpendingConditionBytes(auth.spendingCondition));
+      bytesArray.push(serializeSpendingConditionBytes(auth.sponsorSpendingCondition));
       break;
   }
 
