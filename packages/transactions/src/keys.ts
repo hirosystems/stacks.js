@@ -44,9 +44,9 @@ utils.hmacSha256Sync = (key: Uint8Array, ...msgs: Uint8Array[]) => {
 export function getAddressFromPrivateKey(
   /** Private key bytes or hex string */
   privateKey: PrivateKey,
-  network?: StacksNetworkName | StacksNetwork
+  network: StacksNetworkName | StacksNetwork = 'mainnet'
 ): string {
-  network = networkFrom(network ?? STACKS_MAINNET);
+  network = networkFrom(network);
   const publicKey = privateKeyToPublic(privateKey);
   return getAddressFromPublicKey(publicKey, network);
 }
@@ -55,9 +55,9 @@ export function getAddressFromPrivateKey(
 export function getAddressFromPublicKey(
   /** Public key bytes or hex string */
   publicKey: PublicKey,
-  network?: StacksNetworkName | StacksNetwork
+  network: StacksNetworkName | StacksNetwork = 'mainnet'
 ): string {
-  network = networkFrom(network ?? STACKS_MAINNET);
+  network = networkFrom(network);
   publicKey = typeof publicKey === 'string' ? hexToBytes(publicKey) : publicKey;
   const addrVer = addressHashModeToVersion(AddressHashMode.P2PKH, network);
   const addr = addressFromVersionHash(addrVer, hashP2PKH(publicKey));

@@ -1,19 +1,19 @@
 import {
-  deriveWalletKeys,
-  deriveAccount,
-  getStxAddress,
-  deriveLegacyConfigPrivateKey,
   DerivationType,
-  selectStxDerivation,
+  deriveAccount,
+  deriveLegacyConfigPrivateKey,
+  deriveWalletKeys,
   fetchUsernameForAccountByDerivationType,
+  getStxAddress,
+  selectStxDerivation,
 } from '../src';
 // https://github.com/paulmillr/scure-bip39
 // Secure, audited & minimal implementation of BIP39 mnemonic phrases.
 import { mnemonicToSeed } from '@scure/bip39';
 
 import { HDKey } from '@scure/bip32';
+import { STACKS_MAINNET } from '@stacks/network';
 import fetchMock from 'jest-fetch-mock';
-import { STACKS_MAINNET, TransactionVersion } from '@stacks/network';
 
 const SECRET_KEY =
   'sound idle panel often situate develop unit text design antenna ' +
@@ -33,9 +33,7 @@ test('keys are serialized, and can be deserialized properly using wallet private
     salt: derived.salt,
     stxDerivationType: DerivationType.Wallet,
   });
-  expect(getStxAddress({ account, transactionVersion: TransactionVersion.Mainnet })).toEqual(
-    WALLET_ADDRESS
-  );
+  expect(getStxAddress({ account, network: 'mainnet' })).toEqual(WALLET_ADDRESS);
 });
 
 test('keys are serialized, and can be deserialized properly using data private key for stx', async () => {
@@ -49,9 +47,7 @@ test('keys are serialized, and can be deserialized properly using data private k
     salt: derived.salt,
     stxDerivationType: DerivationType.Data,
   });
-  expect(getStxAddress({ account, transactionVersion: TransactionVersion.Mainnet })).toEqual(
-    DATA_ADDRESS
-  );
+  expect(getStxAddress({ account, network: 'mainnet' })).toEqual(DATA_ADDRESS);
 });
 
 test('backwards compatible legacy config private key derivation', async () => {

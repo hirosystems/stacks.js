@@ -16,6 +16,7 @@ export interface LockedWallet {
  *
  * This helps provide a better UX for users, so we can keep track of accounts they've
  * created, and usernames they've used.
+ * @deprecated The usage of storing wallet related information on Gaia isn't widely used.
  */
 export async function restoreWalletAccounts({
   wallet,
