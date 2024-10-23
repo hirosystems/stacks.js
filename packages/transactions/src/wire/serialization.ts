@@ -125,7 +125,7 @@ export function deserializeStacksWire(
     case StacksWireType.Asset:
       return deserializeAsset(bytesReader);
     case StacksWireType.PostCondition:
-      return deserializePostCondition(bytesReader);
+      return deserializePostConditionWire(bytesReader);
     case StacksWireType.PublicKey:
       return deserializePublicKey(bytesReader);
     case StacksWireType.Payload:
@@ -328,7 +328,7 @@ export function deserializeLPList(
         l.push(deserializeAsset(bytesReader));
         break;
       case StacksWireType.PostCondition:
-        l.push(deserializePostCondition(bytesReader));
+        l.push(deserializePostConditionWire(bytesReader));
         break;
       case StacksWireType.PublicKey:
         l.push(deserializePublicKey(bytesReader));
@@ -378,7 +378,7 @@ export function serializePostConditionWireBytes(postCondition: PostConditionWire
 }
 
 /** @internal */
-export function deserializePostCondition(
+export function deserializePostConditionWire(
   serialized: string | Uint8Array | BytesReader
 ): PostConditionWire {
   const bytesReader = isInstance(serialized, BytesReader)
