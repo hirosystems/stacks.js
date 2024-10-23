@@ -11,10 +11,11 @@ import {
 } from '@stacks/common';
 import {
   ChainId,
-  DEFAULT_CHAIN_ID,
+  NetworkParam,
   STACKS_MAINNET,
   STACKS_TESTNET,
   TransactionVersion,
+  networkFrom,
   whenTransactionVersion,
 } from '@stacks/network';
 import { serializePayloadBytes } from '.';
@@ -37,12 +38,10 @@ import {
 import {
   AddressHashMode,
   AnchorMode,
-  AnchorModeName,
   AuthType,
   PostConditionMode,
   PubKeyEncoding,
   RECOVERABLE_ECDSA_SIG_LENGTH_BYTES,
-  anchorModeFrom,
 } from './constants';
 import { SerializationError, SigningError } from './errors';
 import { createStacksPublicKey, privateKeyIsCompressed, publicKeyIsCompressed } from './keys';
@@ -62,26 +61,39 @@ import {
 } from './wire';
 
 export class StacksTransaction {
-  version: TransactionVersion;
+  transactionVersion: TransactionVersion;
   chainId: ChainId;
   auth: Authorization;
-  anchorMode: AnchorMode;
   payload: PayloadWire;
   postConditionMode: PostConditionMode;
   postConditions: LengthPrefixedList;
 
-  // todo: next: change to opts object with `network` opt
-  constructor(
-    version: TransactionVersion,
-    auth: Authorization,
-    payload: PayloadInput,
-    postConditions?: LengthPrefixedList,
-    postConditionMode?: PostConditionMode,
-    anchorMode?: AnchorModeName | AnchorMode,
-    chainId?: ChainId
-  ) {
-    this.version = version;
+  /** @deprecated Not used, starting with Stacks 2.5. Still needed for serialization. */
+  anchorMode: AnchorMode;
+
+  constructor({
+    auth,
+    payload,
+    postConditions,
+    postConditionMode,
+    transactionVersion,
+    chainId,
+    /** The network is only used if `transactionVersion` or `chainId` are not provided */
+    network = 'mainnet',
+  }: {
+    payload: PayloadInput;
+    auth: Authorization;
+    postConditions?: LengthPrefixedList;
+    postConditionMode?: PostConditionMode;
+    transactionVersion?: TransactionVersion;
+    chainId?: ChainId;
+  } & NetworkParam) {
+    network = networkFrom(network);
+
+    this.transactionVersion = transactionVersion ?? network.transactionVersion;
+    this.chainId = chainId ?? network.chainId;
     this.auth = auth;
+
     if ('amount' in payload) {
       this.payload = {
         ...payload,
@@ -90,11 +102,11 @@ export class StacksTransaction {
     } else {
       this.payload = payload;
     }
-    this.chainId = chainId ?? DEFAULT_CHAIN_ID;
+
     this.postConditionMode = postConditionMode ?? PostConditionMode.Deny;
     this.postConditions = postConditions ?? createLPList([]);
 
-    this.anchorMode = anchorModeFrom(anchorMode ?? AnchorMode.Any);
+    this.anchorMode = AnchorMode.Any;
   }
 
   /** @deprecated Does NOT mutate transaction, but rather returns the hash of the transaction with a cleared initial authorization */
@@ -276,8 +288,8 @@ export class StacksTransaction {
    * ```
    */
   serializeBytes(): Uint8Array {
-    if (this.version === undefined) {
-      throw new SerializationError('"version" is undefined');
+    if (this.transactionVersion === undefined) {
+      throw new SerializationError('"transactionVersion" is undefined');
     }
     if (this.chainId === undefined) {
       throw new SerializationError('"chainId" is undefined');
@@ -285,16 +297,13 @@ export class StacksTransaction {
     if (this.auth === undefined) {
       throw new SerializationError('"auth" is undefined');
     }
-    if (this.anchorMode === undefined) {
-      throw new SerializationError('"anchorMode" is undefined');
-    }
     if (this.payload === undefined) {
       throw new SerializationError('"payload" is undefined');
     }
 
     const bytesArray = [];
 
-    bytesArray.push(this.version);
+    bytesArray.push(this.transactionVersion);
     const chainIdBytes = new Uint8Array(4);
     writeUInt32BE(chainIdBytes, this.chainId, 0);
     bytesArray.push(chainIdBytes);
@@ -313,7 +322,7 @@ export class StacksTransaction {
  */
 export function deserializeTransaction(tx: string | Uint8Array | BytesReader) {
   const bytesReader = isInstance(tx, BytesReader) ? tx : new BytesReader(tx);
-  const version = bytesReader.readUInt8Enum(TransactionVersion, n => {
+  const transactionVersion = bytesReader.readUInt8Enum(TransactionVersion, n => {
     throw new Error(`Could not parse ${n} as TransactionVersion`);
   });
   const chainId = bytesReader.readUInt32BE();
@@ -327,21 +336,22 @@ export function deserializeTransaction(tx: string | Uint8Array | BytesReader) {
   const postConditions = deserializeLPList(bytesReader, StacksWireType.PostCondition);
   const payload = deserializePayload(bytesReader);
 
-  return new StacksTransaction(
-    version,
+  const transaction = new StacksTransaction({
+    transactionVersion,
+    chainId,
     auth,
     payload,
     postConditions,
     postConditionMode,
-    anchorMode,
-    chainId
-  );
+  });
+  transaction.anchorMode = anchorMode; // not used anymore, but part of the transaction wire format
+  return transaction;
 }
 
 /** @ignore */
 export function deriveNetworkFromTx(transaction: StacksTransaction) {
   // todo: maybe add as renamed public method
-  return whenTransactionVersion(transaction.version)({
+  return whenTransactionVersion(transaction.transactionVersion)({
     [TransactionVersion.Mainnet]: STACKS_MAINNET,
     [TransactionVersion.Testnet]: STACKS_TESTNET,
   });
