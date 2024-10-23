@@ -18,7 +18,7 @@ import {
   ClarityAbi,
   ContractIdString,
   FeeEstimation,
-  StacksTransaction,
+  StacksTransactionWire,
   TxBroadcastResult,
   broadcastTransaction,
   fetchAbi,
@@ -65,7 +65,7 @@ export class StacksNodeApi {
    * @returns a Promise that resolves to a {@link TxBroadcastResult} object
    */
   broadcastTransaction = async (
-    transaction: StacksTransaction,
+    transaction: StacksTransactionWire,
     attachment?: Uint8Array | string,
     network?: StacksNetworkName | StacksNetwork
   ): Promise<TxBroadcastResult> => {

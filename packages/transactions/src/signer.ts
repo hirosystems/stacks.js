@@ -8,20 +8,20 @@ import {
 } from './authorization';
 import { AddressHashMode, AuthType, PubKeyEncoding } from './constants';
 import { SigningError } from './errors';
-import { StacksTransaction } from './transaction';
+import { StacksTransactionWire } from './transaction';
 import { cloneDeep } from './utils';
 import { PublicKeyWire, StacksWireType } from './wire';
 import { createStacksPublicKey } from './keys';
 
 // todo: get rid of signer and combine with transaction class? could reduce code and complexity by calculating sighash newly each sign and append.
 export class TransactionSigner {
-  transaction: StacksTransaction;
+  transaction: StacksTransactionWire;
   sigHash: string;
   originDone: boolean;
   checkOversign: boolean;
   checkOverlap: boolean;
 
-  constructor(transaction: StacksTransaction) {
+  constructor(transaction: StacksTransactionWire) {
     this.transaction = transaction;
     this.sigHash = transaction.signBegin();
     this.originDone = false;
@@ -61,14 +61,14 @@ export class TransactionSigner {
   }
 
   static createSponsorSigner(
-    transaction: StacksTransaction,
+    transaction: StacksTransactionWire,
     spendingCondition: SpendingConditionOpts
   ) {
     if (transaction.auth.authType != AuthType.Sponsored) {
       throw new SigningError('Cannot add sponsor to non-sponsored transaction');
     }
 
-    const tx: StacksTransaction = cloneDeep(transaction);
+    const tx: StacksTransactionWire = cloneDeep(transaction);
     tx.setSponsor(spendingCondition);
     const originSigHash = tx.verifyOrigin();
     const signer = new this(tx);
@@ -152,11 +152,11 @@ export class TransactionSigner {
     this.originDone = true;
   }
 
-  getTxInComplete(): StacksTransaction {
+  getTxInComplete(): StacksTransactionWire {
     return cloneDeep(this.transaction);
   }
 
-  resume(transaction: StacksTransaction) {
+  resume(transaction: StacksTransactionWire) {
     this.transaction = cloneDeep(transaction);
     this.sigHash = transaction.signBegin();
   }

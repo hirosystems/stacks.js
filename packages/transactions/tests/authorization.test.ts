@@ -9,8 +9,9 @@ import {
   createSingleSigSpendingCondition,
   deserializeSpendingCondition,
   emptyMessageSignature,
-  serializeAuthorization,
+  serializeAuthorizationBytes,
   serializeSpendingCondition,
+  serializeSpendingConditionBytes,
 } from '../src/authorization';
 import { AddressHashMode, AuthType, PubKeyEncoding } from '../src/constants';
 import { createStacksPublicKey, signWithKey } from '../src/keys';
@@ -56,7 +57,7 @@ test('Single sig spending condition uncompressed', () => {
   const signature = createMessageSignature('ff'.repeat(65));
   spendingCondition.signature = signature;
 
-  const serializedSpendingCondition = serializeSpendingCondition(spendingCondition);
+  const serializedSpendingCondition = serializeSpendingConditionBytes(spendingCondition);
 
   // prettier-ignore
   const spendingConditionBytesHex = [
@@ -105,7 +106,7 @@ test('Multi sig spending condition uncompressed', () => {
     createTransactionAuthField(PubKeyEncoding.Compressed, sig)
   );
 
-  const serializedSpendingCondition = serializeSpendingCondition(spendingCondition);
+  const serializedSpendingCondition = serializeSpendingConditionBytes(spendingCondition);
 
   // prettier-ignore
   const spendingConditionBytesHex = [
@@ -164,7 +165,7 @@ test('Multi sig P2SH spending condition compressed', () => {
     createTransactionAuthField(PubKeyEncoding.Compressed, sig)
   );
 
-  const serializedSpendingCondition = serializeSpendingCondition(spendingCondition);
+  const serializedSpendingCondition = serializeSpendingConditionBytes(spendingCondition);
 
   // prettier-ignore
   const spendingConditionBytesHex = [
@@ -231,7 +232,7 @@ test('Multi sig P2WSH spending condition compressed', () => {
     createTransactionAuthField(PubKeyEncoding.Compressed, sig)
   );
 
-  const serializedSpendingCondition = serializeSpendingCondition(spendingCondition);
+  const serializedSpendingCondition = serializeSpendingConditionBytes(spendingCondition);
 
   // prettier-ignore
   const spendingConditionBytesHex = [
@@ -341,8 +342,8 @@ test('Spending conditions', () => {
   const spendingConditions = [sp1, sp2, sp3, sp4, sp5, sp6];
 
   for (let i = 0; i < spendingConditions.length; i++) {
-    const serialized1 = serializeSpendingCondition(spendingConditions[i]);
-    const serialized2 = serializeSpendingCondition(
+    const serialized1 = serializeSpendingConditionBytes(spendingConditions[i]);
+    const serialized2 = serializeSpendingConditionBytes(
       spendingConditions[(i + 1) % spendingConditions.length]
     );
 
@@ -366,8 +367,8 @@ test('Spending conditions', () => {
     sponsoredArray.push(serialized2);
     const sponsoredBytes = concatArray(sponsoredArray);
 
-    expect(serializeAuthorization(standard)).toEqual(standardBytes);
-    expect(serializeAuthorization(sponsored)).toEqual(sponsoredBytes);
+    expect(serializeAuthorizationBytes(standard)).toEqual(standardBytes);
+    expect(serializeAuthorizationBytes(sponsored)).toEqual(sponsoredBytes);
   }
 });
 
@@ -592,7 +593,7 @@ test('Invalid spending conditions', () => {
   ];
 
   // we can serialize the invalid p2wpkh uncompressed condition, but we can't deserialize it
-  const serializedSPUncompressedKeys = serializeSpendingCondition(badP2WpkhUncompressedSP);
+  const serializedSPUncompressedKeys = serializeSpendingConditionBytes(badP2WpkhUncompressedSP);
 
   expect(new Uint8Array(badP2WpkhUncompressedBytes)).toEqual(serializedSPUncompressedKeys);
   expect(() =>
@@ -667,7 +668,7 @@ test('Single sig P2PKH spending condition', () => {
   ];
 
   for (let i = 0; i < spendingConditions.length; i++) {
-    const serializedSpendingCondition = serializeSpendingCondition(spendingConditions[i]);
+    const serializedSpendingCondition = serializeSpendingConditionBytes(spendingConditions[i]);
     expect(bytesToHex(serializedSpendingCondition)).toEqual(
       bytesToHex(new Uint8Array(spendingConditionsBytes[i]))
     );
@@ -712,7 +713,7 @@ test('Single sig P2WPKH spending condition', () => {
   const spendingConditionsBytes = [spendingConditionP2WpkhCompressedBytes];
 
   for (let i = 0; i < spendingConditions.length; i++) {
-    const serializedSpendingCondition = serializeSpendingCondition(spendingConditions[i]);
+    const serializedSpendingCondition = serializeSpendingConditionBytes(spendingConditions[i]);
     expect(bytesToHex(serializedSpendingCondition)).toEqual(
       bytesToHex(new Uint8Array(spendingConditionsBytes[i]))
     );

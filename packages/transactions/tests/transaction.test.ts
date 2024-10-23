@@ -28,6 +28,7 @@ import { createStacksPublicKey, privateKeyToPublic, publicKeyToHex } from '../sr
 
 import {
   CoinbasePayloadToAltRecipient,
+  LengthPrefixedList,
   Pc,
   STXPostConditionWire,
   TokenTransferPayloadWire,
@@ -39,7 +40,7 @@ import {
 import { postConditionToWire } from '../src/postcondition';
 import { TransactionSigner } from '../src/signer';
 import {
-  StacksTransaction,
+  StacksTransactionWire,
   deserializeTransaction,
   serializeTransaction,
   transactionToHex,
@@ -80,7 +81,7 @@ test('STX token transfer transaction serialization and deserialization', () => {
   });
 
   const postConditions = createLPList([postCondition]);
-  const transaction = new StacksTransaction({
+  const transaction = new StacksTransactionWire({
     network: STACKS_TESTNET,
     auth: authorization,
     payload,
@@ -117,7 +118,8 @@ test('STX token transfer transaction serialization and deserialization', () => {
   expect(deserialized.postConditionMode).toBe(postConditionMode);
   expect(deserialized.postConditions.values.length).toBe(1);
 
-  const deserializedPostCondition = deserialized.postConditions.values[0] as STXPostConditionWire;
+  const deserializedPostCondition = (deserialized.postConditions as LengthPrefixedList)
+    .values[0] as STXPostConditionWire;
   if (!('address' in deserializedPostCondition.principal)) throw TypeError;
   expect(deserializedPostCondition.principal.address).toStrictEqual(recipient.address);
   expect(deserializedPostCondition.conditionCode).toBe(FungibleConditionCode.GreaterEqual);
@@ -155,7 +157,7 @@ test('STX token transfer transaction fee setting', () => {
 
   const postConditions = createLPList([postCondition]);
 
-  const transaction = new StacksTransaction({
+  const transaction = new StacksTransactionWire({
     network: STACKS_TESTNET,
     auth: authorization,
     payload,
@@ -190,7 +192,7 @@ test('STX token transfer transaction fee setting', () => {
   expect(postSetFeeDeserialized.postConditionMode).toBe(postConditionMode);
   expect(postSetFeeDeserialized.postConditions.values.length).toBe(1);
 
-  const deserializedPostCondition = postSetFeeDeserialized.postConditions
+  const deserializedPostCondition = (postSetFeeDeserialized.postConditions as LengthPrefixedList)
     .values[0] as STXPostConditionWire;
   if (!('address' in deserializedPostCondition.principal)) throw TypeError;
   expect(deserializedPostCondition.principal.address).toStrictEqual(recipient.address);
@@ -241,7 +243,7 @@ test('STX token transfer transaction multi-sig serialization and deserialization
 
   const payload = createTokenTransferPayload(recipientCV, amount, memo);
 
-  const transaction = new StacksTransaction({ network: STACKS_MAINNET, auth, payload });
+  const transaction = new StacksTransactionWire({ network: STACKS_MAINNET, auth, payload });
 
   const signer = new TransactionSigner(transaction);
   signer.signOrigin(privKeys[0]);
@@ -306,7 +308,7 @@ test('STX token transfer transaction multi-sig uncompressed keys serialization a
 
   const payload = createTokenTransferPayload(recipientCV, amount, memo);
 
-  const transaction = new StacksTransaction({ network: STACKS_MAINNET, auth, payload });
+  const transaction = new StacksTransactionWire({ network: STACKS_MAINNET, auth, payload });
 
   const signer = new TransactionSigner(transaction);
   signer.signOrigin(privKeys[0]);
@@ -348,7 +350,7 @@ test('Sponsored STX token transfer transaction serialization and deserialization
   const authType = AuthType.Sponsored;
   const auth = createSponsoredAuth(spendingCondition, sponsorSpendingCondition);
 
-  const transaction = new StacksTransaction({ network: STACKS_TESTNET, auth, payload });
+  const transaction = new StacksTransactionWire({ network: STACKS_TESTNET, auth, payload });
 
   const signer = new TransactionSigner(transaction);
   signer.signOrigin(secretKey);
