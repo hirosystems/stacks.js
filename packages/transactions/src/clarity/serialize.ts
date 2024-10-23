@@ -158,6 +158,7 @@ function serializeStringUtf8CV(cv: StringUtf8CV) {
 export function serializeCV(value: ClarityValue): string {
   return bytesToHex(serializeCVBytes(value));
 }
+
 /** @ignore */
 export function serializeCVBytes(value: ClarityValue): Uint8Array {
   switch (value.type) {

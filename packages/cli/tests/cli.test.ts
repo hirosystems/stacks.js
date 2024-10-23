@@ -76,14 +76,14 @@ describe('decode_cv', () => {
 
   test('Should decode from hex to repr', async () => {
     const list = Cl.list([1, 2, 3].map(Cl.int));
-    const serialized = bytesToHex(Cl.serialize(list));
+    const serialized = Cl.serialize(list);
     const result = await decodeCV(mainnetNetwork, [serialized, 'repr']);
     expect(result).toEqual('(list 1 2 3)');
   });
 
   test('Should decode from hex to pretty print', async () => {
     const list = Cl.list([1, 2, 3].map(Cl.int));
-    const serialized = bytesToHex(Cl.serialize(list));
+    const serialized = Cl.serialize(list);
     const result = await decodeCV(mainnetNetwork, [serialized, 'pretty']);
     expect(result).toEqual('(list\n  1\n  2\n  3\n)');
   });
