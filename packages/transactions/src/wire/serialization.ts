@@ -673,6 +673,7 @@ export function serializeTransactionAuthFieldBytes(field: TransactionAuthFieldWi
 export function serializePublicKey(key: PublicKeyWire): string {
   return bytesToHex(serializePublicKeyBytes(key));
 }
+
 /** @ignore */
 export function serializePublicKeyBytes(key: PublicKeyWire): Uint8Array {
   return key.data.slice();
