@@ -9,7 +9,7 @@ import {
   noneCV,
   responseErrorCV,
   responseOkCV,
-  serializeCVBytes,
+  serializeCV,
   someCV,
   standardPrincipalCV,
   stringAsciiCV,
@@ -270,7 +270,7 @@ export const tuple = tupleCV;
 /**
  * `Cl.serialize` — Serializes a Clarity JS object to the equivalent hex-encoded representation
  *
- * Alias for {@link serializeCVBytes}
+ * Alias for {@link serializeCV}
  * @example
  * ```
  * import { Cl } from '@stacks/transactions';
@@ -278,7 +278,7 @@ export const tuple = tupleCV;
  * ```
  * @see {@link deserialize}
  */
-export const serialize = serializeCVBytes;
+export const serialize = serializeCV;
 /**
  * `Cl.deserialize` — Deserializes a hex string to the equivalent Clarity JS object
  *
