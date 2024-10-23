@@ -20,7 +20,6 @@ import {
   getGaiaAddress,
   getStxAddress,
 } from '../src';
-import { TransactionVersion } from '@stacks/network';
 
 describe(generateSecretKey, () => {
   test('generates a 24 word phrase by default', () => {
@@ -70,10 +69,10 @@ describe(generateWallet, () => {
       'a29c3e73dba79ab0f84cb792bafd65ec71f243ebe67a7ebd842ef5cdce3b21eb'
     );
 
-    expect(getStxAddress({ account, transactionVersion: TransactionVersion.Testnet })).toEqual(
+    expect(getStxAddress({ account, network: 'testnet' })).toEqual(
       'ST384CVPNDTYA0E92TKJZQTYXQHNZSWGCAH0ER64E'
     );
-    expect(getStxAddress({ account, transactionVersion: TransactionVersion.Mainnet })).toEqual(
+    expect(getStxAddress({ account, network: 'mainnet' })).toEqual(
       'SP384CVPNDTYA0E92TKJZQTYXQHNZSWGCAG7SAPVB'
     );
 
