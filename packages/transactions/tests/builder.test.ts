@@ -42,7 +42,7 @@ import {
   publicKeyIsCompressed,
   publicKeyToHex,
   serializePayloadBytes,
-  serializePostConditionBytes,
+  serializePostConditionWireBytes,
   serializePublicKeyBytes,
 } from '../src';
 import { BytesReader } from '../src/BytesReader';
@@ -2146,11 +2146,11 @@ test('Post-conditions with amount larger than 8 bytes throw an error', () => {
   };
 
   expect(() => {
-    serializePostConditionBytes(postConditionToWire(stxPc));
+    serializePostConditionWireBytes(postConditionToWire(stxPc));
   }).toThrowError('The post-condition amount may not be larger than 8 bytes');
 
   expect(() => {
-    serializePostConditionBytes(postConditionToWire(fungiblePc));
+    serializePostConditionWireBytes(postConditionToWire(fungiblePc));
   }).toThrowError('The post-condition amount may not be larger than 8 bytes');
 });
 

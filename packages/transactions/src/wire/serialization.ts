@@ -93,7 +93,7 @@ export function serializeStacksWireBytes(wire: StacksWire): Uint8Array {
     case StacksWireType.Asset:
       return serializeAssetBytes(wire);
     case StacksWireType.PostCondition:
-      return serializePostConditionBytes(wire);
+      return serializePostConditionWireBytes(wire);
     case StacksWireType.PublicKey:
       return serializePublicKeyBytes(wire);
     case StacksWireType.LengthPrefixedList:
@@ -341,11 +341,12 @@ export function deserializeLPList(
   return createLPList(l, lengthPrefixBytes);
 }
 
-export function serializePostCondition(postCondition: PostConditionWire): string {
-  return bytesToHex(serializePostConditionBytes(postCondition));
+export function serializePostConditionWire(postCondition: PostConditionWire): string {
+  return bytesToHex(serializePostConditionWireBytes(postCondition));
 }
+
 /** @internal */
-export function serializePostConditionBytes(postCondition: PostConditionWire): Uint8Array {
+export function serializePostConditionWireBytes(postCondition: PostConditionWire): Uint8Array {
   const bytesArray = [];
   bytesArray.push(postCondition.conditionType);
   bytesArray.push(serializePrincipalBytes(postCondition.principal));
