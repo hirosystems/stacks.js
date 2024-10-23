@@ -31,8 +31,8 @@ import {
   addressFromPublicKeys,
   createEmptyAddress,
   createLPList,
-  deserializeLPListBytes,
-  deserializeMessageSignatureBytes,
+  deserializeLPList,
+  deserializeMessageSignature,
   MessageSignatureWire,
   PublicKeyWire,
   serializeLPListBytes,
@@ -258,7 +258,7 @@ export function deserializeSingleSigSpendingCondition(
       'Failed to parse singlesig spending condition: incomaptible hash mode and key encoding'
     );
   }
-  const signature = deserializeMessageSignatureBytes(bytesReader);
+  const signature = deserializeMessageSignature(bytesReader);
   return {
     hashMode,
     signer,
@@ -277,7 +277,7 @@ export function deserializeMultiSigSpendingCondition(
   const nonce = BigInt('0x' + bytesToHex(bytesReader.readBytes(8)));
   const fee = BigInt('0x' + bytesToHex(bytesReader.readBytes(8)));
 
-  const fields = deserializeLPListBytes(bytesReader, StacksWireType.TransactionAuthField)
+  const fields = deserializeLPList(bytesReader, StacksWireType.TransactionAuthField)
     .values as TransactionAuthFieldWire[];
 
   let haveUncompressed = false;

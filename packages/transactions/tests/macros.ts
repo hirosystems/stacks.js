@@ -1,7 +1,7 @@
 import {
   StacksWire,
   StacksWireType,
-  deserializeStacksWireBytes,
+  deserializeStacksWire,
   serializeStacksWireBytes,
 } from '../src';
 import { BytesReader } from '../src/BytesReader';
@@ -12,5 +12,5 @@ export function serializeDeserialize<V extends StacksWire, T extends StacksWireT
 ): V {
   const serialized = serializeStacksWireBytes(value);
   const byteReader = new BytesReader(serialized);
-  return deserializeStacksWireBytes(byteReader, type) as V;
+  return deserializeStacksWire(byteReader, type) as V;
 }
