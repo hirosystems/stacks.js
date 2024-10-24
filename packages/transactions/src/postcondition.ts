@@ -1,16 +1,17 @@
 import {
   FungibleConditionCode,
   NonFungibleConditionCode,
+  PostConditionMode,
   PostConditionPrincipalId,
   PostConditionType,
 } from './constants';
-import { PostCondition } from './postcondition-types';
+import { PostCondition, PostConditionModeName } from './postcondition-types';
 import {
   PostConditionWire,
   StacksWireType,
   parseAssetString,
   parsePrincipalString,
-  serializePostCondition,
+  serializePostConditionWire,
 } from './wire';
 
 const FUNGIBLE_COMPARATOR_MAPPING = {
@@ -89,5 +90,15 @@ export function postConditionToWire(postcondition: PostCondition): PostCondition
  */
 export function postConditionToHex(postcondition: PostCondition): string {
   const wire = postConditionToWire(postcondition);
-  return serializePostCondition(wire);
+  return serializePostConditionWire(wire);
+}
+
+/** @internal */
+export function postConditionModeFrom(
+  mode: PostConditionModeName | PostConditionMode
+): PostConditionMode {
+  if (typeof mode === 'number') return mode;
+  if (mode === 'allow') return PostConditionMode.Allow;
+  if (mode === 'deny') return PostConditionMode.Deny;
+  throw new Error(`Invalid post condition mode: ${mode}`);
 }

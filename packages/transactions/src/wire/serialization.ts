@@ -93,7 +93,7 @@ export function serializeStacksWireBytes(wire: StacksWire): Uint8Array {
     case StacksWireType.Asset:
       return serializeAssetBytes(wire);
     case StacksWireType.PostCondition:
-      return serializePostConditionBytes(wire);
+      return serializePostConditionWireBytes(wire);
     case StacksWireType.PublicKey:
       return serializePublicKeyBytes(wire);
     case StacksWireType.LengthPrefixedList:
@@ -125,7 +125,7 @@ export function deserializeStacksWire(
     case StacksWireType.Asset:
       return deserializeAsset(bytesReader);
     case StacksWireType.PostCondition:
-      return deserializePostCondition(bytesReader);
+      return deserializePostConditionWire(bytesReader);
     case StacksWireType.PublicKey:
       return deserializePublicKey(bytesReader);
     case StacksWireType.Payload:
@@ -328,7 +328,7 @@ export function deserializeLPList(
         l.push(deserializeAsset(bytesReader));
         break;
       case StacksWireType.PostCondition:
-        l.push(deserializePostCondition(bytesReader));
+        l.push(deserializePostConditionWire(bytesReader));
         break;
       case StacksWireType.PublicKey:
         l.push(deserializePublicKey(bytesReader));
@@ -341,11 +341,12 @@ export function deserializeLPList(
   return createLPList(l, lengthPrefixBytes);
 }
 
-export function serializePostCondition(postCondition: PostConditionWire): string {
-  return bytesToHex(serializePostConditionBytes(postCondition));
+export function serializePostConditionWire(postCondition: PostConditionWire): string {
+  return bytesToHex(serializePostConditionWireBytes(postCondition));
 }
+
 /** @internal */
-export function serializePostConditionBytes(postCondition: PostConditionWire): Uint8Array {
+export function serializePostConditionWireBytes(postCondition: PostConditionWire): Uint8Array {
   const bytesArray = [];
   bytesArray.push(postCondition.conditionType);
   bytesArray.push(serializePrincipalBytes(postCondition.principal));
@@ -377,7 +378,7 @@ export function serializePostConditionBytes(postCondition: PostConditionWire): U
 }
 
 /** @internal */
-export function deserializePostCondition(
+export function deserializePostConditionWire(
   serialized: string | Uint8Array | BytesReader
 ): PostConditionWire {
   const bytesReader = isInstance(serialized, BytesReader)
@@ -672,6 +673,7 @@ export function serializeTransactionAuthFieldBytes(field: TransactionAuthFieldWi
 export function serializePublicKey(key: PublicKeyWire): string {
   return bytesToHex(serializePublicKeyBytes(key));
 }
+
 /** @ignore */
 export function serializePublicKeyBytes(key: PublicKeyWire): Uint8Array {
   return key.data.slice();

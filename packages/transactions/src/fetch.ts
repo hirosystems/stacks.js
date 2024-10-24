@@ -4,7 +4,7 @@ import { ClarityValue, NoneCV, deserializeCV, serializeCV } from './clarity';
 import { ClarityAbi } from './contract-abi';
 import { NoEstimateAvailableError } from './errors';
 import {
-  StacksTransaction,
+  StacksTransactionWire,
   deriveNetworkFromTx,
   estimateTransactionByteLength,
 } from './transaction';
@@ -40,7 +40,7 @@ export async function broadcastTransaction({
   client: _client,
 }: {
   /** The transaction to broadcast */
-  transaction: StacksTransaction;
+  transaction: StacksTransactionWire;
   /** Optional attachment in bytes or encoded as a hex string */
   attachment?: Uint8Array | string;
 } & NetworkClientParam): Promise<TxBroadcastResult> {
@@ -139,7 +139,7 @@ export async function fetchFeeEstimateTransfer({
   client: _client,
 }: {
   /** The token transfer transaction to estimate fees for */
-  transaction: StacksTransaction;
+  transaction: StacksTransactionWire;
 } & NetworkClientParam): Promise<bigint> {
   const network = _network ?? deriveNetworkFromTx(txOpt);
   const client = Object.assign({}, clientFromNetwork(networkFrom(network)), _client);
@@ -221,7 +221,7 @@ export async function fetchFeeEstimate({
   network: _network,
   client: _client,
 }: {
-  transaction: StacksTransaction;
+  transaction: StacksTransactionWire;
 } & NetworkClientParam): Promise<bigint | number> {
   const network = _network ?? deriveNetworkFromTx(txOpt);
   const client = Object.assign({}, clientFromNetwork(networkFrom(network)), _client);

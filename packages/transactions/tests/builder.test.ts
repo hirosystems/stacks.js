@@ -9,7 +9,7 @@ import {
   hexToBytes,
   utf8ToBytes,
 } from '@stacks/common';
-import { STACKS_MAINNET, STACKS_TESTNET, TransactionVersion } from '@stacks/network';
+import { STACKS_MAINNET, STACKS_TESTNET } from '@stacks/network';
 import * as fs from 'fs';
 import fetchMock from 'jest-fetch-mock';
 import {
@@ -28,21 +28,21 @@ import {
   addressFromPublicKeys,
   addressToString,
   broadcastTransaction,
-  fetchCallReadOnlyFunction,
   createMessageSignature,
   createStacksPublicKey,
   createTokenTransferPayload,
   createTransactionAuthField,
+  fetchCallReadOnlyFunction,
+  fetchContractMapEntry,
   fetchFeeEstimate,
   fetchFeeEstimateTransaction,
-  fetchContractMapEntry,
   fetchNonce,
   postConditionToWire,
   privateKeyToPublic,
   publicKeyIsCompressed,
   publicKeyToHex,
   serializePayloadBytes,
-  serializePostConditionBytes,
+  serializePostConditionWireBytes,
   serializePublicKeyBytes,
 } from '../src';
 import { BytesReader } from '../src/BytesReader';
@@ -92,7 +92,7 @@ import { compressPrivateKey, makeRandomPrivKey } from '../src/keys';
 import { FungiblePostCondition, PostCondition, StxPostCondition } from '../src/postcondition-types';
 import { TransactionSigner } from '../src/signer';
 import {
-  StacksTransaction,
+  StacksTransactionWire,
   deserializeTransaction,
   estimateTransactionByteLength,
   transactionToHex,
@@ -100,9 +100,9 @@ import {
 import { cloneDeep, randomBytes } from '../src/utils';
 
 function setSignature(
-  unsignedTransaction: StacksTransaction,
+  unsignedTransaction: StacksTransactionWire,
   signature: string | Uint8Array
-): StacksTransaction {
+): StacksTransactionWire {
   const parsedSig = typeof signature === 'string' ? signature : bytesToHex(signature);
   const tx = cloneDeep(unsignedTransaction);
   if (!tx.auth.spendingCondition) {
@@ -960,7 +960,7 @@ test('Make contract-call with post conditions', async () => {
     nonce: 1,
     network: STACKS_TESTNET,
     postConditions,
-    postConditionMode: PostConditionMode.Deny,
+    postConditionMode: 'deny',
   });
   expect(() => transaction.verifyOrigin()).not.toThrow();
 
@@ -1436,8 +1436,11 @@ test('Make sponsored STX token transfer', async () => {
     sponsorFee
   );
   const authorization = createSponsoredAuth(baseSpendingCondition, sponsorSpendingCondition);
-  const transactionVersion = TransactionVersion.Mainnet;
-  const sponsoredTransaction = new StacksTransaction(transactionVersion, authorization, payload);
+  const sponsoredTransaction = new StacksTransactionWire({
+    network: STACKS_MAINNET,
+    auth: authorization,
+    payload,
+  });
 
   const signer = new TransactionSigner(sponsoredTransaction);
   signer.signOrigin(senderKey);
@@ -1944,7 +1947,7 @@ test('Make contract-call with network ABI validation', async () => {
     nonce: 1,
     network: STACKS_TESTNET,
     validateWithAbi: true,
-    postConditionMode: PostConditionMode.Allow,
+    postConditionMode: 'allow',
   });
 
   expect(fetchMock.mock.calls.length).toEqual(1);
@@ -2143,11 +2146,11 @@ test('Post-conditions with amount larger than 8 bytes throw an error', () => {
   };
 
   expect(() => {
-    serializePostConditionBytes(postConditionToWire(stxPc));
+    serializePostConditionWireBytes(postConditionToWire(stxPc));
   }).toThrowError('The post-condition amount may not be larger than 8 bytes');
 
   expect(() => {
-    serializePostConditionBytes(postConditionToWire(fungiblePc));
+    serializePostConditionWireBytes(postConditionToWire(fungiblePc));
   }).toThrowError('The post-condition amount may not be larger than 8 bytes');
 });
 

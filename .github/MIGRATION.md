@@ -229,6 +229,10 @@ Namely, the node/API it is sent to will "broadcast" the transaction to the mempo
 
 ### `serialize` methods
 
+Most users shouldn't need to use `serializeXyz` methods.
+Concepts in Stacks.js have helpers like `postConditionToHex` instead.
+Serialization is meant for internal representations in transactions, mostly not for user-facing data.
+
 Existing methods now take or return **hex-encoded strings** _instead_ of `Uint8Array`s.
 
 > If you were already converting returned bytes to hex-strings in your code, you can now skip the conversion step — hex-strings are the new default.
@@ -236,18 +240,22 @@ Existing methods now take or return **hex-encoded strings** _instead_ of `Uint8A
 For easier migrating, renaming the following methods is possible to keep the previous behavior:
 
 - `StacksTransaction.serialize` → `StacksTransaction.serializeBytes`
-- `serializeCV` → `serializeCVBytes`
 - `serializeAddress` → `serializeAddressBytes`
+- `serializeAuthorization` → `serializeAuthorizationBytes`
+- `serializeCV` → `serializeCVBytes`
 - `serializeLPList` → `serializeLPListBytes`
 - `serializeLPString` → `serializeLPStringBytes`
-- `serializePayload` → `serializePayloadBytes`
-- `serializePublicKey` → `serializePublicKeyBytes`
-- `serializeStacksMessage` → `serializeStacksMessageBytes`
 - `serializeMemoString` → `serializeMemoStringBytes`
-- `serializeTransactionAuthField` → `serializeTransactionAuthFieldBytes`
 - `serializeMessageSignature` → `serializeMessageSignatureBytes`
+- `serializeMultiSigSpendingCondition` → `serializeMultiSigSpendingConditionBytes`
+- `serializePayload` → `serializePayloadBytes`
 - `serializePostCondition` → `serializePostConditionBytes`
+- `serializePublicKey` → `serializePublicKeyBytes`
+- `serializeSingleSigSpendingCondition` → `serializeSingleSigSpendingConditionBytes`
+- `serializeSpendingCondition` → `serializeSpendingConditionBytes`
+- `serializeStacksMessage` → `serializeStacksMessageBytes`
 - `serializeStacksMessage` → `serializeStacksWireBytes`
+- `serializeTransactionAuthField` → `serializeTransactionAuthFieldBytes`
 
 ### Asset Helper Methods
 

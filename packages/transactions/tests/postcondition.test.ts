@@ -3,6 +3,7 @@ import {
   Cl,
   ContractPrincipalWire,
   FungiblePostConditionWire,
+  LengthPrefixedList,
   NonFungiblePostConditionWire,
   PostConditionWire,
   STXPostConditionWire,
@@ -220,7 +221,7 @@ describe('origin postcondition', () => {
 
     expect(() => {
       const tx = deserializeTransaction(txHex);
-      const pc = tx.postConditions.values[0] as PostConditionWire;
+      const pc = (tx.postConditions as LengthPrefixedList).values[0] as PostConditionWire;
       expect(pc.principal.prefix).toBe(PostConditionPrincipalId.Origin);
     }).not.toThrow();
   });

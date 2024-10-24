@@ -17,7 +17,6 @@ import {
 import { ClarityValue, PrincipalCV } from './clarity';
 import {
   AddressHashMode,
-  AnchorMode,
   ClarityVersion,
   MultiSigHashMode,
   PayloadType,
@@ -33,10 +32,10 @@ import {
   publicKeyToAddress,
   publicKeyToHex,
 } from './keys';
-import { postConditionToWire } from './postcondition';
-import { PostCondition } from './postcondition-types';
+import { postConditionModeFrom, postConditionToWire } from './postcondition';
+import { PostCondition, PostConditionModeName } from './postcondition-types';
 import { TransactionSigner } from './signer';
-import { StacksTransaction, deriveNetworkFromTx } from './transaction';
+import { StacksTransactionWire, deriveNetworkFromTx } from './transaction';
 import { omit } from './utils';
 import {
   PostConditionWire,
@@ -114,11 +113,11 @@ export type SignedMultiSigTokenTransferOptions = TokenTransferOptions & SignedMu
  *
  * @param {UnsignedTokenTransferOptions | UnsignedMultiSigTokenTransferOptions} txOptions - an options object for the token transfer
  *
- * @return {Promise<StacksTransaction>}
+ * @return {Promise<StacksTransactionWire>}
  */
 export async function makeUnsignedSTXTokenTransfer(
   txOptions: UnsignedTokenTransferOptions | UnsignedMultiSigTokenTransferOptions
-): Promise<StacksTransaction> {
+): Promise<StacksTransactionWire> {
   const defaultOptions = {
     fee: BigInt(0),
     nonce: BigInt(0),
@@ -171,15 +170,13 @@ export async function makeUnsignedSTXTokenTransfer(
     ? createSponsoredAuth(spendingCondition)
     : createStandardAuth(spendingCondition);
 
-  const transaction = new StacksTransaction(
-    options.network.transactionVersion,
-    authorization,
+  const transaction = new StacksTransactionWire({
+    transactionVersion: options.network.transactionVersion,
+    chainId: options.network.chainId,
+    auth: authorization,
     payload,
-    undefined, // no post conditions on STX transfers (see SIP-005)
-    undefined, // no post conditions on STX transfers (see SIP-005)
-    AnchorMode.Any,
-    options.network.chainId
-  );
+    // no post conditions on STX transfers (see SIP-005)
+  });
 
   if (txOptions.fee == null) {
     const fee = await fetchFeeEstimate({ transaction, ...options });
@@ -203,11 +200,11 @@ export async function makeUnsignedSTXTokenTransfer(
  *
  * @param {SignedTokenTransferOptions | SignedMultiSigTokenTransferOptions} txOptions - an options object for the token transfer
  *
- * @return {StacksTransaction}
+ * @return {StacksTransactionWire}
  */
 export async function makeSTXTokenTransfer(
   txOptions: SignedTokenTransferOptions | SignedMultiSigTokenTransferOptions
-): Promise<StacksTransaction> {
+): Promise<StacksTransactionWire> {
   if ('senderKey' in txOptions) {
     // single-sig
     const publicKey = privateKeyToPublic(txOptions.senderKey);
@@ -249,9 +246,9 @@ export type BaseContractDeployOptions = {
   nonce?: IntegerType;
   /** the post condition mode, specifying whether or not post-conditions must fully cover all
    * transfered assets */
-  postConditionMode?: PostConditionMode;
+  postConditionMode?: PostConditionModeName | PostConditionMode;
   /** a list of post conditions to add to the transaction */
-  postConditions?: PostConditionWire[];
+  postConditions?: PostCondition[] | PostConditionWire[];
   /** set to true if another account is sponsoring the transaction (covering the transaction fee) */
   sponsored?: boolean;
 } & NetworkClientParam;
@@ -280,11 +277,11 @@ export type SignedMultiSigContractDeployOptions = BaseContractDeployOptions & Si
  *
  * Returns a signed Stacks smart contract deploy transaction.
  *
- * @return {StacksTransaction}
+ * @return {StacksTransactionWire}
  */
 export async function makeContractDeploy(
   txOptions: SignedContractDeployOptions | SignedMultiSigContractDeployOptions
-): Promise<StacksTransaction> {
+): Promise<StacksTransactionWire> {
   if ('senderKey' in txOptions) {
     // single-sig
     const publicKey = privateKeyToPublic(txOptions.senderKey);
@@ -314,7 +311,7 @@ export async function makeContractDeploy(
 
 export async function makeUnsignedContractDeploy(
   txOptions: UnsignedContractDeployOptions | UnsignedMultiSigContractDeployOptions
-): Promise<StacksTransaction> {
+): Promise<StacksTransactionWire> {
   const defaultOptions = {
     fee: BigInt(0),
     nonce: BigInt(0),
@@ -327,6 +324,7 @@ export async function makeUnsignedContractDeploy(
   const options = Object.assign(defaultOptions, txOptions);
   options.network = networkFrom(options.network);
   options.client = Object.assign({}, clientFromNetwork(options.network), txOptions.client);
+  options.postConditionMode = postConditionModeFrom(options.postConditionMode);
 
   const payload = createSmartContractPayload(
     options.contractName,
@@ -372,23 +370,20 @@ export async function makeUnsignedContractDeploy(
     ? createSponsoredAuth(spendingCondition)
     : createStandardAuth(spendingCondition);
 
-  const postConditions: PostConditionWire[] = [];
-  if (options.postConditions && options.postConditions.length > 0) {
-    options.postConditions.forEach(postCondition => {
-      postConditions.push(postCondition);
-    });
-  }
+  const postConditions: PostConditionWire[] = (options.postConditions ?? []).map(pc => {
+    if (typeof pc.type === 'string') return postConditionToWire(pc);
+    return pc;
+  });
   const lpPostConditions = createLPList(postConditions);
 
-  const transaction = new StacksTransaction(
-    options.network.transactionVersion,
-    authorization,
+  const transaction = new StacksTransactionWire({
+    transactionVersion: options.network.transactionVersion,
+    chainId: options.network.chainId,
+    auth: authorization,
     payload,
-    lpPostConditions,
-    options.postConditionMode,
-    AnchorMode.Any,
-    options.network.chainId
-  );
+    postConditions: lpPostConditions,
+    postConditionMode: options.postConditionMode,
+  });
 
   if (txOptions.fee === undefined || txOptions.fee === null) {
     const fee = await fetchFeeEstimate({ transaction, ...options });
@@ -420,7 +415,7 @@ export type ContractCallOptions = {
   nonce?: IntegerType;
   /** the post condition mode, specifying whether or not post-conditions must fully cover all
    * transfered assets */
-  postConditionMode?: PostConditionMode;
+  postConditionMode?: PostConditionModeName | PostConditionMode;
   /** a list of post conditions to add to the transaction */
   postConditions?: PostCondition[];
   /** set to true to validate that the supplied function args match those specified in
@@ -447,11 +442,11 @@ export type SignedMultiSigContractCallOptions = ContractCallOptions & SignedMult
  *
  * @param {UnsignedContractCallOptions | UnsignedMultiSigContractCallOptions} txOptions - an options object for the contract call
  *
- * @returns {Promise<StacksTransaction>}
+ * @returns {Promise<StacksTransactionWire>}
  */
 export async function makeUnsignedContractCall(
   txOptions: UnsignedContractCallOptions | UnsignedMultiSigContractCallOptions
-): Promise<StacksTransaction> {
+): Promise<StacksTransactionWire> {
   const defaultOptions = {
     fee: BigInt(0),
     nonce: BigInt(0),
@@ -463,6 +458,7 @@ export async function makeUnsignedContractCall(
   const options = Object.assign(defaultOptions, txOptions);
   options.network = networkFrom(options.network);
   options.client = Object.assign({}, clientFromNetwork(options.network), options.client);
+  options.postConditionMode = postConditionModeFrom(options.postConditionMode);
 
   const payload = createContractCallPayload(
     options.contractAddress,
@@ -524,20 +520,20 @@ export async function makeUnsignedContractCall(
     ? createSponsoredAuth(spendingCondition)
     : createStandardAuth(spendingCondition);
 
-  const postConditions = (options.postConditions ?? []).map(
-    postConditionToWire as (post: PostCondition) => PostConditionWire
-  );
+  const postConditions: PostConditionWire[] = (options.postConditions ?? []).map(pc => {
+    if (typeof pc.type === 'string') return postConditionToWire(pc);
+    return pc;
+  });
   const lpPostConditions = createLPList(postConditions);
 
-  const transaction = new StacksTransaction(
-    options.network.transactionVersion,
-    authorization,
+  const transaction = new StacksTransactionWire({
+    transactionVersion: options.network.transactionVersion,
+    chainId: options.network.chainId,
+    auth: authorization,
     payload,
-    lpPostConditions,
-    options.postConditionMode,
-    AnchorMode.Any,
-    options.network.chainId
-  );
+    postConditions: lpPostConditions,
+    postConditionMode: options.postConditionMode,
+  });
 
   if (txOptions.fee === undefined || txOptions.fee === null) {
     const fee = await fetchFeeEstimate({ transaction, ...options });
@@ -561,11 +557,11 @@ export async function makeUnsignedContractCall(
  *
  * Returns a signed Stacks smart contract function call transaction.
  *
- * @return {StacksTransaction}
+ * @return {StacksTransactionWire}
  */
 export async function makeContractCall(
   txOptions: SignedContractCallOptions | SignedMultiSigContractCallOptions
-): Promise<StacksTransaction> {
+): Promise<StacksTransactionWire> {
   if ('senderKey' in txOptions) {
     // single-sig
     const publicKey = privateKeyToPublic(txOptions.senderKey);
@@ -598,7 +594,7 @@ export async function makeContractCall(
  */
 export type SponsorOptionsOpts = {
   /** the origin-signed transaction */
-  transaction: StacksTransaction;
+  transaction: StacksTransactionWire;
   /** the sponsor's private key */
   sponsorPrivateKey: PrivateKey;
   /** the transaction fee amount to sponsor */
@@ -620,7 +616,7 @@ export type SponsorOptionsOpts = {
  */
 export async function sponsorTransaction(
   sponsorOptions: SponsorOptionsOpts
-): Promise<StacksTransaction> {
+): Promise<StacksTransactionWire> {
   const defaultOptions = {
     fee: 0 as IntegerType,
     sponsorNonce: 0 as IntegerType,
@@ -683,7 +679,7 @@ export async function sponsorTransaction(
 /** @internal multi-sig signing re-use */
 function mutatingSignAppendMultiSig(
   /** **Warning:** method mutates `transaction` */
-  transaction: StacksTransaction,
+  transaction: StacksTransactionWire,
   publicKeys: string[],
   signerKeys: string[],
   address?: string

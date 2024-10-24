@@ -6,7 +6,7 @@ import {
   NonFungiblePostCondition,
   PostCondition,
   ResponseErrorCV,
-  StacksTransaction,
+  StacksTransactionWire,
   StxPostCondition,
   UnsignedContractCallOptions,
   bufferCV,
@@ -60,7 +60,9 @@ export interface BnsContractCallOptions {
   postConditions?: PostCondition[];
 }
 
-async function makeBnsContractCall(options: BnsContractCallOptions): Promise<StacksTransaction> {
+async function makeBnsContractCall(
+  options: BnsContractCallOptions
+): Promise<StacksTransactionWire> {
   const txOptions: UnsignedContractCallOptions = {
     contractAddress: options.network.bootAddress,
     contractName: BNS_CONTRACT_NAME,
@@ -271,7 +273,7 @@ export interface PreorderNamespaceOptions {
  *
  * @param  {PreorderNamespaceOptions} options - an options object for the preorder
  *
- * @return {Promise<StacksTransaction>}
+ * @return {Promise<StacksTransactionWire>}
  */
 export async function buildPreorderNamespaceTx({
   namespace,
@@ -279,7 +281,7 @@ export async function buildPreorderNamespaceTx({
   stxToBurn,
   publicKey,
   network,
-}: PreorderNamespaceOptions): Promise<StacksTransaction> {
+}: PreorderNamespaceOptions): Promise<StacksTransactionWire> {
   const bnsFunctionName = 'namespace-preorder';
   const saltedNamespaceBytes = utf8ToBytes(`${namespace}${salt}`);
   const hashedSaltedNamespace = hash160(saltedNamespaceBytes);
@@ -328,7 +330,7 @@ export interface RevealNamespaceOptions {
  *
  * @param  {RevealNamespaceOptions} options - an options object for the reveal
  *
- * @return {Promise<StacksTransaction>}
+ * @return {Promise<StacksTransactionWire>}
  */
 export async function buildRevealNamespaceTx({
   namespace,
@@ -338,7 +340,7 @@ export async function buildRevealNamespaceTx({
   namespaceImportAddress,
   publicKey,
   network,
-}: RevealNamespaceOptions): Promise<StacksTransaction> {
+}: RevealNamespaceOptions): Promise<StacksTransactionWire> {
   const bnsFunctionName = 'namespace-reveal';
 
   return makeBnsContractCall({
@@ -401,7 +403,7 @@ export interface ImportNameOptions {
  *
  * @param  {ImportNameOptions} options - an options object for the name import
  *
- * @return {Promise<StacksTransaction>}
+ * @return {Promise<StacksTransactionWire>}
  */
 export async function buildImportNameTx({
   namespace,
@@ -410,7 +412,7 @@ export async function buildImportNameTx({
   zonefile,
   publicKey,
   network,
-}: ImportNameOptions): Promise<StacksTransaction> {
+}: ImportNameOptions): Promise<StacksTransactionWire> {
   const bnsFunctionName = 'name-import';
   const zonefileHash = getZonefileHash(zonefile);
 
@@ -449,13 +451,13 @@ export interface ReadyNamespaceOptions {
  *
  * @param  {ReadyNamespaceOptions} options - an options object for the namespace ready transaction
  *
- * @return {Promise<StacksTransaction>}
+ * @return {Promise<StacksTransactionWire>}
  */
 export async function buildReadyNamespaceTx({
   namespace,
   publicKey,
   network,
-}: ReadyNamespaceOptions): Promise<StacksTransaction> {
+}: ReadyNamespaceOptions): Promise<StacksTransactionWire> {
   const bnsFunctionName = 'namespace-ready';
 
   return makeBnsContractCall({
@@ -491,7 +493,7 @@ export interface PreorderNameOptions {
  *
  * @param  {PreorderNameOptions} options - an options object for the preorder
  *
- * @return {Promise<StacksTransaction>}
+ * @return {Promise<StacksTransactionWire>}
  */
 export async function buildPreorderNameTx({
   fullyQualifiedName,
@@ -499,7 +501,7 @@ export async function buildPreorderNameTx({
   stxToBurn,
   publicKey,
   network,
-}: PreorderNameOptions): Promise<StacksTransaction> {
+}: PreorderNameOptions): Promise<StacksTransactionWire> {
   const bnsFunctionName = 'name-preorder';
   const { subdomain } = decodeFQN(fullyQualifiedName);
   if (subdomain) {
@@ -550,7 +552,7 @@ export interface RegisterNameOptions {
  *
  * @param  {RegisterNameOptions} options - an options object for the registration
  *
- * @return {Promise<StacksTransaction>}
+ * @return {Promise<StacksTransactionWire>}
  */
 export async function buildRegisterNameTx({
   fullyQualifiedName,
@@ -558,7 +560,7 @@ export async function buildRegisterNameTx({
   zonefile,
   publicKey,
   network,
-}: RegisterNameOptions): Promise<StacksTransaction> {
+}: RegisterNameOptions): Promise<StacksTransactionWire> {
   const bnsFunctionName = 'name-register';
   const { subdomain, namespace, name } = decodeFQN(fullyQualifiedName);
   if (subdomain) {
@@ -604,14 +606,14 @@ export interface UpdateNameOptions {
  *
  * @param  {UpdateNameOptions} options - an options object for the update
  *
- * @return {Promise<StacksTransaction>}
+ * @return {Promise<StacksTransactionWire>}
  */
 export async function buildUpdateNameTx({
   fullyQualifiedName,
   zonefile,
   publicKey,
   network,
-}: UpdateNameOptions): Promise<StacksTransaction> {
+}: UpdateNameOptions): Promise<StacksTransactionWire> {
   const bnsFunctionName = 'name-update';
   const { subdomain, namespace, name } = decodeFQN(fullyQualifiedName);
   if (subdomain) {
@@ -657,7 +659,7 @@ export interface TransferNameOptions {
  *
  * @param  {TransferNameOptions} options - an options object for the transfer
  *
- * @return {Promise<StacksTransaction>}
+ * @return {Promise<StacksTransactionWire>}
  */
 export async function buildTransferNameTx({
   fullyQualifiedName,
@@ -665,7 +667,7 @@ export async function buildTransferNameTx({
   zonefile,
   publicKey,
   network,
-}: TransferNameOptions): Promise<StacksTransaction> {
+}: TransferNameOptions): Promise<StacksTransactionWire> {
   const bnsFunctionName = 'name-transfer';
   const { subdomain, namespace, name } = decodeFQN(fullyQualifiedName);
   if (subdomain) {
@@ -730,13 +732,13 @@ export interface RevokeNameOptions {
  *
  * @param  {RevokeNameOptions} options - an options object for the revoke
  *
- * @return {Promise<StacksTransaction>}
+ * @return {Promise<StacksTransactionWire>}
  */
 export async function buildRevokeNameTx({
   fullyQualifiedName,
   publicKey,
   network,
-}: RevokeNameOptions): Promise<StacksTransaction> {
+}: RevokeNameOptions): Promise<StacksTransactionWire> {
   const bnsFunctionName = 'name-revoke';
   const { subdomain, namespace, name } = decodeFQN(fullyQualifiedName);
   if (subdomain) {
@@ -777,7 +779,7 @@ export interface RenewNameOptions {
  *
  * @param  {RenewNameOptions} options - an options object for the renew
  *
- * @return {Promise<StacksTransaction>}
+ * @return {Promise<StacksTransactionWire>}
  */
 export async function buildRenewNameTx({
   fullyQualifiedName,
@@ -786,7 +788,7 @@ export async function buildRenewNameTx({
   zonefile,
   publicKey,
   network,
-}: RenewNameOptions): Promise<StacksTransaction> {
+}: RenewNameOptions): Promise<StacksTransactionWire> {
   const bnsFunctionName = 'name-renewal';
   const { subdomain, namespace, name } = decodeFQN(fullyQualifiedName);
   if (subdomain) {
