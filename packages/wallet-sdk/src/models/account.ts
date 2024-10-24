@@ -4,13 +4,14 @@ import { HDKey } from '@scure/bip32';
 import { makeAuthResponse as _makeAuthResponse } from '@stacks/auth';
 import { bytesToHex, utf8ToBytes } from '@stacks/common';
 
+import { FetchFn, createFetchFn } from '@stacks/common';
 import {
   getPublicKeyFromPrivate,
   hashCode,
   hashSha256Sync,
   publicKeyToBtcAddress,
 } from '@stacks/encryption';
-import { createFetchFn, FetchFn } from '@stacks/common';
+import { NetworkParam, StacksNetwork, StacksNetworkName } from '@stacks/network';
 import { getAddressFromPrivateKey } from '@stacks/transactions';
 import { connectToGaiaHubWithConfig, getHubInfo, makeGaiaAssociationToken } from '../utils';
 import { Account, HARDENED_OFFSET } from './common';
@@ -20,20 +21,28 @@ import {
   fetchProfileFromUrl,
   signAndUploadProfile,
 } from './profile';
-import { STACKS_MAINNET, STACKS_TESTNET, TransactionVersion } from '@stacks/network';
 
-export const getStxAddress = ({
+export function getStxAddress(
+  account: Account,
+  network?: StacksNetworkName | StacksNetwork
+): string;
+export function getStxAddress({
   account,
-  transactionVersion = TransactionVersion.Testnet,
+  network = 'mainnet',
 }: {
   account: Account;
-  transactionVersion?: TransactionVersion;
-}): string => {
-  return getAddressFromPrivateKey(
-    account.stxPrivateKey,
-    transactionVersion == TransactionVersion.Mainnet ? STACKS_MAINNET : STACKS_TESTNET // todo: refactor for `next` wallet update
-  );
-};
+} & NetworkParam): string;
+export function getStxAddress(
+  accountOrOptions: Account | ({ account: Account } & NetworkParam),
+  network: StacksNetworkName | StacksNetwork = 'mainnet'
+): string {
+  if ('account' in accountOrOptions) {
+    const { account, network = 'mainnet' } = accountOrOptions;
+    return getAddressFromPrivateKey(account.stxPrivateKey, network);
+  }
+
+  return getAddressFromPrivateKey(accountOrOptions.stxPrivateKey, network);
+}
 
 /**
  * Get the display name of an account.
@@ -124,8 +133,8 @@ export const makeAuthResponse = async ({
     {
       ...(profile || {}),
       stxAddress: {
-        testnet: getStxAddress({ account, transactionVersion: TransactionVersion.Testnet }),
-        mainnet: getStxAddress({ account, transactionVersion: TransactionVersion.Mainnet }),
+        testnet: getStxAddress({ account, network: 'testnet' }),
+        mainnet: getStxAddress({ account, network: 'mainnet' }),
       },
       ...additionalData,
     },
