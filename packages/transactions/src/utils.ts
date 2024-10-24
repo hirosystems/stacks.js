@@ -30,7 +30,7 @@ export const rightPadHexToLength = (hexString: string, length: number): string =
 export const exceedsMaxLengthBytes = (string: string, maxLengthBytes: number): boolean =>
   string ? utf8ToBytes(string).length > maxLengthBytes : false;
 
-/** @internal */
+/** @internal @deprecated */
 export function cloneDeep<T>(obj: T): T {
   return lodashCloneDeep(obj);
 }
