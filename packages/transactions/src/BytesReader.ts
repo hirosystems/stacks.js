@@ -1,4 +1,4 @@
-import { bytesToHex, readUInt16BE, readUInt32BE, readUInt8 } from '@stacks/common';
+import { bytesToHex, hexToBytes, readUInt16BE, readUInt32BE, readUInt8 } from '@stacks/common';
 
 function createEnumChecker<T extends string, TEnumValue extends number>(enumVariable: {
   [key in T]: TEnumValue;
@@ -47,8 +47,8 @@ export class BytesReader {
   source: Uint8Array;
   consumed: number = 0;
 
-  constructor(arr: Uint8Array) {
-    this.source = arr;
+  constructor(bytes: string | Uint8Array) {
+    this.source = typeof bytes === 'string' ? hexToBytes(bytes) : bytes;
   }
 
   readBytes(length: number): Uint8Array {

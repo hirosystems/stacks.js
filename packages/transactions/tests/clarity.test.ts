@@ -1,6 +1,6 @@
 import { asciiToBytes, bytesToUtf8, concatBytes, hexToBytes, utf8ToBytes } from '@stacks/common';
 import assert from 'assert';
-import { Cl, deserializeAddressBytes } from '../src';
+import { Cl, deserializeAddress } from '../src';
 import { BytesReader } from '../src/BytesReader';
 import {
   BufferCV,
@@ -491,9 +491,7 @@ describe('Clarity Types', () => {
         0x11, 0xab, 0xab, 0xff, 0xff,
       ]);
       const bytesReader = new BytesReader(concatBytes(new Uint8Array([0x00]), addressBuffer));
-      const standardPrincipal = standardPrincipalCVFromAddress(
-        deserializeAddressBytes(bytesReader)
-      );
+      const standardPrincipal = standardPrincipalCVFromAddress(deserializeAddress(bytesReader));
       const serialized = serializeCV(standardPrincipal);
       expect(serialized).toEqual('050011deadbeef11ababffff11deadbeef11ababffff');
     });
@@ -505,9 +503,7 @@ describe('Clarity Types', () => {
       ]);
       const contractName = 'abcd';
       const bytesReader = new BytesReader(concatBytes(new Uint8Array([0x00]), addressBuffer));
-      const standardPrincipal = standardPrincipalCVFromAddress(
-        deserializeAddressBytes(bytesReader)
-      );
+      const standardPrincipal = standardPrincipalCVFromAddress(deserializeAddress(bytesReader));
       const contractPrincipal = contractPrincipalCVFromStandard(standardPrincipal, contractName);
       const serialized = serializeCV(contractPrincipal);
       expect(serialized).toEqual('060011deadbeef11ababffff11deadbeef11ababffff0461626364');

@@ -458,12 +458,12 @@ test('Invalid spending conditions', () => {
     badHashModeSinglesigBytesParseable
   );
 
-  const deserializedBadHashModeSinglesigBytesParseable = deserializeSpendingCondition(
+  const deserializedBadHashModeSinglesig = deserializeSpendingCondition(
     new BytesReader(badHashModeSinglesigBytesParseableBuffer)
   );
 
   // corrupt but will parse with trailing bits
-  expect(deserializedBadHashModeSinglesigBytesParseable).toBeTruthy();
+  expect(deserializedBadHashModeSinglesig).toBeTruthy();
 
   // wrong number of public keys (too many signatures)
   // prettier-ignore

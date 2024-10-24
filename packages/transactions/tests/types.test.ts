@@ -13,7 +13,7 @@ import {
   createAsset,
   createLPList,
   createLPString,
-  deserializeLPListBytes,
+  deserializeLPList,
   serializeStacksWireBytes,
 } from '../src';
 import { BytesReader } from '../src/BytesReader';
@@ -51,7 +51,7 @@ test('Length prefixed list serialization and deserialization', () => {
   const serialized = serializeStacksWireBytes(lpList);
 
   const bytesReader = new BytesReader(serialized);
-  const deserialized = deserializeLPListBytes(bytesReader, StacksWireType.Address);
+  const deserialized = deserializeLPList(bytesReader, StacksWireType.Address);
 
   expect(deserialized.values.length).toBe(addressList.length);
 
