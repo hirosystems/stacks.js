@@ -1,7 +1,7 @@
 {
   "private": true,
   "name": "@stacks/api",
-  "version": "6.9.0",
+  "version": "7.0.0",
   "description": "Javascript library for interacting with the Stacks Blockchain Node and API.",
   "license": "MIT",
   "author": "Hiro Systems PBC (https://hiro.so)",
@@ -24,10 +24,10 @@
     "typecheck:watch": "npm run typecheck -- --watch"
   },
   "dependencies": {
-    "@stacks/common": "^6.10.0",
-    "@stacks/network": "^6.11.3",
+    "@stacks/common": "^7.0.0",
+    "@stacks/network": "^7.0.0",
     "@stacks/stacks-blockchain-api-types": "^0.61.0",
-    "@stacks/transactions": "^6.9.0"
+    "@stacks/transactions": "^7.0.0"
   },
   "devDependencies": {
     "rimraf": "^3.0.2"
