@@ -7,9 +7,10 @@
     "typecheck:watch": "npm run typecheck -- --watch"
   },
   "devDependencies": {
-    "@stacks/stacking": "^6.9.0",
     "@stacks/blockchain-api-client": "^7.12.0",
-    "@stacks/network": "^6.16.0",
+    "@stacks/network": "^7.0.0",
+    "@stacks/stacking": "^7.0.0",
     "jest-fetch-mock": "^3.0.3"
-  }
+  },
+  "version": "7.0.0"
 }

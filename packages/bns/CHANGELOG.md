@@ -3,6 +3,23 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.0.0](https://github.com/blockstack/stacks.js/compare/v6.17.0...v7.0.0) (2024-10-25)
+
+
+### ⚠ BREAKING CHANGES
+
+* Convert `version` of PoXAddress from array to number.
+
+* feat: cleanup common files
+
+* refactor: update to correct import path
+
+### Features
+
+* Stacks.js v7.0.0 ([#1520](https://github.com/blockstack/stacks.js/issues/1520)) ([8ce84a3](https://github.com/blockstack/stacks.js/commit/8ce84a38822d9c1d26e8e2cc63f0c627d9c9e165)), closes [#1623](https://github.com/blockstack/stacks.js/issues/1623)
+
+
+
 ## [6.17.0](https://github.com/blockstack/stacks.js/compare/v6.16.1...v6.17.0) (2024-10-17)
 
 **Note:** Version bump only for package @stacks/bns
