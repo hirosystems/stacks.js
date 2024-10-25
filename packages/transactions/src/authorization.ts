@@ -5,11 +5,8 @@ import {
   IntegerType,
   intToBigInt,
   intToBytes,
-  PrivateKey,
-  PublicKey,
   writeUInt16BE,
 } from '@stacks/common';
-import { BytesReader } from './BytesReader';
 import {
   AddressHashMode,
   AuthType,
@@ -17,33 +14,40 @@ import {
   PubKeyEncoding,
   RECOVERABLE_ECDSA_SIG_LENGTH_BYTES,
   SingleSigHashMode,
+  StacksMessageType,
 } from './constants';
-import { DeserializationError, SigningError, VerificationError } from './errors';
-import {
-  createStacksPublicKey,
-  privateKeyToPublic,
-  publicKeyFromSignatureVrs,
-  publicKeyIsCompressed,
-  signWithKey,
-} from './keys';
+
 import { cloneDeep, leftPadHex, txidFromData } from './utils';
+import {
+  TransactionAuthField,
+  serializeMessageSignature,
+  deserializeMessageSignature,
+} from './signature';
 import {
   addressFromPublicKeys,
   createEmptyAddress,
   createLPList,
   deserializeLPList,
-  deserializeMessageSignature,
-  MessageSignatureWire,
-  PublicKeyWire,
-  serializeLPListBytes,
-  serializeMessageSignatureBytes,
-  StacksWireType,
-  TransactionAuthFieldWire,
-} from './wire';
+  serializeLPList,
+} from './types';
 
-export function emptyMessageSignature(): MessageSignatureWire {
+import {
+  createStacksPublicKey,
+  getPublicKey,
+  isCompressed,
+  publicKeyFromSignatureVrs,
+  signWithKey,
+  StacksPrivateKey,
+  StacksPublicKey,
+} from './keys';
+
+import { MessageSignature } from './common';
+import { DeserializationError, SigningError, VerificationError } from './errors';
+import { BytesReader } from './bytesReader';
+
+export function emptyMessageSignature(): MessageSignature {
   return {
-    type: StacksWireType.MessageSignature,
+    type: StacksMessageType.MessageSignature,
     data: bytesToHex(new Uint8Array(RECOVERABLE_ECDSA_SIG_LENGTH_BYTES)),
   };
 }
@@ -54,7 +58,7 @@ export interface SingleSigSpendingCondition {
   nonce: bigint;
   fee: bigint;
   keyEncoding: PubKeyEncoding;
-  signature: MessageSignatureWire;
+  signature: MessageSignature;
 }
 
 export interface SingleSigSpendingConditionOpts
@@ -68,7 +72,7 @@ export interface MultiSigSpendingCondition {
   signer: string;
   nonce: bigint;
   fee: bigint;
-  fields: TransactionAuthFieldWire[];
+  fields: TransactionAuthField[];
   signaturesRequired: number;
 }
 
@@ -82,43 +86,9 @@ export type SpendingCondition = SingleSigSpendingCondition | MultiSigSpendingCon
 
 export type SpendingConditionOpts = SingleSigSpendingConditionOpts | MultiSigSpendingConditionOpts;
 
-export function createSpendingCondition(
-  options:
-    | {
-        // Single-sig
-        publicKey: string;
-        nonce: IntegerType;
-        fee: IntegerType;
-      }
-    | {
-        // Multi-sig
-        publicKeys: string[];
-        numSignatures: number;
-        nonce: IntegerType;
-        fee: IntegerType;
-      }
-) {
-  if ('publicKey' in options) {
-    return createSingleSigSpendingCondition(
-      AddressHashMode.P2PKH,
-      options.publicKey,
-      options.nonce,
-      options.fee
-    );
-  }
-  // multi-sig
-  return createMultiSigSpendingCondition(
-    AddressHashMode.P2SH,
-    options.numSignatures,
-    options.publicKeys,
-    options.nonce,
-    options.fee
-  );
-}
-
 export function createSingleSigSpendingCondition(
   hashMode: SingleSigHashMode,
-  pubKey: PublicKey,
+  pubKey: string,
   nonce: IntegerType,
   fee: IntegerType
 ): SingleSigSpendingCondition {
@@ -129,15 +99,15 @@ export function createSingleSigSpendingCondition(
     1,
     [createStacksPublicKey(pubKey)]
   ).hash160;
-  const keyEncoding = publicKeyIsCompressed(pubKey)
+  const keyEncoding = isCompressed(createStacksPublicKey(pubKey))
     ? PubKeyEncoding.Compressed
     : PubKeyEncoding.Uncompressed;
 
   return {
     hashMode,
     signer,
-    nonce: intToBigInt(nonce),
-    fee: intToBigInt(fee),
+    nonce: intToBigInt(nonce, false),
+    fee: intToBigInt(fee, false),
     keyEncoding,
     signature: emptyMessageSignature(),
   };
@@ -163,8 +133,8 @@ export function createMultiSigSpendingCondition(
   return {
     hashMode,
     signer,
-    nonce: intToBigInt(nonce),
-    fee: intToBigInt(fee),
+    nonce: intToBigInt(nonce, false),
+    fee: intToBigInt(fee, false),
     fields: [],
     signaturesRequired: numSigs,
   };
@@ -179,14 +149,14 @@ export function isSingleSig(
 
 /** @internal */
 export function isSequentialMultiSig(hashMode: AddressHashMode): boolean {
-  return hashMode === AddressHashMode.P2SH || hashMode === AddressHashMode.P2WSH;
+  return hashMode === AddressHashMode.SerializeP2SH || hashMode === AddressHashMode.SerializeP2WSH;
 }
 
 /** @internal */
 export function isNonSequentialMultiSig(hashMode: AddressHashMode): boolean {
   return (
-    hashMode === AddressHashMode.P2SHNonSequential ||
-    hashMode === AddressHashMode.P2WSHNonSequential
+    hashMode === AddressHashMode.SerializeP2SHNonSequential ||
+    hashMode === AddressHashMode.SerializeP2WSHNonSequential
   );
 }
 
@@ -210,44 +180,30 @@ function clearCondition(condition: SpendingConditionOpts): SpendingCondition {
 
 export function serializeSingleSigSpendingCondition(
   condition: SingleSigSpendingConditionOpts
-): string {
-  return bytesToHex(serializeSingleSigSpendingConditionBytes(condition));
-}
-
-/** @internal */
-export function serializeSingleSigSpendingConditionBytes(
-  condition: SingleSigSpendingConditionOpts
 ): Uint8Array {
   const bytesArray = [
     condition.hashMode,
     hexToBytes(condition.signer),
-    intToBytes(condition.nonce, 8),
-    intToBytes(condition.fee, 8),
+    intToBytes(condition.nonce, false, 8),
+    intToBytes(condition.fee, false, 8),
     condition.keyEncoding as number,
-    serializeMessageSignatureBytes(condition.signature),
+    serializeMessageSignature(condition.signature),
   ];
   return concatArray(bytesArray);
 }
 
 export function serializeMultiSigSpendingCondition(
   condition: MultiSigSpendingConditionOpts
-): string {
-  return bytesToHex(serializeMultiSigSpendingConditionBytes(condition));
-}
-
-/** @internal */
-export function serializeMultiSigSpendingConditionBytes(
-  condition: MultiSigSpendingConditionOpts
 ): Uint8Array {
   const bytesArray = [
     condition.hashMode,
     hexToBytes(condition.signer),
-    intToBytes(condition.nonce, 8),
-    intToBytes(condition.fee, 8),
+    intToBytes(condition.nonce, false, 8),
+    intToBytes(condition.fee, false, 8),
   ];
 
   const fields = createLPList(condition.fields);
-  bytesArray.push(serializeLPListBytes(fields));
+  bytesArray.push(serializeLPList(fields));
 
   const numSigs = new Uint8Array(2);
   writeUInt16BE(numSigs, condition.signaturesRequired, 0);
@@ -267,7 +223,7 @@ export function deserializeSingleSigSpendingCondition(
   const keyEncoding = bytesReader.readUInt8Enum(PubKeyEncoding, n => {
     throw new DeserializationError(`Could not parse ${n} as PubKeyEncoding`);
   });
-  if (hashMode === AddressHashMode.P2WPKH && keyEncoding != PubKeyEncoding.Compressed) {
+  if (hashMode === AddressHashMode.SerializeP2WPKH && keyEncoding != PubKeyEncoding.Compressed) {
     throw new DeserializationError(
       'Failed to parse singlesig spending condition: incomaptible hash mode and key encoding'
     );
@@ -291,18 +247,18 @@ export function deserializeMultiSigSpendingCondition(
   const nonce = BigInt('0x' + bytesToHex(bytesReader.readBytes(8)));
   const fee = BigInt('0x' + bytesToHex(bytesReader.readBytes(8)));
 
-  const fields = deserializeLPList(bytesReader, StacksWireType.TransactionAuthField)
-    .values as TransactionAuthFieldWire[];
+  const fields = deserializeLPList(bytesReader, StacksMessageType.TransactionAuthField)
+    .values as TransactionAuthField[];
 
   let haveUncompressed = false;
   let numSigs = 0;
 
   for (const field of fields) {
     switch (field.contents.type) {
-      case StacksWireType.PublicKey:
-        if (!publicKeyIsCompressed(field.contents.data)) haveUncompressed = true;
+      case StacksMessageType.PublicKey:
+        if (!isCompressed(field.contents)) haveUncompressed = true;
         break;
-      case StacksWireType.MessageSignature:
+      case StacksMessageType.MessageSignature:
         if (field.pubKeyEncoding === PubKeyEncoding.Uncompressed) haveUncompressed = true;
         numSigs += 1;
         if (numSigs === 65536)
@@ -319,7 +275,8 @@ export function deserializeMultiSigSpendingCondition(
 
   if (
     haveUncompressed &&
-    (hashMode === AddressHashMode.P2WSH || hashMode === AddressHashMode.P2WSHNonSequential)
+    (hashMode === AddressHashMode.SerializeP2WSH ||
+      hashMode === AddressHashMode.SerializeP2WSHNonSequential)
   ) {
     throw new VerificationError('Uncompressed keys are not allowed in this hash mode');
   }
@@ -334,14 +291,11 @@ export function deserializeMultiSigSpendingCondition(
   };
 }
 
-export function serializeSpendingCondition(condition: SpendingConditionOpts): string {
-  return bytesToHex(serializeSpendingConditionBytes(condition));
-}
-
-/** @internal */
-export function serializeSpendingConditionBytes(condition: SpendingConditionOpts): Uint8Array {
-  if (isSingleSig(condition)) return serializeSingleSigSpendingConditionBytes(condition);
-  return serializeMultiSigSpendingConditionBytes(condition);
+export function serializeSpendingCondition(condition: SpendingConditionOpts): Uint8Array {
+  if (isSingleSig(condition)) {
+    return serializeSingleSigSpendingCondition(condition);
+  }
+  return serializeMultiSigSpendingCondition(condition);
 }
 
 export function deserializeSpendingCondition(bytesReader: BytesReader): SpendingCondition {
@@ -349,15 +303,14 @@ export function deserializeSpendingCondition(bytesReader: BytesReader): Spending
     throw new DeserializationError(`Could not parse ${n} as AddressHashMode`);
   });
 
-  if (hashMode === AddressHashMode.P2PKH || hashMode === AddressHashMode.P2WPKH) {
+  if (hashMode === AddressHashMode.SerializeP2PKH || hashMode === AddressHashMode.SerializeP2WPKH) {
     return deserializeSingleSigSpendingCondition(hashMode, bytesReader);
   } else {
     return deserializeMultiSigSpendingCondition(hashMode, bytesReader);
   }
 }
 
-/** @ignore */
-export function sigHashPreSign(
+export function makeSigHashPreSign(
   curSigHash: string,
   authType: AuthType,
   fee: IntegerType,
@@ -374,8 +327,8 @@ export function sigHashPreSign(
   const sigHash =
     curSigHash +
     bytesToHex(new Uint8Array([authType])) +
-    bytesToHex(intToBytes(fee, 8)) +
-    bytesToHex(intToBytes(nonce, 8));
+    bytesToHex(intToBytes(fee, false, 8)) +
+    bytesToHex(intToBytes(nonce, false, 8));
 
   if (hexToBytes(sigHash).byteLength !== hashLength) {
     throw Error('Invalid signature hash length');
@@ -384,19 +337,22 @@ export function sigHashPreSign(
   return txidFromData(hexToBytes(sigHash));
 }
 
-/** @internal */
-function sigHashPostSign(curSigHash: string, pubKey: PublicKeyWire, signature: string): string {
+function makeSigHashPostSign(
+  curSigHash: string,
+  pubKey: StacksPublicKey,
+  signature: MessageSignature
+): string {
   // new hash combines the previous hash and all the new data this signature will add.  This
   // includes:
   // * the public key compression flag
   // * the signature
   const hashLength = 32 + 1 + RECOVERABLE_ECDSA_SIG_LENGTH_BYTES;
 
-  const pubKeyEncoding = publicKeyIsCompressed(pubKey.data)
+  const pubKeyEncoding = isCompressed(pubKey)
     ? PubKeyEncoding.Compressed
     : PubKeyEncoding.Uncompressed;
 
-  const sigHash = curSigHash + leftPadHex(pubKeyEncoding.toString(16)) + signature;
+  const sigHash = curSigHash + leftPadHex(pubKeyEncoding.toString(16)) + signature.data;
 
   const sigHashBytes = hexToBytes(sigHash);
   if (sigHashBytes.byteLength > hashLength) {
@@ -411,16 +367,16 @@ export function nextSignature(
   authType: AuthType,
   fee: IntegerType,
   nonce: IntegerType,
-  privateKey: PrivateKey
+  privateKey: StacksPrivateKey
 ): {
-  nextSig: string;
+  nextSig: MessageSignature;
   nextSigHash: string;
 } {
-  const sigHashPre = sigHashPreSign(curSigHash, authType, fee, nonce);
+  const sigHashPreSign = makeSigHashPreSign(curSigHash, authType, fee, nonce);
 
-  const signature = signWithKey(privateKey, sigHashPre);
-  const publicKey = createStacksPublicKey(privateKeyToPublic(privateKey));
-  const nextSigHash = sigHashPostSign(sigHashPre, publicKey, signature);
+  const signature = signWithKey(privateKey, sigHashPreSign);
+  const publicKey = getPublicKey(privateKey);
+  const nextSigHash = makeSigHashPostSign(sigHashPreSign, publicKey, signature);
 
   return {
     nextSig: signature,
@@ -434,15 +390,15 @@ export function nextVerification(
   fee: IntegerType,
   nonce: IntegerType,
   pubKeyEncoding: PubKeyEncoding,
-  signature: string
+  signature: MessageSignature
 ) {
-  const sigHashPre = sigHashPreSign(initialSigHash, authType, fee, nonce);
+  const sigHashPreSign = makeSigHashPreSign(initialSigHash, authType, fee, nonce);
 
   const publicKey = createStacksPublicKey(
-    publicKeyFromSignatureVrs(sigHashPre, signature, pubKeyEncoding)
+    publicKeyFromSignatureVrs(sigHashPreSign, signature, pubKeyEncoding)
   );
 
-  const nextSigHash = sigHashPostSign(sigHashPre, publicKey, signature);
+  const nextSigHash = makeSigHashPostSign(sigHashPreSign, publicKey, signature);
 
   return {
     pubKey: publicKey,
@@ -451,7 +407,12 @@ export function nextVerification(
 }
 
 function newInitialSigHash(): SpendingCondition {
-  const spendingCondition = createSingleSigSpendingCondition(AddressHashMode.P2PKH, '', 0, 0);
+  const spendingCondition = createSingleSigSpendingCondition(
+    AddressHashMode.SerializeP2PKH,
+    '',
+    0,
+    0
+  );
   spendingCondition.signer = createEmptyAddress().hash160;
   spendingCondition.keyEncoding = PubKeyEncoding.Compressed;
   spendingCondition.signature = emptyMessageSignature();
@@ -481,7 +442,7 @@ function verifySingleSig(
     condition.fee,
     condition.nonce,
     condition.keyEncoding,
-    condition.signature.data
+    condition.signature
   );
 
   // address version arg doesn't matter for signer hash generation
@@ -505,18 +466,19 @@ function verifyMultiSig(
   initialSigHash: string,
   authType: AuthType
 ): string {
-  const publicKeys: PublicKeyWire[] = [];
+  const publicKeys: StacksPublicKey[] = [];
+
   let curSigHash = initialSigHash;
   let haveUncompressed = false;
   let numSigs = 0;
 
   for (const field of condition.fields) {
     switch (field.contents.type) {
-      case StacksWireType.PublicKey:
-        if (!publicKeyIsCompressed(field.contents.data)) haveUncompressed = true;
+      case StacksMessageType.PublicKey:
+        if (!isCompressed(field.contents)) haveUncompressed = true;
         publicKeys.push(field.contents);
         break;
-      case StacksWireType.MessageSignature:
+      case StacksMessageType.MessageSignature:
         if (field.pubKeyEncoding === PubKeyEncoding.Uncompressed) haveUncompressed = true;
         const { pubKey, nextSigHash } = nextVerification(
           curSigHash,
@@ -524,7 +486,7 @@ function verifyMultiSig(
           condition.fee,
           condition.nonce,
           field.pubKeyEncoding,
-          field.contents.data
+          field.contents
         );
 
         if (isSequentialMultiSig(condition.hashMode)) {
@@ -547,8 +509,8 @@ function verifyMultiSig(
 
   if (
     haveUncompressed &&
-    (condition.hashMode === AddressHashMode.P2WSH ||
-      condition.hashMode === AddressHashMode.P2WSHNonSequential)
+    (condition.hashMode === AddressHashMode.SerializeP2WSH ||
+      condition.hashMode === AddressHashMode.SerializeP2WSHNonSequential)
   )
     throw new VerificationError('Uncompressed keys are not allowed in this hash mode');
 
@@ -595,7 +557,7 @@ export function createSponsoredAuth(
     spendingCondition,
     sponsorSpendingCondition: sponsorSpendingCondition
       ? sponsorSpendingCondition
-      : createSingleSigSpendingCondition(AddressHashMode.P2PKH, '0'.repeat(66), 0, 0),
+      : createSingleSigSpendingCondition(AddressHashMode.SerializeP2PKH, '0'.repeat(66), 0, 0),
   };
 }
 
@@ -630,13 +592,13 @@ export function setFee(auth: Authorization, amount: IntegerType): Authorization 
     case AuthType.Standard:
       const spendingCondition = {
         ...auth.spendingCondition,
-        fee: intToBigInt(amount),
+        fee: intToBigInt(amount, false),
       };
       return { ...auth, spendingCondition };
     case AuthType.Sponsored:
       const sponsorSpendingCondition = {
         ...auth.sponsorSpendingCondition,
-        fee: intToBigInt(amount),
+        fee: intToBigInt(amount, false),
       };
       return { ...auth, sponsorSpendingCondition };
   }
@@ -654,7 +616,7 @@ export function getFee(auth: Authorization): bigint {
 export function setNonce(auth: Authorization, nonce: IntegerType): Authorization {
   const spendingCondition = {
     ...auth.spendingCondition,
-    nonce: intToBigInt(nonce),
+    nonce: intToBigInt(nonce, false),
   };
 
   return {
@@ -666,7 +628,7 @@ export function setNonce(auth: Authorization, nonce: IntegerType): Authorization
 export function setSponsorNonce(auth: SponsoredAuthorization, nonce: IntegerType): Authorization {
   const sponsorSpendingCondition = {
     ...auth.sponsorSpendingCondition,
-    nonce: intToBigInt(nonce),
+    nonce: intToBigInt(nonce, false),
   };
 
   return {
@@ -681,8 +643,8 @@ export function setSponsor(
 ): Authorization {
   const sc = {
     ...sponsorSpendingCondition,
-    nonce: intToBigInt(sponsorSpendingCondition.nonce),
-    fee: intToBigInt(sponsorSpendingCondition.fee),
+    nonce: intToBigInt(sponsorSpendingCondition.nonce, false),
+    fee: intToBigInt(sponsorSpendingCondition.fee, false),
   };
 
   return {
@@ -691,22 +653,17 @@ export function setSponsor(
   };
 }
 
-export function serializeAuthorization(auth: Authorization): string {
-  return bytesToHex(serializeAuthorizationBytes(auth));
-}
-
-/** @internal */
-export function serializeAuthorizationBytes(auth: Authorization): Uint8Array {
+export function serializeAuthorization(auth: Authorization): Uint8Array {
   const bytesArray = [];
   bytesArray.push(auth.authType);
 
   switch (auth.authType) {
     case AuthType.Standard:
-      bytesArray.push(serializeSpendingConditionBytes(auth.spendingCondition));
+      bytesArray.push(serializeSpendingCondition(auth.spendingCondition));
       break;
     case AuthType.Sponsored:
-      bytesArray.push(serializeSpendingConditionBytes(auth.spendingCondition));
-      bytesArray.push(serializeSpendingConditionBytes(auth.sponsorSpendingCondition));
+      bytesArray.push(serializeSpendingCondition(auth.spendingCondition));
+      bytesArray.push(serializeSpendingCondition(auth.sponsorSpendingCondition));
       break;
   }
 

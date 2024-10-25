@@ -11,32 +11,21 @@ import { wordlist } from '@scure/bip39/wordlists/english';
 // https://github.com/paulmillr/scure-bip32
 // Secure, audited & minimal implementation of BIP32 hierarchical deterministic (HD) wallets.
 import { HDKey } from '@scure/bip32';
-import { bytesToHex } from '@stacks/common';
-import { encryptMnemonic } from '@stacks/encryption';
-import { DerivationType } from '.';
-import { deriveAccount, deriveWalletKeys } from './derive';
 import { Wallet, getRootNode } from './models/common';
+import { encrypt } from './encryption';
+import { deriveAccount, deriveWalletKeys } from './derive';
+import { DerivationType } from '.';
+import { bytesToHex } from '@stacks/common';
 
 export type AllowedKeyEntropyBits = 128 | 256;
 
-/**
- * Generate a random 12 or 24 word mnemonic phrase.
- *
- * @example
- * ```ts
- * const phrase = randomSeedPhrase();
- * // "warrior volume sport ... figure cake since"
- * ```
- */
-export function randomSeedPhrase(entropy: AllowedKeyEntropyBits = 256): string {
-  return generateMnemonic(wordlist, entropy);
-}
-
-/** @deprecated Use {@link randomSeedPhrase} instead */
-export const generateSecretKey = randomSeedPhrase;
+export const generateSecretKey = (entropy: AllowedKeyEntropyBits = 256) => {
+  const secretKey = generateMnemonic(wordlist, entropy);
+  return secretKey;
+};
 
 /**
- * Generate a new {@link Wallet}.
+ * Generate a new [[Wallet]].
  * @param secretKey A 12 or 24 word mnemonic phrase. Must be a valid bip39 mnemonic.
  * @param password A password used to encrypt the wallet
  */
@@ -47,7 +36,7 @@ export const generateWallet = async ({
   secretKey: string;
   password: string;
 }): Promise<Wallet> => {
-  const ciphertextBytes = await encryptMnemonic(secretKey, password);
+  const ciphertextBytes = await encrypt(secretKey, password);
   const encryptedSecretKey = bytesToHex(ciphertextBytes);
 
   const rootPrivateKey = await mnemonicToSeed(secretKey);

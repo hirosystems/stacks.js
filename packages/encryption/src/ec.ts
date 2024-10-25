@@ -203,7 +203,7 @@ function isValidPublicKey(pub: string): {
 /**
  * Hex encodes a 32-byte bigint instance.
  * The result string is zero padded and always 64 characters in length.
- * @ignore @internal @deprecated
+ * @ignore
  */
 export function getHexFromBN(bnInput: bigint): string {
   const hexOut = bnInput.toString(16);
@@ -215,13 +215,13 @@ export function getHexFromBN(bnInput: bigint): string {
     const padding = '0'.repeat(64 - hexOut.length);
     return `${padding}${hexOut}`;
   } else {
-    throw new Error('Generated a > 32-byte bigint for encryption. Failing.');
+    throw new Error('Generated a > 32-byte BN for encryption. Failing.');
   }
 }
 
 /**
  * Converts to zero padded 32 bytes
- * @ignore @deprecated
+ * @ignore
  */
 export function getBytesFromBN(bnInput: bigint): Uint8Array {
   // todo: remove method?

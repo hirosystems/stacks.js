@@ -1,47 +1,53 @@
+import { bytesToHex } from '@stacks/common';
+import * as bitcoin from 'bitcoinjs-lib';
+import * as blockstack from 'blockstack';
+import cors from 'cors';
+import * as crypto from 'crypto';
+import * as fs from 'fs';
+import * as process from 'process';
+import * as winston from 'winston';
+
 import * as scureBip39 from '@scure/bip39';
 import { wordlist } from '@scure/bip39/wordlists/english';
 import { buildPreorderNameTx, buildRegisterNameTx } from '@stacks/bns';
-import { bytesToHex, HIRO_MAINNET_URL, HIRO_TESTNET_URL } from '@stacks/common';
+import { StacksMainnet, StacksTestnet } from '@stacks/network';
 import {
-  ACCOUNT_PATH,
+  AnchorMode,
   broadcastTransaction,
-  Cl,
+  callReadOnlyFunction,
   ClarityAbi,
   ClarityValue,
   ContractCallPayload,
-  cvToJSON,
+  SignedContractDeployOptions,
+  createStacksPrivateKey,
   cvToString,
-  estimateTransactionByteLength,
-  fetchAbi,
-  fetchCallReadOnlyFunction,
-  fetchFeeEstimateTransaction,
-  fetchFeeEstimateTransfer,
+  estimateContractDeploy,
+  estimateContractFunctionCall,
+  estimateTransfer,
+  getAbi,
   getAddressFromPrivateKey,
   makeContractCall,
   makeContractDeploy,
   makeSTXTokenTransfer,
   PostConditionMode,
-  privateKeyToPublic,
+  pubKeyfromPrivKey,
+  publicKeyToString,
   ReadOnlyFunctionOptions,
-  serializePayload,
   SignedContractCallOptions,
-  SignedContractDeployOptions,
   SignedTokenTransferOptions,
   signWithKey,
-  StacksTransactionWire,
+  StacksTransaction,
   TransactionSigner,
+  TransactionVersion,
   TxBroadcastResult,
   validateContractCall,
+  Cl,
+  cvToJSON,
 } from '@stacks/transactions';
-import * as bitcoin from 'bitcoinjs-lib';
-import * as blockstack from 'blockstack';
-import * as crypto from 'crypto';
-import * as fs from 'fs';
+import express from 'express';
 import { prompt } from 'inquirer';
 import fetch from 'node-fetch';
 import * as path from 'path';
-import * as process from 'process';
-import * as winston from 'winston';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const c32check = require('c32check');
@@ -69,10 +75,10 @@ import {
 
 import {
   checkArgs,
-  CLI_ARGS,
   CLIOptAsBool,
   CLIOptAsString,
   CLIOptAsStringArray,
+  CLI_ARGS,
   DEFAULT_CONFIG_PATH,
   DEFAULT_CONFIG_TESTNET_PATH,
   getCLIOpts,
@@ -86,18 +92,10 @@ import {
 
 import { decryptBackupPhrase, encryptBackupPhrase } from './encrypt';
 
-import { CLI_NETWORK_OPTS, CLINetworkAdapter, getNetwork, NameInfoType } from './network';
+import { CLINetworkAdapter, CLI_NETWORK_OPTS, getNetwork, NameInfoType } from './network';
 
 import { gaiaAuth, gaiaConnect, gaiaUploadProfileAll, getGaiaAddressFromProfile } from './data';
 
-import { defaultUrlFromNetwork, STACKS_MAINNET, STACKS_TESTNET } from '@stacks/network';
-import {
-  generateNewAccount,
-  generateWallet,
-  getAppPrivateKey,
-  restoreWalletAccounts,
-} from '@stacks/wallet-sdk';
-import { getMaxIDSearchIndex, getPrivateKeyAddress, setMaxIDSearchIndex } from './common';
 import {
   canonicalPrivateKey,
   ClarityFunctionArg,
@@ -118,13 +116,21 @@ import {
   subdomainOpToZFPieces,
 } from './utils';
 
+import {
+  generateNewAccount,
+  generateWallet,
+  getAppPrivateKey,
+  restoreWalletAccounts,
+} from '@stacks/wallet-sdk';
+import { handleAuth, handleSignIn } from './auth';
+import { getMaxIDSearchIndex, getPrivateKeyAddress, setMaxIDSearchIndex } from './common';
 // global CLI options
 let txOnly = false;
 let estimateOnly = false;
 let safetyChecks = true;
 let receiveFeesPeriod = 52595;
 let gracePeriod = 5000;
-const noExit = false;
+let noExit = false;
 
 let BLOCKSTACK_TEST = !!process.env.BLOCKSTACK_TEST;
 
@@ -135,7 +141,7 @@ let BLOCKSTACK_TEST = !!process.env.BLOCKSTACK_TEST;
  */
 // TODO: fix, network is never used
 // @ts-ignore
-function profileSign(_network: CLINetworkAdapter, args: string[]): Promise<string> {
+function profileSign(network: CLINetworkAdapter, args: string[]): Promise<string> {
   const profilePath = args[0];
   const profileData = JSON.parse(fs.readFileSync(profilePath).toString());
   return Promise.resolve().then(() => makeProfileJWT(profileData, args[1]));
@@ -146,13 +152,13 @@ function profileSign(_network: CLINetworkAdapter, args: string[]): Promise<strin
  * @path (string) path to the profile
  * @publicKeyOrAddress (string) public key or address
  */
-function profileVerify(_network: CLINetworkAdapter, args: string[]): Promise<string> {
+function profileVerify(network: CLINetworkAdapter, args: string[]): Promise<string> {
   const profilePath = args[0];
   let publicKeyOrAddress = args[1];
 
   // need to coerce mainnet
   if (publicKeyOrAddress.match(ID_ADDRESS_PATTERN)) {
-    publicKeyOrAddress = _network.coerceMainnetAddress(publicKeyOrAddress.slice(3));
+    publicKeyOrAddress = network.coerceMainnetAddress(publicKeyOrAddress.slice(3));
   }
 
   const profileString = fs.readFileSync(profilePath).toString();
@@ -189,7 +195,7 @@ function profileVerify(_network: CLINetworkAdapter, args: string[]): Promise<str
  * @privateKey (string) owner private key for the name
  * @gaiaUrl (string) this is the write endpoint of the Gaia hub to use
  */
-function profileStore(_network: CLINetworkAdapter, args: string[]): Promise<string> {
+function profileStore(network: CLINetworkAdapter, args: string[]): Promise<string> {
   const nameOrAddress = args[0];
   const signedProfilePath = args[1];
   const privateKey = decodePrivateKey(args[2]);
@@ -197,8 +203,8 @@ function profileStore(_network: CLINetworkAdapter, args: string[]): Promise<stri
 
   const signedProfileData = fs.readFileSync(signedProfilePath).toString();
 
-  const ownerAddress = getPrivateKeyAddress(_network, privateKey);
-  const ownerAddressMainnet = _network.coerceMainnetAddress(ownerAddress);
+  const ownerAddress = getPrivateKeyAddress(network, privateKey);
+  const ownerAddressMainnet = network.coerceMainnetAddress(ownerAddress);
 
   let nameInfoPromise: Promise<NameInfoType | null>;
   let name = '';
@@ -212,11 +218,11 @@ function profileStore(_network: CLINetworkAdapter, args: string[]): Promise<stri
     });
   } else {
     // name; find the address
-    nameInfoPromise = getNameInfoEasy(_network, nameOrAddress);
+    nameInfoPromise = getNameInfoEasy(network, nameOrAddress);
     name = nameOrAddress;
   }
 
-  const verifyProfilePromise = profileVerify(_network, [
+  const verifyProfilePromise = profileVerify(network, [
     signedProfilePath,
     `ID-${ownerAddressMainnet}`,
   ]);
@@ -226,14 +232,14 @@ function profileStore(_network: CLINetworkAdapter, args: string[]): Promise<stri
       if (
         safetyChecks &&
         (!nameInfo ||
-          _network.coerceAddress(nameInfo.address) !== _network.coerceAddress(ownerAddress))
+          network.coerceAddress(nameInfo.address) !== network.coerceAddress(ownerAddress))
       ) {
         throw new Error(
           'Name owner address either could not be found, or does not match ' +
             `private key address ${ownerAddress}`
         );
       }
-      return gaiaUploadProfileAll(_network, [gaiaHubUrl], signedProfileData, args[2], name);
+      return gaiaUploadProfileAll(network, [gaiaHubUrl], signedProfileData, args[2], name);
     })
     .then((gaiaUrls: { dataUrls?: string[] | null; error?: string | null }) => {
       if (gaiaUrls.hasOwnProperty('error')) {
@@ -252,7 +258,7 @@ function profileStore(_network: CLINetworkAdapter, args: string[]): Promise<stri
  * @index (number) the index of the account
  * @appOrigin (string) the application's origin URL
  */
-async function getAppKeys(_network: CLINetworkAdapter, args: string[]): Promise<string> {
+async function getAppKeys(network: CLINetworkAdapter, args: string[]): Promise<string> {
   const mnemonic = await getBackupPhrase(args[0]);
   const index = parseInt(args[1]);
   if (index <= 0) throw new Error('index must be greater than 0');
@@ -265,7 +271,7 @@ async function getAppKeys(_network: CLINetworkAdapter, args: string[]): Promise<
   const privateKey = getAppPrivateKey({ account, appDomain });
   const address = getAddressFromPrivateKey(
     privateKey,
-    _network.isMainnet() ? STACKS_MAINNET : STACKS_TESTNET
+    network.isMainnet() ? TransactionVersion.Mainnet : TransactionVersion.Testnet
   );
 
   return JSON.stringify({ keyInfo: { privateKey, address } });
@@ -277,7 +283,7 @@ async function getAppKeys(_network: CLINetworkAdapter, args: string[]): Promise<
  * @mnemonic (string) the 12-word phrase
  * @max_index (integer) (optional) the profile index maximum
  */
-async function getOwnerKeys(_network: CLINetworkAdapter, args: string[]): Promise<string> {
+async function getOwnerKeys(network: CLINetworkAdapter, args: string[]): Promise<string> {
   const mnemonic = await getBackupPhrase(args[0]);
   let maxIndex = 1;
   if (args.length > 1 && !!args[1]) {
@@ -286,7 +292,7 @@ async function getOwnerKeys(_network: CLINetworkAdapter, args: string[]): Promis
 
   const keyInfo: OwnerKeyInfoType[] = [];
   for (let i = 0; i < maxIndex; i++) {
-    keyInfo.push(await getOwnerKeyInfo(_network, mnemonic, i));
+    keyInfo.push(await getOwnerKeyInfo(network, mnemonic, i));
   }
 
   return JSONStringify(keyInfo);
@@ -297,10 +303,10 @@ async function getOwnerKeys(_network: CLINetworkAdapter, args: string[]): Promis
  * args:
  * @mnemonic (string) the 12-word phrase
  */
-async function getPaymentKey(_network: CLINetworkAdapter, args: string[]): Promise<string> {
+async function getPaymentKey(network: CLINetworkAdapter, args: string[]): Promise<string> {
   const mnemonic = await getBackupPhrase(args[0]);
   // keep the return value consistent with getOwnerKeys
-  const keyObj = await getPaymentKeyInfo(_network, mnemonic);
+  const keyObj = await getPaymentKeyInfo(network, mnemonic);
   const keyInfo: PaymentKeyInfoType[] = [];
   keyInfo.push(keyObj);
   return JSONStringify(keyInfo);
@@ -311,11 +317,11 @@ async function getPaymentKey(_network: CLINetworkAdapter, args: string[]): Promi
  * args:
  * @mnemonic (string) the 24-word phrase
  */
-async function getStacksWalletKey(_network: CLINetworkAdapter, args: string[]): Promise<string> {
+async function getStacksWalletKey(network: CLINetworkAdapter, args: string[]): Promise<string> {
   const mnemonic = await getBackupPhrase(args[0]);
   const derivationPath: string | undefined = args[1] || undefined;
   // keep the return value consistent with getOwnerKeys
-  const keyObj = await getStacksWalletKeyInfo(_network, mnemonic, derivationPath);
+  const keyObj = await getStacksWalletKeyInfo(network, mnemonic, derivationPath);
   const keyInfo: StacksKeyInfoType[] = [];
   keyInfo.push(keyObj);
   return JSONStringify(keyInfo);
@@ -328,14 +334,14 @@ async function getStacksWalletKey(_network: CLINetworkAdapter, args: string[]): 
  * @mnemonic (string) the seed phrase to retrieve the privateKey & address
  * @registrarUrl (string) URL of the registrar to use (defaults to 'https://registrar.stacks.co')
  */
-async function migrateSubdomains(_network: CLINetworkAdapter, args: string[]): Promise<string> {
+async function migrateSubdomains(network: CLINetworkAdapter, args: string[]): Promise<string> {
   const mnemonic: string = await getBackupPhrase(args[0]); // args[0] is the cli argument for mnemonic
   const baseWallet = await generateWallet({ secretKey: mnemonic, password: '' });
-  const network = _network.isMainnet() ? STACKS_MAINNET : STACKS_TESTNET;
+  const _network = network.isMainnet() ? new StacksMainnet() : new StacksTestnet();
   const wallet = await restoreWalletAccounts({
     wallet: baseWallet,
     gaiaHubUrl: 'https://hub.blockstack.org',
-    network,
+    network: _network,
   });
   console.log(
     `Accounts found: ${wallet.accounts.length}\n(Accounts will be checked for both compressed and uncompressed public keys)`
@@ -353,12 +359,14 @@ async function migrateSubdomains(_network: CLINetworkAdapter, args: string[]): P
   for (const account of accounts) {
     console.log('\nAccount:', account);
 
-    const dataKeyAddress = getAddressFromPrivateKey(account.dataPrivateKey, network); // source
-    const walletKeyAddress = getAddressFromPrivateKey(account.stxPrivateKey, network); // target
+    const txVersion = network.isMainnet() ? TransactionVersion.Mainnet : TransactionVersion.Testnet;
+
+    const dataKeyAddress = getAddressFromPrivateKey(account.dataPrivateKey, txVersion); // source
+    const walletKeyAddress = getAddressFromPrivateKey(account.stxPrivateKey, txVersion); // target
 
     console.log(`Finding subdomains for data-key address '${dataKeyAddress}'`);
     const namesResponse = await fetch(
-      `${defaultUrlFromNetwork(network)}/v1/addresses/stacks/${dataKeyAddress}`
+      `${_network.coreApiUrl}/v1/addresses/stacks/${dataKeyAddress}`
     );
     const namesJson = await namesResponse.json();
 
@@ -376,7 +384,7 @@ async function migrateSubdomains(_network: CLINetworkAdapter, args: string[]): P
       // Alerts the user to any subdomains that can't be migrated to these wallet-key-derived addresses
       // Given collision with existing usernames owned by them
       const namesResponse = await fetch(
-        `${defaultUrlFromNetwork(network)}/v1/addresses/stacks/${walletKeyAddress}`
+        `${_network.coreApiUrl}/v1/addresses/stacks/${walletKeyAddress}`
       );
       const existingNames = await namesResponse.json();
       if (existingNames.names?.includes(subdomain)) {
@@ -385,7 +393,7 @@ async function migrateSubdomains(_network: CLINetworkAdapter, args: string[]): P
       }
 
       // Validate user owns the subdomain
-      const nameInfo = await fetch(`${defaultUrlFromNetwork(network)}/v1/names/${subdomain}`);
+      const nameInfo = await fetch(`${_network.coreApiUrl}/v1/names/${subdomain}`);
       const nameInfoJson = await nameInfo.json();
       console.log('Subdomain Info: ', nameInfoJson);
       if (nameInfoJson.address !== dataKeyAddress) {
@@ -410,7 +418,7 @@ async function migrateSubdomains(_network: CLINetworkAdapter, args: string[]): P
         subdomainName,
         owner: walletKeyAddress, // new owner address / wallet-key address (compressed)
         zonefile: nameInfoJson.zonefile,
-        sequenceNumber: 1, // should be 'old sequence number + 1', but cannot find old sequence number so assuming 1. client should calculate it again.
+        sequenceNumber: 1, // should be 'old sequence number + 1', but cannot find old sequence number so assuming 1. Api should calculate it again.
       };
 
       const subdomainPieces = subdomainOpToZFPieces(subDomainOp);
@@ -431,10 +439,10 @@ async function migrateSubdomains(_network: CLINetworkAdapter, args: string[]): P
        * ********************************************************************************
        */
       const hash = crypto.createHash('sha256').update(textToSign).digest('hex');
-      const sig = signWithKey(account.dataPrivateKey, hash);
+      const sig = signWithKey(createStacksPrivateKey(account.dataPrivateKey), hash);
 
       // https://docs.stacks.co/build-apps/references/bns#subdomain-lifecycle
-      subDomainOp.signature = sig;
+      subDomainOp.signature = sig.data;
 
       payload.subdomains_list.push(subDomainOp);
     }
@@ -483,13 +491,13 @@ async function migrateSubdomains(_network: CLINetworkAdapter, args: string[]): P
  * args:
  * @mnemonic (string) OPTIONAL; the 12-word phrase
  */
-async function makeKeychain(_network: CLINetworkAdapter, args: string[]): Promise<string> {
+async function makeKeychain(network: CLINetworkAdapter, args: string[]): Promise<string> {
   const mnemonic: string = args[0]
     ? await getBackupPhrase(args[0])
     : scureBip39.generateMnemonic(wordlist, STX_WALLET_COMPATIBLE_SEED_STRENGTH);
 
   const derivationPath: string | undefined = args[1] || undefined;
-  const stacksKeyInfo = await getStacksWalletKeyInfo(_network, mnemonic, derivationPath);
+  const stacksKeyInfo = await getStacksWalletKeyInfo(network, mnemonic, derivationPath);
 
   return JSONStringify({
     mnemonic,
@@ -503,18 +511,20 @@ async function makeKeychain(_network: CLINetworkAdapter, args: string[]): Promis
  * args:
  * @address (string) the address
  */
-function balance(_network: CLINetworkAdapter, args: string[]): Promise<string> {
+function balance(network: CLINetworkAdapter, args: string[]): Promise<string> {
   let address = args[0];
 
   if (BLOCKSTACK_TEST) {
     // force testnet address if we're in testnet mode
-    address = _network.coerceAddress(address);
+    address = network.coerceAddress(address);
   }
 
   // temporary hack to use network config from stacks-transactions lib
-  const url = _network.isMainnet() ? HIRO_MAINNET_URL : HIRO_TESTNET_URL;
+  const txNetwork = network.isMainnet()
+    ? new StacksMainnet({ url: network.legacyNetwork.blockstackAPIUrl })
+    : new StacksTestnet({ url: network.legacyNetwork.blockstackAPIUrl });
 
-  return fetch(`${url}${ACCOUNT_PATH}/${address}?proof=0`)
+  return fetch(txNetwork.getAccountApiUrl(address))
     .then(response => {
       if (response.status === 404) {
         return Promise.reject({
@@ -542,14 +552,14 @@ function balance(_network: CLINetworkAdapter, args: string[]): Promise<string> {
  * @address (string) the account address
  * @page (int) the page of the history to fetch (optional)
  */
-function getAccountHistory(_network: CLINetworkAdapter, args: string[]): Promise<string> {
+function getAccountHistory(network: CLINetworkAdapter, args: string[]): Promise<string> {
   const address = c32check.c32ToB58(args[0]);
 
   if (args.length >= 2 && !!args[1]) {
     const page = parseInt(args[1]);
     return Promise.resolve()
       .then(() => {
-        return _network.getAccountHistoryPage(address, page);
+        return network.getAccountHistoryPage(address, page);
       })
       .then(accountStates =>
         JSONStringify(
@@ -568,7 +578,7 @@ function getAccountHistory(_network: CLINetworkAdapter, args: string[]): Promise
     let history: any[] = [];
 
     function getAllAccountHistoryPages(page: number): Promise<any[]> {
-      return _network.getAccountHistoryPage(address, page).then((results: any[]) => {
+      return network.getAccountHistoryPage(address, page).then((results: any[]) => {
         if (results.length == 0) {
           return history;
         } else {
@@ -679,7 +689,7 @@ function getAccountHistory(_network: CLINetworkAdapter, args: string[]): Promise
  * @privateKey (string) the hex-encoded private key to use to send the tokens
  * @memo (string) OPTIONAL: a 34-byte memo to include
  */
-async function sendTokens(_network: CLINetworkAdapter, args: string[]): Promise<string> {
+async function sendTokens(network: CLINetworkAdapter, args: string[]): Promise<string> {
   const recipientAddress = args[0];
   const tokenAmount = BigInt(args[1]);
   const fee = BigInt(args[2]);
@@ -692,7 +702,10 @@ async function sendTokens(_network: CLINetworkAdapter, args: string[]): Promise<
     memo = args[5];
   }
 
-  const network = _network.isMainnet() ? STACKS_MAINNET : STACKS_TESTNET;
+  // temporary hack to use network config from stacks-transactions lib
+  const txNetwork = network.isMainnet()
+    ? new StacksMainnet({ url: network.legacyNetwork.blockstackAPIUrl })
+    : new StacksTestnet({ url: network.legacyNetwork.blockstackAPIUrl });
 
   const options: SignedTokenTransferOptions = {
     recipient: recipientAddress,
@@ -701,29 +714,30 @@ async function sendTokens(_network: CLINetworkAdapter, args: string[]): Promise<
     fee,
     nonce,
     memo,
-    network,
+    network: txNetwork,
+    anchorMode: AnchorMode.Any,
   };
 
-  const tx: StacksTransactionWire = await makeSTXTokenTransfer(options);
+  const tx: StacksTransaction = await makeSTXTokenTransfer(options);
 
   if (estimateOnly) {
-    return fetchFeeEstimateTransfer({ transaction: tx, network }).then(cost => {
+    return estimateTransfer(tx, txNetwork).then(cost => {
       return cost.toString(10);
     });
   }
 
   if (txOnly) {
-    return Promise.resolve(tx.serialize());
+    return Promise.resolve(bytesToHex(tx.serialize()));
   }
 
-  return broadcastTransaction({ transaction: tx, network })
+  return broadcastTransaction(tx, txNetwork)
     .then((response: TxBroadcastResult) => {
       if (response.hasOwnProperty('error')) {
         return response;
       }
       return {
         txid: `0x${tx.txid()}`,
-        transaction: generateExplorerTxPageUrl(tx.txid(), network),
+        transaction: generateExplorerTxPageUrl(tx.txid(), txNetwork),
       };
     })
     .catch(error => {
@@ -740,7 +754,7 @@ async function sendTokens(_network: CLINetworkAdapter, args: string[]): Promise<
  * @nonce (int) integer nonce needs to be incremented after each transaction from an account
  * @privateKey (string) the hex-encoded private key to use to send the tokens
  */
-async function contractDeploy(_network: CLINetworkAdapter, args: string[]): Promise<string> {
+async function contractDeploy(network: CLINetworkAdapter, args: string[]): Promise<string> {
   const sourceFile = args[0];
   const contractName = args[1];
   const fee = BigInt(args[2]);
@@ -749,7 +763,10 @@ async function contractDeploy(_network: CLINetworkAdapter, args: string[]): Prom
 
   const source = fs.readFileSync(sourceFile).toString();
 
-  const network = _network.isMainnet() ? STACKS_MAINNET : STACKS_TESTNET;
+  // temporary hack to use network config from stacks-transactions lib
+  const txNetwork = network.isMainnet()
+    ? new StacksMainnet({ url: network.legacyNetwork.blockstackAPIUrl })
+    : new StacksTestnet({ url: network.legacyNetwork.blockstackAPIUrl });
 
   const options: SignedContractDeployOptions = {
     contractName,
@@ -757,31 +774,31 @@ async function contractDeploy(_network: CLINetworkAdapter, args: string[]): Prom
     senderKey: privateKey,
     fee,
     nonce,
-    network,
-    postConditionMode: 'allow',
+    network: txNetwork,
+    postConditionMode: PostConditionMode.Allow,
+    anchorMode: AnchorMode.Any,
   };
 
   const tx = await makeContractDeploy(options);
 
   if (estimateOnly) {
-    return fetchFeeEstimateTransaction({
-      payload: serializePayload(tx.payload),
-      estimatedLength: estimateTransactionByteLength(tx),
-    }).then(costs => costs[1].fee.toString(10));
+    return estimateContractDeploy(tx, txNetwork).then(cost => {
+      return cost.toString(10);
+    });
   }
 
   if (txOnly) {
-    return Promise.resolve(tx.serialize());
+    return Promise.resolve(bytesToHex(tx.serialize()));
   }
 
-  return broadcastTransaction({ transaction: tx })
+  return broadcastTransaction(tx, txNetwork)
     .then(response => {
       if (response.hasOwnProperty('error')) {
         return response;
       }
       return {
         txid: `0x${tx.txid()}`,
-        transaction: generateExplorerTxPageUrl(tx.txid(), network),
+        transaction: generateExplorerTxPageUrl(tx.txid(), txNetwork),
       };
     })
     .catch(error => {
@@ -799,7 +816,7 @@ async function contractDeploy(_network: CLINetworkAdapter, args: string[]): Prom
  * @nonce (int) integer nonce needs to be incremented after each transaction from an account
  * @privateKey (string) the hex-encoded private key to use to send the tokens
  */
-async function contractFunctionCall(_network: CLINetworkAdapter, args: string[]): Promise<string> {
+async function contractFunctionCall(network: CLINetworkAdapter, args: string[]): Promise<string> {
   const contractAddress = args[0];
   const contractName = args[1];
   const functionName = args[2];
@@ -808,13 +825,15 @@ async function contractFunctionCall(_network: CLINetworkAdapter, args: string[])
   const privateKey = args[5];
 
   // temporary hack to use network config from stacks-transactions lib
-  const network = _network.isMainnet() ? STACKS_MAINNET : STACKS_TESTNET;
+  const txNetwork = network.isMainnet()
+    ? new StacksMainnet({ url: network.legacyNetwork.blockstackAPIUrl })
+    : new StacksTestnet({ url: network.legacyNetwork.blockstackAPIUrl });
 
   let abi: ClarityAbi;
   let abiArgs: ClarityFunctionArg[];
   let functionArgs: ClarityValue[] = [];
 
-  return fetchAbi({ contractAddress, contractName, network })
+  return getAbi(contractAddress, contractName, txNetwork)
     .then(responseAbi => {
       abi = responseAbi;
       const filtered = abi.functions.filter(fn => fn.name === functionName);
@@ -837,8 +856,9 @@ async function contractFunctionCall(_network: CLINetworkAdapter, args: string[])
         senderKey: privateKey,
         fee,
         nonce,
-        network,
+        network: txNetwork,
         postConditionMode: PostConditionMode.Allow,
+        anchorMode: AnchorMode.Any,
       };
 
       return makeContractCall(options);
@@ -849,24 +869,23 @@ async function contractFunctionCall(_network: CLINetworkAdapter, args: string[])
       }
 
       if (estimateOnly) {
-        return fetchFeeEstimateTransaction({
-          payload: serializePayload(tx.payload),
-          estimatedLength: estimateTransactionByteLength(tx),
-        }).then(costs => costs[1].fee.toString(10));
+        return estimateContractFunctionCall(tx, txNetwork).then(cost => {
+          return cost.toString(10);
+        });
       }
 
       if (txOnly) {
-        return Promise.resolve(tx.serialize());
+        return Promise.resolve(bytesToHex(tx.serialize()));
       }
 
-      return broadcastTransaction({ transaction: tx, network })
+      return broadcastTransaction(tx, txNetwork)
         .then(response => {
           if (response.hasOwnProperty('error')) {
             return response;
           }
           return {
             txid: `0x${tx.txid()}`,
-            transaction: generateExplorerTxPageUrl(tx.txid(), network),
+            transaction: generateExplorerTxPageUrl(tx.txid(), txNetwork),
           };
         })
         .catch(error => {
@@ -884,7 +903,7 @@ async function contractFunctionCall(_network: CLINetworkAdapter, args: string[])
  * @senderAddress (string) the sender address
  */
 async function readOnlyContractFunctionCall(
-  _network: CLINetworkAdapter,
+  network: CLINetworkAdapter,
   args: string[]
 ): Promise<string> {
   const contractAddress = args[0];
@@ -892,13 +911,16 @@ async function readOnlyContractFunctionCall(
   const functionName = args[2];
   const senderAddress = args[3];
 
-  const network = _network.isMainnet() ? STACKS_MAINNET : STACKS_TESTNET;
+  // temporary hack to use network config from stacks-transactions lib
+  const txNetwork = network.isMainnet()
+    ? new StacksMainnet({ url: network.legacyNetwork.blockstackAPIUrl })
+    : new StacksTestnet({ url: network.legacyNetwork.blockstackAPIUrl });
 
   let abi: ClarityAbi;
   let abiArgs: ClarityFunctionArg[];
   let functionArgs: ClarityValue[] = [];
 
-  return fetchAbi({ contractAddress, contractName, network })
+  return getAbi(contractAddress, contractName, txNetwork)
     .then(responseAbi => {
       abi = responseAbi;
       const filtered = abi.functions.filter(fn => fn.name === functionName);
@@ -919,10 +941,10 @@ async function readOnlyContractFunctionCall(
         functionName,
         functionArgs,
         senderAddress,
-        network,
+        network: txNetwork,
       };
 
-      return fetchCallReadOnlyFunction(options);
+      return callReadOnlyFunction(options);
     })
     .then(returnValue => {
       return cvToString(returnValue);
@@ -995,10 +1017,10 @@ function decodeCV(_network: CLINetworkAdapter, args: string[]): Promise<string> 
  * args:
  * @private_key (string) the hex-encoded private key or key bundle
  */
-function getKeyAddress(_network: CLINetworkAdapter, args: string[]): Promise<string> {
+function getKeyAddress(network: CLINetworkAdapter, args: string[]): Promise<string> {
   const privateKey = decodePrivateKey(args[0]);
   return Promise.resolve().then(() => {
-    const addr = getPrivateKeyAddress(_network, privateKey);
+    const addr = getPrivateKeyAddress(network, privateKey);
     return JSONStringify({
       BTC: addr,
       STACKS: c32check.b58ToC32(addr),
@@ -1017,7 +1039,7 @@ function getKeyAddress(_network: CLINetworkAdapter, args: string[]): Promise<str
  * @verify (string) OPTIONAL: if '1' or 'true', then search for and verify a signature file
  *  along with the data
  */
-function gaiaGetFile(_network: CLINetworkAdapter, args: string[]): Promise<string | Buffer> {
+function gaiaGetFile(network: CLINetworkAdapter, args: string[]): Promise<string | Buffer> {
   const username = args[0];
   const origin = args[1];
   const path = args[2];
@@ -1040,7 +1062,7 @@ function gaiaGetFile(_network: CLINetworkAdapter, args: string[]): Promise<strin
 
   // force mainnet addresses
   blockstack.config.network.layer1 = bitcoin.networks.bitcoin;
-  return gaiaAuth(_network, appPrivateKey, null)
+  return gaiaAuth(network, appPrivateKey, null)
     .then((_userData: UserData) =>
       blockstack.getFile(path, {
         decrypt: decrypt,
@@ -1068,7 +1090,7 @@ function gaiaGetFile(_network: CLINetworkAdapter, args: string[]): Promise<strin
  * @encrypt (string) OPTIONAL: if '1' or 'true', then encrypt the file
  * @sign (string) OPTIONAL: if '1' or 'true', then sign the file and store the signature too.
  */
-function gaiaPutFile(_network: CLINetworkAdapter, args: string[]): Promise<string> {
+function gaiaPutFile(network: CLINetworkAdapter, args: string[]): Promise<string> {
   const hubUrl = args[0];
   const appPrivateKey = args[1];
   const dataPath = args[2];
@@ -1089,7 +1111,7 @@ function gaiaPutFile(_network: CLINetworkAdapter, args: string[]): Promise<strin
   // force mainnet addresses
   // TODO
   blockstack.config.network.layer1 = bitcoin.networks.bitcoin;
-  return gaiaAuth(_network, appPrivateKey, hubUrl)
+  return gaiaAuth(network, appPrivateKey, hubUrl)
     .then((_userData: UserData) => {
       return blockstack.putFile(gaiaPath, data, { encrypt: encrypt, sign: sign });
     })
@@ -1106,7 +1128,7 @@ function gaiaPutFile(_network: CLINetworkAdapter, args: string[]): Promise<strin
  * @gaiaPath (string) the path (in Gaia) to delete
  * @wasSigned (string) OPTIONAL: if '1' or 'true'.  Delete the signature file as well.
  */
-function gaiaDeleteFile(_network: CLINetworkAdapter, args: string[]): Promise<string> {
+function gaiaDeleteFile(network: CLINetworkAdapter, args: string[]): Promise<string> {
   const hubUrl = args[0];
   const appPrivateKey = args[1];
   const gaiaPath = path.normalize(args[2].replace(/^\/+/, ''));
@@ -1120,7 +1142,7 @@ function gaiaDeleteFile(_network: CLINetworkAdapter, args: string[]): Promise<st
   // force mainnet addresses
   // TODO
   blockstack.config.network.layer1 = bitcoin.networks.bitcoin;
-  return gaiaAuth(_network, appPrivateKey, hubUrl)
+  return gaiaAuth(network, appPrivateKey, hubUrl)
     .then((_userData: UserData) => {
       return blockstack.deleteFile(gaiaPath, { wasSigned: wasSigned });
     })
@@ -1135,7 +1157,7 @@ function gaiaDeleteFile(_network: CLINetworkAdapter, args: string[]): Promise<st
  * @hubUrl (string) the URL to the write endpoint of the gaia hub
  * @appPrivateKey (string) the private key used to authenticate to the gaia hub
  */
-function gaiaListFiles(_network: CLINetworkAdapter, args: string[]): Promise<string> {
+function gaiaListFiles(network: CLINetworkAdapter, args: string[]): Promise<string> {
   const hubUrl = args[0];
   const appPrivateKey = args[1];
 
@@ -1143,7 +1165,7 @@ function gaiaListFiles(_network: CLINetworkAdapter, args: string[]): Promise<str
   // TODO
   let count = 0;
   blockstack.config.network.layer1 = bitcoin.networks.bitcoin;
-  return gaiaAuth(_network, canonicalPrivateKey(appPrivateKey), hubUrl)
+  return gaiaAuth(network, canonicalPrivateKey(appPrivateKey), hubUrl)
     .then((_userData: UserData) => {
       return blockstack.listFiles((name: string) => {
         // print out incrementally
@@ -1190,7 +1212,7 @@ function sleep(ms: number) {
  * @mnemonic (string) the 12-word phrase or ciphertext
  * @dumpDir (string) the directory to hold the dumped files
  */
-function gaiaDumpBucket(_network: CLINetworkAdapter, args: string[]): Promise<string> {
+function gaiaDumpBucket(network: CLINetworkAdapter, args: string[]): Promise<string> {
   const nameOrIDAddress = args[0];
   const appOrigin = args[1];
   const hubUrl = args[2];
@@ -1253,14 +1275,14 @@ function gaiaDumpBucket(_network: CLINetworkAdapter, args: string[]): Promise<st
   let appPrivateKey: string;
   let ownerPrivateKey: string;
 
-  return getIDAppKeys(_network, nameOrIDAddress, appOrigin, mnemonicOrCiphertext)
+  return getIDAppKeys(network, nameOrIDAddress, appOrigin, mnemonicOrCiphertext)
     .then((keyInfo: IDAppKeys) => {
       appPrivateKey = keyInfo.appPrivateKey;
       ownerPrivateKey = keyInfo.ownerPrivateKey;
-      return gaiaAuth(_network, appPrivateKey, hubUrl, ownerPrivateKey);
+      return gaiaAuth(network, appPrivateKey, hubUrl, ownerPrivateKey);
     })
     .then((_userData: UserData) => {
-      return gaiaConnect(_network, hubUrl, appPrivateKey);
+      return gaiaConnect(network, hubUrl, appPrivateKey);
     })
     .then((hubConfig: GaiaHubConfig) => {
       gaiaHubConfig = hubConfig;
@@ -1306,7 +1328,7 @@ function gaiaDumpBucket(_network: CLINetworkAdapter, args: string[]): Promise<st
  * @mnemonic (string) the 12-word phrase or ciphertext
  * @dumpDir (string) the directory to hold the dumped files
  */
-function gaiaRestoreBucket(_network: CLINetworkAdapter, args: string[]): Promise<string> {
+function gaiaRestoreBucket(network: CLINetworkAdapter, args: string[]): Promise<string> {
   const nameOrIDAddress = args[0];
   const appOrigin = args[1];
   const hubUrl = args[2];
@@ -1332,11 +1354,11 @@ function gaiaRestoreBucket(_network: CLINetworkAdapter, args: string[]): Promise
   // TODO better way of doing this
   blockstack.config.network.layer1 = bitcoin.networks.bitcoin;
 
-  return getIDAppKeys(_network, nameOrIDAddress, appOrigin, mnemonicOrCiphertext)
+  return getIDAppKeys(network, nameOrIDAddress, appOrigin, mnemonicOrCiphertext)
     .then((keyInfo: IDAppKeys) => {
       appPrivateKey = keyInfo.appPrivateKey;
       ownerPrivateKey = keyInfo.ownerPrivateKey;
-      return gaiaAuth(_network, appPrivateKey, hubUrl, ownerPrivateKey);
+      return gaiaAuth(network, appPrivateKey, hubUrl, ownerPrivateKey);
     })
     .then(async (_userData: UserData) => {
       const batchSize = 99;
@@ -1373,8 +1395,8 @@ function gaiaRestoreBucket(_network: CLINetworkAdapter, args: string[]): Promise
  * @hubUrl (string) the URL to the write endpoint of the app's gaia hub
  * @mnemonic (string) the 12-word backup phrase, or the ciphertext of it
  */
-async function gaiaSetHub(_network: CLINetworkAdapter, args: string[]): Promise<string> {
-  _network.setCoerceMainnetAddress(true);
+async function gaiaSetHub(network: CLINetworkAdapter, args: string[]): Promise<string> {
+  network.setCoerceMainnetAddress(true);
 
   const blockstackID = args[0];
   const ownerHubUrl = args[1];
@@ -1382,7 +1404,7 @@ async function gaiaSetHub(_network: CLINetworkAdapter, args: string[]): Promise<
   const hubUrl = args[3];
   const mnemonicPromise = getBackupPhrase(args[4]);
 
-  const nameInfoPromise = getNameInfoEasy(_network, blockstackID).then(
+  const nameInfoPromise = getNameInfoEasy(network, blockstackID).then(
     (nameInfo: NameInfoType | null) => {
       if (!nameInfo) {
         throw new Error('Name not found');
@@ -1414,26 +1436,26 @@ async function gaiaSetHub(_network: CLINetworkAdapter, args: string[]): Promise<
   }
 
   // get owner ID-address
-  const ownerAddress = _network.coerceMainnetAddress(nameInfo.address);
+  const ownerAddress = network.coerceMainnetAddress(nameInfo.address);
   const idAddress = `ID-${ownerAddress}`;
 
   // get owner and app key info
-  const appKeyInfo = await getApplicationKeyInfo(_network, mnemonic, idAddress, appOrigin);
-  const ownerKeyInfo = await getOwnerKeyInfo(_network, mnemonic, appKeyInfo.ownerKeyIndex);
+  const appKeyInfo = await getApplicationKeyInfo(network, mnemonic, idAddress, appOrigin);
+  const ownerKeyInfo = await getOwnerKeyInfo(network, mnemonic, appKeyInfo.ownerKeyIndex);
 
   // do we already have an address set for this app?
   let existingAppAddress: string | null = null;
   let appPrivateKey: string;
   try {
-    existingAppAddress = getGaiaAddressFromProfile(_network, nameProfile, appOrigin);
-    appPrivateKey = extractAppKey(_network, appKeyInfo, existingAppAddress);
+    existingAppAddress = getGaiaAddressFromProfile(network, nameProfile, appOrigin);
+    appPrivateKey = extractAppKey(network, appKeyInfo, existingAppAddress);
   } catch (e) {
     console.log(`No profile application entry for ${appOrigin}`);
-    appPrivateKey = extractAppKey(_network, appKeyInfo);
+    appPrivateKey = extractAppKey(network, appKeyInfo);
   }
 
   appPrivateKey = `${canonicalPrivateKey(appPrivateKey)}01`;
-  const appAddress = _network.coerceMainnetAddress(getPrivateKeyAddress(_network, appPrivateKey));
+  const appAddress = network.coerceMainnetAddress(getPrivateKeyAddress(network, appPrivateKey));
 
   if (existingAppAddress && appAddress !== existingAppAddress) {
     throw new Error(`BUG: ${existingAppAddress} !== ${appAddress}`);
@@ -1442,8 +1464,8 @@ async function gaiaSetHub(_network: CLINetworkAdapter, args: string[]): Promise<
   const profile = nameProfile;
   const ownerPrivateKey = ownerKeyInfo.privateKey;
 
-  const ownerGaiaHubPromise = gaiaConnect(_network, ownerHubUrl, ownerPrivateKey);
-  const appGaiaHubPromise = gaiaConnect(_network, hubUrl, appPrivateKey);
+  const ownerGaiaHubPromise = gaiaConnect(network, ownerHubUrl, ownerPrivateKey);
+  const appGaiaHubPromise = gaiaConnect(network, hubUrl, appPrivateKey);
 
   const [ownerHubConfig, appHubConfig]: [GaiaHubConfig, GaiaHubConfig] = await Promise.all([
     ownerGaiaHubPromise,
@@ -1472,7 +1494,7 @@ async function gaiaSetHub(_network: CLINetworkAdapter, args: string[]): Promise<
     dataUrls?: string[] | null;
     error?: string | null;
   } = await gaiaUploadProfileAll(
-    _network,
+    network,
     [ownerHubUrl],
     signedProfile,
     ownerPrivateKey,
@@ -1496,7 +1518,7 @@ async function gaiaSetHub(_network: CLINetworkAdapter, args: string[]): Promise<
  * args:
  * @address (string) the input address.  can be in any format
  */
-function addressConvert(_network: CLINetworkAdapter, args: string[]): Promise<string> {
+function addressConvert(network: CLINetworkAdapter, args: string[]): Promise<string> {
   const addr = args[0];
   let b58addr: string;
   let testnetb58addr: string;
@@ -1511,12 +1533,12 @@ function addressConvert(_network: CLINetworkAdapter, args: string[]): Promise<st
 
   if (isTestnetAddress(b58addr)) {
     testnetb58addr = b58addr;
-  } else if (_network.isTestnet()) {
-    testnetb58addr = _network.coerceAddress(b58addr);
+  } else if (network.isTestnet()) {
+    testnetb58addr = network.coerceAddress(b58addr);
   }
 
   return Promise.resolve().then(() => {
-    const mainnetb58addr = _network.coerceMainnetAddress(b58addr);
+    const mainnetb58addr = network.coerceMainnetAddress(b58addr);
     const result: any = {
       mainnet: {
         STACKS: c32check.b58ToC32(mainnetb58addr),
@@ -1537,6 +1559,60 @@ function addressConvert(_network: CLINetworkAdapter, args: string[]): Promise<st
 }
 
 /*
+ * Run an authentication daemon on a given port.
+ * args:
+ * @gaiaHubUrl (string) the write endpoint of your app Gaia hub, where app data will be stored
+ * @mnemonic (string) your 12-word phrase, optionally encrypted.  If encrypted, then
+ * a password will be prompted.
+ * @profileGaiaHubUrl (string) the write endpoint of your profile Gaia hub, where your profile
+ *   will be stored (optional)
+ * @port (number) the port to listen on (optional)
+ */
+function authDaemon(network: CLINetworkAdapter, args: string[]): Promise<string> {
+  const gaiaHubUrl = args[0];
+  const mnemonicOrCiphertext = args[1];
+  let port = 3000; // default port
+  let profileGaiaHub = gaiaHubUrl;
+
+  if (args.length > 2 && !!args[2]) {
+    profileGaiaHub = args[2];
+  }
+
+  if (args.length > 3 && !!args[3]) {
+    port = parseInt(args[3]);
+  }
+
+  if (port < 0 || port > 65535) {
+    return Promise.resolve().then(() => JSONStringify({ error: 'Invalid port' }));
+  }
+
+  const mnemonicPromise = getBackupPhrase(mnemonicOrCiphertext);
+
+  return mnemonicPromise
+    .then((mnemonic: string) => {
+      noExit = true;
+
+      // load up all of our identity addresses, profiles, profile URLs, and Gaia connections
+      const authServer = express();
+      authServer.use(cors());
+
+      authServer.get(/^\/auth\/*$/, (req: express.Request, res: express.Response) => {
+        void handleAuth(network, mnemonic, gaiaHubUrl, profileGaiaHub, port, req, res);
+      });
+
+      authServer.get(/^\/signin\/*$/, (req: express.Request, res: express.Response) => {
+        void handleSignIn(network, mnemonic, gaiaHubUrl, profileGaiaHub, req, res);
+      });
+
+      authServer.listen(port, () => console.log(`Authentication server started on ${port}`));
+      return 'Press Ctrl+C to exit';
+    })
+    .catch((e: Error) => {
+      return JSONStringify({ error: e.message });
+    });
+}
+
+/*
  * Encrypt a backup phrase
  * args:
  * @backup_phrase (string) the 12-word phrase to encrypt
@@ -1544,7 +1620,7 @@ function addressConvert(_network: CLINetworkAdapter, args: string[]): Promise<st
  */
 // TODO: fix: network is never used
 // @ts-ignore
-function encryptMnemonic(_network: CLINetworkAdapter, args: string[]): Promise<string> {
+function encryptMnemonic(network: CLINetworkAdapter, args: string[]): Promise<string> {
   const mnemonic = args[0];
   if (mnemonic.split(/ +/g).length !== 12) {
     throw new Error('Invalid backup phrase: must be 12 words');
@@ -1591,7 +1667,7 @@ function encryptMnemonic(_network: CLINetworkAdapter, args: string[]): Promise<s
  */
 // TODO: fix: network is never used
 // @ts-ignore
-function decryptMnemonic(_network: CLINetworkAdapter, args: string[]): Promise<string> {
+function decryptMnemonic(network: CLINetworkAdapter, args: string[]): Promise<string> {
   const ciphertext = args[0];
 
   const passwordPromise: Promise<string> = new Promise((resolve, reject) => {
@@ -1621,18 +1697,18 @@ function decryptMnemonic(_network: CLINetworkAdapter, args: string[]): Promise<s
     });
 }
 
-async function stackingStatus(_network: CLINetworkAdapter, args: string[]): Promise<string> {
-  const address = args[0];
+async function stackingStatus(network: CLINetworkAdapter, args: string[]): Promise<string> {
+  const stxAddress = args[0];
 
-  const network = _network.isMainnet() ? STACKS_MAINNET : STACKS_TESTNET;
-  const stacker = new StackingClient({ address, network });
+  const txNetwork = network.isMainnet() ? new StacksMainnet() : new StacksTestnet();
+  const stacker = new StackingClient(stxAddress, txNetwork);
 
   return stacker
     .getStatus()
     .then((status: StackerInfo) => {
       if (status.stacked) {
         return {
-          // amount_microstx: status.details.amount_microstx, // todo: add again via other client call?
+          // amount_microstx: status.details.amount_microstx, // todo: add again via other api call?
           first_reward_cycle: status.details.first_reward_cycle,
           lock_period: status.details.lock_period,
           unlock_height: status.details.unlock_height,
@@ -1650,23 +1726,24 @@ async function stackingStatus(_network: CLINetworkAdapter, args: string[]): Prom
     });
 }
 
-async function canStack(_network: CLINetworkAdapter, args: string[]): Promise<string> {
+async function canStack(network: CLINetworkAdapter, args: string[]): Promise<string> {
   const amount = BigInt(args[0]);
   const cycles = Number(args[1]);
   const poxAddress = args[2];
   const stxAddress = args[3];
 
-  const network = _network.isMainnet() ? STACKS_MAINNET : STACKS_TESTNET;
-  const stacker = new StackingClient({ address: stxAddress, network });
+  const txNetwork = network.isMainnet() ? new StacksMainnet() : new StacksTestnet();
 
   const apiConfig = new Configuration({
-    basePath: network.client.baseUrl,
+    basePath: txNetwork.coreApiUrl,
   });
   const accounts = new AccountsApi(apiConfig);
 
   const balancePromise = accounts.getAccountBalance({
     principal: stxAddress,
   });
+
+  const stacker = new StackingClient(stxAddress, txNetwork);
 
   const poxInfoPromise = stacker.getPoxInfo();
 
@@ -1700,7 +1777,7 @@ async function canStack(_network: CLINetworkAdapter, args: string[]): Promise<st
     });
 }
 
-async function stack(_network: CLINetworkAdapter, args: string[]): Promise<string> {
+async function stack(network: CLINetworkAdapter, args: string[]): Promise<string> {
   const amount = BigInt(args[0]);
   const cycles = Number(args[1]);
   const poxAddress = args[2];
@@ -1717,20 +1794,21 @@ async function stack(_network: CLINetworkAdapter, args: string[]): Promise<strin
   //   nonce = new BN(args[5]);
   // }
 
-  const network = _network.isMainnet() ? STACKS_MAINNET : STACKS_TESTNET;
+  const txNetwork = network.isMainnet() ? new StacksMainnet() : new StacksTestnet();
+  const txVersion = txNetwork.isMainnet() ? TransactionVersion.Mainnet : TransactionVersion.Testnet;
 
   const apiConfig = new Configuration({
-    basePath: network.client.baseUrl,
+    basePath: txNetwork.coreApiUrl,
   });
   const accounts = new AccountsApi(apiConfig);
 
-  const stxAddress = getAddressFromPrivateKey(privateKey, network);
+  const stxAddress = getAddressFromPrivateKey(privateKey, txVersion);
 
   const balancePromise = accounts.getAccountBalance({
     principal: stxAddress,
   });
 
-  const stacker = new StackingClient({ address: stxAddress, network });
+  const stacker = new StackingClient(stxAddress, txNetwork);
 
   const poxInfoPromise = stacker.getPoxInfo();
 
@@ -1770,12 +1848,12 @@ async function stack(_network: CLINetworkAdapter, args: string[]): Promise<strin
       });
     })
     .then((response: TxBroadcastResult) => {
-      if ('error' in response) {
+      if (response.hasOwnProperty('error')) {
         return response;
       }
       return {
         txid: `0x${response.txid}`,
-        transaction: generateExplorerTxPageUrl(response.txid, network),
+        transaction: generateExplorerTxPageUrl(response.txid, txNetwork),
       };
     })
     .catch(error => {
@@ -1783,34 +1861,33 @@ async function stack(_network: CLINetworkAdapter, args: string[]): Promise<strin
     });
 }
 
-async function register(_network: CLINetworkAdapter, args: string[]): Promise<string> {
+async function register(network: CLINetworkAdapter, args: string[]): Promise<string> {
   const fullyQualifiedName = args[0];
   const privateKey = args[1];
   const salt = args[2];
   const zonefile = args[3];
-  const publicKey = privateKeyToPublic(privateKey);
-
-  const network = _network.isMainnet() ? STACKS_MAINNET : STACKS_TESTNET;
+  const publicKey = publicKeyToString(pubKeyfromPrivKey(privateKey));
+  const txNetwork = network.isMainnet() ? new StacksMainnet() : new StacksTestnet();
 
   const unsignedTransaction = await buildRegisterNameTx({
     fullyQualifiedName,
     publicKey,
     salt,
     zonefile,
-    network,
+    network: txNetwork,
   });
 
   const signer = new TransactionSigner(unsignedTransaction);
-  signer.signOrigin(privateKey);
+  signer.signOrigin(createStacksPrivateKey(privateKey));
 
-  return broadcastTransaction({ transaction: signer.transaction, network })
+  return broadcastTransaction(signer.transaction, txNetwork)
     .then((response: TxBroadcastResult) => {
       if (response.hasOwnProperty('error')) {
         return response;
       }
       return {
         txid: `0x${response.txid}`,
-        transaction: generateExplorerTxPageUrl(response.txid, network),
+        transaction: generateExplorerTxPageUrl(response.txid, txNetwork),
       };
     })
     .catch(error => {
@@ -1818,34 +1895,33 @@ async function register(_network: CLINetworkAdapter, args: string[]): Promise<st
     });
 }
 
-async function preorder(_network: CLINetworkAdapter, args: string[]): Promise<string> {
+async function preorder(network: CLINetworkAdapter, args: string[]): Promise<string> {
   const fullyQualifiedName = args[0];
   const privateKey = args[1];
   const salt = args[2];
   const stxToBurn = args[3];
-  const publicKey = privateKeyToPublic(privateKey);
-
-  const network = _network.isMainnet() ? STACKS_MAINNET : STACKS_TESTNET;
+  const publicKey = publicKeyToString(pubKeyfromPrivKey(privateKey));
+  const txNetwork = network.isMainnet() ? new StacksMainnet() : new StacksTestnet();
 
   const unsignedTransaction = await buildPreorderNameTx({
     fullyQualifiedName,
     publicKey,
     salt,
     stxToBurn,
-    network,
+    network: txNetwork,
   });
 
   const signer = new TransactionSigner(unsignedTransaction);
-  signer.signOrigin(privateKey);
+  signer.signOrigin(createStacksPrivateKey(privateKey));
 
-  return broadcastTransaction({ transaction: signer.transaction, network })
+  return broadcastTransaction(signer.transaction, txNetwork)
     .then((response: TxBroadcastResult) => {
       if (response.hasOwnProperty('error')) {
         return response;
       }
       return {
         txid: `0x${response.txid}`,
-        transaction: generateExplorerTxPageUrl(response.txid, network),
+        transaction: generateExplorerTxPageUrl(response.txid, txNetwork),
       };
     })
     .catch(error => {
@@ -1868,7 +1944,10 @@ function faucetCall(_: CLINetworkAdapter, args: string[]): Promise<string> {
     .then((faucetTx: any) => {
       return JSONStringify({
         txid: faucetTx.txId!,
-        transaction: generateExplorerTxPageUrl(faucetTx.txId!.replace(/^0x/, ''), STACKS_TESTNET),
+        transaction: generateExplorerTxPageUrl(
+          faucetTx.txId!.replace(/^0x/, ''),
+          new StacksTestnet()
+        ),
       });
     })
     .catch((error: any) => error.toString());
@@ -1931,6 +2010,8 @@ type CommandFunction = (network: CLINetworkAdapter, args: string[]) => Promise<s
  * Global set of commands
  */
 const COMMANDS: Record<string, CommandFunction> = {
+  authenticator: authDaemon,
+  // 'announce': announce,
   balance: balance,
   can_stack: canStack,
   call_contract_func: contractFunctionCall,
@@ -2023,8 +2104,8 @@ export function CLIMain() {
     const configPath = CLIOptAsString(opts, 'c')
       ? CLIOptAsString(opts, 'c')
       : testnet
-        ? DEFAULT_CONFIG_TESTNET_PATH
-        : DEFAULT_CONFIG_PATH;
+      ? DEFAULT_CONFIG_TESTNET_PATH
+      : DEFAULT_CONFIG_PATH;
 
     const namespaceBurnAddr = CLIOptAsString(opts, 'B');
     const feeRate = CLIOptAsString(opts, 'F') ? parseInt(CLIOptAsString(opts, 'F')!) : 0;

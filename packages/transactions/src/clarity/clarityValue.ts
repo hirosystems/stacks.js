@@ -16,8 +16,10 @@ import {
   TrueCV,
   FalseCV,
 } from '.';
+
+import { principalToString } from './types/principalCV';
 import { ClarityType } from './constants';
-import { asciiToBytes, bytesToAscii, hexToBytes, utf8ToBytes } from '@stacks/common';
+import { asciiToBytes, bytesToAscii, bytesToHex, utf8ToBytes } from '@stacks/common';
 
 export type ClarityValue =
   | BooleanCV
@@ -47,12 +49,12 @@ export function cvToString(val: ClarityValue, encoding: 'tryAscii' | 'hex' = 'he
       return `u${val.value.toString()}`;
     case ClarityType.Buffer:
       if (encoding === 'tryAscii') {
-        const str = bytesToAscii(hexToBytes(val.value));
+        const str = bytesToAscii(val.buffer);
         if (/[ -~]/.test(str)) {
           return JSON.stringify(str);
         }
       }
-      return `0x${val.value}`;
+      return `0x${bytesToHex(val.buffer)}`;
     case ClarityType.OptionalNone:
       return 'none';
     case ClarityType.OptionalSome:
@@ -63,17 +65,17 @@ export function cvToString(val: ClarityValue, encoding: 'tryAscii' | 'hex' = 'he
       return `(ok ${cvToString(val.value, encoding)})`;
     case ClarityType.PrincipalStandard:
     case ClarityType.PrincipalContract:
-      return val.value;
+      return principalToString(val);
     case ClarityType.List:
-      return `(list ${val.value.map(v => cvToString(v, encoding)).join(' ')})`;
+      return `(list ${val.list.map(v => cvToString(v, encoding)).join(' ')})`;
     case ClarityType.Tuple:
-      return `(tuple ${Object.keys(val.value)
-        .map(key => `(${key} ${cvToString(val.value[key], encoding)})`)
+      return `(tuple ${Object.keys(val.data)
+        .map(key => `(${key} ${cvToString(val.data[key], encoding)})`)
         .join(' ')})`;
     case ClarityType.StringASCII:
-      return `"${val.value}"`;
+      return `"${val.data}"`;
     case ClarityType.StringUTF8:
-      return `u"${val.value}"`;
+      return `u"${val.data}"`;
   }
 }
 
@@ -95,7 +97,7 @@ export function cvToValue(val: ClarityValue, strictJsonCompat: boolean = false):
       }
       return val.value;
     case ClarityType.Buffer:
-      return `0x${val.value}`;
+      return `0x${bytesToHex(val.buffer)}`;
     case ClarityType.OptionalNone:
       return null;
     case ClarityType.OptionalSome:
@@ -106,19 +108,19 @@ export function cvToValue(val: ClarityValue, strictJsonCompat: boolean = false):
       return cvToJSON(val.value);
     case ClarityType.PrincipalStandard:
     case ClarityType.PrincipalContract:
-      return val.value;
+      return principalToString(val);
     case ClarityType.List:
-      return val.value.map(v => cvToJSON(v));
+      return val.list.map(v => cvToJSON(v));
     case ClarityType.Tuple:
       const result: { [key: string]: any } = {};
-      Object.keys(val.value).forEach(key => {
-        result[key] = cvToJSON(val.value[key]);
+      Object.keys(val.data).forEach(key => {
+        result[key] = cvToJSON(val.data[key]);
       });
       return result;
     case ClarityType.StringASCII:
-      return val.value;
+      return val.data;
     case ClarityType.StringUTF8:
-      return val.value;
+      return val.data;
   }
 }
 
@@ -143,7 +145,7 @@ export function getCVTypeString(val: ClarityValue): string {
     case ClarityType.UInt:
       return 'uint';
     case ClarityType.Buffer:
-      return `(buff ${Math.ceil(val.value.length / 2)})`;
+      return `(buff ${val.buffer.length})`;
     case ClarityType.OptionalNone:
       return '(optional none)';
     case ClarityType.OptionalSome:
@@ -156,17 +158,17 @@ export function getCVTypeString(val: ClarityValue): string {
     case ClarityType.PrincipalContract:
       return 'principal';
     case ClarityType.List:
-      return `(list ${val.value.length} ${
-        val.value.length ? getCVTypeString(val.value[0]) : 'UnknownType'
+      return `(list ${val.list.length} ${
+        val.list.length ? getCVTypeString(val.list[0]) : 'UnknownType'
       })`;
     case ClarityType.Tuple:
-      return `(tuple ${Object.keys(val.value)
-        .map(key => `(${key} ${getCVTypeString(val.value[key])})`)
+      return `(tuple ${Object.keys(val.data)
+        .map(key => `(${key} ${getCVTypeString(val.data[key])})`)
         .join(' ')})`;
     case ClarityType.StringASCII:
-      return `(string-ascii ${asciiToBytes(val.value).length})`;
+      return `(string-ascii ${asciiToBytes(val.data).length})`;
     case ClarityType.StringUTF8:
-      return `(string-utf8 ${utf8ToBytes(val.value).length})`;
+      return `(string-utf8 ${utf8ToBytes(val.data).length})`;
   }
 }
 

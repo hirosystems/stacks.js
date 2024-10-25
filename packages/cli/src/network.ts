@@ -1,4 +1,4 @@
-import { createFetchFn, FetchFn } from '@stacks/common';
+import { createFetchFn, FetchFn } from '@stacks/network';
 import * as bitcoin from 'bitcoinjs-lib';
 import blockstack from 'blockstack';
 import { BlockstackNetwork } from 'blockstack/lib/network';

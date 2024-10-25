@@ -19,8 +19,6 @@ jobs:
         with:
           fetch-depth: 0
       - uses: wagoid/commitlint-github-action@v5
-        with:
-          configFile: .github/.husky/commitlint.json
 
   tests:
     needs: pre-run
@@ -45,34 +43,29 @@ jobs:
         with:
           node-version: 18
           cache: npm
-      - run: npm install -g npm@latest && npm ci
-      - name: Set up npm auth token
-        run: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > ~/.npmrc
+      - run: npm install -g npm@latest
+      - run: npm ci
+      - id: git-commit
+        run: echo "::set-output name=sha::$(git rev-parse --short HEAD)"
+      - run: echo $SHA
+        env:
+          SHA: ${{ steps.git-commit.outputs.sha }}
+      - run: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > ~/.npmrc
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-      - name: Publish to npm (feature branch)
-        id: publish-pr
-        run: |
-          PUBLISH_OUTPUT_FILE=$(mktemp)
-          npx lerna publish --canary --force-publish --preid pr --dist-tag pr --no-verify-access --no-push --no-git-tag-version --yes | tee $PUBLISH_OUTPUT_FILE
-          VERSION=$(grep -oP '@stacks/common\s*=>\s*\K[^\s]+' $PUBLISH_OUTPUT_FILE | head -n 1)
-          echo "Canary version: $VERSION"
-          echo "::set-output name=version::$VERSION"
-        if: ${{ (github.head_ref || github.ref_name) != 'nakamoto' && (github.head_ref || github.ref_name) != 'next' }}
+      - run: npx lerna publish --canary --force-publish --preid pr.$SHA --dist-tag pr --no-verify-access --no-push --no-git-tag-version --yes
         env:
+          SHA: ${{ steps.git-commit.outputs.sha }}
           SKIP_TESTS: true
-      - name: Publish to npm (next/nakamoto)
-        run: |
-          git reset --hard
-          npx lerna publish --canary major --force-publish --preid $BRANCH --dist-tag $BRANCH --no-verify-access --no-push --no-git-tag-version --yes
-        if: ${{ (github.head_ref || github.ref_name) == 'nakamoto' || (github.head_ref || github.ref_name) == 'next' }}
-        env:
-          BRANCH: ${{ github.head_ref || github.ref_name }}
-          SKIP_TESTS: true
-      - name: Edit pull-request description with published version
-        uses: janniks/pull-request-fixed-header@v1.0.1
+      - id: published-version
+        run: echo "::set-output name=version::$(cat lerna.json | jq -r '.version')"
+      - uses: janniks/pull-request-fixed-header@v1.0.1
         with:
-          header: "> This PR was published to npm with the version `${{ steps.publish-pr.outputs.version || env.BRANCH }}`\n> e.g. `npm install @stacks/common@${{ steps.publish-pr.outputs.version || env.BRANCH }} --save-exact`"
+          header: "> This PR was published to npm with the version `${{ steps.published-version.outputs.version }}`\n> e.g. `npm install @stacks/common@${{ steps.published-version.outputs.version }} --save-exact`"
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - run: |
+          git reset --hard
+          npx lerna publish --canary --force-publish --preid $BRANCH --dist-tag $BRANCH --no-verify-access --no-push --no-git-tag-version --yes
+        if: ${{ (github.head_ref || github.ref_name) == 'nakamoto' || (github.head_ref || github.ref_name) == 'next' }}
         env:
           BRANCH: ${{ github.head_ref || github.ref_name }}

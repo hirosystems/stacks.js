@@ -1,5 +1,5 @@
 import { getPublicKeyFromPrivate } from '@stacks/encryption';
-import { FetchFn, createFetchFn } from '@stacks/common';
+import { FetchFn, createFetchFn } from '@stacks/network';
 import {
   PublicPersonProfile,
   PublicProfileBase,

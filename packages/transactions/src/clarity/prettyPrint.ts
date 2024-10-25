@@ -6,7 +6,8 @@
   `Cl.tuple({ id: u1 })` => { id: u1 }
 */
 
-import { ClarityType, ClarityValue, ListCV, TupleCV } from '.';
+import { bytesToHex } from '@stacks/common';
+import { ClarityType, ClarityValue, ListCV, TupleCV, principalToString } from '.';
 
 function formatSpace(space: number, depth: number, end = false) {
   if (!space) return ' ';
@@ -28,12 +29,12 @@ function formatSpace(space: number, depth: number, end = false) {
  * ```
  */
 function formatList(cv: ListCV, space: number, depth = 1): string {
-  if (cv.value.length === 0) return '(list)';
+  if (cv.list.length === 0) return '(list)';
 
   const spaceBefore = formatSpace(space, depth, false);
   const endSpace = space ? formatSpace(space, depth, true) : '';
 
-  const items = cv.value.map(v => prettyPrintWithDepth(v, space, depth)).join(spaceBefore);
+  const items = cv.list.map(v => prettyPrintWithDepth(v, space, depth)).join(spaceBefore);
 
   return `(list${spaceBefore}${items}${endSpace})`;
 }
@@ -55,10 +56,10 @@ function formatList(cv: ListCV, space: number, depth = 1): string {
  * ```
  */
 function formatTuple(cv: TupleCV, space: number, depth = 1): string {
-  if (Object.keys(cv.value).length === 0) return '{}';
+  if (Object.keys(cv.data).length === 0) return '{}';
 
   const items: string[] = [];
-  for (const [key, value] of Object.entries(cv.value)) {
+  for (const [key, value] of Object.entries(cv.data)) {
     items.push(`${key}: ${prettyPrintWithDepth(value, space, depth)}`);
   }
 
@@ -80,13 +81,13 @@ function prettyPrintWithDepth(cv: ClarityValue, space = 0, depth: number): strin
   if (cv.type === ClarityType.Int) return cv.value.toString();
   if (cv.type === ClarityType.UInt) return `u${cv.value.toString()}`;
 
-  if (cv.type === ClarityType.StringASCII) return `"${cv.value}"`;
-  if (cv.type === ClarityType.StringUTF8) return `u"${cv.value}"`;
+  if (cv.type === ClarityType.StringASCII) return `"${cv.data}"`;
+  if (cv.type === ClarityType.StringUTF8) return `u"${cv.data}"`;
 
-  if (cv.type === ClarityType.PrincipalContract) return `'${cv.value}`;
-  if (cv.type === ClarityType.PrincipalStandard) return `'${cv.value}`;
+  if (cv.type === ClarityType.PrincipalContract) return `'${principalToString(cv)}`;
+  if (cv.type === ClarityType.PrincipalStandard) return `'${principalToString(cv)}`;
 
-  if (cv.type === ClarityType.Buffer) return `0x${cv.value}`;
+  if (cv.type === ClarityType.Buffer) return `0x${bytesToHex(cv.buffer)}`;
 
   if (cv.type === ClarityType.OptionalNone) return 'none';
   if (cv.type === ClarityType.OptionalSome)

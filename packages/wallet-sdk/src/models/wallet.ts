@@ -1,10 +1,10 @@
-import { NetworkClientParam, clientFromNetwork, networkFrom } from '@stacks/network';
+import { StacksNetwork } from '@stacks/network';
 import { DerivationType, deriveStxPrivateKey, fetchUsernameForAccountByDerivationType } from '..';
 import { deriveAccount, deriveLegacyConfigPrivateKey } from '../derive';
 import { connectToGaiaHubWithConfig, getHubInfo } from '../utils';
 import { Wallet, getRootNode } from './common';
 import { fetchLegacyWalletConfig } from './legacy-wallet-config';
-import { WalletConfig, fetchWalletConfig, updateWalletConfig } from './wallet-config';
+import { fetchWalletConfig, updateWalletConfig, WalletConfig } from './wallet-config';
 
 export interface LockedWallet {
   encryptedSecretKey: string;
@@ -16,20 +16,17 @@ export interface LockedWallet {
  *
  * This helps provide a better UX for users, so we can keep track of accounts they've
  * created, and usernames they've used.
- * @deprecated The usage of storing wallet related information on Gaia isn't widely used.
  */
 export async function restoreWalletAccounts({
   wallet,
   gaiaHubUrl,
-  network = 'mainnet',
-  client: _client,
+  network,
 }: {
   wallet: Wallet;
   gaiaHubUrl: string;
-} & NetworkClientParam): Promise<Wallet> {
-  const client = Object.assign({}, clientFromNetwork(networkFrom(network)), _client);
-
-  const hubInfo = await getHubInfo(gaiaHubUrl, client.fetch);
+  network: StacksNetwork;
+}): Promise<Wallet> {
+  const hubInfo = await getHubInfo(gaiaHubUrl, network.fetchFn);
   const rootNode = getRootNode(wallet);
   const legacyGaiaConfig = connectToGaiaHubWithConfig({
     hubInfo,
@@ -43,8 +40,8 @@ export async function restoreWalletAccounts({
   });
 
   const [walletConfig, legacyWalletConfig] = await Promise.all([
-    fetchWalletConfig({ wallet, gaiaHubConfig: currentGaiaConfig, fetchFn: client.fetch }),
-    fetchLegacyWalletConfig({ wallet, gaiaHubConfig: legacyGaiaConfig, fetchFn: client.fetch }),
+    fetchWalletConfig({ wallet, gaiaHubConfig: currentGaiaConfig, fetchFn: network.fetchFn }),
+    fetchLegacyWalletConfig({ wallet, gaiaHubConfig: legacyGaiaConfig, fetchFn: network.fetchFn }),
   ]);
   // Restore from existing config
   if (

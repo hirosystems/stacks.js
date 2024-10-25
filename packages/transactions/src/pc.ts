@@ -1,15 +1,15 @@
-import { IntegerType, intToBigInt } from '@stacks/common';
-import { ClarityValue } from './clarity';
+import { IntegerType } from '@stacks/common';
 import {
-  FungibleComparator,
-  FungiblePostCondition,
-  NonFungibleComparator,
-  NonFungiblePostCondition,
-  StxPostCondition,
-} from './postcondition-types';
-import { AddressString, AssetString, ContractIdString } from './types';
-import {} from './postcondition';
-import { parseContractId, validateStacksAddress } from './utils';
+  makeContractFungiblePostCondition,
+  makeContractNonFungiblePostCondition,
+  makeContractSTXPostCondition,
+  makeStandardFungiblePostCondition,
+  makeStandardNonFungiblePostCondition,
+  makeStandardSTXPostCondition,
+} from './builders';
+import { ClarityValue } from './clarity';
+import { FungibleConditionCode, NonFungibleConditionCode } from './constants';
+import { createAssetInfo, NonFungiblePostCondition } from './postcondition-types';
 
 /// `Pc.` Post Condition Builder
 //
@@ -20,50 +20,50 @@ import { parseContractId, validateStacksAddress } from './utils';
 //
 
 /**
+ * An address string encoded as c32check
+ */
+type AddressString = string;
+
+/**
+ * A contract identifier string given as `<address>.<contract-name>`
+ */
+type ContractIdString = `${string}.${string}`;
+
+/**
+ * An asset identifier string given as `<contract-id>::<token-name>` aka `<contract-address>.<contract-name>::<token-name>`
+ */
+type NftString = `${ContractIdString}::${string}`;
+
+/**
  * ### `Pc.` Post Condition Builder
  * @beta Interface may be subject to change in future releases.
- * @param {AddressString | ContractIdString} principal The principal to check, which should/should-not be sending assets. A string in the format `<address>` or `<contractAddress>.<contractName>`.
+ * @param {AddressString | ContractIdString} principal The principal to check, which should/should-not be sending assets. A string in the format "address" or "address.contractId".
  * @returns A partial post condition builder, which can be chained into a final post condition.
  * @example
  * ```
  * import { Pc } from '@stacks/transactions';
  * Pc.principal('STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6').willSendEq(10000).ustx();
- * Pc.principal('STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6.mycontract').willSendGte(2000).ft();
  * ```
  */
 // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
 export function principal(principal: AddressString | ContractIdString) {
-  const [address, name] = principal.split('.');
-
-  // todo: improve validity check (and add helper methods like `isValidContractId`, `isValidAdress`,
-  // token name, asset syntax, etc.) -- also deupe .split checks in codebase
-  if (!address || !validateStacksAddress(address) || (typeof name === 'string' && !name)) {
-    throw new Error(`Invalid contract id: ${principal}`);
+  if (isContractIdString(principal)) {
+    // `principal` is a ContractIdString here
+    const [address, name] = parseContractId(principal);
+    return new PartialPcWithPrincipal(address, name);
   }
 
-  return new PartialPcWithPrincipal(principal);
-}
-
-/**
- * ### `Pc.` Post Condition Builder
- * @beta Interface may be subject to change in future releases.
- * @returns A partial post condition builder, which can be chained into a final post condition.
- * @example
- * ```
- * import { Pc } from '@stacks/transactions';
- * Pc.origin().willSendEq(10000).ustx();
- * Pc.origin().willSendGte(2000).ft();
- * ```
- */
-export function origin() {
-  return new PartialPcWithPrincipal('origin');
+  return new PartialPcWithPrincipal(principal, undefined);
 }
 
 /**
  * Not meant to be used directly. Start from `Pc.principal(…)` instead.
  */
 class PartialPcWithPrincipal {
-  constructor(private address: string) {}
+  constructor(
+    private address: string,
+    private contractName?: string
+  ) {}
 
   // todo: split FT and STX into separate methods? e.g. `willSendSTXEq` and `willSendFtEq`
 
@@ -78,7 +78,12 @@ class PartialPcWithPrincipal {
    * ```
    */
   willSendEq(amount: IntegerType) {
-    return new PartialPcFtWithCode(this.address, amount, 'eq');
+    return new PartialPcFtWithCode(
+      this.address,
+      amount,
+      FungibleConditionCode.Equal,
+      this.contractName
+    );
   }
 
   /**
@@ -92,7 +97,12 @@ class PartialPcWithPrincipal {
    * ```
    */
   willSendLte(amount: IntegerType) {
-    return new PartialPcFtWithCode(this.address, amount, 'lte');
+    return new PartialPcFtWithCode(
+      this.address,
+      amount,
+      FungibleConditionCode.LessEqual,
+      this.contractName
+    );
   }
 
   /**
@@ -106,7 +116,12 @@ class PartialPcWithPrincipal {
    * ```
    */
   willSendLt(amount: IntegerType) {
-    return new PartialPcFtWithCode(this.address, amount, 'lt');
+    return new PartialPcFtWithCode(
+      this.address,
+      amount,
+      FungibleConditionCode.Less,
+      this.contractName
+    );
   }
 
   /**
@@ -120,7 +135,12 @@ class PartialPcWithPrincipal {
    * ```
    */
   willSendGte(amount: IntegerType) {
-    return new PartialPcFtWithCode(this.address, amount, 'gte');
+    return new PartialPcFtWithCode(
+      this.address,
+      amount,
+      FungibleConditionCode.GreaterEqual,
+      this.contractName
+    );
   }
 
   /**
@@ -134,7 +154,12 @@ class PartialPcWithPrincipal {
    * ```
    */
   willSendGt(amount: IntegerType) {
-    return new PartialPcFtWithCode(this.address, amount, 'gt');
+    return new PartialPcFtWithCode(
+      this.address,
+      amount,
+      FungibleConditionCode.Greater,
+      this.contractName
+    );
   }
 
   /**
@@ -148,7 +173,11 @@ class PartialPcWithPrincipal {
    * ```
    */
   willSendAsset() {
-    return new PartialPcNftWithCode(this.address, 'sent');
+    return new PartialPcNftWithCode(
+      this.address,
+      NonFungibleConditionCode.Sends,
+      this.contractName
+    );
   }
 
   /**
@@ -162,7 +191,11 @@ class PartialPcWithPrincipal {
    * ```
    */
   willNotSendAsset() {
-    return new PartialPcNftWithCode(this.address, 'not-sent');
+    return new PartialPcNftWithCode(
+      this.address,
+      NonFungibleConditionCode.DoesNotSend,
+      this.contractName
+    );
   }
 }
 
@@ -173,42 +206,43 @@ class PartialPcFtWithCode {
   constructor(
     private address: string,
     private amount: IntegerType,
-    private code: FungibleComparator
+    private code: FungibleConditionCode,
+    private contractName?: string
   ) {}
 
   /**
    * ### STX Post Condition
    * ⚠ Amount of STX is denoted in uSTX (micro-STX)
    */
-  ustx(): StxPostCondition {
+  ustx() {
     // todo: rename to `uSTX`?
-    return {
-      type: 'stx-postcondition',
-      address: this.address,
-      condition: this.code,
-      amount: intToBigInt(this.amount).toString(),
-    };
+    if (this.contractName) {
+      return makeContractSTXPostCondition(this.address, this.contractName, this.code, this.amount);
+    }
+    return makeStandardSTXPostCondition(this.address, this.code, this.amount);
   }
 
   /**
    * ### Fungible Token Post Condition
    * ⚠ Amount of fungible tokens is denoted in the smallest unit of the token
    */
-  ft(contractId: ContractIdString, tokenName: string): FungiblePostCondition {
-    // todo: allow taking one arg (`Asset`) as well, overload
-
-    const [address, name] = contractId.split('.');
-    if (!address || !validateStacksAddress(address) || (typeof name === 'string' && !name)) {
-      throw new Error(`Invalid contract id: ${contractId}`);
+  ft(contractId: ContractIdString, tokenName: string) {
+    const [address, name] = parseContractId(contractId);
+    if (this.contractName) {
+      return makeContractFungiblePostCondition(
+        this.address,
+        this.contractName,
+        this.code,
+        this.amount,
+        createAssetInfo(address, name, tokenName)
+      );
     }
-
-    return {
-      type: 'ft-postcondition',
-      address: this.address,
-      condition: this.code,
-      amount: intToBigInt(this.amount).toString(),
-      asset: `${contractId}::${tokenName}`,
-    };
+    return makeStandardFungiblePostCondition(
+      this.address,
+      this.code,
+      this.amount,
+      createAssetInfo(address, name, tokenName)
+    );
   }
 }
 
@@ -217,8 +251,9 @@ class PartialPcFtWithCode {
  */
 class PartialPcNftWithCode {
   constructor(
-    private address: string,
-    private code: NonFungibleComparator
+    private principal: string,
+    private code: NonFungibleConditionCode,
+    private contractName?: string
   ) {}
 
   /**
@@ -226,7 +261,7 @@ class PartialPcNftWithCode {
    * @param assetName - The name of the NFT asset. Formatted as `<contract-address>.<contract-name>::<token-name>`.
    * @param assetId - The asset identifier of the NFT. A Clarity value defining the single NFT instance.
    */
-  nft(assetName: AssetString, assetId: ClarityValue): NonFungiblePostCondition;
+  nft(assetName: NftString, assetId: ClarityValue): NonFungiblePostCondition;
   /**
    * ### Non-Fungible Token Post Condition
    * @param contractId - The contract identifier of the NFT. Formatted as `<contract-address>.<contract-name>`.
@@ -243,22 +278,34 @@ class PartialPcNftWithCode {
       ...(args as [any, any, any])
     );
 
-    if (!validateStacksAddress(contractAddress)) {
-      throw new Error(`Invalid contract id: ${contractAddress}`);
+    if (this.contractName) {
+      return makeContractNonFungiblePostCondition(
+        this.principal,
+        this.contractName,
+        this.code,
+        createAssetInfo(contractAddress, contractName, tokenName),
+        assetId
+      );
     }
 
-    return {
-      type: 'nft-postcondition',
-      address: this.address,
-      condition: this.code,
-      asset: `${contractAddress}.${contractName}::${tokenName}`,
-      assetId,
-    };
+    return makeStandardNonFungiblePostCondition(
+      this.principal,
+      this.code,
+      createAssetInfo(contractAddress, contractName, tokenName),
+      assetId
+    );
   }
 }
 
 /** @internal */
-function parseNft(nftAssetName: AssetString) {
+function parseContractId(contractId: ContractIdString) {
+  const [address, name] = contractId.split('.');
+  if (!address || !name) throw new Error(`Invalid contract identifier: ${contractId}`);
+  return [address, name];
+}
+
+/** @internal */
+function parseNft(nftAssetName: NftString) {
   const [principal, tokenName] = nftAssetName.split('::') as [ContractIdString, string];
   if (!principal || !tokenName)
     throw new Error(`Invalid fully-qualified nft asset name: ${nftAssetName}`);
@@ -266,12 +313,18 @@ function parseNft(nftAssetName: AssetString) {
   return { contractAddress: address, contractName: name, tokenName };
 }
 
+/** @internal */
+// eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
+function isContractIdString(value: AddressString | ContractIdString): value is ContractIdString {
+  return value.includes('.');
+}
+
 /**
  * Helper method for `PartialPcNftWithCode.nft` to parse the arguments.
  * @internal
  */
 function getNftArgs(
-  asset: AssetString,
+  assetName: NftString,
   assetId: ClarityValue
 ): { contractAddress: string; contractName: string; tokenName: string; assetId: ClarityValue };
 function getNftArgs(

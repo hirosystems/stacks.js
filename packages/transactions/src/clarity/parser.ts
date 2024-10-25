@@ -236,7 +236,7 @@ function clTuple(): Combinator {
         ],
         ([k, v]) => Cl.tuple({ [k as string]: v as ClarityValue })
       ),
-      c => Cl.tuple(Object.assign({}, ...c.map(t => (t as TupleCV).value))),
+      c => Cl.tuple(Object.assign({}, ...c.map(t => (t as TupleCV).data))),
       regex(/\s*\,\s*/)
     ),
     regex(/\}/),
@@ -261,7 +261,7 @@ function clTuple(): Combinator {
             ([k, v]) => Cl.tuple({ [k as string]: v as ClarityValue })
           )
         ),
-        c => Cl.tuple(Object.assign({}, ...c.map(t => (t as TupleCV).value))),
+        c => Cl.tuple(Object.assign({}, ...c.map(t => (t as TupleCV).data))),
         whitespace()
       ),
     ])

@@ -1,8 +1,8 @@
 import { getPublicKeyFromPrivate, publicKeyToBtcAddress } from '@stacks/encryption';
-import { STACKS_MOCKNET } from '@stacks/network';
+import { StacksMocknet } from '@stacks/network';
 import { makeRandomPrivKey } from '@stacks/transactions';
-import { V2_POX_REGTEST_POX_4, setApiMocks } from '../../internal/src';
 import { StackingClient } from '../src';
+import { V2_POX_REGTEST_POX_4, setApiMocks } from './apiMockingHelpers';
 
 beforeEach(() => {
   jest.resetModules();
@@ -11,12 +11,12 @@ beforeEach(() => {
 
 describe('pox-4', () => {
   test('verify-signer-key-sig', async () => {
-    const network = STACKS_MOCKNET;
+    const network = new StacksMocknet();
     const address = 'STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6';
-    const client = new StackingClient({ address, network, client: { baseUrl: 'localhost:3999' } });
+    const client = new StackingClient(address, network);
 
     const signerPrivateKey = makeRandomPrivKey();
-    const signerKey = getPublicKeyFromPrivate(signerPrivateKey);
+    const signerKey = getPublicKeyFromPrivate(signerPrivateKey.data);
 
     const signature = client.signPoxSignature({
       topic: 'stack-stx',

@@ -11,7 +11,6 @@ export function hashMessage(message: string, prefix: string = chainPrefix): Uint
 }
 
 export function encodeMessage(
-  /** UTF-8 string or Uint8Array (bytes) */
   message: string | Uint8Array,
   prefix: string = chainPrefix
 ): Uint8Array {

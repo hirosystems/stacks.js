@@ -19,8 +19,12 @@
     "typecheck": "tsc --noEmit",
     "typecheck:watch": "npm run typecheck -- --watch"
   },
+  "dependencies": {
+    "@types/bn.js": "^5.1.0",
+    "@types/node": "^18.0.4"
+  },
   "devDependencies": {
-    "@types/node": "^18.0.4",
+    "bn.js": "^5.2.1",
     "process": "^0.11.10",
     "rimraf": "^3.0.2"
   },

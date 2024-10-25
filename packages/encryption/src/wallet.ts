@@ -1,16 +1,26 @@
-import { entropyToMnemonic, mnemonicToEntropy, validateMnemonic } from '@scure/bip39';
+// https://github.com/paulmillr/scure-bip39
+// Secure, audited & minimal implementation of BIP39 mnemonic phrases.
+import { validateMnemonic, mnemonicToEntropy, entropyToMnemonic } from '@scure/bip39';
 // Word lists not imported by default as that would increase bundle sizes too much as in case of bitcoinjs/bip39
 // Use default english world list similar to bitcoinjs/bip39
 // Backward compatible with bitcoinjs/bip39 dependency
 // Very small in size as compared to bitcoinjs/bip39 wordlist
 // Reference: https://github.com/paulmillr/scure-bip39
 import { wordlist } from '@scure/bip39/wordlists/english';
-import { bytesToHex, concatBytes, equals, hexToBytes } from '@stacks/common';
-import { createCipher } from './aesCipher';
-import { GetRandomBytes, randomBytes } from './cryptoRandom';
-import { hmacSha256 } from './ec';
-import { createPbkdf2 } from './pbkdf2';
+import { randomBytes, GetRandomBytes } from './cryptoRandom';
 import { createSha2Hash } from './sha2Hash';
+import { createCipher } from './aesCipher';
+import { createPbkdf2 } from './pbkdf2';
+import { TriplesecDecryptSignature } from './cryptoUtils';
+import {
+  bytesToHex,
+  bytesToUtf8,
+  concatBytes,
+  equals,
+  hexToBytes,
+  utf8ToBytes,
+} from '@stacks/common';
+import { hmacSha256 } from './ec';
 
 /**
  * Encrypt a raw mnemonic phrase to be password protected
@@ -57,7 +67,8 @@ export async function encryptMnemonic(
   const hmacPayload = concatBytes(salt, cipherText);
   const hmacDigest = hmacSha256(macKey, hmacPayload);
 
-  return concatBytes(salt, hmacDigest, cipherText);
+  const payload = concatBytes(salt, hmacDigest, cipherText);
+  return payload;
 }
 
 // Used to distinguish bad password during decrypt vs invalid format
@@ -112,7 +123,40 @@ async function decryptMnemonicBytes(dataBytes: Uint8Array, password: string): Pr
 }
 
 /**
+ * Decrypt legacy triplesec keys
+ * @param {Uint8Array} dataBytes - The encrypted key
+ * @param {String} password - Password for data
+ * @return {Promise<BuUint8Arrayffer>} Decrypted seed
+ * @ignore
+ */
+function decryptLegacy(
+  dataBytes: Uint8Array,
+  password: string,
+  triplesecDecrypt?: TriplesecDecryptSignature
+): Promise<Uint8Array> {
+  return new Promise<Uint8Array>((resolve, reject) => {
+    if (!triplesecDecrypt) {
+      reject(new Error('The `triplesec.decrypt` function must be provided'));
+    }
+    triplesecDecrypt!(
+      {
+        key: utf8ToBytes(password),
+        data: dataBytes,
+      },
+      (err, plaintextBytes) => {
+        if (!err) {
+          resolve(plaintextBytes!);
+        } else {
+          reject(err);
+        }
+      }
+    );
+  });
+}
+
+/**
  * Decrypt an encrypted mnemonic phrase with a password.
+ * Legacy triplesec encrypted payloads are also supported.
  * @param data - Bytes or hex-encoded string of the encrypted mnemonic
  * @param password - Password for data
  * @return {string} the raw mnemonic phrase
@@ -120,8 +164,15 @@ async function decryptMnemonicBytes(dataBytes: Uint8Array, password: string): Pr
  */
 export async function decryptMnemonic(
   data: string | Uint8Array,
-  password: string
+  password: string,
+  triplesecDecrypt?: TriplesecDecryptSignature
 ): Promise<string> {
   const dataBytes = typeof data === 'string' ? hexToBytes(data) : data;
-  return await decryptMnemonicBytes(dataBytes, password);
+  try {
+    return await decryptMnemonicBytes(dataBytes, password);
+  } catch (error) {
+    if (error instanceof PasswordError) throw error;
+    const data = await decryptLegacy(dataBytes, password, triplesecDecrypt);
+    return bytesToUtf8(data);
+  }
 }

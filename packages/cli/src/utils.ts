@@ -25,9 +25,10 @@ import {
   trueCV,
   falseCV,
   standardPrincipalCV,
+  TransactionVersion,
 } from '@stacks/transactions';
 
-import { StacksNetwork, TransactionVersion } from '@stacks/network';
+import { StacksNetwork } from '@stacks/network';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const ZoneFile = require('zone-file');
@@ -761,7 +762,7 @@ export function answerToClarityValue(answer: any, arg: ClarityFunctionArg): Clar
 }
 
 export function generateExplorerTxPageUrl(txid: string, network: StacksNetwork): string {
-  if (network.transactionVersion === TransactionVersion.Testnet) {
+  if (network.version === TransactionVersion.Testnet) {
     return `https://explorer.hiro.so/txid/0x${txid}?chain=testnet`;
   } else {
     return `https://explorer.hiro.so/txid/0x${txid}?chain=mainnet`;

@@ -1,6 +1,6 @@
-import { FetchFn, bytesToHex, createFetchFn } from '@stacks/common';
+import { bytesToHex, ChainID } from '@stacks/common';
 import { getPublicKeyFromPrivate, publicKeyToBtcAddress, randomBytes } from '@stacks/encryption';
-import { ChainId } from '@stacks/network';
+import { createFetchFn, FetchFn } from '@stacks/network';
 import { GaiaHubConfig } from '@stacks/storage';
 import { Json, TokenSigner } from 'jsontokens';
 import { parseZoneFile } from 'zone-file';
@@ -125,9 +125,9 @@ export const makeGaiaAssociationToken = ({
 };
 
 interface WhenChainIdMap<T> {
-  [ChainId.Mainnet]: T;
-  [ChainId.Testnet]: T;
+  [ChainID.Mainnet]: T;
+  [ChainID.Testnet]: T;
 }
-export function whenChainId(chainId: ChainId) {
+export function whenChainId(chainId: ChainID) {
   return <T>(chainIdMap: WhenChainIdMap<T>): T => chainIdMap[chainId];
 }

@@ -9,11 +9,11 @@ import {
   NotEnoughProofError,
   PayloadTooLargeError,
   PreconditionFailedError,
-  PRIVATE_KEY_BYTES_COMPRESSED,
   utf8ToBytes,
   ValidationError,
 } from '@stacks/common';
 import {
+  compressPrivateKey,
   ecSign,
   getPublicKeyFromPrivate,
   hashSha256Sync,
@@ -21,7 +21,7 @@ import {
   randomBytes,
   Signature,
 } from '@stacks/encryption';
-import { createFetchFn, FetchFn } from '@stacks/common';
+import { createFetchFn, FetchFn } from '@stacks/network';
 import { fromByteArray } from 'base64-js';
 import { TokenSigner } from 'jsontokens';
 
@@ -151,9 +151,7 @@ function makeLegacyAuthToken(challengeText: string, signerKeyHex: string): strin
   }
   if (parsedChallenge[0] === 'gaiahub' && parsedChallenge[3] === 'blockstack_storage_please_sign') {
     const digest = hashSha256Sync(utf8ToBytes(challengeText));
-    const compressedPrivateKey =
-      signerKeyHex.length === PRIVATE_KEY_BYTES_COMPRESSED * 2 ? signerKeyHex : `${signerKeyHex}01`;
-    const signatureBytes = ecSign(digest, compressedPrivateKey);
+    const signatureBytes = ecSign(digest, compressPrivateKey(signerKeyHex));
     // We only want the DER encoding so use toDERHex provided by @noble/secp256k1
     const signature = Signature.fromCompact(bytesToHex(signatureBytes)).toDERHex();
 

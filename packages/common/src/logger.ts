@@ -13,7 +13,6 @@ for (let index = 0; index < levels.length; index++) {
 
 /**
  * @ignore
- * @deprecated
  */
 export class Logger {
   static error(message: string) {

@@ -19,7 +19,6 @@ import {
 } from './clarity';
 
 export { prettyPrint, stringify } from './clarity/prettyPrint';
-
 export { parse } from './clarity/parser';
 
 // todo: https://github.com/hirosystems/clarinet/issues/786
@@ -117,6 +116,7 @@ export const contractPrincipal = contractPrincipalCV;
  * @see {@link serialize}, {@link deserialize}
  */
 export const standardPrincipal = standardPrincipalCV;
+// todo: add .principal method that detects `.` inside string for both standard and contract principals
 
 // Sequences ///////////////////////////////////////////////////////////////////
 /**

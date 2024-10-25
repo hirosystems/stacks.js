@@ -1,29 +1,33 @@
-import { bytesToAscii, bytesToTwosBigInt, bytesToUtf8, hexToBytes } from '@stacks/common';
 import {
+  ClarityType,
   ClarityValue,
-  ClarityWireType,
-  bufferCV,
-  contractPrincipalCVFromAddress,
-  falseCV,
   intCV,
-  listCV,
-  noneCV,
-  responseErrorCV,
-  responseOkCV,
-  someCV,
-  standardPrincipalCVFromAddress,
-  stringAsciiCV,
-  stringUtf8CV,
-  trueCV,
-  tupleCV,
   uintCV,
+  bufferCV,
+  trueCV,
+  falseCV,
+  standardPrincipalCVFromAddress,
+  contractPrincipalCVFromAddress,
+  responseOkCV,
+  responseErrorCV,
+  noneCV,
+  someCV,
+  listCV,
+  tupleCV,
 } from '.';
-import { BytesReader } from '../BytesReader';
+import { BytesReader as BytesReader } from '../bytesReader';
+import { deserializeAddress, deserializeLPString } from '../types';
 import { DeserializationError } from '../errors';
-import { deserializeAddress, deserializeLPString } from '../wire';
+import { stringAsciiCV, stringUtf8CV } from './types/stringCV';
+import { bytesToAscii, bytesToUtf8, hexToBytes } from '@stacks/common';
 
 /**
  * Deserializes clarity value to clarity type
+ *
+ * @param {value} Uint8Array | string value to be converted to clarity type
+ **
+ * @returns {ClarityType} returns the clarity type instance
+ *
  * @example
  * ```
  *  import { intCV, serializeCV, deserializeCV } from '@stacks/transactions';
@@ -39,7 +43,7 @@ import { deserializeAddress, deserializeLPString } from '../wire';
  * @see
  * {@link https://github.com/hirosystems/stacks.js/blob/main/packages/transactions/tests/clarity.test.ts | clarity test cases for more examples}
  */
-export function deserializeCV<T extends ClarityValue = ClarityValue>(
+export default function deserializeCV<T extends ClarityValue = ClarityValue>(
   serializedClarityValue: BytesReader | Uint8Array | string
 ): T {
   let bytesReader: BytesReader;
@@ -53,49 +57,49 @@ export function deserializeCV<T extends ClarityValue = ClarityValue>(
   } else {
     bytesReader = serializedClarityValue;
   }
-  const type = bytesReader.readUInt8Enum(ClarityWireType, n => {
+  const type = bytesReader.readUInt8Enum(ClarityType, n => {
     throw new DeserializationError(`Cannot recognize Clarity Type: ${n}`);
   });
 
   switch (type) {
-    case ClarityWireType.int:
-      return intCV(bytesToTwosBigInt(bytesReader.readBytes(16))) as T;
+    case ClarityType.Int:
+      return intCV(bytesReader.readBytes(16)) as T;
 
-    case ClarityWireType.uint:
+    case ClarityType.UInt:
       return uintCV(bytesReader.readBytes(16)) as T;
 
-    case ClarityWireType.buffer:
+    case ClarityType.Buffer:
       const bufferLength = bytesReader.readUInt32BE();
       return bufferCV(bytesReader.readBytes(bufferLength)) as T;
 
-    case ClarityWireType.true:
+    case ClarityType.BoolTrue:
       return trueCV() as T;
 
-    case ClarityWireType.false:
+    case ClarityType.BoolFalse:
       return falseCV() as T;
 
-    case ClarityWireType.address:
+    case ClarityType.PrincipalStandard:
       const sAddress = deserializeAddress(bytesReader);
       return standardPrincipalCVFromAddress(sAddress) as T;
 
-    case ClarityWireType.contract:
+    case ClarityType.PrincipalContract:
       const cAddress = deserializeAddress(bytesReader);
       const contractName = deserializeLPString(bytesReader);
       return contractPrincipalCVFromAddress(cAddress, contractName) as T;
 
-    case ClarityWireType.ok:
+    case ClarityType.ResponseOk:
       return responseOkCV(deserializeCV(bytesReader)) as T;
 
-    case ClarityWireType.err:
+    case ClarityType.ResponseErr:
       return responseErrorCV(deserializeCV(bytesReader)) as T;
 
-    case ClarityWireType.none:
+    case ClarityType.OptionalNone:
       return noneCV() as T;
 
-    case ClarityWireType.some:
+    case ClarityType.OptionalSome:
       return someCV(deserializeCV(bytesReader)) as T;
 
-    case ClarityWireType.list:
+    case ClarityType.List:
       const listLength = bytesReader.readUInt32BE();
       const listContents: ClarityValue[] = [];
       for (let i = 0; i < listLength; i++) {
@@ -103,7 +107,7 @@ export function deserializeCV<T extends ClarityValue = ClarityValue>(
       }
       return listCV(listContents) as T;
 
-    case ClarityWireType.tuple:
+    case ClarityType.Tuple:
       const tupleLength = bytesReader.readUInt32BE();
       const tupleContents: { [key: string]: ClarityValue } = {};
       for (let i = 0; i < tupleLength; i++) {
@@ -115,12 +119,12 @@ export function deserializeCV<T extends ClarityValue = ClarityValue>(
       }
       return tupleCV(tupleContents) as T;
 
-    case ClarityWireType.ascii:
+    case ClarityType.StringASCII:
       const asciiStrLen = bytesReader.readUInt32BE();
       const asciiStr = bytesToAscii(bytesReader.readBytes(asciiStrLen));
       return stringAsciiCV(asciiStr) as T;
 
-    case ClarityWireType.utf8:
+    case ClarityType.StringUTF8:
       const utf8StrLen = bytesReader.readUInt32BE();
       const utf8Str = bytesToUtf8(bytesReader.readBytes(utf8StrLen));
       return stringUtf8CV(utf8Str) as T;

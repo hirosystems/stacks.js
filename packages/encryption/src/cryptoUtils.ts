@@ -32,6 +32,11 @@ export function isNodeCryptoAvailable<T>(
 export const NO_CRYPTO_LIB =
   'Crypto lib not found. Either the WebCrypto "crypto.subtle" or Node.js "crypto" module must be available.';
 
+export type TriplesecDecryptSignature = (
+  arg: { data: Uint8Array; key: Uint8Array },
+  cb: (err: Error | null, buff: Uint8Array | null) => void
+) => void;
+
 export interface WebCryptoLib {
   lib: SubtleCrypto;
   name: 'subtleCrypto';

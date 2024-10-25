@@ -1,17 +1,17 @@
-import { extractProfile, signProfileToken } from './profileTokens';
+import { signProfileToken, extractProfile } from './profileTokens';
 
 import { getPersonFromLegacyFormat } from './profileSchemas';
 import {
-  getAddress,
-  getAvatarUrl,
-  getBirthDate,
-  getConnections,
-  getDescription,
+  getName,
   getFamilyName,
   getGivenName,
-  getName,
-  getOrganizations,
+  getAvatarUrl,
+  getDescription,
   getVerifiedAccounts,
+  getAddress,
+  getBirthDate,
+  getConnections,
+  getOrganizations,
 } from './profileSchemas/personUtils';
 
 // TODO: bring into this monorepo/convert to ts
@@ -23,7 +23,7 @@ import { makeZoneFile, parseZoneFile } from 'zone-file';
 import * as inspector from 'schema-inspector';
 
 import { Logger } from '@stacks/common';
-import { NetworkClientParam, clientFromNetwork, networkFrom } from '@stacks/network';
+import { createFetchFn, FetchFn } from '@stacks/network';
 import { PublicPersonProfile } from './types';
 
 const schemaDefinition: { [key: string]: any } = {
@@ -338,18 +338,14 @@ export function getTokenFileUrl(zoneFileJson: any): string | null {
  * @ignore
  */
 export function resolveZoneFileToProfile(
-  opts: {
-    zoneFile: any;
-    publicKeyOrAddress: string;
-  } & NetworkClientParam
+  zoneFile: any,
+  publicKeyOrAddress: string,
+  fetchFn: FetchFn = createFetchFn()
 ): Promise<Record<string, any>> {
-  const network = networkFrom(opts.network ?? 'mainnet');
-  const client = Object.assign({}, clientFromNetwork(network), opts.client);
-
   return new Promise((resolve, reject) => {
     let zoneFileJson = null;
     try {
-      zoneFileJson = parseZoneFile(opts.zoneFile);
+      zoneFileJson = parseZoneFile(zoneFile);
       if (!zoneFileJson.hasOwnProperty('$origin')) {
         zoneFileJson = null;
       }
@@ -362,20 +358,19 @@ export function resolveZoneFileToProfile(
       tokenFileUrl = getTokenFileUrl(zoneFileJson);
     } else {
       try {
-        return resolve(Person.fromLegacyFormat(JSON.parse(opts.zoneFile)).profile());
+        return resolve(Person.fromLegacyFormat(JSON.parse(zoneFile)).profile());
       } catch (error) {
         return reject(error);
       }
     }
 
     if (tokenFileUrl) {
-      client
-        .fetch(tokenFileUrl)
+      fetchFn(tokenFileUrl)
         .then(response => response.text())
         .then(responseText => JSON.parse(responseText))
         .then(responseJson => {
           const tokenRecords = responseJson;
-          const profile = extractProfile(tokenRecords[0].token, opts.publicKeyOrAddress);
+          const profile = extractProfile(tokenRecords[0].token, publicKeyOrAddress);
           resolve(profile);
         })
         .catch(error => {

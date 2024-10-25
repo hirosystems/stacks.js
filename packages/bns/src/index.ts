@@ -1,33 +1,61 @@
-import { IntegerType, PublicKey, intToBigInt, utf8ToBytes } from '@stacks/common';
-import { NetworkClientParam, StacksNetwork } from '@stacks/network';
+import { IntegerType, utf8ToBytes } from '@stacks/common';
 import {
+  AnchorMode,
+  bufferCV,
+  callReadOnlyFunction,
   ClarityType,
   ClarityValue,
-  NonFungiblePostCondition,
-  PostCondition,
-  ResponseErrorCV,
-  StacksTransactionWire,
-  StxPostCondition,
-  UnsignedContractCallOptions,
-  bufferCV,
-  bufferCVFromString,
   cvToString,
-  fetchCallReadOnlyFunction,
   getAddressFromPrivateKey,
   getCVTypeString,
   hash160,
   makeRandomPrivKey,
   makeUnsignedContractCall,
-  noneCV,
-  publicKeyToAddress,
-  someCV,
+  privateKeyToString,
+  ResponseErrorCV,
+  StacksTransaction,
   standardPrincipalCV,
-  tupleCV,
   uintCV,
+  someCV,
+  noneCV,
+  UnsignedContractCallOptions,
+  PostCondition,
+  createSTXPostCondition,
+  createStacksPublicKey,
+  publicKeyToAddress,
+  FungibleConditionCode,
+  AddressVersion,
+  createNonFungiblePostCondition,
+  NonFungibleConditionCode,
+  parseAssetInfoString,
+  tupleCV,
+  bufferCVFromString,
 } from '@stacks/transactions';
+
+import { StacksNetwork } from '@stacks/network';
+
 import { decodeFQN, getZonefileHash } from './utils';
 
+import { ChainID } from '@stacks/common';
+
 export const BNS_CONTRACT_NAME = 'bns';
+
+export const enum BnsContractAddress {
+  mainnet = 'SP000000000000000000002Q6VF78',
+  testnet = 'ST000000000000000000002AMW42H',
+}
+
+function getBnsContractAddress(network: StacksNetwork) {
+  if (network.chainId === ChainID.Mainnet) return BnsContractAddress.mainnet;
+  else if (network.chainId == ChainID.Testnet) return BnsContractAddress.testnet;
+  else throw new Error(`Unexpected ChainID: ${network.chainId}`);
+}
+
+function getAddressVersion(network: StacksNetwork) {
+  return network.chainId === ChainID.Mainnet
+    ? AddressVersion.MainnetSingleSig
+    : AddressVersion.TestnetSingleSig;
+}
 
 export interface PriceFunction {
   base: IntegerType;
@@ -55,22 +83,21 @@ export interface PriceFunction {
 export interface BnsContractCallOptions {
   functionName: string;
   functionArgs: ClarityValue[];
-  publicKey: PublicKey;
+  publicKey: string;
   network: StacksNetwork;
   postConditions?: PostCondition[];
 }
 
-async function makeBnsContractCall(
-  options: BnsContractCallOptions
-): Promise<StacksTransactionWire> {
+async function makeBnsContractCall(options: BnsContractCallOptions): Promise<StacksTransaction> {
   const txOptions: UnsignedContractCallOptions = {
-    contractAddress: options.network.bootAddress,
+    contractAddress: getBnsContractAddress(options.network),
     contractName: BNS_CONTRACT_NAME,
     functionName: options.functionName,
     functionArgs: options.functionArgs,
     publicKey: options.publicKey,
     validateWithAbi: false,
     network: options.network,
+    anchorMode: AnchorMode.Any,
     postConditions: options.postConditions,
   };
 
@@ -84,13 +111,14 @@ export interface BnsReadOnlyOptions {
   network: StacksNetwork;
 }
 
-async function callReadOnlyBnsFunction(
-  options: BnsReadOnlyOptions & NetworkClientParam
-): Promise<ClarityValue> {
-  return fetchCallReadOnlyFunction({
-    ...options,
-    contractAddress: options.network.bootAddress,
+async function callReadOnlyBnsFunction(options: BnsReadOnlyOptions): Promise<ClarityValue> {
+  return callReadOnlyFunction({
+    contractAddress: getBnsContractAddress(options.network),
     contractName: BNS_CONTRACT_NAME,
+    functionName: options.functionName,
+    senderAddress: options.senderAddress,
+    functionArgs: options.functionArgs,
+    network: options.network,
   });
 }
 
@@ -126,7 +154,7 @@ export async function canRegisterName({
   // Create a random address as input to read-only function call
   // Not used by BNS contract function but required by core node API
   // https://github.com/blockstack/stacks-blockchain/blob/master/src/net/http.rs#L1796
-  const randomPrivateKey = makeRandomPrivKey();
+  const randomPrivateKey = privateKeyToString(makeRandomPrivKey());
   const randomAddress = getAddressFromPrivateKey(randomPrivateKey);
 
   return callReadOnlyBnsFunction({
@@ -171,7 +199,7 @@ export async function getNamespacePrice({
   // Create a random address as input to read-only function call
   // Not used by BNS contract function but required by core node API
   // https://github.com/blockstack/stacks-blockchain/blob/master/src/net/http.rs#L1796
-  const randomPrivateKey = makeRandomPrivKey();
+  const randomPrivateKey = privateKeyToString(makeRandomPrivKey());
   const randomAddress = getAddressFromPrivateKey(randomPrivateKey);
 
   return callReadOnlyBnsFunction({
@@ -182,7 +210,7 @@ export async function getNamespacePrice({
   }).then((responseCV: ClarityValue) => {
     if (responseCV.type === ClarityType.ResponseOk) {
       if (responseCV.value.type === ClarityType.Int || responseCV.value.type === ClarityType.UInt) {
-        return BigInt(responseCV.value.value);
+        return responseCV.value.value;
       } else {
         throw new Error('Response did not contain a number');
       }
@@ -226,7 +254,7 @@ export async function getNamePrice({
   // Create a random address as input to read-only function call
   // Not used by BNS contract function but required by core node API
   // https://github.com/blockstack/stacks-blockchain/blob/master/src/net/http.rs#L1796
-  const randomPrivateKey = makeRandomPrivKey();
+  const randomPrivateKey = privateKeyToString(makeRandomPrivKey());
   const randomAddress = getAddressFromPrivateKey(randomPrivateKey);
 
   return callReadOnlyBnsFunction({
@@ -237,7 +265,7 @@ export async function getNamePrice({
   }).then((responseCV: ClarityValue) => {
     if (responseCV.type === ClarityType.ResponseOk) {
       if (responseCV.value.type === ClarityType.Int || responseCV.value.type === ClarityType.UInt) {
-        return BigInt(responseCV.value.value);
+        return responseCV.value.value;
       } else {
         throw new Error('Response did not contain a number');
       }
@@ -273,7 +301,7 @@ export interface PreorderNamespaceOptions {
  *
  * @param  {PreorderNamespaceOptions} options - an options object for the preorder
  *
- * @return {Promise<StacksTransactionWire>}
+ * @return {Promise<StacksTransaction>}
  */
 export async function buildPreorderNamespaceTx({
   namespace,
@@ -281,17 +309,16 @@ export async function buildPreorderNamespaceTx({
   stxToBurn,
   publicKey,
   network,
-}: PreorderNamespaceOptions): Promise<StacksTransactionWire> {
+}: PreorderNamespaceOptions): Promise<StacksTransaction> {
   const bnsFunctionName = 'namespace-preorder';
   const saltedNamespaceBytes = utf8ToBytes(`${namespace}${salt}`);
   const hashedSaltedNamespace = hash160(saltedNamespaceBytes);
 
-  const burnSTXPostCondition: StxPostCondition = {
-    type: 'stx-postcondition',
-    address: publicKeyToAddress(network.addressVersion.singleSig, publicKey),
-    condition: 'eq',
-    amount: intToBigInt(stxToBurn),
-  };
+  const burnSTXPostCondition = createSTXPostCondition(
+    publicKeyToAddress(getAddressVersion(network), createStacksPublicKey(publicKey)),
+    FungibleConditionCode.Equal,
+    stxToBurn
+  );
 
   return makeBnsContractCall({
     functionName: bnsFunctionName,
@@ -330,7 +357,7 @@ export interface RevealNamespaceOptions {
  *
  * @param  {RevealNamespaceOptions} options - an options object for the reveal
  *
- * @return {Promise<StacksTransactionWire>}
+ * @return {Promise<StacksTransaction>}
  */
 export async function buildRevealNamespaceTx({
   namespace,
@@ -340,7 +367,7 @@ export async function buildRevealNamespaceTx({
   namespaceImportAddress,
   publicKey,
   network,
-}: RevealNamespaceOptions): Promise<StacksTransactionWire> {
+}: RevealNamespaceOptions): Promise<StacksTransaction> {
   const bnsFunctionName = 'namespace-reveal';
 
   return makeBnsContractCall({
@@ -403,7 +430,7 @@ export interface ImportNameOptions {
  *
  * @param  {ImportNameOptions} options - an options object for the name import
  *
- * @return {Promise<StacksTransactionWire>}
+ * @return {Promise<StacksTransaction>}
  */
 export async function buildImportNameTx({
   namespace,
@@ -412,7 +439,7 @@ export async function buildImportNameTx({
   zonefile,
   publicKey,
   network,
-}: ImportNameOptions): Promise<StacksTransactionWire> {
+}: ImportNameOptions): Promise<StacksTransaction> {
   const bnsFunctionName = 'name-import';
   const zonefileHash = getZonefileHash(zonefile);
 
@@ -451,13 +478,13 @@ export interface ReadyNamespaceOptions {
  *
  * @param  {ReadyNamespaceOptions} options - an options object for the namespace ready transaction
  *
- * @return {Promise<StacksTransactionWire>}
+ * @return {Promise<StacksTransaction>}
  */
 export async function buildReadyNamespaceTx({
   namespace,
   publicKey,
   network,
-}: ReadyNamespaceOptions): Promise<StacksTransactionWire> {
+}: ReadyNamespaceOptions): Promise<StacksTransaction> {
   const bnsFunctionName = 'namespace-ready';
 
   return makeBnsContractCall({
@@ -479,7 +506,7 @@ export interface PreorderNameOptions {
   /** amount of STX to burn for the registration */
   stxToBurn: IntegerType;
   /** the private key to sign the transaction */
-  publicKey: PublicKey;
+  publicKey: string;
   /** the Stacks blockchain network to use */
   network: StacksNetwork;
 }
@@ -493,7 +520,7 @@ export interface PreorderNameOptions {
  *
  * @param  {PreorderNameOptions} options - an options object for the preorder
  *
- * @return {Promise<StacksTransactionWire>}
+ * @return {Promise<StacksTransaction>}
  */
 export async function buildPreorderNameTx({
   fullyQualifiedName,
@@ -501,7 +528,7 @@ export async function buildPreorderNameTx({
   stxToBurn,
   publicKey,
   network,
-}: PreorderNameOptions): Promise<StacksTransactionWire> {
+}: PreorderNameOptions): Promise<StacksTransaction> {
   const bnsFunctionName = 'name-preorder';
   const { subdomain } = decodeFQN(fullyQualifiedName);
   if (subdomain) {
@@ -510,12 +537,11 @@ export async function buildPreorderNameTx({
   const saltedNamesBytes = utf8ToBytes(`${fullyQualifiedName}${salt}`);
   const hashedSaltedName = hash160(saltedNamesBytes);
 
-  const burnSTXPostCondition: StxPostCondition = {
-    type: 'stx-postcondition',
-    address: publicKeyToAddress(network.addressVersion.singleSig, publicKey),
-    condition: 'eq',
-    amount: intToBigInt(stxToBurn),
-  };
+  const burnSTXPostCondition = createSTXPostCondition(
+    publicKeyToAddress(getAddressVersion(network), createStacksPublicKey(publicKey)),
+    FungibleConditionCode.Equal,
+    stxToBurn
+  );
 
   return makeBnsContractCall({
     functionName: bnsFunctionName,
@@ -540,7 +566,7 @@ export interface RegisterNameOptions {
   fullyQualifiedName: string;
   salt: string;
   zonefile: string;
-  publicKey: PublicKey;
+  publicKey: string;
   network: StacksNetwork;
 }
 
@@ -552,7 +578,7 @@ export interface RegisterNameOptions {
  *
  * @param  {RegisterNameOptions} options - an options object for the registration
  *
- * @return {Promise<StacksTransactionWire>}
+ * @return {Promise<StacksTransaction>}
  */
 export async function buildRegisterNameTx({
   fullyQualifiedName,
@@ -560,7 +586,7 @@ export async function buildRegisterNameTx({
   zonefile,
   publicKey,
   network,
-}: RegisterNameOptions): Promise<StacksTransactionWire> {
+}: RegisterNameOptions): Promise<StacksTransaction> {
   const bnsFunctionName = 'name-register';
   const { subdomain, namespace, name } = decodeFQN(fullyQualifiedName);
   if (subdomain) {
@@ -606,14 +632,14 @@ export interface UpdateNameOptions {
  *
  * @param  {UpdateNameOptions} options - an options object for the update
  *
- * @return {Promise<StacksTransactionWire>}
+ * @return {Promise<StacksTransaction>}
  */
 export async function buildUpdateNameTx({
   fullyQualifiedName,
   zonefile,
   publicKey,
   network,
-}: UpdateNameOptions): Promise<StacksTransactionWire> {
+}: UpdateNameOptions): Promise<StacksTransaction> {
   const bnsFunctionName = 'name-update';
   const { subdomain, namespace, name } = decodeFQN(fullyQualifiedName);
   if (subdomain) {
@@ -659,7 +685,7 @@ export interface TransferNameOptions {
  *
  * @param  {TransferNameOptions} options - an options object for the transfer
  *
- * @return {Promise<StacksTransactionWire>}
+ * @return {Promise<StacksTransaction>}
  */
 export async function buildTransferNameTx({
   fullyQualifiedName,
@@ -667,7 +693,7 @@ export async function buildTransferNameTx({
   zonefile,
   publicKey,
   network,
-}: TransferNameOptions): Promise<StacksTransactionWire> {
+}: TransferNameOptions): Promise<StacksTransaction> {
   const bnsFunctionName = 'name-transfer';
   const { subdomain, namespace, name } = decodeFQN(fullyQualifiedName);
   if (subdomain) {
@@ -680,26 +706,24 @@ export async function buildTransferNameTx({
     standardPrincipalCV(newOwnerAddress),
     zonefile ? someCV(bufferCV(getZonefileHash(zonefile))) : noneCV(),
   ];
-  const postConditionSender: NonFungiblePostCondition = {
-    type: 'nft-postcondition',
-    address: publicKeyToAddress(network.addressVersion.singleSig, publicKey),
-    condition: 'sent',
-    asset: `${network.bootAddress}.bns::names`,
-    assetId: tupleCV({
+  const postConditionSender = createNonFungiblePostCondition(
+    publicKeyToAddress(getAddressVersion(network), createStacksPublicKey(publicKey)),
+    NonFungibleConditionCode.Sends,
+    parseAssetInfoString(`${getBnsContractAddress(network)}.bns::names`),
+    tupleCV({
       name: bufferCVFromString(name),
       namespace: bufferCVFromString(namespace),
-    }),
-  };
-  const postConditionReceiver: NonFungiblePostCondition = {
-    type: 'nft-postcondition',
-    address: newOwnerAddress,
-    condition: 'not-sent',
-    asset: `${network.bootAddress}.bns::names`,
-    assetId: tupleCV({
+    })
+  );
+  const postConditionReceiver = createNonFungiblePostCondition(
+    newOwnerAddress,
+    NonFungibleConditionCode.DoesNotSend,
+    parseAssetInfoString(`${getBnsContractAddress(network)}.bns::names`),
+    tupleCV({
       name: bufferCVFromString(name),
       namespace: bufferCVFromString(namespace),
-    }),
-  };
+    })
+  );
 
   return makeBnsContractCall({
     functionName: bnsFunctionName,
@@ -732,13 +756,13 @@ export interface RevokeNameOptions {
  *
  * @param  {RevokeNameOptions} options - an options object for the revoke
  *
- * @return {Promise<StacksTransactionWire>}
+ * @return {Promise<StacksTransaction>}
  */
 export async function buildRevokeNameTx({
   fullyQualifiedName,
   publicKey,
   network,
-}: RevokeNameOptions): Promise<StacksTransactionWire> {
+}: RevokeNameOptions): Promise<StacksTransaction> {
   const bnsFunctionName = 'name-revoke';
   const { subdomain, namespace, name } = decodeFQN(fullyQualifiedName);
   if (subdomain) {
@@ -779,7 +803,7 @@ export interface RenewNameOptions {
  *
  * @param  {RenewNameOptions} options - an options object for the renew
  *
- * @return {Promise<StacksTransactionWire>}
+ * @return {Promise<StacksTransaction>}
  */
 export async function buildRenewNameTx({
   fullyQualifiedName,
@@ -788,7 +812,7 @@ export async function buildRenewNameTx({
   zonefile,
   publicKey,
   network,
-}: RenewNameOptions): Promise<StacksTransactionWire> {
+}: RenewNameOptions): Promise<StacksTransaction> {
   const bnsFunctionName = 'name-renewal';
   const { subdomain, namespace, name } = decodeFQN(fullyQualifiedName);
   if (subdomain) {
@@ -802,12 +826,11 @@ export async function buildRenewNameTx({
     newOwnerAddress ? someCV(standardPrincipalCV(newOwnerAddress)) : noneCV(),
     zonefile ? someCV(bufferCV(getZonefileHash(zonefile))) : noneCV(),
   ];
-  const burnSTXPostCondition: StxPostCondition = {
-    type: 'stx-postcondition',
-    address: publicKeyToAddress(network.addressVersion.singleSig, publicKey),
-    condition: 'eq',
-    amount: intToBigInt(stxToBurn),
-  };
+  const burnSTXPostCondition = createSTXPostCondition(
+    publicKeyToAddress(getAddressVersion(network), createStacksPublicKey(publicKey)),
+    FungibleConditionCode.Equal,
+    stxToBurn
+  );
 
   return makeBnsContractCall({
     functionName: bnsFunctionName,

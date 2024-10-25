@@ -1,13 +1,10 @@
 import { hexToBytes } from './utils';
 
-export type PrivateKey = string | Uint8Array;
-export type PublicKey = string | Uint8Array;
-
 /**
  * @private
  * @ignore
  */
-export function privateKeyToBytes(privateKey: PrivateKey): Uint8Array {
+export function privateKeyToBytes(privateKey: string | Uint8Array): Uint8Array {
   const privateKeyBuffer = typeof privateKey === 'string' ? hexToBytes(privateKey) : privateKey;
 
   if (privateKeyBuffer.length != 32 && privateKeyBuffer.length != 33) {

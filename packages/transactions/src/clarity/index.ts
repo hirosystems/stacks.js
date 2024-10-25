@@ -1,26 +1,108 @@
-// todo: use `export *` for more exports here
-
-export {
+import {
   ClarityValue,
-  cvToJSON,
-  cvToString,
-  cvToValue,
   getCVTypeString,
+  cvToString,
+  cvToJSON,
+  cvToValue,
   isClarityType,
 } from './clarityValue';
-export * from './constants';
+import { ClarityType } from './constants';
+import { BooleanCV, TrueCV, FalseCV, trueCV, falseCV, boolCV } from './types/booleanCV';
+import { IntCV, UIntCV, intCV, uintCV } from './types/intCV';
+import { BufferCV, bufferCV, bufferCVFromString } from './types/bufferCV';
+import { OptionalCV, NoneCV, SomeCV, noneCV, someCV, optionalCVOf } from './types/optionalCV';
 
-export * from './values/booleanCV';
-export * from './values/bufferCV';
-export * from './values/intCV';
-export * from './values/listCV';
-export * from './values/optionalCV';
-export * from './values/principalCV';
-export * from './values/responseCV';
-export * from './values/stringCV';
-export * from './values/tupleCV';
+// todo: reduce manual re-exporting
 
-export * from './types';
+import {
+  ResponseCV,
+  ResponseOkCV,
+  ResponseErrorCV,
+  responseOkCV,
+  responseErrorCV,
+} from './types/responseCV';
 
-export * from './deserialize';
-export * from './serialize';
+import {
+  StandardPrincipalCV,
+  ContractPrincipalCV,
+  standardPrincipalCV,
+  contractPrincipalCV,
+  standardPrincipalCVFromAddress,
+  contractPrincipalCVFromAddress,
+  PrincipalCV,
+  contractPrincipalCVFromStandard,
+  principalCV,
+  principalToString,
+} from './types/principalCV';
+
+import { ListCV, listCV } from './types/listCV';
+import { TupleCV, tupleCV } from './types/tupleCV';
+import {
+  StringAsciiCV,
+  StringUtf8CV,
+  stringUtf8CV,
+  stringAsciiCV,
+  stringCV,
+} from './types/stringCV';
+import { serializeCV } from './serialize';
+import deserializeCV from './deserialize';
+
+// Types
+export {
+  ClarityType,
+  ClarityValue,
+  BooleanCV,
+  TrueCV,
+  FalseCV,
+  IntCV,
+  UIntCV,
+  BufferCV,
+  OptionalCV,
+  NoneCV,
+  SomeCV,
+  ResponseCV,
+  ResponseOkCV,
+  ResponseErrorCV,
+  PrincipalCV,
+  StandardPrincipalCV,
+  ContractPrincipalCV,
+  ListCV,
+  TupleCV,
+  StringAsciiCV,
+  StringUtf8CV,
+};
+
+// Value construction functions
+export {
+  boolCV,
+  trueCV,
+  falseCV,
+  intCV,
+  uintCV,
+  bufferCV,
+  bufferCVFromString,
+  noneCV,
+  someCV,
+  optionalCVOf,
+  responseOkCV,
+  responseErrorCV,
+  principalCV,
+  standardPrincipalCV,
+  standardPrincipalCVFromAddress,
+  contractPrincipalCV,
+  contractPrincipalCVFromAddress,
+  contractPrincipalCVFromStandard,
+  listCV,
+  tupleCV,
+  stringCV,
+  stringAsciiCV,
+  stringUtf8CV,
+  getCVTypeString,
+  isClarityType,
+};
+
+// Serialization
+export { serializeCV, deserializeCV };
+
+// toString
+export { cvToString, cvToJSON, cvToValue, principalToString };

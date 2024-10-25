@@ -4,19 +4,12 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Jest: api",
-      "cwd": "${workspaceFolder}/packages/api",
-      "program": "./node_modules/.bin/jest",
-      "args": ["--runInBand"],
-      "console": "integratedTerminal"
-    },
-    {
-      "type": "node",
-      "request": "launch",
       "name": "Jest: auth",
       "cwd": "${workspaceFolder}/packages/auth",
       "program": "./node_modules/.bin/jest",
-      "args": ["--runInBand"],
+      "args": [
+        "--runInBand"
+      ],
       "console": "integratedTerminal"
     },
     {
@@ -25,7 +18,9 @@
       "name": "Jest: bns",
       "cwd": "${workspaceFolder}/packages/bns",
       "program": "./node_modules/.bin/jest",
-      "args": ["--runInBand"],
+      "args": [
+        "--runInBand"
+      ],
       "console": "integratedTerminal"
     },
     {
@@ -34,7 +29,9 @@
       "name": "Jest: cli",
       "cwd": "${workspaceFolder}/packages/cli",
       "program": "./node_modules/.bin/jest",
-      "args": ["--runInBand"],
+      "args": [
+        "--runInBand"
+      ],
       "console": "integratedTerminal"
     },
     {
@@ -43,7 +40,9 @@
       "name": "Jest: common",
       "cwd": "${workspaceFolder}/packages/common",
       "program": "./node_modules/.bin/jest",
-      "args": ["--runInBand"],
+      "args": [
+        "--runInBand"
+      ],
       "console": "integratedTerminal"
     },
     {
@@ -52,7 +51,20 @@
       "name": "Jest: encryption",
       "cwd": "${workspaceFolder}/packages/encryption",
       "program": "./node_modules/.bin/jest",
-      "args": ["--runInBand"],
+      "args": [
+        "--runInBand"
+      ],
+      "console": "integratedTerminal"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Jest: keychain",
+      "cwd": "${workspaceFolder}/packages/keychain",
+      "program": "./node_modules/.bin/jest",
+      "args": [
+        "--runInBand"
+      ],
       "console": "integratedTerminal"
     },
     {
@@ -61,7 +73,9 @@
       "name": "Jest: network",
       "cwd": "${workspaceFolder}/packages/network",
       "program": "./node_modules/.bin/jest",
-      "args": ["--runInBand"],
+      "args": [
+        "--runInBand"
+      ],
       "console": "integratedTerminal"
     },
     {
@@ -70,7 +84,9 @@
       "name": "Jest: profile",
       "cwd": "${workspaceFolder}/packages/profile",
       "program": "./node_modules/.bin/jest",
-      "args": ["--runInBand"],
+      "args": [
+        "--runInBand"
+      ],
       "console": "integratedTerminal"
     },
     {
@@ -79,7 +95,9 @@
       "name": "Jest: stacking",
       "cwd": "${workspaceFolder}/packages/stacking",
       "program": "./node_modules/.bin/jest",
-      "args": ["--runInBand"],
+      "args": [
+        "--runInBand"
+      ],
       "console": "integratedTerminal"
     },
     {
@@ -88,7 +106,9 @@
       "name": "Jest: storage",
       "cwd": "${workspaceFolder}/packages/storage",
       "program": "./node_modules/.bin/jest",
-      "args": ["--runInBand"],
+      "args": [
+        "--runInBand"
+      ],
       "console": "integratedTerminal"
     },
     {
@@ -97,8 +117,10 @@
       "name": "Jest: transactions",
       "cwd": "${workspaceFolder}/packages/transactions",
       "program": "./node_modules/.bin/jest",
-      "args": ["--runInBand"],
+      "args": [
+        "--runInBand"
+      ],
       "console": "integratedTerminal"
-    }
+    },
   ]
 }

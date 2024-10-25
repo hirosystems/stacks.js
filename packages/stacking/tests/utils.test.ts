@@ -1,4 +1,4 @@
-import { hexToBytes } from '@stacks/common';
+import { bytesToHex, hexToBytes } from '@stacks/common';
 import { PoXAddressVersion } from '../src/constants';
 import { decodeBtcAddress, poxAddressToBtcAddress, poxAddressToTuple } from '../src/utils';
 
@@ -68,14 +68,14 @@ test.each(BTC_ADDRESS_CASES)(
   ({ address, expectedVersion, expectedHash, expectedLength }) => {
     const decoded = decodeBtcAddress(address);
     expect(decoded.version).toBe(expectedVersion);
-    expect(decoded.data).toEqual(expectedHash);
-    expect(decoded.data).toHaveLength(expectedLength * 2);
+    expect(decoded.data).toEqual(hexToBytes(expectedHash));
+    expect(decoded.data).toHaveLength(expectedLength);
 
     const tuple = poxAddressToTuple(address);
-    expect(hexToBytes(tuple.value['version'].value)).toHaveLength(1);
-    expect(hexToBytes(tuple.value['version'].value)[0]).toBe(expectedVersion);
-    expect(tuple.value['hashbytes'].value).toEqual(expectedHash);
-    expect(hexToBytes(tuple.value['hashbytes'].value)).toHaveLength(expectedLength);
+    expect(tuple.data['version'].buffer).toHaveLength(1);
+    expect(tuple.data['version'].buffer[0]).toBe(expectedVersion);
+    expect(tuple.data['hashbytes'].buffer).toEqual(hexToBytes(expectedHash));
+    expect(tuple.data['hashbytes'].buffer).toHaveLength(expectedLength);
   }
 );
 
@@ -265,7 +265,7 @@ test.each(BTC_ADDRESS_CASES_API)(
   'decoding and encoding btc address $format',
   ({ address, hash, format, network }) => {
     const decoded = decodeBtcAddress(address);
-    expect(decoded.data).toBe(hash);
+    expect(bytesToHex(decoded.data)).toBe(hash);
     expect(decoded.version).toBe(FORMAT_TO_VERSION[format]);
 
     const encoded1 = poxAddressToBtcAddress(decoded.version, decoded.data, network);
@@ -310,7 +310,7 @@ const BTC_ADDRESS_CASES_HASH = [
 
 test.each(BTC_ADDRESS_CASES_HASH)('decoding btc address hash', ({ address, hash }) => {
   const decoded = decodeBtcAddress(address);
-  expect(decoded.data).toBe(hash);
+  expect(bytesToHex(decoded.data)).toBe(hash);
 });
 
 const BTC_ADDRESS_CASES_INVALID_POX_ADDRESS = [

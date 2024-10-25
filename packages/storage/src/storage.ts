@@ -1,7 +1,7 @@
 import { lookupProfile, NAME_LOOKUP_PATH, UserSession } from '@stacks/auth';
 import {
+  BLOCKSTACK_DEFAULT_GAIA_HUB_URL,
   DoesNotExist,
-  GAIA_URL,
   GaiaHubError,
   getGlobalObject,
   InvalidStateError,
@@ -18,7 +18,7 @@ import {
   signECDSA,
   verifyECDSA,
 } from '@stacks/encryption';
-import { createFetchFn, FetchFn } from '@stacks/common';
+import { createFetchFn, FetchFn } from '@stacks/network';
 import { FileContentLoader } from './fileContentLoader';
 import {
   connectToGaiaHub,
@@ -804,7 +804,7 @@ export class Storage {
     }
 
     if (!userData.hubUrl) {
-      userData.hubUrl = GAIA_URL;
+      userData.hubUrl = BLOCKSTACK_DEFAULT_GAIA_HUB_URL;
     }
 
     const gaiaConfig = await connectToGaiaHub(

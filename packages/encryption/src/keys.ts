@@ -2,11 +2,11 @@ import { hmac } from '@noble/hashes/hmac';
 import { sha256 } from '@noble/hashes/sha256';
 import { getPublicKey as nobleGetPublicKey, signSync, utils } from '@noble/secp256k1';
 import {
-  PrivateKey,
   bytesToHex,
   concatBytes,
   hexToBytes,
   privateKeyToBytes,
+  PRIVATE_KEY_COMPRESSED_LENGTH,
   readUInt8,
 } from '@stacks/common';
 import base58 from 'bs58';
@@ -30,7 +30,6 @@ utils.hmacSha256Sync = (key: Uint8Array, ...msgs: Uint8Array[]) => {
 
 /**
  * @ignore
- * @deprecated Use `randomPrivateKey` instead.
  */
 export function makeECPrivateKey() {
   return bytesToHex(utils.randomPrivateKey());
@@ -97,7 +96,7 @@ export function publicKeyToBtcAddress(
  * @ignore
  * @returns a compressed public key
  */
-export function getPublicKeyFromPrivate(privateKey: PrivateKey): string {
+export function getPublicKeyFromPrivate(privateKey: string | Uint8Array): string {
   const privateKeyBytes = privateKeyToBytes(privateKey);
   // for backwards compatibility we always return a compressed public key, regardless of private key mode
   return bytesToHex(nobleGetPublicKey(privateKeyBytes.slice(0, 32), true));
@@ -106,8 +105,26 @@ export function getPublicKeyFromPrivate(privateKey: PrivateKey): string {
 /**
  * @ignore
  */
-export function ecSign(messageHash: Uint8Array, privateKey: PrivateKey) {
-  return signSync(messageHash, privateKeyToBytes(privateKey).slice(0, 32), {
+export function ecSign(messageHash: Uint8Array, hexPrivateKey: string | Uint8Array) {
+  return signSync(messageHash, privateKeyToBytes(hexPrivateKey).slice(0, 32), {
     der: false,
   });
+}
+
+/**
+ * @ignore
+ */
+export function isValidPrivateKey(privateKey: string | Uint8Array): boolean {
+  return utils.isValidPrivateKey(privateKeyToBytes(privateKey));
+}
+
+/**
+ * @ignore
+ */
+export function compressPrivateKey(privateKey: string | Uint8Array): Uint8Array {
+  const privateKeyBytes = privateKeyToBytes(privateKey);
+
+  return privateKeyBytes.length == PRIVATE_KEY_COMPRESSED_LENGTH
+    ? privateKeyBytes // leave compressed
+    : concatBytes(privateKeyBytes, new Uint8Array([1])); // compress
 }

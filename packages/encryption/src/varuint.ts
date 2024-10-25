@@ -29,7 +29,6 @@ function ensureUInt53(n: number) {
   if (n < 0 || n > MAX_SAFE_INTEGER || n % 1 !== 0) throw new RangeError('value out of range');
 }
 
-/** @ignore */
 export function encode(number: number, bytes?: Uint8Array, offset: number = 0) {
   ensureUInt53(number);
   if (!bytes) bytes = new Uint8Array(encodingLength(number));
@@ -58,7 +57,6 @@ export function encode(number: number, bytes?: Uint8Array, offset: number = 0) {
   return bytes;
 }
 
-/** @ignore */
 export function decode(bytes: Uint8Array, offset: number = 0) {
   const first = readUInt8(bytes, offset);
 
@@ -85,7 +83,6 @@ export function decode(bytes: Uint8Array, offset: number = 0) {
   }
 }
 
-/** @ignore */
 export function encodingLength(number: number) {
   ensureUInt53(number);
 

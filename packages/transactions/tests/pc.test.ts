@@ -1,8 +1,14 @@
 import {
-  FungiblePostCondition,
-  NonFungiblePostCondition,
+  createAssetInfo,
+  FungibleConditionCode,
+  makeContractFungiblePostCondition,
+  makeContractNonFungiblePostCondition,
+  makeContractSTXPostCondition,
+  makeStandardFungiblePostCondition,
+  makeStandardNonFungiblePostCondition,
+  makeStandardSTXPostCondition,
+  NonFungibleConditionCode,
   Pc,
-  StxPostCondition,
   uintCV,
 } from '../src';
 
@@ -88,56 +94,51 @@ describe('pc -- post condition builder', () => {
     describe('stx post condition', () => {
       test('100 ustx', () => {
         const pc = Pc.principal(STANDARD_ADDRESS).willSendEq(100).ustx();
-        const postCondition: StxPostCondition = {
-          type: 'stx-postcondition',
-          address: STANDARD_ADDRESS,
-          condition: 'eq',
-          amount: '100',
-        };
+        const postCondition = makeStandardSTXPostCondition(
+          STANDARD_ADDRESS,
+          FungibleConditionCode.Equal,
+          100
+        );
         expect(pc).toEqual(postCondition);
       });
 
       test('lte 100 ustx', () => {
-        const pc = Pc.principal(STANDARD_ADDRESS).willSendLte(100).ustx();
-        const postCondition: StxPostCondition = {
-          type: 'stx-postcondition',
-          address: STANDARD_ADDRESS,
-          condition: 'lte',
-          amount: '100',
-        };
+        const pc = Pc.principal(STANDARD_ADDRESS).willSendLt(100).ustx();
+        const postCondition = makeStandardSTXPostCondition(
+          STANDARD_ADDRESS,
+          FungibleConditionCode.Less,
+          100
+        );
         expect(pc).toEqual(postCondition);
       });
 
       test('lt 100 ustx', () => {
         const pc = Pc.principal(STANDARD_ADDRESS).willSendLt(100).ustx();
-        const postCondition: StxPostCondition = {
-          type: 'stx-postcondition',
-          address: STANDARD_ADDRESS,
-          condition: 'lt',
-          amount: '100',
-        };
+        const postCondition = makeStandardSTXPostCondition(
+          STANDARD_ADDRESS,
+          FungibleConditionCode.Less,
+          100
+        );
         expect(pc).toEqual(postCondition);
       });
 
       test('gte 100 ustx', () => {
         const pc = Pc.principal(STANDARD_ADDRESS).willSendGte(100).ustx();
-        const postCondition: StxPostCondition = {
-          type: 'stx-postcondition',
-          address: STANDARD_ADDRESS,
-          condition: 'gte',
-          amount: '100',
-        };
+        const postCondition = makeStandardSTXPostCondition(
+          STANDARD_ADDRESS,
+          FungibleConditionCode.GreaterEqual,
+          100
+        );
         expect(pc).toEqual(postCondition);
       });
 
       test('gt 100 ustx', () => {
         const pc = Pc.principal(STANDARD_ADDRESS).willSendGt(100).ustx();
-        const postCondition: StxPostCondition = {
-          type: 'stx-postcondition',
-          address: STANDARD_ADDRESS,
-          condition: 'gt',
-          amount: '100',
-        };
+        const postCondition = makeStandardSTXPostCondition(
+          STANDARD_ADDRESS,
+          FungibleConditionCode.Greater,
+          100
+        );
         expect(pc).toEqual(postCondition);
       });
     });
@@ -147,13 +148,12 @@ describe('pc -- post condition builder', () => {
         const pc = Pc.principal(STANDARD_ADDRESS)
           .willSendEq(100)
           .ft(`${FT_CONTRACT_ADDRESS}.${FT_CONTRACT_NAME}`, FT_ASSET_NAME);
-        const postCondition = {
-          type: 'ft-postcondition',
-          address: STANDARD_ADDRESS,
-          condition: 'eq',
-          amount: '100',
-          asset: `${FT_CONTRACT_ADDRESS}.${FT_CONTRACT_NAME}::${FT_ASSET_NAME}`,
-        } as FungiblePostCondition;
+        const postCondition = makeStandardFungiblePostCondition(
+          STANDARD_ADDRESS,
+          FungibleConditionCode.Equal,
+          100,
+          createAssetInfo(FT_CONTRACT_ADDRESS, FT_CONTRACT_NAME, FT_ASSET_NAME)
+        );
         expect(pc).toEqual(postCondition);
       });
 
@@ -161,13 +161,12 @@ describe('pc -- post condition builder', () => {
         const pc = Pc.principal(STANDARD_ADDRESS)
           .willSendLt(100)
           .ft(`${FT_CONTRACT_ADDRESS}.${FT_CONTRACT_NAME}`, FT_ASSET_NAME);
-        const postCondition = {
-          type: 'ft-postcondition',
-          address: STANDARD_ADDRESS,
-          condition: 'lt',
-          amount: '100',
-          asset: `${FT_CONTRACT_ADDRESS}.${FT_CONTRACT_NAME}::${FT_ASSET_NAME}`,
-        } as FungiblePostCondition;
+        const postCondition = makeStandardFungiblePostCondition(
+          STANDARD_ADDRESS,
+          FungibleConditionCode.Less,
+          100,
+          createAssetInfo(FT_CONTRACT_ADDRESS, FT_CONTRACT_NAME, FT_ASSET_NAME)
+        );
         expect(pc).toEqual(postCondition);
       });
 
@@ -175,13 +174,12 @@ describe('pc -- post condition builder', () => {
         const pc = Pc.principal(STANDARD_ADDRESS)
           .willSendLt(100)
           .ft(`${FT_CONTRACT_ADDRESS}.${FT_CONTRACT_NAME}`, FT_ASSET_NAME);
-        const postCondition = {
-          type: 'ft-postcondition',
-          address: STANDARD_ADDRESS,
-          condition: 'lt',
-          amount: '100',
-          asset: `${FT_CONTRACT_ADDRESS}.${FT_CONTRACT_NAME}::${FT_ASSET_NAME}`,
-        } as FungiblePostCondition;
+        const postCondition = makeStandardFungiblePostCondition(
+          STANDARD_ADDRESS,
+          FungibleConditionCode.Less,
+          100,
+          createAssetInfo(FT_CONTRACT_ADDRESS, FT_CONTRACT_NAME, FT_ASSET_NAME)
+        );
         expect(pc).toEqual(postCondition);
       });
 
@@ -189,13 +187,12 @@ describe('pc -- post condition builder', () => {
         const pc = Pc.principal(STANDARD_ADDRESS)
           .willSendGte(100)
           .ft(`${FT_CONTRACT_ADDRESS}.${FT_CONTRACT_NAME}`, FT_ASSET_NAME);
-        const postCondition = {
-          type: 'ft-postcondition',
-          address: STANDARD_ADDRESS,
-          condition: 'gte',
-          amount: '100',
-          asset: `${FT_CONTRACT_ADDRESS}.${FT_CONTRACT_NAME}::${FT_ASSET_NAME}`,
-        } as FungiblePostCondition;
+        const postCondition = makeStandardFungiblePostCondition(
+          STANDARD_ADDRESS,
+          FungibleConditionCode.GreaterEqual,
+          100,
+          createAssetInfo(FT_CONTRACT_ADDRESS, FT_CONTRACT_NAME, FT_ASSET_NAME)
+        );
         expect(pc).toEqual(postCondition);
       });
 
@@ -203,13 +200,12 @@ describe('pc -- post condition builder', () => {
         const pc = Pc.principal(STANDARD_ADDRESS)
           .willSendGt(100)
           .ft(`${FT_CONTRACT_ADDRESS}.${FT_CONTRACT_NAME}`, FT_ASSET_NAME);
-        const postCondition = {
-          type: 'ft-postcondition',
-          address: STANDARD_ADDRESS,
-          condition: 'gt',
-          amount: '100',
-          asset: `${FT_CONTRACT_ADDRESS}.${FT_CONTRACT_NAME}::${FT_ASSET_NAME}`,
-        } as FungiblePostCondition;
+        const postCondition = makeStandardFungiblePostCondition(
+          STANDARD_ADDRESS,
+          FungibleConditionCode.Greater,
+          100,
+          createAssetInfo(FT_CONTRACT_ADDRESS, FT_CONTRACT_NAME, FT_ASSET_NAME)
+        );
         expect(pc).toEqual(postCondition);
       });
     });
@@ -219,13 +215,12 @@ describe('pc -- post condition builder', () => {
         const pc = Pc.principal(STANDARD_ADDRESS)
           .willSendAsset()
           .nft(`${NFT_CONTRACT_ADDRESS}.${NFT_CONTRACT_NAME}`, NFT_TOKEN_NAME, NFT_ASSET_ID);
-        const postCondition = {
-          type: 'nft-postcondition',
-          address: STANDARD_ADDRESS,
-          condition: 'sent',
-          asset: `${NFT_CONTRACT_ADDRESS}.${NFT_CONTRACT_NAME}::${NFT_TOKEN_NAME}`,
-          assetId: NFT_ASSET_ID,
-        } as NonFungiblePostCondition;
+        const postCondition = makeStandardNonFungiblePostCondition(
+          STANDARD_ADDRESS,
+          NonFungibleConditionCode.Sends,
+          createAssetInfo(NFT_CONTRACT_ADDRESS, NFT_CONTRACT_NAME, NFT_TOKEN_NAME),
+          NFT_ASSET_ID
+        );
         expect(pc).toEqual(postCondition);
       });
 
@@ -233,13 +228,12 @@ describe('pc -- post condition builder', () => {
         const pc = Pc.principal(STANDARD_ADDRESS)
           .willNotSendAsset()
           .nft(`${NFT_CONTRACT_ADDRESS}.${NFT_CONTRACT_NAME}`, NFT_TOKEN_NAME, NFT_ASSET_ID);
-        const postCondition = {
-          type: 'nft-postcondition',
-          address: STANDARD_ADDRESS,
-          condition: 'not-sent',
-          asset: `${NFT_CONTRACT_ADDRESS}.${NFT_CONTRACT_NAME}::${NFT_TOKEN_NAME}`,
-          assetId: NFT_ASSET_ID,
-        } as NonFungiblePostCondition;
+        const postCondition = makeStandardNonFungiblePostCondition(
+          STANDARD_ADDRESS,
+          NonFungibleConditionCode.DoesNotSend,
+          createAssetInfo(NFT_CONTRACT_ADDRESS, NFT_CONTRACT_NAME, NFT_TOKEN_NAME),
+          NFT_ASSET_ID
+        );
         expect(pc).toEqual(postCondition);
       });
     });
@@ -249,56 +243,56 @@ describe('pc -- post condition builder', () => {
     describe('stx post condition', () => {
       test('100 ustx', () => {
         const pc = Pc.principal(`${CONTRACT_ADDRESS}.${CONTRACT_NAME}`).willSendEq(100).ustx();
-        const postCondition: StxPostCondition = {
-          type: 'stx-postcondition',
-          address: `${CONTRACT_ADDRESS}.${CONTRACT_NAME}`,
-          condition: 'eq',
-          amount: '100',
-        };
+        const postCondition = makeContractSTXPostCondition(
+          CONTRACT_ADDRESS,
+          CONTRACT_NAME,
+          FungibleConditionCode.Equal,
+          100
+        );
         expect(pc).toEqual(postCondition);
       });
 
       test('lte 100 ustx', () => {
         const pc = Pc.principal(`${CONTRACT_ADDRESS}.${CONTRACT_NAME}`).willSendLt(100).ustx();
-        const postCondition: StxPostCondition = {
-          type: 'stx-postcondition',
-          address: `${CONTRACT_ADDRESS}.${CONTRACT_NAME}`,
-          condition: 'lt',
-          amount: '100',
-        };
+        const postCondition = makeContractSTXPostCondition(
+          CONTRACT_ADDRESS,
+          CONTRACT_NAME,
+          FungibleConditionCode.Less,
+          100
+        );
         expect(pc).toEqual(postCondition);
       });
 
       test('lt 100 ustx', () => {
         const pc = Pc.principal(`${CONTRACT_ADDRESS}.${CONTRACT_NAME}`).willSendLt(100).ustx();
-        const postCondition: StxPostCondition = {
-          type: 'stx-postcondition',
-          address: `${CONTRACT_ADDRESS}.${CONTRACT_NAME}`,
-          condition: 'lt',
-          amount: '100',
-        };
+        const postCondition = makeContractSTXPostCondition(
+          CONTRACT_ADDRESS,
+          CONTRACT_NAME,
+          FungibleConditionCode.Less,
+          100
+        );
         expect(pc).toEqual(postCondition);
       });
 
       test('gte 100 ustx', () => {
         const pc = Pc.principal(`${CONTRACT_ADDRESS}.${CONTRACT_NAME}`).willSendGte(100).ustx();
-        const postCondition: StxPostCondition = {
-          type: 'stx-postcondition',
-          address: `${CONTRACT_ADDRESS}.${CONTRACT_NAME}`,
-          condition: 'gte',
-          amount: '100',
-        };
+        const postCondition = makeContractSTXPostCondition(
+          CONTRACT_ADDRESS,
+          CONTRACT_NAME,
+          FungibleConditionCode.GreaterEqual,
+          100
+        );
         expect(pc).toEqual(postCondition);
       });
 
       test('gt 100 ustx', () => {
         const pc = Pc.principal(`${CONTRACT_ADDRESS}.${CONTRACT_NAME}`).willSendGt(100).ustx();
-        const postCondition: StxPostCondition = {
-          type: 'stx-postcondition',
-          address: `${CONTRACT_ADDRESS}.${CONTRACT_NAME}`,
-          condition: 'gt',
-          amount: '100',
-        };
+        const postCondition = makeContractSTXPostCondition(
+          CONTRACT_ADDRESS,
+          CONTRACT_NAME,
+          FungibleConditionCode.Greater,
+          100
+        );
         expect(pc).toEqual(postCondition);
       });
     });
@@ -308,13 +302,13 @@ describe('pc -- post condition builder', () => {
         const pc = Pc.principal(`${CONTRACT_ADDRESS}.${CONTRACT_NAME}`)
           .willSendEq(100)
           .ft(`${FT_CONTRACT_ADDRESS}.${FT_CONTRACT_NAME}`, FT_ASSET_NAME);
-        const postCondition = {
-          type: 'ft-postcondition',
-          address: `${CONTRACT_ADDRESS}.${CONTRACT_NAME}`,
-          condition: 'eq',
-          amount: '100',
-          asset: `${FT_CONTRACT_ADDRESS}.${FT_CONTRACT_NAME}::${FT_ASSET_NAME}`,
-        } as FungiblePostCondition;
+        const postCondition = makeContractFungiblePostCondition(
+          CONTRACT_ADDRESS,
+          CONTRACT_NAME,
+          FungibleConditionCode.Equal,
+          100,
+          createAssetInfo(FT_CONTRACT_ADDRESS, FT_CONTRACT_NAME, FT_ASSET_NAME)
+        );
         expect(pc).toEqual(postCondition);
       });
 
@@ -322,13 +316,13 @@ describe('pc -- post condition builder', () => {
         const pc = Pc.principal(`${CONTRACT_ADDRESS}.${CONTRACT_NAME}`)
           .willSendLt(100)
           .ft(`${FT_CONTRACT_ADDRESS}.${FT_CONTRACT_NAME}`, FT_ASSET_NAME);
-        const postCondition = {
-          type: 'ft-postcondition',
-          address: `${CONTRACT_ADDRESS}.${CONTRACT_NAME}`,
-          condition: 'lt',
-          amount: '100',
-          asset: `${FT_CONTRACT_ADDRESS}.${FT_CONTRACT_NAME}::${FT_ASSET_NAME}`,
-        } as FungiblePostCondition;
+        const postCondition = makeContractFungiblePostCondition(
+          CONTRACT_ADDRESS,
+          CONTRACT_NAME,
+          FungibleConditionCode.Less,
+          100,
+          createAssetInfo(FT_CONTRACT_ADDRESS, FT_CONTRACT_NAME, FT_ASSET_NAME)
+        );
         expect(pc).toEqual(postCondition);
       });
 
@@ -336,13 +330,13 @@ describe('pc -- post condition builder', () => {
         const pc = Pc.principal(`${CONTRACT_ADDRESS}.${CONTRACT_NAME}`)
           .willSendLt(100)
           .ft(`${FT_CONTRACT_ADDRESS}.${FT_CONTRACT_NAME}`, FT_ASSET_NAME);
-        const postCondition = {
-          type: 'ft-postcondition',
-          address: `${CONTRACT_ADDRESS}.${CONTRACT_NAME}`,
-          condition: 'lt',
-          amount: '100',
-          asset: `${FT_CONTRACT_ADDRESS}.${FT_CONTRACT_NAME}::${FT_ASSET_NAME}`,
-        } as FungiblePostCondition;
+        const postCondition = makeContractFungiblePostCondition(
+          CONTRACT_ADDRESS,
+          CONTRACT_NAME,
+          FungibleConditionCode.Less,
+          100,
+          createAssetInfo(FT_CONTRACT_ADDRESS, FT_CONTRACT_NAME, FT_ASSET_NAME)
+        );
         expect(pc).toEqual(postCondition);
       });
 
@@ -350,13 +344,13 @@ describe('pc -- post condition builder', () => {
         const pc = Pc.principal(`${CONTRACT_ADDRESS}.${CONTRACT_NAME}`)
           .willSendGte(100)
           .ft(`${FT_CONTRACT_ADDRESS}.${FT_CONTRACT_NAME}`, FT_ASSET_NAME);
-        const postCondition = {
-          type: 'ft-postcondition',
-          address: `${CONTRACT_ADDRESS}.${CONTRACT_NAME}`,
-          condition: 'gte',
-          amount: '100',
-          asset: `${FT_CONTRACT_ADDRESS}.${FT_CONTRACT_NAME}::${FT_ASSET_NAME}`,
-        } as FungiblePostCondition;
+        const postCondition = makeContractFungiblePostCondition(
+          CONTRACT_ADDRESS,
+          CONTRACT_NAME,
+          FungibleConditionCode.GreaterEqual,
+          100,
+          createAssetInfo(FT_CONTRACT_ADDRESS, FT_CONTRACT_NAME, FT_ASSET_NAME)
+        );
         expect(pc).toEqual(postCondition);
       });
 
@@ -364,13 +358,13 @@ describe('pc -- post condition builder', () => {
         const pc = Pc.principal(`${CONTRACT_ADDRESS}.${CONTRACT_NAME}`)
           .willSendGt(100)
           .ft(`${FT_CONTRACT_ADDRESS}.${FT_CONTRACT_NAME}`, FT_ASSET_NAME);
-        const postCondition = {
-          type: 'ft-postcondition',
-          address: `${CONTRACT_ADDRESS}.${CONTRACT_NAME}`,
-          condition: 'gt',
-          amount: '100',
-          asset: `${FT_CONTRACT_ADDRESS}.${FT_CONTRACT_NAME}::${FT_ASSET_NAME}`,
-        } as FungiblePostCondition;
+        const postCondition = makeContractFungiblePostCondition(
+          CONTRACT_ADDRESS,
+          CONTRACT_NAME,
+          FungibleConditionCode.Greater,
+          100,
+          createAssetInfo(FT_CONTRACT_ADDRESS, FT_CONTRACT_NAME, FT_ASSET_NAME)
+        );
         expect(pc).toEqual(postCondition);
       });
     });
@@ -380,13 +374,13 @@ describe('pc -- post condition builder', () => {
         const pc = Pc.principal(`${CONTRACT_ADDRESS}.${CONTRACT_NAME}`)
           .willSendAsset()
           .nft(`${NFT_CONTRACT_ADDRESS}.${NFT_CONTRACT_NAME}`, NFT_TOKEN_NAME, NFT_ASSET_ID);
-        const postCondition = {
-          type: 'nft-postcondition',
-          address: `${CONTRACT_ADDRESS}.${CONTRACT_NAME}`,
-          condition: 'sent',
-          asset: `${NFT_CONTRACT_ADDRESS}.${NFT_CONTRACT_NAME}::${NFT_TOKEN_NAME}`,
-          assetId: NFT_ASSET_ID,
-        } as NonFungiblePostCondition;
+        const postCondition = makeContractNonFungiblePostCondition(
+          CONTRACT_ADDRESS,
+          CONTRACT_NAME,
+          NonFungibleConditionCode.Sends,
+          createAssetInfo(NFT_CONTRACT_ADDRESS, NFT_CONTRACT_NAME, NFT_TOKEN_NAME),
+          NFT_ASSET_ID
+        );
         expect(pc).toEqual(postCondition);
       });
 
@@ -394,26 +388,14 @@ describe('pc -- post condition builder', () => {
         const pc = Pc.principal(`${CONTRACT_ADDRESS}.${CONTRACT_NAME}`)
           .willNotSendAsset()
           .nft(`${NFT_CONTRACT_ADDRESS}.${NFT_CONTRACT_NAME}`, NFT_TOKEN_NAME, NFT_ASSET_ID);
-        const postCondition = {
-          type: 'nft-postcondition',
-          address: `${CONTRACT_ADDRESS}.${CONTRACT_NAME}`,
-          condition: 'not-sent',
-          asset: `${NFT_CONTRACT_ADDRESS}.${NFT_CONTRACT_NAME}::${NFT_TOKEN_NAME}`,
-          assetId: NFT_ASSET_ID,
-        } as NonFungiblePostCondition;
+        const postCondition = makeContractNonFungiblePostCondition(
+          CONTRACT_ADDRESS,
+          CONTRACT_NAME,
+          NonFungibleConditionCode.DoesNotSend,
+          createAssetInfo(NFT_CONTRACT_ADDRESS, NFT_CONTRACT_NAME, NFT_TOKEN_NAME),
+          NFT_ASSET_ID
+        );
         expect(pc).toEqual(postCondition);
-      });
-    });
-  });
-
-  describe('origin principal', () => {
-    test('origin string representation', () => {
-      const pc = Pc.origin().willSendEq(12_345).ustx();
-      expect(pc).toEqual({
-        type: 'stx-postcondition',
-        address: 'origin',
-        condition: 'eq',
-        amount: '12345',
       });
     });
   });
