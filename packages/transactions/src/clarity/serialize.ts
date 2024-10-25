@@ -1,89 +1,100 @@
 import {
+  asciiToBytes,
+  bigIntToBytes,
+  bytesToHex,
   concatArray,
   concatBytes,
-  bigIntToBytes,
+  hexToBytes,
   toTwos,
-  writeUInt32BE,
   utf8ToBytes,
-  asciiToBytes,
+  writeUInt32BE,
 } from '@stacks/common';
-import { serializeAddress, serializeLPString } from '../types';
-import { createLPString } from '../postcondition-types';
 import {
   BooleanCV,
-  OptionalCV,
   BufferCV,
-  IntCV,
-  UIntCV,
-  StandardPrincipalCV,
-  ContractPrincipalCV,
-  ResponseCV,
-  ListCV,
-  TupleCV,
   ClarityValue,
+  ContractPrincipalCV,
+  IntCV,
+  OptionalCV,
+  ResponseCV,
+  StandardPrincipalCV,
+  UIntCV,
 } from '.';
-import { ClarityType } from './constants';
-
-import { SerializationError } from '../errors';
-import { StringAsciiCV, StringUtf8CV } from './types/stringCV';
 import { CLARITY_INT_BYTE_SIZE, CLARITY_INT_SIZE } from '../constants';
+import { SerializationError } from '../errors';
+import { parseContractId } from '../utils';
+import {
+  createAddress,
+  createLPString,
+  serializeAddressBytes,
+  serializeLPStringBytes,
+} from '../wire';
+import { ClarityType, clarityTypeToByte } from './constants';
+import { ListCV, StringAsciiCV, StringUtf8CV, TupleCV } from './types';
 
 function bytesWithTypeID(typeId: ClarityType, bytes: Uint8Array): Uint8Array {
-  return concatArray([typeId, bytes]);
+  return concatArray([clarityTypeToByte(typeId), bytes]);
 }
 
 function serializeBoolCV(value: BooleanCV): Uint8Array {
-  return new Uint8Array([value.type]);
+  return new Uint8Array([clarityTypeToByte(value.type)]);
 }
 
 function serializeOptionalCV(cv: OptionalCV): Uint8Array {
   if (cv.type === ClarityType.OptionalNone) {
-    return new Uint8Array([cv.type]);
+    return new Uint8Array([clarityTypeToByte(cv.type)]);
   } else {
-    return bytesWithTypeID(cv.type, serializeCV(cv.value));
+    return bytesWithTypeID(cv.type, serializeCVBytes(cv.value));
   }
 }
 
 function serializeBufferCV(cv: BufferCV): Uint8Array {
   const length = new Uint8Array(4);
-  writeUInt32BE(length, cv.buffer.length, 0);
-  return bytesWithTypeID(cv.type, concatBytes(length, cv.buffer));
+  writeUInt32BE(length, Math.ceil(cv.value.length / 2), 0);
+  return bytesWithTypeID(cv.type, concatBytes(length, hexToBytes(cv.value)));
 }
 
 function serializeIntCV(cv: IntCV): Uint8Array {
-  const bytes = bigIntToBytes(toTwos(cv.value, BigInt(CLARITY_INT_SIZE)), CLARITY_INT_BYTE_SIZE);
+  const bytes = bigIntToBytes(
+    toTwos(BigInt(cv.value), BigInt(CLARITY_INT_SIZE)),
+    CLARITY_INT_BYTE_SIZE
+  );
   return bytesWithTypeID(cv.type, bytes);
 }
 
 function serializeUIntCV(cv: UIntCV): Uint8Array {
-  const bytes = bigIntToBytes(cv.value, CLARITY_INT_BYTE_SIZE);
+  const bytes = bigIntToBytes(BigInt(cv.value), CLARITY_INT_BYTE_SIZE);
   return bytesWithTypeID(cv.type, bytes);
 }
 
 function serializeStandardPrincipalCV(cv: StandardPrincipalCV): Uint8Array {
-  return bytesWithTypeID(cv.type, serializeAddress(cv.address));
+  return bytesWithTypeID(cv.type, serializeAddressBytes(createAddress(cv.value)));
 }
 
 function serializeContractPrincipalCV(cv: ContractPrincipalCV): Uint8Array {
+  const [address, name] = parseContractId(cv.value);
   return bytesWithTypeID(
     cv.type,
-    concatBytes(serializeAddress(cv.address), serializeLPString(cv.contractName))
+    concatBytes(
+      serializeAddressBytes(createAddress(address)),
+      serializeLPStringBytes(createLPString(name))
+    )
   );
 }
 
 function serializeResponseCV(cv: ResponseCV) {
-  return bytesWithTypeID(cv.type, serializeCV(cv.value));
+  return bytesWithTypeID(cv.type, serializeCVBytes(cv.value));
 }
 
 function serializeListCV(cv: ListCV) {
   const bytesArray = [];
 
   const length = new Uint8Array(4);
-  writeUInt32BE(length, cv.list.length, 0);
+  writeUInt32BE(length, cv.value.length, 0);
   bytesArray.push(length);
 
-  for (const value of cv.list) {
-    const serializedValue = serializeCV(value);
+  for (const value of cv.value) {
+    const serializedValue = serializeCVBytes(value);
     bytesArray.push(serializedValue);
   }
 
@@ -94,16 +105,16 @@ function serializeTupleCV(cv: TupleCV) {
   const bytesArray = [];
 
   const length = new Uint8Array(4);
-  writeUInt32BE(length, Object.keys(cv.data).length, 0);
+  writeUInt32BE(length, Object.keys(cv.value).length, 0);
   bytesArray.push(length);
 
-  const lexicographicOrder = Object.keys(cv.data).sort((a, b) => a.localeCompare(b));
+  const lexicographicOrder = Object.keys(cv.value).sort((a, b) => a.localeCompare(b));
 
   for (const key of lexicographicOrder) {
     const nameWithLength = createLPString(key);
-    bytesArray.push(serializeLPString(nameWithLength));
+    bytesArray.push(serializeLPStringBytes(nameWithLength));
 
-    const serializedValue = serializeCV(cv.data[key]);
+    const serializedValue = serializeCVBytes(cv.value[key]);
     bytesArray.push(serializedValue);
   }
 
@@ -113,7 +124,7 @@ function serializeTupleCV(cv: TupleCV) {
 function serializeStringCV(cv: StringAsciiCV | StringUtf8CV, encoding: 'ascii' | 'utf8') {
   const bytesArray = [];
 
-  const str = encoding == 'ascii' ? asciiToBytes(cv.data) : utf8ToBytes(cv.data);
+  const str = encoding == 'ascii' ? asciiToBytes(cv.value) : utf8ToBytes(cv.value);
   const len = new Uint8Array(4);
   writeUInt32BE(len, str.length, 0);
 
@@ -132,25 +143,24 @@ function serializeStringUtf8CV(cv: StringUtf8CV) {
 }
 
 /**
- * Serializes clarity value to Uint8Array
- *
- * @param {ClarityValue} value to be converted to bytes
- *
- * @returns {Uint8Array} returns the bytes
- *
+ * Serializes clarity value to hex
  * @example
  * ```
  *  import { intCV, serializeCV } from '@stacks/transactions';
  *
  *  const serialized = serializeCV(intCV(100)); // Similarly works for other clarity types as well like listCV, booleanCV ...
- *
- *  // <Uint8Array 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 64>
+ *  // '0000000000000000000000000000000064'
  * ```
  *
  * @see
  * {@link https://github.com/hirosystems/stacks.js/blob/main/packages/transactions/tests/clarity.test.ts | clarity test cases for more examples}
  */
-export function serializeCV(value: ClarityValue): Uint8Array {
+export function serializeCV(value: ClarityValue): string {
+  return bytesToHex(serializeCVBytes(value));
+}
+
+/** @ignore */
+export function serializeCVBytes(value: ClarityValue): Uint8Array {
   switch (value.type) {
     case ClarityType.BoolTrue:
     case ClarityType.BoolFalse:

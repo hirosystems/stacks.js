@@ -1,2 +1,2 @@
-export * from './fetch';
+export * from './constants';
 export * from './network';

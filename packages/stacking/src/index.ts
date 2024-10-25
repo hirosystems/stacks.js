@@ -1,12 +1,18 @@
-import { IntegerType, hexToBytes, intToBigInt } from '@stacks/common';
-import { StacksNetwork } from '@stacks/network';
+import { ClientOpts, IntegerType, PrivateKey, hexToBytes, intToBigInt } from '@stacks/common';
+import {
+  ChainId,
+  NetworkClientParam,
+  StacksNetwork,
+  clientFromNetwork,
+  networkFrom,
+} from '@stacks/network';
 import {
   BurnchainRewardListResponse,
   BurnchainRewardSlotHolderListResponse,
   BurnchainRewardsTotal,
 } from '@stacks/stacks-blockchain-api-types';
+import type { ContractIdString } from '@stacks/transactions';
 import {
-  AnchorMode,
   BufferCV,
   ClarityType,
   ClarityValue,
@@ -15,20 +21,18 @@ import {
   OptionalCV,
   PrincipalCV,
   ResponseErrorCV,
-  StacksPrivateKey,
-  StacksTransaction,
+  StacksTransactionWire,
   TupleCV,
   TxBroadcastResult,
   UIntCV,
   broadcastTransaction,
   bufferCV,
-  callReadOnlyFunction,
   cvToString,
+  fetchCallReadOnlyFunction,
   getFee,
   makeContractCall,
   noneCV,
   principalCV,
-  principalToString,
   someCV,
   stringAsciiCV,
   uintCV,
@@ -105,21 +109,6 @@ export type PoxOperationInfo = {
   current: ContractVersion;
 };
 
-export interface AccountExtendedBalances {
-  stx: {
-    balance: IntegerType;
-    total_sent: IntegerType;
-    total_received: IntegerType;
-    locked: IntegerType;
-    lock_tx_id: string;
-    lock_height: number;
-    burnchain_lock_height: number;
-    burnchain_unlock_height: number;
-  };
-  fungible_tokens: any;
-  non_fungible_tokens: any;
-}
-
 export type StackerInfo =
   | {
       stacked: false;
@@ -146,43 +135,13 @@ export type DelegationInfo =
       details: {
         amount_micro_stx: bigint;
         delegated_to: string;
-        pox_address:
-          | {
-              version: Uint8Array;
-              hashbytes: Uint8Array;
-            }
-          | undefined;
-        until_burn_ht: number | undefined;
+        pox_address?: {
+          version: number;
+          hashbytes: Uint8Array;
+        };
+        until_burn_ht?: number;
       };
     };
-
-export interface BlockTimeInfo {
-  mainnet: {
-    target_block_time: number;
-  };
-  testnet: {
-    target_block_time: number;
-  };
-}
-
-export interface CoreInfo {
-  burn_block_height: number;
-  stable_pox_consensus: string;
-}
-
-export interface BalanceInfo {
-  balance: string;
-  nonce: number;
-}
-
-export interface PaginationOptions {
-  limit: number;
-  offset: number;
-}
-
-export interface RewardsError {
-  error: string;
-}
 
 export interface RewardSetOptions {
   contractId: string;
@@ -369,83 +328,84 @@ export interface StackAggregationIncreaseOptions {
 }
 
 export class StackingClient {
-  constructor(
-    public address: string,
-    public network: StacksNetwork
-  ) {}
+  public address: string;
+  public network: StacksNetwork;
 
-  /**
-   * Get stacks node info
-   *
-   * @returns {Promise<CoreInfo>} that resolves to a CoreInfo response if the operation succeeds
-   */
-  async getCoreInfo(): Promise<CoreInfo> {
-    const url = this.network.getInfoUrl();
-    return this.network.fetchFn(url).then(res => res.json());
+  public client: Required<ClientOpts>;
+
+  // todo: make more constructor opts optional
+  constructor(opts: { address: string } & NetworkClientParam) {
+    this.address = opts.address;
+    this.network = networkFrom(opts.network ?? 'mainnet');
+    this.client = Object.assign({}, clientFromNetwork(this.network), opts.client);
   }
 
-  /**
-   * Get stacks node pox info
-   *
-   * @returns {Promise<PoxInfo>} that resolves to a PoxInfo response if the operation succeeds
-   */
-  async getPoxInfo(): Promise<PoxInfo> {
-    const url = this.network.getPoxInfoUrl();
-    return this.network.fetchFn(url).then(res => res.json());
+  get baseUrl() {
+    return this.client.baseUrl;
   }
 
-  /**
-   * Get stacks node target block time
-   *
-   * @returns {Promise<number>} resolves to a number if the operation succeeds
-   */
+  get fetch() {
+    return this.client.fetch;
+  }
+
+  /** @deprecated Kept for backwards compatibility, may be removed in the future */
+  getCoreInfo(): Promise<V2CoreInfoResponse> {
+    return this.client.fetch(`${this.client.baseUrl}/v2/info`).then(res => res.json());
+  }
+
+  /** @deprecated Kept for backwards compatibility, may be removed in the future */
+  getPoxInfo(): Promise<V2PoxInfoResponse> {
+    return this.client.fetch(`${this.client.baseUrl}/v2/pox`).then(res => res.json());
+  }
+
+  /** @deprecated Kept for backwards compatibility, may be removed in the future */
   async getTargetBlockTime(): Promise<number> {
-    const url = this.network.getBlockTimeInfoUrl();
-    const res = await this.network.fetchFn(url).then(res => res.json());
+    const res = await this.client
+      .fetch(`${this.client.baseUrl}/extended/v1/info/network_block_times`)
+      .then((res: any): V1InfoBlockTimesResponse => res.json());
 
-    if (this.network.isMainnet()) {
-      return res.mainnet.target_block_time;
-    } else {
-      return res.testnet.target_block_time;
-    }
+    if (this.network.chainId === ChainId.Mainnet) return res.mainnet.target_block_time;
+    return res.testnet.target_block_time;
   }
 
+  /** Get account status */
   async getAccountStatus(): Promise<any> {
-    const url = this.network.getAccountApiUrl(this.address);
-    return this.network.fetchFn(url).then(res => res.json());
+    // todo: add types for response
+    return this.client
+      .fetch(`${this.client.baseUrl}/v2/accounts/${this.address}?proof=0`)
+      .then(res => res.json())
+      .then(json => {
+        json.balance = BigInt(json.balance);
+        json.locked = BigInt(json.locked);
+        return json;
+      });
   }
 
-  /**
-   * Get account balance
-   * @returns {Promise<bigint>} resolves to a bigint if the operation succeeds
-   */
+  /** Get account balance */
   async getAccountBalance(): Promise<bigint> {
-    return this.getAccountStatus().then(res => {
-      return BigInt(res.balance);
-    });
+    return this.getAccountStatus().then(a => a.balance);
   }
 
-  /**
-   * Get extended account balances
-   * @returns {Promise<AccountExtendedBalances>} resolves to an AccountExtendedBalances response if the operation succeeds
-   */
-  async getAccountExtendedBalances(): Promise<AccountExtendedBalances> {
-    const url = this.network.getAccountExtendedBalancesApiUrl(this.address);
-    return this.network.fetchFn(url).then(res => res.json());
+  /** Get extended account balances */
+  async getAccountExtendedBalances(): Promise<ExtendedAccountBalances> {
+    return this.client
+      .fetch(`${this.client.baseUrl}/extended/v1/address/${this.address}/balances`)
+      .then(res => res.json())
+      .then(json => {
+        json.stx.balance = BigInt(json.stx.balance);
+        json.stx.total_sent = BigInt(json.stx.total_sent);
+        json.stx.total_received = BigInt(json.stx.total_received);
+        json.stx.locked = BigInt(json.stx.locked);
+        return json;
+      });
   }
 
-  /**
-   * Get account balance of locked tokens
-   * @returns {Promise<bigint>} resolves to a bigint if the operation succeeds
-   */
+  /** Get account balance of locked tokens */
   async getAccountBalanceLocked(): Promise<bigint> {
-    return this.getAccountStatus().then(res => BigInt(res.locked));
+    return this.getAccountStatus().then(a => a.locked);
   }
 
-  /**
-   * Get reward cycle duration in seconds
-   * @returns {Promise<number>} resolves to a number if the operation succeeds
-   */
+  /** Get reward cycle duration in seconds */
   async getCycleDuration(): Promise<number> {
     const poxInfoPromise = this.getPoxInfo();
     const targetBlockTimePromise = await this.getTargetBlockTime();
@@ -457,45 +417,42 @@ export class StackingClient {
     );
   }
 
-  /**
-   * Get the total burnchain rewards total for the set address
-   * @returns {Promise<TotalRewardsResponse | RewardsError>} that resolves to TotalRewardsResponse or RewardsError
-   */
-  async getRewardsTotalForBtcAddress(): Promise<BurnchainRewardsTotal | RewardsError> {
-    const url = this.network.getRewardsTotalUrl(this.address);
-    return this.network.fetchFn(url).then(res => res.json());
+  /** Get the total burnchain rewards total for the set address */
+  async getRewardsTotalForBtcAddress(): Promise<BurnchainRewardsTotal | BaseErrorResponse> {
+    return this.client
+      .fetch(`${this.client.baseUrl}/extended/v1/burnchain/rewards/${this.address}/total`)
+      .then(res => res.json())
+      .then(json => {
+        json.reward_amount = BigInt(json.reward_amount);
+        return json;
+      });
   }
 
-  /**
-   * Get burnchain rewards for the set address
-   * @returns {Promise<RewardsResponse | RewardsError>} that resolves to RewardsResponse or RewardsError
-   */
+  /** Get burnchain rewards for the set address */
   async getRewardsForBtcAddress(
     options?: PaginationOptions
-  ): Promise<BurnchainRewardListResponse | RewardsError> {
-    const url = `${this.network.getRewardsUrl(this.address, options)}`;
-    return this.network.fetchFn(url).then(res => res.json());
+  ): Promise<BurnchainRewardListResponse | BaseErrorResponse> {
+    let url = `${this.client.baseUrl}/extended/v1/burnchain/rewards/${this.address}`;
+    if (options) url += `?limit=${options.limit}&offset=${options.offset}`;
+
+    return this.client.fetch(url).then(res => res.json());
   }
 
-  /**
-   * Get burnchain rewards holders for the set address
-   * @returns {Promise<RewardHoldersResponse | RewardsError>} that resolves to RewardHoldersResponse or RewardsError
-   */
+  /** Get burnchain rewards holders for the set address */
   async getRewardHoldersForBtcAddress(
     options?: PaginationOptions
-  ): Promise<BurnchainRewardSlotHolderListResponse | RewardsError> {
-    const url = `${this.network.getRewardHoldersUrl(this.address, options)}`;
-    return this.network.fetchFn(url).then(res => res.json());
+  ): Promise<BurnchainRewardSlotHolderListResponse | BaseErrorResponse> {
+    let url = `${this.client.baseUrl}/extended/v1/burnchain/reward_slot_holders/${this.address}`;
+    if (options) url += `?limit=${options.limit}&offset=${options.offset}`;
+
+    return this.client.fetch(url).then(res => res.json());
   }
 
-  /**
-   * Get PoX address from reward set by index
-   * @returns {Promise<RewardSetInfo | undefined>} that resolves to RewardSetInfo if the entry exists
-   */
+  /** Get PoX address from reward set by index (if it exists) */
   async getRewardSet(options: RewardSetOptions): Promise<RewardSetInfo | undefined> {
     const [contractAddress, contractName] = this.parseContractId(options?.contractId);
-    const result = await callReadOnlyFunction({
-      network: this.network,
+    const result = await fetchCallReadOnlyFunction({
+      client: this.client,
       senderAddress: this.address,
       contractAddress,
       contractName,
@@ -505,19 +462,20 @@ export class StackingClient {
 
     return unwrapMap(result as OptionalCV<TupleCV>, tuple => ({
       pox_address: {
-        version: ((tuple.data['pox-addr'] as TupleCV).data['version'] as BufferCV).buffer,
-        hashbytes: ((tuple.data['pox-addr'] as TupleCV).data['hashbytes'] as BufferCV).buffer,
+        version: hexToBytes(
+          ((tuple.value['pox-addr'] as TupleCV).value['version'] as BufferCV).value
+        ),
+        hashbytes: hexToBytes(
+          ((tuple.value['pox-addr'] as TupleCV).value['hashbytes'] as BufferCV).value
+        ),
       },
-      total_ustx: (tuple.data['total-ustx'] as UIntCV).value,
+      total_ustx: BigInt((tuple.value['total-ustx'] as UIntCV).value),
     }));
   }
 
   /**
    * Get number of seconds until next reward cycle
-   * @returns {Promise<number>} resolves to a number if the operation succeeds
-   *
-   * See also:
-   * - {@link getSecondsUntilStackingDeadline}
+   * @see {@link getSecondsUntilStackingDeadline}
    */
   async getSecondsUntilNextCycle(): Promise<number> {
     const poxInfoPromise = this.getPoxInfo();
@@ -539,11 +497,9 @@ export class StackingClient {
    * Get number of seconds until the end of the stacking deadline.
    * This is the estimated time stackers have to submit their stacking
    * transactions to be included in the upcoming reward cycle.
-   * @returns {Promise<number>} resolves to a number of seconds if the operation succeeds.
+   * @returns number of seconds
    * **⚠️ Attention**: The returned number of seconds can be negative if the deadline has passed and the prepare phase has started.
-   *
-   * See also:
-   * - {@link getSecondsUntilNextCycle}
+   * @see {@link getSecondsUntilNextCycle}
    */
   async getSecondsUntilStackingDeadline(): Promise<number> {
     const poxInfoPromise = this.getPoxInfo();
@@ -562,19 +518,17 @@ export class StackingClient {
    * - Period 1: This is before the 2.1 fork.
    * - Period 2: This is after the 2.1 fork, but before cycle (N+1).
    * - Period 3: This is after cycle (N+1) has begun. Original PoX contract state will no longer have any impact on reward sets, account lock status, etc.
-   *
-   * @returns {Promise<PoxOperationInfo>} that resolves to PoX operation info
    */
-  async getPoxOperationInfo(poxInfo?: PoxInfo): Promise<PoxOperationInfo> {
+  async getPoxOperationInfo(poxInfo?: V2PoxInfoResponse): Promise<PoxOperationInfo> {
     poxInfo = poxInfo ?? (await this.getPoxInfo());
 
     const poxContractVersions = [...poxInfo.contract_versions].sort(
       (a, b) => a.activation_burnchain_block_height - b.activation_burnchain_block_height
-    ); //  by activation height ASC (earliest first)
+    ); // by activation height ASC (earliest first)
     const [pox1, pox2, pox3, pox4] = poxContractVersions;
 
     const activatedPoxs = poxContractVersions.filter(
-      (c: ContractVersion) =>
+      (c: ContractVersionResponse) =>
         (poxInfo?.current_burnchain_block_height as number) >= c.activation_burnchain_block_height
     );
     const current = activatedPoxs[activatedPoxs.length - 1];
@@ -608,8 +562,8 @@ export class StackingClient {
         const address = poxAddressToTuple(poxAddress);
         const [contractAddress, contractName] = this.parseContractId(poxInfo.contract_id);
 
-        return callReadOnlyFunction({
-          network: this.network,
+        return fetchCallReadOnlyFunction({
+          client: this.client,
           contractName,
           contractAddress,
           functionName: 'can-stack-stx',
@@ -679,7 +633,7 @@ export class StackingClient {
       ...renamePrivateKey(txOptions),
     });
 
-    return broadcastTransaction(tx, callOptions.network as StacksNetwork);
+    return broadcastTransaction({ transaction: tx, client: this.client });
   }
 
   /**
@@ -725,7 +679,7 @@ export class StackingClient {
       ...renamePrivateKey(txOptions),
     });
 
-    return broadcastTransaction(tx, callOptions.network as StacksNetwork);
+    return broadcastTransaction({ transaction: tx, client: this.client });
   }
 
   /**
@@ -766,7 +720,7 @@ export class StackingClient {
       ...renamePrivateKey(txOptions),
     });
 
-    return broadcastTransaction(tx, callOptions.network as StacksNetwork);
+    return broadcastTransaction({ transaction: tx, client: this.client });
   }
 
   /**
@@ -803,7 +757,7 @@ export class StackingClient {
       ...renamePrivateKey(txOptions),
     });
 
-    return broadcastTransaction(tx, callOptions.network as StacksNetwork);
+    return broadcastTransaction({ transaction: tx, client: this.client });
   }
 
   /**
@@ -840,7 +794,7 @@ export class StackingClient {
       ...renamePrivateKey(txOptions),
     });
 
-    return broadcastTransaction(tx, callOptions.network as StacksNetwork);
+    return broadcastTransaction({ transaction: tx, client: this.client });
   }
 
   /**
@@ -871,7 +825,7 @@ export class StackingClient {
       ...renamePrivateKey(txOptions),
     });
 
-    return broadcastTransaction(tx, callOptions.network as StacksNetwork);
+    return broadcastTransaction({ transaction: tx, client: this.client });
   }
 
   /**
@@ -901,7 +855,7 @@ export class StackingClient {
       ...renamePrivateKey(txOptions),
     });
 
-    return broadcastTransaction(tx, callOptions.network as StacksNetwork);
+    return broadcastTransaction({ transaction: tx, client: this.client });
   }
 
   /**
@@ -936,7 +890,7 @@ export class StackingClient {
       ...renamePrivateKey(txOptions),
     });
 
-    return broadcastTransaction(tx, callOptions.network as StacksNetwork);
+    return broadcastTransaction({ transaction: tx, client: this.client });
   }
 
   /**
@@ -984,7 +938,7 @@ export class StackingClient {
       ...renamePrivateKey(txOptions),
     });
 
-    return broadcastTransaction(tx, callOptions.network as StacksNetwork);
+    return broadcastTransaction({ transaction: tx, client: this.client });
   }
 
   /**
@@ -1023,7 +977,7 @@ export class StackingClient {
       ...renamePrivateKey(txOptions),
     });
 
-    return broadcastTransaction(tx, callOptions.network as StacksNetwork);
+    return broadcastTransaction({ transaction: tx, client: this.client });
   }
 
   /**
@@ -1051,7 +1005,7 @@ export class StackingClient {
       ...renamePrivateKey(arg),
     });
 
-    return broadcastTransaction(tx, callOptions.network as StacksNetwork);
+    return broadcastTransaction({ transaction: tx, client: this.client });
   }
 
   getStackOptions({
@@ -1093,13 +1047,13 @@ export class StackingClient {
     }
 
     const callOptions: ContractCallOptions = {
+      client: this.client,
       contractAddress,
       contractName,
       functionName: 'stack-stx',
       functionArgs,
       validateWithAbi: true,
       network: this.network,
-      anchorMode: AnchorMode.Any,
     };
     return callOptions;
   }
@@ -1134,13 +1088,13 @@ export class StackingClient {
     }
 
     const callOptions: ContractCallOptions = {
+      client: this.client,
       contractAddress,
       contractName,
       functionName: 'stack-extend',
       functionArgs,
       validateWithAbi: true,
       network: this.network,
-      anchorMode: AnchorMode.Any,
     };
     return callOptions;
   }
@@ -1172,13 +1126,13 @@ export class StackingClient {
     }
 
     const callOptions: ContractCallOptions = {
+      client: this.client,
       contractAddress,
       contractName,
       functionName: 'stack-increase',
       functionArgs,
       validateWithAbi: true,
       network: this.network,
-      anchorMode: AnchorMode.Any,
     };
     return callOptions;
   }
@@ -1199,6 +1153,7 @@ export class StackingClient {
     const address = poxAddress ? someCV(poxAddressToTuple(poxAddress)) : noneCV();
     const [contractAddress, contractName] = this.parseContractId(contract);
     const callOptions: ContractCallOptions = {
+      client: this.client,
       contractAddress,
       contractName,
       functionName: 'delegate-stx',
@@ -1210,7 +1165,6 @@ export class StackingClient {
       ],
       validateWithAbi: true,
       network: this.network,
-      anchorMode: AnchorMode.Any,
     };
     return callOptions;
   }
@@ -1234,6 +1188,7 @@ export class StackingClient {
     const [contractAddress, contractName] = this.parseContractId(contract);
 
     const callOptions: ContractCallOptions = {
+      client: this.client,
       contractAddress,
       contractName,
       functionName: 'delegate-stack-stx',
@@ -1246,7 +1201,6 @@ export class StackingClient {
       ],
       validateWithAbi: true,
       network: this.network,
-      anchorMode: AnchorMode.Any,
     };
 
     return callOptions;
@@ -1267,13 +1221,13 @@ export class StackingClient {
     const [contractAddress, contractName] = this.parseContractId(contract);
 
     const callOptions: ContractCallOptions = {
+      client: this.client,
       contractAddress,
       contractName,
       functionName: 'delegate-stack-extend',
       functionArgs: [principalCV(stacker), address, uintCV(extendCount)],
       validateWithAbi: true,
       network: this.network,
-      anchorMode: AnchorMode.Any,
     };
 
     return callOptions;
@@ -1293,13 +1247,13 @@ export class StackingClient {
     const address = poxAddressToTuple(poxAddress);
     const [contractAddress, contractName] = this.parseContractId(contract);
     const callOptions: ContractCallOptions = {
+      client: this.client,
       contractAddress,
       contractName,
       functionName: 'delegate-stack-increase',
       functionArgs: [principalCV(stacker), address, uintCV(increaseBy)],
       validateWithAbi: true,
       network: this.network,
-      anchorMode: AnchorMode.Any,
     };
 
     return callOptions;
@@ -1335,13 +1289,13 @@ export class StackingClient {
     }
 
     const callOptions: ContractCallOptions = {
+      client: this.client,
       contractAddress,
       contractName,
       functionName: 'stack-aggregation-commit',
       functionArgs,
       validateWithAbi: true,
       network: this.network,
-      anchorMode: AnchorMode.Any,
     };
     return callOptions;
   }
@@ -1378,13 +1332,13 @@ export class StackingClient {
     }
 
     const callOptions: ContractCallOptions = {
+      client: this.client,
       contractAddress,
       contractName,
       functionName: 'stack-aggregation-increase',
       functionArgs,
       validateWithAbi: true,
       network: this.network,
-      anchorMode: AnchorMode.Any,
     };
     return callOptions;
   }
@@ -1419,13 +1373,13 @@ export class StackingClient {
     }
 
     const callOptions: ContractCallOptions = {
+      client: this.client,
       contractAddress,
       contractName,
       functionName: 'stack-aggregation-commit-indexed',
       functionArgs,
       validateWithAbi: true,
       network: this.network,
-      anchorMode: AnchorMode.Any,
     };
     return callOptions;
   }
@@ -1433,13 +1387,13 @@ export class StackingClient {
   getRevokeDelegateStxOptions(contract: string) {
     const [contractAddress, contractName] = this.parseContractId(contract);
     const callOptions: ContractCallOptions = {
+      client: this.client,
       contractAddress,
       contractName,
       functionName: 'revoke-delegate-stx',
       functionArgs: [],
       validateWithAbi: true,
       network: this.network,
-      anchorMode: AnchorMode.Any,
     };
     return callOptions;
   }
@@ -1455,22 +1409,22 @@ export class StackingClient {
     const account = await this.getAccountStatus();
     const functionName = 'get-stacker-info';
 
-    return callReadOnlyFunction({
+    return fetchCallReadOnlyFunction({
       contractAddress,
       contractName,
       functionName,
       senderAddress: this.address,
       functionArgs: [principalCV(this.address)],
-      network: this.network,
+      client: this.client,
     }).then((responseCV: ClarityValue) => {
       if (responseCV.type === ClarityType.OptionalSome) {
         const someCV = responseCV;
         const tupleCV: TupleCV = someCV.value as TupleCV;
-        const poxAddress: TupleCV = tupleCV.data['pox-addr'] as TupleCV;
-        const firstRewardCycle: UIntCV = tupleCV.data['first-reward-cycle'] as UIntCV;
-        const lockPeriod: UIntCV = tupleCV.data['lock-period'] as UIntCV;
-        const version: BufferCV = poxAddress.data['version'] as BufferCV;
-        const hashbytes: BufferCV = poxAddress.data['hashbytes'] as BufferCV;
+        const poxAddress: TupleCV = tupleCV.value['pox-addr'] as TupleCV;
+        const firstRewardCycle: UIntCV = tupleCV.value['first-reward-cycle'] as UIntCV;
+        const lockPeriod: UIntCV = tupleCV.value['lock-period'] as UIntCV;
+        const version: BufferCV = poxAddress.value['version'] as BufferCV;
+        const hashbytes: BufferCV = poxAddress.value['hashbytes'] as BufferCV;
 
         return {
           stacked: true,
@@ -1479,8 +1433,8 @@ export class StackingClient {
             lock_period: Number(lockPeriod.value),
             unlock_height: account.unlock_height,
             pox_address: {
-              version: version.buffer,
-              hashbytes: hashbytes.buffer,
+              version: hexToBytes(version.value),
+              hashbytes: hexToBytes(hashbytes.value),
             },
           },
         };
@@ -1504,30 +1458,30 @@ export class StackingClient {
     const [contractAddress, contractName] = this.parseContractId(poxInfo.contract_id);
     const functionName = 'get-delegation-info';
 
-    return callReadOnlyFunction({
+    return fetchCallReadOnlyFunction({
       contractAddress,
       contractName,
       functionName,
-      senderAddress: this.address,
       functionArgs: [principalCV(this.address)],
-      network: this.network,
+      senderAddress: this.address,
+      client: this.client,
     }).then((responseCV: ClarityValue) => {
       if (responseCV.type === ClarityType.OptionalSome) {
         const tupleCV = responseCV.value as TupleCV;
-        const amountMicroStx = tupleCV.data['amount-ustx'] as UIntCV;
-        const delegatedTo = tupleCV.data['delegated-to'] as PrincipalCV;
+        const amountMicroStx = tupleCV.value['amount-ustx'] as UIntCV;
+        const delegatedTo = tupleCV.value['delegated-to'] as PrincipalCV;
 
-        const poxAddress = unwrapMap(tupleCV.data['pox-addr'] as OptionalCV<TupleCV>, tuple => ({
-          version: (tuple.data['version'] as BufferCV).buffer,
-          hashbytes: (tuple.data['hashbytes'] as BufferCV).buffer,
+        const poxAddress = unwrapMap(tupleCV.value['pox-addr'] as OptionalCV<TupleCV>, tuple => ({
+          version: hexToBytes((tuple.value['version'] as BufferCV).value)[0],
+          hashbytes: hexToBytes((tuple.value['hashbytes'] as BufferCV).value),
         }));
-        const untilBurnBlockHeight = unwrap(tupleCV.data['until-burn-ht'] as OptionalCV<UIntCV>);
+        const untilBurnBlockHeight = unwrap(tupleCV.value['until-burn-ht'] as OptionalCV<UIntCV>);
 
         return {
           delegated: true,
           details: {
             amount_micro_stx: BigInt(amountMicroStx.value),
-            delegated_to: principalToString(delegatedTo),
+            delegated_to: delegatedTo.value,
             pox_address: poxAddress,
             until_burn_ht: untilBurnBlockHeight ? Number(untilBurnBlockHeight.value) : undefined,
           },
@@ -1584,13 +1538,13 @@ export class StackingClient {
       uintCV(authId),
     ];
 
-    return callReadOnlyFunction({
+    return fetchCallReadOnlyFunction({
       contractAddress,
       contractName,
       functionName,
       functionArgs,
-      network: this.network,
       senderAddress: this.address,
+      client: this.client,
     }).then(responseCV => responseCV.type === ClarityType.ResponseOk);
   }
 
@@ -1615,13 +1569,17 @@ export class StackingClient {
   /**
    * Adjust microstacks amount for locking after taking into account transaction fees
    *
-   * @returns {StacksTransaction} that resolves to a transaction object if the operation succeeds
+   * @returns {StacksTransactionWire} that resolves to a transaction object if the operation succeeds
    */
-  modifyLockTxFee({ tx, amountMicroStx }: { tx: StacksTransaction; amountMicroStx: IntegerType }) {
+  modifyLockTxFee({
+    tx,
+    amountMicroStx,
+  }: {
+    tx: StacksTransactionWire;
+    amountMicroStx: IntegerType;
+  }) {
     const fee = getFee(tx.auth);
-    (tx.payload as ContractCallPayload).functionArgs[0] = uintCV(
-      intToBigInt(amountMicroStx, false) - fee
-    );
+    (tx.payload as ContractCallPayload).functionArgs[0] = uintCV(intToBigInt(amountMicroStx) - fee);
     return tx;
   }
 
@@ -1657,7 +1615,7 @@ export class StackingClient {
     poxAddress: string;
     rewardCycle: number;
     period: number;
-    signerPrivateKey: StacksPrivateKey;
+    signerPrivateKey: PrivateKey;
     maxAmount: IntegerType;
     authId: IntegerType;
   }) {
@@ -1687,4 +1645,105 @@ function renamePrivateKey(txOptions: BaseTxOptions) {
     nonce?: IntegerType;
     senderKey: string;
   };
+}
+
+/** @beta @ignore Type export subject to change*/
+export interface V2CoreInfoResponse {
+  burn_block_height: number;
+  stable_pox_consensus: string;
+}
+
+/** @beta @ignore Type export subject to change*/
+export interface CycleInfoResponse {
+  id: number;
+  min_threshold_ustx: number;
+  stacked_ustx: number;
+  is_pox_active: boolean;
+}
+
+/** @beta @ignore Type export subject to change*/
+export interface ContractVersionResponse {
+  contract_id: ContractIdString;
+  activation_burnchain_block_height: number;
+  first_reward_cycle_id: number;
+}
+
+/** @beta @ignore Type export subject to change*/
+export interface V2PoxInfoResponse {
+  contract_id: string;
+  contract_versions: ContractVersionResponse[];
+  current_burnchain_block_height?: number;
+  first_burnchain_block_height: number;
+  min_amount_ustx: string;
+  next_reward_cycle_in: number;
+  prepare_cycle_length: number;
+  prepare_phase_block_length: number;
+  rejection_fraction: number;
+  rejection_votes_left_required: number;
+  reward_cycle_id: number;
+  reward_cycle_length: number;
+  reward_phase_block_length: number;
+  reward_slots: number;
+  current_cycle: CycleInfoResponse;
+  next_cycle: CycleInfoResponse & {
+    min_increment_ustx: number;
+    prepare_phase_start_block_height: number;
+    blocks_until_prepare_phase: number;
+    reward_phase_start_block_height: number;
+    blocks_until_reward_phase: number;
+    ustx_until_pox_rejection: number;
+  };
+}
+
+/** @beta @ignore Type export subject to change*/
+export interface V1InfoBlockTimesResponse {
+  mainnet: {
+    target_block_time: number;
+  };
+  testnet: {
+    target_block_time: number;
+  };
+}
+
+/** @beta @ignore Type export subject to change*/
+export interface ExtendedAccountBalancesResponse {
+  stx: {
+    balance: string;
+    total_sent: string;
+    total_received: string;
+    locked: string;
+    lock_tx_id: string;
+    lock_height: number;
+    burnchain_lock_height: number;
+    burnchain_unlock_height: number;
+  };
+  fungible_tokens: any;
+  non_fungible_tokens: any;
+}
+
+/** @beta @ignore Type export subject to change*/
+export interface ExtendedAccountBalances {
+  stx: {
+    balance: bigint;
+    total_sent: bigint;
+    total_received: bigint;
+    locked: bigint;
+    lock_tx_id: string;
+    lock_height: number;
+    burnchain_lock_height: number;
+    burnchain_unlock_height: number;
+  };
+  fungible_tokens: any;
+  non_fungible_tokens: any;
+}
+
+/** @beta @ignore Type export subject to change*/
+export interface PaginationOptions {
+  limit: number;
+  offset: number;
+}
+
+/** @beta @ignore Type export subject to change*/
+export interface BaseErrorResponse {
+  error: string;
 }

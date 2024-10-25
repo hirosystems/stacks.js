@@ -2,10 +2,11 @@ import { ripemd160 } from '@noble/hashes/ripemd160';
 import { sha256 } from '@noble/hashes/sha256';
 import { sha512_256 } from '@noble/hashes/sha512';
 import { utils } from '@noble/secp256k1';
-import { bytesToHex, concatArray, concatBytes, utf8ToBytes, with0x } from '@stacks/common';
+import { bytesToHex, concatArray, concatBytes, utf8ToBytes } from '@stacks/common';
 import { c32addressDecode } from 'c32check';
 import lodashCloneDeep from 'lodash.clonedeep';
 import { ClarityValue, deserializeCV, serializeCV } from './clarity';
+import { ContractIdString } from './types';
 
 // Export verify as utility method for signature verification
 export { verify as verifySignature } from '@noble/secp256k1';
@@ -18,7 +19,7 @@ export { verify as verifySignature } from '@noble/secp256k1';
 export const randomBytes = (bytesLength?: number): Uint8Array => utils.randomBytes(bytesLength);
 
 export const leftPadHex = (hexString: string): string =>
-  hexString.length % 2 == 0 ? hexString : `0${hexString}`;
+  hexString.length % 2 ? `0${hexString}` : hexString;
 
 export const leftPadHexToLength = (hexString: string, length: number): string =>
   hexString.padStart(length, '0');
@@ -29,7 +30,7 @@ export const rightPadHexToLength = (hexString: string, length: number): string =
 export const exceedsMaxLengthBytes = (string: string, maxLengthBytes: number): boolean =>
   string ? utf8ToBytes(string).length > maxLengthBytes : false;
 
-/** @ignore */
+/** @internal @deprecated */
 export function cloneDeep<T>(obj: T): T {
   return lodashCloneDeep(obj);
 }
@@ -58,14 +59,14 @@ export const txidFromBytes = txidFromData;
 
 // Internally, the Stacks blockchain encodes address the same as Bitcoin
 // single-sig address (p2pkh)
-/** @ignore */
+/** @internal */
 export const hashP2PKH = (input: Uint8Array): string => {
   return bytesToHex(hash160(input));
 };
 
 // Internally, the Stacks blockchain encodes address the same as Bitcoin
 // single-sig address over p2sh (p2h-p2wpkh)
-/** @ignore */
+/** @internal */
 export const hashP2WPKH = (input: Uint8Array): string => {
   const keyHash = hash160(input);
   const redeemScript = concatBytes(new Uint8Array([0]), new Uint8Array([keyHash.length]), keyHash);
@@ -75,7 +76,7 @@ export const hashP2WPKH = (input: Uint8Array): string => {
 
 // Internally, the Stacks blockchain encodes address the same as Bitcoin
 // multi-sig address (p2sh)
-/** @ignore */
+/** @internal */
 export const hashP2SH = (numSigs: number, pubKeys: Uint8Array[]): string => {
   if (numSigs > 15 || pubKeys.length > 15) {
     throw Error('P2SH multisig address can only contain up to 15 public keys');
@@ -102,7 +103,7 @@ export const hashP2SH = (numSigs: number, pubKeys: Uint8Array[]): string => {
 
 // Internally, the Stacks blockchain encodes address the same as Bitcoin
 // multisig address over p2sh (p2sh-p2wsh)
-/** @ignore */
+/** @internal */
 export const hashP2WSH = (numSigs: number, pubKeys: Uint8Array[]): string => {
   if (numSigs > 15 || pubKeys.length > 15) {
     throw Error('P2WSH multisig address can only contain up to 15 public keys');
@@ -146,7 +147,7 @@ export function isClarityName(name: string) {
  */
 export function cvToHex(cv: ClarityValue) {
   const serialized = serializeCV(cv);
-  return `0x${bytesToHex(serialized)}`;
+  return `0x${serialized}`;
 }
 
 /**
@@ -156,13 +157,13 @@ export function cvToHex(cv: ClarityValue) {
 export function hexToCV(hex: string) {
   return deserializeCV(hex);
 }
+
 /**
  * Read only function response object
  *
  * @param {Boolean} okay - the status of the response
  * @param {string} result - serialized hex clarity value
  */
-
 export interface ReadOnlyFunctionSuccessResponse {
   okay: true;
   result: string;
@@ -186,18 +187,18 @@ export const parseReadOnlyResponse = (response: ReadOnlyFunctionResponse): Clari
   throw new Error(response.cause);
 };
 
-export const validateStacksAddress = (stacksAddress: string): boolean => {
+export const validateStacksAddress = (address: string): boolean => {
   try {
-    c32addressDecode(stacksAddress);
+    c32addressDecode(address);
     return true;
   } catch (e) {
     return false;
   }
 };
 
-export const validateTxId = (txid: string): boolean => {
-  if (txid === 'success') return true; // Bypass fetchMock tests // todo: move this line into mocks in test files
-  const value = with0x(txid).toLowerCase();
-  if (value.length !== 66) return false;
-  return with0x(BigInt(value).toString(16).padStart(64, '0')) === value;
-};
+/** @internal */
+export function parseContractId(contractId: ContractIdString) {
+  const [address, name] = contractId.split('.');
+  if (!address || !name) throw new Error(`Invalid contract identifier: ${contractId}`);
+  return [address, name];
+}

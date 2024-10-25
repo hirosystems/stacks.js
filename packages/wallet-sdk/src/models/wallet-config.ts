@@ -1,8 +1,9 @@
 import { Account, Wallet } from './common';
 import { GaiaHubConfig, connectToGaiaHub, uploadToGaiaHub } from '@stacks/storage';
 import { decryptContent, encryptContent, getPublicKeyFromPrivate } from '@stacks/encryption';
-import { createFetchFn, FetchFn } from '@stacks/network';
+import { createFetchFn, FetchFn } from '@stacks/common';
 
+/** @deprecated */
 export interface ConfigApp {
   origin: string;
   scopes: string[];
@@ -11,6 +12,7 @@ export interface ConfigApp {
   name: string;
 }
 
+/** @deprecated */
 export interface ConfigAccount {
   username?: string;
   apps: {
@@ -18,6 +20,7 @@ export interface ConfigAccount {
   };
 }
 
+/** @deprecated */
 export interface WalletConfig {
   accounts: ConfigAccount[];
   meta?: {
@@ -25,6 +28,7 @@ export interface WalletConfig {
   };
 }
 
+/** @deprecated  */
 export const createWalletGaiaConfig = async ({
   gaiaHubUrl,
   wallet,
@@ -35,6 +39,7 @@ export const createWalletGaiaConfig = async ({
   return connectToGaiaHub(gaiaHubUrl, wallet.configPrivateKey);
 };
 
+/** @deprecated not used for anything relevant */
 export const getOrCreateWalletConfig = async ({
   wallet,
   gaiaHubConfig,
@@ -55,6 +60,7 @@ export const getOrCreateWalletConfig = async ({
   return newConfig;
 };
 
+/** @deprecated not used for anything relevant */
 export const fetchWalletConfig = async ({
   wallet,
   gaiaHubConfig,
@@ -81,6 +87,7 @@ export const fetchWalletConfig = async ({
   }
 };
 
+/** @deprecated not used for anything relevant */
 export const updateWalletConfig = async ({
   wallet,
   walletConfig: _walletConfig,
@@ -104,6 +111,7 @@ export const updateWalletConfig = async ({
   return walletConfig;
 };
 
+/** @deprecated */
 export function makeWalletConfig(wallet: Wallet): WalletConfig {
   return {
     accounts: wallet.accounts.map(account => ({
@@ -113,6 +121,7 @@ export function makeWalletConfig(wallet: Wallet): WalletConfig {
   };
 }
 
+/** @deprecated */
 export const encryptWalletConfig = async ({
   wallet,
   walletConfig,
@@ -125,6 +134,7 @@ export const encryptWalletConfig = async ({
   return encrypted;
 };
 
+/** @deprecated */
 export const updateWalletConfigWithApp = async ({
   wallet,
   account,

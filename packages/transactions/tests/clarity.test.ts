@@ -1,18 +1,12 @@
-import {
-  asciiToBytes,
-  bytesToHex,
-  bytesToUtf8,
-  concatBytes,
-  hexToBytes,
-  utf8ToBytes,
-} from '@stacks/common';
+import { asciiToBytes, bytesToUtf8, concatBytes, hexToBytes, utf8ToBytes } from '@stacks/common';
 import assert from 'assert';
-import { Cl } from '../src';
-import { BytesReader } from '../src/bytesReader';
+import { Cl, deserializeAddress } from '../src';
+import { BytesReader } from '../src/BytesReader';
 import {
   BufferCV,
   ClarityType,
   ClarityValue,
+  ClarityWireType,
   IntCV,
   ListCV,
   SomeCV,
@@ -22,6 +16,8 @@ import {
   TupleCV,
   UIntCV,
   bufferCV,
+  clarityByteToType,
+  clarityTypeToByte,
   contractPrincipalCV,
   contractPrincipalCVFromStandard,
   deserializeCV,
@@ -32,6 +28,7 @@ import {
   responseErrorCV,
   responseOkCV,
   serializeCV,
+  serializeCVBytes,
   someCV,
   standardPrincipalCV,
   standardPrincipalCVFromAddress,
@@ -49,15 +46,13 @@ import {
   isClarityType,
 } from '../src/clarity/clarityValue';
 import { parse } from '../src/clarity/parser';
-import { addressToString } from '../src/common';
-import { deserializeAddress } from '../src/types';
 
 const ADDRESS = 'SP2JXKMSH007NPYAQHKJPQMAQYAD90NQGTVJVQ02B';
 
-function serializeDeserialize<T extends ClarityValue>(value: T): ClarityValue {
-  const serializedDeserialized: Uint8Array = serializeCV(value);
+function serializeDeserialize<T extends ClarityValue>(value: T): T {
+  const serializedDeserialized: Uint8Array = serializeCVBytes(value);
   const bytesReader = new BytesReader(serializedDeserialized);
-  return deserializeCV(bytesReader);
+  return deserializeCV(bytesReader) as T;
 }
 
 describe('Clarity Types', () => {
@@ -69,33 +64,33 @@ describe('Clarity Types', () => {
     function parseWithManualTypeAssertions() {
       const deserializedCv = deserializeCV(serializedClarityValue);
       const clVal = deserializedCv as TupleCV;
-      const namespaceCV = clVal.data['namespace'] as BufferCV;
-      const statusCV = clVal.data['status'] as StringAsciiCV;
-      const properties = clVal.data['properties'] as TupleCV;
-      const launchedAtCV = properties.data['launched-at'] as SomeCV;
+      const namespaceCV = clVal.value['namespace'] as BufferCV;
+      const statusCV = clVal.value['status'] as StringAsciiCV;
+      const properties = clVal.value['properties'] as TupleCV;
+      const launchedAtCV = properties.value['launched-at'] as SomeCV;
       const launchAtIntCV = launchedAtCV.value as UIntCV;
-      const lifetimeCV = properties.data['lifetime'] as IntCV;
-      const revealedAtCV = properties.data['revealed-at'] as IntCV;
-      const addressCV = properties.data['namespace-import'] as StandardPrincipalCV;
-      const priceFunction = properties.data['price-function'] as TupleCV;
-      const baseCV = priceFunction.data['base'] as IntCV;
-      const coeffCV = priceFunction.data['coeff'] as IntCV;
-      const noVowelDiscountCV = priceFunction.data['no-vowel-discount'] as IntCV;
-      const nonalphaDiscountCV = priceFunction.data['nonalpha-discount'] as IntCV;
-      const bucketsCV = priceFunction.data['buckets'] as ListCV;
+      const lifetimeCV = properties.value['lifetime'] as IntCV;
+      const revealedAtCV = properties.value['revealed-at'] as IntCV;
+      const addressCV = properties.value['namespace-import'] as StandardPrincipalCV;
+      const priceFunction = properties.value['price-function'] as TupleCV;
+      const baseCV = priceFunction.value['base'] as IntCV;
+      const coeffCV = priceFunction.value['coeff'] as IntCV;
+      const noVowelDiscountCV = priceFunction.value['no-vowel-discount'] as IntCV;
+      const nonalphaDiscountCV = priceFunction.value['nonalpha-discount'] as IntCV;
+      const bucketsCV = priceFunction.value['buckets'] as ListCV;
       const buckets: string[] = [];
-      const listCV = bucketsCV.list;
+      const listCV = bucketsCV.value;
       for (let i = 0; i < listCV.length; i++) {
         const cv = listCV[i] as UIntCV;
         buckets.push(cv.value.toString());
       }
       return {
-        namespace: bytesToUtf8(namespaceCV.buffer),
-        status: statusCV.data,
+        namespace: bytesToUtf8(hexToBytes(namespaceCV.value)),
+        status: statusCV.value,
         launchedAt: launchAtIntCV.value.toString(),
         lifetime: lifetimeCV.value.toString(),
         revealedAt: revealedAtCV.value.toString(),
-        address: addressToString(addressCV.address),
+        address: addressCV.value,
         base: baseCV.value.toString(),
         coeff: coeffCV.value.toString(),
         noVowelDiscount: noVowelDiscountCV.value.toString(),
@@ -141,20 +136,20 @@ describe('Clarity Types', () => {
       }>;
       const cv = deserializeCV<BnsNamespaceCV>(serializedClarityValue);
       // easy, fully-typed access into the Clarity value properties
-      const namespaceProps = cv.data.properties.data;
-      const priceProps = namespaceProps['price-function'].data;
+      const namespaceProps = cv.value.properties.value;
+      const priceProps = namespaceProps['price-function'].value;
       return {
-        namespace: bytesToUtf8(cv.data.namespace.buffer),
-        status: cv.data.status.data,
+        namespace: bytesToUtf8(hexToBytes(cv.value.namespace.value)),
+        status: cv.value.status.value,
         launchedAt: namespaceProps['launched-at'].value.value.toString(),
         lifetime: namespaceProps.lifetime.value.toString(),
         revealedAt: namespaceProps['revealed-at'].value.toString(),
-        address: addressToString(namespaceProps['namespace-import'].address),
+        address: namespaceProps['namespace-import'].value,
         base: priceProps.base.value.toString(),
         coeff: priceProps.coeff.value.toString(),
         noVowelDiscount: priceProps['no-vowel-discount'].value.toString(),
         nonalphaDiscount: priceProps['nonalpha-discount'].value.toString(),
-        buckets: priceProps.buckets.list.map(b => b.value.toString()),
+        buckets: priceProps.buckets.value.map(b => b.value.toString()),
       };
     }
 
@@ -228,7 +223,7 @@ describe('Clarity Types', () => {
 
       expect(() => intCV(NaN)).toThrowError(RangeError);
       expect(() => intCV(Infinity)).toThrowError(RangeError);
-      expect(() => intCV('3.1415')).toThrowError(RangeError);
+      expect(() => intCV('3.1415')).toThrowError(SyntaxError);
       expect(() => intCV(3.1415)).toThrowError(RangeError);
       expect(() => intCV(10000000000000000000000000000000)).toThrowError(RangeError);
     });
@@ -269,7 +264,7 @@ describe('Clarity Types', () => {
       const numCV = intCV(num);
       expect(numCV.value.toString()).toBe(expectedInt);
       const serialized = serializeCV(numCV);
-      expect('0x' + bytesToHex(serialized.slice(1))).toBe(expectedHex);
+      expect('0x' + serialized.slice(2)).toBe(expectedHex);
       expect(cvToString(deserializeCV(serialized))).toBe(expectedInt);
     });
 
@@ -278,7 +273,7 @@ describe('Clarity Types', () => {
       const maxSigned128 = intCV(2n ** 127n - 1n);
       expect(maxSigned128.value.toString()).toBe('170141183460469231731687303715884105727');
       const serializedMax = serializeCV(maxSigned128);
-      expect('0x' + bytesToHex(serializedMax.slice(1))).toBe('0x7fffffffffffffffffffffffffffffff');
+      expect('0x' + serializedMax.slice(2)).toBe('0x7fffffffffffffffffffffffffffffff');
       const serializedDeserializedMax = serializeDeserialize(maxSigned128) as IntCV;
       expect(cvToString(serializedDeserializedMax)).toBe(cvToString(maxSigned128));
 
@@ -286,7 +281,7 @@ describe('Clarity Types', () => {
       const minSigned128 = intCV((-2n) ** 127n);
       expect(minSigned128.value.toString()).toBe('-170141183460469231731687303715884105728');
       const serializedMin = serializeCV(minSigned128);
-      expect('0x' + bytesToHex(serializedMin.slice(1))).toBe('0x80000000000000000000000000000000');
+      expect('0x' + serializedMin.slice(2)).toBe('0x80000000000000000000000000000000');
       const serializedDeserializedMin = serializeDeserialize(minSigned128) as IntCV;
       expect(cvToString(serializedDeserializedMin)).toBe(cvToString(minSigned128));
 
@@ -302,13 +297,13 @@ describe('Clarity Types', () => {
       const uint = uintCV(10);
       expect(uint.value.toString()).toBe('10');
       const serialized1 = serializeCV(uint);
-      expect('0x' + bytesToHex(serialized1.slice(1))).toBe('0x0000000000000000000000000000000a');
+      expect('0x' + serialized1.slice(2)).toBe('0x0000000000000000000000000000000a');
       const serializedDeserialized = serializeDeserialize(uint) as UIntCV;
       expect(cvToString(serializedDeserialized)).toBe(cvToString(uint));
 
       const uint2 = uintCV('0x0a');
       const serialized2 = serializeCV(uint2);
-      expect('0x' + bytesToHex(serialized2.slice(1))).toBe('0x0000000000000000000000000000000a');
+      expect('0x' + serialized2.slice(2)).toBe('0x0000000000000000000000000000000a');
       expect(cvToString(serializeDeserialize(uint2))).toBe(cvToString(uint));
 
       expect(() => uintCV(10000000000000000000000000000000)).toThrowError(RangeError);
@@ -319,16 +314,16 @@ describe('Clarity Types', () => {
       const max128 = uintCV(2n ** 128n - 1n);
       expect(max128.value.toString()).toBe('340282366920938463463374607431768211455');
       const serializedMax = serializeCV(max128);
-      expect('0x' + bytesToHex(serializedMax.slice(1))).toBe('0xffffffffffffffffffffffffffffffff');
-      const serializedDeserializedMax = serializeDeserialize(max128) as IntCV;
+      expect('0x' + serializedMax.slice(2)).toBe('0xffffffffffffffffffffffffffffffff');
+      const serializedDeserializedMax = serializeDeserialize(max128);
       expect(cvToString(serializedDeserializedMax)).toBe(cvToString(max128));
 
       // Min 128-bit integer
       const min128 = uintCV(0);
       expect(min128.value.toString()).toBe('0');
       const serializedMin = serializeCV(min128);
-      expect('0x' + bytesToHex(serializedMin.slice(1))).toBe('0x00000000000000000000000000000000');
-      const serializedDeserializedMin = serializeDeserialize(min128) as IntCV;
+      expect('0x' + serializedMin.slice(2)).toBe('0x00000000000000000000000000000000');
+      const serializedDeserializedMin = serializeDeserialize(min128);
       expect(cvToString(serializedDeserializedMin)).toBe(cvToString(min128));
 
       // Out of bounds, too large
@@ -352,7 +347,7 @@ describe('Clarity Types', () => {
       const numCV = uintCV(num);
       expect(numCV.value.toString()).toBe(expectedInt);
       const serialized = serializeCV(numCV);
-      expect('0x' + bytesToHex(serialized.slice(1))).toBe(expectedHex);
+      expect('0x' + serialized.slice(2)).toBe(expectedHex);
       expect(cvToString(deserializeCV(serialized))).toBe('u' + expectedInt);
     });
 
@@ -432,13 +427,12 @@ describe('Clarity Types', () => {
       expect(serializedDeserialized).toEqual(tuple);
 
       // Test lexicographic ordering of tuple keys (to match Node Buffer compare)
-      const lexicographic = Object.keys(tuple.data).sort((a, b) => {
+      const lexicographic = Object.keys(tuple.value).sort((a, b) => {
         const bufA = Buffer.from(a);
-
         const bufB = Buffer.from(b);
         return bufA.compare(bufB);
       });
-      expect(Object.keys(serializedDeserialized.data)).toEqual(lexicographic);
+      expect(Object.keys(serializedDeserialized.value)).toEqual(lexicographic);
     });
 
     test('StringAsciiCV', () => {
@@ -457,37 +451,37 @@ describe('Clarity Types', () => {
   describe('Serialization Test Vectors', () => {
     test('Int 1 Vector', () => {
       const int = intCV(1);
-      const serialized = bytesToHex(serializeCV(int));
+      const serialized = serializeCV(int);
       expect(serialized).toEqual('0000000000000000000000000000000001');
     });
 
     test('Int -1 Vector', () => {
       const int = intCV(-1);
-      const serialized = bytesToHex(serializeCV(int));
+      const serialized = serializeCV(int);
       expect(serialized).toEqual('00ffffffffffffffffffffffffffffffff');
     });
 
     test('UInt 1 Vector', () => {
       const uint = uintCV(1);
-      const serialized = bytesToHex(serializeCV(uint));
+      const serialized = serializeCV(uint);
       expect(serialized).toEqual('0100000000000000000000000000000001');
     });
 
     test('Buffer Vector', () => {
       const buffer = bufferCV(new Uint8Array([0xde, 0xad, 0xbe, 0xef]));
-      const serialized = bytesToHex(serializeCV(buffer));
+      const serialized = serializeCV(buffer);
       expect(serialized).toEqual('0200000004deadbeef');
     });
 
     test('True Vector', () => {
       const t = trueCV();
-      const serialized = bytesToHex(serializeCV(t));
+      const serialized = serializeCV(t);
       expect(serialized).toEqual('03');
     });
 
     test('False Vector', () => {
       const f = falseCV();
-      const serialized = bytesToHex(serializeCV(f));
+      const serialized = serializeCV(f);
       expect(serialized).toEqual('04');
     });
 
@@ -498,7 +492,7 @@ describe('Clarity Types', () => {
       ]);
       const bytesReader = new BytesReader(concatBytes(new Uint8Array([0x00]), addressBuffer));
       const standardPrincipal = standardPrincipalCVFromAddress(deserializeAddress(bytesReader));
-      const serialized = bytesToHex(serializeCV(standardPrincipal));
+      const serialized = serializeCV(standardPrincipal);
       expect(serialized).toEqual('050011deadbeef11ababffff11deadbeef11ababffff');
     });
 
@@ -511,37 +505,37 @@ describe('Clarity Types', () => {
       const bytesReader = new BytesReader(concatBytes(new Uint8Array([0x00]), addressBuffer));
       const standardPrincipal = standardPrincipalCVFromAddress(deserializeAddress(bytesReader));
       const contractPrincipal = contractPrincipalCVFromStandard(standardPrincipal, contractName);
-      const serialized = bytesToHex(serializeCV(contractPrincipal));
+      const serialized = serializeCV(contractPrincipal);
       expect(serialized).toEqual('060011deadbeef11ababffff11deadbeef11ababffff0461626364');
     });
 
     test('Response Ok Vector', () => {
       const ok = responseOkCV(intCV(-1));
-      const serialized = bytesToHex(serializeCV(ok));
+      const serialized = serializeCV(ok);
       expect(serialized).toEqual('0700ffffffffffffffffffffffffffffffff');
     });
 
     test('Response Err Vector', () => {
       const err = responseErrorCV(intCV(-1));
-      const serialized = bytesToHex(serializeCV(err));
+      const serialized = serializeCV(err);
       expect(serialized).toEqual('0800ffffffffffffffffffffffffffffffff');
     });
 
     test('None Vector', () => {
       const none = noneCV();
-      const serialized = bytesToHex(serializeCV(none));
+      const serialized = serializeCV(none);
       expect(serialized).toEqual('09');
     });
 
     test('Some Vector', () => {
       const some = someCV(intCV(-1));
-      const serialized = bytesToHex(serializeCV(some));
+      const serialized = serializeCV(some);
       expect(serialized).toEqual('0a00ffffffffffffffffffffffffffffffff');
     });
 
     test('List Vector', () => {
       const list = listCV([intCV(1), intCV(2), intCV(3), intCV(-4)]);
-      const serialized = bytesToHex(serializeCV(list));
+      const serialized = serializeCV(list);
       expect(serialized).toEqual(
         '0b0000000400000000000000000000000000000000010000000000000000000000000000000002000000000000000000000000000000000300fffffffffffffffffffffffffffffffc'
       );
@@ -552,13 +546,13 @@ describe('Clarity Types', () => {
         baz: noneCV(),
         foobar: trueCV(),
       });
-      const serialized = bytesToHex(serializeCV(tuple));
+      const serialized = serializeCV(tuple);
       expect(serialized).toEqual('0c000000020362617a0906666f6f62617203');
     });
 
     test('Ascii String Vector', () => {
       const str = stringAsciiCV('hello world');
-      const serialized = bytesToHex(serializeCV(str));
+      const serialized = serializeCV(str);
       expect(serialized).toEqual('0d0000000b68656c6c6f20776f726c64');
     });
 
@@ -571,7 +565,7 @@ describe('Clarity Types', () => {
         stringAsciiCV('\r'),
         stringAsciiCV('\0'),
       ];
-      const serialized = strings.map(serializeCV);
+      const serialized = strings.map(serializeCVBytes);
       serialized.forEach(ser => {
         const reader = new BytesReader(ser);
         const serializedStringLenByte = reader.readBytes(5)[4];
@@ -582,7 +576,7 @@ describe('Clarity Types', () => {
 
     test('Utf8 String Vector', () => {
       const str = stringUtf8CV('hello world');
-      const serialized = bytesToHex(serializeCV(str));
+      const serialized = serializeCV(str);
       expect(serialized).toEqual('0e0000000b68656c6c6f20776f726c64');
     });
   });
@@ -707,6 +701,73 @@ describe('Clarity Types', () => {
       assert(isClarityType(vInt, ClarityType.Int));
       const intTest: IntCV = vInt;
       intTest; // avoid the "value is never read warning"
+    });
+  });
+
+  describe('Clarity type wire format', () => {
+    test(clarityTypeToByte.name, () => {
+      expect(clarityTypeToByte(ClarityType.Int)).toEqual(0x00);
+      expect(clarityTypeToByte(ClarityType.Int)).toEqual(ClarityWireType.int);
+
+      expect(clarityTypeToByte(ClarityType.UInt)).toEqual(0x01);
+      expect(clarityTypeToByte(ClarityType.UInt)).toEqual(ClarityWireType.uint);
+
+      expect(clarityTypeToByte(ClarityType.Buffer)).toEqual(0x02);
+      expect(clarityTypeToByte(ClarityType.Buffer)).toEqual(ClarityWireType.buffer);
+
+      expect(clarityTypeToByte(ClarityType.BoolTrue)).toEqual(0x03);
+      expect(clarityTypeToByte(ClarityType.BoolTrue)).toEqual(ClarityWireType.true);
+
+      expect(clarityTypeToByte(ClarityType.BoolFalse)).toEqual(0x04);
+      expect(clarityTypeToByte(ClarityType.BoolFalse)).toEqual(ClarityWireType.false);
+
+      expect(clarityTypeToByte(ClarityType.PrincipalStandard)).toEqual(0x05);
+      expect(clarityTypeToByte(ClarityType.PrincipalStandard)).toEqual(ClarityWireType.address);
+
+      expect(clarityTypeToByte(ClarityType.PrincipalContract)).toEqual(0x06);
+      expect(clarityTypeToByte(ClarityType.PrincipalContract)).toEqual(ClarityWireType.contract);
+
+      expect(clarityTypeToByte(ClarityType.ResponseOk)).toEqual(0x07);
+      expect(clarityTypeToByte(ClarityType.ResponseOk)).toEqual(ClarityWireType.ok);
+
+      expect(clarityTypeToByte(ClarityType.ResponseErr)).toEqual(0x08);
+      expect(clarityTypeToByte(ClarityType.ResponseErr)).toEqual(ClarityWireType.err);
+
+      expect(clarityTypeToByte(ClarityType.OptionalNone)).toEqual(0x09);
+      expect(clarityTypeToByte(ClarityType.OptionalNone)).toEqual(ClarityWireType.none);
+
+      expect(clarityTypeToByte(ClarityType.OptionalSome)).toEqual(0x0a);
+      expect(clarityTypeToByte(ClarityType.OptionalSome)).toEqual(ClarityWireType.some);
+
+      expect(clarityTypeToByte(ClarityType.List)).toEqual(0x0b);
+      expect(clarityTypeToByte(ClarityType.List)).toEqual(ClarityWireType.list);
+
+      expect(clarityTypeToByte(ClarityType.Tuple)).toEqual(0x0c);
+      expect(clarityTypeToByte(ClarityType.Tuple)).toEqual(ClarityWireType.tuple);
+
+      expect(clarityTypeToByte(ClarityType.StringASCII)).toEqual(0x0d);
+      expect(clarityTypeToByte(ClarityType.StringASCII)).toEqual(ClarityWireType.ascii);
+
+      expect(clarityTypeToByte(ClarityType.StringUTF8)).toEqual(0x0e);
+      expect(clarityTypeToByte(ClarityType.StringUTF8)).toEqual(ClarityWireType.utf8);
+    });
+
+    test(clarityByteToType.name, () => {
+      expect(clarityByteToType(0x00)).toEqual(ClarityType.Int);
+      expect(clarityByteToType(0x01)).toEqual(ClarityType.UInt);
+      expect(clarityByteToType(0x02)).toEqual(ClarityType.Buffer);
+      expect(clarityByteToType(0x03)).toEqual(ClarityType.BoolTrue);
+      expect(clarityByteToType(0x04)).toEqual(ClarityType.BoolFalse);
+      expect(clarityByteToType(0x05)).toEqual(ClarityType.PrincipalStandard);
+      expect(clarityByteToType(0x06)).toEqual(ClarityType.PrincipalContract);
+      expect(clarityByteToType(0x07)).toEqual(ClarityType.ResponseOk);
+      expect(clarityByteToType(0x08)).toEqual(ClarityType.ResponseErr);
+      expect(clarityByteToType(0x09)).toEqual(ClarityType.OptionalNone);
+      expect(clarityByteToType(0x0a)).toEqual(ClarityType.OptionalSome);
+      expect(clarityByteToType(0x0b)).toEqual(ClarityType.List);
+      expect(clarityByteToType(0x0c)).toEqual(ClarityType.Tuple);
+      expect(clarityByteToType(0x0d)).toEqual(ClarityType.StringASCII);
+      expect(clarityByteToType(0x0e)).toEqual(ClarityType.StringUTF8);
     });
   });
 });

@@ -20,6 +20,7 @@
     "typecheck:watch": "npm run typecheck -- --watch"
   },
   "dependencies": {
+    "@noble/secp256k1": "1.7.1",
     "@stacks/common": "^6.16.0",
     "@stacks/encryption": "^6.17.0",
     "@stacks/network": "^6.17.0",

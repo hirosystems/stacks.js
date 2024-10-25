@@ -1,13 +1,6 @@
-/**
- * The chain ID (unsigned 32-bit integer), used so transactions can't be replayed on other chains.
- * Similar to the {@link TransactionVersion}.
- */
-export enum ChainID {
-  Testnet = 0x80000000,
-  Mainnet = 0x00000001,
-}
+/** @ignore internal */
+export const BLOCKSTACK_DEFAULT_GAIA_HUB_URL = 'https://hub.blockstack.org';
 
-export const DEFAULT_CHAIN_ID = ChainID.Mainnet;
 export const MAX_STRING_LENGTH_BYTES = 128;
 export const CLARITY_INT_SIZE = 128;
 export const CLARITY_INT_BYTE_SIZE = 16;
@@ -17,33 +10,6 @@ export const RECOVERABLE_ECDSA_SIG_LENGTH_BYTES = 65;
 export const COMPRESSED_PUBKEY_LENGTH_BYTES = 32;
 export const UNCOMPRESSED_PUBKEY_LENGTH_BYTES = 64;
 export const MEMO_MAX_LENGTH_BYTES = 34;
-export const DEFAULT_CORE_NODE_API_URL = 'https://api.mainnet.hiro.so';
-
-// todo: add explicit enum values
-/**
- * The type of message that is being serialized.
- * Used internally for serializing and deserializing messages.
- */
-export enum StacksMessageType {
-  Address,
-  Principal,
-  LengthPrefixedString,
-  MemoString,
-  AssetInfo,
-  PostCondition,
-  PublicKey,
-  LengthPrefixedList,
-  Payload,
-  MessageSignature,
-  StructuredDataSignature,
-  TransactionAuthField,
-}
-
-type WhenMessageTypeMap<T> = Record<StacksMessageType, T>;
-
-export function whenMessageType(messageType: StacksMessageType) {
-  return <T>(messageTypeMap: WhenMessageTypeMap<T>): T => messageTypeMap[messageType];
-}
 
 /**
  * The type of transaction (payload) that is being serialized.
@@ -80,6 +46,7 @@ export enum ClarityVersion {
  *
  * For more information about the kinds of Stacks blocks and the various
  * AnchorModes, check out {@link https://github.com/stacksgov/sips/blob/main/sips/sip-001/sip-001-burn-election.md SIP 001} and
+ * @deprecated `AnchorMode` is not needed in Stacks since the Nakamoto update.
  * {@link https://github.com/stacksgov/sips/blob/main/sips/sip-005/sip-005-blocks-and-transactions.md SIP 005}
  */
 export enum AnchorMode {
@@ -91,7 +58,9 @@ export enum AnchorMode {
   Any = 0x03,
 }
 
+/** @deprecated `AnchorMode` is not needed in Stacks since the Nakamoto update. */
 export const AnchorModeNames = ['onChainOnly', 'offChainOnly', 'any'] as const;
+/** @deprecated `AnchorMode` is not needed in Stacks since the Nakamoto update. */
 export type AnchorModeName = (typeof AnchorModeNames)[number];
 
 const AnchorModeMap = {
@@ -103,23 +72,11 @@ const AnchorModeMap = {
   [AnchorMode.Any]: AnchorMode.Any,
 };
 
-/** @ignore */
-export function anchorModeFromNameOrValue(mode: AnchorModeName | AnchorMode): AnchorMode {
+/** @ignore @deprecated Block anchor modes don't exist on-chain anymore. */
+export function anchorModeFrom(mode: AnchorModeName | AnchorMode): AnchorMode {
   if (mode in AnchorModeMap) return AnchorModeMap[mode];
   throw new Error(`Invalid anchor mode "${mode}", must be one of: ${AnchorModeNames.join(', ')}`);
 }
-
-/**
- * The transaction version, used so transactions can't be replayed on other networks.
- * Similar to the {@link ChainID}.
- * Used internally for serializing and deserializing transactions.
- */
-export enum TransactionVersion {
-  Mainnet = 0x00,
-  Testnet = 0x80,
-}
-
-export const DEFAULT_TRANSACTION_VERSION = TransactionVersion.Mainnet;
 
 /**
  * How to treat unspecified transfers of a transaction.
@@ -163,45 +120,30 @@ export enum AuthType {
  */
 export enum AddressHashMode {
   /** `SingleSigHashMode` — hash160(public-key), same as bitcoin's p2pkh */
-  SerializeP2PKH = 0x00,
+  P2PKH = 0x00,
   /** Legacy `MultiSigHashMode` — hash160(multisig-redeem-script), same as bitcoin's multisig p2sh */
-  SerializeP2SH = 0x01,
+  P2SH = 0x01,
   /** `SingleSigHashMode` — hash160(segwit-program-00(p2pkh)), same as bitcoin's p2sh-p2wpkh */
-  SerializeP2WPKH = 0x02,
+  P2WPKH = 0x02,
   /** Legacy `MultiSigHashMode` — hash160(segwit-program-00(public-keys)), same as bitcoin's p2sh-p2wsh */
-  SerializeP2WSH = 0x03,
+  P2WSH = 0x03,
   /** Non-Sequential `MultiSigHashMode` — hash160(multisig-redeem-script), same as bitcoin's multisig p2sh */
-  SerializeP2SHNonSequential = 0x05,
+  P2SHNonSequential = 0x05,
   /** Non-Sequential `MultiSigHashMode` — hash160(segwit-program-00(public-keys)), same as bitcoin's p2sh-p2wsh */
-  SerializeP2WSHNonSequential = 0x07,
+  P2WSHNonSequential = 0x07,
 
-  // todo: `next` rename to remove the `Serialize` prefix?
-  // todo: `next` rename to remove `NonSequential` and add `Legacy` to sequential mutlisig
+  // todo: once live, rename to remove `NonSequential` and add `Legacy` to sequential mutlisig
 }
 
-export type SingleSigHashMode = AddressHashMode.SerializeP2PKH | AddressHashMode.SerializeP2WPKH;
+export type SingleSigHashMode = AddressHashMode.P2PKH | AddressHashMode.P2WPKH;
 export type MultiSigHashMode =
-  | AddressHashMode.SerializeP2SH
-  | AddressHashMode.SerializeP2WSH
-  | AddressHashMode.SerializeP2SHNonSequential
-  | AddressHashMode.SerializeP2WSHNonSequential;
+  | AddressHashMode.P2SH
+  | AddressHashMode.P2WSH
+  | AddressHashMode.P2SHNonSequential
+  | AddressHashMode.P2WSHNonSequential;
 
-/**
- * Address versions for identifying address types in an encoded Stacks address.
- * The address version is a single byte, indicating the address type.
- * Every Stacks address starts with `S` followed by a single character indicating the address version.
- * The second character is the c32-encoded AddressVersion byte.
- */
-export enum AddressVersion {
-  /** `P` — A single-sig address for mainnet (starting with `SP`) */
-  MainnetSingleSig = 22,
-  /** `M` — A multi-sig address for mainnet (starting with `SM`) */
-  MainnetMultiSig = 20,
-  /** `T` — A single-sig address for testnet (starting with `ST`) */
-  TestnetSingleSig = 26,
-  /** `N` — A multi-sig address for testnet (starting with `SN`) */
-  TestnetMultiSig = 21,
-}
+// re-export for backwards compatibility
+export { AddressVersion } from '@stacks/network';
 
 // todo: try to remove this
 export enum PubKeyEncoding {
@@ -233,7 +175,7 @@ export enum NonFungibleConditionCode {
 /**
  * The type of sender for a post-condition.
  */
-export enum PostConditionPrincipalID {
+export enum PostConditionPrincipalId {
   Origin = 0x01,
   Standard = 0x02,
   Contract = 0x03,
@@ -246,6 +188,20 @@ export enum AssetType {
   STX = 0x00,
   Fungible = 0x01,
   NonFungible = 0x02,
+}
+
+export enum TenureChangeCause {
+  /** A valid winning block-commit */
+  BlockFound = 0,
+  /** The next burnchain block is taking too long, so extend the runtime budget */
+  Extended = 1,
+}
+
+export enum AuthFieldType {
+  PublicKeyCompressed = 0x00,
+  PublicKeyUncompressed = 0x01,
+  SignatureCompressed = 0x02,
+  SignatureUncompressed = 0x03,
 }
 
 // todo: refactor this, if only used in one place, just use a string
@@ -267,13 +223,6 @@ export enum TxRejectedReason {
   BadAddressVersionByte = 'BadAddressVersionByte',
   NoCoinbaseViaMempool = 'NoCoinbaseViaMempool',
   ServerFailureNoSuchChainTip = 'ServerFailureNoSuchChainTip',
-  TooMuchChaining = 'TooMuchChaining',
-  ConflictingNonceInMempool = 'ConflictingNonceInMempool',
-  BadTransactionVersion = 'BadTransactionVersion',
-  TransferRecipientCannotEqualSender = 'TransferRecipientCannotEqualSender',
-  TransferAmountMustBePositive = 'TransferAmountMustBePositive',
   ServerFailureDatabase = 'ServerFailureDatabase',
-  EstimatorError = 'EstimatorError',
-  TemporarilyBlacklisted = 'TemporarilyBlacklisted',
   ServerFailureOther = 'ServerFailureOther',
 }

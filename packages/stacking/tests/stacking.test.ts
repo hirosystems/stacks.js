@@ -1,15 +1,15 @@
-import { bigIntToBytes, bytesToHex, hexToBytes } from '@stacks/common';
+import { sha256 } from '@noble/hashes/sha256';
+import { HIRO_TESTNET_URL, bigIntToBytes, bytesToHex, hexToBytes } from '@stacks/common';
 import { base58CheckDecode, getPublicKeyFromPrivate } from '@stacks/encryption';
-import { StacksMainnet, StacksTestnet } from '@stacks/network';
+import { V2_POX_REGTEST_POX_3, setApiMocks } from '@stacks/internal';
+import { STACKS_MAINNET, STACKS_TESTNET, defaultUrlFromNetwork } from '@stacks/network';
 import {
-  AnchorMode,
   ClarityType,
   ReadOnlyFunctionOptions,
   SignedContractCallOptions,
   TupleCV,
   bufferCV,
-  createStacksPrivateKey,
-  encodeStructuredData,
+  encodeStructuredDataBytes,
   intCV,
   noneCV,
   responseErrorCV,
@@ -31,8 +31,6 @@ import {
   signPox4SignatureHash,
   verifyPox4SignatureHash,
 } from '../src/utils';
-import { V2_POX_REGTEST_POX_3, setApiMocks } from './apiMockingHelpers';
-import { sha256 } from '@noble/hashes/sha256';
 
 const poxInfo = {
   contract_id: 'ST000000000000000000002AMW42H.pox-3',
@@ -175,7 +173,7 @@ const blocktimeInfo = {
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const poxAbi = require('./poxAbi.json');
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const { createContractCallPayload } = require('../../transactions/src/payload.ts'); // not exported currently
+const { createContractCallPayload } = require('../../transactions/src/wire/create.ts');
 
 // testing helper method
 function isPoxAbiValid(opts: SignedContractCallOptions | ReadOnlyFunctionOptions): boolean {
@@ -198,18 +196,18 @@ beforeEach(() => {
 test('check stacking eligibility true', async () => {
   const address = 'ST3XKKN4RPV69NN1PHFDNX3TYKXT7XPC4N8KC1ARH';
   const poxAddress = '1Xik14zRm29UsyS6DjhYg4iZeZqsDa8D3';
-  const network = new StacksTestnet();
+  const network = STACKS_TESTNET;
 
   const functionCallResponse = responseOkCV(trueCV());
-  const callReadOnlyFunction = jest.fn().mockResolvedValue(functionCallResponse);
+  const fetchCallReadOnlyFunction = jest.fn().mockResolvedValue(functionCallResponse);
 
   jest.mock('@stacks/transactions', () => ({
     ...jest.requireActual('@stacks/transactions'),
-    callReadOnlyFunction,
+    fetchCallReadOnlyFunction,
   }));
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const { StackingClient } = require('../src'); // needed for jest.mock module
-  const client = new StackingClient(address, network);
+  const client = new StackingClient({ address, network });
 
   fetchMock.mockResponse(request => {
     const url = request.url;
@@ -230,27 +228,27 @@ test('check stacking eligibility true', async () => {
   const stackingEligibility = await client.canStack({ poxAddress, cycles });
 
   expect(fetchMock.mock.calls.length).toEqual(2);
-  expect(fetchMock.mock.calls[0][0]).toEqual(network.getAccountApiUrl(address));
-  expect(fetchMock.mock.calls[1][0]).toEqual(network.getPoxInfoUrl());
+  expect(fetchMock.mock.calls[0][0]).toEqual(`${HIRO_TESTNET_URL}/v2/accounts/${address}?proof=0`);
+  expect(fetchMock.mock.calls[1][0]).toEqual(`${HIRO_TESTNET_URL}/v2/pox`);
   expect(stackingEligibility.eligible).toBe(true);
 });
 
 test('check stacking eligibility false bad cycles', async () => {
   const address = 'ST3XKKN4RPV69NN1PHFDNX3TYKXT7XPC4N8KC1ARH';
   const poxAddress = '1Xik14zRm29UsyS6DjhYg4iZeZqsDa8D3';
-  const network = new StacksTestnet();
+  const network = STACKS_TESTNET;
 
   const expectedErrorString = StackingErrors[StackingErrors.ERR_STACKING_INVALID_LOCK_PERIOD];
   const functionCallResponse = responseErrorCV(intCV(2));
-  const callReadOnlyFunction = jest.fn().mockResolvedValue(functionCallResponse);
+  const fetchCallReadOnlyFunction = jest.fn().mockResolvedValue(functionCallResponse);
 
   jest.mock('@stacks/transactions', () => ({
     ...jest.requireActual('@stacks/transactions'),
-    callReadOnlyFunction,
+    fetchCallReadOnlyFunction,
   }));
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const { StackingClient } = require('../src'); // needed for jest.mock module
-  const client = new StackingClient(address, network);
+  const client = new StackingClient({ address, network });
 
   fetchMock.mockResponse(request => {
     const url = request.url;
@@ -271,8 +269,8 @@ test('check stacking eligibility false bad cycles', async () => {
   const stackingEligibility = await client.canStack({ poxAddress, cycles: invalidCycles });
 
   expect(fetchMock.mock.calls.length).toEqual(2);
-  expect(fetchMock.mock.calls[0][0]).toEqual(network.getAccountApiUrl(address));
-  expect(fetchMock.mock.calls[1][0]).toEqual(network.getPoxInfoUrl());
+  expect(fetchMock.mock.calls[0][0]).toEqual(`${HIRO_TESTNET_URL}/v2/accounts/${address}?proof=0`);
+  expect(fetchMock.mock.calls[1][0]).toEqual(`${HIRO_TESTNET_URL}/v2/pox`);
   expect(stackingEligibility.eligible).toBe(false);
   expect(stackingEligibility.reason).toBe(expectedErrorString);
 });
@@ -280,7 +278,7 @@ test('check stacking eligibility false bad cycles', async () => {
 test('stack stx', async () => {
   const address = 'ST3XKKN4RPV69NN1PHFDNX3TYKXT7XPC4N8KC1ARH';
   const poxAddress = '1Xik14zRm29UsyS6DjhYg4iZeZqsDa8D3';
-  const network = new StacksTestnet();
+  const network = STACKS_TESTNET;
   const amountMicroStx = BigInt(100000000000);
   const cycles = 10;
   const privateKey = 'd48f215481c16cbe6426f8e557df9b78895661971d71735126545abddcd5377001';
@@ -306,7 +304,7 @@ test('stack stx', async () => {
 
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const { StackingClient } = require('../src'); // needed for jest.mock module
-  const client = new StackingClient(address, network);
+  const client = new StackingClient({ address, network });
 
   const stackingResults = await client.stack({
     amountMicroStx,
@@ -337,14 +335,25 @@ test('stack stx', async () => {
     validateWithAbi: true,
     network,
     senderKey: privateKey,
-    anchorMode: AnchorMode.Any,
+    client: expect.objectContaining({
+      baseUrl: defaultUrlFromNetwork(network),
+    }),
   };
 
-  expect(fetchMock.mock.calls[0][0]).toEqual(network.getPoxInfoUrl());
+  expect(fetchMock.mock.calls[0][0]).toEqual(`${HIRO_TESTNET_URL}/v2/pox`);
   expect(makeContractCall).toHaveBeenCalledTimes(1);
-  expect(makeContractCall).toHaveBeenCalledWith(expectedContractCallOptions);
+  expect(makeContractCall).toHaveBeenCalledWith(
+    expect.objectContaining(expectedContractCallOptions)
+  );
   expect(broadcastTransaction).toHaveBeenCalledTimes(1);
-  expect(broadcastTransaction).toHaveBeenCalledWith(transaction, network);
+  expect(broadcastTransaction).toHaveBeenCalledWith(
+    expect.objectContaining({
+      transaction,
+      client: expect.objectContaining({
+        baseUrl: defaultUrlFromNetwork(network),
+      }),
+    })
+  );
   expect(stackingResults).toEqual(broadcastResponse);
   expect(isPoxAbiValid(expectedContractCallOptions)).toBe(true);
 });
@@ -353,7 +362,7 @@ test('delegate stx', async () => {
   const address = 'ST3XKKN4RPV69NN1PHFDNX3TYKXT7XPC4N8KC1ARH';
   const delegateTo = 'ST2MCYPWTFMD2MGR5YY695EJG0G1R4J2BTJPRGM7H';
   const poxAddress = '1Xik14zRm29UsyS6DjhYg4iZeZqsDa8D3';
-  const network = new StacksTestnet();
+  const network = STACKS_TESTNET;
   const amountMicroStx = BigInt(100000000000);
   const untilBurnBlockHeight = 2000;
   const privateKey = 'd48f215481c16cbe6426f8e557df9b78895661971d71735126545abddcd5377001';
@@ -378,7 +387,7 @@ test('delegate stx', async () => {
 
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const { StackingClient } = require('../src'); // needed for jest.mock module
-  const client = new StackingClient(address, network);
+  const client = new StackingClient({ address, network });
 
   const delegateResults = await client.delegateStx({
     amountMicroStx,
@@ -409,14 +418,25 @@ test('delegate stx', async () => {
     validateWithAbi: true,
     network,
     senderKey: privateKey,
-    anchorMode: AnchorMode.Any,
+    client: expect.objectContaining({
+      baseUrl: defaultUrlFromNetwork(network),
+    }),
   };
 
-  expect(fetchMock.mock.calls[0][0]).toEqual(network.getPoxInfoUrl());
+  expect(fetchMock.mock.calls[0][0]).toEqual(`${HIRO_TESTNET_URL}/v2/pox`);
   expect(makeContractCall).toHaveBeenCalledTimes(1);
-  expect(makeContractCall).toHaveBeenCalledWith(expectedContractCallOptions);
+  expect(makeContractCall).toHaveBeenCalledWith(
+    expect.objectContaining(expectedContractCallOptions)
+  );
   expect(broadcastTransaction).toHaveBeenCalledTimes(1);
-  expect(broadcastTransaction).toHaveBeenCalledWith(transaction, network);
+  expect(broadcastTransaction).toHaveBeenCalledWith(
+    expect.objectContaining({
+      transaction,
+      client: expect.objectContaining({
+        baseUrl: defaultUrlFromNetwork(network),
+      }),
+    })
+  );
   expect(delegateResults).toEqual(broadcastResponse);
   expect(isPoxAbiValid(expectedContractCallOptions)).toBe(true);
 });
@@ -424,7 +444,7 @@ test('delegate stx', async () => {
 test('delegate stx with empty optional parameters', async () => {
   const address = 'ST3XKKN4RPV69NN1PHFDNX3TYKXT7XPC4N8KC1ARH';
   const delegateTo = 'ST2MCYPWTFMD2MGR5YY695EJG0G1R4J2BTJPRGM7H';
-  const network = new StacksTestnet();
+  const network = STACKS_TESTNET;
   const amountMicroStx = BigInt(100000000000);
   const privateKey = 'd48f215481c16cbe6426f8e557df9b78895661971d71735126545abddcd5377001';
 
@@ -448,7 +468,7 @@ test('delegate stx with empty optional parameters', async () => {
 
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const { StackingClient } = require('../src'); // needed for jest.mock module
-  const client = new StackingClient(address, network);
+  const client = new StackingClient({ address, network });
 
   const delegateResults = await client.delegateStx({
     amountMicroStx,
@@ -473,14 +493,25 @@ test('delegate stx with empty optional parameters', async () => {
     validateWithAbi: true,
     network,
     senderKey: privateKey,
-    anchorMode: AnchorMode.Any,
+    client: expect.objectContaining({
+      baseUrl: defaultUrlFromNetwork(network),
+    }),
   };
 
-  expect(fetchMock.mock.calls[0][0]).toEqual(network.getPoxInfoUrl());
+  expect(fetchMock.mock.calls[0][0]).toEqual(`${HIRO_TESTNET_URL}/v2/pox`);
   expect(makeContractCall).toHaveBeenCalledTimes(1);
-  expect(makeContractCall).toHaveBeenCalledWith(expectedContractCallOptions);
+  expect(makeContractCall).toHaveBeenCalledWith(
+    expect.objectContaining(expectedContractCallOptions)
+  );
   expect(broadcastTransaction).toHaveBeenCalledTimes(1);
-  expect(broadcastTransaction).toHaveBeenCalledWith(transaction, network);
+  expect(broadcastTransaction).toHaveBeenCalledWith(
+    expect.objectContaining({
+      transaction,
+      client: expect.objectContaining({
+        baseUrl: defaultUrlFromNetwork(network),
+      }),
+    })
+  );
   expect(delegateResults).toEqual(broadcastResponse);
   expect(isPoxAbiValid(expectedContractCallOptions)).toBe(true);
 });
@@ -489,7 +520,7 @@ test('delegate stack stx with one delegator', async () => {
   const stacker = 'ST3XKKN4RPV69NN1PHFDNX3TYKXT7XPC4N8KC1ARH';
   const address = 'ST2MCYPWTFMD2MGR5YY695EJG0G1R4J2BTJPRGM7H';
   const poxAddress = '1Xik14zRm29UsyS6DjhYg4iZeZqsDa8D3';
-  const network = new StacksTestnet();
+  const network = STACKS_TESTNET;
   const amountMicroStx = BigInt(100000000000);
   const burnBlockHeight = 2000;
   const cycles = 10;
@@ -523,7 +554,7 @@ test('delegate stack stx with one delegator', async () => {
 
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const { StackingClient } = require('../src'); // needed for jest.mock module // needed for jest.mock module
-  const client = new StackingClient(address, network);
+  const client = new StackingClient({ address, network });
 
   const delegateResults = await client.delegateStackStx({
     stacker,
@@ -556,14 +587,25 @@ test('delegate stack stx with one delegator', async () => {
     validateWithAbi: true,
     network,
     senderKey: privateKey,
-    anchorMode: AnchorMode.Any,
+    client: expect.objectContaining({
+      baseUrl: defaultUrlFromNetwork(network),
+    }),
   };
 
-  expect(fetchMock.mock.calls[0][0]).toEqual(network.getPoxInfoUrl());
+  expect(fetchMock.mock.calls[0][0]).toEqual(`${HIRO_TESTNET_URL}/v2/pox`);
   expect(makeContractCall).toHaveBeenCalledTimes(1);
-  expect(makeContractCall).toHaveBeenCalledWith(expectedContractCallOptions);
+  expect(makeContractCall).toHaveBeenCalledWith(
+    expect.objectContaining(expectedContractCallOptions)
+  );
   expect(broadcastTransaction).toHaveBeenCalledTimes(1);
-  expect(broadcastTransaction).toHaveBeenCalledWith(transaction, network);
+  expect(broadcastTransaction).toHaveBeenCalledWith(
+    expect.objectContaining({
+      transaction,
+      client: expect.objectContaining({
+        baseUrl: defaultUrlFromNetwork(network),
+      }),
+    })
+  );
   expect(delegateResults).toEqual(broadcastResponse);
   expect(isPoxAbiValid(expectedContractCallOptions)).toBe(true);
 });
@@ -572,7 +614,7 @@ test('delegate stack stx with set nonce', async () => {
   const stacker = 'ST3XKKN4RPV69NN1PHFDNX3TYKXT7XPC4N8KC1ARH';
   const address = 'ST2MCYPWTFMD2MGR5YY695EJG0G1R4J2BTJPRGM7H';
   const poxAddress = '1Xik14zRm29UsyS6DjhYg4iZeZqsDa8D3';
-  const network = new StacksTestnet();
+  const network = STACKS_TESTNET;
   const amountMicroStx = BigInt(100000000000);
   const burnBlockHeight = 2000;
   const cycles = 10;
@@ -607,7 +649,7 @@ test('delegate stack stx with set nonce', async () => {
 
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const { StackingClient } = require('../src'); // needed for jest.mock module
-  const client = new StackingClient(address, network);
+  const client = new StackingClient({ address, network });
 
   const delegateResults = await client.delegateStackStx({
     stacker,
@@ -642,14 +684,25 @@ test('delegate stack stx with set nonce', async () => {
     network,
     senderKey: privateKey,
     nonce,
-    anchorMode: AnchorMode.Any,
+    client: expect.objectContaining({
+      baseUrl: defaultUrlFromNetwork(network),
+    }),
   };
 
-  expect(fetchMock.mock.calls[0][0]).toEqual(network.getPoxInfoUrl());
+  expect(fetchMock.mock.calls[0][0]).toEqual(`${HIRO_TESTNET_URL}/v2/pox`);
   expect(makeContractCall).toHaveBeenCalledTimes(1);
-  expect(makeContractCall).toHaveBeenCalledWith(expectedContractCallOptions);
+  expect(makeContractCall).toHaveBeenCalledWith(
+    expect.objectContaining(expectedContractCallOptions)
+  );
   expect(broadcastTransaction).toHaveBeenCalledTimes(1);
-  expect(broadcastTransaction).toHaveBeenCalledWith(transaction, network);
+  expect(broadcastTransaction).toHaveBeenCalledWith(
+    expect.objectContaining({
+      transaction,
+      client: expect.objectContaining({
+        baseUrl: defaultUrlFromNetwork(network),
+      }),
+    })
+  );
   expect(delegateResults).toEqual(broadcastResponse);
   expect(isPoxAbiValid(expectedContractCallOptions)).toBe(true);
 });
@@ -657,7 +710,7 @@ test('delegate stack stx with set nonce', async () => {
 test('delegator commit', async () => {
   const address = 'ST3XKKN4RPV69NN1PHFDNX3TYKXT7XPC4N8KC1ARH';
   const poxAddress = '1Xik14zRm29UsyS6DjhYg4iZeZqsDa8D3';
-  const network = new StacksTestnet();
+  const network = STACKS_TESTNET;
   const rewardCycle = 10;
   const privateKey = 'd48f215481c16cbe6426f8e557df9b78895661971d71735126545abddcd5377001';
 
@@ -681,7 +734,7 @@ test('delegator commit', async () => {
 
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const { StackingClient } = require('../src'); // needed for jest.mock module
-  const client = new StackingClient(address, network);
+  const client = new StackingClient({ address, network });
 
   const delegateResults = await client.stackAggregationCommit({
     poxAddress,
@@ -705,21 +758,32 @@ test('delegator commit', async () => {
     validateWithAbi: true,
     network,
     senderKey: privateKey,
-    anchorMode: AnchorMode.Any,
+    client: expect.objectContaining({
+      baseUrl: defaultUrlFromNetwork(network),
+    }),
   };
 
-  expect(fetchMock.mock.calls[0][0]).toEqual(network.getPoxInfoUrl());
+  expect(fetchMock.mock.calls[0][0]).toEqual(`${HIRO_TESTNET_URL}/v2/pox`);
   expect(makeContractCall).toHaveBeenCalledTimes(1);
-  expect(makeContractCall).toHaveBeenCalledWith(expectedContractCallOptions);
+  expect(makeContractCall).toHaveBeenCalledWith(
+    expect.objectContaining(expectedContractCallOptions)
+  );
   expect(broadcastTransaction).toHaveBeenCalledTimes(1);
-  expect(broadcastTransaction).toHaveBeenCalledWith(transaction, network);
+  expect(broadcastTransaction).toHaveBeenCalledWith(
+    expect.objectContaining({
+      transaction,
+      client: expect.objectContaining({
+        baseUrl: defaultUrlFromNetwork(network),
+      }),
+    })
+  );
   expect(delegateResults).toEqual(broadcastResponse);
   expect(isPoxAbiValid(expectedContractCallOptions)).toBe(true);
 });
 
 test('revoke delegate stx', async () => {
   const address = 'ST3XKKN4RPV69NN1PHFDNX3TYKXT7XPC4N8KC1ARH';
-  const network = new StacksTestnet();
+  const network = STACKS_TESTNET;
   const privateKey = 'd48f215481c16cbe6426f8e557df9b78895661971d71735126545abddcd5377001';
 
   const transaction = { serialize: () => 'mocktxhex' };
@@ -742,7 +806,7 @@ test('revoke delegate stx', async () => {
 
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const { StackingClient } = require('../src'); // needed for jest.mock module
-  const client = new StackingClient(address, network);
+  const client = new StackingClient({ address, network });
 
   const revokeDelegateResults = await client.revokeDelegateStx(privateKey);
 
@@ -754,21 +818,32 @@ test('revoke delegate stx', async () => {
     validateWithAbi: true,
     network,
     senderKey: privateKey,
-    anchorMode: AnchorMode.Any,
+    client: expect.objectContaining({
+      baseUrl: defaultUrlFromNetwork(network),
+    }),
   };
 
-  expect(fetchMock.mock.calls[0][0]).toEqual(network.getPoxInfoUrl());
+  expect(fetchMock.mock.calls[0][0]).toEqual(`${HIRO_TESTNET_URL}/v2/pox`);
   expect(makeContractCall).toHaveBeenCalledTimes(1);
-  expect(makeContractCall).toHaveBeenCalledWith(expectedContractCallOptions);
+  expect(makeContractCall).toHaveBeenCalledWith(
+    expect.objectContaining(expectedContractCallOptions)
+  );
   expect(broadcastTransaction).toHaveBeenCalledTimes(1);
-  expect(broadcastTransaction).toHaveBeenCalledWith(transaction, network);
+  expect(broadcastTransaction).toHaveBeenCalledWith(
+    expect.objectContaining({
+      transaction,
+      client: expect.objectContaining({
+        baseUrl: defaultUrlFromNetwork(network),
+      }),
+    })
+  );
   expect(revokeDelegateResults).toEqual(broadcastResponse);
   expect(isPoxAbiValid(expectedContractCallOptions)).toBe(true);
 });
 
 test('get stacking status', async () => {
   const address = 'ST3XKKN4RPV69NN1PHFDNX3TYKXT7XPC4N8KC1ARH';
-  const network = new StacksTestnet();
+  const network = STACKS_TESTNET;
   const amountMicrostx = 10_000;
   const firstRewardCycle = 10;
   const lockPeriod = 20;
@@ -787,11 +862,11 @@ test('get stacking status', async () => {
     })
   );
 
-  const callReadOnlyFunction = jest.fn().mockResolvedValue(functionCallResponse);
+  const fetchCallReadOnlyFunction = jest.fn().mockResolvedValue(functionCallResponse);
 
   jest.mock('@stacks/transactions', () => ({
     ...jest.requireActual('@stacks/transactions'),
-    callReadOnlyFunction,
+    fetchCallReadOnlyFunction,
   }));
 
   fetchMock.mockResponse(request => {
@@ -811,7 +886,7 @@ test('get stacking status', async () => {
 
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const { StackingClient } = require('../src'); // needed for jest.mock module
-  const client = new StackingClient(address, network);
+  const client = new StackingClient({ address, network });
 
   const stackingStatus = await client.getStatus();
 
@@ -821,11 +896,15 @@ test('get stacking status', async () => {
     functionName: 'get-stacker-info',
     functionArgs: [standardPrincipalCV(address)],
     senderAddress: address,
-    network,
+    client: expect.objectContaining({
+      baseUrl: defaultUrlFromNetwork(network),
+    }),
   };
 
-  expect(callReadOnlyFunction).toHaveBeenCalledTimes(1);
-  expect(callReadOnlyFunction).toHaveBeenCalledWith(expectedReadOnlyFunctionCallOptions);
+  expect(fetchCallReadOnlyFunction).toHaveBeenCalledTimes(1);
+  expect(fetchCallReadOnlyFunction).toHaveBeenCalledWith(
+    expect.objectContaining(expectedReadOnlyFunctionCallOptions)
+  );
 
   expect(stackingStatus.stacked).toEqual(true);
   expect(stackingStatus.details.first_reward_cycle).toEqual(firstRewardCycle);
@@ -837,7 +916,7 @@ test('get stacking status', async () => {
 
 test('get core info', async () => {
   const address = 'ST3XKKN4RPV69NN1PHFDNX3TYKXT7XPC4N8KC1ARH';
-  const network = new StacksTestnet();
+  const network = STACKS_TESTNET;
 
   fetchMock.mockResponse(() => {
     return Promise.resolve({
@@ -848,17 +927,17 @@ test('get core info', async () => {
 
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const { StackingClient } = require('../src'); // needed for jest.mock module
-  const client = new StackingClient(address, network);
+  const client = new StackingClient({ address, network });
 
   const responseCoreInfo = await client.getCoreInfo();
 
-  expect(fetchMock.mock.calls[0][0]).toEqual(network.getInfoUrl());
+  expect(fetchMock.mock.calls[0][0]).toEqual(`${HIRO_TESTNET_URL}/v2/info`);
   expect(responseCoreInfo).toEqual(coreInfo);
 });
 
 test('get pox info', async () => {
   const address = 'ST3XKKN4RPV69NN1PHFDNX3TYKXT7XPC4N8KC1ARH';
-  const network = new StacksTestnet();
+  const network = STACKS_TESTNET;
 
   fetchMock.mockResponse(() => {
     return Promise.resolve({
@@ -869,17 +948,17 @@ test('get pox info', async () => {
 
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const { StackingClient } = require('../src'); // needed for jest.mock module
-  const client = new StackingClient(address, network);
+  const client = new StackingClient({ address, network });
 
   const responsePoxInfo = await client.getPoxInfo();
 
-  expect(fetchMock.mock.calls[0][0]).toEqual(network.getPoxInfoUrl());
+  expect(fetchMock.mock.calls[0][0]).toEqual(`${HIRO_TESTNET_URL}/v2/pox`);
   expect(responsePoxInfo).toEqual(poxInfo);
 });
 
 test('get a list of burnchain rewards for the set address', async () => {
   const address = 'myfTfju9XSMRusaY2qTitSEMSchsWRA441';
-  const network = new StacksTestnet();
+  const network = STACKS_TESTNET;
 
   fetchMock.mockResponse(() => {
     return Promise.resolve({
@@ -890,17 +969,19 @@ test('get a list of burnchain rewards for the set address', async () => {
 
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const { StackingClient } = require('../src'); // needed for jest.mock module
-  const client = new StackingClient(address, network);
+  const client = new StackingClient({ address, network });
   const options = { limit: 2, offset: 0 };
   const response = await client.getRewardsForBtcAddress(options);
 
-  expect(fetchMock.mock.calls[0][0]).toEqual(network.getRewardsUrl(address, options));
+  expect(fetchMock.mock.calls[0][0]).toEqual(
+    `${HIRO_TESTNET_URL}/extended/v1/burnchain/rewards/${address}?limit=${options.limit}&offset=${options.offset}`
+  );
   expect(response).toEqual(rewardsInfo);
 });
 
 test('get the burnchain rewards total for the set address', async () => {
   const address = 'myfTfju9XSMRusaY2qTitSEMSchsWRA441';
-  const network = new StacksTestnet();
+  const network = STACKS_TESTNET;
 
   fetchMock.mockResponse(() => {
     return Promise.resolve({
@@ -911,16 +992,19 @@ test('get the burnchain rewards total for the set address', async () => {
 
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const { StackingClient } = require('../src'); // needed for jest.mock module
-  const client = new StackingClient(address, network);
+  const client = new StackingClient({ address, network });
   const response = await client.getRewardsTotalForBtcAddress();
 
-  expect(fetchMock.mock.calls[0][0]).toEqual(network.getRewardsTotalUrl(address));
-  expect(response).toEqual(rewardsTotalInfo);
+  expect(fetchMock.mock.calls[0][0]).toEqual(
+    `${HIRO_TESTNET_URL}/extended/v1/burnchain/rewards/${address}/total`
+  );
+  expect(response.reward_recipient).toEqual(rewardsTotalInfo.reward_recipient);
+  expect(response.reward_amount.toString()).toBe(rewardsTotalInfo.reward_amount);
 });
 
 test('get a list of burnchain reward holders for the set address ', async () => {
   const address = 'myfTfju9XSMRusaY2qTitSEMSchsWRA441';
-  const network = new StacksTestnet();
+  const network = STACKS_TESTNET;
 
   fetchMock.mockResponse(() => {
     return Promise.resolve({
@@ -931,17 +1015,19 @@ test('get a list of burnchain reward holders for the set address ', async () => 
 
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const { StackingClient } = require('../src'); // needed for jest.mock module
-  const client = new StackingClient(address, network);
+  const client = new StackingClient({ address, network });
   const options = { limit: 2, offset: 0 };
   const response = await client.getRewardHoldersForBtcAddress(options);
 
-  expect(fetchMock.mock.calls[0][0]).toEqual(network.getRewardHoldersUrl(address, options));
+  expect(fetchMock.mock.calls[0][0]).toEqual(
+    `${HIRO_TESTNET_URL}/extended/v1/burnchain/reward_slot_holders/${address}?limit=${options.limit}&offset=${options.offset}`
+  );
   expect(response).toEqual(rewardHoldersInfo);
 });
 
 test('get target block time info', async () => {
   const address = 'ST3XKKN4RPV69NN1PHFDNX3TYKXT7XPC4N8KC1ARH';
-  const network = new StacksTestnet();
+  const network = STACKS_TESTNET;
 
   fetchMock.mockResponse(() => {
     return Promise.resolve({
@@ -952,17 +1038,19 @@ test('get target block time info', async () => {
 
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const { StackingClient } = require('../src'); // needed for jest.mock module
-  const client = new StackingClient(address, network);
+  const client = new StackingClient({ address, network });
 
   const responseBlockTimeInfo = await client.getTargetBlockTime();
 
-  expect(fetchMock.mock.calls[0][0]).toEqual(network.getBlockTimeInfoUrl());
+  expect(fetchMock.mock.calls[0][0]).toEqual(
+    `${HIRO_TESTNET_URL}/extended/v1/info/network_block_times`
+  );
   expect(responseBlockTimeInfo).toEqual(blocktimeInfo.testnet.target_block_time);
 });
 
 test('get account balance', async () => {
   const address = 'ST3XKKN4RPV69NN1PHFDNX3TYKXT7XPC4N8KC1ARH';
-  const network = new StacksTestnet();
+  const network = STACKS_TESTNET;
 
   fetchMock.mockResponse(() => {
     return Promise.resolve({
@@ -973,17 +1061,17 @@ test('get account balance', async () => {
 
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const { StackingClient } = require('../src'); // needed for jest.mock module
-  const client = new StackingClient(address, network);
+  const client = new StackingClient({ address, network });
 
   const responseBalanceInfo = await client.getAccountBalance();
 
-  expect(fetchMock.mock.calls[0][0]).toEqual(network.getAccountApiUrl(address));
+  expect(fetchMock.mock.calls[0][0]).toEqual(`${HIRO_TESTNET_URL}/v2/accounts/${address}?proof=0`);
   expect(responseBalanceInfo.toString()).toEqual(BigInt(balanceInfo.balance).toString());
 });
 
 test('get seconds until next cycle', async () => {
   const address = 'ST3XKKN4RPV69NN1PHFDNX3TYKXT7XPC4N8KC1ARH';
-  const network = new StacksTestnet();
+  const network = STACKS_TESTNET;
 
   fetchMock
     .mockResponseOnce(() => {
@@ -1007,12 +1095,14 @@ test('get seconds until next cycle', async () => {
 
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const { StackingClient } = require('../src'); // needed for jest.mock module
-  const client = new StackingClient(address, network);
+  const client = new StackingClient({ address, network });
 
   const responseSecondsUntilNextCycle = await client.getSecondsUntilNextCycle();
-  expect(fetchMock.mock.calls[0][0]).toEqual(network.getPoxInfoUrl());
-  expect(fetchMock.mock.calls[1][0]).toEqual(network.getBlockTimeInfoUrl());
-  expect(fetchMock.mock.calls[2][0]).toEqual(network.getInfoUrl());
+  expect(fetchMock.mock.calls[0][0]).toEqual(`${HIRO_TESTNET_URL}/v2/pox`);
+  expect(fetchMock.mock.calls[1][0]).toEqual(
+    `${HIRO_TESTNET_URL}/extended/v1/info/network_block_times`
+  );
+  expect(fetchMock.mock.calls[2][0]).toEqual(`${HIRO_TESTNET_URL}/v2/info`);
 
   // next reward cycle in 10 blocks
   expect(responseSecondsUntilNextCycle.toString()).toEqual((10 * 120).toString());
@@ -1094,20 +1184,20 @@ test('pox address to btc address', () => {
     expect(btcAddress).toBe(item.expectedBtcAddr);
     const decodedAddress = decodeBtcAddress(btcAddress);
     expect(decodedAddress.version).toBe(item.version);
-    expect(bytesToHex(decodedAddress.data)).toBe(bytesToHex(item.hashBytes));
+    expect(decodedAddress.data).toBe(bytesToHex(item.hashBytes));
   });
 
   vectors.forEach(item => {
     const clarityValue: TupleCV = {
       type: ClarityType.Tuple,
-      data: {
+      value: {
         version: {
           type: ClarityType.Buffer,
-          buffer: new Uint8Array([item.version]),
+          value: bytesToHex(new Uint8Array([item.version])),
         },
         hashbytes: {
           type: ClarityType.Buffer,
-          buffer: item.hashBytes,
+          value: bytesToHex(item.hashBytes),
         },
       },
     };
@@ -1115,7 +1205,7 @@ test('pox address to btc address', () => {
     expect(btcAddress).toBe(item.expectedBtcAddr);
     const decodedAddress = decodeBtcAddress(btcAddress);
     expect(decodedAddress.version).toBe(item.version);
-    expect(bytesToHex(decodedAddress.data)).toBe(bytesToHex(item.hashBytes));
+    expect(decodedAddress.data).toBe(bytesToHex(item.hashBytes));
   });
 });
 
@@ -1128,16 +1218,19 @@ test('client operations with contract principal stacker', () => {
 
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const { StackingClient } = require('../src'); // needed for jest.mock module
-  const client = new StackingClient(
-    'SP2HNY1HNF5X25VC7GZ3Y48JC4762AYFHKS061BM0.stacking-contract',
-    new StacksTestnet()
-  );
+  const client = new StackingClient({
+    address: 'SP2HNY1HNF5X25VC7GZ3Y48JC4762AYFHKS061BM0.stacking-contract',
+    network: STACKS_TESTNET,
+  });
   expect(async () => await client.getStatus()).not.toThrow();
 });
 
 test('getSecondsUntilStackingDeadline', async () => {
-  const network = new StacksMainnet({ url: 'http://localhost:3999' });
-  const client = new StackingClient('', network);
+  const client = new StackingClient({
+    address: '',
+    network: STACKS_MAINNET,
+    client: { baseUrl: 'http://localhost:3999' },
+  });
 
   setApiMocks({
     '/extended/v1/info/network_block_times': `{"testnet":{"target_block_time":120},"mainnet":{"target_block_time":600}}`,
@@ -1167,13 +1260,11 @@ test('getSecondsUntilStackingDeadline', async () => {
 });
 
 test('correctly signs pox-4 signer signature', () => {
-  const network = new StacksTestnet();
+  const network = STACKS_TESTNET;
   const poxAddress = 'msiYwJCvXEzjgq6hDwD9ueBka6MTfN962Z';
 
-  const privateKey = createStacksPrivateKey(
-    '002bc479cae71c410cf10113de8fe1611b148231eccdfb19ca779ba365cc511601'
-  );
-  const publicKey = getPublicKeyFromPrivate(privateKey.data);
+  const privateKey = '002bc479cae71c410cf10113de8fe1611b148231eccdfb19ca779ba365cc511601';
+  const publicKey = getPublicKeyFromPrivate(privateKey);
   const maxAmount = 1000n;
   const authId = 0;
 
@@ -1220,7 +1311,7 @@ test('correctly generates pox-4 message hash', () => {
   const fixture = 'ec5b88aa81a96a6983c26cdba537a13d253425348ffc0ba6b07130869b025a2d';
 
   const hash = sha256(
-    encodeStructuredData(
+    encodeStructuredDataBytes(
       pox4SignatureMessage({
         poxAddress: poxAddress,
         topic,
@@ -1228,7 +1319,7 @@ test('correctly generates pox-4 message hash', () => {
         authId,
         maxAmount: 340282366920938463463374607431768211455n,
         rewardCycle: 1,
-        network: new StacksTestnet(),
+        network: STACKS_TESTNET,
       })
     )
   );

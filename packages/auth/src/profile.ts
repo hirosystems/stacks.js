@@ -1,10 +1,9 @@
+import { NetworkClientParam, clientFromNetwork, networkFrom } from '@stacks/network';
 import { resolveZoneFileToProfile } from '@stacks/profile';
-import { StacksMainnet, StacksNetwork, StacksNetworkName } from '@stacks/network';
 
 export interface ProfileLookupOptions {
   username: string;
   zoneFileLookupURL?: string;
-  network?: StacksNetworkName | StacksNetwork;
 }
 
 /**
@@ -16,31 +15,67 @@ export interface ProfileLookupOptions {
  * blockstack.js [[getNameInfo]] function.
  * @returns {Promise} that resolves to a profile object
  */
-export function lookupProfile(lookupOptions: ProfileLookupOptions): Promise<Record<string, any>> {
-  if (!lookupOptions.username) {
+export function lookupProfile(
+  options: ProfileLookupOptions & NetworkClientParam
+): Promise<Record<string, any>> {
+  if (!options.username) {
     return Promise.reject(new Error('No username provided'));
   }
 
-  const defaultOptions = {
-    network: new StacksMainnet(),
-  };
-  const options = Object.assign(defaultOptions, lookupOptions);
+  const network = networkFrom(options.network ?? 'mainnet');
+  const client = Object.assign({}, clientFromNetwork(network), options.client);
 
-  const network = StacksNetwork.fromNameOrNetwork(options.network);
   let lookupPromise;
   if (options.zoneFileLookupURL) {
     const url = `${options.zoneFileLookupURL.replace(/\/$/, '')}/${options.username}`;
-    lookupPromise = network.fetchFn(url).then(response => response.json());
+    lookupPromise = client.fetch(url).then(response => response.json());
   } else {
-    lookupPromise = network.getNameInfo(options.username);
+    lookupPromise = getNameInfo({ name: options.username });
   }
   return lookupPromise.then((responseJSON: any) => {
     if (responseJSON.hasOwnProperty('zonefile') && responseJSON.hasOwnProperty('address')) {
-      return resolveZoneFileToProfile(responseJSON.zonefile, responseJSON.address, network.fetchFn);
+      return resolveZoneFileToProfile({
+        zoneFile: responseJSON.zonefile,
+        publicKeyOrAddress: responseJSON.address,
+        client,
+      });
     } else {
       throw new Error(
         'Invalid zonefile lookup response: did not contain `address`' + ' or `zonefile` field'
       );
     }
   });
+}
+
+export function getNameInfo(
+  opts: {
+    /** Fully qualified name */
+    name: string;
+  } & NetworkClientParam
+) {
+  const network = networkFrom(opts.network ?? 'mainnet');
+  const client = Object.assign({}, clientFromNetwork(network), opts.client);
+
+  const nameLookupURL = `${client.baseUrl}/v1/names/${opts.name}`;
+  return client
+    .fetch(nameLookupURL)
+    .then((resp: any) => {
+      if (resp.status === 404) {
+        throw new Error('Name not found');
+      } else if (resp.status !== 200) {
+        throw new Error(`Bad response status: ${resp.status}`);
+      } else {
+        return resp.json();
+      }
+    })
+    .then((nameInfo: any) => {
+      // the returned address _should_ be in the correct network ---
+      //  stacks node gets into trouble because it tries to coerce back to mainnet
+      //  and the regtest transaction generation libraries want to use testnet addresses
+      if (nameInfo.address) {
+        return Object.assign({}, nameInfo, { address: nameInfo.address });
+      } else {
+        return nameInfo;
+      }
+    });
 }

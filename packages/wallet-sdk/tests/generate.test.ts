@@ -13,7 +13,6 @@ import {
 // Reference: https://github.com/paulmillr/scure-bip39
 import { wordlist } from '@scure/bip39/wordlists/english';
 import { bytesToHex } from '@stacks/common';
-import { TransactionVersion } from '@stacks/transactions';
 import {
   generateSecretKey,
   generateWallet,
@@ -70,10 +69,10 @@ describe(generateWallet, () => {
       'a29c3e73dba79ab0f84cb792bafd65ec71f243ebe67a7ebd842ef5cdce3b21eb'
     );
 
-    expect(getStxAddress({ account, transactionVersion: TransactionVersion.Testnet })).toEqual(
+    expect(getStxAddress({ account, network: 'testnet' })).toEqual(
       'ST384CVPNDTYA0E92TKJZQTYXQHNZSWGCAH0ER64E'
     );
-    expect(getStxAddress({ account, transactionVersion: TransactionVersion.Mainnet })).toEqual(
+    expect(getStxAddress({ account, network: 'mainnet' })).toEqual(
       'SP384CVPNDTYA0E92TKJZQTYXQHNZSWGCAG7SAPVB'
     );
 

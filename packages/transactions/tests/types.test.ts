@@ -1,32 +1,33 @@
+import { STACKS_MAINNET, STACKS_TESTNET, StacksNetwork } from '@stacks/network';
 import {
-  createLPList,
-  serializeStacksMessage,
-  deserializeLPList,
-  addressFromHashMode,
+  AddressWire,
+  AssetWire,
   LengthPrefixedList,
+  LengthPrefixedStringWire,
+  StacksWireType,
   addressFromPublicKeys,
-} from '../src/types';
-import {
-  LengthPrefixedString,
-  AssetInfo,
-  createLPString,
+  addressFromVersionHash,
+  addressHashModeToVersion,
+  addressToString,
   createAddress,
-  createAssetInfo,
-} from '../src/postcondition-types';
-import { Address, addressToString } from '../src/common';
-import { TransactionVersion, AddressHashMode, StacksMessageType } from '../src/constants';
-
-import { serializeDeserialize } from './macros';
-import { BytesReader } from '../src/bytesReader';
+  createAsset,
+  createLPList,
+  createLPString,
+  deserializeLPList,
+  serializeStacksWireBytes,
+} from '../src';
+import { BytesReader } from '../src/BytesReader';
+import { AddressHashMode } from '../src/constants';
 import { createStacksPublicKey } from '../src/keys';
+import { serializeDeserialize } from './macros';
 
 test('Length prefixed strings serialization and deserialization', () => {
   const testString = 'test message string';
   const lpString = createLPString(testString);
   const deserialized = serializeDeserialize(
     lpString,
-    StacksMessageType.LengthPrefixedString
-  ) as LengthPrefixedString;
+    StacksWireType.LengthPrefixedString
+  ) as LengthPrefixedStringWire;
   expect(deserialized.content).toBe(testString);
 
   const longTestString = 'a'.repeat(129);
@@ -47,23 +48,23 @@ test('Length prefixed list serialization and deserialization', () => {
     l.push(addressList[index]);
   }
   const lpList: LengthPrefixedList = createLPList(l);
-  const serialized = serializeStacksMessage(lpList);
+  const serialized = serializeStacksWireBytes(lpList);
 
   const bytesReader = new BytesReader(serialized);
-  const deserialized = deserializeLPList(bytesReader, StacksMessageType.Address);
+  const deserialized = deserializeLPList(bytesReader, StacksWireType.Address);
 
   expect(deserialized.values.length).toBe(addressList.length);
 
   for (let index = 0; index < addressList.length; index++) {
-    expect(deserialized.values[index].toString()).toBe(addressList[index].toString());
+    expect(deserialized.values[index]).toEqual(addressList[index]);
   }
 });
 
 test('C32 address hash mode - testnet P2PKH', () => {
   const address = addressToString(
     addressFromHashMode(
-      AddressHashMode.SerializeP2PKH,
-      TransactionVersion.Testnet,
+      AddressHashMode.P2PKH,
+      STACKS_TESTNET,
       'c22d24fec5d06e539c551e732a5ba88997761ba0'
     )
   );
@@ -74,8 +75,8 @@ test('C32 address hash mode - testnet P2PKH', () => {
 test('C32 address hash mode - mainnet P2PKH', () => {
   const address = addressToString(
     addressFromHashMode(
-      AddressHashMode.SerializeP2PKH,
-      TransactionVersion.Mainnet,
+      AddressHashMode.P2PKH,
+      STACKS_MAINNET,
       'b976e9f5d6181e40bed7fa589142dfcf2fb28d8e'
     )
   );
@@ -86,8 +87,8 @@ test('C32 address hash mode - mainnet P2PKH', () => {
 test('C32 address hash mode - mainnet P2SH', () => {
   const address = addressToString(
     addressFromHashMode(
-      AddressHashMode.SerializeP2SH,
-      TransactionVersion.Mainnet,
+      AddressHashMode.P2SH,
+      STACKS_MAINNET,
       '55011fc38a7e12f7d00496aef7a1c4b6dfeba81b'
     )
   );
@@ -98,8 +99,8 @@ test('C32 address hash mode - mainnet P2SH', () => {
 test('C32 address hash mode - testnet P2SH', () => {
   const address = addressToString(
     addressFromHashMode(
-      AddressHashMode.SerializeP2SH,
-      TransactionVersion.Testnet,
+      AddressHashMode.P2SH,
+      STACKS_TESTNET,
       '55011fc38a7e12f7d00496aef7a1c4b6dfeba81b'
     )
   );
@@ -110,8 +111,8 @@ test('C32 address hash mode - testnet P2SH', () => {
 test('C32 address hash mode - mainnet P2WSH', () => {
   const address = addressToString(
     addressFromHashMode(
-      AddressHashMode.SerializeP2WSH,
-      TransactionVersion.Mainnet,
+      AddressHashMode.P2WSH,
+      STACKS_MAINNET,
       '55011fc38a7e12f7d00496aef7a1c4b6dfeba81b'
     )
   );
@@ -122,8 +123,8 @@ test('C32 address hash mode - mainnet P2WSH', () => {
 test('C32 address hash mode - testnet P2WSH', () => {
   const address = addressToString(
     addressFromHashMode(
-      AddressHashMode.SerializeP2WSH,
-      TransactionVersion.Testnet,
+      AddressHashMode.P2WSH,
+      STACKS_TESTNET,
       '55011fc38a7e12f7d00496aef7a1c4b6dfeba81b'
     )
   );
@@ -134,7 +135,7 @@ test('C32 address hash mode - testnet P2WSH', () => {
 test('C32check addresses serialization and deserialization', () => {
   const c32AddressString = 'SP9YX31TK12T0EZKWP3GZXX8AM37JDQHAWM7VBTH';
   const addr = createAddress(c32AddressString);
-  const deserialized = serializeDeserialize(addr, StacksMessageType.Address) as Address;
+  const deserialized = serializeDeserialize(addr, StacksWireType.Address) as AddressWire;
   expect(addressToString(deserialized)).toBe(c32AddressString);
 });
 
@@ -142,8 +143,8 @@ test('Asset info serialization and deserialization', () => {
   const assetAddress = 'SP2ZP4GJDZJ1FDHTQ963F0292PE9J9752TZJ68F21';
   const assetContractName = 'contract_name';
   const assetName = 'asset_name';
-  const info = createAssetInfo(assetAddress, assetContractName, assetName);
-  const deserialized = serializeDeserialize(info, StacksMessageType.AssetInfo) as AssetInfo;
+  const info = createAsset(assetAddress, assetContractName, assetName);
+  const deserialized = serializeDeserialize(info, StacksWireType.Asset) as AssetWire;
   expect(addressToString(deserialized.address)).toBe(assetAddress);
   expect(deserialized.contractName.content).toBe(assetContractName);
   expect(deserialized.assetName.content).toBe(assetName);
@@ -198,11 +199,11 @@ test('Public keys to address hash', () => {
     let hashMode;
 
     if (!fixture.segwit) {
-      if (fixture.numRequired === 1) hashMode = AddressHashMode.SerializeP2PKH;
-      else hashMode = AddressHashMode.SerializeP2SH;
+      if (fixture.numRequired === 1) hashMode = AddressHashMode.P2PKH;
+      else hashMode = AddressHashMode.P2SH;
     } else {
-      if (fixture.numRequired === 1) hashMode = AddressHashMode.SerializeP2WPKH;
-      else hashMode = AddressHashMode.SerializeP2WSH;
+      if (fixture.numRequired === 1) hashMode = AddressHashMode.P2WPKH;
+      else hashMode = AddressHashMode.P2WSH;
     }
 
     const address = addressFromPublicKeys(
@@ -214,3 +215,15 @@ test('Public keys to address hash', () => {
     expect(address.hash160).toBe(fixture.result);
   }
 });
+
+// helpers
+
+/** @internal */
+function addressFromHashMode(
+  hashMode: AddressHashMode,
+  network: StacksNetwork,
+  data: string
+): AddressWire {
+  const version = addressHashModeToVersion(hashMode, network);
+  return addressFromVersionHash(version, data);
+}
