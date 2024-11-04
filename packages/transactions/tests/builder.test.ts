@@ -716,6 +716,7 @@ test('Make smart contract deploy (defaults to versioned smart contract, as of 2.
     senderKey,
     fee,
     nonce,
+    clarityVersion: 2,
     network: STACKS_TESTNET,
   });
   expect(() => transaction.verifyOrigin()).not.toThrow();
