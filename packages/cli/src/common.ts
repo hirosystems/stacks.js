@@ -3,7 +3,7 @@ import * as bitcoinjs from 'bitcoinjs-lib';
 import { TransactionSigner } from 'blockstack';
 import { DEFAULT_MAX_ID_SEARCH_INDEX } from './argparse';
 import { CLINetworkAdapter } from './network';
-import { privateKeyToPublic } from '@stacks/transactions/src';
+import { privateKeyToPublic } from '@stacks/transactions';
 
 let maxIDSearchIndex = DEFAULT_MAX_ID_SEARCH_INDEX;
 
