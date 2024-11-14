@@ -3,6 +3,7 @@
 - [Stacks.js (\>=5.x.x) → (7.x.x)](#stacksjs-5xx--7xx)
   - [Breaking Changes](#breaking-changes)
   - [Reducing Wrapper Types](#reducing-wrapper-types)
+  - [Clarity Version](#clarity-version)
   - [Stacks Network](#stacks-network)
     - [Impacts](#impacts)
   - [Clarity Representation](#clarity-representation)
@@ -34,6 +35,7 @@
 ### Breaking Changes
 
 - The `@stacks/network` `new StacksNetwork()` objects were removed. Instead `@stacks/network` now exports the objects `STACKS_MAINNET`, `STACKS_TESNET`, and `STACKS_DEVNET`, which are static (and shouldn't be changed for most use-cases). [Read more...](#stacks-network)
+- Contract Deploys now default to Clarity version 3. [Read more...](#clarity-version)
 - Most `fetch` (aka networking) methods were renamed to indicate they send HTTP requests. The new methods are named `fetchXyz` and are compatible with the old `Xyz` interfaces. [Read more...](#fetch-methods)
 - Reducing wrapper types, which create annoyances for the developer, rather than being able to use values directly. [Read more...](#reducing-wrapper-types)
 - The `ClarityType` enum was replaced by a human-readable version. The previous (wire format compatible) enum is still available as `ClarityWireType`. [Read more...](#clarity-representation)
@@ -54,6 +56,10 @@ This breaks the signatures of many functions:
 
 - `signMessageHashRsv`, `signWithKey` now return the message signature as a `string` directly.
 - `nextSignature`, `nextVerification`, `publicKeyFromSignatureVrs`, `publicKeyFromSignatureRsv` now take in the message signature as a `string`.
+
+### Clarity Version
+
+Contract Deploys now default to Clarity version `3`, which is the latest version introduced with the Stacks Nakamoto update.
 
 ### Stacks Network
 
