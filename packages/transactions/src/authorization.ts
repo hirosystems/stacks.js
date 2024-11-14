@@ -170,19 +170,21 @@ export function createMultiSigSpendingCondition(
   };
 }
 
-/** @internal */
+/** Advanced: Checks if the condition is a single signature spending condition. */
 export function isSingleSig(
   condition: SpendingConditionOpts
 ): condition is SingleSigSpendingConditionOpts {
   return 'signature' in condition;
 }
 
-/** @internal */
+// todo: add override for the functions below to allow for address string input as well.
+
+/** Advanced: Checks if the address is for a sequential (legacy) multi-signature spending condition. */
 export function isSequentialMultiSig(hashMode: AddressHashMode): boolean {
   return hashMode === AddressHashMode.P2SH || hashMode === AddressHashMode.P2WSH;
 }
 
-/** @internal */
+/** Advanced: Checks if the address is for a non-sequential multi-signature spending condition. */
 export function isNonSequentialMultiSig(hashMode: AddressHashMode): boolean {
   return (
     hashMode === AddressHashMode.P2SHNonSequential ||
