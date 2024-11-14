@@ -75,11 +75,9 @@ import {
   TransactionAuthFieldWire,
 } from './types';
 
-/** @internal */
 export function serializeStacksWire(wire: StacksWire): string {
   return bytesToHex(serializeStacksWireBytes(wire));
 }
-/** @internal */
 export function serializeStacksWireBytes(wire: StacksWire): Uint8Array {
   switch (wire.type) {
     case StacksWireType.Address:
@@ -107,7 +105,6 @@ export function serializeStacksWireBytes(wire: StacksWire): Uint8Array {
   }
 }
 
-/** @internal */
 export function deserializeStacksWire(
   bytesReader: string | Uint8Array | BytesReader,
   type: StacksWireType,
@@ -145,7 +142,6 @@ export function deserializeStacksWire(
 export function serializeAddress(address: AddressWire): string {
   return bytesToHex(serializeAddressBytes(address));
 }
-/** @internal */
 export function serializeAddressBytes(address: AddressWire): Uint8Array {
   const bytesArray = [];
   bytesArray.push(hexToBytes(intToHex(address.version, 1)));
@@ -153,7 +149,6 @@ export function serializeAddressBytes(address: AddressWire): Uint8Array {
   return concatArray(bytesArray);
 }
 
-/** @internal */
 export function deserializeAddress(serialized: string | Uint8Array | BytesReader): AddressWire {
   const bytesReader = isInstance(serialized, BytesReader)
     ? serialized
@@ -167,7 +162,6 @@ export function deserializeAddress(serialized: string | Uint8Array | BytesReader
 export function serializePrincipal(principal: PostConditionPrincipalWire): string {
   return bytesToHex(serializePrincipalBytes(principal));
 }
-/** @internal */
 export function serializePrincipalBytes(principal: PostConditionPrincipalWire): Uint8Array {
   const bytesArray = [];
   bytesArray.push(principal.prefix);
@@ -183,7 +177,6 @@ export function serializePrincipalBytes(principal: PostConditionPrincipalWire): 
   return concatArray(bytesArray);
 }
 
-/** @internal */
 export function deserializePrincipal(
   serialized: string | Uint8Array | BytesReader
 ): PostConditionPrincipalWire {
@@ -212,7 +205,6 @@ export function deserializePrincipal(
 export function serializeLPString(lps: LengthPrefixedStringWire): string {
   return bytesToHex(serializeLPStringBytes(lps));
 }
-/** @internal */
 export function serializeLPStringBytes(lps: LengthPrefixedStringWire): Uint8Array {
   const bytesArray = [];
   const contentBytes = utf8ToBytes(lps.content);
@@ -222,7 +214,6 @@ export function serializeLPStringBytes(lps: LengthPrefixedStringWire): Uint8Arra
   return concatArray(bytesArray);
 }
 
-/** @internal */
 export function deserializeLPString(
   serialized: string | Uint8Array | BytesReader,
   prefixBytes?: number,
@@ -240,7 +231,6 @@ export function deserializeLPString(
 export function serializeMemoString(memoString: MemoStringWire): string {
   return bytesToHex(serializeMemoStringBytes(memoString));
 }
-/** @internal */
 export function serializeMemoStringBytes(memoString: MemoStringWire): Uint8Array {
   const bytesArray = [];
   const contentBytes = utf8ToBytes(memoString.content);
@@ -249,7 +239,6 @@ export function serializeMemoStringBytes(memoString: MemoStringWire): Uint8Array
   return concatArray(bytesArray);
 }
 
-/** @internal */
 export function deserializeMemoString(
   serialized: string | Uint8Array | BytesReader
 ): MemoStringWire {
@@ -264,7 +253,6 @@ export function deserializeMemoString(
 export function serializeAsset(info: AssetWire): string {
   return bytesToHex(serializeAssetBytes(info));
 }
-/** @internal */
 export function serializeAssetBytes(info: AssetWire): Uint8Array {
   const bytesArray = [];
   bytesArray.push(serializeAddressBytes(info.address));
@@ -273,7 +261,6 @@ export function serializeAssetBytes(info: AssetWire): Uint8Array {
   return concatArray(bytesArray);
 }
 
-/** @internal */
 export function deserializeAsset(serialized: string | Uint8Array | BytesReader): AssetWire {
   const bytesReader = isInstance(serialized, BytesReader)
     ? serialized
@@ -289,7 +276,6 @@ export function deserializeAsset(serialized: string | Uint8Array | BytesReader):
 export function serializeLPList(lpList: LengthPrefixedList): string {
   return bytesToHex(serializeLPListBytes(lpList));
 }
-/** @internal */
 export function serializeLPListBytes(lpList: LengthPrefixedList): Uint8Array {
   const list = lpList.values;
   const bytesArray = [];
@@ -300,7 +286,6 @@ export function serializeLPListBytes(lpList: LengthPrefixedList): Uint8Array {
   return concatArray(bytesArray);
 }
 
-/** @internal */
 export function deserializeLPList(
   serialized: string | Uint8Array | BytesReader,
   type: StacksWireType,
@@ -345,7 +330,6 @@ export function serializePostConditionWire(postCondition: PostConditionWire): st
   return bytesToHex(serializePostConditionWireBytes(postCondition));
 }
 
-/** @internal */
 export function serializePostConditionWireBytes(postCondition: PostConditionWire): Uint8Array {
   const bytesArray = [];
   bytesArray.push(postCondition.conditionType);
@@ -377,7 +361,6 @@ export function serializePostConditionWireBytes(postCondition: PostConditionWire
   return concatArray(bytesArray);
 }
 
-/** @internal */
 export function deserializePostConditionWire(
   serialized: string | Uint8Array | BytesReader
 ): PostConditionWire {

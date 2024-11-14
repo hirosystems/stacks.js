@@ -214,7 +214,6 @@ export function serializeSingleSigSpendingCondition(
   return bytesToHex(serializeSingleSigSpendingConditionBytes(condition));
 }
 
-/** @internal */
 export function serializeSingleSigSpendingConditionBytes(
   condition: SingleSigSpendingConditionOpts
 ): Uint8Array {
@@ -235,7 +234,6 @@ export function serializeMultiSigSpendingCondition(
   return bytesToHex(serializeMultiSigSpendingConditionBytes(condition));
 }
 
-/** @internal */
 export function serializeMultiSigSpendingConditionBytes(
   condition: MultiSigSpendingConditionOpts
 ): Uint8Array {
@@ -338,7 +336,6 @@ export function serializeSpendingCondition(condition: SpendingConditionOpts): st
   return bytesToHex(serializeSpendingConditionBytes(condition));
 }
 
-/** @internal */
 export function serializeSpendingConditionBytes(condition: SpendingConditionOpts): Uint8Array {
   if (isSingleSig(condition)) return serializeSingleSigSpendingConditionBytes(condition);
   return serializeMultiSigSpendingConditionBytes(condition);
@@ -695,7 +692,6 @@ export function serializeAuthorization(auth: Authorization): string {
   return bytesToHex(serializeAuthorizationBytes(auth));
 }
 
-/** @internal */
 export function serializeAuthorizationBytes(auth: Authorization): Uint8Array {
   const bytesArray = [];
   bytesArray.push(auth.authType);
