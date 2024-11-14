@@ -140,19 +140,19 @@ export function createMultiSigSpendingCondition(
   };
 }
 
-/** @internal */
+/** Advanced: Checks if the condition is a single signature spending condition. */
 export function isSingleSig(
   condition: SpendingConditionOpts
 ): condition is SingleSigSpendingConditionOpts {
   return 'signature' in condition;
 }
 
-/** @internal */
+/** Advanced: Checks if the condition is a sequential (legacy) multi-signature spending condition. */
 export function isSequentialMultiSig(hashMode: AddressHashMode): boolean {
   return hashMode === AddressHashMode.SerializeP2SH || hashMode === AddressHashMode.SerializeP2WSH;
 }
 
-/** @internal */
+/** Advanced: Checks if the condition is a non-sequential multi-signature spending condition. */
 export function isNonSequentialMultiSig(hashMode: AddressHashMode): boolean {
   return (
     hashMode === AddressHashMode.SerializeP2SHNonSequential ||
