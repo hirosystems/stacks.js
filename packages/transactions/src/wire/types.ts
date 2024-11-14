@@ -38,7 +38,6 @@ export function whenWireType(wireType: StacksWireType) {
   return <T>(wireTypeMap: WhenWireTypeMap<T>): T => wireTypeMap[wireType];
 }
 
-/** @internal */
 export type StacksWire =
   | AddressWire
   | PostConditionPrincipalWire
