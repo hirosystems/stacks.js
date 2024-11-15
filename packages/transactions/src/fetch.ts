@@ -129,7 +129,7 @@ export async function fetchNonce(
  * Estimate the total transaction fee in microstacks for a token transfer
  *
  * ⚠ Only sensible for token transfer transactions!
- * @param opts.transaction - The token transfer transaction to estimate fees for
+ * @param opts.transaction - The token transfer transaction to estimate fees for (or its estimated length in bytes)
  * @param opts.api - Optional API info (`.url` & `.fetch`) used for fetch call
  * @return A promise that resolves to number of microstacks per byte
  */
@@ -138,10 +138,10 @@ export async function fetchFeeEstimateTransfer({
   network: _network,
   client: _client,
 }: {
-  /** The token transfer transaction to estimate fees for */
-  transaction: StacksTransactionWire;
+  /** The token transfer transaction to estimate fees for (or its estimated length in bytes) */
+  transaction: StacksTransactionWire | number;
 } & NetworkClientParam): Promise<bigint> {
-  const network = _network ?? deriveNetworkFromTx(txOpt);
+  const network = typeof txOpt === 'number' ? 'mainnet' : _network ?? deriveNetworkFromTx(txOpt);
   const client = Object.assign({}, clientFromNetwork(networkFrom(network)), _client);
 
   const url = `${client.baseUrl}${TRANSFER_FEE_ESTIMATE_PATH}`;
@@ -157,7 +157,10 @@ export async function fetchFeeEstimateTransfer({
   }
 
   const feeRateResult = await response.text();
-  const txBytes = BigInt(Math.ceil(txOpt.serializeBytes().byteLength));
+  const txBytes =
+    typeof txOpt === 'number'
+      ? BigInt(txOpt)
+      : BigInt(Math.ceil(txOpt.serializeBytes().byteLength));
   const feeRate = BigInt(feeRateResult);
   return feeRate * txBytes;
 }
