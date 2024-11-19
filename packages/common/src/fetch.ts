@@ -1,4 +1,7 @@
+import { isInstance } from './utils';
+
 // Define default request options and allow modification using getters, setters
+
 // Reference: https://developer.mozilla.org/en-US/docs/Web/API/Request/Request
 const defaultFetchOpts: RequestInit = {
   // By default referrer value will be client:origin: above reference link
@@ -138,8 +141,13 @@ export function createApiKeyMiddleware({
 }: ApiKeyMiddlewareOpts): FetchMiddleware {
   return {
     pre: context => {
-      const reqUrl = new URL(context.url);
-      if (!hostMatches(reqUrl.host, host)) return; // Skip middleware if host does not match pattern
+      const url = isInstance(context.input, URL)
+        ? context.input
+        : typeof context.input === 'string'
+          ? new URL(context.input)
+          : new URL(context.input.url);
+
+      if (!hostMatches(url.host, host)) return; // Skip middleware if host does not match pattern
 
       const headers =
         context.init.headers instanceof Headers
