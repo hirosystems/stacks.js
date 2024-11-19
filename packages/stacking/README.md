@@ -2,8 +2,6 @@
 
 Library for PoX Stacking.
 
-> **Note**: [Not all methods](https://stacks.js.org/classes/_stacks_stacking.StackingClient#:~:text=methods%20-%20pox-2) are available before the 2.1 fork. These will throw if used on a <2.1 chain.
-
 ## Installation <!-- omit in toc -->
 
 ```shell
@@ -11,9 +9,11 @@ npm install @stacks/stacking
 ```
 
 - [Initialization](#initialization)
+- [Signing](#signing)
+  - [Topics](#topics)
 - [Stack STX](#stack-stx)
   - [Check stacking eligibility](#check-stacking-eligibility)
-  - [Broadcast the stacking transaction](#broadcast-the-stacking-transaction)
+  - [Build and broadcast a solo-stacking transaction](#build-and-broadcast-a-solo-stacking-transaction)
   - [Extend stacking](#extend-stacking)
   - [Increase amount stacked](#increase-amount-stacked)
 - [Client helpers](#client-helpers)
@@ -61,6 +61,51 @@ const address = 'ST3XKKN4RPV69NN1PHFDNX3TYKXT7XPC4N8KC1ARH';
 const client = new StackingClient(address, network);
 ```
 
+## Signing
+
+_Coming with epoch 2.5 and Nakamoto_, stackers are required to include signer signatures for their stacking transactions.
+[Signers](https://docs.stacks.co/nakamoto-upgrade/signing-and-stacking/running-a-signer) need to be run along side Stacks nodes to participate in the [PoX consensus](https://docs.stacks.co/nakamoto-upgrade/nakamoto-in-depth/stackers-and-signing).
+
+The `StackingClient` provides a helper method to create a signer signature for a stacking transaction.
+
+```typescript
+// the id of the current cycle
+const currentCycle = 83;
+// a BTC address for reward payouts
+const poxAddress = 'mvuYDknzDtPgGqm2GnbAbmGMLwiyW3AwFP';
+// number cycles to stack
+const cycles = 3;
+// how much to stack (at most), in microSTX
+const maxAmount = 100000000000n;
+// the auth id of the signer (a random id to not allow reusing the signature)
+const authId = 702;
+
+const signerPrivateKey = makeRandomPrivKey(); // replace with your signer private key
+
+const signature = client.signPoxSignature({
+  topic: 'stack-stx', // the topic of the transaction
+  poxAddress,
+  rewardCycle: currentCycle,
+  period: cycles,
+  maxAmount,
+  authId,
+  signerPrivateKey,
+});
+```
+
+> [!WARNING]
+> Make sure to replace `signerPrivateKey` with the signer private key of your setup and keep it private.
+
+### Topics
+
+Signatures include a topic, so they can only be used for the intended transaction type. The following topics are available:
+
+- `stack-stx`
+- `stack-extend`
+- `stack-increase`
+- `agg-commit`
+- `agg-increase`
+
 ## Stack STX
 
 ### Check stacking eligibility
@@ -80,7 +125,10 @@ const stackingEligibility = await client.canStack({ poxAddress, cycles });
 // }
 ```
 
-### Broadcast the stacking transaction
+### Build and broadcast a solo-stacking transaction
+
+> [!NOTE]
+> For the cycles given, the signer-key cannot be changed.
 
 ```typescript
 // a BTC address for reward payouts
@@ -93,14 +141,42 @@ const amountMicroStx = 100000000000n;
 const privateKey = 'd48f215481c16cbe6426f8e557df9b78895661971d71735126545abddcd5377001';
 // block height at which to stack
 const burnBlockHeight = 2000;
+// signature `maxAmount`
+const maxAmountMicroStx = amountMicroStx;
+// signature `authId` (random id)
+const authId = 3;
+
+// signer key
+const signerPrivateKey = makeRandomPrivKey();
+const signerKey = getPublicKeyFromPrivate(signerPrivateKey.data);
 
 // Refer to initialization section to create client instance
-const stackingResults = await client.stack({
+
+// Generate the signer signature
+const signerSignature = client.signPoxSignature({
+  topic: 'stack-stx',
+  rewardCycle: await client.getPoxInfo().reward_cycle_id,
+  poxAddress,
+  period: cycles,
+  maxAmount,
+  authId,
+
+  signerPrivateKey,
+});
+
+// Build and broadcast the stacking transaction
+const stackingResult = await client.stack({
   amountMicroStx,
   poxAddress,
   cycles,
-  privateKey,
   burnBlockHeight,
+
+  signerKey,
+  signerSignature,
+  maxAmountMicroStx,
+  authId,
+
+  privateKey,
 });
 
 // {
@@ -119,15 +195,42 @@ const extendCycles = 3;
 const poxAddress = 'mvuYDknzDtPgGqm2GnbAbmGMLwiyW3AwFP';
 // private key for transaction signing
 const privateKey = 'd48f215481c16cbe6426f8e557df9b78895661971d71735126545abddcd5377001';
+// signature `maxAMount`
+const maxAmountMicroStx = 100000000000n;
+// signature `authId` (random id)
+const authId = 4;
 
-const extendResults = await client.stackExtend({
+// signer key
+const signerPrivateKey = makeRandomPrivKey();
+const signerKey = getPublicKeyFromPrivate(signerPrivateKey.data);
+
+// Refer to initialization section to create client instance
+// Generate the signer signature
+const signerSignature = client.signPoxSignature({
+  topic: 'stack-extend',
+  poxAddress,
+  period: extendCycles,
+  maxAmount,
+  authId,
+
+  signerPrivateKey,
+});
+
+// Build and broadcast the stacking transaction
+const extendResult = await client.stackExtend({
   extendCycles,
   poxAddress,
+
+  signerKey,
+  signerSignature,
+  maxAmount,
+  authId,
+
   privateKey,
 });
 
 // {
-//   txid: '0xf6e9dbf6a26c1b73a14738606cb2232375d1b440246e6bbc14a45b3a66618481',
+// txid: '0xf6e9dbf6a26c1b73a14738606cb2232375d1b440246e6bbc14a45b3a66618481',
 // }
 ```
 
@@ -140,9 +243,36 @@ Increases the amount of funds stacked/locked after previously stacking.
 const increaseBy = 3000000;
 // private key for transaction signing
 const privateKey = 'd48f215481c16cbe6426f8e557df9b78895661971d71735126545abddcd5377001';
+// signature `maxAmount`
+const maxAmount = increaseBy;
+// signature `authId` (random id)
+const authId = 5;
 
+// signer key
+const signerPrivateKey = makeRandomPrivKey();
+const signerKey = getPublicKeyFromPrivate(signerPrivateKey.data);
+
+// Refer to initialization section to create client instance
+// Generate the signer signature
+const signerSignature = client.signPoxSignature({
+  topic: 'stack-increase',
+  poxAddress,
+  period: extendCycles,
+  maxAmount,
+  authId,
+
+  signerPrivateKey,
+});
+
+// Build and broadcast the stacking transaction
 const increaseResults = await client.stackIncrease({
   increaseBy,
+
+  signerKey,
+  signerSignature,
+  maxAmount,
+  authId,
+
   privateKey,
 });
 
@@ -310,7 +440,7 @@ These are the methods for creating the required transactions for delegated stack
   - [`.revokeDelegateStx` Revoke delegation](#revoke-delegation)
 - [Operating a pool](#operating-a-pool)
   - [`.delegateStackStx` Stack delegated STX](#stack-delegated-stx)
-  - [`.stackAggregationCommit` Commit to stacking](#commit-to-stacking)
+  - [`.stackAggregationCommitIndexed` Commit to stacking](#commit-to-stacking)
 
 ```mermaid
 sequenceDiagram
@@ -364,14 +494,14 @@ const revokeResponse = await client.revokeDelegateStx(privateKey);
 ### Operating a pool / Stacking for others
 
 If you are a pool operator (or wish to stack with someone else's funds), you can stack ("lock up") tokens for your users and commit to stacking participation for upcoming reward cycles.
-These users need to first "delegate" some or all of their funds to you (the "delegator").
-The following examples refer to the "delegator" as pool, but in practice a delegator can also stack for only single or few individuals.
+These users need to first "delegate" some or all of their funds to you (the "pool").
+The following examples refer to the "delegate" as pool, but in practice a delegator can also stack for only single or few individuals.
 Even a group of friends could stack together and share a multi-sig BTC wallet for payouts.
 
 #### Stack delegated STX
 
 Stack STX, which have been previously delegated to the pool.
-This step only locks the funds (partial stacking).
+This step only locks the funds (partial stacking) and doesn't require a signer-key/signature yet.
 The pool operator will also need to ["commit"](#commit-to-stacking) to a reward cycle.
 
 ```typescript
@@ -396,8 +526,7 @@ const burnBlockHeight = 2000;
 // number cycles to stack
 const cycles = 3;
 // if you call this method multiple times in the same block, you need to increase the nonce manually
-let nonce = await getNonce(poolAddress, network);
-nonce = nonce + 1n;
+const nonce = await getNonce(poolAddress, network);
 
 const poolClient = new StackingClient(poolAddress, network);
 
@@ -438,8 +567,7 @@ const poolBtcAddress = 'msiYwJCvXEzjgq6hDwD9ueBka6MTfN962Z';
 // number of cycles to extend by
 const extendCount = 3;
 // if you call this method multiple times in the same block, you need to increase the nonce manually
-let nonce = await getNonce(poolAddress, network);
-nonce = nonce + 1n;
+const nonce = await getNonce(poolAddress, network);
 
 const poolClient = new StackingClient(poolAddress, network);
 
@@ -478,8 +606,7 @@ const poolBtcAddress = 'msiYwJCvXEzjgq6hDwD9ueBka6MTfN962Z';
 // amount to increase by, in microSTX
 const increaseBy = 3;
 // if you call this method multiple times in the same block, you need to increase the nonce manually
-let nonce = await getNonce(poolAddress, network);
-nonce = nonce + 1n;
+const nonce = await getNonce(poolAddress, network);
 
 const poolClient = new StackingClient(poolAddress, network);
 
@@ -501,17 +628,42 @@ const delegetateIncreaseResponses = await poolClient.delegateStackIncrease({
 The result of this commit transaction will contain the index of the pools reward set entry.
 
 ```typescript
-// reward cycle id to commit to
+// reward cycle id to commit to (not the current cycle)
 const rewardCycle = 12;
 // the BTC address for reward payouts
 const poolBtcAddress = 'msiYwJCvXEzjgq6hDwD9ueBka6MTfN962Z';
 // Private key
-const privateKeyDelegate = 'd48f215481c16cbe6426f8e557df9b78895661971d71735126545abddcd5377001';
+const poolPrivateKey = 'd48f215481c16cbe6426f8e557df9b78895661971d71735126545abddcd5377001';
+// signature `maxAmount`
+const maxAmountMicroStx = 100000000000n;
+// signature `authId` (random id)
+const authId = 7;
+
+const signerPrivateKey = makeRandomPrivKey();
+const signerKey = getPublicKeyFromPrivate(signerPrivateKey.data);
+
+// Generate the signer signature
+const signerSignature = poolClient.signPoxSignature({
+  topic: 'agg-commit',
+  poxAddress: poolBtcAddress,
+  rewardCycle,
+  period: 1, // always 1 for agg-commit
+  maxAmount,
+  authId,
+
+  signerPrivateKey,
+});
 
 const delegetateCommitResponse = await poolClient.stackAggregationCommitIndexed({
-  rewardCycle,
   poxAddress: poolBtcAddress,
-  privateKey: privateKeyDelegate,
+  rewardCycle,
+
+  signerKey,
+  signerSignature,
+  maxAmount,
+  authId,
+
+  privateKey: poolPrivateKey,
 });
 
 // {
@@ -521,22 +673,48 @@ const delegetateCommitResponse = await poolClient.stackAggregationCommitIndexed(
 
 #### Increase existing commitment
 
-The result of this commit transaction will contain the index of the pools reward set entry.
+Increase partially stacked STX via the index of the reward set entry.
 
 ```typescript
 // reward cycle id to commit to
 const rewardCycle = 12;
-// reward set entry index
+// reward set entry index (returned from the original stackAggregationCommitIndexed transaction)
 const rewardIndex = 3;
 // the BTC address for reward payouts
 const poolBtcAddress = 'msiYwJCvXEzjgq6hDwD9ueBka6MTfN962Z';
 // Private key
 const privateKeyDelegate = 'd48f215481c16cbe6426f8e557df9b78895661971d71735126545abddcd5377001';
+// signature `maxAmount`
+const maxAmountMicroStx = 100000000000n;
+// signature `authId` (random id)
+const authId = 8;
 
+const signerPrivateKey = makeRandomPrivKey();
+const signerKey = getPublicKeyFromPrivate(signerPrivateKey.data);
+
+// Generate the signer signature
+const signerSignature = poolClient.signPoxSignature({
+  topic: 'agg-increase',
+  poxAddress: poolBtcAddress,
+  rewardCycle,
+  period: 1, // always 1 for agg-increase
+  maxAmount,
+  authId,
+
+  signerPrivateKey,
+});
+
+// Build and broadcast the stacking transaction
 const delegetateIncreaseResponse = await poolClient.stackAggregationIncrease({
+  poxAddress: poolBtcAddress,
   rewardCycle,
   rewardIndex,
-  poxAddress: poolBtcAddress,
+
+  signerKey,
+  signerSignature,
+  maxAmount,
+  authId,
+
   privateKey: privateKeyDelegate,
 });
 

@@ -1,36 +1,33 @@
+import { bytesToHex, concatArray } from '@stacks/common';
+import { createMessageSignature, createTransactionAuthField } from '../src';
+import { BytesReader } from '../src/BytesReader';
 import {
+  SingleSigSpendingCondition,
+  SponsoredAuthorization,
+  StandardAuthorization,
   createMultiSigSpendingCondition,
   createSingleSigSpendingCondition,
   deserializeSpendingCondition,
   emptyMessageSignature,
-  serializeAuthorization,
+  serializeAuthorizationBytes,
   serializeSpendingCondition,
-  SingleSigSpendingCondition,
-  SponsoredAuthorization,
-  StandardAuthorization,
+  serializeSpendingConditionBytes,
 } from '../src/authorization';
-import { createMessageSignature } from '../src/common';
-import { createTransactionAuthField } from '../src/signature';
-
 import { AddressHashMode, AuthType, PubKeyEncoding } from '../src/constants';
-
-import { bytesToHex, concatArray } from '@stacks/common';
-import { BytesReader } from '../src/bytesReader';
-import { createStacksPrivateKey, createStacksPublicKey, signWithKey } from '../src/keys';
+import { createStacksPublicKey, signWithKey } from '../src/keys';
 
 test('ECDSA recoverable signature', () => {
-  const privKeyString = 'edf9aee84d9b7abc145504dde6726c64f369d37ee34ded868fabd876c26570bc';
+  const privKey = 'edf9aee84d9b7abc145504dde6726c64f369d37ee34ded868fabd876c26570bc';
   const messagetoSign = 'eec72e6cd1ce0ac1dd1a0c260f099a8fc72498c80b3447f962fd5d39a3d70921';
   const correctSignature =
     '019901d8b1d67a7b853dc473d0609508ab2519ec370eabfef460aa0fd9234660' +
     '787970968562da9de8b024a7f36f946b2fdcbf39b2f59247267a9d72730f19276b';
-  const privKey = createStacksPrivateKey(privKeyString);
   const messageSignature = signWithKey(privKey, messagetoSign);
-  expect(messageSignature.data).toBe(correctSignature);
+  expect(messageSignature).toBe(correctSignature);
 });
 
 test('Single spending condition serialization and deserialization', () => {
-  const addressHashMode = AddressHashMode.SerializeP2PKH;
+  const addressHashMode = AddressHashMode.P2PKH;
   const nonce = 0;
   const fee = 0;
   const pubKey = '03ef788b3830c00abe8f64f62dc32fc863bc0b2cafeb073b6c8e1c7657d9c2c3ab';
@@ -49,7 +46,7 @@ test('Single spending condition serialization and deserialization', () => {
 });
 
 test('Single sig spending condition uncompressed', () => {
-  const addressHashMode = AddressHashMode.SerializeP2PKH;
+  const addressHashMode = AddressHashMode.P2PKH;
   const nonce = 123;
   const fee = 456;
   const pubKey = '';
@@ -60,12 +57,12 @@ test('Single sig spending condition uncompressed', () => {
   const signature = createMessageSignature('ff'.repeat(65));
   spendingCondition.signature = signature;
 
-  const serializedSpendingCondition = serializeSpendingCondition(spendingCondition);
+  const serializedSpendingCondition = serializeSpendingConditionBytes(spendingCondition);
 
   // prettier-ignore
   const spendingConditionBytesHex = [
     // address hash mode
-    AddressHashMode.SerializeP2PKH,
+    AddressHashMode.P2PKH,
     // signer
     0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11,
     0x11, 0x11, 0x11, 0x11, 0x11,
@@ -88,7 +85,7 @@ test('Single sig spending condition uncompressed', () => {
 });
 
 test('Multi sig spending condition uncompressed', () => {
-  const addressHashMode = AddressHashMode.SerializeP2SH;
+  const addressHashMode = AddressHashMode.P2SH;
   const nonce = 123;
   const fee = 456;
   const pubKey = '02'.repeat(33);
@@ -109,12 +106,12 @@ test('Multi sig spending condition uncompressed', () => {
     createTransactionAuthField(PubKeyEncoding.Compressed, sig)
   );
 
-  const serializedSpendingCondition = serializeSpendingCondition(spendingCondition);
+  const serializedSpendingCondition = serializeSpendingConditionBytes(spendingCondition);
 
   // prettier-ignore
   const spendingConditionBytesHex = [
     // address hash mode
-    AddressHashMode.SerializeP2SH,
+    AddressHashMode.P2SH,
     // signer
     0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11,
     0x11, 0x11, 0x11, 0x11, 0x11,
@@ -146,7 +143,7 @@ test('Multi sig spending condition uncompressed', () => {
 
 // auth.rs: tx_stacks_spending_condition_p2sh() (compressed multisig)
 test('Multi sig P2SH spending condition compressed', () => {
-  const addressHashMode = AddressHashMode.SerializeP2SH;
+  const addressHashMode = AddressHashMode.P2SH;
   const nonce = 456;
   const fee = 567;
   const pubKey = '03ef2340518b5867b23598a9cf74611f8b98064f7d55cdb8c107c67b5efcbc5c77';
@@ -168,12 +165,12 @@ test('Multi sig P2SH spending condition compressed', () => {
     createTransactionAuthField(PubKeyEncoding.Compressed, sig)
   );
 
-  const serializedSpendingCondition = serializeSpendingCondition(spendingCondition);
+  const serializedSpendingCondition = serializeSpendingConditionBytes(spendingCondition);
 
   // prettier-ignore
   const spendingConditionBytesHex = [
     // address hash mode
-    AddressHashMode.SerializeP2SH,
+    AddressHashMode.P2SH,
     // signer
     0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11,
     0x11, 0x11, 0x11, 0x11, 0x11,
@@ -213,7 +210,7 @@ test('Multi sig P2SH spending condition compressed', () => {
 
 // auth.rs: tx_stacks_spending_condition_p2wsh()
 test('Multi sig P2WSH spending condition compressed', () => {
-  const addressHashMode = AddressHashMode.SerializeP2WSH;
+  const addressHashMode = AddressHashMode.P2WSH;
   const nonce = 456;
   const fee = 567;
   const pubKey = '03ef2340518b5867b23598a9cf74611f8b98064f7d55cdb8c107c67b5efcbc5c77';
@@ -235,12 +232,12 @@ test('Multi sig P2WSH spending condition compressed', () => {
     createTransactionAuthField(PubKeyEncoding.Compressed, sig)
   );
 
-  const serializedSpendingCondition = serializeSpendingCondition(spendingCondition);
+  const serializedSpendingCondition = serializeSpendingConditionBytes(spendingCondition);
 
   // prettier-ignore
   const spendingConditionBytesHex = [
     // address hash mode
-    AddressHashMode.SerializeP2WSH,
+    AddressHashMode.P2WSH,
     // signer
     0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11,
     0x11, 0x11, 0x11, 0x11, 0x11,
@@ -291,18 +288,18 @@ test('Spending conditions', () => {
     '04ef2340518b5867b23598a9cf74611f8b98064f7d55cdb8c107c67b5efcbc5c771f112f919b00a6c6c5f51f7c63e1762fe9fac9b66ec75a053db7f51f4a52712b';
   const pubKeyCompressed = '03ef2340518b5867b23598a9cf74611f8b98064f7d55cdb8c107c67b5efcbc5c77';
 
-  const sp1 = createSingleSigSpendingCondition(AddressHashMode.SerializeP2PKH, '', bn123, bn567);
+  const sp1 = createSingleSigSpendingCondition(AddressHashMode.P2PKH, '', bn123, bn567);
   sp1.signer = signer;
   sp1.keyEncoding = PubKeyEncoding.Uncompressed;
   sp1.signature = signatureFF;
 
-  const sp2 = createSingleSigSpendingCondition(AddressHashMode.SerializeP2PKH, '', bn345, bn567);
+  const sp2 = createSingleSigSpendingCondition(AddressHashMode.P2PKH, '', bn345, bn567);
   sp2.signer = signer;
   sp2.keyEncoding = PubKeyEncoding.Compressed;
   sp2.signature = signatureFF;
 
   const sp3 = createMultiSigSpendingCondition(
-    AddressHashMode.SerializeP2SH,
+    AddressHashMode.P2SH,
     2,
     [pubKeyUncompressed, pubKeyUncompressed, pubKeyUncompressed],
     bn123,
@@ -314,7 +311,7 @@ test('Spending conditions', () => {
   );
 
   const sp4 = createMultiSigSpendingCondition(
-    AddressHashMode.SerializeP2SH,
+    AddressHashMode.P2SH,
     2,
     [pubKeyCompressed, pubKeyCompressed, pubKeyCompressed],
     bn123,
@@ -325,13 +322,13 @@ test('Spending conditions', () => {
     createTransactionAuthField(PubKeyEncoding.Compressed, sig)
   );
 
-  const sp5 = createSingleSigSpendingCondition(AddressHashMode.SerializeP2WPKH, '', bn345, bn567);
+  const sp5 = createSingleSigSpendingCondition(AddressHashMode.P2WPKH, '', bn345, bn567);
   sp5.signer = signer;
   sp5.keyEncoding = PubKeyEncoding.Compressed;
   sp5.signature = signatureFE;
 
   const sp6 = createMultiSigSpendingCondition(
-    AddressHashMode.SerializeP2WSH,
+    AddressHashMode.P2WSH,
     2,
     [pubKeyCompressed, pubKeyCompressed, pubKeyCompressed],
     bn456,
@@ -345,8 +342,8 @@ test('Spending conditions', () => {
   const spendingConditions = [sp1, sp2, sp3, sp4, sp5, sp6];
 
   for (let i = 0; i < spendingConditions.length; i++) {
-    const serialized1 = serializeSpendingCondition(spendingConditions[i]);
-    const serialized2 = serializeSpendingCondition(
+    const serialized1 = serializeSpendingConditionBytes(spendingConditions[i]);
+    const serialized2 = serializeSpendingConditionBytes(
       spendingConditions[(i + 1) % spendingConditions.length]
     );
 
@@ -370,8 +367,8 @@ test('Spending conditions', () => {
     sponsoredArray.push(serialized2);
     const sponsoredBytes = concatArray(sponsoredArray);
 
-    expect(serializeAuthorization(standard)).toEqual(standardBytes);
-    expect(serializeAuthorization(sponsored)).toEqual(sponsoredBytes);
+    expect(serializeAuthorizationBytes(standard)).toEqual(standardBytes);
+    expect(serializeAuthorizationBytes(sponsored)).toEqual(sponsoredBytes);
   }
 });
 
@@ -407,7 +404,7 @@ test('Invalid spending conditions', () => {
   // prettier-ignore
   const badHashModeMultiSigBytesHex = [
     // hash mode
-    AddressHashMode.SerializeP2SH,
+    AddressHashMode.P2SH,
     // signer
     0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11,
     0x11,
@@ -436,7 +433,7 @@ test('Invalid spending conditions', () => {
   // prettier-ignore
   const badHashModeSinglesigBytesParseable = [
     // hash mode
-    AddressHashMode.SerializeP2PKH,
+    AddressHashMode.P2PKH,
     // signer
     0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11,
     0x11,
@@ -462,18 +459,18 @@ test('Invalid spending conditions', () => {
     badHashModeSinglesigBytesParseable
   );
 
-  const deserializedBadHashModeSinglesigBytesParseable = deserializeSpendingCondition(
+  const deserializedBadHashModeSinglesig = deserializeSpendingCondition(
     new BytesReader(badHashModeSinglesigBytesParseableBuffer)
   );
 
   // corrupt but will parse with trailing bits
-  expect(deserializedBadHashModeSinglesigBytesParseable).toBeTruthy();
+  expect(deserializedBadHashModeSinglesig).toBeTruthy();
 
   // wrong number of public keys (too many signatures)
   // prettier-ignore
   const badPublicKeyCountBytes = [
     // hash mode
-    AddressHashMode.SerializeP2SH,
+    AddressHashMode.P2SH,
     // signer
     0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11,
     0x11,
@@ -513,7 +510,7 @@ test('Invalid spending conditions', () => {
   // prettier-ignore
   const badPublicKeyCountBytes2 = [
     // hash mode
-    AddressHashMode.SerializeP2SH,
+    AddressHashMode.P2SH,
     // signer
     0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11,
     0x11,
@@ -566,7 +563,7 @@ test('Invalid spending conditions', () => {
   // hashing mode doesn't allow uncompressed keys
   const signatureFF = createMessageSignature('ff'.repeat(65));
   const badP2WpkhUncompressedSP = createSingleSigSpendingCondition(
-    AddressHashMode.SerializeP2WPKH,
+    AddressHashMode.P2WPKH,
     '',
     123,
     567
@@ -578,7 +575,7 @@ test('Invalid spending conditions', () => {
   // prettier-ignore
   const badP2WpkhUncompressedBytes = [
     // hash mode
-    AddressHashMode.SerializeP2WPKH,
+    AddressHashMode.P2WPKH,
     // signer
     0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11,
     0x11,
@@ -596,7 +593,7 @@ test('Invalid spending conditions', () => {
   ];
 
   // we can serialize the invalid p2wpkh uncompressed condition, but we can't deserialize it
-  const serializedSPUncompressedKeys = serializeSpendingCondition(badP2WpkhUncompressedSP);
+  const serializedSPUncompressedKeys = serializeSpendingConditionBytes(badP2WpkhUncompressedSP);
 
   expect(new Uint8Array(badP2WpkhUncompressedBytes)).toEqual(serializedSPUncompressedKeys);
   expect(() =>
@@ -609,12 +606,7 @@ test('Invalid spending conditions', () => {
 // auth.rs: tx_stacks_spending_condition_p2pkh()
 test('Single sig P2PKH spending condition', () => {
   // p2pkh
-  const spP2PkhUncompressed = createSingleSigSpendingCondition(
-    AddressHashMode.SerializeP2PKH,
-    '',
-    123,
-    456
-  );
+  const spP2PkhUncompressed = createSingleSigSpendingCondition(AddressHashMode.P2PKH, '', 123, 456);
   spP2PkhUncompressed.keyEncoding = PubKeyEncoding.Uncompressed;
 
   const signature = createMessageSignature('ff'.repeat(65));
@@ -624,7 +616,7 @@ test('Single sig P2PKH spending condition', () => {
   // prettier-ignore
   const spendingConditionP2PkhUncompressedBytes = [
     // address hash mode
-    AddressHashMode.SerializeP2PKH,
+    AddressHashMode.P2PKH,
     // signer
     0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11,
     0x11, 0x11, 0x11, 0x11, 0x11,
@@ -642,12 +634,7 @@ test('Single sig P2PKH spending condition', () => {
     0xff, 0xff, 0xff, 0xff, 0xff
   ];
 
-  const spP2PkhCompressed = createSingleSigSpendingCondition(
-    AddressHashMode.SerializeP2PKH,
-    '',
-    345,
-    456
-  );
+  const spP2PkhCompressed = createSingleSigSpendingCondition(AddressHashMode.P2PKH, '', 345, 456);
   spP2PkhCompressed.keyEncoding = PubKeyEncoding.Compressed;
 
   spP2PkhCompressed.signature = createMessageSignature('fe'.repeat(65));
@@ -657,7 +644,7 @@ test('Single sig P2PKH spending condition', () => {
 
   const spendingConditionP2PkhCompressedBytes = [
     // hash mode
-    AddressHashMode.SerializeP2PKH,
+    AddressHashMode.P2PKH,
     // signer
     0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11,
     0x11, 0x11,
@@ -681,7 +668,7 @@ test('Single sig P2PKH spending condition', () => {
   ];
 
   for (let i = 0; i < spendingConditions.length; i++) {
-    const serializedSpendingCondition = serializeSpendingCondition(spendingConditions[i]);
+    const serializedSpendingCondition = serializeSpendingConditionBytes(spendingConditions[i]);
     expect(bytesToHex(serializedSpendingCondition)).toEqual(
       bytesToHex(new Uint8Array(spendingConditionsBytes[i]))
     );
@@ -695,12 +682,7 @@ test('Single sig P2PKH spending condition', () => {
 // auth.rs: tx_stacks_spending_condition_p2wpkh()
 test('Single sig P2WPKH spending condition', () => {
   // P2WPKH
-  const spP2WPKHCompressed = createSingleSigSpendingCondition(
-    AddressHashMode.SerializeP2WPKH,
-    '',
-    345,
-    567
-  );
+  const spP2WPKHCompressed = createSingleSigSpendingCondition(AddressHashMode.P2WPKH, '', 345, 567);
   spP2WPKHCompressed.keyEncoding = PubKeyEncoding.Compressed;
 
   const signature = createMessageSignature('fe'.repeat(65));
@@ -708,9 +690,9 @@ test('Single sig P2WPKH spending condition', () => {
   spP2WPKHCompressed.signer = '11'.repeat(20);
 
   // prettier-ignore
-  let spendingConditionP2WpkhCompressedBytes = [
+  const spendingConditionP2WpkhCompressedBytes = [
     // hash mode
-    AddressHashMode.SerializeP2WPKH,
+    AddressHashMode.P2WPKH,
     // signer
     0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11,
     0x11, 0x11,
@@ -731,7 +713,7 @@ test('Single sig P2WPKH spending condition', () => {
   const spendingConditionsBytes = [spendingConditionP2WpkhCompressedBytes];
 
   for (let i = 0; i < spendingConditions.length; i++) {
-    const serializedSpendingCondition = serializeSpendingCondition(spendingConditions[i]);
+    const serializedSpendingCondition = serializeSpendingConditionBytes(spendingConditions[i]);
     expect(bytesToHex(serializedSpendingCondition)).toEqual(
       bytesToHex(new Uint8Array(spendingConditionsBytes[i]))
     );

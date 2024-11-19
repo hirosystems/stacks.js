@@ -3,6 +3,135 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.0.3](https://github.com/blockstack/stacks.js/compare/v7.0.2...v7.0.3) (2024-11-15)
+
+**Note:** Version bump only for package @stacks/bns
+
+
+
+
+
+## [7.0.2](https://github.com/blockstack/stacks.js/compare/v7.0.1...v7.0.2) (2024-11-14)
+
+**Note:** Version bump only for package @stacks/bns
+
+
+
+
+
+## [7.0.0](https://github.com/blockstack/stacks.js/compare/v6.17.0...v7.0.0) (2024-10-25)
+
+
+### ⚠ BREAKING CHANGES
+
+* Convert `version` of PoXAddress from array to number.
+
+* feat: cleanup common files
+
+* refactor: update to correct import path
+
+### Features
+
+* Stacks.js v7.0.0 ([#1520](https://github.com/blockstack/stacks.js/issues/1520)) ([8ce84a3](https://github.com/blockstack/stacks.js/commit/8ce84a38822d9c1d26e8e2cc63f0c627d9c9e165)), closes [#1623](https://github.com/blockstack/stacks.js/issues/1623)
+
+
+
+## [6.17.0](https://github.com/blockstack/stacks.js/compare/v6.16.1...v6.17.0) (2024-10-17)
+
+**Note:** Version bump only for package @stacks/bns
+
+
+
+
+
+## [6.16.1](https://github.com/blockstack/stacks.js/compare/v6.16.0...v6.16.1) (2024-07-02)
+
+**Note:** Version bump only for package @stacks/bns
+
+
+
+
+
+## [6.16.0](https://github.com/blockstack/stacks.js/compare/v6.15.0...v6.16.0) (2024-06-30)
+
+**Note:** Version bump only for package @stacks/bns
+
+
+
+
+
+## [6.15.0](https://github.com/blockstack/stacks.js/compare/v6.14.0...v6.15.0) (2024-05-03)
+
+**Note:** Version bump only for package @stacks/bns
+
+
+
+
+
+## [6.13.1](https://github.com/blockstack/stacks.js/compare/v6.13.0...v6.13.1) (2024-04-04)
+
+**Note:** Version bump only for package @stacks/bns
+
+
+
+
+
+## [6.13.0](https://github.com/blockstack/stacks.js/compare/v6.12.1...v6.13.0) (2024-03-22)
+
+**Note:** Version bump only for package @stacks/bns
+
+
+
+
+
+## [6.12.1](https://github.com/blockstack/stacks.js/compare/v6.12.0...v6.12.1) (2024-03-18)
+
+**Note:** Version bump only for package @stacks/bns
+
+
+
+
+
+## [6.12.0](https://github.com/blockstack/stacks.js/compare/v6.11.3...v6.12.0) (2024-02-23)
+
+**Note:** Version bump only for package @stacks/bns
+
+
+
+
+
+## [6.11.3](https://github.com/blockstack/stacks.js/compare/v6.11.2...v6.11.3) (2024-01-24)
+
+**Note:** Version bump only for package @stacks/bns
+
+
+
+
+
+## [6.11.2](https://github.com/blockstack/stacks.js/compare/v6.11.1...v6.11.2) (2024-01-03)
+
+**Note:** Version bump only for package @stacks/bns
+
+
+
+
+
+## [6.11.0](https://github.com/blockstack/stacks.js/compare/v6.10.0...v6.11.0) (2023-12-18)
+
+**Note:** Version bump only for package @stacks/bns
+
+
+
+
+
+## [6.10.0](https://github.com/blockstack/stacks.js/compare/v6.9.0...v6.10.0) (2023-11-28)
+
+**Note:** Version bump only for package @stacks/bns
+
+
+
+
+
 ## [6.9.0](https://github.com/blockstack/stacks.js/compare/v6.8.1...v6.9.0) (2023-09-20)
 
 **Note:** Version bump only for package @stacks/bns

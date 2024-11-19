@@ -1,24 +1,25 @@
-import { utf8ToBytes } from '@stacks/common';
+import { bytesToHex, utf8ToBytes } from '@stacks/common';
 import {
-  contractPrincipalCV,
-  falseCV,
-  principalToString,
-  standardPrincipalCV,
-  trueCV,
-} from '../src/clarity';
-import { ClarityVersion, StacksMessageType } from '../src/constants';
-import {
-  CoinbasePayload,
+  ClarityVersion,
   CoinbasePayloadToAltRecipient,
+  CoinbasePayloadWire,
   ContractCallPayload,
+  SmartContractPayloadWire,
+  StacksWireType,
+  TenureChangeCause,
+  TenureChangePayloadWire,
+  TokenTransferPayloadWire,
+  VersionedSmartContractPayloadWire,
   createCoinbasePayload,
   createContractCallPayload,
   createSmartContractPayload,
+  createTenureChangePayload,
   createTokenTransferPayload,
-  SmartContractPayload,
-  TokenTransferPayload,
-  VersionedSmartContractPayload,
-} from '../src/payload';
+  deserializePayload,
+  randomBytes,
+  serializePayload,
+} from '../src';
+import { contractPrincipalCV, falseCV, standardPrincipalCV, trueCV } from '../src/clarity';
 import { serializeDeserialize } from './macros';
 
 test('STX token transfer payload serialization and deserialization', () => {
@@ -29,8 +30,8 @@ test('STX token transfer payload serialization and deserialization', () => {
 
   const deserialized = serializeDeserialize(
     payload,
-    StacksMessageType.Payload
-  ) as TokenTransferPayload;
+    StacksWireType.Payload
+  ) as TokenTransferPayloadWire;
   expect(deserialized.payloadType).toBe(payload.payloadType);
   expect(deserialized.recipient).toEqual(recipient);
   expect(deserialized.amount.toString()).toBe(amount.toString());
@@ -47,8 +48,8 @@ test('STX token transfer payload (to contract addr)  serialization and deseriali
 
   const deserialized = serializeDeserialize(
     payload,
-    StacksMessageType.Payload
-  ) as TokenTransferPayload;
+    StacksWireType.Payload
+  ) as TokenTransferPayloadWire;
   expect(deserialized.payloadType).toBe(payload.payloadType);
   expect(deserialized.recipient).toEqual(recipient);
   expect(deserialized.amount.toString()).toBe(amount.toString());
@@ -62,10 +63,10 @@ test('STX token transfer payload (with contract principal string) serialization 
 
   const deserialized = serializeDeserialize(
     payload,
-    StacksMessageType.Payload
-  ) as TokenTransferPayload;
+    StacksWireType.Payload
+  ) as TokenTransferPayloadWire;
   expect(deserialized.payloadType).toBe(payload.payloadType);
-  expect(principalToString(deserialized.recipient)).toEqual(recipient);
+  expect(deserialized.recipient.value).toEqual(recipient);
   expect(deserialized.amount.toString()).toBe(amount.toString());
 });
 
@@ -77,10 +78,10 @@ test('STX token transfer payload (with address principal string) serialization a
 
   const deserialized = serializeDeserialize(
     payload,
-    StacksMessageType.Payload
-  ) as TokenTransferPayload;
+    StacksWireType.Payload
+  ) as TokenTransferPayloadWire;
   expect(deserialized.payloadType).toBe(payload.payloadType);
-  expect(principalToString(deserialized.recipient)).toEqual(recipient);
+  expect(deserialized.recipient.value).toEqual(recipient);
   expect(deserialized.amount.toString()).toBe(amount.toString());
 });
 
@@ -92,10 +93,7 @@ test('Contract call payload serialization and deserialization', () => {
 
   const payload = createContractCallPayload(contractAddress, contractName, functionName, args);
 
-  const deserialized = serializeDeserialize(
-    payload,
-    StacksMessageType.Payload
-  ) as ContractCallPayload;
+  const deserialized = serializeDeserialize(payload, StacksWireType.Payload) as ContractCallPayload;
   expect(deserialized).toEqual(payload);
 });
 
@@ -116,8 +114,8 @@ test('Smart contract payload serialization and deserialization', () => {
 
   const deserialized = serializeDeserialize(
     payload,
-    StacksMessageType.Payload
-  ) as SmartContractPayload;
+    StacksWireType.Payload
+  ) as SmartContractPayloadWire;
   expect(deserialized.contractName.content).toBe(contractName);
   expect(deserialized.codeBody.content).toBe(codeBody);
 });
@@ -139,8 +137,8 @@ test('Versioned smart contract payload serialization and deserialization', () =>
 
   const deserialized = serializeDeserialize(
     payload,
-    StacksMessageType.Payload
-  ) as VersionedSmartContractPayload;
+    StacksWireType.Payload
+  ) as VersionedSmartContractPayloadWire;
   expect(deserialized.clarityVersion).toBe(2);
   expect(deserialized.contractName.content).toBe(contractName);
   expect(deserialized.codeBody.content).toBe(codeBody);
@@ -151,7 +149,7 @@ test('Coinbase payload serialization and deserialization', () => {
 
   const payload = createCoinbasePayload(coinbaseBuffer);
 
-  const deserialized = serializeDeserialize(payload, StacksMessageType.Payload) as CoinbasePayload;
+  const deserialized = serializeDeserialize(payload, StacksWireType.Payload) as CoinbasePayloadWire;
   expect(deserialized.coinbaseBytes).toEqual(coinbaseBuffer);
 });
 
@@ -163,7 +161,7 @@ test('Coinbase to standard principal recipient payload serialization and deseria
 
   const deserialized = serializeDeserialize(
     payload,
-    StacksMessageType.Payload
+    StacksWireType.Payload
   ) as CoinbasePayloadToAltRecipient;
   expect(deserialized.coinbaseBytes).toEqual(coinbaseBuffer);
   expect(deserialized.recipient).toEqual(standardRecipient);
@@ -180,8 +178,46 @@ test('Coinbase to contract principal recipient payload serialization and deseria
 
   const deserialized = serializeDeserialize(
     payload,
-    StacksMessageType.Payload
+    StacksWireType.Payload
   ) as CoinbasePayloadToAltRecipient;
   expect(deserialized.coinbaseBytes).toEqual(coinbaseBuffer);
   expect(deserialized.recipient).toEqual(contractRecipient);
+});
+
+test('serialize/deserialize tenure change payload', () => {
+  const tenureHash = bytesToHex(randomBytes(20));
+  const previousTenureHash = bytesToHex(randomBytes(20));
+  const burnViewHash = bytesToHex(randomBytes(20));
+  const previousTenureEnd = bytesToHex(randomBytes(32));
+  const previousTenureBlocks = 100;
+  const cause = TenureChangeCause.Extended;
+  const publicKeyHash = bytesToHex(randomBytes(20));
+
+  const payload = createTenureChangePayload(
+    tenureHash,
+    previousTenureHash,
+    burnViewHash,
+    previousTenureEnd,
+    previousTenureBlocks,
+    cause,
+    publicKeyHash
+  );
+
+  const deserialized = serializeDeserialize(
+    payload,
+    StacksWireType.Payload
+  ) as TenureChangePayloadWire;
+  expect(deserialized).toEqual(payload);
+});
+
+test.each([
+  // test vector taken from https://github.com/stacks-network/stacks-core/blob/396b34ba414220834de7ff96a890d55458ded51b/stackslib/src/chainstate/stacks/transaction.rs#L2003-L2122
+  '081212121212121212121212121212121212121212121212121212121212121212099275df67a68c8745c0ff97b48201ee6db447f7c93b23ae24cdc2400f52fdb08a1a6ac7ec71bf9c9c76e96ee4675ebff60625af28718501047bfd87b810c2d2139b73c23bd69de66360953a642c2a330a',
+  // test vector taken from https://github.com/stacks-network/stacks-core/blob/396b34ba414220834de7ff96a890d55458ded51b/stackslib/src/chainstate/stacks/transaction.rs#L2143-L2301
+  '0812121212121212121212121212121212121212121212121212121212121212120a0601ffffffffffffffffffffffffffffffffffffffff0c666f6f2d636f6e74726163749275df67a68c8745c0ff97b48201ee6db447f7c93b23ae24cdc2400f52fdb08a1a6ac7ec71bf9c9c76e96ee4675ebff60625af28718501047bfd87b810c2d2139b73c23bd69de66360953a642c2a330a',
+])('deserialize/serialize nakamoto coinbase payload', payloadHex => {
+  const payload = deserializePayload(payloadHex);
+
+  expect(payload).toBeDefined();
+  expect(serializePayload(payload)).toEqual(payloadHex);
 });

@@ -210,7 +210,8 @@ const mainnetAddress = getStxAddress({ account, transactionVersion: TransactionV
 You can generate signed transactions by following the documentation from `@stacks/transactions`. Use the `stxPrivateKey` of an account as the `senderKey` option when creating a transaction.
 
 ```ts
-import { makeSTXTokenTransfer, StacksMainnet } from '@stacks/transactions';
+import { StacksMainnet } from '@stacks/network';
+import { makeSTXTokenTransfer } from '@stacks/transactions';
 
 const network = new StacksMainnet();
 

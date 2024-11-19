@@ -533,7 +533,7 @@ test('profileLookUp', async () => {
 
   const mockZonefile = {
     zonefile:
-      '$ORIGIN ryan.id\n$TTL 3600\n_http._tcp IN URI 10 1 "https://blockstack.s3.amazonaws.com/ryan.id"\n',
+      '$ORIGIN ryan.id\n$TTL 3600\n_http._tcp IN URI 10 1 "https://_example_.s3.amazonaws.com/ryan.id"\n',
     address: 'SP3AMDH2ZZB8XQK467V9HV5CRQF2RPBZ4MDMSBHJZ',
   };
 
@@ -558,7 +558,7 @@ test('profileLookUp', async () => {
   expect(fetchMock.mock.calls[0][0]).toEqual('http://potato:6270/v1/names/ryan.id');
   expect(fetchMock.mock.calls[1][0]).toEqual(sampleTokenFiles.ryan.url);
   expect(fetchMock.mock.calls[2][0]).toEqual(
-    'https://stacks-node-api.mainnet.stacks.co/v1/names/ryan.id'
+    'https://api.mainnet.hiro.so/v1/names/ryan.id'
   );
   expect(fetchMock.mock.calls[3][0]).toEqual(sampleTokenFiles.ryan.url);
 });

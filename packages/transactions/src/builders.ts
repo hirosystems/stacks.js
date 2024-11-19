@@ -1,521 +1,85 @@
-import { bytesToHex, hexToBytes, IntegerType, intToBigInt } from '@stacks/common';
+import { IntegerType, PrivateKey, PublicKey } from '@stacks/common';
 import {
-  StacksNetwork,
-  StacksMainnet,
-  StacksNetworkName,
-  StacksTestnet,
-  FetchFn,
-  createFetchFn,
+  NetworkClientParam,
+  STACKS_MAINNET,
+  clientFromNetwork,
+  networkFrom,
 } from '@stacks/network';
 import { c32address } from 'c32check';
 import {
-  Authorization,
+  SpendingCondition,
   createMultiSigSpendingCondition,
   createSingleSigSpendingCondition,
   createSponsoredAuth,
   createStandardAuth,
-  SpendingCondition,
-  MultiSigSpendingCondition,
+  isSingleSig,
 } from './authorization';
-import { ClarityValue, deserializeCV, NoneCV, PrincipalCV, serializeCV } from './clarity';
+import { ClarityValue, PrincipalCV } from './clarity';
 import {
   AddressHashMode,
-  AddressVersion,
-  AnchorMode,
-  FungibleConditionCode,
-  NonFungibleConditionCode,
+  ClarityVersion,
+  MultiSigHashMode,
   PayloadType,
   PostConditionMode,
   SingleSigHashMode,
-  TransactionVersion,
-  TxRejectedReason,
-  RECOVERABLE_ECDSA_SIG_LENGTH_BYTES,
-  StacksMessageType,
-  ClarityVersion,
-  AnchorModeName,
 } from './constants';
 import { ClarityAbi, validateContractCall } from './contract-abi';
-import { NoEstimateAvailableError } from './errors';
+import { fetchAbi, fetchFeeEstimate, fetchNonce } from './fetch';
 import {
-  createStacksPrivateKey,
-  getPublicKey,
-  pubKeyfromPrivKey,
-  publicKeyFromBytes,
+  createStacksPublicKey,
+  privateKeyToHex,
+  privateKeyToPublic,
   publicKeyToAddress,
-  publicKeyToString,
+  publicKeyToHex,
 } from './keys';
+import { postConditionModeFrom, postConditionToWire } from './postcondition';
+import { PostCondition, PostConditionModeName } from './postcondition-types';
+import { TransactionSigner } from './signer';
+import { StacksTransactionWire, deriveNetworkFromTx } from './transaction';
+import { omit } from './utils';
 import {
+  PostConditionWire,
+  addressFromPublicKeys,
+  createAddress,
   createContractCallPayload,
+  createLPList,
   createSmartContractPayload,
   createTokenTransferPayload,
-  Payload,
-  serializePayload,
-} from './payload';
-import {
-  createFungiblePostCondition,
-  createNonFungiblePostCondition,
-  createSTXPostCondition,
-} from './postcondition';
-import {
-  AssetInfo,
-  createContractPrincipal,
-  createStandardPrincipal,
-  FungiblePostCondition,
-  NonFungiblePostCondition,
-  PostCondition,
-  STXPostCondition,
-} from './postcondition-types';
-import { TransactionSigner } from './signer';
-import { StacksTransaction } from './transaction';
-import { createLPList } from './types';
-import { cvToHex, omit, parseReadOnlyResponse, validateTxId } from './utils';
+} from './wire';
 
-/**
- * Lookup the nonce for an address from a core node
- *
- * @param {string} address - the c32check address to look up
- * @param {StacksNetworkName | StacksNetwork} network - the Stacks network to look up address on
- *
- * @return a promise that resolves to an integer
- */
-export async function getNonce(
-  address: string,
-  network?: StacksNetworkName | StacksNetwork
-): Promise<bigint> {
-  const derivedNetwork = StacksNetwork.fromNameOrNetwork(network ?? new StacksMainnet());
-  const url = derivedNetwork.getAccountApiUrl(address);
-
-  const response = await derivedNetwork.fetchFn(url);
-  if (!response.ok) {
-    let msg = '';
-    try {
-      msg = await response.text();
-    } catch (error) {}
-    throw new Error(
-      `Error fetching nonce. Response ${response.status}: ${response.statusText}. Attempted to fetch ${url} and failed with the message: "${msg}"`
-    );
-  }
-  const responseText = await response.text();
-  const result = JSON.parse(responseText) as { nonce: string };
-  return BigInt(result.nonce);
-}
-
-/**
- * @deprecated Use the new {@link estimateTransaction} function instead.
- *
- * Estimate the total transaction fee in microstacks for a token transfer
- *
- * @param {StacksTransaction} transaction - the token transfer transaction to estimate fees for
- * @param {StacksNetworkName | StacksNetwork} network - the Stacks network to estimate transaction for
- *
- * @return a promise that resolves to number of microstacks per byte
- */
-export async function estimateTransfer(
-  transaction: StacksTransaction,
-  network?: StacksNetworkName | StacksNetwork
-): Promise<bigint> {
-  if (transaction.payload.payloadType !== PayloadType.TokenTransfer) {
-    throw new Error(
-      `Transaction fee estimation only possible with ${
-        PayloadType[PayloadType.TokenTransfer]
-      } transactions. Invoked with: ${PayloadType[transaction.payload.payloadType]}`
-    );
-  }
-
-  return estimateTransferUnsafe(transaction, network);
-}
-
-/**
- * @deprecated Use the new {@link estimateTransaction} function instead.
- * @internal
- */
-export async function estimateTransferUnsafe(
-  transaction: StacksTransaction,
-  network?: StacksNetworkName | StacksNetwork
-): Promise<bigint> {
-  const requestHeaders = {
-    Accept: 'application/text',
-  };
-
-  const fetchOptions = {
-    method: 'GET',
-    headers: requestHeaders,
-  };
-
-  const derivedNetwork = StacksNetwork.fromNameOrNetwork(network ?? deriveNetwork(transaction));
-  const url = derivedNetwork.getTransferFeeEstimateApiUrl();
-
-  const response = await derivedNetwork.fetchFn(url, fetchOptions);
-  if (!response.ok) {
-    let msg = '';
-    try {
-      msg = await response.text();
-    } catch (error) {}
-    throw new Error(
-      `Error estimating transaction fee. Response ${response.status}: ${response.statusText}. Attempted to fetch ${url} and failed with the message: "${msg}"`
-    );
-  }
-  const feeRateResult = await response.text();
-  const txBytes = BigInt(transaction.serialize().byteLength);
-  const feeRate = BigInt(feeRateResult);
-  return feeRate * txBytes;
-}
-
-interface FeeEstimation {
-  fee: number;
-  fee_rate: number;
-}
-interface FeeEstimateResponse {
-  cost_scalar_change_by_byte: bigint;
-  estimated_cost: {
-    read_count: bigint;
-    read_length: bigint;
-    runtime: bigint;
-    write_count: bigint;
-    write_length: bigint;
-  };
-  estimated_cost_scalar: bigint;
-  estimations: [FeeEstimation, FeeEstimation, FeeEstimation];
-}
-
-/**
- * Estimate the total transaction fee in microstacks for a Stacks transaction
- *
- * @param {StacksTransaction} transaction - the transaction to estimate fees for
- * @param {number} estimatedLen - is an optional argument that provides the endpoint with an
- * estimation of the final length (in bytes) of the transaction, including any post-conditions
- * and signatures
- * @param {StacksNetworkName | StacksNetwork} network - the Stacks network to estimate transaction fees for
- *
- * @return a promise that resolves to FeeEstimate
- */
-export async function estimateTransaction(
-  transactionPayload: Payload,
-  estimatedLen?: number,
-  network?: StacksNetworkName | StacksNetwork
-): Promise<[FeeEstimation, FeeEstimation, FeeEstimation]> {
-  const options = {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      transaction_payload: bytesToHex(serializePayload(transactionPayload)),
-      ...(estimatedLen ? { estimated_len: estimatedLen } : {}),
-    }),
-  };
-
-  const derivedNetwork = StacksNetwork.fromNameOrNetwork(network ?? new StacksMainnet());
-  const url = derivedNetwork.getTransactionFeeEstimateApiUrl();
-
-  const response = await derivedNetwork.fetchFn(url, options);
-
-  if (!response.ok) {
-    const body = await response.json().catch(() => ({}));
-
-    if (body?.reason === 'NoEstimateAvailable') {
-      throw new NoEstimateAvailableError(body?.reason_data?.message ?? '');
-    }
-
-    throw new Error(
-      `Error estimating transaction fee. Response ${response.status}: ${response.statusText}. Attempted to fetch ${url} and failed with the message: "${body}"`
-    );
-  }
-
-  const data: FeeEstimateResponse = await response.json();
-  return data.estimations;
-}
-
-export type SerializationRejection = {
-  error: string;
-  reason: TxRejectedReason.Serialization;
-  reason_data: {
-    message: string;
-  };
-  txid: string;
-};
-
-export type DeserializationRejection = {
-  error: string;
-  reason: TxRejectedReason.Deserialization;
-  reason_data: {
-    message: string;
-  };
-  txid: string;
-};
-
-export type SignatureValidationRejection = {
-  error: string;
-  reason: TxRejectedReason.SignatureValidation;
-  reason_data: {
-    message: string;
-  };
-  txid: string;
-};
-
-export type BadNonceRejection = {
-  error: string;
-  reason: TxRejectedReason.BadNonce;
-  reason_data: {
-    expected: number;
-    actual: number;
-    is_origin: boolean;
-    principal: boolean;
-  };
-  txid: string;
-};
-
-export type FeeTooLowRejection = {
-  error: string;
-  reason: TxRejectedReason.FeeTooLow;
-  reason_data: {
-    expected: number;
-    actual: number;
-  };
-  txid: string;
-};
-
-export type NotEnoughFundsRejection = {
-  error: string;
-  reason: TxRejectedReason.NotEnoughFunds;
-  reason_data: {
-    expected: string;
-    actual: string;
-  };
-  txid: string;
-};
-
-export type NoSuchContractRejection = {
-  error: string;
-  reason: TxRejectedReason.NoSuchContract;
-  reason_data?: undefined;
-  txid: string;
-};
-
-export type NoSuchPublicFunctionRejection = {
-  error: string;
-  reason: TxRejectedReason.NoSuchPublicFunction;
-  reason_data?: undefined;
-  txid: string;
-};
-
-export type BadFunctionArgumentRejection = {
-  error: string;
-  reason: TxRejectedReason.BadFunctionArgument;
-  reason_data: {
-    message: string;
-  };
-  txid: string;
-};
-
-export type ContractAlreadyExistsRejection = {
-  error: string;
-  reason: TxRejectedReason.ContractAlreadyExists;
-  reason_data: {
-    contract_identifier: string;
-  };
-  txid: string;
-};
-
-export type PoisonMicroblocksDoNotConflictRejection = {
-  error: string;
-  reason: TxRejectedReason.PoisonMicroblocksDoNotConflict;
-  reason_data?: undefined;
-  txid: string;
-};
-
-export type PoisonMicroblockHasUnknownPubKeyHashRejection = {
-  error: string;
-  reason: TxRejectedReason.PoisonMicroblockHasUnknownPubKeyHash;
-  reason_data?: undefined;
-  txid: string;
-};
-
-export type PoisonMicroblockIsInvalidRejection = {
-  error: string;
-  reason: TxRejectedReason.PoisonMicroblockIsInvalid;
-  reason_data?: undefined;
-  txid: string;
-};
-
-export type BadAddressVersionByteRejection = {
-  error: string;
-  reason: TxRejectedReason.BadAddressVersionByte;
-  reason_data?: undefined;
-  txid: string;
-};
-
-export type NoCoinbaseViaMempoolRejection = {
-  error: string;
-  reason: TxRejectedReason.NoCoinbaseViaMempool;
-  reason_data?: undefined;
-  txid: string;
-};
-
-export type ServerFailureNoSuchChainTipRejection = {
-  error: string;
-  reason: TxRejectedReason.ServerFailureNoSuchChainTip;
-  reason_data?: undefined;
-  txid: string;
-};
-
-export type ServerFailureDatabaseRejection = {
-  error: string;
-  reason: TxRejectedReason.ServerFailureDatabase;
-  reason_data: {
-    message: string;
-  };
-  txid: string;
-};
-
-export type ServerFailureOtherRejection = {
-  error: string;
-  reason: TxRejectedReason.ServerFailureOther;
-  reason_data: {
-    message: string;
-  };
-  txid: string;
-};
-
-export type TxBroadcastResultOk = {
-  txid: string;
-  error?: undefined;
-  reason?: undefined;
-  reason_data?: undefined;
-};
-
-export type TxBroadcastResultRejected =
-  | SerializationRejection
-  | DeserializationRejection
-  | SignatureValidationRejection
-  | BadNonceRejection
-  | FeeTooLowRejection
-  | NotEnoughFundsRejection
-  | NoSuchContractRejection
-  | NoSuchPublicFunctionRejection
-  | BadFunctionArgumentRejection
-  | ContractAlreadyExistsRejection
-  | PoisonMicroblocksDoNotConflictRejection
-  | PoisonMicroblockHasUnknownPubKeyHashRejection
-  | PoisonMicroblockIsInvalidRejection
-  | BadAddressVersionByteRejection
-  | NoCoinbaseViaMempoolRejection
-  | ServerFailureNoSuchChainTipRejection
-  | ServerFailureDatabaseRejection
-  | ServerFailureOtherRejection;
-
-export type TxBroadcastResult = TxBroadcastResultOk | TxBroadcastResultRejected;
-
-/**
- * Broadcast the signed transaction to a core node
- *
- * @param {StacksTransaction} transaction - the token transfer transaction to broadcast
- * @param {StacksNetworkName | StacksNetwork} network - the Stacks network to broadcast transaction to
- *
- * @returns {Promise} that resolves to a response if the operation succeeds
- */
-export async function broadcastTransaction(
-  transaction: StacksTransaction,
-  network?: StacksNetworkName | StacksNetwork,
-  attachment?: Uint8Array
-): Promise<TxBroadcastResult> {
-  const rawTx = transaction.serialize();
-  const derivedNetwork = StacksNetwork.fromNameOrNetwork(network ?? deriveNetwork(transaction));
-  const url = derivedNetwork.getBroadcastApiUrl();
-
-  return broadcastRawTransaction(rawTx, url, attachment, derivedNetwork.fetchFn);
-}
-
-/**
- * Broadcast the signed transaction to a core node
- *
- * @param {Uint8Array} rawTx - the raw serialized transaction bytes to broadcast
- * @param {string} url - the broadcast endpoint URL
- *
- * @returns {Promise} that resolves to a response if the operation succeeds
- */
-export async function broadcastRawTransaction(
-  rawTx: Uint8Array,
-  url: string,
-  attachment?: Uint8Array,
-  fetchFn: FetchFn = createFetchFn()
-): Promise<TxBroadcastResult> {
-  const options = {
-    method: 'POST',
-    headers: { 'Content-Type': attachment ? 'application/json' : 'application/octet-stream' },
-    body: attachment
-      ? JSON.stringify({
-          tx: bytesToHex(rawTx),
-          attachment: bytesToHex(attachment),
-        })
-      : rawTx,
-  };
-
-  const response = await fetchFn(url, options);
-  if (!response.ok) {
-    try {
-      return (await response.json()) as TxBroadcastResult;
-    } catch (e) {
-      throw Error(`Failed to broadcast transaction: ${(e as Error).message}`);
-    }
-  }
-
-  const text = await response.text();
-  // Replace extra quotes around txid string
-  const txid = text.replace(/["]+/g, '');
-  if (!validateTxId(txid)) throw new Error(text);
-  return { txid } as TxBroadcastResult;
-}
-
-/**
- * Fetch a contract's ABI
- *
- * @param {string} address - the contracts address
- * @param {string} contractName - the contracts name
- * @param {StacksNetworkName | StacksNetwork} network - the Stacks network to broadcast transaction to
- *
- * @returns {Promise} that resolves to a ClarityAbi if the operation succeeds
- */
-export async function getAbi(
-  address: string,
-  contractName: string,
-  network: StacksNetworkName | StacksNetwork
-): Promise<ClarityAbi> {
-  const options = {
-    method: 'GET',
-  };
-
-  const derivedNetwork = StacksNetwork.fromNameOrNetwork(network);
-  const url = derivedNetwork.getAbiApiUrl(address, contractName);
-
-  const response = await derivedNetwork.fetchFn(url, options);
-  if (!response.ok) {
-    const msg = await response.text().catch(() => '');
-    throw new Error(
-      `Error fetching contract ABI for contract "${contractName}" at address ${address}. Response ${response.status}: ${response.statusText}. Attempted to fetch ${url} and failed with the message: "${msg}"`
-    );
-  }
-
-  return JSON.parse(await response.text()) as ClarityAbi;
-}
-
-function deriveNetwork(transaction: StacksTransaction) {
-  switch (transaction.version) {
-    case TransactionVersion.Mainnet:
-      return new StacksMainnet();
-    case TransactionVersion.Testnet:
-      return new StacksTestnet();
-  }
-}
-
+/** @deprecated Not used internally */
 export interface MultiSigOptions {
   numSignatures: number;
   publicKeys: string[];
   signerKeys?: string[];
 }
 
+export interface UnsignedMultiSigOptions {
+  /** The minimum required signatures N (in a N of M multi-sig) */
+  numSignatures: number;
+  /** The M public-keys (in a N of M multi-sig), which together form the address of the multi-sig account */
+  publicKeys: PublicKey[];
+  /**
+   * The `address` of the multi-sig account.
+   * - If NOT provided, the public-key order is taken AS IS.
+   * - If provided, the address will be checked against the order of the public-keys (either AS IS or SORTED).
+   * The default is to SORT the public-keys (only if the `address` is provided).
+   */
+  address?: string;
+  /** @experimental Use newer non-sequential multi-sig hashmode for transaction. Future releases may make this the default. */
+  useNonSequentialMultiSig?: boolean;
+}
+
+export type SignedMultiSigOptions = UnsignedMultiSigOptions & {
+  signerKeys: PrivateKey[];
+};
+
 /**
  * STX token transfer transaction options
+ *
+ * Note: Standard STX transfer does not allow post-conditions.
  */
-export interface TokenTransferOptions {
+export type TokenTransferOptions = {
   /** the address of the recipient of the token transfer */
   recipient: string | PrincipalCV;
   /** the amount to be transfered in microstacks */
@@ -524,35 +88,23 @@ export interface TokenTransferOptions {
   fee?: IntegerType;
   /** the transaction nonce, which must be increased monotonically with each new transaction */
   nonce?: IntegerType;
-  /** the network that the transaction will ultimately be broadcast to */
-  network?: StacksNetworkName | StacksNetwork;
-  /** the transaction anchorMode, which specifies whether it should be
-   * included in an anchor block or a microblock */
-  anchorMode: AnchorModeName | AnchorMode;
   /** an arbitrary string to include in the transaction, must be less than 34 bytes */
   memo?: string;
   /** set to true if another account is sponsoring the transaction (covering the transaction fee) */
   sponsored?: boolean;
-}
+} & NetworkClientParam;
 
 export interface UnsignedTokenTransferOptions extends TokenTransferOptions {
-  publicKey: string;
+  publicKey: PublicKey;
 }
 
 export interface SignedTokenTransferOptions extends TokenTransferOptions {
-  senderKey: string;
+  senderKey: PrivateKey;
 }
 
-export interface UnsignedMultiSigTokenTransferOptions extends TokenTransferOptions {
-  numSignatures: number;
-  publicKeys: string[];
-}
+export type UnsignedMultiSigTokenTransferOptions = TokenTransferOptions & UnsignedMultiSigOptions;
 
-export interface SignedMultiSigTokenTransferOptions extends TokenTransferOptions {
-  numSignatures: number;
-  publicKeys: string[];
-  signerKeys: string[];
-}
+export type SignedMultiSigTokenTransferOptions = TokenTransferOptions & SignedMultiSigOptions;
 
 /**
  * Generates an unsigned Stacks token transfer transaction
@@ -561,75 +113,80 @@ export interface SignedMultiSigTokenTransferOptions extends TokenTransferOptions
  *
  * @param {UnsignedTokenTransferOptions | UnsignedMultiSigTokenTransferOptions} txOptions - an options object for the token transfer
  *
- * @return {Promise<StacksTransaction>}
+ * @return {Promise<StacksTransactionWire>}
  */
 export async function makeUnsignedSTXTokenTransfer(
   txOptions: UnsignedTokenTransferOptions | UnsignedMultiSigTokenTransferOptions
-): Promise<StacksTransaction> {
+): Promise<StacksTransactionWire> {
   const defaultOptions = {
     fee: BigInt(0),
     nonce: BigInt(0),
-    network: new StacksMainnet(),
+    network: STACKS_MAINNET,
     memo: '',
     sponsored: false,
   };
 
   const options = Object.assign(defaultOptions, txOptions);
+  options.network = networkFrom(options.network);
+  options.client = Object.assign({}, clientFromNetwork(options.network), txOptions.client);
 
   const payload = createTokenTransferPayload(options.recipient, options.amount, options.memo);
 
-  let authorization: Authorization | null = null;
   let spendingCondition: SpendingCondition | null = null;
 
   if ('publicKey' in options) {
     // single-sig
     spendingCondition = createSingleSigSpendingCondition(
-      AddressHashMode.SerializeP2PKH,
+      AddressHashMode.P2PKH,
       options.publicKey,
       options.nonce,
       options.fee
     );
   } else {
     // multi-sig
+    const hashMode = options.useNonSequentialMultiSig
+      ? AddressHashMode.P2SHNonSequential
+      : AddressHashMode.P2SH;
+
+    const publicKeys = options.address
+      ? sortPublicKeysForAddress(
+          options.publicKeys.map(publicKeyToHex),
+          options.numSignatures,
+          hashMode,
+          createAddress(options.address).hash160
+        )
+      : options.publicKeys.map(publicKeyToHex);
+
     spendingCondition = createMultiSigSpendingCondition(
-      AddressHashMode.SerializeP2SH,
+      hashMode,
       options.numSignatures,
-      options.publicKeys,
+      publicKeys,
       options.nonce,
       options.fee
     );
   }
 
-  if (options.sponsored) {
-    authorization = createSponsoredAuth(spendingCondition);
-  } else {
-    authorization = createStandardAuth(spendingCondition);
-  }
+  const authorization = options.sponsored
+    ? createSponsoredAuth(spendingCondition)
+    : createStandardAuth(spendingCondition);
 
-  const network = StacksNetwork.fromNameOrNetwork(options.network);
-
-  const transaction = new StacksTransaction(
-    network.version,
-    authorization,
+  const transaction = new StacksTransactionWire({
+    transactionVersion: options.network.transactionVersion,
+    chainId: options.network.chainId,
+    auth: authorization,
     payload,
-    undefined, // no post conditions on STX transfers (see SIP-005)
-    undefined, // no post conditions on STX transfers (see SIP-005)
-    options.anchorMode,
-    network.chainId
-  );
+    // no post conditions on STX transfers (see SIP-005)
+  });
 
-  if (txOptions.fee === undefined || txOptions.fee === null) {
-    const fee = await estimateTransactionFeeWithFallback(transaction, network);
+  if (txOptions.fee == null) {
+    const fee = await fetchFeeEstimate({ transaction, ...options });
     transaction.setFee(fee);
   }
 
-  if (txOptions.nonce === undefined || txOptions.nonce === null) {
-    const addressVersion =
-      options.network.version === TransactionVersion.Mainnet
-        ? AddressVersion.MainnetSingleSig
-        : AddressVersion.TestnetSingleSig;
-    const senderAddress = c32address(addressVersion, transaction.auth.spendingCondition!.signer);
-    const txNonce = await getNonce(senderAddress, options.network);
+  if (txOptions.nonce == null) {
+    const addressVersion = options.network.addressVersion.singleSig;
+    const address = c32address(addressVersion, transaction.auth.spendingCondition!.signer);
+    const txNonce = await fetchNonce({ address, ...options });
     transaction.setNonce(txNonce);
   }
 
@@ -643,38 +200,33 @@ export async function makeUnsignedSTXTokenTransfer(
  *
  * @param {SignedTokenTransferOptions | SignedMultiSigTokenTransferOptions} txOptions - an options object for the token transfer
  *
- * @return {StacksTransaction}
+ * @return {StacksTransactionWire}
  */
 export async function makeSTXTokenTransfer(
   txOptions: SignedTokenTransferOptions | SignedMultiSigTokenTransferOptions
-): Promise<StacksTransaction> {
+): Promise<StacksTransactionWire> {
   if ('senderKey' in txOptions) {
-    // txOptions is SignedTokenTransferOptions
-    const publicKey = publicKeyToString(getPublicKey(createStacksPrivateKey(txOptions.senderKey)));
+    // single-sig
+    const publicKey = privateKeyToPublic(txOptions.senderKey);
     const options = omit(txOptions, 'senderKey');
     const transaction = await makeUnsignedSTXTokenTransfer({ publicKey, ...options });
 
-    const privKey = createStacksPrivateKey(txOptions.senderKey);
+    const privKey = txOptions.senderKey;
     const signer = new TransactionSigner(transaction);
     signer.signOrigin(privKey);
 
     return transaction;
   } else {
-    // txOptions is SignedMultiSigTokenTransferOptions
+    // multi-sig
     const options = omit(txOptions, 'signerKeys');
     const transaction = await makeUnsignedSTXTokenTransfer(options);
 
-    const signer = new TransactionSigner(transaction);
-    let pubKeys = txOptions.publicKeys;
-    for (const key of txOptions.signerKeys) {
-      const pubKey = pubKeyfromPrivKey(key);
-      pubKeys = pubKeys.filter(pk => pk !== bytesToHex(pubKey.data));
-      signer.signOrigin(createStacksPrivateKey(key));
-    }
-
-    for (const key of pubKeys) {
-      signer.appendOrigin(publicKeyFromBytes(hexToBytes(key)));
-    }
+    mutatingSignAppendMultiSig(
+      transaction,
+      txOptions.publicKeys.map(publicKeyToHex).slice(),
+      txOptions.signerKeys.map(privateKeyToHex),
+      txOptions.address
+    );
 
     return transaction;
   }
@@ -683,7 +235,7 @@ export async function makeSTXTokenTransfer(
 /**
  * Contract deploy transaction options
  */
-export interface BaseContractDeployOptions {
+export type BaseContractDeployOptions = {
   clarityVersion?: ClarityVersion;
   contractName: string;
   /** the Clarity code to be deployed */
@@ -692,94 +244,31 @@ export interface BaseContractDeployOptions {
   fee?: IntegerType;
   /** the transaction nonce, which must be increased monotonically with each new transaction */
   nonce?: IntegerType;
-  /** the network that the transaction will ultimately be broadcast to */
-  network?: StacksNetworkName | StacksNetwork;
-  /** the transaction anchorMode, which specifies whether it should be
-   * included in an anchor block or a microblock */
-  anchorMode: AnchorModeName | AnchorMode;
   /** the post condition mode, specifying whether or not post-conditions must fully cover all
    * transfered assets */
-  postConditionMode?: PostConditionMode;
+  postConditionMode?: PostConditionModeName | PostConditionMode;
   /** a list of post conditions to add to the transaction */
-  postConditions?: PostCondition[];
+  postConditions?: PostCondition[] | PostConditionWire[];
   /** set to true if another account is sponsoring the transaction (covering the transaction fee) */
   sponsored?: boolean;
-}
+} & NetworkClientParam;
 
 export interface UnsignedContractDeployOptions extends BaseContractDeployOptions {
   /** a hex string of the public key of the transaction sender */
-  publicKey: string;
+  publicKey: PublicKey;
 }
 
 export interface SignedContractDeployOptions extends BaseContractDeployOptions {
-  senderKey: string;
+  senderKey: PrivateKey;
 }
 
 /** @deprecated Use {@link SignedContractDeployOptions} or {@link UnsignedContractDeployOptions} instead. */
 export interface ContractDeployOptions extends SignedContractDeployOptions {}
 
-export interface UnsignedMultiSigContractDeployOptions extends BaseContractDeployOptions {
-  numSignatures: number;
-  publicKeys: string[];
-}
+export type UnsignedMultiSigContractDeployOptions = BaseContractDeployOptions &
+  UnsignedMultiSigOptions;
 
-export interface SignedMultiSigContractDeployOptions extends BaseContractDeployOptions {
-  numSignatures: number;
-  publicKeys: string[];
-  signerKeys: string[];
-}
-
-/**
- * @deprecated Use the new {@link estimateTransaction} function insterad.
- *
- * Estimate the total transaction fee in microstacks for a contract deploy
- *
- * @param {StacksTransaction} transaction - the token transfer transaction to estimate fees for
- * @param {StacksNetworkName | StacksNetwork} network - the Stacks network to estimate transaction for
- *
- * @return a promise that resolves to number of microstacks per byte
- */
-export async function estimateContractDeploy(
-  transaction: StacksTransaction,
-  network?: StacksNetworkName | StacksNetwork
-): Promise<bigint> {
-  if (
-    transaction.payload.payloadType !== PayloadType.SmartContract &&
-    transaction.payload.payloadType !== PayloadType.VersionedSmartContract
-  ) {
-    throw new Error(
-      `Contract deploy fee estimation only possible with ${
-        PayloadType[PayloadType.SmartContract]
-      } transactions. Invoked with: ${PayloadType[transaction.payload.payloadType]}`
-    );
-  }
-
-  const requestHeaders = {
-    Accept: 'application/text',
-  };
-
-  const fetchOptions = {
-    method: 'GET',
-    headers: requestHeaders,
-  };
-
-  // Place holder estimate until contract deploy fee estimation is fully implemented on Stacks
-  // blockchain core
-  const derivedNetwork = StacksNetwork.fromNameOrNetwork(network ?? deriveNetwork(transaction));
-  const url = derivedNetwork.getTransferFeeEstimateApiUrl();
-
-  const response = await derivedNetwork.fetchFn(url, fetchOptions);
-  if (!response.ok) {
-    const msg = await response.text().catch(() => '');
-    throw new Error(
-      `Error estimating contract deploy fee. Response ${response.status}: ${response.statusText}. Attempted to fetch ${url} and failed with the message: "${msg}"`
-    );
-  }
-  const feeRateResult = await response.text();
-  const txBytes = intToBigInt(transaction.serialize().byteLength, false);
-  const feeRate = intToBigInt(feeRateResult, false);
-  return feeRate * txBytes;
-}
+export type SignedMultiSigContractDeployOptions = BaseContractDeployOptions & SignedMultiSigOptions;
 
 /**
  * Generates a Clarity smart contract deploy transaction
@@ -788,38 +277,33 @@ export async function estimateContractDeploy(
  *
  * Returns a signed Stacks smart contract deploy transaction.
  *
- * @return {StacksTransaction}
+ * @return {StacksTransactionWire}
  */
 export async function makeContractDeploy(
   txOptions: SignedContractDeployOptions | SignedMultiSigContractDeployOptions
-): Promise<StacksTransaction> {
+): Promise<StacksTransactionWire> {
   if ('senderKey' in txOptions) {
-    // txOptions is SignedContractDeployOptions
-    const publicKey = publicKeyToString(getPublicKey(createStacksPrivateKey(txOptions.senderKey)));
+    // single-sig
+    const publicKey = privateKeyToPublic(txOptions.senderKey);
     const options = omit(txOptions, 'senderKey');
     const transaction = await makeUnsignedContractDeploy({ publicKey, ...options });
 
-    const privKey = createStacksPrivateKey(txOptions.senderKey);
+    const privKey = txOptions.senderKey;
     const signer = new TransactionSigner(transaction);
     signer.signOrigin(privKey);
 
     return transaction;
   } else {
-    // txOptions is SignedMultiSigContractDeployOptions
+    // multi-sig
     const options = omit(txOptions, 'signerKeys');
     const transaction = await makeUnsignedContractDeploy(options);
 
-    const signer = new TransactionSigner(transaction);
-    let pubKeys = txOptions.publicKeys;
-    for (const key of txOptions.signerKeys) {
-      const pubKey = pubKeyfromPrivKey(key);
-      pubKeys = pubKeys.filter(pk => pk !== bytesToHex(pubKey.data));
-      signer.signOrigin(createStacksPrivateKey(key));
-    }
-
-    for (const key of pubKeys) {
-      signer.appendOrigin(publicKeyFromBytes(hexToBytes(key)));
-    }
+    mutatingSignAppendMultiSig(
+      transaction,
+      txOptions.publicKeys.map(publicKeyToHex).slice(),
+      txOptions.signerKeys.map(privateKeyToHex),
+      txOptions.address
+    );
 
     return transaction;
   }
@@ -827,17 +311,20 @@ export async function makeContractDeploy(
 
 export async function makeUnsignedContractDeploy(
   txOptions: UnsignedContractDeployOptions | UnsignedMultiSigContractDeployOptions
-): Promise<StacksTransaction> {
+): Promise<StacksTransactionWire> {
   const defaultOptions = {
     fee: BigInt(0),
     nonce: BigInt(0),
-    network: new StacksMainnet(),
+    network: STACKS_MAINNET,
     postConditionMode: PostConditionMode.Deny,
     sponsored: false,
-    clarityVersion: ClarityVersion.Clarity2,
+    clarityVersion: ClarityVersion.Clarity3,
   };
 
   const options = Object.assign(defaultOptions, txOptions);
+  options.network = networkFrom(options.network);
+  options.client = Object.assign({}, clientFromNetwork(options.network), txOptions.client);
+  options.postConditionMode = postConditionModeFrom(options.postConditionMode);
 
   const payload = createSmartContractPayload(
     options.contractName,
@@ -845,67 +332,68 @@ export async function makeUnsignedContractDeploy(
     options.clarityVersion
   );
 
-  let authorization: Authorization | null = null;
-
   let spendingCondition: SpendingCondition | null = null;
 
   if ('publicKey' in options) {
     // single-sig
     spendingCondition = createSingleSigSpendingCondition(
-      AddressHashMode.SerializeP2PKH,
+      AddressHashMode.P2PKH,
       options.publicKey,
       options.nonce,
       options.fee
     );
   } else {
     // multi-sig
+    const hashMode = options.useNonSequentialMultiSig
+      ? AddressHashMode.P2SHNonSequential
+      : AddressHashMode.P2SH;
+
+    const publicKeys = options.address
+      ? sortPublicKeysForAddress(
+          options.publicKeys.map(publicKeyToHex),
+          options.numSignatures,
+          hashMode,
+          createAddress(options.address).hash160
+        )
+      : options.publicKeys.map(publicKeyToHex);
+
     spendingCondition = createMultiSigSpendingCondition(
-      AddressHashMode.SerializeP2SH,
+      hashMode,
       options.numSignatures,
-      options.publicKeys,
+      publicKeys,
       options.nonce,
       options.fee
     );
   }
 
-  if (options.sponsored) {
-    authorization = createSponsoredAuth(spendingCondition);
-  } else {
-    authorization = createStandardAuth(spendingCondition);
-  }
+  const authorization = options.sponsored
+    ? createSponsoredAuth(spendingCondition)
+    : createStandardAuth(spendingCondition);
 
-  const network = StacksNetwork.fromNameOrNetwork(options.network);
-
-  const postConditions: PostCondition[] = [];
-  if (options.postConditions && options.postConditions.length > 0) {
-    options.postConditions.forEach(postCondition => {
-      postConditions.push(postCondition);
-    });
-  }
+  const postConditions: PostConditionWire[] = (options.postConditions ?? []).map(pc => {
+    if (typeof pc.type === 'string') return postConditionToWire(pc);
+    return pc;
+  });
   const lpPostConditions = createLPList(postConditions);
 
-  const transaction = new StacksTransaction(
-    network.version,
-    authorization,
+  const transaction = new StacksTransactionWire({
+    transactionVersion: options.network.transactionVersion,
+    chainId: options.network.chainId,
+    auth: authorization,
     payload,
-    lpPostConditions,
-    options.postConditionMode,
-    options.anchorMode,
-    network.chainId
-  );
+    postConditions: lpPostConditions,
+    postConditionMode: options.postConditionMode,
+  });
 
   if (txOptions.fee === undefined || txOptions.fee === null) {
-    const fee = await estimateTransactionFeeWithFallback(transaction, network);
+    const fee = await fetchFeeEstimate({ transaction, ...options });
     transaction.setFee(fee);
   }
 
   if (txOptions.nonce === undefined || txOptions.nonce === null) {
-    const addressVersion =
-      options.network.version === TransactionVersion.Mainnet
-        ? AddressVersion.MainnetSingleSig
-        : AddressVersion.TestnetSingleSig;
-    const senderAddress = c32address(addressVersion, transaction.auth.spendingCondition!.signer);
-    const txNonce = await getNonce(senderAddress, options.network);
+    const addressVersion = options.network.addressVersion.singleSig;
+    const address = c32address(addressVersion, transaction.auth.spendingCondition!.signer);
+    const txNonce = await fetchNonce({ address, ...options });
     transaction.setNonce(txNonce);
   }
 
@@ -915,7 +403,7 @@ export async function makeUnsignedContractDeploy(
 /**
  * Contract function call transaction options
  */
-export interface ContractCallOptions {
+export type ContractCallOptions = {
   /** the Stacks address of the contract */
   contractAddress: string;
   contractName: string;
@@ -923,17 +411,11 @@ export interface ContractCallOptions {
   functionArgs: ClarityValue[];
   /** transaction fee in microstacks */
   fee?: IntegerType;
-  feeEstimateApiUrl?: string;
   /** the transaction nonce, which must be increased monotonically with each new transaction */
   nonce?: IntegerType;
-  /** the Stacks blockchain network that will ultimately be used to broadcast this transaction */
-  network?: StacksNetworkName | StacksNetwork;
-  /** the transaction anchorMode, which specifies whether it should be
-   * included in an anchor block or a microblock */
-  anchorMode: AnchorModeName | AnchorMode;
   /** the post condition mode, specifying whether or not post-conditions must fully cover all
    * transfered assets */
-  postConditionMode?: PostConditionMode;
+  postConditionMode?: PostConditionModeName | PostConditionMode;
   /** a list of post conditions to add to the transaction */
   postConditions?: PostCondition[];
   /** set to true to validate that the supplied function args match those specified in
@@ -941,95 +423,42 @@ export interface ContractCallOptions {
   validateWithAbi?: boolean | ClarityAbi;
   /** set to true if another account is sponsoring the transaction (covering the transaction fee) */
   sponsored?: boolean;
-}
+} & NetworkClientParam;
 
 export interface UnsignedContractCallOptions extends ContractCallOptions {
-  publicKey: string;
+  publicKey: PrivateKey;
 }
 
 export interface SignedContractCallOptions extends ContractCallOptions {
-  senderKey: string;
+  senderKey: PublicKey;
 }
 
-export interface UnsignedMultiSigContractCallOptions extends ContractCallOptions {
-  numSignatures: number;
-  publicKeys: string[];
-}
+export type UnsignedMultiSigContractCallOptions = ContractCallOptions & UnsignedMultiSigOptions;
 
-export interface SignedMultiSigContractCallOptions extends ContractCallOptions {
-  numSignatures: number;
-  publicKeys: string[];
-  signerKeys: string[];
-}
-
-/**
- * @deprecated Use the new {@link estimateTransaction} function insterad.
- *
- * Estimate the total transaction fee in microstacks for a contract function call
- *
- * @param {StacksTransaction} transaction - the token transfer transaction to estimate fees for
- * @param {StacksNetworkName | StacksNetwork} network - the Stacks network to estimate transaction for
- *
- * @return a promise that resolves to number of microstacks per byte
- */
-export async function estimateContractFunctionCall(
-  transaction: StacksTransaction,
-  network?: StacksNetworkName | StacksNetwork
-): Promise<bigint> {
-  if (transaction.payload.payloadType !== PayloadType.ContractCall) {
-    throw new Error(
-      `Contract call fee estimation only possible with ${
-        PayloadType[PayloadType.ContractCall]
-      } transactions. Invoked with: ${PayloadType[transaction.payload.payloadType]}`
-    );
-  }
-
-  const requestHeaders = {
-    Accept: 'application/text',
-  };
-
-  const fetchOptions = {
-    method: 'GET',
-    headers: requestHeaders,
-  };
-
-  // Place holder estimate until contract call fee estimation is fully implemented on Stacks
-  // blockchain core
-  const derivedNetwork = StacksNetwork.fromNameOrNetwork(network ?? deriveNetwork(transaction));
-  const url = derivedNetwork.getTransferFeeEstimateApiUrl();
-
-  const response = await derivedNetwork.fetchFn(url, fetchOptions);
-  if (!response.ok) {
-    const msg = await response.text().catch(() => '');
-    throw new Error(
-      `Error estimating contract call fee. Response ${response.status}: ${response.statusText}. Attempted to fetch ${url} and failed with the message: "${msg}"`
-    );
-  }
-  const feeRateResult = await response.text();
-  const txBytes = intToBigInt(transaction.serialize().byteLength, false);
-  const feeRate = intToBigInt(feeRateResult, false);
-  return feeRate * txBytes;
-}
+export type SignedMultiSigContractCallOptions = ContractCallOptions & SignedMultiSigOptions;
 
 /**
  * Generates an unsigned Clarity smart contract function call transaction
  *
  * @param {UnsignedContractCallOptions | UnsignedMultiSigContractCallOptions} txOptions - an options object for the contract call
  *
- * @returns {Promise<StacksTransaction>}
+ * @returns {Promise<StacksTransactionWire>}
  */
 export async function makeUnsignedContractCall(
   txOptions: UnsignedContractCallOptions | UnsignedMultiSigContractCallOptions
-): Promise<StacksTransaction> {
+): Promise<StacksTransactionWire> {
   const defaultOptions = {
     fee: BigInt(0),
     nonce: BigInt(0),
-    network: new StacksMainnet(),
+    network: STACKS_MAINNET,
     postConditionMode: PostConditionMode.Deny,
     sponsored: false,
   };
 
   const options = Object.assign(defaultOptions, txOptions);
+  options.network = networkFrom(options.network);
+  options.client = Object.assign({}, clientFromNetwork(options.network), options.client);
+  options.postConditionMode = postConditionModeFrom(options.postConditionMode);
 
   const payload = createContractCallPayload(
     options.contractAddress,
@@ -1042,7 +471,7 @@ export async function makeUnsignedContractCall(
     let abi: ClarityAbi;
     if (typeof options.validateWithAbi === 'boolean') {
       if (options?.network) {
-        abi = await getAbi(options.contractAddress, options.contractName, options.network);
+        abi = await fetchAbi({ ...options });
       } else {
         throw new Error('Network option must be provided in order to validate with ABI');
       }
@@ -1054,65 +483,67 @@ export async function makeUnsignedContractCall(
   }
 
   let spendingCondition: SpendingCondition | null = null;
-  let authorization: Authorization | null = null;
 
   if ('publicKey' in options) {
     // single-sig
     spendingCondition = createSingleSigSpendingCondition(
-      AddressHashMode.SerializeP2PKH,
+      AddressHashMode.P2PKH,
       options.publicKey,
       options.nonce,
       options.fee
     );
   } else {
     // multi-sig
+    const hashMode = options.useNonSequentialMultiSig
+      ? AddressHashMode.P2SHNonSequential
+      : AddressHashMode.P2SH;
+
+    const publicKeys = options.address
+      ? sortPublicKeysForAddress(
+          options.publicKeys.map(publicKeyToHex),
+          options.numSignatures,
+          hashMode,
+          createAddress(options.address).hash160
+        )
+      : options.publicKeys.map(publicKeyToHex);
+
     spendingCondition = createMultiSigSpendingCondition(
-      AddressHashMode.SerializeP2SH,
+      hashMode,
       options.numSignatures,
-      options.publicKeys,
+      publicKeys,
       options.nonce,
       options.fee
     );
   }
 
-  if (options.sponsored) {
-    authorization = createSponsoredAuth(spendingCondition);
-  } else {
-    authorization = createStandardAuth(spendingCondition);
-  }
+  const authorization = options.sponsored
+    ? createSponsoredAuth(spendingCondition)
+    : createStandardAuth(spendingCondition);
 
-  const network = StacksNetwork.fromNameOrNetwork(options.network);
-
-  const postConditions: PostCondition[] = [];
-  if (options.postConditions && options.postConditions.length > 0) {
-    options.postConditions.forEach(postCondition => {
-      postConditions.push(postCondition);
-    });
-  }
-
+  const postConditions: PostConditionWire[] = (options.postConditions ?? []).map(pc => {
+    if (typeof pc.type === 'string') return postConditionToWire(pc);
+    return pc;
+  });
   const lpPostConditions = createLPList(postConditions);
-  const transaction = new StacksTransaction(
-    network.version,
-    authorization,
+
+  const transaction = new StacksTransactionWire({
+    transactionVersion: options.network.transactionVersion,
+    chainId: options.network.chainId,
+    auth: authorization,
     payload,
-    lpPostConditions,
-    options.postConditionMode,
-    options.anchorMode,
-    network.chainId
-  );
+    postConditions: lpPostConditions,
+    postConditionMode: options.postConditionMode,
+  });
 
   if (txOptions.fee === undefined || txOptions.fee === null) {
-    const fee = await estimateTransactionFeeWithFallback(transaction, network);
+    const fee = await fetchFeeEstimate({ transaction, ...options });
     transaction.setFee(fee);
   }
 
   if (txOptions.nonce === undefined || txOptions.nonce === null) {
-    const addressVersion =
-      network.version === TransactionVersion.Mainnet
-        ? AddressVersion.MainnetSingleSig
-        : AddressVersion.TestnetSingleSig;
-    const senderAddress = c32address(addressVersion, transaction.auth.spendingCondition!.signer);
-    const txNonce = await getNonce(senderAddress, network);
+    const addressVersion = options.network.addressVersion.singleSig;
+    const address = c32address(addressVersion, transaction.auth.spendingCondition!.signer);
+    const txNonce = await fetchNonce({ address, ...options });
     transaction.setNonce(txNonce);
   }
 
@@ -1126,344 +557,53 @@ export async function makeUnsignedContractCall(
  *
  * Returns a signed Stacks smart contract function call transaction.
  *
- * @return {StacksTransaction}
+ * @return {StacksTransactionWire}
  */
 export async function makeContractCall(
   txOptions: SignedContractCallOptions | SignedMultiSigContractCallOptions
-): Promise<StacksTransaction> {
+): Promise<StacksTransactionWire> {
   if ('senderKey' in txOptions) {
-    const publicKey = publicKeyToString(getPublicKey(createStacksPrivateKey(txOptions.senderKey)));
+    // single-sig
+    const publicKey = privateKeyToPublic(txOptions.senderKey);
     const options = omit(txOptions, 'senderKey');
     const transaction = await makeUnsignedContractCall({ publicKey, ...options });
 
-    const privKey = createStacksPrivateKey(txOptions.senderKey);
+    const privKey = txOptions.senderKey;
     const signer = new TransactionSigner(transaction);
     signer.signOrigin(privKey);
 
     return transaction;
   } else {
+    // multi-sig
     const options = omit(txOptions, 'signerKeys');
     const transaction = await makeUnsignedContractCall(options);
 
-    const signer = new TransactionSigner(transaction);
-    let pubKeys = txOptions.publicKeys;
-    for (const key of txOptions.signerKeys) {
-      const pubKey = pubKeyfromPrivKey(key);
-      pubKeys = pubKeys.filter(pk => pk !== bytesToHex(pubKey.data));
-      signer.signOrigin(createStacksPrivateKey(key));
-    }
-
-    for (const key of pubKeys) {
-      signer.appendOrigin(publicKeyFromBytes(hexToBytes(key)));
-    }
+    mutatingSignAppendMultiSig(
+      transaction,
+      txOptions.publicKeys.map(publicKeyToHex).slice(),
+      txOptions.signerKeys.map(privateKeyToHex),
+      txOptions.address
+    );
 
     return transaction;
   }
 }
 
 /**
- * Generates a STX post condition with a standard principal
- *
- * Returns a STX post condition object
- *
- * @param address - the c32check address
- * @param conditionCode - the condition code
- * @param amount - the amount of STX tokens (denoted in micro-STX)
- */
-export function makeStandardSTXPostCondition(
-  address: string,
-  conditionCode: FungibleConditionCode,
-  amount: IntegerType
-): STXPostCondition {
-  return createSTXPostCondition(createStandardPrincipal(address), conditionCode, amount);
-}
-
-/**
- * Generates a STX post condition with a contract principal
- *
- * Returns a STX post condition object
- *
- * @param address - the c32check address of the contract
- * @param contractName - the name of the contract
- * @param conditionCode - the condition code
- * @param amount - the amount of STX tokens (denoted in micro-STX)
- *
- * @return {STXPostCondition}
- */
-export function makeContractSTXPostCondition(
-  address: string,
-  contractName: string,
-  conditionCode: FungibleConditionCode,
-  amount: IntegerType
-): STXPostCondition {
-  return createSTXPostCondition(
-    createContractPrincipal(address, contractName),
-    conditionCode,
-    amount
-  );
-}
-
-/**
- * Generates a fungible token post condition with a standard principal
- *
- * Returns a fungible token post condition object
- *
- * @param address - the c32check address
- * @param conditionCode - the condition code
- * @param amount - the amount of fungible tokens (in their respective base unit)
- * @param assetInfo - asset info describing the fungible token
- */
-export function makeStandardFungiblePostCondition(
-  address: string,
-  conditionCode: FungibleConditionCode,
-  amount: IntegerType,
-  assetInfo: string | AssetInfo
-): FungiblePostCondition {
-  return createFungiblePostCondition(
-    createStandardPrincipal(address),
-    conditionCode,
-    amount,
-    assetInfo
-  );
-}
-
-/**
- * Generates a fungible token post condition with a contract principal
- *
- * Returns a fungible token post condition object
- *
- * @param address - the c32check address
- * @param contractName - the name of the contract
- * @param conditionCode - the condition code
- * @param amount - the amount of fungible tokens (in their respective base unit)
- * @param assetInfo - asset info describing the fungible token
- */
-export function makeContractFungiblePostCondition(
-  address: string,
-  contractName: string,
-  conditionCode: FungibleConditionCode,
-  amount: IntegerType,
-  assetInfo: string | AssetInfo
-): FungiblePostCondition {
-  return createFungiblePostCondition(
-    createContractPrincipal(address, contractName),
-    conditionCode,
-    amount,
-    assetInfo
-  );
-}
-
-/**
- * Generates a non-fungible token post condition with a standard principal
- *
- * Returns a non-fungible token post condition object
- *
- * @param {String} address - the c32check address
- * @param {FungibleConditionCode} conditionCode - the condition code
- * @param {AssetInfo} assetInfo - asset info describing the non-fungible token
- * @param {ClarityValue} assetId - asset identifier of the nft instance (typically a uint/buffer/string)
- *
- * @return {NonFungiblePostCondition}
- */
-export function makeStandardNonFungiblePostCondition(
-  address: string,
-  conditionCode: NonFungibleConditionCode,
-  assetInfo: string | AssetInfo,
-  assetId: ClarityValue
-): NonFungiblePostCondition {
-  return createNonFungiblePostCondition(
-    createStandardPrincipal(address),
-    conditionCode,
-    assetInfo,
-    assetId
-  );
-}
-
-/**
- * Generates a non-fungible token post condition with a contract principal
- *
- * Returns a non-fungible token post condition object
- *
- * @param {String} address - the c32check address
- * @param {String} contractName - the name of the contract
- * @param {FungibleConditionCode} conditionCode - the condition code
- * @param {AssetInfo} assetInfo - asset info describing the non-fungible token
- * @param {ClarityValue} assetId - asset identifier of the nft instance (typically a uint/buffer/string)
- *
- * @return {NonFungiblePostCondition}
- */
-export function makeContractNonFungiblePostCondition(
-  address: string,
-  contractName: string,
-  conditionCode: NonFungibleConditionCode,
-  assetInfo: string | AssetInfo,
-  assetId: ClarityValue
-): NonFungiblePostCondition {
-  return createNonFungiblePostCondition(
-    createContractPrincipal(address, contractName),
-    conditionCode,
-    assetInfo,
-    assetId
-  );
-}
-
-/**
- * Read only function options
- *
- * @param {String} contractAddress - the c32check address of the contract
- * @param {String} contractName - the contract name
- * @param {String} functionName - name of the function to be called
- * @param {[ClarityValue]} functionArgs - an array of Clarity values as arguments to the function call
- * @param {StacksNetwork} network - the Stacks blockchain network this transaction is destined for
- * @param {String} senderAddress - the c32check address of the sender
- */
-
-export interface ReadOnlyFunctionOptions {
-  contractName: string;
-  contractAddress: string;
-  functionName: string;
-  functionArgs: ClarityValue[];
-  /** the network that the contract which contains the function is deployed to */
-  network?: StacksNetworkName | StacksNetwork;
-  /** address of the sender */
-  senderAddress: string;
-}
-
-/**
- * Calls a function as read-only from a contract interface
- * It is not necessary that the function is defined as read-only in the contract
- *
- * @param {ReadOnlyFunctionOptions} readOnlyFunctionOptions - the options object
- *
- * Returns an object with a status bool (okay) and a result string that is a serialized clarity value in hex format.
- *
- * @return {ClarityValue}
- */
-export async function callReadOnlyFunction(
-  readOnlyFunctionOptions: ReadOnlyFunctionOptions
-): Promise<ClarityValue> {
-  const defaultOptions = {
-    network: new StacksMainnet(),
-  };
-
-  const options = Object.assign(defaultOptions, readOnlyFunctionOptions);
-
-  const { contractName, contractAddress, functionName, functionArgs, senderAddress } = options;
-
-  const network = StacksNetwork.fromNameOrNetwork(options.network);
-  const url = network.getReadOnlyFunctionCallApiUrl(contractAddress, contractName, functionName);
-
-  const args = functionArgs.map(arg => cvToHex(arg));
-
-  const body = JSON.stringify({
-    sender: senderAddress,
-    arguments: args,
-  });
-
-  const response = await network.fetchFn(url, {
-    method: 'POST',
-    body,
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  });
-
-  if (!response.ok) {
-    const msg = await response.text().catch(() => '');
-    throw new Error(
-      `Error calling read-only function. Response ${response.status}: ${response.statusText}. Attempted to fetch ${url} and failed with the message: "${msg}"`
-    );
-  }
-
-  return response.json().then(responseJson => parseReadOnlyResponse(responseJson));
-}
-
-export interface GetContractMapEntryOptions {
-  /** the contracts address */
-  contractAddress: string;
-  /** the contracts name */
-  contractName: string;
-  /** the map name */
-  mapName: string;
-  /** key to lookup in the map */
-  mapKey: ClarityValue;
-  /** the network that has the contract */
-  network?: StacksNetworkName | StacksNetwork;
-}
-
-/**
- * Fetch data from a contract data map.
- * @param getContractMapEntryOptions - the options object
- * @returns
- * Promise that resolves to a ClarityValue if the operation succeeds.
- * Resolves to NoneCV if the map does not contain the given key, if the map does not exist, or if the contract prinicipal does not exist
- */
-export async function getContractMapEntry<T extends ClarityValue = ClarityValue>(
-  getContractMapEntryOptions: GetContractMapEntryOptions
-): Promise<T | NoneCV> {
-  const defaultOptions = {
-    network: new StacksMainnet(),
-  };
-  const { contractAddress, contractName, mapName, mapKey, network } = Object.assign(
-    defaultOptions,
-    getContractMapEntryOptions
-  );
-
-  const derivedNetwork = StacksNetwork.fromNameOrNetwork(network);
-  const url = derivedNetwork.getMapEntryUrl(contractAddress, contractName, mapName);
-
-  const serializedKeyBytes = serializeCV(mapKey);
-  const serializedKeyHex = '0x' + bytesToHex(serializedKeyBytes);
-
-  const fetchOptions: RequestInit = {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Accept: 'application/json',
-    },
-    body: JSON.stringify(serializedKeyHex), // endpoint expects a JSON string atom (quote wrapped string)
-  };
-
-  const response = await derivedNetwork.fetchFn(url, fetchOptions);
-  if (!response.ok) {
-    const msg = await response.text().catch(() => '');
-    throw new Error(
-      `Error fetching map entry for map "${mapName}" in contract "${contractName}" at address ${contractAddress}, using map key "${serializedKeyHex}". Response ${response.status}: ${response.statusText}. Attempted to fetch ${url} and failed with the message: "${msg}"`
-    );
-  }
-  const responseBody = await response.text();
-  const responseJson: { data?: string } = JSON.parse(responseBody);
-  if (!responseJson.data) {
-    throw new Error(
-      `Error fetching map entry for map "${mapName}" in contract "${contractName}" at address ${contractAddress}, using map key "${serializedKeyHex}". Response ${response.status}: ${response.statusText}. Attempted to fetch ${url} and failed with the response: "${responseBody}"`
-    );
-  }
-  let deserializedCv: T;
-  try {
-    deserializedCv = deserializeCV<T>(responseJson.data);
-  } catch (error) {
-    throw new Error(`Error deserializing Clarity value "${responseJson.data}": ${error}`);
-  }
-  return deserializedCv;
-}
-
-/**
  * Sponsored transaction options
  */
-export interface SponsorOptionsOpts {
+export type SponsorOptionsOpts = {
   /** the origin-signed transaction */
-  transaction: StacksTransaction;
+  transaction: StacksTransactionWire;
   /** the sponsor's private key */
-  sponsorPrivateKey: string;
+  sponsorPrivateKey: PrivateKey;
   /** the transaction fee amount to sponsor */
   fee?: IntegerType;
   /** the nonce of the sponsor account */
   sponsorNonce?: IntegerType;
   /** the hashmode of the sponsor's address */
   sponsorAddressHashmode?: AddressHashMode;
-  /** the Stacks blockchain network that this transaction will ultimately be broadcast to */
-  network?: StacksNetworkName | StacksNetwork;
-}
+} & NetworkClientParam;
 
 /**
  * Constructs and signs a sponsored transaction as the sponsor
@@ -1476,36 +616,28 @@ export interface SponsorOptionsOpts {
  */
 export async function sponsorTransaction(
   sponsorOptions: SponsorOptionsOpts
-): Promise<StacksTransaction> {
+): Promise<StacksTransactionWire> {
   const defaultOptions = {
     fee: 0 as IntegerType,
     sponsorNonce: 0 as IntegerType,
-    sponsorAddressHashmode: AddressHashMode.SerializeP2PKH as SingleSigHashMode,
-    network:
-      sponsorOptions.transaction.version === TransactionVersion.Mainnet
-        ? new StacksMainnet()
-        : new StacksTestnet(),
+    sponsorAddressHashmode: AddressHashMode.P2PKH as SingleSigHashMode,
+    network: deriveNetworkFromTx(sponsorOptions.transaction),
   };
 
   const options = Object.assign(defaultOptions, sponsorOptions);
+  options.network = networkFrom(options.network);
+  options.client = Object.assign({}, clientFromNetwork(options.network), options.client);
 
-  const network = StacksNetwork.fromNameOrNetwork(options.network);
-  const sponsorPubKey = pubKeyfromPrivKey(options.sponsorPrivateKey);
+  const sponsorPubKey = privateKeyToPublic(options.sponsorPrivateKey);
 
-  if (sponsorOptions.fee === undefined || sponsorOptions.fee === null) {
-    let txFee = 0;
+  if (sponsorOptions.fee == null) {
+    let txFee: bigint | number = 0;
     switch (options.transaction.payload.payloadType) {
       case PayloadType.TokenTransfer:
       case PayloadType.SmartContract:
       case PayloadType.VersionedSmartContract:
       case PayloadType.ContractCall:
-        const estimatedLen = estimateTransactionByteLength(options.transaction);
-        try {
-          txFee = (await estimateTransaction(options.transaction.payload, estimatedLen, network))[1]
-            .fee;
-        } catch (e) {
-          throw e;
-        }
+        txFee = BigInt(await fetchFeeEstimate({ ...options }));
         break;
       default:
         throw new Error(
@@ -1518,27 +650,23 @@ export async function sponsorTransaction(
     options.fee = txFee;
   }
 
-  if (sponsorOptions.sponsorNonce === undefined || sponsorOptions.sponsorNonce === null) {
-    const addressVersion =
-      network.version === TransactionVersion.Mainnet
-        ? AddressVersion.MainnetSingleSig
-        : AddressVersion.TestnetSingleSig;
-
-    const senderAddress = publicKeyToAddress(addressVersion, sponsorPubKey);
-    const sponsorNonce = await getNonce(senderAddress, network);
+  if (sponsorOptions.sponsorNonce == null) {
+    const addressVersion = options.network.addressVersion.singleSig;
+    const address = publicKeyToAddress(addressVersion, sponsorPubKey);
+    const sponsorNonce = await fetchNonce({ address, ...options });
     options.sponsorNonce = sponsorNonce;
   }
 
   const sponsorSpendingCondition = createSingleSigSpendingCondition(
     options.sponsorAddressHashmode,
-    publicKeyToString(sponsorPubKey),
+    sponsorPubKey,
     options.sponsorNonce,
     options.fee
   );
 
   options.transaction.setSponsor(sponsorSpendingCondition);
 
-  const privKey = createStacksPrivateKey(options.sponsorPrivateKey);
+  const privKey = options.sponsorPrivateKey;
   const signer = TransactionSigner.createSponsorSigner(
     options.transaction,
     sponsorSpendingCondition
@@ -1548,60 +676,69 @@ export async function sponsorTransaction(
   return signer.transaction;
 }
 
-/**
- * Estimates transaction byte length
- * Context:
- * 1) Multi-sig transaction byte length increases by adding signatures
- *    which causes the incorrect fee estimation because the fee value is set while creating unsigned transaction
- * 2) Single-sig transaction byte length remain same due to empty message signature which allocates the space for signature
- * @param {transaction} - StacksTransaction object to be estimated
- * @return {number} Estimated transaction byte length
- */
-export function estimateTransactionByteLength(transaction: StacksTransaction): number {
-  const hashMode = transaction.auth.spendingCondition.hashMode;
-  // List of Multi-sig transaction hash modes
-  const multiSigHashModes = [AddressHashMode.SerializeP2SH, AddressHashMode.SerializeP2WSH];
+/** @internal multi-sig signing re-use */
+function mutatingSignAppendMultiSig(
+  /** **Warning:** method mutates `transaction` */
+  transaction: StacksTransactionWire,
+  publicKeys: string[],
+  signerKeys: string[],
+  address?: string
+) {
+  if (isSingleSig(transaction.auth.spendingCondition)) {
+    throw new Error('Transaction is not a multi-sig transaction');
+  }
 
-  // Check if its a Multi-sig transaction
-  if (multiSigHashModes.includes(hashMode)) {
-    const multiSigSpendingCondition: MultiSigSpendingCondition = transaction.auth
-      .spendingCondition as MultiSigSpendingCondition;
+  const signer = new TransactionSigner(transaction);
 
-    // Find number of existing signatures if the transaction is signed or partially signed
-    const existingSignatures = multiSigSpendingCondition.fields.filter(
-      field => field.contents.type === StacksMessageType.MessageSignature
-    ).length; // existingSignatures will be 0 if its a unsigned transaction
+  const pubs = address
+    ? sortPublicKeysForAddress(
+        publicKeys,
+        transaction.auth.spendingCondition.signaturesRequired,
+        transaction.auth.spendingCondition.hashMode,
+        createAddress(address).hash160
+      )
+    : publicKeys;
 
-    // Estimate total signature bytes size required for this multi-sig transaction
-    // Formula: totalSignatureLength = (signaturesRequired - existingSignatures) * (SIG_LEN_BYTES + 1 byte of type of signature)
-    const totalSignatureLength =
-      (multiSigSpendingCondition.signaturesRequired - existingSignatures) *
-      (RECOVERABLE_ECDSA_SIG_LENGTH_BYTES + 1);
-
-    return transaction.serialize().byteLength + totalSignatureLength;
-  } else {
-    // Single-sig transaction
-    // Signature space already allocated by empty message signature
-    return transaction.serialize().byteLength;
+  // sign in order of public keys
+  for (const publicKey of pubs) {
+    const signerKey = signerKeys.find(key => privateKeyToPublic(key) === publicKey);
+    if (signerKey) {
+      // either sign and append message signature (which allows for recovering the public key)
+      signer.signOrigin(signerKey);
+    } else {
+      // or append the public key (which did not sign here)
+      signer.appendOrigin(publicKey);
+    }
   }
 }
 
-/**
- * Estimates the fee using {@link estimateTransfer} as a fallback if
- * {@link estimateTransaction} does not get an estimation due to the
- * {@link NoEstimateAvailableError} error.
- */
-export async function estimateTransactionFeeWithFallback(
-  transaction: StacksTransaction,
-  network: StacksNetwork
-): Promise<bigint | number> {
-  try {
-    const estimatedLen = estimateTransactionByteLength(transaction);
-    return (await estimateTransaction(transaction.payload, estimatedLen, network))[1].fee;
-  } catch (error) {
-    if (error instanceof NoEstimateAvailableError) {
-      return await estimateTransferUnsafe(transaction, network);
-    }
-    throw error;
-  }
+/** @internal Get the matching public-keys array for a multi-sig address */
+function sortPublicKeysForAddress(
+  publicKeys: string[],
+  numSigs: number,
+  hashMode: MultiSigHashMode,
+  hash: string
+): string[] {
+  // unsorted
+  const hashUnsorted = addressFromPublicKeys(
+    0 as any, // only used for hash, so version doesn't matter
+    hashMode,
+    numSigs,
+    publicKeys.map(createStacksPublicKey)
+  ).hash160;
+
+  if (hashUnsorted === hash) return publicKeys;
+
+  // sorted
+  const publicKeysSorted = publicKeys.slice().sort();
+  const hashSorted = addressFromPublicKeys(
+    0 as any, // only used for hash, so version doesn't matter
+    hashMode,
+    numSigs,
+    publicKeysSorted.map(createStacksPublicKey)
+  ).hash160;
+
+  if (hashSorted === hash) return publicKeysSorted;
+
+  throw new Error('Failed to find matching multi-sig address given public-keys.');
 }

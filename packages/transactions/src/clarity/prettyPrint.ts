@@ -6,8 +6,7 @@
   `Cl.tuple({ id: u1 })` => { id: u1 }
 */
 
-import { bytesToHex } from '@stacks/common';
-import { ClarityType, ClarityValue, ListCV, TupleCV, principalToString } from '.';
+import { ClarityType, ClarityValue, ListCV, TupleCV } from '.';
 
 function formatSpace(space: number, depth: number, end = false) {
   if (!space) return ' ';
@@ -29,42 +28,44 @@ function formatSpace(space: number, depth: number, end = false) {
  * ```
  */
 function formatList(cv: ListCV, space: number, depth = 1): string {
-  if (cv.list.length === 0) return '(list)';
+  if (cv.value.length === 0) return '(list)';
 
   const spaceBefore = formatSpace(space, depth, false);
   const endSpace = space ? formatSpace(space, depth, true) : '';
 
-  const items = cv.list.map(v => prettyPrintWithDepth(v, space, depth)).join(spaceBefore);
+  const items = cv.value.map(v => prettyPrintWithDepth(v, space, depth)).join(spaceBefore);
 
   return `(list${spaceBefore}${items}${endSpace})`;
 }
 
 /**
  * @description format Tuple clarity values in clarity style strings
+ * the keys are alphabetically sorted
  * with the ability to prettify the result with line break end space indentation
  * @example
  * ```ts
- * formatTuple(Cl.tuple({ id: Cl.uint(1) }))
- * // { id: u1 }
+ * formatTuple(Cl.tuple({ id: Cl.uint(1), age: Cl.uint(20) }))
+ * // { age: 20, id: u1 }
  *
- * formatTuple(Cl.tuple({ id: Cl.uint(1) }, 2))
+ * formatTuple(Cl.tuple({ id: Cl.uint(1), age: Cl.uint(20) }, 2))
  * // {
+ * //   age: 20,
  * //   id: u1
  * // }
  * ```
  */
 function formatTuple(cv: TupleCV, space: number, depth = 1): string {
-  if (Object.keys(cv.data).length === 0) return '{}';
+  if (Object.keys(cv.value).length === 0) return '{}';
 
   const items: string[] = [];
-  for (const [key, value] of Object.entries(cv.data)) {
+  for (const [key, value] of Object.entries(cv.value)) {
     items.push(`${key}: ${prettyPrintWithDepth(value, space, depth)}`);
   }
 
   const spaceBefore = formatSpace(space, depth, false);
   const endSpace = formatSpace(space, depth, true);
 
-  return `{${spaceBefore}${items.join(`,${spaceBefore}`)}${endSpace}}`;
+  return `{${spaceBefore}${items.sort().join(`,${spaceBefore}`)}${endSpace}}`;
 }
 
 function exhaustiveCheck(param: never): never {
@@ -79,13 +80,13 @@ function prettyPrintWithDepth(cv: ClarityValue, space = 0, depth: number): strin
   if (cv.type === ClarityType.Int) return cv.value.toString();
   if (cv.type === ClarityType.UInt) return `u${cv.value.toString()}`;
 
-  if (cv.type === ClarityType.StringASCII) return `"${cv.data}"`;
-  if (cv.type === ClarityType.StringUTF8) return `u"${cv.data}"`;
+  if (cv.type === ClarityType.StringASCII) return `"${cv.value}"`;
+  if (cv.type === ClarityType.StringUTF8) return `u"${cv.value}"`;
 
-  if (cv.type === ClarityType.PrincipalContract) return `'${principalToString(cv)}`;
-  if (cv.type === ClarityType.PrincipalStandard) return `'${principalToString(cv)}`;
+  if (cv.type === ClarityType.PrincipalContract) return `'${cv.value}`;
+  if (cv.type === ClarityType.PrincipalStandard) return `'${cv.value}`;
 
-  if (cv.type === ClarityType.Buffer) return `0x${bytesToHex(cv.buffer)}`;
+  if (cv.type === ClarityType.Buffer) return `0x${cv.value}`;
 
   if (cv.type === ClarityType.OptionalNone) return 'none';
   if (cv.type === ClarityType.OptionalSome)
@@ -108,21 +109,25 @@ function prettyPrintWithDepth(cv: ClarityValue, space = 0, depth: number): strin
 }
 
 /**
- * @description format clarity values in clarity style strings
- * with the ability to prettify the result with line break end space indentation
+ * Format clarity values in clarity style strings with the ability to prettify
+ * the result with line break end space indentation.
  * @param cv The Clarity Value to format
  * @param space The indentation size of the output string. There's no indentation and no line breaks if space = 0
  * @example
  * ```ts
- * prettyPrint(Cl.tuple({ id: Cl.some(Cl.uint(1)) }))
- * // { id: (some u1) }
+ * prettyPrint(Cl.tuple({ id: Cl.uint(1), age: Cl.some(Cl.uint(42)) }))
+ * // { age: (some u42), id: u1 }
  *
- * prettyPrint(Cl.tuple({ id: Cl.uint(1) }, 2))
+ * prettyPrint(Cl.tuple({ id: Cl.uint(1), age: Cl.some(Cl.uint(42)) }, 2))
  * // {
+ * //   age: (some u42),
  * //   id: u1
  * // }
  * ```
  */
-export function prettyPrint(cv: ClarityValue, space = 0): string {
+export function stringify(cv: ClarityValue, space = 0): string {
   return prettyPrintWithDepth(cv, space, 0);
 }
+
+/** @deprecated alias for {@link Cl.stringify} */
+export const prettyPrint = stringify;

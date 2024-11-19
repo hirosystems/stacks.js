@@ -1,6 +1,6 @@
 {
   "name": "@stacks/stacking",
-  "version": "6.9.0",
+  "version": "7.0.3",
   "description": "Library for Stacking.",
   "license": "MIT",
   "author": "Hiro Systems PBC (https://hiro.so)",
@@ -20,16 +20,18 @@
     "typecheck:watch": "npm run typecheck -- --watch"
   },
   "dependencies": {
+    "@noble/hashes": "1.1.5",
     "@scure/base": "1.1.1",
-    "@stacks/common": "^6.8.1",
-    "@stacks/encryption": "^6.9.0",
-    "@stacks/network": "^6.8.1",
+    "@stacks/common": "^7.0.2",
+    "@stacks/encryption": "^7.0.3",
+    "@stacks/network": "^7.0.2",
     "@stacks/stacks-blockchain-api-types": "^0.61.0",
-    "@stacks/transactions": "^6.9.0",
+    "@stacks/transactions": "^7.0.3",
     "bs58": "^5.0.0"
   },
   "devDependencies": {
     "@stacks/blockchain-api-client": "^7.3.0",
+    "@stacks/internal": "file:../internal",
     "jest-fetch-mock": "^3.0.3",
     "process": "^0.11.10",
     "rimraf": "^3.0.2",

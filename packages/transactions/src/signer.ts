@@ -1,19 +1,27 @@
-import { StacksTransaction } from './transaction';
-
-import { StacksPrivateKey, StacksPublicKey } from './keys';
-import { isSingleSig, nextVerification, SpendingConditionOpts } from './authorization';
-import { cloneDeep } from './utils';
-import { AuthType, PubKeyEncoding, StacksMessageType } from './constants';
+import { PrivateKey, PublicKey } from '@stacks/common';
+import {
+  SpendingConditionOpts,
+  isNonSequentialMultiSig,
+  isSequentialMultiSig,
+  isSingleSig,
+  nextVerification,
+} from './authorization';
+import { AddressHashMode, AuthType, PubKeyEncoding } from './constants';
 import { SigningError } from './errors';
+import { StacksTransactionWire } from './transaction';
+import { cloneDeep } from './utils';
+import { PublicKeyWire, StacksWireType } from './wire';
+import { createStacksPublicKey } from './keys';
 
+// todo: get rid of signer and combine with transaction class? could reduce code and complexity by calculating sighash newly each sign and append.
 export class TransactionSigner {
-  transaction: StacksTransaction;
+  transaction: StacksTransactionWire;
   sigHash: string;
   originDone: boolean;
   checkOversign: boolean;
   checkOverlap: boolean;
 
-  constructor(transaction: StacksTransaction) {
+  constructor(transaction: StacksTransactionWire) {
     this.transaction = transaction;
     this.sigHash = transaction.signBegin();
     this.originDone = false;
@@ -26,23 +34,26 @@ export class TransactionSigner {
     if (spendingCondition && !isSingleSig(spendingCondition)) {
       if (
         spendingCondition.fields.filter(
-          field => field.contents.type === StacksMessageType.MessageSignature
+          field => field.contents.type === StacksWireType.MessageSignature
         ).length >= spendingCondition.signaturesRequired
       ) {
         throw new Error('SpendingCondition has more signatures than are expected');
       }
 
       spendingCondition.fields.forEach(field => {
-        if (field.contents.type === StacksMessageType.MessageSignature) {
-          const signature = field.contents;
-          const nextVerify = nextVerification(
-            this.sigHash,
-            transaction.auth.authType,
-            spendingCondition.fee,
-            spendingCondition.nonce,
-            PubKeyEncoding.Compressed, // always compressed for multisig
-            signature
-          );
+        if (field.contents.type !== StacksWireType.MessageSignature) return;
+
+        const signature = field.contents;
+        const nextVerify = nextVerification(
+          this.sigHash,
+          transaction.auth.authType,
+          spendingCondition.fee,
+          spendingCondition.nonce,
+          PubKeyEncoding.Compressed, // always compressed for multisig
+          signature.data
+        );
+
+        if (!isNonSequentialMultiSig(spendingCondition.hashMode)) {
           this.sigHash = nextVerify.nextSigHash;
         }
       });
@@ -50,14 +61,14 @@ export class TransactionSigner {
   }
 
   static createSponsorSigner(
-    transaction: StacksTransaction,
+    transaction: StacksTransactionWire,
     spendingCondition: SpendingConditionOpts
   ) {
     if (transaction.auth.authType != AuthType.Sponsored) {
       throw new SigningError('Cannot add sponsor to non-sponsored transaction');
     }
 
-    const tx: StacksTransaction = cloneDeep(transaction);
+    const tx: StacksTransactionWire = cloneDeep(transaction);
     tx.setSponsor(spendingCondition);
     const originSigHash = tx.verifyOrigin();
     const signer = new this(tx);
@@ -68,7 +79,7 @@ export class TransactionSigner {
     return signer;
   }
 
-  signOrigin(privateKey: StacksPrivateKey) {
+  signOrigin(privateKey: PrivateKey) {
     if (this.checkOverlap && this.originDone) {
       throw new SigningError('Cannot sign origin after sponsor key');
     }
@@ -80,12 +91,16 @@ export class TransactionSigner {
       throw new SigningError('"transaction.auth.spendingCondition" is undefined');
     }
 
-    if (!isSingleSig(this.transaction.auth.spendingCondition)) {
-      const spendingCondition = this.transaction.auth.spendingCondition;
+    const spendingCondition = this.transaction.auth.spendingCondition;
+    if (
+      spendingCondition.hashMode === AddressHashMode.P2SH ||
+      spendingCondition.hashMode === AddressHashMode.P2WSH
+    ) {
+      // only check oversign on legacy multisig modes
       if (
         this.checkOversign &&
         spendingCondition.fields.filter(
-          field => field.contents.type === StacksMessageType.MessageSignature
+          field => field.contents.type === StacksWireType.MessageSignature
         ).length >= spendingCondition.signaturesRequired
       ) {
         throw new Error('Origin would have too many signatures');
@@ -93,10 +108,23 @@ export class TransactionSigner {
     }
 
     const nextSighash = this.transaction.signNextOrigin(this.sigHash, privateKey);
-    this.sigHash = nextSighash;
+
+    if (
+      isSingleSig(this.transaction.auth.spendingCondition) ||
+      isSequentialMultiSig(this.transaction.auth.spendingCondition.hashMode)
+    ) {
+      this.sigHash = nextSighash;
+    }
   }
 
-  appendOrigin(publicKey: StacksPublicKey) {
+  appendOrigin(publicKey: PublicKey): void;
+  appendOrigin(publicKey: PublicKeyWire): void;
+  appendOrigin(publicKey: PublicKey | PublicKeyWire): void {
+    const wire =
+      typeof publicKey === 'object' && 'type' in publicKey
+        ? publicKey
+        : createStacksPublicKey(publicKey);
+
     if (this.checkOverlap && this.originDone) {
       throw Error('Cannot append public key to origin after sponsor key');
     }
@@ -108,10 +136,10 @@ export class TransactionSigner {
       throw new Error('"transaction.auth.spendingCondition" is undefined');
     }
 
-    this.transaction.appendPubkey(publicKey);
+    this.transaction.appendPubkey(wire);
   }
 
-  signSponsor(privateKey: StacksPrivateKey) {
+  signSponsor(privateKey: PrivateKey) {
     if (this.transaction.auth === undefined) {
       throw new SigningError('"transaction.auth" is undefined');
     }
@@ -124,11 +152,11 @@ export class TransactionSigner {
     this.originDone = true;
   }
 
-  getTxInComplete(): StacksTransaction {
+  getTxInComplete(): StacksTransactionWire {
     return cloneDeep(this.transaction);
   }
 
-  resume(transaction: StacksTransaction) {
+  resume(transaction: StacksTransactionWire) {
     this.transaction = cloneDeep(transaction);
     this.sigHash = transaction.signBegin();
   }

@@ -6,16 +6,15 @@ import { InstanceDataStore, LocalStorageStore, SessionDataStore } from './sessio
 import { decodeToken } from 'jsontokens';
 import { verifyAuthResponse } from './verification';
 import * as authMessages from './messages';
-import {
-  decryptContent,
-  encryptContent,
-  EncryptContentOptions,
-  isValidPrivateKey,
-} from '@stacks/encryption';
+import { utils } from '@noble/secp256k1';
+import { decryptContent, encryptContent, EncryptContentOptions } from '@stacks/encryption';
 import { getAddressFromDID } from './dids';
 import {
-  BLOCKSTACK_DEFAULT_GAIA_HUB_URL,
+  createFetchFn,
+  FetchFn,
+  GAIA_URL,
   getGlobalObject,
+  HIRO_MAINNET_URL,
   InvalidStateError,
   isLaterVersion,
   Logger,
@@ -27,7 +26,6 @@ import { extractProfile } from '@stacks/profile';
 import { AuthScope, DEFAULT_PROFILE } from './constants';
 
 import { UserData } from './userData';
-import { createFetchFn, FetchFn, StacksMainnet } from '@stacks/network';
 import { protocolEchoReplyDetection } from './protocolEchoDetection';
 
 /**
@@ -225,8 +223,7 @@ export class UserSession {
     // let nameLookupURL;
     let coreNode = this.appConfig && this.appConfig.coreNode;
     if (!coreNode) {
-      const network = new StacksMainnet();
-      coreNode = network.bnsLookupUrl;
+      coreNode = HIRO_MAINNET_URL;
     }
 
     const tokenPayload = decodeToken(authResponseToken).payload;
@@ -253,7 +250,7 @@ export class UserSession {
             )) as string;
           } catch (e) {
             Logger.warn('Failed decryption of appPrivateKey, will try to use as given');
-            if (!isValidPrivateKey(tokenPayload.private_key as string)) {
+            if (!utils.isValidPrivateKey(tokenPayload.private_key as string)) {
               throw new LoginFailedError(
                 'Failed decrypting appPrivateKey. Usually means' +
                   ' that the transit key has changed during login.'
@@ -277,7 +274,7 @@ export class UserSession {
         );
       }
     }
-    let hubUrl = BLOCKSTACK_DEFAULT_GAIA_HUB_URL;
+    let hubUrl = GAIA_URL;
     let gaiaAssociationToken: string;
     if (
       isLaterVersion(tokenPayload.version as string, '1.2.0') &&

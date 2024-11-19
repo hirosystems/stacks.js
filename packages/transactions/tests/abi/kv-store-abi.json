@@ -22,8 +22,8 @@
   "maps": [
     {
       "name": "store",
-      "key": [{ "name": "key", "type": { "buffer": { "length": 3 } } }],
-      "value": [{ "name": "value", "type": { "buffer": { "length": 3 } } }]
+      "key": { "buffer": { "length": 3 } },
+      "value": { "buffer": { "length": 3 } }
     }
   ],
   "fungible_tokens": [],

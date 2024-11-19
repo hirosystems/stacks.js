@@ -34,7 +34,7 @@ const privateKey = createStacksPrivateKey(key);
 ## STX Token Transfer Transaction
 
 ```typescript
-import { makeSTXTokenTransfer, broadcastTransaction, AnchorMode } from '@stacks/transactions';
+import { makeSTXTokenTransfer, broadcastTransaction } from '@stacks/transactions';
 
 const txOptions = {
   recipient: 'SP3FGQ8Z7JY9BWYZ5WM53E0M9NK7WHJF0691NZ159',
@@ -44,7 +44,6 @@ const txOptions = {
   memo: 'test memo',
   nonce: 0n, // set a nonce manually if you don't want builder to fetch from a Stacks node
   fee: 200n, // set a tx fee if you don't want the builder to estimate
-  anchorMode: AnchorMode.Any,
 };
 
 const transaction = await makeSTXTokenTransfer(txOptions);
@@ -61,7 +60,7 @@ const txId = broadcastResponse.txid;
 ## Smart Contract Deploy Transaction
 
 ```typescript
-import { makeContractDeploy, broadcastTransaction, AnchorMode } from '@stacks/transactions';
+import { makeContractDeploy, broadcastTransaction } from '@stacks/transactions';
 import { StacksTestnet, StacksMainnet } from '@stacks/network';
 import { readFileSync } from 'fs';
 
@@ -73,7 +72,6 @@ const txOptions = {
   codeBody: readFileSync('/path/to/contract.clar').toString(),
   senderKey: 'b244296d5907de9864c0b0d51f98a13c52890be0404e83f273144cd5b9960eed01',
   network,
-  anchorMode: AnchorMode.Any,
 };
 
 const transaction = await makeContractDeploy(txOptions);
@@ -88,7 +86,6 @@ const txId = broadcastResponse.txid;
 import {
   makeContractCall,
   broadcastTransaction,
-  AnchorMode,
   FungibleConditionCode,
   makeStandardSTXPostCondition,
   bufferCVFromString,
@@ -116,7 +113,6 @@ const txOptions = {
   validateWithAbi: true,
   network,
   postConditions,
-  anchorMode: AnchorMode.Any,
 };
 
 const transaction = await makeContractCall(txOptions);
@@ -141,7 +137,7 @@ To generate a sponsored transaction, first create and sign the transaction as th
 
 ```typescript
 import { bytesToHex } from '@stacks/common';
-import { makeContractCall, BufferCV, AnchorMode, bufferCVFromString } from '@stacks/transactions';
+import { makeContractCall, BufferCV, bufferCVFromString } from '@stacks/transactions';
 
 const txOptions = {
   contractAddress: 'SPBMRFRPPGCDE3F384WCJPK8PQJGZ8K9QKK7F59X',
@@ -152,7 +148,6 @@ const txOptions = {
   senderKey: 'b244296d5907de9864c0b0d51f98a13c52890be0404e83f273144cd5b9960eed01',
   validateWithAbi: true,
   sponsored: true,
-  anchorMode: AnchorMode.Any,
 };
 
 const transaction = await makeContractCall(txOptions);
@@ -206,7 +201,6 @@ import {
   TransactionSigner,
   standardPrincipalCV,
   BytesReader,
-  AnchorMode,
 } from '@stacks/transactions';
 
 const recipient = standardPrincipalCV('SP3FGQ8...');
@@ -233,7 +227,6 @@ const transaction = await makeUnsignedSTXTokenTransfer({
   memo,
   numSignatures: 2, // number of signature required
   publicKeys: pubKeyStrings, // public key string array with >= numSignatures elements
-  anchorMode: AnchorMode.Any,
 });
 
 const serializedTx = transaction.serialize();
@@ -425,7 +418,7 @@ const contractSTXPostCondition = makeContractSTXPostCondition(
 ```typescript
 import {
   FungibleConditionCode,
-  createAssetInfo,
+  createAsset,
   makeStandardFungiblePostCondition,
 } from '@stacks/transactions';
 
@@ -436,13 +429,13 @@ const postConditionAmount = 12345n;
 const assetAddress = 'SP62M8MEFH32WGSB7XSF9WJZD7TQB48VQB5ANWSJ';
 const assetContractName = 'test-asset-contract';
 const assetName = 'test-token';
-const fungibleAssetInfo = createAssetInfo(assetAddress, assetContractName, assetName);
+const fungibleAsset = createAsset(assetAddress, assetContractName, assetName);
 
 const standardFungiblePostCondition = makeStandardFungiblePostCondition(
   postConditionAddress,
   postConditionCode,
   postConditionAmount,
-  fungibleAssetInfo
+  fungibleAsset
 );
 
 // With a contract principal
@@ -451,14 +444,14 @@ const contractName = 'test-contract';
 const assetAddress = 'SP62M8MEFH32WGSB7XSF9WJZD7TQB48VQB5ANWSJ';
 const assetContractName = 'test-asset-contract';
 const assetName = 'test-token';
-const fungibleAssetInfo = createAssetInfo(assetAddress, assetContractName, assetName);
+const fungibleAsset = createAsset(assetAddress, assetContractName, assetName);
 
 const contractFungiblePostCondition = makeContractFungiblePostCondition(
   contractAddress,
   contractName,
   postConditionCode,
   postConditionAmount,
-  fungibleAssetInfo
+  fungibleAsset
 );
 ```
 
@@ -473,7 +466,7 @@ const contractFungiblePostCondition = makeContractFungiblePostCondition(
 ```typescript
 import {
   NonFungibleConditionCode,
-  createAssetInfo,
+  createAsset,
   makeStandardNonFungiblePostCondition,
   makeContractNonFungiblePostCondition,
   bufferCVFromString,
@@ -485,14 +478,14 @@ const postConditionCode = NonFungibleConditionCode.DoesNotSend;
 const assetAddress = 'SP62M8MEFH32WGSB7XSF9WJZD7TQB48VQB5ANWSJ';
 const assetContractName = 'test-asset-contract';
 const assetName = 'test-asset';
-const tokenAssetName = bufferCVFromString('test-token-asset');
-const nonFungibleAssetInfo = createAssetInfo(assetAddress, assetContractName, assetName);
+const assetId = bufferCVFromString('test-token-asset-id');
+const nonFungibleAsset = createAsset(assetAddress, assetContractName, assetName);
 
 const standardNonFungiblePostCondition = makeStandardNonFungiblePostCondition(
   postConditionAddress,
   postConditionCode,
-  nonFungibleAssetInfo,
-  tokenAssetName
+  nonFungibleAsset,
+  assetId
 );
 
 // With a contract principal
@@ -503,8 +496,8 @@ const contractNonFungiblePostCondition = makeContractNonFungiblePostCondition(
   contractAddress,
   contractName,
   postConditionCode,
-  nonFungibleAssetInfo,
-  tokenAssetName
+  nonFungibleAsset,
+  assetId
 );
 ```
 

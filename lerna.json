@@ -5,7 +5,5 @@
     "access": "public"
   },
   "changelogPreset": "conventionalcommits",
-  "packages": [
-    "packages/*"
-  ]
+  "packages": ["packages/*"]
 }

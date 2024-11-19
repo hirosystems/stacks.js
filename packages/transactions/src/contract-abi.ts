@@ -1,22 +1,24 @@
-import { cloneDeep } from './utils';
+import { hexToBytes, utf8ToBytes } from '@stacks/common';
 import {
-  ClarityValue,
-  uintCV,
-  intCV,
-  contractPrincipalCV,
-  standardPrincipalCV,
-  noneCV,
-  bufferCV,
-  falseCV,
-  trueCV,
   ClarityType,
-  getCVTypeString,
+  ClarityValue,
+  bufferCV,
   bufferCVFromString,
+  contractPrincipalCV,
+  falseCV,
+  getCVTypeString,
+  intCV,
+  noneCV,
+  someCV,
+  standardPrincipalCV,
+  stringAsciiCV,
+  stringUtf8CV,
+  trueCV,
+  uintCV,
 } from './clarity';
-import { ContractCallPayload } from './payload';
 import { NotImplementedError } from './errors';
-import { stringAsciiCV, stringUtf8CV } from './clarity/types/stringCV';
-import { utf8ToBytes } from '@stacks/common';
+import { cloneDeep } from './utils';
+import { ContractCallPayload } from './wire';
 
 // From https://github.com/blockstack/stacks-blockchain-sidecar/blob/master/src/event-stream/contract-abi.ts
 
@@ -138,58 +140,76 @@ export function getTypeUnion(val: ClarityAbiType): ClarityAbiTypeUnion {
   }
 }
 
-function encodeClarityValue(type: ClarityAbiType, val: string): ClarityValue;
-function encodeClarityValue(type: ClarityAbiTypeUnion, val: string): ClarityValue;
-function encodeClarityValue(
-  input: ClarityAbiTypeUnion | ClarityAbiType,
-  val: string
+/**
+ * Convert a string to a Clarity value based on the ABI type.
+ *
+ * Currently does NOT support some nested Clarity ABI types:
+ * - ClarityAbiTypeResponse
+ * - ClarityAbiTypeTuple
+ * - ClarityAbiTypeList
+ */
+export function encodeAbiClarityValue(
+  value: string,
+  type: ClarityAbiType | ClarityAbiTypeUnion
 ): ClarityValue {
-  let union: ClarityAbiTypeUnion;
-  if ((input as ClarityAbiTypeUnion).id !== undefined) {
-    union = input as ClarityAbiTypeUnion;
-  } else {
-    union = getTypeUnion(input as ClarityAbiType);
-  }
+  const union = (type as ClarityAbiTypeUnion).id
+    ? (type as ClarityAbiTypeUnion)
+    : getTypeUnion(type as ClarityAbiType);
   switch (union.id) {
     case ClarityAbiTypeId.ClarityAbiTypeUInt128:
-      return uintCV(val);
+      return uintCV(value);
     case ClarityAbiTypeId.ClarityAbiTypeInt128:
-      return intCV(val);
+      return intCV(value);
     case ClarityAbiTypeId.ClarityAbiTypeBool:
-      if (val === 'false' || val === '0') return falseCV();
-      else if (val === 'true' || val === '1') return trueCV();
-      else throw new Error(`Unexpected Clarity bool value: ${JSON.stringify(val)}`);
+      if (value === 'false' || value === '0') return falseCV();
+      else if (value === 'true' || value === '1') return trueCV();
+      else throw new Error(`Unexpected Clarity bool value: ${JSON.stringify(value)}`);
     case ClarityAbiTypeId.ClarityAbiTypePrincipal:
-      if (val.includes('.')) {
-        const [addr, name] = val.split('.');
+      if (value.includes('.')) {
+        const [addr, name] = value.split('.');
         return contractPrincipalCV(addr, name);
       } else {
-        return standardPrincipalCV(val);
+        return standardPrincipalCV(value);
       }
     case ClarityAbiTypeId.ClarityAbiTypeTraitReference:
-      const [addr, name] = val.split('.');
+      const [addr, name] = value.split('.');
       return contractPrincipalCV(addr, name);
     case ClarityAbiTypeId.ClarityAbiTypeNone:
       return noneCV();
     case ClarityAbiTypeId.ClarityAbiTypeBuffer:
-      return bufferCV(utf8ToBytes(val));
+      return bufferCV(hexToBytes(value));
     case ClarityAbiTypeId.ClarityAbiTypeStringAscii:
-      return stringAsciiCV(val);
+      return stringAsciiCV(value);
     case ClarityAbiTypeId.ClarityAbiTypeStringUtf8:
-      return stringUtf8CV(val);
-    case ClarityAbiTypeId.ClarityAbiTypeResponse:
-      throw new NotImplementedError(`Unsupported encoding for Clarity type: ${union.id}`);
+      return stringUtf8CV(value);
     case ClarityAbiTypeId.ClarityAbiTypeOptional:
-      throw new NotImplementedError(`Unsupported encoding for Clarity type: ${union.id}`);
+      return someCV(encodeAbiClarityValue(value, union.type.optional));
+    case ClarityAbiTypeId.ClarityAbiTypeResponse:
     case ClarityAbiTypeId.ClarityAbiTypeTuple:
-      throw new NotImplementedError(`Unsupported encoding for Clarity type: ${union.id}`);
     case ClarityAbiTypeId.ClarityAbiTypeList:
       throw new NotImplementedError(`Unsupported encoding for Clarity type: ${union.id}`);
     default:
       throw new Error(`Unexpected Clarity type ID: ${JSON.stringify(union)}`);
   }
 }
-export { encodeClarityValue };
+
+/** @deprecated due to a breaking bug for the buffer encoding case, this was fixed and renamed to {@link clarityAbiStringToCV} */
+export function encodeClarityValue(type: ClarityAbiType, value: string): ClarityValue;
+export function encodeClarityValue(type: ClarityAbiTypeUnion, value: string): ClarityValue;
+export function encodeClarityValue(
+  type: ClarityAbiTypeUnion | ClarityAbiType,
+  value: string
+): ClarityValue {
+  const union = (type as ClarityAbiTypeUnion).id
+    ? (type as ClarityAbiTypeUnion)
+    : getTypeUnion(type as ClarityAbiType);
+
+  if (union.id === ClarityAbiTypeId.ClarityAbiTypeBuffer) {
+    return bufferCV(utf8ToBytes(value)); // legacy behavior
+  }
+
+  return encodeAbiClarityValue(value, union);
+}
 
 export function getTypeString(val: ClarityAbiType): string {
   if (isClarityAbiPrimitive(val)) {
@@ -245,14 +265,8 @@ export interface ClarityAbiVariable {
 
 export interface ClarityAbiMap {
   name: string;
-  key: {
-    name: string;
-    type: ClarityAbiType;
-  }[];
-  value: {
-    name: string;
-    type: ClarityAbiType;
-  }[];
+  key: ClarityAbiType;
+  value: ClarityAbiType;
 }
 
 export interface ClarityAbiTypeFungibleToken {
@@ -286,17 +300,17 @@ function matchType(cv: ClarityValue, abiType: ClarityAbiType): boolean {
     case ClarityType.Buffer:
       return (
         union.id === ClarityAbiTypeId.ClarityAbiTypeBuffer &&
-        union.type.buffer.length >= cv.buffer.length
+        union.type.buffer.length >= Math.ceil(cv.value.length / 2)
       );
     case ClarityType.StringASCII:
       return (
         union.id === ClarityAbiTypeId.ClarityAbiTypeStringAscii &&
-        union.type['string-ascii'].length >= cv.data.length
+        union.type['string-ascii'].length >= cv.value.length
       );
     case ClarityType.StringUTF8:
       return (
         union.id === ClarityAbiTypeId.ClarityAbiTypeStringUtf8 &&
-        union.type['string-utf8'].length >= cv.data.length
+        union.type['string-utf8'].length >= cv.value.length
       );
     case ClarityType.OptionalNone:
       return (
@@ -328,12 +342,12 @@ function matchType(cv: ClarityValue, abiType: ClarityAbiType): boolean {
     case ClarityType.List:
       return (
         union.id == ClarityAbiTypeId.ClarityAbiTypeList &&
-        union.type.list.length >= cv.list.length &&
-        cv.list.every(val => matchType(val, union.type.list.type))
+        union.type.list.length >= cv.value.length &&
+        cv.value.every(val => matchType(val, union.type.list.type))
       );
     case ClarityType.Tuple:
       if (union.id == ClarityAbiTypeId.ClarityAbiTypeTuple) {
-        const tuple = cloneDeep(cv.data);
+        const tuple = cloneDeep(cv.value);
         for (let i = 0; i < union.type.tuple.length; i++) {
           const abiTupleEntry = union.type.tuple[i];
           const key = abiTupleEntry.name;

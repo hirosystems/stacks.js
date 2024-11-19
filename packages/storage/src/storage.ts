@@ -1,7 +1,7 @@
 import { lookupProfile, NAME_LOOKUP_PATH, UserSession } from '@stacks/auth';
 import {
-  BLOCKSTACK_DEFAULT_GAIA_HUB_URL,
   DoesNotExist,
+  GAIA_URL,
   GaiaHubError,
   getGlobalObject,
   InvalidStateError,
@@ -18,7 +18,7 @@ import {
   signECDSA,
   verifyECDSA,
 } from '@stacks/encryption';
-import { createFetchFn, FetchFn } from '@stacks/network';
+import { createFetchFn, FetchFn } from '@stacks/common';
 import { FileContentLoader } from './fileContentLoader';
 import {
   connectToGaiaHub,
@@ -443,7 +443,7 @@ export class Storage {
   }
 
   /**
-   * Stores the data provided in the app's data store to to the file specified.
+   * Stores the data provided in the app's data store to the file specified.
    * @param {String} path - the path to store the data in
    * @param {String|Uint8Array} content - the data to store in the file
    * @param options a [[PutFileOptions]] object
@@ -804,7 +804,7 @@ export class Storage {
     }
 
     if (!userData.hubUrl) {
-      userData.hubUrl = BLOCKSTACK_DEFAULT_GAIA_HUB_URL;
+      userData.hubUrl = GAIA_URL;
     }
 
     const gaiaConfig = await connectToGaiaHub(

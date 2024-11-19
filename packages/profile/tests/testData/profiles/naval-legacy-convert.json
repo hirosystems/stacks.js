@@ -59,7 +59,7 @@
         "role": "key",
         "service": "pgp",
         "identifier": "07354EDF5C6CF2572847840D8FA3F960B62B7C41",
-        "contentUrl": "https://s3.amazonaws.com/pk9/naval"
+        "contentUrl": "https://s3.amazonaws.com/_example_/naval"
       }
     ]
   },

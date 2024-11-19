@@ -1,15 +1,14 @@
 import {
-  isSameOriginAbsoluteUrl,
-  isLaterVersion,
-  intToHex,
-  hexToBytes,
+  bigIntToBytes,
   bytesToHex,
   fromTwos,
+  hexToBytes,
+  intToHex,
+  isLaterVersion,
+  isSameOriginAbsoluteUrl,
   toTwos,
-  bigIntToBytes,
-  intToBigInt,
+  validateHash256,
 } from '../src';
-import BN from 'bn.js';
 
 test('isLaterVersion', () => {
   expect(isLaterVersion('', '1.1.0')).toEqual(false);
@@ -157,12 +156,22 @@ test('toTwos', () => {
   ).toEqual('8000000000000000000000000000000000000000000000000000000000000000');
 });
 
-test('Should accept bn.js instance', () => {
-  const value = '123456';
-  const bn = new BN(value);
-  // After removing bn.js library verify backward compatibility for users passing bn.js instance
-  // Should not break if bn.js instance is passed
-  const nativeBigInt = intToBigInt(bn, false);
+describe(validateHash256, () => {
+  const TXID = '117a6522b4e9ec27ff10bbe3940a4a07fd58e5352010b4143992edb05a7130c7';
 
-  expect(nativeBigInt.toString()).toEqual(value);
+  test.each([
+    { txid: TXID, expected: true }, // without 0x
+    { txid: `0x${TXID}`, expected: true }, // with 0x
+    { txid: TXID.split('30c7')[0], expected: false }, // too short
+    {
+      txid: 'Failed to deserialize posted transaction: Invalid Stacks string: non-printable or non-ASCII string',
+      expected: false, // string without txid
+    },
+    {
+      txid: `Failed to deserialize posted transaction: Invalid Stacks string: non-printable or non-ASCII string. ${TXID}`,
+      expected: false, // string with txid
+    },
+  ])('txid is validated as hash 256', ({ txid, expected }) => {
+    expect(validateHash256(txid)).toEqual(expected);
+  });
 });

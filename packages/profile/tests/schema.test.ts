@@ -88,7 +88,7 @@ test('legacyFormat', () => {
 
 test('resolveZoneFileToPerson', () => {
   const zoneFile =
-    '$ORIGIN ryan.id\n$TTL 3600\n_http._tcp IN URI 10 1 "https://blockstack.s3.amazonaws.com/ryan.id"\n';
+    '$ORIGIN ryan.id\n$TTL 3600\n_http._tcp IN URI 10 1 "https://_example_.s3.amazonaws.com/ryan.id"\n';
   const ownerAddress = 'SP3AMDH2ZZB8XQK467V9HV5CRQF2RPBZ4MDMSBHJZ';
   fetchMock.once(JSON.stringify(sampleTokenFiles.ryan.body));
 

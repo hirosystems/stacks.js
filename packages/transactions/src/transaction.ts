@@ -1,112 +1,122 @@
 import {
+  Hex,
+  IntegerType,
+  PrivateKey,
+  PublicKey,
   bytesToHex,
   concatArray,
-  hexToBytes,
-  IntegerType,
   intToBigInt,
+  isInstance,
   writeUInt32BE,
 } from '@stacks/common';
 import {
-  AnchorMode,
-  anchorModeFromNameOrValue,
-  AnchorModeName,
-  AuthType,
-  ChainID,
-  DEFAULT_CHAIN_ID,
-  PayloadType,
-  PostConditionMode,
-  PubKeyEncoding,
-  StacksMessageType,
+  ChainId,
+  NetworkParam,
+  STACKS_MAINNET,
+  STACKS_TESTNET,
   TransactionVersion,
-} from './constants';
-
+  networkFrom,
+  whenTransactionVersion,
+} from '@stacks/network';
+import { serializePayloadBytes } from '.';
+import { BytesReader } from './BytesReader';
 import {
   Authorization,
+  MultiSigSpendingCondition,
+  SpendingConditionOpts,
   deserializeAuthorization,
   intoInitialSighashAuth,
   isSingleSig,
   nextSignature,
-  serializeAuthorization,
+  serializeAuthorizationBytes,
   setFee,
   setNonce,
   setSponsor,
   setSponsorNonce,
-  SpendingConditionOpts,
   verifyOrigin,
 } from './authorization';
-import { createTransactionAuthField } from './signature';
-
-import { cloneDeep, txidFromData } from './utils';
-
-import { deserializePayload, Payload, PayloadInput, serializePayload } from './payload';
-
-import { createLPList, deserializeLPList, LengthPrefixedList, serializeLPList } from './types';
-
-import { isCompressed, StacksPrivateKey, StacksPublicKey } from './keys';
-
-import { BytesReader } from './bytesReader';
-
+import {
+  AddressHashMode,
+  AnchorMode,
+  AuthType,
+  PostConditionMode,
+  PubKeyEncoding,
+  RECOVERABLE_ECDSA_SIG_LENGTH_BYTES,
+} from './constants';
 import { SerializationError, SigningError } from './errors';
+import { createStacksPublicKey, privateKeyIsCompressed, publicKeyIsCompressed } from './keys';
+import { cloneDeep, txidFromData } from './utils';
+import {
+  LengthPrefixedList,
+  PayloadInput,
+  PayloadWire,
+  PublicKeyWire,
+  StacksWireType,
+  createLPList,
+  createMessageSignature,
+  createTransactionAuthField,
+  deserializeLPList,
+  deserializePayload,
+  serializeLPListBytes,
+} from './wire';
 
-export class StacksTransaction {
-  version: TransactionVersion;
-  chainId: ChainID;
+export class StacksTransactionWire {
+  transactionVersion: TransactionVersion;
+  chainId: ChainId;
   auth: Authorization;
-  anchorMode: AnchorMode;
-  payload: Payload;
+  payload: PayloadWire;
   postConditionMode: PostConditionMode;
   postConditions: LengthPrefixedList;
 
-  constructor(
-    version: TransactionVersion,
-    auth: Authorization,
-    payload: PayloadInput,
-    postConditions?: LengthPrefixedList,
-    postConditionMode?: PostConditionMode,
-    anchorMode?: AnchorModeName | AnchorMode,
-    chainId?: ChainID
-  ) {
-    this.version = version;
+  /** @deprecated Not used, starting with Stacks 2.5. Still needed for serialization. */
+  anchorMode: AnchorMode;
+
+  constructor({
+    auth,
+    payload,
+    postConditions = createLPList([]),
+    postConditionMode = PostConditionMode.Deny,
+    transactionVersion,
+    chainId,
+    /** The network is only used if `transactionVersion` or `chainId` are not provided */
+    network = 'mainnet',
+  }: {
+    payload: PayloadInput;
+    auth: Authorization;
+    postConditions?: LengthPrefixedList;
+    postConditionMode?: PostConditionMode;
+    transactionVersion?: TransactionVersion;
+    chainId?: ChainId;
+  } & NetworkParam) {
+    network = networkFrom(network);
+
+    this.transactionVersion = transactionVersion ?? network.transactionVersion;
+    this.chainId = chainId ?? network.chainId;
     this.auth = auth;
+
     if ('amount' in payload) {
       this.payload = {
         ...payload,
-        amount: intToBigInt(payload.amount, false),
+        amount: intToBigInt(payload.amount),
       };
     } else {
       this.payload = payload;
     }
-    this.chainId = chainId ?? DEFAULT_CHAIN_ID;
-    this.postConditionMode = postConditionMode ?? PostConditionMode.Deny;
-    this.postConditions = postConditions ?? createLPList([]);
 
-    if (anchorMode) {
-      this.anchorMode = anchorModeFromNameOrValue(anchorMode);
-    } else {
-      switch (payload.payloadType) {
-        case PayloadType.Coinbase:
-        case PayloadType.CoinbaseToAltRecipient:
-        case PayloadType.PoisonMicroblock: {
-          this.anchorMode = AnchorMode.OnChainOnly;
-          break;
-        }
-        case PayloadType.ContractCall:
-        case PayloadType.SmartContract:
-        case PayloadType.VersionedSmartContract:
-        case PayloadType.TokenTransfer: {
-          this.anchorMode = AnchorMode.Any;
-          break;
-        }
-      }
-    }
+    this.postConditionMode = postConditionMode;
+    this.postConditions = postConditions;
+
+    this.anchorMode = AnchorMode.Any;
   }
 
+  /** @deprecated Does NOT mutate transaction, but rather returns the hash of the transaction with a cleared initial authorization */
   signBegin() {
     const tx = cloneDeep(this);
     tx.auth = intoInitialSighashAuth(tx.auth);
     return tx.txid();
   }
 
+  /** @deprecated Alias of `.signBegin()` */
   verifyBegin() {
     const tx = cloneDeep(this);
     tx.auth = intoInitialSighashAuth(tx.auth);
@@ -117,7 +127,7 @@ export class StacksTransaction {
     return verifyOrigin(this.auth, this.verifyBegin());
   }
 
-  signNextOrigin(sigHash: string, privateKey: StacksPrivateKey): string {
+  signNextOrigin(sigHash: string, privateKey: PrivateKey): string {
     if (this.auth.spendingCondition === undefined) {
       throw new Error('"auth.spendingCondition" is undefined');
     }
@@ -127,7 +137,7 @@ export class StacksTransaction {
     return this.signAndAppend(this.auth.spendingCondition, sigHash, AuthType.Standard, privateKey);
   }
 
-  signNextSponsor(sigHash: string, privateKey: StacksPrivateKey): string {
+  signNextSponsor(sigHash: string, privateKey: PrivateKey): string {
     if (this.auth.authType === AuthType.Sponsored) {
       return this.signAndAppend(
         this.auth.sponsorSpendingCondition,
@@ -140,14 +150,33 @@ export class StacksTransaction {
     }
   }
 
-  appendPubkey(publicKey: StacksPublicKey) {
+  /**
+   * Append a public key to the spending-condition of the transaction
+   *
+   * @param publicKey - the public key to append
+   * @example
+   * ```ts
+   * import { makeSTXTokenTransfer } from '@stacks/transactions';
+   *
+   * const transaction = makeSTXTokenTransfer({ ... });
+   * transaction.appendPubkey('034f355bdcb7cc0af728..24c0e585c5e89ac788521e0');
+   * ```
+   */
+  appendPubkey(publicKey: PublicKey): void;
+  appendPubkey(publicKey: PublicKeyWire): void;
+  appendPubkey(publicKey: PublicKey | PublicKeyWire): void {
+    const wire =
+      typeof publicKey === 'object' && 'type' in publicKey
+        ? publicKey
+        : createStacksPublicKey(publicKey);
+
     const cond = this.auth.spendingCondition;
     if (cond && !isSingleSig(cond)) {
-      const compressed = isCompressed(publicKey);
+      const compressed = publicKeyIsCompressed(wire.data);
       cond.fields.push(
         createTransactionAuthField(
           compressed ? PubKeyEncoding.Compressed : PubKeyEncoding.Uncompressed,
-          publicKey
+          wire
         )
       );
     } else {
@@ -155,11 +184,14 @@ export class StacksTransaction {
     }
   }
 
+  // todo: this could be static?
+  /** **Warning**: method mutates the `condition` param */
   signAndAppend(
+    /** `condition` is mutated by this method */
     condition: SpendingConditionOpts,
     curSigHash: string,
     authType: AuthType,
-    privateKey: StacksPrivateKey
+    privateKey: PrivateKey
   ): string {
     const { nextSig, nextSigHash } = nextSignature(
       curSigHash,
@@ -169,13 +201,13 @@ export class StacksTransaction {
       privateKey
     );
     if (isSingleSig(condition)) {
-      condition.signature = nextSig;
+      condition.signature = createMessageSignature(nextSig);
     } else {
-      const compressed = bytesToHex(privateKey.data).endsWith('01');
+      const compressed = privateKeyIsCompressed(privateKey);
       condition.fields.push(
         createTransactionAuthField(
           compressed ? PubKeyEncoding.Compressed : PubKeyEncoding.Uncompressed,
-          nextSig
+          createMessageSignature(nextSig)
         )
       );
     }
@@ -184,7 +216,7 @@ export class StacksTransaction {
   }
 
   txid(): string {
-    const serialized = this.serialize();
+    const serialized = this.serializeBytes();
     return txidFromData(serialized);
   }
 
@@ -227,9 +259,37 @@ export class StacksTransaction {
     this.auth = setSponsorNonce(this.auth, nonce);
   }
 
-  serialize(): Uint8Array {
-    if (this.version === undefined) {
-      throw new SerializationError('"version" is undefined');
+  /**
+   * Serialize a transaction to a hex string (byte representation)
+   *
+   * @returns A hex string of the serialized transaction
+   * @example
+   * ```ts
+   * import { makeSTXTokenTransfer } from '@stacks/transactions';
+   *
+   * const transaction = makeSTXTokenTransfer({ ... });
+   * const hex = transaction.serialize();
+   * ```
+   */
+  serialize(): Hex {
+    return bytesToHex(this.serializeBytes());
+  }
+
+  /**
+   * Serialize a transaction to bytes
+   *
+   * @returns A Uint8Array of the serialized transaction
+   * @example
+   * ```ts
+   * import { makeSTXTokenTransfer } from '@stacks/transactions';
+   *
+   * const transaction = makeSTXTokenTransfer({ ... });
+   * const bytes = transaction.serializeBytes();
+   * ```
+   */
+  serializeBytes(): Uint8Array {
+    if (this.transactionVersion === undefined) {
+      throw new SerializationError('"transactionVersion" is undefined');
     }
     if (this.chainId === undefined) {
       throw new SerializationError('"chainId" is undefined');
@@ -237,46 +297,32 @@ export class StacksTransaction {
     if (this.auth === undefined) {
       throw new SerializationError('"auth" is undefined');
     }
-    if (this.anchorMode === undefined) {
-      throw new SerializationError('"anchorMode" is undefined');
-    }
     if (this.payload === undefined) {
       throw new SerializationError('"payload" is undefined');
     }
 
     const bytesArray = [];
 
-    bytesArray.push(this.version);
+    bytesArray.push(this.transactionVersion);
     const chainIdBytes = new Uint8Array(4);
     writeUInt32BE(chainIdBytes, this.chainId, 0);
     bytesArray.push(chainIdBytes);
-    bytesArray.push(serializeAuthorization(this.auth));
+    bytesArray.push(serializeAuthorizationBytes(this.auth));
     bytesArray.push(this.anchorMode);
     bytesArray.push(this.postConditionMode);
-    bytesArray.push(serializeLPList(this.postConditions));
-    bytesArray.push(serializePayload(this.payload));
+    bytesArray.push(serializeLPListBytes(this.postConditions));
+    bytesArray.push(serializePayloadBytes(this.payload));
 
     return concatArray(bytesArray);
   }
 }
 
 /**
- * @param data Uint8Array or hex string
+ * @param tx hex string or bytes of serialized transaction
  */
-export function deserializeTransaction(data: BytesReader | Uint8Array | string) {
-  let bytesReader: BytesReader;
-  if (typeof data === 'string') {
-    if (data.slice(0, 2).toLowerCase() === '0x') {
-      bytesReader = new BytesReader(hexToBytes(data.slice(2)));
-    } else {
-      bytesReader = new BytesReader(hexToBytes(data));
-    }
-  } else if (data instanceof Uint8Array) {
-    bytesReader = new BytesReader(data);
-  } else {
-    bytesReader = data;
-  }
-  const version = bytesReader.readUInt8Enum(TransactionVersion, n => {
+export function deserializeTransaction(tx: string | Uint8Array | BytesReader) {
+  const bytesReader = isInstance(tx, BytesReader) ? tx : new BytesReader(tx);
+  const transactionVersion = bytesReader.readUInt8Enum(TransactionVersion, n => {
     throw new Error(`Could not parse ${n} as TransactionVersion`);
   });
   const chainId = bytesReader.readUInt32BE();
@@ -287,16 +333,115 @@ export function deserializeTransaction(data: BytesReader | Uint8Array | string) 
   const postConditionMode = bytesReader.readUInt8Enum(PostConditionMode, n => {
     throw new Error(`Could not parse ${n} as PostConditionMode`);
   });
-  const postConditions = deserializeLPList(bytesReader, StacksMessageType.PostCondition);
+  const postConditions = deserializeLPList(bytesReader, StacksWireType.PostCondition);
   const payload = deserializePayload(bytesReader);
 
-  return new StacksTransaction(
-    version,
+  const transaction = new StacksTransactionWire({
+    transactionVersion,
+    chainId,
     auth,
     payload,
     postConditions,
     postConditionMode,
-    anchorMode,
-    chainId
-  );
+  });
+  transaction.anchorMode = anchorMode; // not used anymore, but part of the transaction wire format
+  return transaction;
+}
+
+/** @ignore */
+export function deriveNetworkFromTx(transaction: StacksTransactionWire) {
+  // todo: maybe add as renamed public method
+  return whenTransactionVersion(transaction.transactionVersion)({
+    [TransactionVersion.Mainnet]: STACKS_MAINNET,
+    [TransactionVersion.Testnet]: STACKS_TESTNET,
+  });
+}
+
+/**
+ * Estimates transaction byte length
+ * Context:
+ * 1) Multi-sig transaction byte length increases by adding signatures
+ *    which causes the incorrect fee estimation because the fee value is set while creating unsigned transaction
+ * 2) Single-sig transaction byte length remain same due to empty message signature which allocates the space for signature
+ * @param {transaction} - StacksTransaction object to be estimated
+ * @return {number} Estimated transaction byte length
+ */
+export function estimateTransactionByteLength(transaction: StacksTransactionWire): number {
+  const hashMode = transaction.auth.spendingCondition.hashMode;
+  // List of Multi-sig transaction hash modes
+  const multiSigHashModes = [AddressHashMode.P2SH, AddressHashMode.P2WSH];
+
+  // Check if its a Multi-sig transaction
+  if (multiSigHashModes.includes(hashMode)) {
+    const multiSigSpendingCondition: MultiSigSpendingCondition = transaction.auth
+      .spendingCondition as MultiSigSpendingCondition;
+
+    // Find number of existing signatures if the transaction is signed or partially signed
+    const existingSignatures = multiSigSpendingCondition.fields.filter(
+      field => field.contents.type === StacksWireType.MessageSignature
+    ).length; // existingSignatures will be 0 if its a unsigned transaction
+
+    // Estimate total signature bytes size required for this multi-sig transaction
+    // Formula: totalSignatureLength = (signaturesRequired - existingSignatures) * (SIG_LEN_BYTES + 1 byte for type of signature)
+    const totalSignatureLength =
+      (multiSigSpendingCondition.signaturesRequired - existingSignatures) *
+      (RECOVERABLE_ECDSA_SIG_LENGTH_BYTES + 1);
+
+    return transaction.serializeBytes().byteLength + totalSignatureLength;
+  } else {
+    // Single-sig transaction
+    // Signature space already allocated by empty message signature
+    return transaction.serializeBytes().byteLength;
+  }
+}
+
+/**
+ * Alias for `transaction.serialize()`
+ *
+ * Serializes a transaction to a hex string.
+ *
+ * @example
+ * ```ts
+ * import { makeSTXTokenTransfer, serializeTransaction } from '@stacks/transactions';
+ *
+ * const transaction = makeSTXTokenTransfer({ ... });
+ * const hex = serializeTransaction(transaction);
+ * ```
+ */
+export function serializeTransaction(transaction: StacksTransactionWire): Hex {
+  return transaction.serialize();
+}
+
+/**
+ * Alias for `transaction.serializeBytes()`
+ *
+ * Serializes a transaction to bytes.
+ *
+ * @example
+ * ```ts
+ * import { makeSTXTokenTransfer, serializeTransactionBytes } from '@stacks/transactions';
+ *
+ * const transaction = makeSTXTokenTransfer({ ... });
+ * const bytes = serializeTransactionBytes(transaction);
+ * ```
+ */
+export function serializeTransactionBytes(transaction: StacksTransactionWire): Uint8Array {
+  return transaction.serializeBytes();
+}
+
+/**
+ * Alias for `transaction.serialize()`
+ *
+ * Serializes a transaction to a hex string.
+ *
+ * @example
+ * ```ts
+ * import { makeSTXTokenTransfer, transactionToHex } from '@stacks/transactions';
+ *
+ * const transaction = makeSTXTokenTransfer({ ... });
+ * const hex = transactionToHex(transaction);
+ * ```
+ */
+export function transactionToHex(transaction: StacksTransactionWire): string {
+  return transaction.serialize();
 }

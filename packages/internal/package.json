@@ -1,0 +1,16 @@
+{
+  "private": true,
+  "name": "@stacks/internal",
+  "scripts": {
+    "start": "tsc -b tsconfig.build.json --watch --verbose",
+    "typecheck": "tsc --noEmit",
+    "typecheck:watch": "npm run typecheck -- --watch"
+  },
+  "devDependencies": {
+    "@stacks/blockchain-api-client": "^7.12.0",
+    "@stacks/network": "^7.0.2",
+    "@stacks/stacking": "^7.0.3",
+    "jest-fetch-mock": "^3.0.3"
+  },
+  "version": "7.0.3"
+}
