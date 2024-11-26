@@ -189,7 +189,7 @@ The old `PostCondition` type was renamed to `PostConditionWire`.
 A new human-readable `PostCondition` type was introduced in its place.
 
 The previous builders (`makeStandardSTXPostCondition`, `makeStandardFungiblePostCondition`, `makeStandardNonFungiblePostCondition`, `makeContractSTXPostCondition`, `makeContractFungiblePostCondition`, and `makeContractNonFungiblePostCondition` using the enums were removed.
-Use the `Pc` post-condition builder instead or construct post-condition object (of the type `PostCondition` manually using strings and string literals.
+Use the `Pc` post-condition builder instead or construct post-condition object (of the type `PostCondition`) manually using strings and string literals.
 
 Below are examples of the new `PostCondition` types.
 
