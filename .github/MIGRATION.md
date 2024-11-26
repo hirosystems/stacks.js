@@ -188,7 +188,10 @@ For `bigint` values, the type of the `value` property is a now `string`, for bet
 The old `PostCondition` type was renamed to `PostConditionWire`.
 A new human-readable `PostCondition` type was introduced in its place.
 
-Below is an example of the new `PostCondition` types.
+The previous builders (`makeStandardSTXPostCondition`, `makeStandardFungiblePostCondition`, `makeStandardNonFungiblePostCondition`, `makeContractSTXPostCondition`, `makeContractFungiblePostCondition`, and `makeContractNonFungiblePostCondition` using the enums where removed.
+Use the `Pc` post-condition builder instead or construct post-condition object (of the type `PostCondition` manually using strings and string literals.
+
+Below are examples of the new `PostCondition` types.
 
 ```ts
 // STX post-condition
