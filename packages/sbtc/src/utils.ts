@@ -1,25 +1,38 @@
 import * as btc from '@scure/btc-signer';
+import {
+  TransactionInput,
+  TransactionInputUpdate,
+  TransactionOutput,
+} from '@scure/btc-signer/psbt';
 import { hexToBytes, intToHex, utf8ToBytes } from '@stacks/common';
 import { c32addressDecode } from 'c32check';
 import * as P from 'micro-packed';
 import { UtxoWithTx } from './api';
-import { BitcoinNetwork, OVERHEAD_TX, VSIZE_INPUT_P2WPKH } from './constants';
+import { BitcoinNetwork, VSIZE_INPUT_P2WPKH, VSIZE_OVERHEAD_TX } from './constants';
 
-const concat = P.concatBytes;
+const concat = P.utils.concatBytes;
+
+/** @internal */
+export type Prettify<T> = {
+  [K in keyof T]: T[K];
+  // eslint-disable-next-line @typescript-eslint/ban-types
+} & {};
 
 // todo: move to transactions package
 export function stacksAddressBytes(address: string): Uint8Array {
   const [addr, contractName] = address.split('.');
   const [version, hash] = c32addressDecode(addr);
-  const versionBytes = hexToBytes(version.toString(16));
-  const hashBytes = hexToBytes(hash);
-  const contractNameBytes = lengthPrefixedString(contractName, utf8ToBytes);
 
-  return concat(versionBytes, hashBytes, contractNameBytes);
+  const principalTypeByte = Uint8Array.from([contractName ? 0x06 : 0x05]); // todo: find vars/enum
+  const versionByte = Uint8Array.from([version]);
+  const hashBytes = hexToBytes(hash);
+  const contractNameBytes = lengthPrefixedString(contractName);
+
+  return concat(principalTypeByte, versionByte, hashBytes, contractNameBytes);
 }
 
 // todo: move to transactions package
-export function lengthPrefixedString(
+function lengthPrefixedString(
   something: string | null | undefined,
   map: (something: string) => Uint8Array = utf8ToBytes,
   maxByteLength: number = 40,
@@ -52,20 +65,22 @@ export async function paymentInfo({
   const outputs = []; // can't enumerate directly
   for (let i = 0; i < tx.outputsLength; i++) outputs.push(tx.getOutput(i));
 
-  return await utxoSelect({ feeRate, utxos, utxoToSpendable, outputs });
+  return await utxoSelect({ feeRate, utxos, utxoToSpendables: utxoToSpendable, outputs });
 }
 
 // == vsizing ==================================================================
 
-export function txBytes(inputs: btc.TransactionInput[], outputs: btc.TransactionOutput[]) {
+export function txBytes(inputs: TransactionInputUpdate[], outputs: TransactionOutput[]) {
   return (
-    OVERHEAD_TX + inputs.map(inputBytes).reduce(plus, 0) + outputs.map(outputBytes).reduce(plus, 0)
+    VSIZE_OVERHEAD_TX +
+    inputs.map(inputBytes).reduce(plus, 0) +
+    outputs.map(outputBytes).reduce(plus, 0)
   );
 }
 
 // todo: switch to estimating?
 
-export function inputBytes(input: btc.TransactionInput) {
+export function inputBytes(input: TransactionInputUpdate) {
   const tmpTx = new btc.Transaction({ allowUnknownInputs: true });
   const originalSize = tmpTx.vsize;
   tmpTx.addInput(input);
@@ -73,7 +88,7 @@ export function inputBytes(input: btc.TransactionInput) {
   // return OVERHEAD_INPUT + (input.finalScriptWitness ? input.finalScriptWitness.byteLength : OVERHEAD_INPUT_P2PKH);
 }
 
-export function outputBytes(output: btc.TransactionOutput) {
+export function outputBytes(output: TransactionOutput) {
   const tmpTx = new btc.Transaction({ allowUnknownOutputs: true });
   const originalSize = tmpTx.vsize;
   tmpTx.addOutput(output);
@@ -87,7 +102,7 @@ export function dustMinimum(inputVsize: number, feeRate: number) {
 
 const plus = (a: number, b: number) => a + b;
 
-export type Spendable = { input: btc.TransactionInput; vsize?: number };
+export type Spendable = { input: TransactionInputUpdate; vsize?: number };
 
 export type SpendableByScriptTypes =
   // prettier-ignore
@@ -102,14 +117,14 @@ interface UtxoToSpendableOpts {
   tx: btc.Transaction;
   txHex: string;
   utxo: UtxoWithTx;
-  output: ReturnType<btc.Transaction['getOutput']>;
+  output: TransactionOutput;
   spendScript: ReturnType<typeof btc.OutScript.decode>;
 }
 
 export function wpkhUtxoToSpendable(opts: UtxoToSpendableOpts) {
   if (!opts.output?.script) throw new Error('No script found on utxo tx');
 
-  const spendableInput: btc.TransactionInput = {
+  const spendableInput: TransactionInputUpdate = {
     txid: hexToBytes(opts.utxo.txid),
     index: opts.utxo.vout,
     ...opts.output,
@@ -155,7 +170,7 @@ export function shUtxoToSpendable(
 
       // wrapped witness script
       if (i < 3) {
-        const input: btc.TransactionInput = {
+        const input: TransactionInput = {
           txid: hexToBytes(opts.utxo.txid),
           index: opts.utxo.vout,
           witnessUtxo: {
@@ -173,7 +188,7 @@ export function shUtxoToSpendable(
         index: opts.utxo.vout,
         nonWitnessUtxo: opts.txHex,
         redeemScript: p2shRet.redeemScript,
-      } as unknown as btc.TransactionInput; // todo: something wrong with types here?
+      } as TransactionInputUpdate; // todo: something wrong with types here?
       new btc.Transaction().addInput(input);
       return { input, vsize: p2shRet.script?.byteLength ?? 0 };
     } catch (e) {}
@@ -184,31 +199,31 @@ export function shUtxoToSpendable(
 export async function utxoSelect({
   feeRate,
   utxos,
-  utxoToSpendable,
+  utxoToSpendables,
   outputs,
 }: {
   feeRate: number;
   utxos: UtxoWithTx[];
-  utxoToSpendable: Partial<SpendableByScriptTypes>;
-  outputs: btc.TransactionOutput[];
+  utxoToSpendables: Partial<SpendableByScriptTypes>;
+  outputs: TransactionOutput[];
 }): Promise<{
-  inputs: btc.TransactionInput[];
+  inputs: TransactionInputUpdate[];
   totalSats: bigint;
   changeSats: bigint;
 }> {
   const outputsValue = outputs.reduce(
-    (acc: bigint, o: btc.TransactionOutput) => acc + (o.amount ?? 0n),
+    (acc: bigint, o: TransactionOutput) => acc + (o.amount ?? 0n),
     0n
   );
 
-  const inputs: btc.TransactionInput[] = []; // collect inputs
+  const inputs: TransactionInputUpdate[] = []; // collect inputs
   let inputRunning = 0n;
 
   let vsizeRunning = txBytes([], outputs);
 
   for (const utxo of utxos) {
     try {
-      const { input, vsize } = await switchUtxoToSpendable(utxo, utxoToSpendable);
+      const { input, vsize } = await switchUtxoToSpendable(utxo, utxoToSpendables);
       const inputVsize = vsize ?? inputBytes(input);
       const utxoFee = feeRate * inputVsize;
 
@@ -265,13 +280,10 @@ export async function switchUtxoToSpendable(
   }
 }
 
-const x: btc.TransactionInput | btc.TransactionOutput = {} as any;
-if ('index' in x) x;
-
 // todo: after DR?
 // async function tryAllToSpendable(
 //   utxo: BlockstreamUtxo | BlockstreamUtxoWithTxHex
-// ): Promise<btc.TransactionInput> {
+// ): Promise<TransactionInput> {
 //   const utxoWithTx: BlockstreamUtxoWithTxHex =
 //     'hex' in utxo ? utxo : { ...utxo, hex: await fetchTxHex(utxo.txid) };
 
@@ -296,6 +308,7 @@ if ('index' in x) x;
 
 type LazyLoadable<T extends object, K extends string> = T & Record<K, any>;
 
+/** @internal */
 export function wrapLazyProxy<
   T extends {
     [key: string]: any;

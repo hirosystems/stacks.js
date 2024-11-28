@@ -66,7 +66,7 @@ export const REGTEST: BitcoinNetwork = {
 };
 
 // Estimates based on https://bitcoinops.org/en/tools/calc-size/
-export const OVERHEAD_TX = 4 + 1 + 1 + 4; // new btc.Transaction().vsize
+export const VSIZE_OVERHEAD_TX = 4 + 1 + 1 + 4; // new btc.Transaction().vsize
 // const OVERHEAD_INPUT = 36 + 1 + 4 + 0.25;
 // const OVERHEAD_OUTPUT = 8 + 1;
 // const OVERHEAD_INPUT_P2PKH = 107;

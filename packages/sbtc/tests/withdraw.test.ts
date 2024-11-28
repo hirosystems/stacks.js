@@ -1,3 +1,6 @@
+import { test } from 'vitest';
+test.skip('', () => {});
+
 // import * as btc from '@scure/btc-signer';
 // import { bytesToHex, hexToBytes } from '@stacks/common';
 // import { hashMessage } from '@stacks/encryption';

@@ -2,6 +2,7 @@ import { Configuration, TransactionsApi } from '@stacks/blockchain-api-client';
 import { STACKS_TESTNET } from '@stacks/network';
 import { MockResponseInitFunction } from 'jest-fetch-mock';
 import { StackingClient } from '@stacks/stacking';
+import fs from 'fs';
 
 // NOTES
 // Capture traffic via the fetchWrapper
@@ -184,4 +185,19 @@ export function getFetchMockBroadcast() {
     .reverse()
     .find((m: any) => m[0].endsWith('/transactions'));
   return JSON.parse(broadcast[1].body);
+}
+
+export function enableFetchLogging() {
+  const fetchOriginal = globalThis.fetch;
+  (globalThis.fetch as any) = async (input: string | Request, init?: RequestInit) => {
+    const r = await fetchOriginal(input, init);
+    const response = await r
+      .clone()
+      .json()
+      .catch(() => r.clone().text());
+    const url = input instanceof Request ? input.url : input;
+    const log = `'${url}': \`${JSON.stringify(response)}\`,`;
+    fs.appendFileSync('network.txt', `${log}\n`);
+    return r;
+  };
 }
