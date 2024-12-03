@@ -12,6 +12,7 @@ import {
 import { REGTEST } from './constants';
 import { wrapLazyProxy } from './utils';
 import { bytesToHex } from '@stacks/common';
+import { sbtcDepositHelper } from './transactions';
 
 /** todo */
 // https://blockstream.info/api/address/1KFHE7w8BhaENAswwryaoccDb6qcT6DbYY/utxo
@@ -89,20 +90,14 @@ export class SbtcApiClient {
     }).then(res => res.text());
   }
 
-  async notifySbtc(tx: btc.Transaction) {
-    const depositScript = tx.getOutput(0).script;
-    const reclaimScript = tx.getOutput(1).script;
-
-    if (!depositScript) throw new Error('Missing deposit script at index 0');
-    if (!reclaimScript) throw new Error('Missing reclaim script at index 1');
-
+  async notifySbtc(depositInfo: Awaited<ReturnType<typeof sbtcDepositHelper>>) {
     return (await fetch(`${this.config.sbtcApiUrl}/deposit`, {
       method: 'POST',
       body: JSON.stringify({
-        bitcoinTxid: tx.id,
+        bitcoinTxid: depositInfo.transaction.id,
         bitcoinTxOutputIndex: 0,
-        depositScript: bytesToHex(depositScript),
-        reclaimScript: bytesToHex(reclaimScript),
+        depositScript: depositInfo.depositScript,
+        reclaimScript: depositInfo.reclaimScript,
       }),
     }).then(res => res.json())) as {
       bitcoinTxid: string;
@@ -182,12 +177,10 @@ export class SbtcApiClient {
   }
 
   async fetchSbtcBalance(stacksAddress: string) {
-    const [address, name] = stacksAddress.split('.');
-
     const balance = (await this.fetchCallReadOnly({
       contractAddress: this.config.sbtcContract,
       functionName: 'get-balance',
-      args: [name ? Cl.contractPrincipal(address, name) : Cl.standardPrincipal(address)],
+      args: [Cl.address(stacksAddress)],
     })) as SomeCV<UIntCV>;
 
     return balance?.value?.value ?? 0;
