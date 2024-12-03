@@ -54,9 +54,9 @@ npm install sbtc
 - **Processing by Signers:** (_no action required_)
   - The signers retrieve and verify the deposit transaction from the Bitcoin blockchain.
   - Once verified, the signers mint the equivalent amount of sBTC on the Stacks network.
-- **Receive sBTC:** (_no action required_)
+- **Receive sBTC (Stacks):** (_no action required_)
   - The minted sBTC is sent to the depositor's designated Stacks address, completing the deposit process.
-  - sBTC is SIP-010 compatible and will show up in wallets and explorers.
+  - sBTC is SIP-010 compatible and will show up in Stacks wallets and explorers.
 
 #### Withdraw Flow
 
@@ -159,7 +159,7 @@ const sbtcBalance = await client.fetchSbtcBalance(STX_ADDRESS); // fetch the sBT
 |                        |                                                                                                 |                      |                                                            |
 | `paymentPublicKey`     | Optional payment public key (currently only used for default utxoToSpendable.sh implementation) | `string` hex         | —                                                          |
 | `utxoToSpendable`      | Optional function to convert p2wpk and p2sh utxos to spendable inputs                           | `Function`           | Best effort default implementation to make utxos spendable |
-| `maxFee`               | Optional maximum fee to pay for the deposit transaction                                         | `number`             | `80_000`                                                   |
+| `maxSignerFee`         | Optional maximum fee to pay for the deposit transaction                                         | `number`             | `80_000`                                                   |
 | `reclaimLockTime`      | Optional reclaim lock time                                                                      | `number`             | `6_000`                                                    |
 | `network`              | Optional Bitcoin network                                                                        | `BitcoinNetwork`     | `REGTEST`                                                  |
 
@@ -189,7 +189,7 @@ const deposit = buildSbtcDepositTx({
   amountSats,
   stacksAddress,
   signersPublicKey,
-  maxFee,
+  maxSignerFee,
   reclaimLockTime,
 });
 

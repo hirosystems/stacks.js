@@ -164,7 +164,7 @@ test('btc tx, deposit to sbtc, tx compare to cli', async () => {
     stacksAddress: 'STGSJA8EMYDBAJDX6Z4ED8CWW071B6NB97SRAM1E',
     amountSats: 20_042,
 
-    maxFee: 20_000,
+    maxSignerFee: 20_000,
     reclaimLockTime: 50,
 
     signersPublicKey: '14c515722f2b61f9bc8bfbcd48422988533007602c74f3145616817f27302237',

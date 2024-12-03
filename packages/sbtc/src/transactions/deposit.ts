@@ -15,16 +15,16 @@ import {
 const concat = P.utils.concatBytes;
 
 export function buildSbtcDepositScript(opts: {
-  maxFee: number;
+  maxSignerFee: number;
   stacksAddress: string;
   signersPublicKey: string;
 }) {
-  const maxFeeBytes = P.U64BE.encode(BigInt(opts.maxFee));
+  const maxSignerFeeBytes = P.U64BE.encode(BigInt(opts.maxSignerFee));
   const recipientBytes = stacksAddressBytes(opts.stacksAddress);
   const signersPublicKeyBytes = hexToBytes(opts.signersPublicKey);
 
   return btc.Script.encode([
-    concat(maxFeeBytes, recipientBytes),
+    concat(maxSignerFeeBytes, recipientBytes),
     'DROP',
     signersPublicKeyBytes,
     'CHECKSIG',
@@ -42,7 +42,7 @@ export function buildSbtcDepositTr(opts: {
   network: BitcoinNetwork;
   stacksAddress: string;
   signersPublicKey: string;
-  maxFee: number;
+  maxSignerFee: number;
   lockTime: number;
 }) {
   const deposit = buildSbtcDepositScript(opts);
@@ -71,7 +71,7 @@ export function buildSbtcDepositTx({
   amountSats,
   stacksAddress,
   signersPublicKey,
-  maxFee,
+  maxSignerFee,
   reclaimLockTime,
 }: {
   network: BitcoinNetwork;
@@ -79,7 +79,7 @@ export function buildSbtcDepositTx({
   stacksAddress: string;
   /** Aggregated (schnorr) public key of all signers */
   signersPublicKey: string;
-  maxFee: number;
+  maxSignerFee: number;
   reclaimLockTime: number;
 }) {
   // todo: check opts, e.g. pub key length to be schnorr
@@ -88,7 +88,7 @@ export function buildSbtcDepositTx({
     network,
     stacksAddress,
     signersPublicKey,
-    maxFee,
+    maxSignerFee,
     lockTime: reclaimLockTime,
   });
   if (!tr.trOut.address) throw new Error('Failed to create build taproot output');
@@ -109,7 +109,7 @@ export async function sbtcDepositHelper({
   utxos,
   utxoToSpendable = DEFAULT_UTXO_TO_SPENDABLE,
   paymentPublicKey,
-  maxFee = 80_000,
+  maxSignerFee = 80_000,
   reclaimLockTime = 6_000,
 }: {
   /** Bitcoin network, defaults to REGTEST */
@@ -145,7 +145,7 @@ export async function sbtcDepositHelper({
   utxoToSpendable?: Partial<SpendableByScriptTypes>;
 
   /** Optional maximum fee to pay for the deposit transaction, defaults to 80_000 */
-  maxFee?: number;
+  maxSignerFee?: number;
   /** Optional reclaim lock time, defaults to 6_000 */
   reclaimLockTime?: number;
 
@@ -161,7 +161,7 @@ export async function sbtcDepositHelper({
     amountSats,
     stacksAddress,
     signersPublicKey,
-    maxFee,
+    maxSignerFee,
     reclaimLockTime,
   });
 
