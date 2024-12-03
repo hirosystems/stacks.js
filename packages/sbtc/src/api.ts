@@ -10,9 +10,8 @@ import {
   fetchCallReadOnlyFunction,
 } from '@stacks/transactions';
 import { REGTEST } from './constants';
-import { wrapLazyProxy } from './utils';
-import { bytesToHex } from '@stacks/common';
 import { sbtcDepositHelper } from './transactions';
+import { wrapLazyProxy } from './utils';
 
 /** todo */
 // https://blockstream.info/api/address/1KFHE7w8BhaENAswwryaoccDb6qcT6DbYY/utxo
