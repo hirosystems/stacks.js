@@ -14,13 +14,13 @@ A helper package for interacting with sBTC from JavaScript/TypeScript.
     - [Withdraw Flow](#withdraw-flow)
   - [`sbtc` Package](#sbtc-package)
 - [Examples](#examples)
+  - [`buildSbtcDepositAddress`](#buildsbtcdepositaddress)
+  - [`buildSbtcDepositTx`](#buildsbtcdeposittx)
   - [`sbtcDepositHelper`](#sbtcdeposithelper)
   - [`SbtcApiClientTestnet` / `SbtcApiClientDevenv`](#sbtcapiclienttestnet--sbtcapiclientdevenv)
 - [API](#api)
   - [`sbtcDepositHelper`](#sbtcdeposithelper-1)
   - [`SbtcApiClientTestnet` / `SbtcApiClientDevenv`](#sbtcapiclienttestnet--sbtcapiclientdevenv-1)
-- [Advanced API](#advanced-api)
-  - [`buildSbtcDepositTx` (e.g., for wallets)](#buildsbtcdeposittx-eg-for-wallets)
 
 ## Installation
 
@@ -62,12 +62,22 @@ npm install sbtc
 
 > _Coming soon_
 
+---
+
 ### `sbtc` Package
 
-The package exports two high-level helpers for interacting with sBTC:
+The package exports high-level functions for building addresses and transactions.
+
+**With wallets:**
+
+- [`buildSbtcDepositAddress`](#buildsbtcdepositaddress) — build a deposit address and metadata (enough for most use-cases)
+- [`buildSbtcDepositTx`](#buildsbtcdepositaddress) — build a deposit transaction and metadata
+
+**Without wallets:**
 
 - [`sbtcDepositHelper`](#sbtcdeposithelper) — create a fully-formed deposit transaction (assuming an address with spendable bitcoin UTXOs)
-- [`sbtcWithdrawHelper`](#sbtcwithdrawhelper) — _coming soon_
+
+**HTTP Clients:**
 
 Additionally, there are two API helpers, which make it easier to get all the data needed to create the above transactions:
 
@@ -85,14 +95,83 @@ While the final adjustments are still being made in the pre-release phase, this 
 
 ## Examples
 
+### `buildSbtcDepositAddress`
+
+Build a deposit address and metadata to be used with any wallet.
+
+```ts
+import { buildSbtcDepositAddress, SbtcApiClientTestnet } from 'sbtc';
+
+const client = new SbtcApiClientTestnet();
+
+// 1. BUILD THE DEPOSIT ADDRESS AND METADATA
+const deposit = buildSbtcDepositAddress({
+  stacksAddress: TARGET_STX_ADDRESS,
+  signersPublicKey: await client.fetchSignersPublicKey(),
+
+  // OPTIONAL DEFAULTS
+  // maxSignerFee: 80_000, // optional: fee to pay for the deposit transaction (taken from the signers from the sats)
+  // reclaimLockTime: 6_000, // optional: lock time for the reclaim script
+  // network: REGTEST, // optional: which bitcoin network to use
+});
+
+// `deposit.address` is the deposit address (send funds here, aka the deposit address as an output)
+
+// 2. DEPOSIT USING YOUR FAVORITE WALLET (TYPICALLY ALSO BROADCASTED BY THE WALLET)
+const txid = await WalletProvider.sendTransfer({
+  recipient: deposit.address,
+  amount: 100_000, // the amount to deposit; <=maxSignerFee is taken from this amount
+});
+
+// 3. NOTIFY THE SIGNERS
+await client.notifySbtc({ txid, ...deposit });
+```
+
+### `buildSbtcDepositTx`
+
+Like `buildSbtcDepositAddress`, but also builds a deposit transaction.
+
+> **Note:** This function ONLY builds the basic format of the deposit transaction. You still need to add inputs (and potential change outputs) yourself.
+
+```ts
+import { buildSbtcDepositTx } from 'sbtc';
+
+// 1. BUILD THE DEPOSIT TRANSACTION AND METADATA
+const deposit = buildSbtcDepositTx({
+  amountSats: DEPOSIT_AMOUNT, // the amount in sats/sBTC to deposit; <=maxSignerFee is taken from this amount
+
+  // same options as `buildSbtcDepositAddress`
+  network,
+  stacksAddress,
+  signersPublicKey,
+  maxSignerFee,
+  reclaimLockTime,
+});
+
+// `deposit.transaction` has one output, which is the combined taproot of the deposit and reclaim scripts
+
+// 2. SIGN THE TRANSACTION
+deposit.transaction.sign(YOUR_BTC_PRIVATE_KEY);
+deposit.transaction.finalize();
+
+// 2. OR SIGN VIA EXTERNAL WALLET
+const psbtBytes = deposit.transaction.toPSBT();
+
+// 3. BROADCAST THE TRANSACTION
+const txid = await client.broadcastTx(deposit.transaction);
+
+// 4. NOTIFY THE SIGNERS
+await client.notifySbtc(deposit);
+```
+
 ### `sbtcDepositHelper`
 
-```typescript
+```ts
 import { sbtcDepositHelper, SbtcApiClientTestnet } from 'sbtc';
 
 const client = new SbtcApiClientTestnet();
 
-// 1. BUILD THE DEPOSIT TRANSACTION (GIVEN UTXOS FOR AN ADDRESS)
+// 1. BUILD THE DEPOSIT TRANSACTION AND METADATA (GIVEN UTXOS FOR AN ADDRESS)
 const deposit = await sbtcDepositHelper({
   stacksAddress: TARGET_STX_ADDRESS, // where to send/mint the sBTC
   amountSats: 5_000_000, // (maximum) amount of sBTC to deposit
@@ -171,27 +250,3 @@ const sbtcBalance = await client.fetchSbtcBalance(STX_ADDRESS); // fetch the sBT
 | `sbtcApiUrl`   | The base URL of the sBTC API (Emily)              | `string` |
 | `btcApiUrl`    | The base URL of the Bitcoin mempool/electrs API   | `string` |
 | `stxApiUrl`    | The base URL of the Stacks API                    | `string` |
-
-## Advanced API
-
-If you need more control over the transaction, you can use the low-level functions to build the transaction directly.
-
-### `buildSbtcDepositTx` (e.g., for wallets)
-
-> **Note:** This function ONLY builds the basic format of the deposit transaction. You still need to add inputs (and potential change outputs) yourself.
-
-```ts
-import { buildSbtcDepositTx } from 'sbtc';
-
-const deposit = buildSbtcDepositTx({
-  // subset of parameters from `sbtcDepositHelper`
-  network,
-  amountSats,
-  stacksAddress,
-  signersPublicKey,
-  maxSignerFee,
-  reclaimLockTime,
-});
-
-// `deposit.transaction` has one output, which is the combined taproot of the deposit and reclaim scripts
-```

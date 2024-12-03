@@ -66,6 +66,35 @@ export function buildSbtcDepositTr(opts: {
   };
 }
 
+export function buildSbtcDepositAddress({
+  network = REGTEST,
+  stacksAddress,
+  signersPublicKey,
+  maxSignerFee,
+  reclaimLockTime,
+}: {
+  network: BitcoinNetwork;
+  stacksAddress: string;
+  /** Aggregated (schnorr) public key of all signers */
+  signersPublicKey: string;
+  maxSignerFee: number;
+  reclaimLockTime: number;
+}) {
+  const tr = buildSbtcDepositTr({
+    network,
+    stacksAddress,
+    signersPublicKey,
+    maxSignerFee,
+    lockTime: reclaimLockTime,
+  });
+  if (!tr.trOut.address) throw new Error('Failed to create build taproot output');
+
+  return {
+    address: tr.trOut.address,
+    ...tr,
+  };
+}
+
 export function buildSbtcDepositTx({
   network = REGTEST,
   amountSats,
@@ -84,19 +113,18 @@ export function buildSbtcDepositTx({
 }) {
   // todo: check opts, e.g. pub key length to be schnorr
 
-  const tr = buildSbtcDepositTr({
+  const deposit = buildSbtcDepositAddress({
     network,
     stacksAddress,
     signersPublicKey,
     maxSignerFee,
-    lockTime: reclaimLockTime,
+    reclaimLockTime,
   });
-  if (!tr.trOut.address) throw new Error('Failed to create build taproot output');
 
   const tx = new btc.Transaction();
-  tx.addOutputAddress(tr.trOut.address, BigInt(amountSats), network);
+  tx.addOutputAddress(deposit.address, BigInt(amountSats), network);
 
-  return { transaction: tx, ...tr };
+  return { transaction: tx, ...deposit };
 }
 
 export async function sbtcDepositHelper({

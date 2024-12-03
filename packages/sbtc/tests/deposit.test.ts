@@ -1,24 +1,44 @@
 import * as btc from '@scure/btc-signer';
 import { hexToBytes } from '@stacks/common';
-import { enableFetchLogging } from '@stacks/internal';
+import { enableFetchLogging, waitForFulfilled } from '@stacks/internal';
 import { expect, test, vi } from 'vitest';
 import createFetchMock from 'vitest-fetch-mock';
 import { SbtcApiClientDevenv, sbtcDepositHelper } from '../src';
 import { WALLET_00, getBitcoinAccount, getStacksAccount } from './helpers/wallet';
+import RpcClient from '@btc-helpers/rpc';
 
 enableFetchLogging(); // enable if you want to record requests to network.txt file
 
 // set globalThis.fetch and globalThis.fetchMock to mocked version
-createFetchMock(vi).enableMocks();
+// createFetchMock(vi).enableMocks();
 
-test('btc tx, deposit to sbtc, broadcast', async () => {
+test('fetch signer address', async () => {
+  const dev = new SbtcApiClientDevenv();
+
+  await waitForFulfilled(function sbtcIsDeployed() {
+    return dev.fetchSignersPublicKey();
+  });
+
+  const address = await dev.fetchSignersAddress();
+  console.log('address', address);
+
+  const bitcoinAccount = await getBitcoinAccount(WALLET_00);
+
+  const rpc = new RpcClient('http://devnet:devnet@127.0.0.1:18443').Typed;
+
+  let res = await rpc.generatetoaddress({ nblocks: 1, address });
+  console.log('res', res);
+
+  res = await rpc.generatetoaddress({ nblocks: 1, address: bitcoinAccount.wpkh.address });
+  console.log('res', res);
+});
+
+test('btc tx, deposit to sbtc, broadcast — raw fetch', async () => {
   // TEST CASE
   // Assumes a manually funded signers address and WALLET_00 wpkh address
 
   const bitcoinAccount = await getBitcoinAccount(WALLET_00); // wpkh bcrt1q3tj2fr9scwmcw3rq5m6jslva65f2rqjxfrjz47 (manually funded on devenv via bridge)
   const stacksAccount = await getStacksAccount(WALLET_00);
-
-  // todo: switch to mempool proxy once it's live
 
   fetchMock.mockOnce(
     `{"result":{"success":true,"txouts":342,"height":252,"bestblock":"71903ce6738b723dad54e3ad110b859e8c1bd6ba499d94b4b0b22a44b0c10b37","unspents":[{"txid":"51349ba2a37959a5d84826311a556cf5201aeae6ddeb94b8d254976d0d20c217","vout":0,"scriptPubKey":"00148ae4a48cb0c3b7874460a6f5287d9dd512a18246","desc":"addr(bcrt1q3tj2fr9scwmcw3rq5m6jslva65f2rqjxfrjz47)#gcletckr","amount":1,"coinbase":false,"height":241}],"total_amount":1}}`
@@ -75,6 +95,87 @@ test('btc tx, deposit to sbtc, broadcast', async () => {
 
   const signerAddress = await dev.fetchSignersAddress();
   expect(signerAddress).toBe('bcrt1paeulen354qzsstck3es7ur4c27ls5kyq8myvts7zmkyp4m6972kqwanet5');
+
+  // Tx building
+  const {
+    transaction: tx,
+    depositScript,
+    reclaimScript,
+  } = await sbtcDepositHelper({
+    stacksAddress: stacksAccount.address,
+    amountSats: 5_000_000,
+
+    signersPublicKey: pub,
+
+    feeRate: 1,
+    utxos,
+
+    bitcoinChangeAddress: bitcoinAccount.wpkh.address,
+  });
+
+  tx.sign(bitcoinAccount.privateKey);
+  tx.finalize();
+
+  fetchMock.mockOnce(
+    `{"result":[{"txid":"3cc72977efc12ceeddaf5589e53cb67525e798e0c67018eeffdc1c583e9c6005","wtxid":"0f8ce4916f6550f8af6de05bf2e8066a090694ff65cf5ba4f3a574c457a797b8","allowed":true,"vsize":153,"fees":{"base":0.00000189,"effective-feerate":0.00001235,"effective-includes":["0f8ce4916f6550f8af6de05bf2e8066a090694ff65cf5ba4f3a574c457a797b8"]}}]}`
+  );
+
+  const resTestmempoolaccept = await fetch('http://localhost:3010/api/bitcoind', {
+    body: `{"rpcMethod":"testmempoolaccept","params":[["${tx.hex}"]],"bitcoinDUrl":"http://bitcoin:18443/"}`,
+    method: 'POST',
+  });
+  const jsonTestmempoolaccept = await resTestmempoolaccept.json();
+  expect(jsonTestmempoolaccept.result[0].txid).toBe(tx.id);
+
+  fetchMock.mockOnce(
+    `{"result":"3cc72977efc12ceeddaf5589e53cb67525e798e0c67018eeffdc1c583e9c6005"}`
+  );
+
+  const resBroadcast = await fetch('http://localhost:3010/api/bitcoind', {
+    body: `{"rpcMethod":"sendrawtransaction","params":["${tx.hex}"],"bitcoinDUrl":"http://bitcoin:18443/"}`,
+    method: 'POST',
+  });
+  const jsonBroadcast = (await resBroadcast.json()) as { result: string };
+
+  fetchMock.mockOnce(
+    `{"bitcoinTxid":"3cc72977efc12ceeddaf5589e53cb67525e798e0c67018eeffdc1c583e9c6005","bitcoinTxOutputIndex":0,"recipient":"051a6d78de7b0625dfbfc16c3a8a5735f6dc3dc3f2ce","amount":0,"lastUpdateHeight":137,"lastUpdateBlockHash":"aa92e5d8af05a266e98ac9ed8bc1979029adaff556b8ca33ca6b216458a3a22c","status":"pending","statusMessage":"Just received deposit","parameters":{"maxFee":80000,"lockTime":6000},"reclaimScript":"027017b2","depositScript":"1e0000000000013880051a6d78de7b0625dfbfc16c3a8a5735f6dc3dc3f2ce7520b6ad657d5428873633f6c3c948b4102bd697c1c8449425c1be1ff71992f98b74ac"}`
+  );
+
+  const resEmilyDeposit = await fetch('http://localhost:3010/api/emilyDeposit', {
+    body: `{"bitcoinTxid":"${jsonBroadcast.result}","bitcoinTxOutputIndex":0,"reclaimScript":"${reclaimScript}","depositScript":"${depositScript}","url":"http://emily-server:3031"}`,
+    method: 'POST',
+  });
+  const jsonEmilyDeposit = await resEmilyDeposit.json();
+  expect(jsonEmilyDeposit.status).toBe('pending');
+  expect(jsonEmilyDeposit.depositScript).toBe(depositScript);
+  expect(jsonEmilyDeposit.reclaimScript).toBe(reclaimScript);
+});
+
+test('btc tx, deposit to sbtc, broadcast — client proxy', async () => {
+  // TEST CASE
+  // Assumes a manually funded signers address and WALLET_00 wpkh address
+
+  const bitcoinAccount = await getBitcoinAccount(WALLET_00); // wpkh bcrt1q3tj2fr9scwmcw3rq5m6jslva65f2rqjxfrjz47 (manually funded on devenv via bridge)
+  const stacksAccount = await getStacksAccount(WALLET_00);
+
+  const dev = new SbtcApiClientDevenv({
+    btcApiUrl: 'http://localhost:3010/api/proxy',
+  });
+
+  const pub = await dev.fetchSignersPublicKey();
+  expect(pub).toBe('f1934e22bddf0dff972cf91404ab0d1cb9d4797e07c310d47283b9100d762937');
+
+  const signerAddress = await dev.fetchSignersAddress();
+  expect(signerAddress).toBe('bcrt1p5yupkjf2k8fk0unqfz9l40putap6ls9satez6a86hgdryfz4zvwqv9jal3');
+
+  const utxos = await dev.fetchUtxos(bitcoinAccount.wpkh.address);
+  expect(utxos.length).toBeGreaterThan(0);
+
+  const utxosSigner = await dev.fetchUtxos(signerAddress);
+  expect(utxosSigner.length).toBeGreaterThan(0);
+
+  expect(await utxos[0].tx).toBeInstanceOf(String);
+  return;
 
   // Tx building
   const {

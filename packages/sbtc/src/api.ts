@@ -69,11 +69,11 @@ export class SbtcApiClient {
   }
 
   async fetchTxHex(txid: string): Promise<string> {
-    return fetch(`${this.config.btcApiUrl}/api/tx/${txid}/hex`).then(res => res.text());
+    return fetch(`${this.config.btcApiUrl}/tx/${txid}/hex`).then(res => res.text());
   }
 
   async fetchFeeRates(): Promise<MempoolFeeEstimates> {
-    return fetch(`${this.config.btcApiUrl}/api/v1/fees/recommended`).then(res => res.json());
+    return fetch(`${this.config.btcApiUrl}/fees/recommended`).then(res => res.json());
   }
 
   async fetchFeeRate(target: 'low' | 'medium' | 'high'): Promise<number> {
@@ -89,14 +89,24 @@ export class SbtcApiClient {
     }).then(res => res.text());
   }
 
-  async notifySbtc(depositInfo: Awaited<ReturnType<typeof sbtcDepositHelper>>) {
+  async notifySbtc({
+    depositScript,
+    reclaimScript,
+    vout = 0,
+    ...tx
+  }: {
+    depositScript: string;
+    reclaimScript: string;
+    /** Optional, output index (defaults to `0`) */
+    vout?: number;
+  } & ({ txid: string } | { transaction: { id: string } })) {
     return (await fetch(`${this.config.sbtcApiUrl}/deposit`, {
       method: 'POST',
       body: JSON.stringify({
-        bitcoinTxid: depositInfo.transaction.id,
-        bitcoinTxOutputIndex: 0,
-        depositScript: depositInfo.depositScript,
-        reclaimScript: depositInfo.reclaimScript,
+        bitcoinTxid: 'txid' in tx ? tx.txid : tx.transaction.id,
+        bitcoinTxOutputIndex: vout,
+        depositScript,
+        reclaimScript,
       }),
     }).then(res => res.json())) as {
       bitcoinTxid: string;
