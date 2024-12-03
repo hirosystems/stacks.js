@@ -10,7 +10,6 @@ import {
   fetchCallReadOnlyFunction,
 } from '@stacks/transactions';
 import { REGTEST } from './constants';
-import { sbtcDepositHelper } from './transactions';
 import { wrapLazyProxy } from './utils';
 
 /** todo */
