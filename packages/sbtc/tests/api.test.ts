@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'vitest';
-import { SbtcApiClientDevenv, SbtcApiClientTestnet } from '../src';
+import { REGTEST, SbtcApiClientDevenv, SbtcApiClientTestnet } from '../src';
 import { WALLET_00, getBitcoinAccount, getStacksAccount } from './helpers/wallet';
+import * as btc from '@scure/btc-signer';
 
 const dev = new SbtcApiClientDevenv();
 const tnet = new SbtcApiClientTestnet();
@@ -16,6 +17,19 @@ describe('testnet:', () => {
 
 describe('devenv:', () => {
   const btcAddressDevenv = 'bcrt1qgl8eevaz70u7ny69l052w8ku36sgeddjjcawwq';
+
+  test('fetch signers info', async () => {
+    const pub = await dev.fetchSignersPublicKey();
+    console.log(pub);
+
+    const address = await dev.fetchSignersAddress();
+    console.log(address);
+  });
+
+  test('get signers address', () => {
+    const pub = 'ae0636a3ba8c98ca311fe8856f377f86abe76788716c8fccd065d59f85483e6d';
+    console.log(btc.p2tr(pub, undefined, REGTEST).address!);
+  });
 
   test('fetch utxos', async () => {
     const unspent = await dev.fetchUtxos(btcAddressDevenv);

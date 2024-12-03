@@ -11,6 +11,7 @@ import {
 } from '@stacks/transactions';
 import { REGTEST } from './constants';
 import { wrapLazyProxy } from './utils';
+import { bytesToHex } from '@stacks/common';
 
 /** todo */
 // https://blockstream.info/api/address/1KFHE7w8BhaENAswwryaoccDb6qcT6DbYY/utxo
@@ -47,7 +48,7 @@ export interface BaseClientConfig {
   sbtcContract: string;
 
   sbtcApiUrl: string;
-  btcMempoolApiUrl: string;
+  btcApiUrl: string;
   stxApiUrl: string;
 }
 
@@ -56,7 +57,7 @@ export class SbtcApiClient {
 
   async fetchUtxos(address: string): Promise<UtxoWithTx[]> {
     return (
-      fetch(`${this.config.btcMempoolApiUrl}/address/${address}/utxo`)
+      fetch(`${this.config.btcApiUrl}/address/${address}/utxo`)
         .then(res => res.json())
         // .then((utxos: MempoolApiUtxo[]) =>
         //   utxos.sort((a, b) => a.status.block_height - b.status.block_height)
@@ -68,11 +69,11 @@ export class SbtcApiClient {
   }
 
   async fetchTxHex(txid: string): Promise<string> {
-    return fetch(`${this.config.btcMempoolApiUrl}/api/tx/${txid}/hex`).then(res => res.text());
+    return fetch(`${this.config.btcApiUrl}/api/tx/${txid}/hex`).then(res => res.text());
   }
 
   async fetchFeeRates(): Promise<MempoolFeeEstimates> {
-    return fetch(`${this.config.btcMempoolApiUrl}/api/v1/fees/recommended`).then(res => res.json());
+    return fetch(`${this.config.btcApiUrl}/api/v1/fees/recommended`).then(res => res.json());
   }
 
   async fetchFeeRate(target: 'low' | 'medium' | 'high'): Promise<number> {
@@ -82,10 +83,43 @@ export class SbtcApiClient {
   }
 
   async broadcastTx(tx: btc.Transaction): Promise<string> {
-    return await fetch(`${this.config.btcMempoolApiUrl}/tx`, {
+    return await fetch(`${this.config.btcApiUrl}/tx`, {
       method: 'POST',
       body: tx.hex,
     }).then(res => res.text());
+  }
+
+  async notifySbtc(tx: btc.Transaction) {
+    const depositScript = tx.getOutput(0).script;
+    const reclaimScript = tx.getOutput(1).script;
+
+    if (!depositScript) throw new Error('Missing deposit script at index 0');
+    if (!reclaimScript) throw new Error('Missing reclaim script at index 1');
+
+    return (await fetch(`${this.config.sbtcApiUrl}/deposit`, {
+      method: 'POST',
+      body: JSON.stringify({
+        bitcoinTxid: tx.id,
+        bitcoinTxOutputIndex: 0,
+        depositScript: bytesToHex(depositScript),
+        reclaimScript: bytesToHex(reclaimScript),
+      }),
+    }).then(res => res.json())) as {
+      bitcoinTxid: string;
+      bitcoinTxOutputIndex: number;
+      recipient: string;
+      amount: number;
+      lastUpdateHeight: number;
+      lastUpdateBlockHash: string;
+      status: string;
+      statusMessage: string;
+      parameters: {
+        maxFee: number;
+        lockTime: number;
+      };
+      reclaimScript: string;
+      depositScript: string;
+    };
   }
 
   async fetchSignersPublicKey(contractAddress?: string): Promise<string> {
@@ -140,7 +174,7 @@ export class SbtcApiClient {
   /** Get BTC balance (in satoshis) */
   async fetchBalance(address: string): Promise<number> {
     // todo: check if better endpoints now exist
-    const addressInfo = await fetch(`${this.config.btcMempoolApiUrl}/address/${address}`).then(r =>
+    const addressInfo = await fetch(`${this.config.btcApiUrl}/address/${address}`).then(r =>
       r.json()
     );
 
@@ -160,15 +194,17 @@ export class SbtcApiClient {
   }
 }
 
+/** todo */
 export class SbtcApiClientTestnet extends SbtcApiClient {
   constructor(config?: Partial<BaseClientConfig>) {
     super(
       Object.assign(
         {
-          sbtcApiUrl: 'https://sbtc.tech', // todo: get real url
-          btcMempoolApiUrl: 'https://blockstream.info/testnet/api', // todo: mempool it
-          stxApiUrl: 'https://stacks-node-api.testnet.stacks.co',
-          sbtcContract: 'SN3R84XZYA63QS28932XQF3G1J8R9PC3W76P9CSQS', // todo: find final value
+          sbtcApiUrl: 'https://beta.sbtc-emily.com', // todo: get real url
+          btcApiUrl: 'https://TODO', // todo: replace with functioning regtest testnet deployment
+          stxApiUrl: 'https://api.testnet.hiro.so',
+          /** ⚠︎ Attention: This contract address might still change over the course of the sBTC contract on Testnet */
+          sbtcContract: 'SNGWPN3XDAQE673MXYXF81016M50NHF5X5PWWM70',
         },
         config
       )
@@ -181,8 +217,8 @@ export class SbtcApiClientDevenv extends SbtcApiClient {
     super(
       Object.assign(
         {
-          sbtcApiUrl: 'http://localhost:3031', // todo: get real url
-          btcMempoolApiUrl: 'http://localhost:8083',
+          sbtcApiUrl: 'http://localhost:3031',
+          btcApiUrl: 'http://localhost:3002',
           stxApiUrl: 'http://localhost:3999',
           sbtcContract: 'SN3R84XZYA63QS28932XQF3G1J8R9PC3W76P9CSQS',
         },

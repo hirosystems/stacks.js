@@ -14,20 +14,6 @@ import {
 
 const concat = P.utils.concatBytes;
 
-// export function buildSBtcDepositBtcPayload({
-//   network,
-//   address,
-// }: {
-//   network: BitcoinNetwork;
-//   address: string;
-// }): Uint8Array {
-//   const magicBytes = asciiToBytes(network.magicBytes);
-//   const opCodeBytes = hexToBytes(OpCode.PegIn);
-//   const addressBytes = stacksAddressBytes(address);
-
-//   return concat(magicBytes, opCodeBytes, addressBytes);
-// }
-
 export function buildSbtcDepositScript(opts: {
   maxFee: number;
   stacksAddress: string;
@@ -48,8 +34,7 @@ export function buildSbtcDepositScript(opts: {
 export function buildSbtcReclaimScript(opts: { lockTime: number }) {
   return btc.Script.encode([
     btc.ScriptNum().encode(BigInt(opts.lockTime)),
-    'CHECKSEQUENCEVERIFY',
-    // 'CHECKSEQUENCEVERIFY', // todo: remove; I'm assuming once is enough? // sbtc-bridge code does twice with additional optional data before
+    'CHECKSEQUENCEVERIFY', // sbtc-bridge code does twice with additional optional data before
   ]);
 }
 
@@ -63,7 +48,7 @@ export function buildSbtcDepositTr(opts: {
   const deposit = buildSbtcDepositScript(opts);
   const reclaim = buildSbtcReclaimScript(opts);
 
-  const NUMS_X_COORDINATE = new Uint8Array([
+  const UNSPENDABLE_PUB = new Uint8Array([
     0x50, 0x92, 0x9b, 0x74, 0xc1, 0xa0, 0x49, 0x54, 0xb7, 0x8b, 0x4b, 0x60, 0x35, 0xe9, 0x7a, 0x5e,
     0x07, 0x8a, 0x5a, 0x0f, 0x28, 0xec, 0x96, 0xd5, 0x47, 0xbf, 0xee, 0x9a, 0xce, 0x80, 0x3a, 0xc0,
   ]);
@@ -73,10 +58,10 @@ export function buildSbtcDepositTr(opts: {
     reclaimScript: bytesToHex(reclaim),
 
     trOut: btc.p2tr(
-      NUMS_X_COORDINATE,
+      UNSPENDABLE_PUB,
       [{ script: deposit }, { script: reclaim }],
       opts.network,
-      true
+      true // allow custom scripts
     ),
   };
 }
@@ -113,29 +98,6 @@ export function buildSbtcDepositTx({
 
   return { transaction: tx, ...tr };
 }
-
-// export function buildSbtcDepositTxOpReturn({
-//   network = REGTEST,
-//   amountSats,
-//   stacksAddress,
-//   pegAddress = SBTC_PEG_ADDRESS_DEVENV,
-// }: {
-//   network?: BitcoinNetwork;
-//   amountSats: number;
-//   stacksAddress: string;
-//   pegAddress?: string;
-// }) {
-//   const data = buildSBtcDepositBtcPayload({ network, address: stacksAddress });
-
-//   const tx = new btc.Transaction({
-//     allowUnknownInputs: true,
-//     allowUnknownOutputs: true,
-//   });
-//   tx.addOutput({ script: btc.Script.encode(['RETURN', data]), amount: BigInt(0) });
-//   tx.addOutputAddress(pegAddress, BigInt(amountSats), network);
-
-//   return tx;
-// }
 
 export async function sbtcDepositHelper({
   network = REGTEST,
@@ -186,7 +148,8 @@ export async function sbtcDepositHelper({
   maxFee?: number;
   /** Optional reclaim lock time, defaults to 6_000 */
   reclaimLockTime?: number;
-  /** Optional payment public key (currently only used for `utxoToSpendable.sh`) */
+
+  /** Optional payment public key (currently only used for the default `utxoToSpendable.sh` implementation) */
   paymentPublicKey?: string;
 }) {
   if (paymentPublicKey) {
@@ -198,7 +161,7 @@ export async function sbtcDepositHelper({
     amountSats,
     stacksAddress,
     signersPublicKey,
-    maxFee: maxFee,
+    maxFee,
     reclaimLockTime,
   });
 

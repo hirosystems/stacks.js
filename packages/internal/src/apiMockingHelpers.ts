@@ -26,7 +26,8 @@ const MATCHER = {
 export function setApiMocks(responseMap: { [key: string]: any }, mockTxBroadcast = true) {
   // we want to be able to call setApiMocks and it do nothing if mocking is currently disabled
   // (maybe move this to inside the mockIf handler, for better enabling/disabling mocking during a run)
-  if (!isMocking()) return;
+
+  // if (!isMocking()) return; todo: disabled for vitest compatibility
 
   if (mockTxBroadcast)
     responseMap = {
@@ -57,7 +58,7 @@ function sleep(ms: number) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-function isMocking(): boolean {
+export function isMocking(): boolean {
   const result = fetchMock.isMocking(''); // be careful using .isMocking, it will consume .mockOnce's
   if (typeof result === 'boolean') return result;
   return result[0];
