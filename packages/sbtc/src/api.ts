@@ -201,8 +201,8 @@ export class SbtcApiClientTestnet extends SbtcApiClient {
     super(
       Object.assign(
         {
-          sbtcApiUrl: 'https://beta.sbtc-emily.com', // todo: get real url
-          btcApiUrl: 'https://TODO', // todo: replace with functioning regtest testnet deployment
+          sbtcApiUrl: 'https://beta.sbtc-emily.com',
+          btcApiUrl: 'https://beta.sbtc-mempool.tech/api/proxy',
           stxApiUrl: 'https://api.testnet.hiro.so',
           /** ⚠︎ Attention: This contract address might still change over the course of the sBTC contract on Testnet */
           sbtcContract: 'SNGWPN3XDAQE673MXYXF81016M50NHF5X5PWWM70',
