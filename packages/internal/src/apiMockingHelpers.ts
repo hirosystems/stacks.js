@@ -192,6 +192,7 @@ export function enableFetchLogging() {
   const fetchOriginal = globalThis.fetch;
   (globalThis.fetch as any) = async (input: string | Request, init?: RequestInit) => {
     const r = await fetchOriginal(input, init);
+    logCurl(input, init);
     const response = await r
       .clone()
       .json()
@@ -201,4 +202,19 @@ export function enableFetchLogging() {
     fs.appendFileSync('network.txt', `${log}\n`);
     return r;
   };
+}
+
+function logCurl(input: string | Request, init?: RequestInit) {
+  const url = input instanceof Request ? input.url : input;
+  const method = init?.method || 'GET';
+  const headers = init?.headers
+    ? Object.entries(init.headers)
+        .map(([k, v]) => `-H '${k}: ${v}'`)
+        .join(' ')
+    : '';
+  const body = init?.body
+    ? `-d '${typeof init.body === 'string' ? init.body : JSON.stringify(init.body)}'`
+    : '';
+  const curl = `curl -X ${method} ${headers} ${body} '${url}'`;
+  fs.appendFileSync('curl.txt', `${curl}\n`);
 }

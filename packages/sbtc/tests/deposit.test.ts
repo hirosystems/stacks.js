@@ -1,9 +1,9 @@
 import * as btc from '@scure/btc-signer';
 import { hexToBytes } from '@stacks/common';
 import { enableFetchLogging, waitForFulfilled } from '@stacks/internal';
-import { expect, test, vi } from 'vitest';
+import { describe, expect, test, vi } from 'vitest';
 import createFetchMock from 'vitest-fetch-mock';
-import { SbtcApiClientDevenv, sbtcDepositHelper } from '../src';
+import { SbtcApiClientDevenv, SbtcApiClientTestnet, sbtcDepositHelper } from '../src';
 import { WALLET_00, getBitcoinAccount, getStacksAccount } from './helpers/wallet';
 import RpcClient from '@btc-helpers/rpc';
 
@@ -12,227 +12,273 @@ enableFetchLogging(); // enable if you want to record requests to network.txt fi
 // set globalThis.fetch and globalThis.fetchMock to mocked version
 // createFetchMock(vi).enableMocks();
 
-test('fetch signer address', async () => {
-  const dev = new SbtcApiClientDevenv();
+describe('deposit devenv', () => {
+  test('btc tx, broadcast — raw fetch', async () => {
+    // TEST CASE
+    // Assumes a manually funded signers address and WALLET_00 wpkh address
 
-  await waitForFulfilled(function sbtcIsDeployed() {
-    return dev.fetchSignersPublicKey();
+    const bitcoinAccount = await getBitcoinAccount(WALLET_00); // wpkh bcrt1q3tj2fr9scwmcw3rq5m6jslva65f2rqjxfrjz47 (manually funded on devenv via bridge)
+    const stacksAccount = await getStacksAccount(WALLET_00);
+
+    fetchMock.mockOnce(
+      `{"result":{"success":true,"txouts":342,"height":252,"bestblock":"71903ce6738b723dad54e3ad110b859e8c1bd6ba499d94b4b0b22a44b0c10b37","unspents":[{"txid":"51349ba2a37959a5d84826311a556cf5201aeae6ddeb94b8d254976d0d20c217","vout":0,"scriptPubKey":"00148ae4a48cb0c3b7874460a6f5287d9dd512a18246","desc":"addr(bcrt1q3tj2fr9scwmcw3rq5m6jslva65f2rqjxfrjz47)#gcletckr","amount":1,"coinbase":false,"height":241}],"total_amount":1}}`
+    );
+
+    const resScantxoutset = await fetch('http://localhost:3010/api/bitcoind', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: `{"rpcMethod":"scantxoutset","params":["start",[{"desc":"addr(${bitcoinAccount.wpkh.address})","range":10000}]],"bitcoinDUrl":"http://bitcoin:18443/"}`,
+    });
+    const jsonUtxo = await resScantxoutset.json();
+
+    fetchMock.mockOnce(
+      `{"result":"020000000150a4f0768a8ec85e76c8c049dd1839b2a6c8f35d79a5f0e0c1b23ed398cf8240000000006b4830450221008f19e4bc403136bad26e757647ccb45d8d0fc8d572da0adecd92194319be6e39022018830d39aabfbb76c037d450609466ae01d2e9a98167866d26379ce5cbf41a340121035379aa40c02890d253cfa577964116eb5295570ae9f7287cbae5f2585f5b2c7cffffffff0200e1f505000000001600148ae4a48cb0c3b7874460a6f5287d9dd512a18246e0c20f24010000001976a9141dc27eba0247f8cc9575e7d45e50a0bc7e72427d88ac00000000"}`
+    );
+
+    const txHexResponse = await fetch('http://localhost:3010/api/bitcoind', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        rpcMethod: 'getrawtransaction',
+        params: [jsonUtxo.result.unspents[0].txid],
+        bitcoinDUrl: 'http://bitcoin:18443/',
+      }),
+    });
+    const jsonTx = await txHexResponse.json();
+
+    // single utxo
+    const unspents = [{ ...jsonUtxo.result.unspents[0], tx: jsonTx.result }] as {
+      txid: string;
+      vout: number;
+      amount: number;
+      height: number;
+      scriptPubKey: string;
+      tx: string;
+    }[];
+
+    // ensure correct object format
+    const utxos = unspents.map(u => ({
+      txid: u.txid,
+      vout: u.vout,
+      value: Math.floor(u.amount * 1e8),
+      tx: u.tx,
+    }));
+
+    const dev = new SbtcApiClientDevenv();
+
+    fetchMock.mockResponse(
+      `{"okay":true,"result":"0x020000002103b6ad657d5428873633f6c3c948b4102bd697c1c8449425c1be1ff71992f98b74"}`
+    );
+
+    const pub = await dev.fetchSignersPublicKey();
+    expect(pub).toBe('b6ad657d5428873633f6c3c948b4102bd697c1c8449425c1be1ff71992f98b74');
+
+    const signerAddress = await dev.fetchSignersAddress();
+    expect(signerAddress).toBe('bcrt1paeulen354qzsstck3es7ur4c27ls5kyq8myvts7zmkyp4m6972kqwanet5');
+
+    // Tx building
+    const {
+      transaction: tx,
+      depositScript,
+      reclaimScript,
+    } = await sbtcDepositHelper({
+      stacksAddress: stacksAccount.address,
+      amountSats: 5_000_000,
+
+      signersPublicKey: pub,
+
+      feeRate: 1,
+      utxos,
+
+      bitcoinChangeAddress: bitcoinAccount.wpkh.address,
+    });
+
+    tx.sign(bitcoinAccount.privateKey);
+    tx.finalize();
+
+    fetchMock.mockOnce(
+      `{"result":[{"txid":"3cc72977efc12ceeddaf5589e53cb67525e798e0c67018eeffdc1c583e9c6005","wtxid":"0f8ce4916f6550f8af6de05bf2e8066a090694ff65cf5ba4f3a574c457a797b8","allowed":true,"vsize":153,"fees":{"base":0.00000189,"effective-feerate":0.00001235,"effective-includes":["0f8ce4916f6550f8af6de05bf2e8066a090694ff65cf5ba4f3a574c457a797b8"]}}]}`
+    );
+
+    const resTestmempoolaccept = await fetch('http://localhost:3010/api/bitcoind', {
+      body: `{"rpcMethod":"testmempoolaccept","params":[["${tx.hex}"]],"bitcoinDUrl":"http://bitcoin:18443/"}`,
+      method: 'POST',
+    });
+    const jsonTestmempoolaccept = await resTestmempoolaccept.json();
+    expect(jsonTestmempoolaccept.result[0].txid).toBe(tx.id);
+
+    fetchMock.mockOnce(
+      `{"result":"3cc72977efc12ceeddaf5589e53cb67525e798e0c67018eeffdc1c583e9c6005"}`
+    );
+
+    const resBroadcast = await fetch('http://localhost:3010/api/bitcoind', {
+      body: `{"rpcMethod":"sendrawtransaction","params":["${tx.hex}"],"bitcoinDUrl":"http://bitcoin:18443/"}`,
+      method: 'POST',
+    });
+    const jsonBroadcast = (await resBroadcast.json()) as { result: string };
+
+    fetchMock.mockOnce(
+      `{"bitcoinTxid":"3cc72977efc12ceeddaf5589e53cb67525e798e0c67018eeffdc1c583e9c6005","bitcoinTxOutputIndex":0,"recipient":"051a6d78de7b0625dfbfc16c3a8a5735f6dc3dc3f2ce","amount":0,"lastUpdateHeight":137,"lastUpdateBlockHash":"aa92e5d8af05a266e98ac9ed8bc1979029adaff556b8ca33ca6b216458a3a22c","status":"pending","statusMessage":"Just received deposit","parameters":{"maxFee":80000,"lockTime":6000},"reclaimScript":"027017b2","depositScript":"1e0000000000013880051a6d78de7b0625dfbfc16c3a8a5735f6dc3dc3f2ce7520b6ad657d5428873633f6c3c948b4102bd697c1c8449425c1be1ff71992f98b74ac"}`
+    );
+
+    const resEmilyDeposit = await fetch('http://localhost:3010/api/emilyDeposit', {
+      body: `{"bitcoinTxid":"${jsonBroadcast.result}","bitcoinTxOutputIndex":0,"reclaimScript":"${reclaimScript}","depositScript":"${depositScript}","url":"http://emily-server:3031"}`,
+      method: 'POST',
+    });
+    const jsonEmilyDeposit = await resEmilyDeposit.json();
+    expect(jsonEmilyDeposit.status).toBe('pending');
+    expect(jsonEmilyDeposit.depositScript).toBe(depositScript);
+    expect(jsonEmilyDeposit.reclaimScript).toBe(reclaimScript);
   });
 
-  const address = await dev.fetchSignersAddress();
-  console.log('address', address);
+  test('btc tx, broadcast — client proxy', async () => {
+    // TEST CASE
+    // Assumes a manually funded signers address and WALLET_00 wpkh address
 
-  const bitcoinAccount = await getBitcoinAccount(WALLET_00);
+    const bitcoinAccount = await getBitcoinAccount(WALLET_00); // wpkh bcrt1q3tj2fr9scwmcw3rq5m6jslva65f2rqjxfrjz47 (manually funded on devenv via bridge)
+    const stacksAccount = await getStacksAccount(WALLET_00);
 
-  const rpc = new RpcClient('http://devnet:devnet@127.0.0.1:18443').Typed;
+    const dev = new SbtcApiClientDevenv();
 
-  let res = await rpc.generatetoaddress({ nblocks: 1, address });
-  console.log('res', res);
+    const pub = await dev.fetchSignersPublicKey();
+    expect(pub).toBe('f1934e22bddf0dff972cf91404ab0d1cb9d4797e07c310d47283b9100d762937');
 
-  res = await rpc.generatetoaddress({ nblocks: 1, address: bitcoinAccount.wpkh.address });
-  console.log('res', res);
+    const signerAddress = await dev.fetchSignersAddress();
+    expect(signerAddress).toBe('bcrt1p5yupkjf2k8fk0unqfz9l40putap6ls9satez6a86hgdryfz4zvwqv9jal3');
+
+    const utxos = await dev.fetchUtxos(bitcoinAccount.wpkh.address);
+    expect(utxos.length).toBeGreaterThan(0);
+
+    const utxosSigner = await dev.fetchUtxos(signerAddress);
+    expect(utxosSigner.length).toBeGreaterThan(0);
+
+    expect(await utxos[0].tx).toBeInstanceOf(String);
+
+    // Tx building
+    const {
+      transaction: tx,
+      depositScript,
+      reclaimScript,
+    } = await sbtcDepositHelper({
+      stacksAddress: stacksAccount.address,
+      amountSats: 5_000_000,
+
+      signersPublicKey: pub,
+
+      feeRate: 1,
+      utxos,
+
+      bitcoinChangeAddress: bitcoinAccount.wpkh.address,
+    });
+
+    tx.sign(bitcoinAccount.privateKey);
+    tx.finalize();
+
+    fetchMock.mockOnce(
+      `{"result":[{"txid":"3cc72977efc12ceeddaf5589e53cb67525e798e0c67018eeffdc1c583e9c6005","wtxid":"0f8ce4916f6550f8af6de05bf2e8066a090694ff65cf5ba4f3a574c457a797b8","allowed":true,"vsize":153,"fees":{"base":0.00000189,"effective-feerate":0.00001235,"effective-includes":["0f8ce4916f6550f8af6de05bf2e8066a090694ff65cf5ba4f3a574c457a797b8"]}}]}`
+    );
+
+    const resTestmempoolaccept = await fetch('http://localhost:3010/api/bitcoind', {
+      body: `{"rpcMethod":"testmempoolaccept","params":[["${tx.hex}"]],"bitcoinDUrl":"http://bitcoin:18443/"}`,
+      method: 'POST',
+    });
+    const jsonTestmempoolaccept = await resTestmempoolaccept.json();
+    expect(jsonTestmempoolaccept.result[0].txid).toBe(tx.id);
+
+    fetchMock.mockOnce(
+      `{"result":"3cc72977efc12ceeddaf5589e53cb67525e798e0c67018eeffdc1c583e9c6005"}`
+    );
+
+    const resBroadcast = await fetch('http://localhost:3010/api/bitcoind', {
+      body: `{"rpcMethod":"sendrawtransaction","params":["${tx.hex}"],"bitcoinDUrl":"http://bitcoin:18443/"}`,
+      method: 'POST',
+    });
+    const jsonBroadcast = (await resBroadcast.json()) as { result: string };
+
+    fetchMock.mockOnce(
+      `{"bitcoinTxid":"3cc72977efc12ceeddaf5589e53cb67525e798e0c67018eeffdc1c583e9c6005","bitcoinTxOutputIndex":0,"recipient":"051a6d78de7b0625dfbfc16c3a8a5735f6dc3dc3f2ce","amount":0,"lastUpdateHeight":137,"lastUpdateBlockHash":"aa92e5d8af05a266e98ac9ed8bc1979029adaff556b8ca33ca6b216458a3a22c","status":"pending","statusMessage":"Just received deposit","parameters":{"maxFee":80000,"lockTime":6000},"reclaimScript":"027017b2","depositScript":"1e0000000000013880051a6d78de7b0625dfbfc16c3a8a5735f6dc3dc3f2ce7520b6ad657d5428873633f6c3c948b4102bd697c1c8449425c1be1ff71992f98b74ac"}`
+    );
+
+    const resEmilyDeposit = await fetch('http://localhost:3010/api/emilyDeposit', {
+      body: `{"bitcoinTxid":"${jsonBroadcast.result}","bitcoinTxOutputIndex":0,"reclaimScript":"${reclaimScript}","depositScript":"${depositScript}","url":"http://emily-server:3031"}`,
+      method: 'POST',
+    });
+    const jsonEmilyDeposit = await resEmilyDeposit.json();
+    expect(jsonEmilyDeposit.status).toBe('pending');
+    expect(jsonEmilyDeposit.depositScript).toBe(depositScript);
+    expect(jsonEmilyDeposit.reclaimScript).toBe(reclaimScript);
+  });
 });
 
-test('btc tx, deposit to sbtc, broadcast — raw fetch', async () => {
-  // TEST CASE
-  // Assumes a manually funded signers address and WALLET_00 wpkh address
+describe('deposit testnet', () => {
+  test('btc tx, broadcast — client proxy', async () => {
+    // TEST CASE
+    // Assumes a manually funded WALLET_00 wpkh address
 
-  const bitcoinAccount = await getBitcoinAccount(WALLET_00); // wpkh bcrt1q3tj2fr9scwmcw3rq5m6jslva65f2rqjxfrjz47 (manually funded on devenv via bridge)
-  const stacksAccount = await getStacksAccount(WALLET_00);
+    const bitcoinAccount = await getBitcoinAccount(WALLET_00); // wpkh bcrt1q3tj2fr9scwmcw3rq5m6jslva65f2rqjxfrjz47 (manually funded on devenv via bridge)
+    const stacksAccount = await getStacksAccount(WALLET_00);
 
-  fetchMock.mockOnce(
-    `{"result":{"success":true,"txouts":342,"height":252,"bestblock":"71903ce6738b723dad54e3ad110b859e8c1bd6ba499d94b4b0b22a44b0c10b37","unspents":[{"txid":"51349ba2a37959a5d84826311a556cf5201aeae6ddeb94b8d254976d0d20c217","vout":0,"scriptPubKey":"00148ae4a48cb0c3b7874460a6f5287d9dd512a18246","desc":"addr(bcrt1q3tj2fr9scwmcw3rq5m6jslva65f2rqjxfrjz47)#gcletckr","amount":1,"coinbase":false,"height":241}],"total_amount":1}}`
-  );
+    const tnet = new SbtcApiClientTestnet();
 
-  const resScantxoutset = await fetch('http://localhost:3010/api/bitcoind', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: `{"rpcMethod":"scantxoutset","params":["start",[{"desc":"addr(${bitcoinAccount.wpkh.address})","range":10000}]],"bitcoinDUrl":"http://bitcoin:18443/"}`,
+    // fetchMock.mockResponse(
+    //   `{"okay":true,"result":"0x0200000021024ea6e657117bc8168254b8943e55a65997c71b3994e1e2915002a9da0c22ee1e"}`
+    // );
+    const pub = await tnet.fetchSignersPublicKey();
+    expect(pub).toBe('4ea6e657117bc8168254b8943e55a65997c71b3994e1e2915002a9da0c22ee1e');
+
+    const signerAddress = await tnet.fetchSignersAddress();
+    expect(signerAddress).toBe('bcrt1p534swhsspmeepqu8gcg9ehu95ny74kch6rlu4er3zml0saxds0cqwpn73n');
+
+    // fetchMock.mockOnce(
+    //   `[{"txid":"2095d57185bdfca2b07456c60e3c7b853f51660fcb071d386cbbffe7e7630ea3","vout":0,"scriptPubKey":"00148ae4a48cb0c3b7874460a6f5287d9dd512a18246","status":{"confirmed":true,"block_height":76156,"block_hash":"0e48c180d554333816fca68c5de7c87cf44e3e2f87c503368d7a0d5dc744e1b5","block_time":1733510080},"value":50000000}]`,
+    // );
+    const utxos = await tnet.fetchUtxos(bitcoinAccount.wpkh.address);
+    expect(utxos.length).toBeGreaterThan(0);
+
+    // fetchMock.mockOnce(
+    //   `[{"txid":"68f0a31be2d80c52599cbc0b88d07b4e1ca1d749daebaedbb06bdecbd7afbce0","vout":0,"scriptPubKey":"5120a46b075e100ef390838746105cdf85a4c9eadb17d0ffcae47116fef874cd83f0","status":{"confirmed":true,"block_height":77308,"block_hash":"0e48c180d554333816fca68c5de7c87cf44e3e2f87c503368d7a0d5dc744e1b5","block_time":1733510080},"value":225673939}]`,
+    // );
+    const utxosSigner = await tnet.fetchUtxos(signerAddress);
+    expect(utxosSigner.length).toBeGreaterThan(0);
+
+    // fetchMock.mockResponse(
+    //   `"02000000018759eeec0f4e35663081ca2df21897d6003da0d0eb16d5be02dd58e3001ddd5a010000006a473044022004bd0273ce1349c2d85c476bf5060922ee92287f7a4bc697635bcf204015ccad02206c0d1afe2f9079cfa8cfd26d59395732157f83f1e9f2dbea1af6c8dda0bc696501210254ec0be893c64ca843baaaac650f7a278c5078f2f115d7d8a751f176f4460eb5ffffffff0280f0fa02000000001600148ae4a48cb0c3b7874460a6f5287d9dd512a182461870b3ee010000001976a9145f111ba7d289989af165d4d1f75863a61268c30788ac00000000"`,
+    // );
+    expect(await utxos[0].tx).toBeTypeOf('string'); // full tx hexes can be fetched
+
+    // Tx building
+    const {
+      transaction: tx,
+      depositScript,
+      reclaimScript,
+    } = await sbtcDepositHelper({
+      stacksAddress: stacksAccount.address,
+      amountSats: 5_000_000,
+
+      signersPublicKey: pub,
+
+      feeRate: 1,
+      utxos,
+
+      bitcoinChangeAddress: bitcoinAccount.wpkh.address,
+    });
+
+    tx.sign(bitcoinAccount.privateKey);
+    tx.finalize();
+
+    // fetchMock.mockOnce(
+    //   "58830aaa68af737b772b7db155d70005ae7ae0e212673232ca8100e0337660cd"
+    // );
+    const txid = await tnet.broadcastTx(tx);
+
+    const notify = await tnet.notifySbtcBridge({ txid, depositScript, reclaimScript });
+    expect(notify.status).toBe('pending');
+    expect(notify.depositScript).toBe(depositScript);
+    expect(notify.reclaimScript).toBe(reclaimScript);
   });
-  const jsonUtxo = await resScantxoutset.json();
-
-  fetchMock.mockOnce(
-    `{"result":"020000000150a4f0768a8ec85e76c8c049dd1839b2a6c8f35d79a5f0e0c1b23ed398cf8240000000006b4830450221008f19e4bc403136bad26e757647ccb45d8d0fc8d572da0adecd92194319be6e39022018830d39aabfbb76c037d450609466ae01d2e9a98167866d26379ce5cbf41a340121035379aa40c02890d253cfa577964116eb5295570ae9f7287cbae5f2585f5b2c7cffffffff0200e1f505000000001600148ae4a48cb0c3b7874460a6f5287d9dd512a18246e0c20f24010000001976a9141dc27eba0247f8cc9575e7d45e50a0bc7e72427d88ac00000000"}`
-  );
-
-  const txHexResponse = await fetch('http://localhost:3010/api/bitcoind', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      rpcMethod: 'getrawtransaction',
-      params: [jsonUtxo.result.unspents[0].txid],
-      bitcoinDUrl: 'http://bitcoin:18443/',
-    }),
-  });
-  const jsonTx = await txHexResponse.json();
-
-  // single utxo
-  const unspents = [{ ...jsonUtxo.result.unspents[0], tx: jsonTx.result }] as {
-    txid: string;
-    vout: number;
-    amount: number;
-    height: number;
-    scriptPubKey: string;
-    tx: string;
-  }[];
-
-  // ensure correct object format
-  const utxos = unspents.map(u => ({
-    txid: u.txid,
-    vout: u.vout,
-    value: Math.floor(u.amount * 1e8),
-    tx: u.tx,
-  }));
-
-  const dev = new SbtcApiClientDevenv();
-
-  fetchMock.mockResponse(
-    `{"okay":true,"result":"0x020000002103b6ad657d5428873633f6c3c948b4102bd697c1c8449425c1be1ff71992f98b74"}`
-  );
-
-  const pub = await dev.fetchSignersPublicKey();
-  expect(pub).toBe('b6ad657d5428873633f6c3c948b4102bd697c1c8449425c1be1ff71992f98b74');
-
-  const signerAddress = await dev.fetchSignersAddress();
-  expect(signerAddress).toBe('bcrt1paeulen354qzsstck3es7ur4c27ls5kyq8myvts7zmkyp4m6972kqwanet5');
-
-  // Tx building
-  const {
-    transaction: tx,
-    depositScript,
-    reclaimScript,
-  } = await sbtcDepositHelper({
-    stacksAddress: stacksAccount.address,
-    amountSats: 5_000_000,
-
-    signersPublicKey: pub,
-
-    feeRate: 1,
-    utxos,
-
-    bitcoinChangeAddress: bitcoinAccount.wpkh.address,
-  });
-
-  tx.sign(bitcoinAccount.privateKey);
-  tx.finalize();
-
-  fetchMock.mockOnce(
-    `{"result":[{"txid":"3cc72977efc12ceeddaf5589e53cb67525e798e0c67018eeffdc1c583e9c6005","wtxid":"0f8ce4916f6550f8af6de05bf2e8066a090694ff65cf5ba4f3a574c457a797b8","allowed":true,"vsize":153,"fees":{"base":0.00000189,"effective-feerate":0.00001235,"effective-includes":["0f8ce4916f6550f8af6de05bf2e8066a090694ff65cf5ba4f3a574c457a797b8"]}}]}`
-  );
-
-  const resTestmempoolaccept = await fetch('http://localhost:3010/api/bitcoind', {
-    body: `{"rpcMethod":"testmempoolaccept","params":[["${tx.hex}"]],"bitcoinDUrl":"http://bitcoin:18443/"}`,
-    method: 'POST',
-  });
-  const jsonTestmempoolaccept = await resTestmempoolaccept.json();
-  expect(jsonTestmempoolaccept.result[0].txid).toBe(tx.id);
-
-  fetchMock.mockOnce(
-    `{"result":"3cc72977efc12ceeddaf5589e53cb67525e798e0c67018eeffdc1c583e9c6005"}`
-  );
-
-  const resBroadcast = await fetch('http://localhost:3010/api/bitcoind', {
-    body: `{"rpcMethod":"sendrawtransaction","params":["${tx.hex}"],"bitcoinDUrl":"http://bitcoin:18443/"}`,
-    method: 'POST',
-  });
-  const jsonBroadcast = (await resBroadcast.json()) as { result: string };
-
-  fetchMock.mockOnce(
-    `{"bitcoinTxid":"3cc72977efc12ceeddaf5589e53cb67525e798e0c67018eeffdc1c583e9c6005","bitcoinTxOutputIndex":0,"recipient":"051a6d78de7b0625dfbfc16c3a8a5735f6dc3dc3f2ce","amount":0,"lastUpdateHeight":137,"lastUpdateBlockHash":"aa92e5d8af05a266e98ac9ed8bc1979029adaff556b8ca33ca6b216458a3a22c","status":"pending","statusMessage":"Just received deposit","parameters":{"maxFee":80000,"lockTime":6000},"reclaimScript":"027017b2","depositScript":"1e0000000000013880051a6d78de7b0625dfbfc16c3a8a5735f6dc3dc3f2ce7520b6ad657d5428873633f6c3c948b4102bd697c1c8449425c1be1ff71992f98b74ac"}`
-  );
-
-  const resEmilyDeposit = await fetch('http://localhost:3010/api/emilyDeposit', {
-    body: `{"bitcoinTxid":"${jsonBroadcast.result}","bitcoinTxOutputIndex":0,"reclaimScript":"${reclaimScript}","depositScript":"${depositScript}","url":"http://emily-server:3031"}`,
-    method: 'POST',
-  });
-  const jsonEmilyDeposit = await resEmilyDeposit.json();
-  expect(jsonEmilyDeposit.status).toBe('pending');
-  expect(jsonEmilyDeposit.depositScript).toBe(depositScript);
-  expect(jsonEmilyDeposit.reclaimScript).toBe(reclaimScript);
 });
 
-test('btc tx, deposit to sbtc, broadcast — client proxy', async () => {
-  // TEST CASE
-  // Assumes a manually funded signers address and WALLET_00 wpkh address
-
-  const bitcoinAccount = await getBitcoinAccount(WALLET_00); // wpkh bcrt1q3tj2fr9scwmcw3rq5m6jslva65f2rqjxfrjz47 (manually funded on devenv via bridge)
-  const stacksAccount = await getStacksAccount(WALLET_00);
-
-  const dev = new SbtcApiClientDevenv({
-    btcApiUrl: 'http://localhost:3010/api/proxy',
-  });
-
-  const pub = await dev.fetchSignersPublicKey();
-  expect(pub).toBe('f1934e22bddf0dff972cf91404ab0d1cb9d4797e07c310d47283b9100d762937');
-
-  const signerAddress = await dev.fetchSignersAddress();
-  expect(signerAddress).toBe('bcrt1p5yupkjf2k8fk0unqfz9l40putap6ls9satez6a86hgdryfz4zvwqv9jal3');
-
-  const utxos = await dev.fetchUtxos(bitcoinAccount.wpkh.address);
-  expect(utxos.length).toBeGreaterThan(0);
-
-  const utxosSigner = await dev.fetchUtxos(signerAddress);
-  expect(utxosSigner.length).toBeGreaterThan(0);
-
-  expect(await utxos[0].tx).toBeInstanceOf(String);
-  return;
-
-  // Tx building
-  const {
-    transaction: tx,
-    depositScript,
-    reclaimScript,
-  } = await sbtcDepositHelper({
-    stacksAddress: stacksAccount.address,
-    amountSats: 5_000_000,
-
-    signersPublicKey: pub,
-
-    feeRate: 1,
-    utxos,
-
-    bitcoinChangeAddress: bitcoinAccount.wpkh.address,
-  });
-
-  tx.sign(bitcoinAccount.privateKey);
-  tx.finalize();
-
-  fetchMock.mockOnce(
-    `{"result":[{"txid":"3cc72977efc12ceeddaf5589e53cb67525e798e0c67018eeffdc1c583e9c6005","wtxid":"0f8ce4916f6550f8af6de05bf2e8066a090694ff65cf5ba4f3a574c457a797b8","allowed":true,"vsize":153,"fees":{"base":0.00000189,"effective-feerate":0.00001235,"effective-includes":["0f8ce4916f6550f8af6de05bf2e8066a090694ff65cf5ba4f3a574c457a797b8"]}}]}`
-  );
-
-  const resTestmempoolaccept = await fetch('http://localhost:3010/api/bitcoind', {
-    body: `{"rpcMethod":"testmempoolaccept","params":[["${tx.hex}"]],"bitcoinDUrl":"http://bitcoin:18443/"}`,
-    method: 'POST',
-  });
-  const jsonTestmempoolaccept = await resTestmempoolaccept.json();
-  expect(jsonTestmempoolaccept.result[0].txid).toBe(tx.id);
-
-  fetchMock.mockOnce(
-    `{"result":"3cc72977efc12ceeddaf5589e53cb67525e798e0c67018eeffdc1c583e9c6005"}`
-  );
-
-  const resBroadcast = await fetch('http://localhost:3010/api/bitcoind', {
-    body: `{"rpcMethod":"sendrawtransaction","params":["${tx.hex}"],"bitcoinDUrl":"http://bitcoin:18443/"}`,
-    method: 'POST',
-  });
-  const jsonBroadcast = (await resBroadcast.json()) as { result: string };
-
-  fetchMock.mockOnce(
-    `{"bitcoinTxid":"3cc72977efc12ceeddaf5589e53cb67525e798e0c67018eeffdc1c583e9c6005","bitcoinTxOutputIndex":0,"recipient":"051a6d78de7b0625dfbfc16c3a8a5735f6dc3dc3f2ce","amount":0,"lastUpdateHeight":137,"lastUpdateBlockHash":"aa92e5d8af05a266e98ac9ed8bc1979029adaff556b8ca33ca6b216458a3a22c","status":"pending","statusMessage":"Just received deposit","parameters":{"maxFee":80000,"lockTime":6000},"reclaimScript":"027017b2","depositScript":"1e0000000000013880051a6d78de7b0625dfbfc16c3a8a5735f6dc3dc3f2ce7520b6ad657d5428873633f6c3c948b4102bd697c1c8449425c1be1ff71992f98b74ac"}`
-  );
-
-  const resEmilyDeposit = await fetch('http://localhost:3010/api/emilyDeposit', {
-    body: `{"bitcoinTxid":"${jsonBroadcast.result}","bitcoinTxOutputIndex":0,"reclaimScript":"${reclaimScript}","depositScript":"${depositScript}","url":"http://emily-server:3031"}`,
-    method: 'POST',
-  });
-  const jsonEmilyDeposit = await resEmilyDeposit.json();
-  expect(jsonEmilyDeposit.status).toBe('pending');
-  expect(jsonEmilyDeposit.depositScript).toBe(depositScript);
-  expect(jsonEmilyDeposit.reclaimScript).toBe(reclaimScript);
-});
-
-test('btc tx, deposit to sbtc, tx compare to cli', async () => {
+test('btc tx — compare to cli', async () => {
   // TEST CASE
   // Compares a JS generated transactions outputs to a test vector created with the CLI
 
