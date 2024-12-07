@@ -1,6 +1,8 @@
 {
   "private": true,
   "name": "@stacks/internal",
+  "version": "7.0.3",
+  "main": "./src/index.ts",
   "scripts": {
     "start": "tsc -b tsconfig.build.json --watch --verbose",
     "typecheck": "tsc --noEmit",
@@ -11,6 +13,5 @@
     "@stacks/network": "^7.0.2",
     "@stacks/stacking": "^7.0.3",
     "jest-fetch-mock": "^3.0.3"
-  },
-  "version": "7.0.3"
+  }
 }
