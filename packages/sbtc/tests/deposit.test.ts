@@ -1,16 +1,14 @@
 import * as btc from '@scure/btc-signer';
 import { hexToBytes } from '@stacks/common';
-import { enableFetchLogging, waitForFulfilled } from '@stacks/internal';
 import { describe, expect, test, vi } from 'vitest';
 import createFetchMock from 'vitest-fetch-mock';
 import { SbtcApiClientDevenv, SbtcApiClientTestnet, sbtcDepositHelper } from '../src';
 import { WALLET_00, getBitcoinAccount, getStacksAccount } from './helpers/wallet';
-import RpcClient from '@btc-helpers/rpc';
 
-enableFetchLogging(); // enable if you want to record requests to network.txt file
+// enableFetchLogging(); // enable if you want to record requests to network.txt file
 
 // set globalThis.fetch and globalThis.fetchMock to mocked version
-// createFetchMock(vi).enableMocks();
+createFetchMock(vi).enableMocks();
 
 describe('deposit devenv', () => {
   test('btc tx, broadcast — raw fetch', async () => {
@@ -140,6 +138,10 @@ describe('deposit devenv', () => {
 
     const dev = new SbtcApiClientDevenv();
 
+    fetchMock.mockResponse(
+      `{"okay":true,"result":"0x020000002103b6ad657d5428873633f6c3c948b4102bd697c1c8449425c1be1ff71992f98b74"}`
+    );
+
     const pub = await dev.fetchSignersPublicKey();
     expect(pub).toBe('f1934e22bddf0dff972cf91404ab0d1cb9d4797e07c310d47283b9100d762937');
 
@@ -220,30 +222,30 @@ describe('deposit testnet', () => {
 
     const tnet = new SbtcApiClientTestnet();
 
-    // fetchMock.mockResponse(
-    //   `{"okay":true,"result":"0x0200000021024ea6e657117bc8168254b8943e55a65997c71b3994e1e2915002a9da0c22ee1e"}`
-    // );
+    fetchMock.mockResponse(
+      `{"okay":true,"result":"0x0200000021024ea6e657117bc8168254b8943e55a65997c71b3994e1e2915002a9da0c22ee1e"}`
+    );
     const pub = await tnet.fetchSignersPublicKey();
     expect(pub).toBe('4ea6e657117bc8168254b8943e55a65997c71b3994e1e2915002a9da0c22ee1e');
 
     const signerAddress = await tnet.fetchSignersAddress();
     expect(signerAddress).toBe('bcrt1p534swhsspmeepqu8gcg9ehu95ny74kch6rlu4er3zml0saxds0cqwpn73n');
 
-    // fetchMock.mockOnce(
-    //   `[{"txid":"2095d57185bdfca2b07456c60e3c7b853f51660fcb071d386cbbffe7e7630ea3","vout":0,"scriptPubKey":"00148ae4a48cb0c3b7874460a6f5287d9dd512a18246","status":{"confirmed":true,"block_height":76156,"block_hash":"0e48c180d554333816fca68c5de7c87cf44e3e2f87c503368d7a0d5dc744e1b5","block_time":1733510080},"value":50000000}]`,
-    // );
+    fetchMock.mockOnce(
+      `[{"txid":"5a4968eb88da4a62aca8cbae6d9d29cd91ba30d5cca843072f3023186aab5dae","vout":1,"scriptPubKey":"00148ae4a48cb0c3b7874460a6f5287d9dd512a18246","status":{"confirmed":true,"block_height":77518,"block_hash":"6e9934b83908e999f22dd651b3d77df7315d4f079846ddc8adb7d844325d180f","block_time":1733529138},"value":14998677}]`
+    );
     const utxos = await tnet.fetchUtxos(bitcoinAccount.wpkh.address);
     expect(utxos.length).toBeGreaterThan(0);
 
-    // fetchMock.mockOnce(
-    //   `[{"txid":"68f0a31be2d80c52599cbc0b88d07b4e1ca1d749daebaedbb06bdecbd7afbce0","vout":0,"scriptPubKey":"5120a46b075e100ef390838746105cdf85a4c9eadb17d0ffcae47116fef874cd83f0","status":{"confirmed":true,"block_height":77308,"block_hash":"0e48c180d554333816fca68c5de7c87cf44e3e2f87c503368d7a0d5dc744e1b5","block_time":1733510080},"value":225673939}]`,
-    // );
+    fetchMock.mockOnce(
+      `[{"txid":"68f0a31be2d80c52599cbc0b88d07b4e1ca1d749daebaedbb06bdecbd7afbce0","vout":0,"scriptPubKey":"5120a46b075e100ef390838746105cdf85a4c9eadb17d0ffcae47116fef874cd83f0","status":{"confirmed":true,"block_height":77308,"block_hash":"6e9934b83908e999f22dd651b3d77df7315d4f079846ddc8adb7d844325d180f","block_time":1733529139},"value":225673939}]`
+    );
     const utxosSigner = await tnet.fetchUtxos(signerAddress);
     expect(utxosSigner.length).toBeGreaterThan(0);
 
-    // fetchMock.mockResponse(
-    //   `"02000000018759eeec0f4e35663081ca2df21897d6003da0d0eb16d5be02dd58e3001ddd5a010000006a473044022004bd0273ce1349c2d85c476bf5060922ee92287f7a4bc697635bcf204015ccad02206c0d1afe2f9079cfa8cfd26d59395732157f83f1e9f2dbea1af6c8dda0bc696501210254ec0be893c64ca843baaaac650f7a278c5078f2f115d7d8a751f176f4460eb5ffffffff0280f0fa02000000001600148ae4a48cb0c3b7874460a6f5287d9dd512a182461870b3ee010000001976a9145f111ba7d289989af165d4d1f75863a61268c30788ac00000000"`,
-    // );
+    fetchMock.mockOnce(
+      `0200000001ac02e32e0c9ac8d375cd590556564b5725169f224a7e997c385c0a6bfa51a4a90100000000ffffffff02404b4c00000000002251203a1a17c591190f4cd7a3b59320fb5ef8f05b4b9058e113074efae0ebbe4df22f95dce400000000001600148ae4a48cb0c3b7874460a6f5287d9dd512a1824600000000`
+    );
     expect(await utxos[0].tx).toBeTypeOf('string'); // full tx hexes can be fetched
 
     // Tx building
@@ -266,12 +268,14 @@ describe('deposit testnet', () => {
     tx.sign(bitcoinAccount.privateKey);
     tx.finalize();
 
-    // fetchMock.mockOnce(
-    //   "58830aaa68af737b772b7db155d70005ae7ae0e212673232ca8100e0337660cd"
-    // );
+    fetchMock.mockOnce(`"8d88c3878d172acd1fccf1763479b27d3287b67a14ef7ec5d36dc6335fd531fd"`);
     const txid = await tnet.broadcastTx(tx);
 
-    const notify = await tnet.notifySbtcBridge({ txid, depositScript, reclaimScript });
+    fetchMock.mockOnce(
+      `{"bitcoinTxid":"8d88c3878d172acd1fccf1763479b27d3287b67a14ef7ec5d36dc6335fd531fd","bitcoinTxOutputIndex":0,"recipient":"051a6d78de7b0625dfbfc16c3a8a5735f6dc3dc3f2ce","amount":0,"lastUpdateHeight":201059,"lastUpdateBlockHash":"083222f99686f9bd63859e2af6497df020fdb0eca9609ed41d82a9bdb1b31254","status":"pending","statusMessage":"Just received deposit","parameters":{"maxFee":80000,"lockTime":6000},"reclaimScript":"027017b2","depositScript":"1e0000000000013880051a6d78de7b0625dfbfc16c3a8a5735f6dc3dc3f2ce75204ea6e657117bc8168254b8943e55a65997c71b3994e1e2915002a9da0c22ee1eac"}`
+    );
+
+    const notify = await tnet.notifySbtc({ txid, depositScript, reclaimScript });
     expect(notify.status).toBe('pending');
     expect(notify.depositScript).toBe(depositScript);
     expect(notify.reclaimScript).toBe(reclaimScript);

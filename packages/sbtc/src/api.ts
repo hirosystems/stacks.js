@@ -66,7 +66,7 @@ export interface BaseClientConfig {
   btcApiUrl: string;
   stxApiUrl: string;
   sbtcApiUrl: string;
-  sbtcBridgeUrl: string;
+  // sbtcBridgeUrl: string;
 }
 
 export class SbtcApiClient {
@@ -103,7 +103,7 @@ export class SbtcApiClient {
     return await fetch(`${this.config.btcApiUrl}/tx`, {
       method: 'POST',
       body: tx.hex,
-    }).then(res => res.text());
+    }).then(res => res.json() as Promise<string>);
   }
 
   async notifySbtc({
@@ -119,6 +119,11 @@ export class SbtcApiClient {
   } & ({ txid: string } | { transaction: { id: string } })) {
     return (await fetch(`${this.config.sbtcApiUrl}/deposit`, {
       method: 'POST',
+      headers: {
+        // needed for CORS
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
       body: JSON.stringify({
         bitcoinTxid: 'txid' in tx ? tx.txid : tx.transaction.id,
         bitcoinTxOutputIndex: vout,
@@ -129,28 +134,28 @@ export class SbtcApiClient {
   }
 
   /** Proxies the Emily `/deposit` request via the bridge */
-  async notifySbtcBridge({
-    depositScript,
-    reclaimScript,
-    vout = 0,
-    ...tx
-  }: {
-    depositScript: string;
-    reclaimScript: string;
-    /** Optional, output index (defaults to `0`) */
-    vout?: number;
-  } & ({ txid: string } | { transaction: { id: string } })) {
-    return (await fetch(`${this.config.sbtcBridgeUrl}/api/emilyDeposit`, {
-      method: 'POST',
-      body: JSON.stringify({
-        bitcoinTxid: 'txid' in tx ? tx.txid : tx.transaction.id,
-        bitcoinTxOutputIndex: vout,
-        depositScript,
-        reclaimScript,
-        url: this.config.sbtcApiUrl,
-      }),
-    }).then(res => res.json())) as SbtcApiNotifyResponse;
-  }
+  // async notifySbtcBridge({
+  //   depositScript,
+  //   reclaimScript,
+  //   vout = 0,
+  //   ...tx
+  // }: {
+  //   depositScript: string;
+  //   reclaimScript: string;
+  //   /** Optional, output index (defaults to `0`) */
+  //   vout?: number;
+  // } & ({ txid: string } | { transaction: { id: string } })) {
+  //   return (await fetch(`${this.config.sbtcBridgeUrl}/api/emilyDeposit`, {
+  //     method: 'POST',
+  //     body: JSON.stringify({
+  //       bitcoinTxid: 'txid' in tx ? tx.txid : tx.transaction.id,
+  //       bitcoinTxOutputIndex: vout,
+  //       depositScript,
+  //       reclaimScript,
+  //       url: this.config.sbtcApiUrl,
+  //     }),
+  //   }).then(res => res.json())) as SbtcApiNotifyResponse;
+  // }
 
   async fetchSignersPublicKey(contractAddress?: string): Promise<string> {
     const res = (await fetchCallReadOnlyFunction({
@@ -221,15 +226,25 @@ export class SbtcApiClient {
     return balance?.value?.value ?? 0;
   }
 
-  async fetchDeposit({ txid, vout }: { txid: string; vout: number }) {
-    const params = new URLSearchParams();
-    params.append('bitcoinTxid', txid);
-    params.append('vout', vout.toString());
-    return await fetch(`${this.config.sbtcBridgeUrl}/api/emilyDeposit?${params}`).then(r =>
-      r.json()
+  async fetchDeposit(txid: string): Promise<SbtcApiNotifyResponse>;
+  async fetchDeposit({
+    txid,
+    vout = 0,
+  }: {
+    txid: string;
+    vout: number;
+  }): Promise<SbtcApiNotifyResponse>;
+  async fetchDeposit(param: string | { txid: string; vout: number }) {
+    if (typeof param === 'string') return this.fetchDeposit({ txid: param, vout: 0 });
+
+    const { txid, vout } = param;
+    return await fetch(`${this.config.sbtcApiUrl}/deposit/${txid}/${vout}`).then(
+      r => r.json() as Promise<SbtcApiNotifyResponse>
     );
   }
 }
+
+// todo: add async fetchDeposits('pending' | 'confirmed')
 
 /** todo */
 export class SbtcApiClientTestnet extends SbtcApiClient {
@@ -240,7 +255,7 @@ export class SbtcApiClientTestnet extends SbtcApiClient {
           btcApiUrl: 'https://beta.sbtc-mempool.tech/api/proxy',
           stxApiUrl: 'https://api.testnet.hiro.so',
           sbtcApiUrl: 'https://beta.sbtc-emily.com',
-          sbtcBridgeUrl: 'https://staging.beta.sbtc.tech',
+          // sbtcBridgeUrl: 'https://staging.beta.sbtc.tech',
           /** ⚠︎ Attention: This contract address might still change over the course of the sBTC contract on Testnet */
           sbtcContract: 'SNGWPN3XDAQE673MXYXF81016M50NHF5X5PWWM70',
         },
@@ -258,7 +273,7 @@ export class SbtcApiClientDevenv extends SbtcApiClient {
           btcApiUrl: 'http://localhost:3010/api/proxy',
           stxApiUrl: 'http://localhost:3999',
           sbtcApiUrl: 'http://localhost:3031',
-          sbtcBridgeUrl: 'http://localhost:3010',
+          // sbtcBridgeUrl: 'http://localhost:3010',
           sbtcContract: 'SN3R84XZYA63QS28932XQF3G1J8R9PC3W76P9CSQS',
         },
         config
