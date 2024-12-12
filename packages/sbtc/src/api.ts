@@ -102,6 +102,7 @@ export class SbtcApiClient {
   async broadcastTx(tx: btc.Transaction): Promise<string> {
     return await fetch(`${this.config.btcApiUrl}/tx`, {
       method: 'POST',
+      headers: { 'Content-Type': 'text/plain' },
       body: tx.hex,
     }).then(res => res.json() as Promise<string>);
   }
