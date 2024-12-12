@@ -1,3 +1,13 @@
 {
-  "markdown.extension.toc.levels": "2..6"
+  "markdown.extension.toc.levels": "2..6",
+
+  // Jest -> Vitest: Run
+  "jestrunner.jestCommand": "npx vitest run",
+
+  // Jest -> Vitest: Debug (Hack)
+  "jestrunner.jestPath": "node_modules/.bin/vitest",
+  "jestrunner.runOptions": ["--"],
+  "jestrunner.debugOptions": {
+    "args": ["run"]
+  }
 }
