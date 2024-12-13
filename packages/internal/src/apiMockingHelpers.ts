@@ -198,7 +198,7 @@ export function enableFetchLogging() {
       .json()
       .catch(() => r.clone().text());
     const url = input instanceof Request ? input.url : input;
-    const log = `'${url}': \`${JSON.stringify(response)}\`,`;
+    const log = `'${url}': \`${r.headers.get('content-type')?.includes('application/json') ? JSON.stringify(response) : response}\`,`;
     fs.appendFileSync('network.txt', `${log}\n`);
     return r;
   };

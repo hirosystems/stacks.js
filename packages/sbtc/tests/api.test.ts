@@ -3,6 +3,7 @@ import { describe, expect, test, vi } from 'vitest';
 import createFetchMock from 'vitest-fetch-mock';
 import { REGTEST, SbtcApiClientDevenv, SbtcApiClientTestnet } from '../src';
 import { WALLET_00, getBitcoinAccount, getStacksAccount } from './helpers/wallet';
+import { bytesToHex } from '@stacks/common';
 
 const dev = new SbtcApiClientDevenv();
 const tnet = new SbtcApiClientTestnet();
@@ -10,6 +11,11 @@ const tnet = new SbtcApiClientTestnet();
 // enableFetchLogging();
 
 createFetchMock(vi).enableMocks();
+
+test('script', async () => {
+  const wallet = await getBitcoinAccount(WALLET_00);
+  console.log(bytesToHex(wallet.privateKey));
+});
 
 describe('testnet:', () => {
   test('fetch utxos', async () => {

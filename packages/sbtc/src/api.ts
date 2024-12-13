@@ -86,7 +86,13 @@ export class SbtcApiClient {
   }
 
   async fetchTxHex(txid: string): Promise<string> {
-    return fetch(`${this.config.btcApiUrl}/tx/${txid}/hex`).then(res => res.text());
+    return fetch(`${this.config.btcApiUrl}/tx/${txid}/hex`, {
+      headers: {
+        Accept: 'text/plain',
+        'Content-Type': 'text/plain',
+        'Accept-Encoding': 'identity',
+      },
+    }).then(res => res.text());
   }
 
   async fetchFeeRates(): Promise<MempoolFeeEstimates> {

@@ -1,9 +1,23 @@
 import * as btc from '@scure/btc-signer';
-import { hexToBytes } from '@stacks/common';
+import { bytesToHex, hexToBytes, isInstance } from '@stacks/common';
 import { describe, expect, test, vi } from 'vitest';
 import createFetchMock from 'vitest-fetch-mock';
-import { SbtcApiClientDevenv, SbtcApiClientTestnet, sbtcDepositHelper } from '../src';
+import { enableFetchLogging } from '@stacks/internal';
+import {
+  DEFAULT_UTXO_TO_SPENDABLE,
+  REGTEST,
+  SbtcApiClientDevenv,
+  SbtcApiClientTestnet,
+  TESTNET,
+  VSIZE_INPUT_P2WPKH,
+  buildSbtcReclaimTx,
+  dustMinimum,
+  paymentInfo,
+  sbtcDepositHelper,
+} from '../src';
 import { WALLET_00, getBitcoinAccount, getStacksAccount } from './helpers/wallet';
+import { hex } from '@scure/base';
+import * as P from 'micro-packed';
 
 // enableFetchLogging(); // enable if you want to record requests to network.txt file
 
@@ -254,7 +268,7 @@ describe('deposit testnet', () => {
       depositScript,
       reclaimScript,
     } = await sbtcDepositHelper({
-      stacksAddress: stacksAccount.address,
+      stacksAddress: stacksAccount.address + '.contract-address',
       amountSats: 5_000_000,
 
       signersPublicKey: pub,
@@ -264,6 +278,24 @@ describe('deposit testnet', () => {
 
       bitcoinChangeAddress: bitcoinAccount.wpkh.address,
     });
+
+    const psbt = tx.toPSBT();
+
+    // @ts-ignore
+    BigInt.prototype.toJSON = function () {
+      return this.toString();
+    };
+    const txPsbt = btc.Transaction.fromPSBT(psbt);
+    const json = JSON.stringify(txPsbt, null, 2);
+
+    function parseScript(bytes: Uint8Array) {
+      return btc.Script.decode(bytes).map(i => (isInstance(i, Uint8Array) ? hex.encode(i) : i));
+    }
+
+    const script = parseScript(txPsbt.getOutput(0).script!);
+    console.log(script);
+
+    console.log(json);
 
     tx.sign(bitcoinAccount.privateKey);
     tx.finalize();
@@ -279,6 +311,103 @@ describe('deposit testnet', () => {
     expect(notify.status).toBe('pending');
     expect(notify.depositScript).toBe(depositScript);
     expect(notify.reclaimScript).toBe(reclaimScript);
+  });
+
+  test('send funds to address (stacks testnet btc regtest)', async () => {
+    const priv = 'bfbd81098fcabdd0904f1d7ed1fc5db6123341ac166a61c24d115bfb665c6ba5';
+    const address = btc.getAddress('wpkh', hexToBytes(priv), REGTEST)!;
+    const recipient = 'bcrt1q3tj2fr9scwmcw3rq5m6jslva65f2rqjxfrjz47';
+    const feeRate = 1;
+    const amount = 4539558n;
+
+    const tnet = new SbtcApiClientTestnet();
+    const utxos = (await tnet.fetchUtxos(address)).sort(
+      (a, b) => (a.status?.block_height ?? 0) - (b.status?.block_height ?? 0)
+    );
+
+    const tx = new btc.Transaction();
+    tx.addOutputAddress(recipient, amount, REGTEST);
+
+    const pay = await paymentInfo({
+      tx,
+      feeRate,
+      utxos,
+      utxoToSpendable: DEFAULT_UTXO_TO_SPENDABLE,
+    });
+
+    for (const input of pay.inputs) tx.addInput(input);
+
+    const changeAfterAdditionalOutput =
+      pay.changeSats - BigInt(Math.ceil(VSIZE_INPUT_P2WPKH * feeRate));
+    if (changeAfterAdditionalOutput > dustMinimum(VSIZE_INPUT_P2WPKH, feeRate)) {
+      tx.addOutputAddress(address, changeAfterAdditionalOutput, REGTEST);
+    }
+
+    tx.sign(hexToBytes(priv));
+    tx.finalize();
+
+    console.log('tx', tx.hex);
+    const txid = await tnet.broadcastTx(tx);
+    console.log('txid', txid);
+  });
+
+  test('btc tx, deposit to wrong signers, reclaim', async () => {
+    const bitcoinAccount = await getBitcoinAccount(WALLET_00); // wpkh bcrt1q3tj2fr9scwmcw3rq5m6jslva65f2rqjxfrjz47 (manually funded on devenv via bridge)
+    const stacksAccount = await getStacksAccount(WALLET_00);
+
+    const tnet = new SbtcApiClientTestnet();
+
+    fetchMock.mockOnce(
+      `[{"txid":"b9f6fe6021ba347454902b1b9796e73882ebdf336675be3f08da895d48ab7a48","vout":1,"scriptPubKey":"00148ae4a48cb0c3b7874460a6f5287d9dd512a18246","status":{"confirmed":true,"block_height":80168,"block_hash":"49b7a5b26fca06dc42bb36f1c5db51bac2ff89640a686ed322b1c3d4b0537e9f","block_time":1734123925},"value":4456642}]`
+    );
+
+    const utxos = (await tnet.fetchUtxos(bitcoinAccount.wpkh.address))
+      .filter(u => u.status?.block_height ?? 0 > 80168 - 100)
+      .sort((a, b) => (a.status?.block_height ?? 0) - (b.status?.block_height ?? 0));
+
+    fetchMock.mockOnce(
+      `0200000001df18462593a0c582bc7bddbed0b25cba5fb0a37b57b408b6f8ff74d55810df5d0100000000ffffffff024a4e0000000000002251202a7e0f8616c84cb643587c7b0650b30b438c6f258885319a93bb70cc8aae5618c2004400000000001600148ae4a48cb0c3b7874460a6f5287d9dd512a1824600000000`
+    );
+
+    const deposit = await sbtcDepositHelper({
+      stacksAddress: stacksAccount.address + '.contract-address',
+      amountSats: 20_042,
+
+      maxSignerFee: 20_000,
+      reclaimLockTime: 3,
+      reclaimPublicKey: bytesToHex(bitcoinAccount.publicKey).slice(2),
+
+      signersPublicKey: '14c515722f2b61f9bc8bfbcd48422988533007602c74f3145616817f27302237',
+      bitcoinChangeAddress: bitcoinAccount.wpkh.address,
+
+      feeRate: 1,
+      utxos,
+    });
+
+    deposit.transaction.sign(bitcoinAccount.privateKey);
+    deposit.transaction.finalize();
+
+    fetchMock.mockOnce(`"250a95549f6bd2066a6eb25370f8856029d9be11db0ef6eddedeea7bc2d223ad"`);
+
+    const txid = await tnet.broadcastTx(deposit.transaction);
+
+    const reclaimTx = buildSbtcReclaimTx({
+      amountSats: 20_042,
+      bitcoinAddress: bitcoinAccount.wpkh.address,
+      stacksAddress: stacksAccount.address + '.contract-address',
+      signersPublicKey: '14c515722f2b61f9bc8bfbcd48422988533007602c74f3145616817f27302237',
+      maxSignerFee: 20_000,
+      reclaimLockTime: 3,
+      reclaimPublicKey: bytesToHex(bitcoinAccount.publicKey).slice(2),
+      txid,
+      feeRate: 1,
+    });
+    reclaimTx.sign(bitcoinAccount.privateKey);
+    reclaimTx.finalize();
+
+    fetchMock.mockOnce(`"48c06d251235e9ce96c0c7c507772b11e688bb55f9d411d87f089bf0a25b0401"`);
+
+    await tnet.broadcastTx(reclaimTx);
   });
 });
 
