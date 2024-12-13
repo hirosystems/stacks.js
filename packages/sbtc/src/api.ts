@@ -66,7 +66,6 @@ export interface BaseClientConfig {
   btcApiUrl: string;
   stxApiUrl: string;
   sbtcApiUrl: string;
-  // sbtcBridgeUrl: string;
 }
 
 export class SbtcApiClient {
@@ -139,30 +138,6 @@ export class SbtcApiClient {
       }),
     }).then(res => res.json())) as SbtcApiNotifyResponse;
   }
-
-  /** Proxies the Emily `/deposit` request via the bridge */
-  // async notifySbtcBridge({
-  //   depositScript,
-  //   reclaimScript,
-  //   vout = 0,
-  //   ...tx
-  // }: {
-  //   depositScript: string;
-  //   reclaimScript: string;
-  //   /** Optional, output index (defaults to `0`) */
-  //   vout?: number;
-  // } & ({ txid: string } | { transaction: { id: string } })) {
-  //   return (await fetch(`${this.config.sbtcBridgeUrl}/api/emilyDeposit`, {
-  //     method: 'POST',
-  //     body: JSON.stringify({
-  //       bitcoinTxid: 'txid' in tx ? tx.txid : tx.transaction.id,
-  //       bitcoinTxOutputIndex: vout,
-  //       depositScript,
-  //       reclaimScript,
-  //       url: this.config.sbtcApiUrl,
-  //     }),
-  //   }).then(res => res.json())) as SbtcApiNotifyResponse;
-  // }
 
   async fetchSignersPublicKey(contractAddress?: string): Promise<string> {
     const res = (await fetchCallReadOnlyFunction({
@@ -253,7 +228,22 @@ export class SbtcApiClient {
 
 // todo: add async fetchDeposits('pending' | 'confirmed')
 
-/** todo */
+export class SbtcApiClientMainnet extends SbtcApiClient {
+  constructor(config?: Partial<BaseClientConfig>) {
+    super(
+      Object.assign(
+        {
+          btcApiUrl: 'https://mempool.space/api',
+          stxApiUrl: 'https://api.hiro.so',
+          sbtcApiUrl: 'https://sbtc-emily.com',
+          sbtcContract: 'SM3VDXK3WZZSA84XXFKAFAF15NNZX32CTSG82JFQ4',
+        },
+        config
+      )
+    );
+  }
+}
+
 export class SbtcApiClientTestnet extends SbtcApiClient {
   constructor(config?: Partial<BaseClientConfig>) {
     super(
@@ -262,7 +252,6 @@ export class SbtcApiClientTestnet extends SbtcApiClient {
           btcApiUrl: 'https://beta.sbtc-mempool.tech/api/proxy',
           stxApiUrl: 'https://api.testnet.hiro.so',
           sbtcApiUrl: 'https://beta.sbtc-emily.com',
-          // sbtcBridgeUrl: 'https://staging.beta.sbtc.tech',
           /** ⚠︎ Attention: This contract address might still change over the course of the sBTC contract on Testnet */
           sbtcContract: 'SNGWPN3XDAQE673MXYXF81016M50NHF5X5PWWM70',
         },
@@ -280,7 +269,6 @@ export class SbtcApiClientDevenv extends SbtcApiClient {
           btcApiUrl: 'http://localhost:3010/api/proxy',
           stxApiUrl: 'http://localhost:3999',
           sbtcApiUrl: 'http://localhost:3031',
-          // sbtcBridgeUrl: 'http://localhost:3010',
           sbtcContract: 'SN3R84XZYA63QS28932XQF3G1J8R9PC3W76P9CSQS',
         },
         config
@@ -288,131 +276,6 @@ export class SbtcApiClientDevenv extends SbtcApiClient {
     );
   }
 }
-
-// export class TestnetHelper extends SbtcApiClient {
-//   constructor(config?: Partial<BaseUrlConfig>) {
-//     super(
-//       Object.assign(
-//         {
-//           bitcoinElectrsApiUrl: 'https://blockstream.info/testnet/api',
-//           stacksApiUrl: 'https://stacks-node-api.testnet.stacks.co',
-//         },
-//         config
-//       )
-//     );
-//   }
-
-//   async getSbtcPegAddress(contractAddress = SBTC_FT_ADDRESS_TESTNET): Promise<string> {
-//     const publicKey = (
-//       (await this.fetchCallReadOnly({
-//         contractAddress,
-//         functionName: 'get-bitcoin-wallet-public-key',
-//       })) as SomeCV<BufferCV>
-//     ).value.buffer;
-
-//     const tr = btc.p2tr(
-//       publicKey.length === 33 ? publicKey.subarray(1) : publicKey, // strip y byte
-//       undefined,
-//       TESTNET
-//     );
-//     return tr.address!;
-//   }
-
-//   async getBitcoinAccount(mnemonic: string, idx: number = 0) {
-//     return await getBitcoinAccount(TESTNET, mnemonic, idx);
-//   }
-
-//   async getStacksAccount(mnemonic: string, idx: number = 0) {
-//     return await getStacksAccount(TransactionVersion.Testnet, mnemonic, idx);
-//   }
-// }
-
-// export class DevEnvHelper extends SbtcApiClient {
-//   btcRpc: RpcClient & RpcCallSpec;
-
-//   constructor(config?: Partial<BaseUrlConfig & { bitcoinCoreRpcUrl: string }>) {
-//     super(
-//       Object.assign(
-//         {
-//           bitcoinElectrsApiUrl: 'http://127.0.0.1:3002',
-//           stacksApiUrl: 'http://127.0.0.1:3999',
-//         },
-//         config
-//       )
-//     );
-
-//     const bitcoinCoreRpcUrl = config?.bitcoinCoreRpcUrl ?? 'http://devnet:devnet@127.0.0.1:18433';
-//     this.btcRpc = new RpcClient(bitcoinCoreRpcUrl).Typed;
-//   }
-
-//   async getSbtcPegAddress(): Promise<string> {
-//     const pegAccount = await this.getBitcoinAccount(WALLET_00);
-//     return pegAccount.tr.address;
-//   }
-
-//   async getBitcoinAccount(mnemonic: string, idx: number = 0) {
-//     return await getBitcoinAccount(REGTEST, mnemonic, idx);
-//   }
-
-//   async getStacksAccount(mnemonic: string, idx: number = 0) {
-//     return await getStacksAccount(TransactionVersion.Testnet, mnemonic, idx);
-//   }
-// }
-
-// // == WALLET ===================================================================
-
-// export const WALLET_00 =
-//   'twice kind fence tip hidden tilt action fragile skin nothing glory cousin green tomorrow spring wrist shed math olympic multiply hip blue scout claw';
-// export const WALLET_01 =
-//   'sell invite acquire kitten bamboo drastic jelly vivid peace spawn twice guilt pave pen trash pretty park cube fragile unaware remain midnight betray rebuild';
-// export const WALLET_02 =
-//   'hold excess usual excess ring elephant install account glad dry fragile donkey gaze humble truck breeze nation gasp vacuum limb head keep delay hospital';
-
-// export async function getBitcoinAccount(
-//   network: BitcoinNetwork,
-//   mnemonic: string,
-//   idx: number = 0
-// ) {
-//   const seed = await bip39.mnemonicToSeed(mnemonic);
-//   const hdkey = HDKey.fromMasterSeed(seed, network.bip32);
-
-//   const path = `m/84'/${network.bip84.coin}'/${idx}'/0/0`;
-//   const privateKey = hdkey.derive(path).privateKey!;
-//   const publicKey = hdkey.derive(path).publicKey!;
-
-//   const trPath = `m/86'/${network.bip84.coin}'/${idx}'/0/0`;
-//   const trPrivateKey = hdkey.derive(trPath).privateKey!;
-//   const trPublicKey = hdkey.derive(trPath).publicKey!; // not sure if this should be used, but this is what the CLI returns
-
-//   return {
-//     privateKey,
-//     publicKey,
-//     wpkh: { address: btc.getAddress('wpkh', privateKey, network)! },
-//     tr: {
-//       address: btc.getAddress('tr', trPrivateKey, network)!,
-//       publicKey: trPublicKey,
-//     },
-//   };
-// }
-
-// export async function getStacksAccount(
-//   transactionVersion: TransactionVersion,
-//   mnemonic: string,
-//   idx: number = 0
-// ) {
-//   const rootPrivateKey = await bip39.mnemonicToSeed(mnemonic);
-//   const rootNode = HDKey.fromMasterSeed(rootPrivateKey);
-
-//   const childKey = rootNode.derive(`m/44'/5757'/0'/0`).deriveChild(idx);
-//   const stxPrivateKey = bytesToHex(compressPrivateKey(childKey.privateKey!));
-
-//   return {
-//     /** Alias for `privateKey` @deprecated use `.privateKey` instead */
-//     stxPrivateKey,
-//     privateKey: stxPrivateKey,
-//     address: getAddressFromPrivateKey(stxPrivateKey, transactionVersion),
-//   };
-// }
 
 export function sleep(ms: number) {
   return new Promise(resolve => setTimeout(resolve, ms));

@@ -2,10 +2,11 @@ import { ProjectivePoint } from '@noble/secp256k1';
 import { HDKey } from '@scure/bip32';
 import * as bip39 from '@scure/bip39';
 import * as btc from '@scure/btc-signer';
-import { REGTEST } from '../../src';
+import { MAINNET, REGTEST } from '../../src';
 import { bytesToHex } from '@stacks/common';
 import { compressPrivateKey, privateKeyToAddress } from '@stacks/transactions';
 import { STACKS_TESTNET } from '../../../network/src';
+import { STACKS_MAINNET } from '@stacks/network';
 
 export function schnorrPublicKey(privateKey: Uint8Array) {
   return ProjectivePoint.fromPrivateKey(privateKey).toRawBytes(true).slice(1);
@@ -22,9 +23,7 @@ export const WALLET_01 =
 export const WALLET_02 =
   'hold excess usual excess ring elephant install account glad dry fragile donkey gaze humble truck breeze nation gasp vacuum limb head keep delay hospital';
 
-export async function getBitcoinAccount(mnemonic: string, idx: number = 0) {
-  const network = REGTEST;
-
+export async function getBitcoinAccount(mnemonic: string, idx: number = 0, network = MAINNET) {
   const seed = await bip39.mnemonicToSeed(mnemonic);
   const hdkey = HDKey.fromMasterSeed(seed, network.bip32);
 
@@ -47,7 +46,11 @@ export async function getBitcoinAccount(mnemonic: string, idx: number = 0) {
   };
 }
 
-export async function getStacksAccount(mnemonic: string, idx: number = 0) {
+export async function getStacksAccount(
+  mnemonic: string,
+  idx: number = 0,
+  network = STACKS_MAINNET
+) {
   const rootPrivateKey = await bip39.mnemonicToSeed(mnemonic);
   const rootNode = HDKey.fromMasterSeed(rootPrivateKey);
 
@@ -58,6 +61,6 @@ export async function getStacksAccount(mnemonic: string, idx: number = 0) {
     /** Alias for `privateKey` @deprecated use `.privateKey` instead */
     stxPrivateKey,
     privateKey: stxPrivateKey,
-    address: privateKeyToAddress(stxPrivateKey, STACKS_TESTNET),
+    address: privateKeyToAddress(stxPrivateKey, network),
   };
 }

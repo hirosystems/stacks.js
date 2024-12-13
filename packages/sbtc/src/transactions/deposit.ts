@@ -3,7 +3,7 @@ import { P2TROut } from '@scure/btc-signer/payment';
 import { bytesToHex, hexToBytes } from '@stacks/common';
 import * as P from 'micro-packed';
 import { UtxoWithTx } from '../api';
-import { BitcoinNetwork, REGTEST, VSIZE_INPUT_P2WPKH } from '../constants';
+import { BitcoinNetwork, MAINNET, VSIZE_INPUT_P2WPKH } from '../constants';
 import {
   DEFAULT_UTXO_TO_SPENDABLE,
   SpendableByScriptTypes,
@@ -143,7 +143,7 @@ export function buildSbtcDepositTr(opts: // | {
 // }
 
 export function buildSbtcReclaimTx({
-  network = REGTEST,
+  network = MAINNET,
   amountSats,
   bitcoinAddress,
   stacksAddress,
@@ -224,7 +224,7 @@ export function buildSbtcReclaimTx({
 }
 
 export function buildSbtcDepositAddress({
-  network = REGTEST,
+  network = MAINNET,
   stacksAddress,
   signersPublicKey,
   maxSignerFee,
@@ -258,7 +258,7 @@ export function buildSbtcDepositAddress({
 }
 
 export function buildSbtcDepositTx({
-  network = REGTEST,
+  network = MAINNET,
   amountSats,
   stacksAddress,
   signersPublicKey,
@@ -291,7 +291,7 @@ export function buildSbtcDepositTx({
 }
 
 export async function sbtcDepositHelper({
-  network = REGTEST,
+  network = MAINNET,
   amountSats,
   stacksAddress,
   bitcoinChangeAddress,

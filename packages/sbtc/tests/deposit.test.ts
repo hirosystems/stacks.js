@@ -18,6 +18,7 @@ import {
 import { WALLET_00, getBitcoinAccount, getStacksAccount } from './helpers/wallet';
 import { hex } from '@scure/base';
 import * as P from 'micro-packed';
+import { STACKS_TESTNET } from '@stacks/network';
 
 // enableFetchLogging(); // enable if you want to record requests to network.txt file
 
@@ -352,8 +353,8 @@ describe('deposit testnet', () => {
   });
 
   test('btc tx, deposit to wrong signers, reclaim', async () => {
-    const bitcoinAccount = await getBitcoinAccount(WALLET_00); // wpkh bcrt1q3tj2fr9scwmcw3rq5m6jslva65f2rqjxfrjz47 (manually funded on devenv via bridge)
-    const stacksAccount = await getStacksAccount(WALLET_00);
+    const bitcoinAccount = await getBitcoinAccount(WALLET_00, 0, REGTEST); // wpkh bcrt1q3tj2fr9scwmcw3rq5m6jslva65f2rqjxfrjz47 (manually funded on devenv via bridge)
+    const stacksAccount = await getStacksAccount(WALLET_00, 0, STACKS_TESTNET);
 
     const tnet = new SbtcApiClientTestnet();
 
@@ -370,6 +371,8 @@ describe('deposit testnet', () => {
     );
 
     const deposit = await sbtcDepositHelper({
+      network: REGTEST,
+
       stacksAddress: stacksAccount.address + '.contract-address',
       amountSats: 20_042,
 
@@ -392,6 +395,8 @@ describe('deposit testnet', () => {
     const txid = await tnet.broadcastTx(deposit.transaction);
 
     const reclaimTx = buildSbtcReclaimTx({
+      network: REGTEST,
+
       amountSats: 20_042,
       bitcoinAddress: bitcoinAccount.wpkh.address,
       stacksAddress: stacksAccount.address + '.contract-address',

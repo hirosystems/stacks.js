@@ -1,10 +1,6 @@
-# `sbtc` 0.2.x (regtest/testnet-release)
-
-⚠︎ **Warning:** Some API instances are not fully deployed yet on Testnet.
+# `sbtc` 0.3.x (mainnet-pre-release)
 
 A helper package for interacting with sBTC from JavaScript/TypeScript.
-
-> **Note:** This package currently targets the Stacks Testnet (on top of Bitcoin Regtest).
 
 - [Installation](#installation)
 - [Overview](#overview)
@@ -17,10 +13,10 @@ A helper package for interacting with sBTC from JavaScript/TypeScript.
   - [`buildSbtcDepositAddress`](#buildsbtcdepositaddress)
   - [`buildSbtcDepositTx`](#buildsbtcdeposittx)
   - [`sbtcDepositHelper`](#sbtcdeposithelper)
-  - [`SbtcApiClientTestnet` / `SbtcApiClientDevenv`](#sbtcapiclienttestnet--sbtcapiclientdevenv)
+  - [`SbtcApiClientMainnet` / `SbtcApiClientTestnet` / `SbtcApiClientDevenv`](#sbtcapiclientmainnet--sbtcapiclienttestnet--sbtcapiclientdevenv)
 - [API](#api)
   - [`sbtcDepositHelper`](#sbtcdeposithelper-1)
-  - [`SbtcApiClientTestnet` / `SbtcApiClientDevenv`](#sbtcapiclienttestnet--sbtcapiclientdevenv-1)
+  - [`SbtcApiClientMainnet` / `SbtcApiClientTestnet` / `SbtcApiClientDevenv`](#sbtcapiclientmainnet--sbtcapiclienttestnet--sbtcapiclientdevenv-1)
 
 ## Installation
 
@@ -81,8 +77,9 @@ The package exports high-level functions for building addresses and transactions
 
 Additionally, there are two API helpers, which make it easier to get all the data needed to create the above transactions:
 
-- [`SbtcApiClientTestnet`](#devenvhelper--testnethelper) — a client for communicating with the different pieces of the testnet deployment of sBTC
-- [`SbtcApiClientDevenv`](#devenvhelper--testnethelper) — a client for developing against a [local deployment of sBTC](https://github.com/stacks-network/sbtc/blob/0ff9070ffdfde4a8c0fec025de5a182e2aedca2d/Makefile#L169-L173)
+- [`SbtcApiClientMainnet`](#sbtcapiclientmainnet-sbtcapiclienttestnet-sbtcapiclientdevenv) — a client for communicating with the different pieces of the sBTC deployment
+- [`SbtcApiClientTestnet`](#sbtcapiclientmainnet-sbtcapiclienttestnet-sbtcapiclientdevenv) — a client for communicating with the different pieces of the sBTC deployment on Testnet
+- [`SbtcApiClientDevenv`](#sbtcapiclientmainnet-sbtcapiclienttestnet-sbtcapiclientdevenv) — a client for developing against a [local deployment of sBTC](https://github.com/stacks-network/sbtc/blob/0ff9070ffdfde4a8c0fec025de5a182e2aedca2d/Makefile#L169-L173)
 
 While the final adjustments are still being made in the pre-release phase, this package may change default URLs and contract addresses on every minor release.
 
@@ -90,6 +87,7 @@ While the final adjustments are still being made in the pre-release phase, this 
 | ------- | ----------------------------- | ------------- |
 | 0.1.x   | Developer release (hackathon) |               |
 | 0.2.x   | Regtest/Testnet release       | Deposit only  |
+| 0.3.x   | Mainnet pre-release           | Deposit only  |
 
 ---
 
@@ -202,12 +200,13 @@ console.log('res', res.status, res.statusMessage);
 
 > **Note:** Here `SbtcApiClientTestnet` can be replaced with `SbtcApiClientDevenv` to interact with the local deployment of the sBTC contract.
 
-### `SbtcApiClientTestnet` / `SbtcApiClientDevenv`
+### `SbtcApiClientMainnet` / `SbtcApiClientTestnet` / `SbtcApiClientDevenv`
 
 ```ts
-import { SbtcApiClientTestnet, SbtcApiClientDevenv } from 'sbtc';
+import { SbtcApiClientMainnet, SbtcApiClientTestnet, SbtcApiClientDevenv } from 'sbtc';
 
-const client = new SbtcApiClientTestnet();
+const client = new SbtcApiClientMainnet();
+// const client = new SbtcApiClientTestnet();
 // const client = new SbtcApiClientDevenv();
 
 const pub = await client.fetchSignersPublicKey(); // fetches the aggregated public key of the signers
@@ -235,14 +234,16 @@ const sbtcBalance = await client.fetchSbtcBalance(STX_ADDRESS); // fetch the sBT
 | `bitcoinChangeAddress` | Bitcoin change address                                                                          | `string`             | —                                                          |
 | `feeRate`              | Fee rate in sat/vbyte                                                                           | `number`             | —                                                          |
 | `utxos`                | UTXOs to "fund" the transaction                                                                 | `UtxoWithTx[]`       | —                                                          |
+| `reclaimPublicKey`     | Public key (schnorr, x-only) for reclaiming failed deposits                                     | `string`             | —                                                          |
+|                        |                                                                                                 |                      |                                                            |
+| `reclaimLockTime`      | Optional reclaim lock time                                                                      | `number`             | `144`                                                      |
+| `maxSignerFee`         | Optional maximum fee to pay to signers for the sBTC mint                                        | `number`             | `80_000`                                                   |
+| `network`              | Optional Bitcoin network                                                                        | `BitcoinNetwork`     | `MAINNET`                                                  |
+| `utxoToSpendable`      | Optional function to convert p2wpk and p2sh utxos to spendable inputs                           | `Function`           | Best effort default implementation to make utxos spendable |
 |                        |                                                                                                 |                      |                                                            |
 | `paymentPublicKey`     | Optional payment public key (currently only used for default utxoToSpendable.sh implementation) | `string` hex         | —                                                          |
-| `utxoToSpendable`      | Optional function to convert p2wpk and p2sh utxos to spendable inputs                           | `Function`           | Best effort default implementation to make utxos spendable |
-| `maxSignerFee`         | Optional maximum fee to pay for the deposit transaction                                         | `number`             | `80_000`                                                   |
-| `reclaimLockTime`      | Optional reclaim lock time                                                                      | `number`             | `6_000`                                                    |
-| `network`              | Optional Bitcoin network                                                                        | `BitcoinNetwork`     | `REGTEST`                                                  |
 
-### `SbtcApiClientTestnet` / `SbtcApiClientDevenv`
+### `SbtcApiClientMainnet` / `SbtcApiClientTestnet` / `SbtcApiClientDevenv`
 
 | Parameter      | Description                                       | Type     |
 | -------------- | ------------------------------------------------- | -------- |
