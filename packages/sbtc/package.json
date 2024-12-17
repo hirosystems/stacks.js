@@ -1,0 +1,63 @@
+{
+  "name": "sbtc",
+  "version": "0.3.1",
+  "description": "Library for sBTC.",
+  "license": "MIT",
+  "author": "Hiro Systems PBC (https://hiro.so)",
+  "homepage": "https://hiro.so/stacks-js",
+  "scripts": {
+    "build": "npm run clean && npm run build:cjs && npm run build:esm && npm run build:umd",
+    "build:cjs": "tsc -b tsconfig.build.json",
+    "build:esm": "tsc -p tsconfig.build.json --module ES6 --outDir ./dist/esm",
+    "build:umd": "NODE_OPTIONS=--max-old-space-size=8192 webpack --config webpack.config.js",
+    "clean": "rimraf dist && tsc -b tsconfig.build.json --clean",
+    "pack": "npm pack",
+    "prepublishOnly": "npm run test && NODE_ENV=production npm run build",
+    "start": "tsc -b tsconfig.build.json --watch --verbose",
+    "test": "vitest",
+    "test:watch": "jest --watch --coverage=false",
+    "typecheck": "tsc --noEmit",
+    "typecheck:watch": "npm run typecheck -- --watch"
+  },
+  "dependencies": {
+    "@btc-helpers/rpc": "^2.0.0",
+    "@noble/secp256k1": "^2.1.0",
+    "@scure/base": "^1.1.9",
+    "@scure/btc-signer": "^1.4.0",
+    "@stacks/common": "^7.0.2",
+    "@stacks/encryption": "^7.0.2",
+    "@stacks/network": "^7.0.2",
+    "@stacks/transactions": "^7.0.2",
+    "c32check": "^2.0.0",
+    "micro-packed": "^0.6.3"
+  },
+  "devDependencies": {
+    "@scure/bip32": "^1.5.0",
+    "@scure/bip39": "^1.4.0",
+    "@stacks/internal": "file:../internal",
+    "rimraf": "^6.0.1",
+    "vitest": "^2.1.5",
+    "vitest-fetch-mock": "^0.4.2"
+  },
+  "sideEffects": false,
+  "typings": "dist/index.d.ts",
+  "main": "dist/index.js",
+  "module": "dist/esm/index.js",
+  "umd:main": "dist/umd/index.js",
+  "unpkg": "dist/umd/index.js",
+  "files": [
+    "dist",
+    "src"
+  ],
+  "keywords": [
+    "sBTC",
+    "Stacks"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hirosystems/stacks.js.git"
+  },
+  "bugs": {
+    "url": "https://github.com/hirosystems/stacks.js/issues"
+  }
+}

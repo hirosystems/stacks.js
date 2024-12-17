@@ -1,11 +1,9 @@
 {
-  "version": "7.0.3",
+  "version": "independent",
   "registry": "https://registry.npmjs.org/",
   "publishConfig": {
     "access": "public"
   },
   "changelogPreset": "conventionalcommits",
-  "packages": [
-    "packages/*"
-  ]
+  "packages": ["packages/*"]
 }

@@ -2,6 +2,7 @@ import { Configuration, TransactionsApi } from '@stacks/blockchain-api-client';
 import { STACKS_TESTNET } from '@stacks/network';
 import { MockResponseInitFunction } from 'jest-fetch-mock';
 import { StackingClient } from '@stacks/stacking';
+import fs from 'fs';
 
 // NOTES
 // Capture traffic via the fetchWrapper
@@ -25,7 +26,8 @@ const MATCHER = {
 export function setApiMocks(responseMap: { [key: string]: any }, mockTxBroadcast = true) {
   // we want to be able to call setApiMocks and it do nothing if mocking is currently disabled
   // (maybe move this to inside the mockIf handler, for better enabling/disabling mocking during a run)
-  if (!isMocking()) return;
+
+  // if (!isMocking()) return; todo: disabled for vitest compatibility
 
   if (mockTxBroadcast)
     responseMap = {
@@ -56,7 +58,7 @@ function sleep(ms: number) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-function isMocking(): boolean {
+export function isMocking(): boolean {
   const result = fetchMock.isMocking(''); // be careful using .isMocking, it will consume .mockOnce's
   if (typeof result === 'boolean') return result;
   return result[0];
@@ -184,4 +186,35 @@ export function getFetchMockBroadcast() {
     .reverse()
     .find((m: any) => m[0].endsWith('/transactions'));
   return JSON.parse(broadcast[1].body);
+}
+
+export function enableFetchLogging() {
+  const fetchOriginal = globalThis.fetch;
+  (globalThis.fetch as any) = async (input: string | Request, init?: RequestInit) => {
+    const r = await fetchOriginal(input, init);
+    logCurl(input, init);
+    const response = await r
+      .clone()
+      .json()
+      .catch(() => r.clone().text());
+    const url = input instanceof Request ? input.url : input;
+    const log = `'${url}': \`${r.headers.get('content-type')?.includes('application/json') ? JSON.stringify(response) : response}\`,`;
+    fs.appendFileSync('network.txt', `${log}\n`);
+    return r;
+  };
+}
+
+function logCurl(input: string | Request, init?: RequestInit) {
+  const url = input instanceof Request ? input.url : input;
+  const method = init?.method || 'GET';
+  const headers = init?.headers
+    ? Object.entries(init.headers)
+        .map(([k, v]) => `-H '${k}: ${v}'`)
+        .join(' ')
+    : '';
+  const body = init?.body
+    ? `-d '${typeof init.body === 'string' ? init.body : JSON.stringify(init.body)}'`
+    : '';
+  const curl = `curl -X ${method} ${headers} ${body} '${url}'`;
+  fs.appendFileSync('curl.txt', `${curl}\n`);
 }

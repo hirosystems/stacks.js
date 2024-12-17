@@ -6,8 +6,12 @@ import { decode, encode, encodingLength } from './varuint';
 // 'Stacks Signed Message:\n'.length.toString(16) === 17
 const chainPrefix = '\x17Stacks Signed Message:\n';
 
-export function hashMessage(message: string, prefix: string = chainPrefix): Uint8Array {
-  return sha256(encodeMessage(message, prefix));
+export function hashMessage(
+  message: string | Uint8Array,
+  prefix: string = chainPrefix
+): Uint8Array {
+  const messageBytes = typeof message == 'string' ? utf8ToBytes(message) : message;
+  return sha256(encodeMessage(messageBytes, prefix));
 }
 
 export function encodeMessage(
@@ -16,7 +20,7 @@ export function encodeMessage(
   prefix: string = chainPrefix
 ): Uint8Array {
   const messageBytes = typeof message == 'string' ? utf8ToBytes(message) : message;
-  const encodedLength = encode(messageBytes.length);
+  const encodedLength = encode(messageBytes.byteLength);
   return concatBytes(utf8ToBytes(prefix), encodedLength, messageBytes);
 }
 

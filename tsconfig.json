@@ -33,6 +33,7 @@
       "packages/bns",
       "packages/common",
       "packages/profile",
+      "packages/sbtc",
       "packages/storage",
       "packages/wallet-sdk"
     ],
