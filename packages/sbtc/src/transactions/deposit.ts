@@ -13,6 +13,9 @@ import {
   stacksAddressBytes,
 } from '../utils';
 
+export const DEFAULT_RECLAIM_LOCK_TIME = 12;
+export const DEFAULT_MAX_SIGNER_FEE = 80_000;
+
 /** Taken from [bip-0341.mediawiki](https://github.com/bitcoin/bips/blob/master/bip-0341.mediawiki#user-content-Constructing_and_spending_Taproot_outputs) and [sbtc](https://github.com/stacks-network/sbtc/blob/a3a927f759871440962d8f8066108e5b0af696a0/sbtc/src/lib.rs#L28) */
 export const UNSPENDABLE_PUB = new Uint8Array([
   0x50, 0x92, 0x9b, 0x74, 0xc1, 0xa0, 0x49, 0x54, 0xb7, 0x8b, 0x4b, 0x60, 0x35, 0xe9, 0x7a, 0x5e,
@@ -148,8 +151,8 @@ export function buildSbtcReclaimTx({
   bitcoinAddress,
   stacksAddress,
   signersPublicKey,
-  maxSignerFee,
-  reclaimLockTime = 144,
+  maxSignerFee = DEFAULT_MAX_SIGNER_FEE,
+  reclaimLockTime = DEFAULT_RECLAIM_LOCK_TIME,
   reclaimPublicKey,
   txid,
   vout = 0,
@@ -163,9 +166,9 @@ export function buildSbtcReclaimTx({
   stacksAddress: string;
   /** The signers public key (aggregated schnorr; needed to reconstruct the deposit tx) */
   signersPublicKey: string;
-  /** The max signer fee (needed to reconstruct the deposit tx) */
-  maxSignerFee: number;
-  /** The lock time (needed to reconstruct the deposit tx), defaults to 144 */
+  /** The max signer fee (needed to reconstruct the deposit tx), defaults to 80_000 */
+  maxSignerFee?: number;
+  /** The lock time (needed to reconstruct the deposit tx), defaults to 12 */
   reclaimLockTime?: number;
   /** The reclaim public key (schnorr; to reconstruct the deposit tx AND sign the reclaim tx) */
   reclaimPublicKey: string;
@@ -180,8 +183,8 @@ export function buildSbtcReclaimTx({
   /** Fee rate in sat/vbyte for the reclaim tx */
   feeRate: number;
 }) {
-  const tx = new btc.Transaction({ allowUnknownInputs: true });
-  if (tx.version < 2) throw new Error('Transaction version must be >= 2');
+  const tx = new btc.Transaction({ allowUnknownInputs: true, allowUnknownOutputs: true });
+  if (tx.version !== 2) throw new Error('Transaction version must be == 2');
 
   const deposit = buildSbtcDepositTr({
     network,
@@ -227,16 +230,17 @@ export function buildSbtcDepositAddress({
   network = MAINNET,
   stacksAddress,
   signersPublicKey,
-  maxSignerFee,
-  reclaimLockTime = 144,
+  maxSignerFee = DEFAULT_MAX_SIGNER_FEE,
+  reclaimLockTime = DEFAULT_RECLAIM_LOCK_TIME,
   reclaimPublicKey,
 }: {
   network: BitcoinNetwork;
   stacksAddress: string;
   /** Aggregated (schnorr) public key of all signers */
   signersPublicKey: string;
-  maxSignerFee: number;
-  /** The lock time (needed to reconstruct the deposit tx), defaults to 144 */
+  /** The max signer fee (needed to reconstruct the deposit tx), defaults to 80_000 */
+  maxSignerFee?: number;
+  /** The lock time (needed to reconstruct the deposit tx), defaults to 12 */
   reclaimLockTime?: number;
   /** The reclaim public key (schnorr; to reconstruct the deposit tx AND sign the reclaim tx) */
   reclaimPublicKey: string;
@@ -301,8 +305,8 @@ export async function sbtcDepositHelper({
   utxoToSpendable = DEFAULT_UTXO_TO_SPENDABLE,
   paymentPublicKey,
   reclaimPublicKey,
-  maxSignerFee = 80_000,
-  reclaimLockTime = 144,
+  maxSignerFee = DEFAULT_MAX_SIGNER_FEE,
+  reclaimLockTime = DEFAULT_RECLAIM_LOCK_TIME,
 }: {
   /** Bitcoin network, defaults to REGTEST */
   network?: BitcoinNetwork;

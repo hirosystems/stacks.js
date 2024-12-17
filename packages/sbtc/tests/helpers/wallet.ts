@@ -2,11 +2,10 @@ import { ProjectivePoint } from '@noble/secp256k1';
 import { HDKey } from '@scure/bip32';
 import * as bip39 from '@scure/bip39';
 import * as btc from '@scure/btc-signer';
-import { MAINNET, REGTEST } from '../../src';
 import { bytesToHex } from '@stacks/common';
-import { compressPrivateKey, privateKeyToAddress } from '@stacks/transactions';
-import { STACKS_TESTNET } from '../../../network/src';
 import { STACKS_MAINNET } from '@stacks/network';
+import { compressPrivateKey, privateKeyToAddress } from '@stacks/transactions';
+import { MAINNET } from '../../src';
 
 export function schnorrPublicKey(privateKey: Uint8Array) {
   return ProjectivePoint.fromPrivateKey(privateKey).toRawBytes(true).slice(1);

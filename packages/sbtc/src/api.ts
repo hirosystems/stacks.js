@@ -73,7 +73,12 @@ export class SbtcApiClient {
 
   async fetchUtxos(address: string): Promise<UtxoWithTx[]> {
     return (
-      fetch(`${this.config.btcApiUrl}/address/${address}/utxo`)
+      fetch(`${this.config.btcApiUrl}/address/${address}/utxo`, {
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+      })
         .then(res => res.json())
         // .then((utxos: MempoolApiUtxo[]) =>
         //   utxos.sort((a, b) => a.status.block_height - b.status.block_height)
@@ -95,7 +100,7 @@ export class SbtcApiClient {
   }
 
   async fetchFeeRates(): Promise<MempoolFeeEstimates> {
-    return fetch(`${this.config.btcApiUrl}/fees/recommended`).then(res => res.json());
+    return fetch(`${this.config.btcApiUrl}/v1/fees/recommended`).then(res => res.json());
   }
 
   async fetchFeeRate(target: 'low' | 'medium' | 'high'): Promise<number> {
@@ -107,9 +112,15 @@ export class SbtcApiClient {
   async broadcastTx(tx: btc.Transaction): Promise<string> {
     return await fetch(`${this.config.btcApiUrl}/tx`, {
       method: 'POST',
-      headers: { 'Content-Type': 'text/plain' },
+      headers: { Accept: 'text/plain', 'Content-Type': 'text/plain' },
       body: tx.hex,
-    }).then(res => res.json() as Promise<string>);
+    }).then(res => {
+      try {
+        return res.text() as Promise<string>;
+      } catch (e) {
+        return res.json() as Promise<string>; // the proxy might need a fallback decode
+      }
+    });
   }
 
   async notifySbtc({
@@ -146,9 +157,7 @@ export class SbtcApiClient {
       functionName: 'get-current-aggregate-pubkey',
       functionArgs: [],
       senderAddress: STACKS_DEVNET.bootAddress, // zero address
-      client: {
-        baseUrl: this.config.stxApiUrl,
-      },
+      client: { baseUrl: this.config.stxApiUrl },
     })) as BufferCV;
 
     return res.value.slice(2);
