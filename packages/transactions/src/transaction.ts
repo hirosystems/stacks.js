@@ -50,6 +50,7 @@ import {
   LengthPrefixedList,
   PayloadInput,
   PayloadWire,
+  PostConditionWire,
   PublicKeyWire,
   StacksWireType,
   createLPList,
@@ -66,7 +67,7 @@ export class StacksTransactionWire {
   auth: Authorization;
   payload: PayloadWire;
   postConditionMode: PostConditionMode;
-  postConditions: LengthPrefixedList;
+  postConditions: LengthPrefixedList<PostConditionWire>;
 
   /** @deprecated Not used, starting with Stacks 2.5. Still needed for serialization. */
   anchorMode: AnchorMode;
@@ -83,7 +84,7 @@ export class StacksTransactionWire {
   }: {
     payload: PayloadInput;
     auth: Authorization;
-    postConditions?: LengthPrefixedList;
+    postConditions?: LengthPrefixedList<PostConditionWire>;
     postConditionMode?: PostConditionMode;
     transactionVersion?: TransactionVersion;
     chainId?: ChainId;
