@@ -33,6 +33,7 @@ import {
   STXPostConditionWire,
   TokenTransferPayloadWire,
   createLPList,
+  createMemoString,
   createStandardPrincipal,
   createTokenTransferPayload,
   serializePublicKeyBytes,
@@ -130,6 +131,31 @@ test('STX token transfer transaction serialization and deserialization', () => {
   expect(deserializedPayload.amount.toString()).toBe(amount.toString());
 });
 
+test('Post condition type check', () => {
+  const address = 'SP3FGQ8Z7JY9BWYZ5WM53E0M9NK7WHJF0691NZ159';
+  const recipientCV = standardPrincipalCV(address);
+  const amount = 2500000;
+  const memo = 'memo (not included';
+  const payload = createTokenTransferPayload(recipientCV, amount, memo);
+  const addressHashMode = AddressHashMode.P2PKH;
+  const nonce = 0;
+  const fee = 0;
+  const pubKey = '03ef788b3830c00abe8f64f62dc32fc863bc0b2cafeb073b6c8e1c7657d9c2c3ab';
+  const spendingCondition = createSingleSigSpendingCondition(addressHashMode, pubKey, nonce, fee);
+  const authorization = createStandardAuth(spendingCondition);
+
+  // Valid LengthPrefixedList type ...
+  const badPostConditions = createLPList([createMemoString('1234')]);
+  new StacksTransactionWire({
+    network: STACKS_TESTNET,
+    auth: authorization,
+    payload,
+    // ... but not valid LengthPrefixedList<PostConditionWire> type
+    // @ts-expect-error
+    postConditions: badPostConditions,
+  });
+});
+
 test('STX token transfer transaction fee setting', () => {
   const transactionVersion = TransactionVersion.Testnet;
   const chainId = ChainId.Testnet;
@@ -192,7 +218,7 @@ test('STX token transfer transaction fee setting', () => {
   expect(postSetFeeDeserialized.postConditionMode).toBe(postConditionMode);
   expect(postSetFeeDeserialized.postConditions.values.length).toBe(1);
 
-  const deserializedPostCondition = (postSetFeeDeserialized.postConditions as LengthPrefixedList)
+  const deserializedPostCondition = postSetFeeDeserialized.postConditions
     .values[0] as STXPostConditionWire;
   if (!('address' in deserializedPostCondition.principal)) throw TypeError;
   expect(deserializedPostCondition.principal.address).toStrictEqual(recipient.address);
