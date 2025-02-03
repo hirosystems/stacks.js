@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.0.4](https://github.com/hirosystems/stacks.js/compare/v7.0.2...v7.0.4) (2025-02-03)
+
+
+### Bug Fixes
+
+* Add byte length override for transfer fee estimates ([#1763](https://github.com/hirosystems/stacks.js/issues/1763)) ([a789994](https://github.com/hirosystems/stacks.js/commit/a7899940c0cf8698b1fc9a406b2923d3bf8231f4))
+* regression in 'NoEstimateAvailable' check ([#1785](https://github.com/hirosystems/stacks.js/issues/1785)) ([a079a74](https://github.com/hirosystems/stacks.js/commit/a079a74e0c14189373c93c09229fd039c61c55ab))
+* use correct types for postConditions ([#1784](https://github.com/hirosystems/stacks.js/issues/1784)) ([1d7d280](https://github.com/hirosystems/stacks.js/commit/1d7d2808d039d759fd9bcdc2b6e03e15cf65af43))
+
+
+
 ## [7.0.3](https://github.com/hirosystems/stacks.js/compare/v7.0.2...v7.0.3) (2024-11-15)
 
 

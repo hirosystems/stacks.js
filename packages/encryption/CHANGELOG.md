@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.0.4](https://github.com/hirosystems/stacks.js/compare/v7.0.2...v7.0.4) (2025-02-03)
+
+
+### Bug Fixes
+
+* use correct types for postConditions ([#1784](https://github.com/hirosystems/stacks.js/issues/1784)) ([1d7d280](https://github.com/hirosystems/stacks.js/commit/1d7d2808d039d759fd9bcdc2b6e03e15cf65af43))
+
+
+
 ## [7.0.3](https://github.com/hirosystems/stacks.js/compare/v7.0.2...v7.0.3) (2024-11-15)
 
 **Note:** Version bump only for package @stacks/encryption
