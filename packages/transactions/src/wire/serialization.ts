@@ -286,12 +286,29 @@ export function serializeLPListBytes(lpList: LengthPrefixedList): Uint8Array {
   return concatArray(bytesArray);
 }
 
-export function deserializeLPList(
+export function deserializeLPList<
+  TType extends StacksWireType = StacksWireType,
+  TWire extends StacksWire = TType extends StacksWireType.Address
+    ? AddressWire
+    : TType extends StacksWireType.LengthPrefixedString
+      ? LengthPrefixedStringWire
+      : TType extends StacksWireType.MemoString
+        ? MemoStringWire
+        : TType extends StacksWireType.Asset
+          ? AssetWire
+          : TType extends StacksWireType.PostCondition
+            ? PostConditionWire
+            : TType extends StacksWireType.PublicKey
+              ? PublicKeyWire
+              : TType extends StacksWireType.TransactionAuthField
+                ? TransactionAuthFieldWire
+                : StacksWire,
+>(
   serialized: string | Uint8Array | BytesReader,
-  type: StacksWireType,
+  type: TType,
   lengthPrefixBytes?: number
   // todo: `next` refactor for inversion of control
-): LengthPrefixedList {
+): LengthPrefixedList<TWire> {
   const bytesReader = isInstance(serialized, BytesReader)
     ? serialized
     : new BytesReader(serialized);
@@ -323,7 +340,7 @@ export function deserializeLPList(
         break;
     }
   }
-  return createLPList(l, lengthPrefixBytes);
+  return createLPList<TWire>(l as TWire[], lengthPrefixBytes);
 }
 
 export function serializePostConditionWire(postCondition: PostConditionWire): string {

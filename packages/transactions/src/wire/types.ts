@@ -61,10 +61,10 @@ export interface PublicKeyWire {
   readonly data: Uint8Array;
 }
 
-export interface LengthPrefixedList {
+export interface LengthPrefixedList<TWire extends StacksWire = StacksWire> {
   readonly type: StacksWireType.LengthPrefixedList;
   readonly lengthPrefixBytes: number;
-  readonly values: StacksWire[];
+  readonly values: TWire[];
 }
 
 export interface AddressWire {
