@@ -57,7 +57,7 @@ export function createMemoString(content: string): MemoStringWire {
 export function createLPList<T extends StacksWire>(
   values: T[],
   lengthPrefixBytes?: number
-): LengthPrefixedList {
+): LengthPrefixedList<T> {
   return {
     type: StacksWireType.LengthPrefixedList,
     lengthPrefixBytes: lengthPrefixBytes || 4,
