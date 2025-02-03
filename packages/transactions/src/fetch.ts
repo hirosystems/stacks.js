@@ -200,10 +200,12 @@ export async function fetchFeeEstimateTransaction({
     const body = await response.text().catch(() => '');
 
     if (body.includes('NoEstimateAvailable')) {
-      let json: { reason_data?: { message?: string} } = {};
+      let json: { reason_data?: { message?: string } } = {};
       try {
         json = JSON.parse(body);
-      } catch (err) { // ignore }
+      } catch (err) {
+        // ignore
+      }
       throw new NoEstimateAvailableError(json?.reason_data?.message ?? '');
     }
 
