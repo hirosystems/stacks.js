@@ -291,18 +291,18 @@ export function deserializeLPList<
   TWire extends StacksWire = TType extends StacksWireType.Address
     ? AddressWire
     : TType extends StacksWireType.LengthPrefixedString
-    ? LengthPrefixedStringWire
-    : TType extends StacksWireType.MemoString
-    ? MemoStringWire
-    : TType extends StacksWireType.Asset
-    ? AssetWire
-    : TType extends StacksWireType.PostCondition
-    ? PostConditionWire
-    : TType extends StacksWireType.PublicKey
-    ? PublicKeyWire
-    : TType extends StacksWireType.TransactionAuthField
-    ? TransactionAuthFieldWire
-    : StacksWire,
+      ? LengthPrefixedStringWire
+      : TType extends StacksWireType.MemoString
+        ? MemoStringWire
+        : TType extends StacksWireType.Asset
+          ? AssetWire
+          : TType extends StacksWireType.PostCondition
+            ? PostConditionWire
+            : TType extends StacksWireType.PublicKey
+              ? PublicKeyWire
+              : TType extends StacksWireType.TransactionAuthField
+                ? TransactionAuthFieldWire
+                : StacksWire,
 >(
   serialized: string | Uint8Array | BytesReader,
   type: TType,
