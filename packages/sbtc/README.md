@@ -104,14 +104,14 @@ const client = new SbtcApiClientTestnet();
 
 // 1. BUILD THE DEPOSIT ADDRESS AND METADATA
 const deposit = buildSbtcDepositAddress({
-  stacksAddress: TARGET_STX_ADDRESS,
-  signersPublicKey: await client.fetchSignersPublicKey(),
+  stacksAddress: TARGET_STX_ADDRESS, // the address to send/mint the sBTC to
+  signersPublicKey: await client.fetchSignersPublicKey(), // the aggregated public key of the signers
+  reclaimPublicKey: YOUR_RECLAIM_PUBLIC_KEY, // public key for reclaiming failed deposits
 
   // OPTIONAL DEFAULTS
   // maxSignerFee: 80_000, // optional: fee to pay for the deposit transaction (taken from the signers from the sats)
-  // reclaimLockTime: 12, // optional: lock time for the reclaim script
+  // reclaimLockTime: 950, // optional: lock time for the reclaim script
   // network: MAINNET, // optional: which bitcoin network to use
-  // reclaimPublicKey: YOUR_RECLAIM_PUBLIC_KEY, // required: public key for reclaiming failed deposits
 });
 
 // `deposit.address` is the deposit address (send funds here, aka the deposit address as an output)
@@ -119,11 +119,12 @@ const deposit = buildSbtcDepositAddress({
 // 2. DEPOSIT USING YOUR FAVORITE WALLET (TYPICALLY ALSO BROADCASTED BY THE WALLET)
 const txid = await WalletProvider.sendTransfer({
   recipient: deposit.address,
-  amount: 100_000, // the amount to deposit; <=maxSignerFee is taken from this amount
+  amount: 100_000, // the amount to deposit; <=maxSignerFee is taken from this amount by the signers as a fee
 });
+const transaction = await client.fetchTxHex(txid);
 
 // 3. NOTIFY THE SIGNERS
-await client.notifySbtc({ txid, ...deposit });
+await client.notifySbtc({ transaction, ...deposit });
 ```
 
 ### `buildSbtcDepositTx`
@@ -138,14 +139,14 @@ import { buildSbtcDepositTx } from 'sbtc';
 // 1. BUILD THE DEPOSIT TRANSACTION AND METADATA
 const deposit = buildSbtcDepositTx({
   amountSats: DEPOSIT_AMOUNT, // the amount in sats/sBTC to deposit; <=maxSignerFee is taken from this amount
-  stacksAddress: TARGET_STX_ADDRESS,
-  signersPublicKey: await client.fetchSignersPublicKey(),
-  reclaimPublicKey: YOUR_RECLAIM_PUBLIC_KEY,
+  stacksAddress: TARGET_STX_ADDRESS, // the address to send/mint the sBTC to
+  signersPublicKey: await client.fetchSignersPublicKey(), // the aggregated public key of the signers
+  reclaimPublicKey: YOUR_RECLAIM_PUBLIC_KEY, // public key for reclaiming failed deposits
 
   // OPTIONAL DEFAULTS
-  // maxSignerFee: 80_000,
-  // reclaimLockTime: 12,
-  // network: MAINNET,
+  // maxSignerFee: 80_000, // optional: fee to pay for the deposit transaction (taken from the signers from the sats)
+  // reclaimLockTime: 950, // optional: lock time for the reclaim script
+  // network: MAINNET, // optional: which bitcoin network to use
 });
 
 // `deposit.transaction` has one output, which is the combined taproot of the deposit and reclaim scripts
@@ -185,7 +186,7 @@ const deposit = await sbtcDepositHelper({
   // OPTIONAL DEFAULTS
   // network: MAINNET,
   // maxSignerFee: 80_000,
-  // reclaimLockTime: 12,
+  // reclaimLockTime: 950,
   // paymentPublicKey: YOUR_PAYMENT_PUBLIC_KEY, // only used for default utxoToSpendable.sh implementation
 });
 
@@ -252,7 +253,7 @@ const result = await client.fetchCallReadOnly({
 | `utxos`                | UTXOs to "fund" the transaction                                                                 | `UtxoWithTx[]`       | —                                                          |
 | `reclaimPublicKey`     | Public key (schnorr, x-only) for reclaiming failed deposits                                     | `string`             | —                                                          |
 |                        |                                                                                                 |                      |                                                            |
-| `reclaimLockTime`      | Optional reclaim lock time                                                                      | `number`             | `12`                                                       |
+| `reclaimLockTime`      | Optional reclaim lock time                                                                      | `number`             | `950`                                                      |
 | `maxSignerFee`         | Optional maximum fee to pay to signers for the sBTC mint                                        | `number`             | `80_000`                                                   |
 | `network`              | Optional Bitcoin network                                                                        | `BitcoinNetwork`     | `MAINNET`                                                  |
 | `utxoToSpendable`      | Optional function to convert p2wpk and p2sh utxos to spendable inputs                           | `Function`           | Best effort default implementation to make utxos spendable |

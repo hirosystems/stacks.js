@@ -11,6 +11,7 @@ import {
 } from '@stacks/transactions';
 import { REGTEST } from './constants';
 import { wrapLazyProxy } from './utils';
+import { hexToBytes } from '@stacks/common';
 
 /** todo */
 // https://blockstream.info/api/address/1KFHE7w8BhaENAswwryaoccDb6qcT6DbYY/utxo
@@ -127,14 +128,19 @@ export class SbtcApiClient {
     depositScript,
     reclaimScript,
     vout = 0,
-    ...tx
+    transaction,
   }: {
     depositScript: string;
     reclaimScript: string;
     /** Optional, output index (defaults to `0`) */
     vout?: number;
-    transaction: btc.Transaction;
+    transaction: btc.Transaction | string;
   }) {
+    const tx =
+      typeof transaction === 'string'
+        ? btc.Transaction.fromRaw(hexToBytes(transaction))
+        : transaction;
+
     return (await fetch(`${this.config.sbtcApiUrl}/deposit`, {
       method: 'POST',
       headers: {
@@ -143,11 +149,11 @@ export class SbtcApiClient {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        bitcoinTxid: tx.transaction.id,
+        bitcoinTxid: tx.id,
         bitcoinTxOutputIndex: vout,
         depositScript,
         reclaimScript,
-        transactionHex: tx.transaction.hex,
+        transactionHex: tx.hex,
       }),
     }).then(res => res.json())) as SbtcApiNotifyResponse;
   }

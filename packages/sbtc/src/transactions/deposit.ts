@@ -13,7 +13,7 @@ import {
   stacksAddressBytes,
 } from '../utils';
 
-export const DEFAULT_RECLAIM_LOCK_TIME = 12;
+export const DEFAULT_RECLAIM_LOCK_TIME = 950;
 export const DEFAULT_MAX_SIGNER_FEE = 80_000;
 
 /** Taken from [bip-0341.mediawiki](https://github.com/bitcoin/bips/blob/master/bip-0341.mediawiki#user-content-Constructing_and_spending_Taproot_outputs) and [sbtc](https://github.com/stacks-network/sbtc/blob/a3a927f759871440962d8f8066108e5b0af696a0/sbtc/src/lib.rs#L28) */
