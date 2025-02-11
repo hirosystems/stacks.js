@@ -133,7 +133,8 @@ export class SbtcApiClient {
     reclaimScript: string;
     /** Optional, output index (defaults to `0`) */
     vout?: number;
-  } & ({ txid: string } | { transaction: { id: string } })) {
+    transaction: btc.Transaction;
+  }) {
     return (await fetch(`${this.config.sbtcApiUrl}/deposit`, {
       method: 'POST',
       headers: {
@@ -142,10 +143,11 @@ export class SbtcApiClient {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        bitcoinTxid: 'txid' in tx ? tx.txid : tx.transaction.id,
+        bitcoinTxid: tx.transaction.id,
         bitcoinTxOutputIndex: vout,
         depositScript,
         reclaimScript,
+        transactionHex: tx.transaction.hex,
       }),
     }).then(res => res.json())) as SbtcApiNotifyResponse;
   }

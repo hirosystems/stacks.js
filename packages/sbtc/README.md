@@ -42,7 +42,7 @@ npm install sbtc
     - **Deposit Script**: Identifies which _Stacks address_ the sBTC will be minted to and what the _maximum fee_ (in satoshis) the signers may take in exchange for minting.
     - **Reclaim Script**: Allows the sender to reclaim their funds if the transaction is not processed by the signers.
 - **Sign and Broadcast the Transaction:**
-  - Sign the transaction with the sender’s private key.
+  - Sign the transaction with the sender's private key.
   - Broadcast the transaction to the Bitcoin network (Bitcoin Regtest for Stacks Testnet).
 - **Notify the sBTC API (Emily):**
   - Inform the API about the transaction by submitting its details.
@@ -67,7 +67,7 @@ The package exports high-level functions for building addresses and transactions
 **With wallets:**
 
 - [`buildSbtcDepositAddress`](#buildsbtcdepositaddress) — build a deposit address and metadata (enough for most use-cases)
-- [`buildSbtcDepositTx`](#buildsbtcdepositaddress) — build a deposit transaction and metadata
+- [`buildSbtcDepositTx`](#buildsbtcdeposittx) — build a deposit transaction and metadata
 
 **Without wallets:**
 
@@ -75,10 +75,10 @@ The package exports high-level functions for building addresses and transactions
 
 **HTTP Clients:**
 
-Additionally, there are two API helpers, which make it easier to get all the data needed to create the above transactions:
+Additionally, there are three API helpers, which make it easier to get all the data needed to create the above transactions:
 
-- [`SbtcApiClientMainnet`](#sbtcapiclientmainnet-sbtcapiclienttestnet-sbtcapiclientdevenv) — a client for communicating with the different pieces of the sBTC deployment
-- [`SbtcApiClientTestnet`](#sbtcapiclientmainnet-sbtcapiclienttestnet-sbtcapiclientdevenv) — a client for communicating with the different pieces of the sBTC deployment on Testnet
+- [`SbtcApiClientMainnet`](#sbtcapiclientmainnet-sbtcapiclienttestnet-sbtcapiclientdevenv) — a client for communicating with the sBTC deployment on Mainnet
+- [`SbtcApiClientTestnet`](#sbtcapiclientmainnet-sbtcapiclienttestnet-sbtcapiclientdevenv) — a client for communicating with the sBTC deployment on Testnet
 - [`SbtcApiClientDevenv`](#sbtcapiclientmainnet-sbtcapiclienttestnet-sbtcapiclientdevenv) — a client for developing against a [local deployment of sBTC](https://github.com/stacks-network/sbtc/blob/0ff9070ffdfde4a8c0fec025de5a182e2aedca2d/Makefile#L169-L173)
 
 While the final adjustments are still being made in the pre-release phase, this package may change default URLs and contract addresses on every minor release.
@@ -109,8 +109,9 @@ const deposit = buildSbtcDepositAddress({
 
   // OPTIONAL DEFAULTS
   // maxSignerFee: 80_000, // optional: fee to pay for the deposit transaction (taken from the signers from the sats)
-  // reclaimLockTime: 6_000, // optional: lock time for the reclaim script
-  // network: REGTEST, // optional: which bitcoin network to use
+  // reclaimLockTime: 12, // optional: lock time for the reclaim script
+  // network: MAINNET, // optional: which bitcoin network to use
+  // reclaimPublicKey: YOUR_RECLAIM_PUBLIC_KEY, // required: public key for reclaiming failed deposits
 });
 
 // `deposit.address` is the deposit address (send funds here, aka the deposit address as an output)
@@ -137,13 +138,14 @@ import { buildSbtcDepositTx } from 'sbtc';
 // 1. BUILD THE DEPOSIT TRANSACTION AND METADATA
 const deposit = buildSbtcDepositTx({
   amountSats: DEPOSIT_AMOUNT, // the amount in sats/sBTC to deposit; <=maxSignerFee is taken from this amount
+  stacksAddress: TARGET_STX_ADDRESS,
+  signersPublicKey: await client.fetchSignersPublicKey(),
+  reclaimPublicKey: YOUR_RECLAIM_PUBLIC_KEY,
 
-  // same options as `buildSbtcDepositAddress`
-  network,
-  stacksAddress,
-  signersPublicKey,
-  maxSignerFee,
-  reclaimLockTime,
+  // OPTIONAL DEFAULTS
+  // maxSignerFee: 80_000,
+  // reclaimLockTime: 12,
+  // network: MAINNET,
 });
 
 // `deposit.transaction` has one output, which is the combined taproot of the deposit and reclaim scripts
@@ -173,13 +175,18 @@ const client = new SbtcApiClientTestnet();
 const deposit = await sbtcDepositHelper({
   stacksAddress: TARGET_STX_ADDRESS, // where to send/mint the sBTC
   amountSats: 5_000_000, // (maximum) amount of sBTC to deposit
+  bitcoinChangeAddress: YOUR_BTC_ADDRESS, // where to send change
+  reclaimPublicKey: YOUR_RECLAIM_PUBLIC_KEY, // public key for reclaiming failed deposits
 
-  signersPublicKey: pub, // the aggregated public key of the signers
-
+  signersPublicKey: await client.fetchSignersPublicKey(), // the aggregated public key of the signers
   feeRate: await client.fetchFeeRate('medium'),
   utxos: await client.fetchUtxos(YOUR_BTC_ADDRESS),
 
-  bitcoinChangeAddress: YOUR_BTC_ADDRESS,
+  // OPTIONAL DEFAULTS
+  // network: MAINNET,
+  // maxSignerFee: 80_000,
+  // reclaimLockTime: 12,
+  // paymentPublicKey: YOUR_PAYMENT_PUBLIC_KEY, // only used for default utxoToSpendable.sh implementation
 });
 
 // 2. SIGN THE TRANSACTION
@@ -198,8 +205,6 @@ const res = await client.notifySbtc(deposit);
 console.log('res', res.status, res.statusMessage);
 ```
 
-> **Note:** Here `SbtcApiClientTestnet` can be replaced with `SbtcApiClientDevenv` to interact with the local deployment of the sBTC contract.
-
 ### `SbtcApiClientMainnet` / `SbtcApiClientTestnet` / `SbtcApiClientDevenv`
 
 ```ts
@@ -209,17 +214,28 @@ const client = new SbtcApiClientMainnet();
 // const client = new SbtcApiClientTestnet();
 // const client = new SbtcApiClientDevenv();
 
+// Bitcoin-related methods
 const pub = await client.fetchSignersPublicKey(); // fetches the aggregated public key of the signers
 const address = await client.fetchSignersAddress(); // fetches the p2tr address of the aggregated public key of the signers
-
 const feeRate = await client.fetchFeeRate('low'); // or 'medium', 'high'
 const unspents = await client.fetchUtxos(BTC_ADDRESS);
 const hex = await client.fetchTxHex(TXID);
+const btcBalance = await client.fetchBalance(BTC_ADDRESS); // in satoshis
 
+// Transaction-related methods
 await client.broadcastTx(DEPOSIT_BTC_TX); // broadcast a deposit BTC transaction
-await client.notifySbtc(DEPOSIT_BTC_TX); // notify the sBTC API about the deposit (otherwise it won't be processed)
+await client.notifySbtc(DEPOSIT_BTC_TX); // notify the sBTC API about the deposit
+const deposit = await client.fetchDeposit(TXID); // fetch deposit status by txid
+const deposit2 = await client.fetchDeposit({ txid: TXID, vout: 0 }); // fetch deposit status by txid and output index
 
-const sbtcBalance = await client.fetchSbtcBalance(STX_ADDRESS); // fetch the sBTC balance of an Stacks address
+// Stacks-related methods
+const sbtcBalance = await client.fetchSbtcBalance(STX_ADDRESS); // fetch the sBTC balance of a Stacks address
+const result = await client.fetchCallReadOnly({
+  contractAddress: CONTRACT_ADDRESS,
+  functionName: FUNCTION_NAME,
+  args: [], // optional clarity values
+  sender: SENDER_ADDRESS, // optional, defaults to zero address
+});
 ```
 
 ## API
@@ -236,7 +252,7 @@ const sbtcBalance = await client.fetchSbtcBalance(STX_ADDRESS); // fetch the sBT
 | `utxos`                | UTXOs to "fund" the transaction                                                                 | `UtxoWithTx[]`       | —                                                          |
 | `reclaimPublicKey`     | Public key (schnorr, x-only) for reclaiming failed deposits                                     | `string`             | —                                                          |
 |                        |                                                                                                 |                      |                                                            |
-| `reclaimLockTime`      | Optional reclaim lock time                                                                      | `number`             | `144`                                                      |
+| `reclaimLockTime`      | Optional reclaim lock time                                                                      | `number`             | `12`                                                       |
 | `maxSignerFee`         | Optional maximum fee to pay to signers for the sBTC mint                                        | `number`             | `80_000`                                                   |
 | `network`              | Optional Bitcoin network                                                                        | `BitcoinNetwork`     | `MAINNET`                                                  |
 | `utxoToSpendable`      | Optional function to convert p2wpk and p2sh utxos to spendable inputs                           | `Function`           | Best effort default implementation to make utxos spendable |
@@ -245,9 +261,17 @@ const sbtcBalance = await client.fetchSbtcBalance(STX_ADDRESS); // fetch the sBT
 
 ### `SbtcApiClientMainnet` / `SbtcApiClientTestnet` / `SbtcApiClientDevenv`
 
-| Parameter      | Description                                       | Type     |
-| -------------- | ------------------------------------------------- | -------- |
-| `sbtcContract` | The multisig address of the initial sBTC contract | `string` |
-| `sbtcApiUrl`   | The base URL of the sBTC API (Emily)              | `string` |
-| `btcApiUrl`    | The base URL of the Bitcoin mempool/electrs API   | `string` |
-| `stxApiUrl`    | The base URL of the Stacks API                    | `string` |
+| Parameter      | Description                                       | Type     | Default                                              |
+| -------------- | ------------------------------------------------- | -------- | ---------------------------------------------------- |
+| `sbtcContract` | The multisig address of the initial sBTC contract | `string` | Mainnet: `SM3VDXK3WZZSA84XXFKAFAF15NNZX32CTSG82JFQ4` |
+|                |                                                   |          | Testnet: `SNGWPN3XDAQE673MXYXF81016M50NHF5X5PWWM70`  |
+|                |                                                   |          | Devenv: `SN3R84XZYA63QS28932XQF3G1J8R9PC3W76P9CSQS`  |
+| `sbtcApiUrl`   | The base URL of the sBTC API (Emily)              | `string` | Mainnet: `https://sbtc-emily.com`                    |
+|                |                                                   |          | Testnet: `https://beta.sbtc-emily.com`               |
+|                |                                                   |          | Devenv: `http://localhost:3031`                      |
+| `btcApiUrl`    | The base URL of the Bitcoin mempool/electrs API   | `string` | Mainnet: `https://mempool.space/api`                 |
+|                |                                                   |          | Testnet: `https://beta.sbtc-mempool.tech/api/proxy`  |
+|                |                                                   |          | Devenv: `http://localhost:3010/api/proxy`            |
+| `stxApiUrl`    | The base URL of the Stacks API                    | `string` | Mainnet: `https://api.hiro.so`                       |
+|                |                                                   |          | Testnet: `https://api.testnet.hiro.so`               |
+|                |                                                   |          | Devenv: `http://localhost:3999`                      |
