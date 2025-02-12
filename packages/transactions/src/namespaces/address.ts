@@ -39,7 +39,8 @@ export function parse(
     | ContractIdString
 ): AddressRepr {
   const [addr, contractName] = address.split('.');
-  const parsed = c32addressDecode(addr);
+  const parsed = c32addressDecode(addr); // throws if c32 part is invalid
+  // todo: throw if contract name is invalid
   return {
     version: parsed[0],
     versionChar: C32[parsed[0]],
