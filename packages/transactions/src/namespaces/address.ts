@@ -37,7 +37,7 @@ export function parse(
     | AddressString
     // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
     | ContractIdString
-): AddressRepr {
+): Required<AddressRepr> {
   const [addr, contractName] = address.split('.');
   const parsed = c32addressDecode(addr); // throws if c32 part is invalid
   // todo: throw if contract name is invalid
@@ -45,7 +45,7 @@ export function parse(
     version: parsed[0],
     versionChar: C32[parsed[0]],
     hash160: parsed[1],
-    contractName: contractName,
+    contractName,
   };
 }
 
