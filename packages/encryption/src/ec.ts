@@ -554,3 +554,8 @@ export function verifyMessageSignatureRsv({
     publicKey,
   });
 }
+
+// todo: create a version of the message verify which doesn't double encode the structured data
+// encodeMessage is used inside if it's a string, but that may not be wanted for structured data which is already encoded
+
+// todo: add double argument, one called message and one called messageHash to make it clear what's happening
