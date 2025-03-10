@@ -18,6 +18,7 @@ import {
   BadNonceRejection,
   CONTRACT_ABI_PATH,
   ClarityAbi,
+  Pc,
   READONLY_FUNCTION_CALL_PATH,
   StacksWireType,
   TRANSACTION_FEE_ESTIMATE_PATH,
@@ -83,8 +84,11 @@ import {
   AddressHashMode,
   AuthType,
   ClarityVersion,
+  FungibleConditionCode,
   PayloadType,
   PostConditionMode,
+  PostConditionPrincipalId,
+  PostConditionType,
   PubKeyEncoding,
   TxRejectedReason,
 } from '../src/constants';
@@ -98,6 +102,7 @@ import {
   transactionToHex,
 } from '../src/transaction';
 import { cloneDeep, randomBytes } from '../src/utils';
+import { FungiblePostConditionWire, STXPostConditionWire } from '../src/wire/types';
 
 function setSignature(
   unsignedTransaction: StacksTransactionWire,
@@ -1949,6 +1954,294 @@ test('Transaction broadcast fails', async () => {
   fetchMock.mockOnce('test', { status: 400 });
 
   await expect(broadcastTransaction({ transaction })).rejects.toThrow();
+});
+
+test('Make contract-call with serialized hex post conditions', async () => {
+  const contractAddress = 'ST3KC0MTNW34S1ZXD36JYKFD3JJMWA01M55DSJ4JE';
+  const contractName = 'kv-store';
+  const functionName = 'get-value';
+  const buffer = bufferCV(utf8ToBytes('foo'));
+  const senderKey = 'e494f188c2d35887531ba474c433b1e41fadd8eb824aca983447fd4bb8b277a801';
+  const fee = 0;
+
+  // These are serialized post conditions
+  const stxPostConditionHex = '00021a5dd8ff3545259925b982524807686567eec2933f03000000000000000a'; // STX post condition for ST1EXHZSN8MJSJ9DSG994G1V8CNKYXGMK7Z4SA6DH, gte, 10
+  const ftPostConditionHex =
+    '01021a5dd8ff3545259925b982524807686567eec2933f1ac989ba53bbb27a76ef5e8499e65f69c7798fd5d113746573742d61737365742d636f6e74726163740f746573742d61737365742d6e616d650400000000000003e8'; // FT post condition
+
+  const postConditions = [stxPostConditionHex, ftPostConditionHex];
+
+  const transaction = await makeContractCall({
+    contractAddress,
+    contractName,
+    functionName,
+    functionArgs: [buffer],
+    senderKey,
+    fee,
+    nonce: 1,
+    network: STACKS_TESTNET,
+    postConditions,
+    postConditionMode: 'deny',
+  });
+
+  expect(() => transaction.verifyOrigin()).not.toThrow();
+
+  // Re-serialize and check if the serialized post conditions were correctly handled
+  const serializedTx = transaction.serialize();
+  const bytesReader = new BytesReader(hexToBytes(serializedTx));
+  const deserializedTx = deserializeTransaction(bytesReader);
+
+  // Should have 2 post conditions
+  expect(deserializedTx.postConditions.values.length).toBe(2);
+
+  const firstPC = deserializedTx.postConditions.values[0];
+  expect(firstPC.conditionType).toBe(PostConditionType.STX);
+  expect((firstPC as STXPostConditionWire).amount.toString()).toBe('10');
+
+  const secondPC = deserializedTx.postConditions.values[1];
+  expect(secondPC.conditionType).toBe(PostConditionType.Fungible);
+  expect((secondPC as FungiblePostConditionWire).amount.toString()).toBe('1000');
+});
+
+test('Make contract deploy with mixed post conditions (objects and serialized hex)', async () => {
+  const contractName = 'kv-store';
+  const codeBody = fs.readFileSync('./tests/contracts/kv-store.clar').toString();
+  const senderKey = 'e494f188c2d35887531ba474c433b1e41fadd8eb824aca983447fd4bb8b277a801';
+  const fee = 0;
+  const nonce = 0;
+
+  // Object post condition
+  const stxPostCondition: StxPostCondition = {
+    type: 'stx-postcondition',
+    address: 'ST1EXHZSN8MJSJ9DSG994G1V8CNKYXGMK7Z4SA6DH',
+    condition: 'eq',
+    amount: 5000,
+  };
+
+  // Serialized hex post condition
+  const serializedPostConditionHex =
+    '00021a5dd8ff3545259925b982524807686567eec2933f03000000000000000a'; // STX post condition for the same address, gte, 10
+
+  const transaction = await makeContractDeploy({
+    contractName,
+    codeBody,
+    senderKey,
+    fee,
+    nonce,
+    network: STACKS_TESTNET,
+    postConditions: [stxPostCondition, serializedPostConditionHex],
+    postConditionMode: 'deny',
+  });
+
+  expect(() => transaction.verifyOrigin()).not.toThrow();
+
+  // Re-serialize and check if both post conditions were correctly handled
+  const serializedTx = transaction.serialize();
+  const bytesReader = new BytesReader(hexToBytes(serializedTx));
+  const deserializedTx = deserializeTransaction(bytesReader);
+
+  // Should have 2 post conditions
+  expect(deserializedTx.postConditions.values.length).toBe(2);
+
+  const firstPC = deserializedTx.postConditions.values[0];
+  expect(firstPC.conditionType).toBe(PostConditionType.STX);
+  expect((firstPC as STXPostConditionWire).amount).toBe(5000n);
+
+  const secondPC = deserializedTx.postConditions.values[1];
+  expect(secondPC.conditionType).toBe(PostConditionType.STX);
+  expect((secondPC as STXPostConditionWire).amount).toBe(10n);
+});
+
+test('Comprehensive post condition test for contract call and deploy', async () => {
+  // Common test variables
+  const senderKey = 'e494f188c2d35887531ba474c433b1e41fadd8eb824aca983447fd4bb8b277a801';
+  const fee = 0;
+  const nonce = 0;
+
+  // Test data - Post Conditions in different formats
+
+  // 1. Normal post condition objects
+  const stxPostCondition: StxPostCondition = {
+    type: 'stx-postcondition',
+    address: 'ST1EXHZSN8MJSJ9DSG994G1V8CNKYXGMK7Z4SA6DH',
+    condition: 'eq',
+    amount: 5000,
+  };
+
+  const ftPostCondition: FungiblePostCondition = {
+    type: 'ft-postcondition',
+    address: 'ST1EXHZSN8MJSJ9DSG994G1V8CNKYXGMK7Z4SA6DH',
+    condition: 'gte',
+    asset: 'ST34RKEJKQES7MXQFBT29KSJZD73QK3YNT5N56C6X.test-asset-contract::test-asset-name',
+    amount: 1000,
+  };
+
+  // 2. Wire format post conditions
+  const stxPostConditionWire: STXPostConditionWire = {
+    type: StacksWireType.PostCondition,
+    conditionType: PostConditionType.STX,
+    principal: {
+      type: StacksWireType.Principal,
+      prefix: PostConditionPrincipalId.Standard,
+      address: {
+        type: StacksWireType.Address,
+        version: 22,
+        hash160: '5dd8ff3545259925b982524807686567eec2933f',
+      },
+    },
+    conditionCode: FungibleConditionCode.Less,
+    amount: 7500n,
+  };
+
+  // 3. Hex serialized post conditions
+  const hexSerializedStxPostCondition =
+    '00021a5dd8ff3545259925b982524807686567eec2933f03000000000000000a'; // STX post condition for ST1EXHZSN8MJSJ9DSG994G1V8CNKYXGMK7Z4SA6DH, gte, 10
+
+  const hexSerializedFtPostCondition =
+    '01021a5dd8ff3545259925b982524807686567eec2933f1ac989ba53bbb27a76ef5e8499e65f69c7798fd5d113746573742d61737365742d636f6e74726163740f746573742d61737365742d6e616d650400000000000003e8'; // FT post condition
+
+  // Create an array with all post condition types
+  const allPostConditions = [
+    stxPostCondition,
+    ftPostCondition,
+    stxPostConditionWire,
+    hexSerializedStxPostCondition,
+    hexSerializedFtPostCondition,
+  ];
+
+  // Define expected post condition values after deserialization for easier testing
+  const expectedPostConditions = [
+    {
+      conditionType: PostConditionType.STX,
+      amount: 5000n,
+      conditionCode: FungibleConditionCode.Equal,
+    },
+    {
+      conditionType: PostConditionType.Fungible,
+      amount: 1000n,
+      conditionCode: FungibleConditionCode.GreaterEqual,
+    },
+    {
+      conditionType: PostConditionType.STX,
+      amount: 7500n,
+      conditionCode: FungibleConditionCode.Less,
+    },
+    {
+      conditionType: PostConditionType.STX,
+      amount: 10n,
+      conditionCode: FungibleConditionCode.GreaterEqual,
+    },
+    {
+      conditionType: PostConditionType.Fungible,
+      amount: 1000n,
+      conditionCode: FungibleConditionCode.Less,
+    },
+  ];
+
+  // Test Contract Deploy with all post condition types
+  const contractName = 'test-contract';
+  const codeBody = fs.readFileSync('./tests/contracts/kv-store.clar').toString();
+
+  const deployTx = await makeContractDeploy({
+    contractName,
+    codeBody,
+    senderKey,
+    fee,
+    nonce,
+    network: STACKS_TESTNET,
+    postConditions: allPostConditions,
+    postConditionMode: 'deny',
+  });
+
+  // Verify transaction and post conditions
+  expect(() => deployTx.verifyOrigin()).not.toThrow();
+
+  // Re-serialize and check if post conditions were correctly handled
+  let serializedTx = deployTx.serialize();
+  let deserializedTx = deserializeTransaction(serializedTx);
+
+  // Should have all 5 post conditions
+  expect(deserializedTx.postConditions.values.length).toBe(5);
+
+  // Verify all post conditions from deserialized transaction match expected values
+  const deployPCs = deserializedTx.postConditions.values;
+
+  // Validate all post conditions at once with a loop
+  expectedPostConditions.forEach((expected, index) => {
+    const actual = deployPCs[index];
+    expect(actual.conditionType).toBe(expected.conditionType);
+
+    if (actual.conditionType === PostConditionType.STX) {
+      expect((actual as STXPostConditionWire).amount).toBe(expected.amount);
+      expect((actual as STXPostConditionWire).conditionCode).toBe(expected.conditionCode);
+    } else if (actual.conditionType === PostConditionType.Fungible) {
+      expect((actual as FungiblePostConditionWire).amount).toBe(expected.amount);
+      expect((actual as FungiblePostConditionWire).conditionCode).toBe(expected.conditionCode);
+    }
+  });
+
+  // Test Contract Call with same post conditions
+  const contractAddress = 'ST3KC0MTNW34S1ZXD36JYKFD3JJMWA01M55DSJ4JE';
+  const contractCallName = 'kv-store';
+  const functionName = 'get-value';
+  const buffer = bufferCV(utf8ToBytes('test-key'));
+
+  const callTx = await makeContractCall({
+    contractAddress,
+    contractName: contractCallName,
+    functionName,
+    functionArgs: [buffer],
+    senderKey,
+    fee,
+    nonce,
+    network: STACKS_TESTNET,
+    postConditions: allPostConditions,
+    postConditionMode: 'deny',
+  });
+
+  // Verify transaction and post conditions
+  expect(() => callTx.verifyOrigin()).not.toThrow();
+
+  // Re-serialize and check if post conditions were correctly handled
+  serializedTx = callTx.serialize();
+  deserializedTx = deserializeTransaction(serializedTx);
+
+  // Should have all 5 post conditions
+  expect(deserializedTx.postConditions.values.length).toBe(5);
+
+  // Verify all post conditions from deserialized transaction match expected values
+  const callPCs = deserializedTx.postConditions.values;
+
+  // Validate all post conditions at once with a loop (same expected values)
+  expectedPostConditions.forEach((expected, index) => {
+    const actual = callPCs[index];
+    expect(actual.conditionType).toBe(expected.conditionType);
+
+    if (actual.conditionType === PostConditionType.STX) {
+      expect((actual as STXPostConditionWire).amount).toBe(expected.amount);
+      expect((actual as STXPostConditionWire).conditionCode).toBe(expected.conditionCode);
+    } else if (actual.conditionType === PostConditionType.Fungible) {
+      expect((actual as FungiblePostConditionWire).amount).toBe(expected.amount);
+      expect((actual as FungiblePostConditionWire).conditionCode).toBe(expected.conditionCode);
+    }
+  });
+
+  // Test conversion back to JSON format using Pc.fromHex
+  const expectedPcFromHex = {
+    type: 'stx-postcondition',
+    address: 'ST1EXHZSN8MJSJ9DSG994G1V8CNKYXGMK7Z4SA6DH',
+    condition: 'gte',
+    amount: '10',
+  };
+
+  // Check that Pc.fromHex correctly converts the serialized hex post condition
+  const pcFromHex = Pc.fromHex(hexSerializedStxPostCondition) as StxPostCondition;
+  expect({
+    type: pcFromHex.type,
+    address: pcFromHex.address,
+    condition: pcFromHex.condition,
+    amount: pcFromHex.amount,
+  }).toEqual(expectedPcFromHex);
 });
 
 test('Make contract-call with network ABI validation', async () => {
