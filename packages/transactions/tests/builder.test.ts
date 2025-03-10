@@ -2972,4 +2972,3 @@ describe('multi-sig', () => {
     await expect(txMismatch).rejects.toThrow();
   });
 });
-
