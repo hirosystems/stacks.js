@@ -25,6 +25,11 @@ import {
 } from '../src/postcondition';
 import { StacksWireType, parseAssetString, parsePrincipalString } from '../src/wire';
 import { serializeDeserialize } from './macros';
+import {
+  StxPostCondition,
+  FungiblePostCondition,
+  NonFungiblePostCondition,
+} from '../src/postcondition-types';
 
 test('STX post condition serialization and deserialization', () => {
   const postConditionType = PostConditionType.STX;
@@ -365,4 +370,78 @@ describe('conditionBytesToType', () => {
       expect(result).toBe(expectedName);
     }
   );
+});
+
+describe('Pc.fromHex', () => {
+  test('deserializes STX post condition from hex', () => {
+    const postConditionHex = '00021a5dd8ff3545259925b982524807686567eec2933f03000000000000000a';
+    const postCondition = Pc.fromHex(postConditionHex) as StxPostCondition;
+
+    expect(postCondition.type).toBe('stx-postcondition');
+    expect(postCondition.address).toBe('ST1EXHZSN8MJSJ9DSG994G1V8CNKYXGMK7Z4SA6DH');
+    expect(postCondition.condition).toBe('gte');
+    expect(postCondition.amount).toBe('10');
+  });
+
+  test('deserializes FT post condition from hex', () => {
+    const postConditionHex =
+      '01021a5dd8ff3545259925b982524807686567eec2933f1ac989ba53bbb27a76ef5e8499e65f69c7798fd5d113746573742d61737365742d636f6e74726163740f746573742d61737365742d6e616d650400000000000003e8';
+    const postCondition = Pc.fromHex(postConditionHex) as FungiblePostCondition;
+
+    expect(postCondition.type).toBe('ft-postcondition');
+    expect(postCondition.address).toBe('ST1EXHZSN8MJSJ9DSG994G1V8CNKYXGMK7Z4SA6DH');
+    expect(postCondition.condition).toBe('lt');
+    expect(postCondition.amount).toBe('1000');
+    expect(postCondition.asset).toBe(
+      'ST34RKEJKQES7MXQFBT29KSJZD73QK3YNT5N56C6X.test-asset-contract::test-asset-name'
+    );
+  });
+
+  test('deserializes NFT post condition from hex', () => {
+    // NFT post condition where asset ID is a buffer of string "token-asset-name"
+    const postConditionHex =
+      '02021a5dd8ff3545259925b982524807686567eec2933f1ac989ba53bbb27a76ef5e8499e65f69c7798fd5d113746573742d61737365742d636f6e74726163740f746573742d61737365742d6e616d650200000010746f6b656e2d61737365742d6e616d6511';
+    const postCondition = Pc.fromHex(postConditionHex) as NonFungiblePostCondition;
+
+    expect(postCondition.type).toBe('nft-postcondition');
+    expect(postCondition.address).toBe('ST1EXHZSN8MJSJ9DSG994G1V8CNKYXGMK7Z4SA6DH');
+    expect(postCondition.condition).toBe('not-sent');
+    expect(postCondition.asset).toBe(
+      'ST34RKEJKQES7MXQFBT29KSJZD73QK3YNT5N56C6X.test-asset-contract::test-asset-name'
+    );
+
+    // Check that assetId is a BufferCV of "token-asset-name"
+    expect(postCondition.assetId.type).toBe('buffer');
+    expect(bytesToUtf8(hexToBytes((postCondition.assetId as BufferCV).value))).toBe(
+      'token-asset-name'
+    );
+  });
+
+  test('deserializes origin principal post condition from hex', () => {
+    // Origin STX post condition
+    const postConditionHex = '0001030000000000000001';
+    const postCondition = Pc.fromHex(postConditionHex) as StxPostCondition;
+
+    expect(postCondition.type).toBe('stx-postcondition');
+    expect(postCondition.address).toBe('origin');
+    expect(postCondition.condition).toBe('gte');
+    expect(postCondition.amount).toBe('1');
+  });
+
+  test('deserializes contract principal post condition from hex', () => {
+    // Contract principal STX post condition
+    const postConditionHex =
+      '00031a5dd8ff3545259925b982524807686567eec2933f086b762d73746f72650300000000000186a0';
+    const postCondition = Pc.fromHex(postConditionHex) as StxPostCondition;
+
+    expect(postCondition.type).toBe('stx-postcondition');
+    expect(postCondition.address).toBe('ST1EXHZSN8MJSJ9DSG994G1V8CNKYXGMK7Z4SA6DH.kv-store');
+    expect(postCondition.condition).toBe('gte');
+    expect(postCondition.amount).toBe('100000');
+  });
+
+  test('rejects invalid hex with descriptive error', () => {
+    const invalidHex = 'not-a-valid-hex-string';
+    expect(() => Pc.fromHex(invalidHex)).toThrow();
+  });
 });

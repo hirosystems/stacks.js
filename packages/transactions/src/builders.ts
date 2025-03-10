@@ -45,6 +45,7 @@ import {
   createLPList,
   createSmartContractPayload,
   createTokenTransferPayload,
+  deserializePostConditionWire,
 } from './wire';
 
 /** @deprecated Not used internally */
@@ -248,7 +249,7 @@ export type BaseContractDeployOptions = {
    * transfered assets */
   postConditionMode?: PostConditionModeName | PostConditionMode;
   /** a list of post conditions to add to the transaction */
-  postConditions?: PostCondition[] | PostConditionWire[];
+  postConditions?: (PostCondition | PostConditionWire | string)[];
   /** set to true if another account is sponsoring the transaction (covering the transaction fee) */
   sponsored?: boolean;
 } & NetworkClientParam;
@@ -371,6 +372,7 @@ export async function makeUnsignedContractDeploy(
     : createStandardAuth(spendingCondition);
 
   const postConditions: PostConditionWire[] = (options.postConditions ?? []).map(pc => {
+    if (typeof pc === 'string') return deserializePostConditionWire(pc);
     if (typeof pc.type === 'string') return postConditionToWire(pc);
     return pc;
   });
@@ -417,7 +419,7 @@ export type ContractCallOptions = {
    * transfered assets */
   postConditionMode?: PostConditionModeName | PostConditionMode;
   /** a list of post conditions to add to the transaction */
-  postConditions?: PostCondition[];
+  postConditions?: (PostCondition | PostConditionWire | string)[];
   /** set to true to validate that the supplied function args match those specified in
    * the published contract */
   validateWithAbi?: boolean | ClarityAbi;
@@ -521,6 +523,7 @@ export async function makeUnsignedContractCall(
     : createStandardAuth(spendingCondition);
 
   const postConditions: PostConditionWire[] = (options.postConditions ?? []).map(pc => {
+    if (typeof pc === 'string') return deserializePostConditionWire(pc);
     if (typeof pc.type === 'string') return postConditionToWire(pc);
     return pc;
   });
