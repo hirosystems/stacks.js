@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.0.5](https://github.com/hirosystems/stacks.js/compare/v7.0.4...v7.0.5) (2025-03-10)
+
+
+### Bug Fixes
+
+* Add missing post-condition conversion functions: `Pc.fromHex()`, `wireToPostCondition` ([4e36e26](https://github.com/hirosystems/stacks.js/commit/4e36e26d69c220f66dff3ddac50e8919c4c75813))
+* Allow `make` builder functions to take in serialized post-conditions ([a617f65](https://github.com/hirosystems/stacks.js/commit/a617f65042b3eaf845375f4b7e72b3a5344079b5))
+
+
+
 ## [7.0.4](https://github.com/hirosystems/stacks.js/compare/v7.0.2...v7.0.4) (2025-02-03)
 
 
