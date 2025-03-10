@@ -2052,7 +2052,7 @@ test('Make contract deploy with mixed post conditions (objects and serialized he
   expect((secondPC as STXPostConditionWire).amount).toBe(10n);
 });
 
-test('Comprehensive post condition test for contract call and deploy', async () => {
+test('Make contract transactions with multiple post condition formats', async () => {
   // Common test variables
   const senderKey = 'e494f188c2d35887531ba474c433b1e41fadd8eb824aca983447fd4bb8b277a801';
   const fee = 0;
@@ -2972,3 +2972,4 @@ describe('multi-sig', () => {
     await expect(txMismatch).rejects.toThrow();
   });
 });
+
