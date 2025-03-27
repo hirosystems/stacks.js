@@ -22,12 +22,9 @@ jobs:
       - name: Install tsx globally
         run: npm install -g tsx
 
-      - name: Run package verification
-        run: npx tsx ./build-packages.ts
-
       - name: Check for mismatches
         run: |
-          if grep -q "DIFFERS" <<< "$(./build-packages.ts)"; then
+          if grep -q "DIFFERS" <<< "$(npx tsx ./build-packages.ts)"; then
             echo "❌ Found package build mismatches with npm registry!"
             exit 1
           else
