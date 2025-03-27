@@ -19,8 +19,11 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Install tsx globally
+        run: npm install -g tsx
+
       - name: Run package verification
-        run: npx tsx -y ./build-packages.ts
+        run: npx tsx ./build-packages.ts
 
       - name: Check for mismatches
         run: |
