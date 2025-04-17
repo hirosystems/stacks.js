@@ -13,7 +13,9 @@ const packages = fs.readdirSync(PACKAGES_DIR).filter(item => {
   return fs.statSync(itemPath).isDirectory() && !item.startsWith('.');
 });
 
-console.log(`Found ${packages.length} packages to process`);
+// console.debug(`Found ${packages.length} packages to process`);
+
+const NPM_VERSION_TAG = (process.env.NPM_VERSION_TAG || 'latest').replace(/^v/, '');
 
 // Process all packages
 const results = packages
@@ -22,11 +24,11 @@ const results = packages
     const pkg = JSON.parse(fs.readFileSync(json, 'utf8'));
 
     if (pkg.private === true) {
-      console.log(`Skipping package: ${pkg.name}`);
+      // console.debug(`Skipping package: ${pkg.name}`);
       return null;
     }
 
-    console.log(`\nProcessing package: ${pkg.name}`);
+    // console.debug(`\nProcessing package: ${pkg.name}`);
     process.chdir(path.join(PACKAGES_DIR, dir));
 
     // Run npm publish dry-run
@@ -40,34 +42,36 @@ const results = packages
       /npm notice integrity:\s+(sha\d+-[A-Za-z0-9+/=]+(?:\[\.\.\.\][A-Za-z0-9+/=]*==?)?)/
     );
 
-    console.log(`  Package: ${pkg.name}`);
-    console.log(`  Tarball hash: ${integrity}`);
-    console.log(`  Shasum: ${shasum}`);
+    // console.debug(`  Package: ${pkg.name}`);
+    // console.debug(`  Tarball hash: ${integrity}`);
+    // console.debug(`  Shasum: ${shasum}`);
 
-    // Check latest published version on npm registry
-    const registryCheck = spawnSync('curl', [`https://registry.npmjs.org/${pkg.name}/latest`], {
+    const registryUrl = `https://registry.npmjs.org/${pkg.name}/${NPM_VERSION_TAG}`;
+    const registryCheck = spawnSync('curl', [registryUrl], {
       encoding: 'utf8',
     });
     const registryData = JSON.parse(registryCheck.stdout);
     const registryShasum = registryData.dist?.shasum;
 
-    const status = registryShasum === shasum ? 'matches' : `DIFFERS`;
-    console.log(`  ${status}`);
-
     return {
       name: pkg.name,
       tarballHash: integrity,
       shasum,
+      differs: registryShasum === shasum,
     };
   })
-  .filter(Boolean) as PackageInfo[];
+  .filter(Boolean) as (PackageInfo & { differs: boolean })[];
 
 // Restore original directory
 process.chdir(ORIGINAL_DIR);
 
 // Output final results
-console.log('\n=== PACKAGE BUILD RESULTS ===');
-console.table(results);
+// console.debug('\n=== PACKAGE BUILD RESULTS ===');
+// console.debug(results);
+
+// Output JSON array of differing packages
+const differingPackages = results.filter(r => r.differs).map(r => r.name);
+console.log(JSON.stringify(differingPackages));
 
 // HELPERS
 function extractFromOutput(output: string, regex: RegExp): string {
