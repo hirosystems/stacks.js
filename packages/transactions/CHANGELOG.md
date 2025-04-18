@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.0.6](https://github.com/hirosystems/stacks.js/compare/v7.0.5...v7.0.6) (2025-04-18)
+
+
+### Bug Fixes
+
+* Increase maximum code body length for contract deploys ([#1793](https://github.com/hirosystems/stacks.js/issues/1793)) ([02e05ca](https://github.com/hirosystems/stacks.js/commit/02e05caeead9c8a3da5cf4c1cddbfbe0c692fc3c))
+
+
+
 ## [7.0.5](https://github.com/hirosystems/stacks.js/compare/v7.0.4...v7.0.5) (2025-03-10)
 
 
