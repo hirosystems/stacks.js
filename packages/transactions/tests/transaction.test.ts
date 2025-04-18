@@ -454,10 +454,7 @@ test('Coinbase pay to alt contract principal recipient deserialization', () => {
 });
 
 test('deserialize wtf tx', () => {
-  const largeTxDeployBody = fs.readFileSync(
-    './packages/transactions/tests/tx-contract-deploy-large-hex.txt',
-    'utf8'
-  );
+  const largeTxDeployBody = fs.readFileSync('./tests/tx-contract-deploy-large-hex.txt', 'utf8');
   const reader = new BytesReader(largeTxDeployBody);
   const deserialized = deserializeTransaction(reader);
   expect(deserialized.payload).toBeTruthy();
