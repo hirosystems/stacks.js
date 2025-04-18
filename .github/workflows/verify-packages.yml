@@ -38,13 +38,16 @@ jobs:
           mkdir -p results
           echo "| Tag | Result | Differing Packages |" > results/summary.md
           echo "|-----|--------|--------------------|" >> results/summary.md
-          echo "Tags to check:" >&2
-          echo "${{ steps.get_tags.outputs.tags }}" >&2
+          echo "Tags to check:"
+          echo "${{ steps.get_tags.outputs.tags }}"
           for TAG in ${{ steps.get_tags.outputs.tags }}; do
+            echo "\nProcessing tag: $TAG"
             echo "Checking out $TAG"
             git checkout $TAG
             npm ci || { echo "| $TAG | npm ci failed | - |" >> results/summary.md; continue; }
+            echo "Running build-packages.ts for tag: $TAG"
             DIFFERS_JSON=$(TAG=$TAG npx tsx ./build-packages.ts)
+            echo "build-packages.ts output for $TAG: $DIFFERS_JSON"
             if [ "$DIFFERS_JSON" != "[]" ]; then
               # Remove brackets and quotes for markdown table
               DIFFERS_LIST=$(echo $DIFFERS_JSON | jq -r '. | join(", ")')
