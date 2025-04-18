@@ -28,6 +28,7 @@ import {
   COMPRESSED_PUBKEY_LENGTH_BYTES,
   ClarityVersion,
   FungibleConditionCode,
+  STRING_MAX_LENGTH,
   MEMO_MAX_LENGTH_BYTES,
   NonFungibleConditionCode,
   PayloadType,
@@ -541,7 +542,7 @@ export function deserializePayload(serialized: string | Uint8Array | BytesReader
         throw new Error(`Cannot recognize ClarityVersion: ${n}`);
       });
       const smartContractName = deserializeLPString(bytesReader);
-      const codeBody = deserializeLPString(bytesReader, 4, 100_000);
+      const codeBody = deserializeLPString(bytesReader, 4, STRING_MAX_LENGTH);
       return createSmartContractPayload(smartContractName, codeBody, clarityVersion);
     }
     case PayloadType.PoisonMicroblock:

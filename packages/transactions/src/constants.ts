@@ -11,6 +11,18 @@ export const COMPRESSED_PUBKEY_LENGTH_BYTES = 32;
 export const UNCOMPRESSED_PUBKEY_LENGTH_BYTES = 64;
 export const MEMO_MAX_LENGTH_BYTES = 34;
 
+// https://github.com/stacks-network/stacks-core/blob/31d048c6c345c8cb7be38283385e54870b1c3c83/stacks-common/src/codec/mod.rs#L206
+// messages can't be bigger than 16MB plus the preamble and relayers
+const MAX_PAYLOAD_LEN = 1 + 16 * 1024 * 1024;
+const PREAMBLE_ENCODED_SIZE = 165;
+const MAX_RELAYERS_LEN = 16;
+const PEER_ADDRESS_ENCODED_SIZE = 16;
+const HASH160_ENCODED_SIZE = 20;
+const NEIGHBOR_ADDRESS_ENCODED_SIZE = PEER_ADDRESS_ENCODED_SIZE + 2 + HASH160_ENCODED_SIZE;
+const RELAY_DATA_ENCODED_SIZE = NEIGHBOR_ADDRESS_ENCODED_SIZE + 4;
+export const STRING_MAX_LENGTH =
+  MAX_PAYLOAD_LEN + (PREAMBLE_ENCODED_SIZE + MAX_RELAYERS_LEN * RELAY_DATA_ENCODED_SIZE);
+
 /**
  * The type of transaction (payload) that is being serialized.
  * Used internally for serializing and deserializing transactions.
