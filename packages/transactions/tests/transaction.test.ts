@@ -22,6 +22,7 @@ import {
   AddressHashMode,
   AuthType,
   FungibleConditionCode,
+  PayloadType,
   PostConditionMode,
 } from '../src/constants';
 import { createStacksPublicKey, privateKeyToPublic, publicKeyToHex } from '../src/keys';
@@ -46,6 +47,8 @@ import {
   serializeTransaction,
   transactionToHex,
 } from '../src/transaction';
+import fs from 'node:fs';
+import assert from 'node:assert';
 
 beforeEach(() => {
   fetchMock.resetMocks();
@@ -448,6 +451,28 @@ test('Coinbase pay to alt contract principal recipient deserialization', () => {
     'bd1a9e1d60ca29fc630633170f396f5b6b85c9620bd16d63384ebc5a01a1829b'
   );
   expect(deserializedTx.transactionVersion).toBe(TransactionVersion.Testnet);
+});
+
+test('deserialize wtf tx', () => {
+  const largeTxDeployBody = fs.readFileSync(
+    './packages/transactions/tests/tx-contract-deploy-large-hex.txt',
+    'utf8'
+  );
+  const reader = new BytesReader(largeTxDeployBody);
+  const deserialized = deserializeTransaction(reader);
+  expect(deserialized.payload).toBeTruthy();
+  assert(deserialized.payload.payloadType === PayloadType.VersionedSmartContract);
+  expect(deserialized.payload.contractName.content).toBe('tcat-01');
+  expect(
+    deserialized.payload.codeBody.content.startsWith(
+      `(use-trait nma 'SP102V8P0F7JX67ARQ77WEA3D3CFB5XW39REDT0AM.trait-sip-010.sip-010-trait) (use-trait nmb 'SP2AKWJYC7BNY18W1XXKPGP0YVEK63QJG4793Z2D4.sip-010-trait-ft-standard.sip-010-trait) (use-trait nmc 'SP2ZNGJ85ENDY6QRHQ5P2D4FXKGZWCKTB2T0Z55KS.dao-traits-v4.sip010-ft-trait`
+    )
+  );
+  expect(
+    deserialized.payload.codeBody.content.endsWith(
+      `(use-trait nma 'SP102V8P0F7JX67ARQ77WEA3D3CFB5XW39REDT0AM.trait-sip-010.sip-010-trait) (use-trait nmb 'SP2AKWJYC7BNY18W1XXKPGP0YVEK63QJG4793Z2D4.sip-010-trait-ft-standard.sip-010-trait) (use-trait nmc 'SP2ZNGJ85ENDY6QRHQ5P2D4FXKGZWCKTB2T0Z55KS.dao-traits-v4.sip010-ft-trait`
+    )
+  );
 });
 
 describe(serializeTransaction.name, () => {
