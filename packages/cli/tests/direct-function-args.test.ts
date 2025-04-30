@@ -127,7 +127,6 @@ describe('Contract Function Call with Direct Arguments', () => {
     // Validate the transaction
     expect(capturedTxHex).toBeTruthy();
     expect(typeof capturedTxHex).toBe('string');
-    expect(capturedTxHex.length).toBeGreaterThan(100); // Reasonable transaction length
 
     // Compare the captured transaction hex with our expected transaction
     expect(capturedTxHex).toEqual(expectedTxHex);
