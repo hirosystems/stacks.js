@@ -889,9 +889,8 @@ async function contractFunctionCall(_network: CLINetworkAdapter, args: string[])
 
   try {
     const response = await broadcastTransaction({ transaction: tx, network });
-    if ('error' in response) {
-      return JSONStringify(response);
-    }
+    if (response.hasOwnProperty('error')) return JSONStringify(response);
+
     return JSONStringify({
       txid: `0x${tx.txid()}`,
       transaction: generateExplorerTxPageUrl(tx.txid(), network),
