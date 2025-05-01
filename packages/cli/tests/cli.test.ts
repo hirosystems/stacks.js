@@ -2,11 +2,13 @@ import { CLI_CONFIG_TYPE } from '../src/argparse';
 import { CLIMain, testables } from '../src/cli';
 import { CLINetworkAdapter, CLI_NETWORK_OPTS, getNetwork } from '../src/network';
 
+import { bytesToHex } from '@stacks/common';
 import {
   Cl,
   ClarityAbi,
   publicKeyFromSignatureVrs,
   randomBytes,
+  randomPrivateKey,
   signWithKey,
   verifySignature,
 } from '@stacks/transactions';
@@ -17,14 +19,13 @@ import fetchMock from 'jest-fetch-mock';
 import path from 'path';
 import { SubdomainOp, subdomainOpToZFPieces } from '../src/utils';
 import {
-  keyInfoTests,
   MakeKeychainResult,
+  WalletKeyInfoResult,
+  keyInfoTests,
   makekeychainTestsMainnet,
   makekeychainTestsTestnet,
-  WalletKeyInfoResult,
 } from './derivation-path/keychain';
 import * as fixtures from './fixtures/cli.fixture';
-import { bytesToHex } from '@stacks/common';
 
 const TEST_ABI: ClarityAbi = JSON.parse(
   readFileSync(path.join(__dirname, './abi/test-abi.json')).toString()
@@ -461,9 +462,170 @@ test('can_stack', async () => {
 });
 
 describe('CLI Main', () => {
+  let exitSpy: jest.SpyInstance;
+  let exit: Promise<void>;
+
+  beforeEach(() => {
+    exitSpy = jest.spyOn(process, 'exit');
+    exit = new Promise<void>(resolve => {
+      exitSpy.mockImplementation(() => resolve());
+    });
+  });
+
+  afterEach(() => {
+    exitSpy.mockRestore();
+  });
+
   test('argparse should work', () => {
     process.argv = ['node', 'stx', 'make_keychain'];
     jest.spyOn(process, 'exit').mockImplementation();
     expect(() => CLIMain()).not.toThrow();
+  });
+
+  test('Commands should use custom API URL from -H flag', async () => {
+    const customApiUrl = 'http://localhost:3999';
+    const contractAddress = 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM';
+    const contractName = 'test-contract';
+    const functionName = 'test-func-string-ascii-argument'; // Same as in the ABI
+    const fee = 100;
+    const nonce = 0;
+    const privateKey = randomPrivateKey();
+
+    // Store original argv and redefine
+    const originalArgv = process.argv;
+    process.argv = [
+      'node',
+      'stx',
+      '-H',
+      customApiUrl,
+      '-t', // Use testnet flag
+      'call_contract_func',
+      contractAddress,
+      contractName,
+      functionName,
+      String(fee),
+      String(nonce),
+      privateKey,
+    ];
+
+    const mockAbi = { ...TEST_ABI };
+    mockAbi.functions[0].args = []; // Remove args from ABI, so we don't need to mock inquirer
+    const mockTxid = `0x${bytesToHex(randomBytes(32))}`;
+
+    fetchMock.once(JSON.stringify(mockAbi));
+    fetchMock.once(mockTxid);
+
+    CLIMain();
+    await exit;
+
+    process.argv = originalArgv;
+
+    // Call 1: ABI fetch
+    expect(fetchMock.mock.calls[0][0]).toContain(customApiUrl);
+    expect(fetchMock.mock.calls[0][0]).toContain(
+      `/v2/contracts/interface/${contractAddress}/${contractName}`
+    );
+    // Call 2: Broadcast
+    expect(fetchMock.mock.calls[1][0]).toEqual(`${customApiUrl}/v2/transactions`);
+
+    expect(exitSpy).toHaveBeenCalledWith(0); // success
+  });
+
+  test('Commands should use localnet API URL from -l flag', async () => {
+    const localnetApiUrl = 'http://localhost:20443'; // From argparse.ts CONFIG_LOCALNET_DEFAULTS
+    const contractAddress = 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM';
+    const contractName = 'test-contract';
+    const functionName = 'test-func-string-ascii-argument'; // Same as in the ABI
+    const fee = 100;
+    const nonce = 0;
+    const privateKey = randomPrivateKey();
+
+    // Store original argv and redefine
+    const originalArgv = process.argv;
+    process.argv = [
+      'node',
+      'stx',
+      '-l', // Use localnet flag
+      'call_contract_func',
+      contractAddress,
+      contractName,
+      functionName,
+      String(fee),
+      String(nonce),
+      privateKey,
+    ];
+
+    const mockAbi = { ...TEST_ABI };
+    mockAbi.functions[0].args = []; // Remove args from ABI, so we don't need to mock inquirer
+    const mockTxid = `0x${bytesToHex(randomBytes(32))}`;
+
+    // Mock fetch calls: 1 for ABI, 1 for transaction broadcast
+    fetchMock.once(JSON.stringify(mockAbi));
+    fetchMock.once(mockTxid); // Mock the broadcast response
+
+    CLIMain(); // Run the main CLI entrypoint
+    await exit;
+
+    process.argv = originalArgv; // Restore original argv
+
+    // Verify fetch calls used the correct localnet URL
+    // Call 1: ABI fetch
+    expect(fetchMock.mock.calls[0][0]).toContain(localnetApiUrl);
+    expect(fetchMock.mock.calls[0][0]).toContain(
+      `/v2/contracts/interface/${contractAddress}/${contractName}`
+    );
+    // Call 2: Transaction broadcast
+    expect(fetchMock.mock.calls[1][0]).toEqual(`${localnetApiUrl}/v2/transactions`);
+
+    expect(exitSpy).toHaveBeenCalledWith(0); // Expect successful exit
+  });
+
+  test('Commands should use testnet API URL from -t flag', async () => {
+    const testnetApiUrl = 'https://api.testnet.hiro.so'; // From argparse.ts CONFIG_TESTNET_DEFAULTS
+    const contractAddress = 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM';
+    const contractName = 'test-contract';
+    const functionName = 'test-func-string-ascii-argument'; // Same as in the ABI
+    const fee = 100;
+    const nonce = 0;
+    const privateKey = randomPrivateKey();
+
+    // Store original argv and redefine
+    const originalArgv = process.argv;
+    process.argv = [
+      'node',
+      'stx',
+      '-t', // Use testnet flag
+      'call_contract_func',
+      contractAddress,
+      contractName,
+      functionName,
+      String(fee),
+      String(nonce),
+      privateKey,
+    ];
+
+    const mockAbi = { ...TEST_ABI };
+    mockAbi.functions[0].args = []; // Remove args from ABI, so we don't need to mock inquirer
+    const mockTxid = `0x${bytesToHex(randomBytes(32))}`;
+
+    // Mock fetch calls: 1 for ABI, 1 for transaction broadcast
+    fetchMock.once(JSON.stringify(mockAbi));
+    fetchMock.once(mockTxid); // Mock the broadcast response
+
+    CLIMain(); // Run the main CLI entrypoint
+    await exit;
+
+    process.argv = originalArgv; // Restore original argv
+
+    // Verify fetch calls used the correct testnet URL
+    // Call 1: ABI fetch
+    expect(fetchMock.mock.calls[0][0]).toContain(testnetApiUrl);
+    expect(fetchMock.mock.calls[0][0]).toContain(
+      `/v2/contracts/interface/${contractAddress}/${contractName}`
+    );
+    // Call 2: Transaction broadcast
+    expect(fetchMock.mock.calls[1][0]).toEqual(`${testnetApiUrl}/v2/transactions`);
+
+    expect(exitSpy).toHaveBeenCalledWith(0); // Expect successful exit
   });
 });

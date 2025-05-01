@@ -3,6 +3,7 @@ import * as bitcoin from 'bitcoinjs-lib';
 import blockstack from 'blockstack';
 import { BlockstackNetwork } from 'blockstack/lib/network';
 import { CLI_CONFIG_TYPE } from './argparse';
+import { STACKS_MAINNET, STACKS_TESTNET, StacksNetwork } from '@stacks/network';
 
 export interface CLI_NETWORK_OPTS {
   consensusHash: string | null;
@@ -346,4 +347,15 @@ export function getNetwork(configData: CLI_CONFIG_TYPE, testNet: boolean): Block
 
     return network;
   }
+}
+
+/** @internal helper to convert a CLINetworkAdapter to a StacksNetwork */
+export function getStacksNetwork(network: CLINetworkAdapter): StacksNetwork {
+  const basic = network.isMainnet() ? STACKS_MAINNET : STACKS_TESTNET;
+  return {
+    ...basic,
+    client: {
+      baseUrl: network.nodeAPIUrl,
+    },
+  };
 }
