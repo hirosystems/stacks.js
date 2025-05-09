@@ -461,11 +461,14 @@ test('can_stack', async () => {
   );
 });
 
-describe('CLI Main', () => {
+describe('CLIMain', () => {
   let exitSpy: jest.SpyInstance;
   let exit: Promise<void>;
+  let argvBefore: string[];
 
   beforeEach(() => {
+    fetchMock.resetMocks();
+    argvBefore = [...process.argv];
     exitSpy = jest.spyOn(process, 'exit');
     exit = new Promise<void>(resolve => {
       exitSpy.mockImplementation(() => resolve());
@@ -473,6 +476,7 @@ describe('CLI Main', () => {
   });
 
   afterEach(() => {
+    process.argv = argvBefore;
     exitSpy.mockRestore();
   });
 
@@ -491,8 +495,6 @@ describe('CLI Main', () => {
     const nonce = 0;
     const privateKey = randomPrivateKey();
 
-    // Store original argv and redefine
-    const originalArgv = process.argv;
     process.argv = [
       'node',
       'stx',
@@ -518,8 +520,6 @@ describe('CLI Main', () => {
     CLIMain();
     await exit;
 
-    process.argv = originalArgv;
-
     // Call 1: ABI fetch
     expect(fetchMock.mock.calls[0][0]).toContain(customApiUrl);
     expect(fetchMock.mock.calls[0][0]).toContain(
@@ -540,8 +540,6 @@ describe('CLI Main', () => {
     const nonce = 0;
     const privateKey = randomPrivateKey();
 
-    // Store original argv and redefine
-    const originalArgv = process.argv;
     process.argv = [
       'node',
       'stx',
@@ -566,8 +564,6 @@ describe('CLI Main', () => {
     CLIMain(); // Run the main CLI entrypoint
     await exit;
 
-    process.argv = originalArgv; // Restore original argv
-
     // Verify fetch calls used the correct localnet URL
     // Call 1: ABI fetch
     expect(fetchMock.mock.calls[0][0]).toContain(localnetApiUrl);
@@ -589,8 +585,6 @@ describe('CLI Main', () => {
     const nonce = 0;
     const privateKey = randomPrivateKey();
 
-    // Store original argv and redefine
-    const originalArgv = process.argv;
     process.argv = [
       'node',
       'stx',
@@ -614,8 +608,6 @@ describe('CLI Main', () => {
 
     CLIMain(); // Run the main CLI entrypoint
     await exit;
-
-    process.argv = originalArgv; // Restore original argv
 
     // Verify fetch calls used the correct testnet URL
     // Call 1: ABI fetch
