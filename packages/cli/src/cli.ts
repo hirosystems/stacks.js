@@ -1,7 +1,7 @@
 import * as scureBip39 from '@scure/bip39';
 import { wordlist } from '@scure/bip39/wordlists/english';
 import { buildPreorderNameTx, buildRegisterNameTx } from '@stacks/bns';
-import { bytesToHex, HIRO_MAINNET_URL, HIRO_TESTNET_URL } from '@stacks/common';
+import { bytesToHex } from '@stacks/common';
 import {
   ACCOUNT_PATH,
   broadcastTransaction,
@@ -86,11 +86,17 @@ import {
 
 import { decryptBackupPhrase, encryptBackupPhrase } from './encrypt';
 
-import { CLI_NETWORK_OPTS, CLINetworkAdapter, getNetwork, NameInfoType } from './network';
+import {
+  CLI_NETWORK_OPTS,
+  CLINetworkAdapter,
+  getNetwork,
+  getStacksNetwork,
+  NameInfoType,
+} from './network';
 
 import { gaiaAuth, gaiaConnect, gaiaUploadProfileAll, getGaiaAddressFromProfile } from './data';
 
-import { defaultUrlFromNetwork, STACKS_MAINNET, STACKS_TESTNET } from '@stacks/network';
+import { defaultUrlFromNetwork, STACKS_TESTNET } from '@stacks/network';
 import {
   generateNewAccount,
   generateWallet,
@@ -263,10 +269,7 @@ async function getAppKeys(_network: CLINetworkAdapter, args: string[]): Promise<
   }
   const account = wallet.accounts[index - 1];
   const privateKey = getAppPrivateKey({ account, appDomain });
-  const address = getAddressFromPrivateKey(
-    privateKey,
-    _network.isMainnet() ? STACKS_MAINNET : STACKS_TESTNET
-  );
+  const address = getAddressFromPrivateKey(privateKey, getStacksNetwork(_network));
 
   return JSON.stringify({ keyInfo: { privateKey, address } });
 }
@@ -331,7 +334,7 @@ async function getStacksWalletKey(_network: CLINetworkAdapter, args: string[]): 
 async function migrateSubdomains(_network: CLINetworkAdapter, args: string[]): Promise<string> {
   const mnemonic: string = await getBackupPhrase(args[0]); // args[0] is the cli argument for mnemonic
   const baseWallet = await generateWallet({ secretKey: mnemonic, password: '' });
-  const network = _network.isMainnet() ? STACKS_MAINNET : STACKS_TESTNET;
+  const network = getStacksNetwork(_network);
   const wallet = await restoreWalletAccounts({
     wallet: baseWallet,
     gaiaHubUrl: 'https://hub.blockstack.org',
@@ -511,9 +514,7 @@ function balance(_network: CLINetworkAdapter, args: string[]): Promise<string> {
     address = _network.coerceAddress(address);
   }
 
-  // temporary hack to use network config from stacks-transactions lib
-  const url = _network.isMainnet() ? HIRO_MAINNET_URL : HIRO_TESTNET_URL;
-
+  const url = _network.nodeAPIUrl;
   return fetch(`${url}${ACCOUNT_PATH}/${address}?proof=0`)
     .then(response => {
       if (response.status === 404) {
@@ -692,7 +693,7 @@ async function sendTokens(_network: CLINetworkAdapter, args: string[]): Promise<
     memo = args[5];
   }
 
-  const network = _network.isMainnet() ? STACKS_MAINNET : STACKS_TESTNET;
+  const network = getStacksNetwork(_network);
 
   const options: SignedTokenTransferOptions = {
     recipient: recipientAddress,
@@ -749,7 +750,7 @@ async function contractDeploy(_network: CLINetworkAdapter, args: string[]): Prom
 
   const source = fs.readFileSync(sourceFile).toString();
 
-  const network = _network.isMainnet() ? STACKS_MAINNET : STACKS_TESTNET;
+  const network = getStacksNetwork(_network);
 
   const options: SignedContractDeployOptions = {
     contractName,
@@ -807,8 +808,7 @@ async function contractFunctionCall(_network: CLINetworkAdapter, args: string[])
   const nonce = BigInt(args[4]);
   const privateKey = args[5];
 
-  // temporary hack to use network config from stacks-transactions lib
-  const network = _network.isMainnet() ? STACKS_MAINNET : STACKS_TESTNET;
+  const network = getStacksNetwork(_network);
 
   let abi: ClarityAbi;
   let abiArgs: ClarityFunctionArg[];
@@ -892,7 +892,7 @@ async function readOnlyContractFunctionCall(
   const functionName = args[2];
   const senderAddress = args[3];
 
-  const network = _network.isMainnet() ? STACKS_MAINNET : STACKS_TESTNET;
+  const network = getStacksNetwork(_network);
 
   let abi: ClarityAbi;
   let abiArgs: ClarityFunctionArg[];
@@ -1624,7 +1624,7 @@ function decryptMnemonic(_network: CLINetworkAdapter, args: string[]): Promise<s
 async function stackingStatus(_network: CLINetworkAdapter, args: string[]): Promise<string> {
   const address = args[0];
 
-  const network = _network.isMainnet() ? STACKS_MAINNET : STACKS_TESTNET;
+  const network = getStacksNetwork(_network);
   const stacker = new StackingClient({ address, network });
 
   return stacker
@@ -1656,7 +1656,7 @@ async function canStack(_network: CLINetworkAdapter, args: string[]): Promise<st
   const poxAddress = args[2];
   const stxAddress = args[3];
 
-  const network = _network.isMainnet() ? STACKS_MAINNET : STACKS_TESTNET;
+  const network = getStacksNetwork(_network);
   const stacker = new StackingClient({ address: stxAddress, network });
 
   const apiConfig = new Configuration({
@@ -1717,7 +1717,7 @@ async function stack(_network: CLINetworkAdapter, args: string[]): Promise<strin
   //   nonce = new BN(args[5]);
   // }
 
-  const network = _network.isMainnet() ? STACKS_MAINNET : STACKS_TESTNET;
+  const network = getStacksNetwork(_network);
 
   const apiConfig = new Configuration({
     basePath: network.client.baseUrl,
@@ -1790,7 +1790,7 @@ async function register(_network: CLINetworkAdapter, args: string[]): Promise<st
   const zonefile = args[3];
   const publicKey = privateKeyToPublic(privateKey);
 
-  const network = _network.isMainnet() ? STACKS_MAINNET : STACKS_TESTNET;
+  const network = getStacksNetwork(_network);
 
   const unsignedTransaction = await buildRegisterNameTx({
     fullyQualifiedName,
@@ -1825,7 +1825,7 @@ async function preorder(_network: CLINetworkAdapter, args: string[]): Promise<st
   const stxToBurn = args[3];
   const publicKey = privateKeyToPublic(privateKey);
 
-  const network = _network.isMainnet() ? STACKS_MAINNET : STACKS_TESTNET;
+  const network = getStacksNetwork(_network);
 
   const unsignedTransaction = await buildPreorderNameTx({
     fullyQualifiedName,
@@ -2068,7 +2068,7 @@ export function CLIMain() {
       altTransactionBroadcasterUrl: transactionBroadcasterUrl
         ? transactionBroadcasterUrl
         : configData.broadcastServiceUrl,
-      nodeAPIUrl: nodeAPIUrl ? nodeAPIUrl : configData.blockstackNodeUrl,
+      nodeAPIUrl: nodeAPIUrl ? nodeAPIUrl : apiUrl ? apiUrl : configData.blockstackNodeUrl,
     };
 
     // wrap command-line options
