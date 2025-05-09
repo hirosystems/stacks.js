@@ -620,4 +620,42 @@ describe('CLIMain', () => {
 
     expect(exitSpy).toHaveBeenCalledWith(0); // Expect successful exit
   });
+
+  describe('"balance" command', () => {
+    test('should call the correct endpoint and exit successfully', async () => {
+      const testAddress = 'SP2ZNGJ85ENDY6QRHQ5P2D4FXKGZWCKTB2T0Z55KS';
+      const mainnetApiUrl = 'https://api.hiro.so'; // From argparse.ts CONFIG_MAINNET_DEFAULTS
+
+      process.argv = ['node', 'stx', 'balance', testAddress];
+
+      fetchMock.once(
+        `{"balance":"0x0000000000000000000000018d4e23ec","locked":"0x00000000000000000000000000000000","unlock_height":0,"nonce":13320}`
+      );
+
+      CLIMain();
+      await exit;
+
+      expect(fetchMock.mock.calls[0][0]).toEqual(
+        `${mainnetApiUrl}/v2/accounts/${testAddress}?proof=0`
+      );
+      expect(exitSpy).toHaveBeenCalledWith(0);
+    });
+
+    test('should use testnet API URL from -t flag for balance', async () => {
+      const testAddress = 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM';
+      const testnetApiUrl = 'https://api.testnet.hiro.so'; // From argparse.ts CONFIG_TESTNET_DEFAULTS
+
+      process.argv = ['node', 'stx', '-t', 'balance', testAddress];
+
+      fetchMock.once(
+        `{"balance":"0x0000000000000000000000018d4e23ec","locked":"0x00000000000000000000000000000000","unlock_height":0,"nonce":13320}`
+      );
+
+      CLIMain();
+      await exit;
+
+      expect(fetchMock.mock.calls[0][0]).toContain(testnetApiUrl);
+      expect(exitSpy).toHaveBeenCalledWith(0);
+    });
+  });
 });
