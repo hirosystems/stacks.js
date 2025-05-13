@@ -792,13 +792,13 @@ async function contractDeploy(_network: CLINetworkAdapter, args: string[]): Prom
 }
 
 /** @internal */
-function parseDirectFunctionArgs(functionArgsStr: string): ClarityValue[] {
+export function parseDirectFunctionArgs(functionArgsStr: string): ClarityValue[] {
   return functionArgsStr
     .split('')
     .reduce(
       (acc, char) => {
-        if (char === '(') acc.p++;
-        if (char === ')') acc.p--;
+        if (char === '(' || char === '{') acc.p++;
+        if (char === ')' || char === '}') acc.p--;
         if (char === ',' && !acc.p) {
           acc.segs.push('');
         } else {
