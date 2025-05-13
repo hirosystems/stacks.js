@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.0.7](https://github.com/hirosystems/stacks.js/compare/v7.0.6...v7.0.7) (2025-05-13)
+
+
+### Bug Fixes
+
+* Fix a regression from the v7.x.x update where the localnet/mocknet flag stopped being respected in the CLI ([53c6aaa](https://github.com/hirosystems/stacks.js/commit/53c6aaa8a237fcbdee96c814b1e3a00a10b2a433))
+
+
+
 ## [7.0.6](https://github.com/hirosystems/stacks.js/compare/v7.0.5...v7.0.6) (2025-04-18)
 
 
