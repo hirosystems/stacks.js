@@ -363,7 +363,7 @@ export const CLI_ARGS = {
         'You can also provide function arguments directly instead of being prompted for them:\n' +
         '```console\n' +
         '    $ stx call_contract_func SPBMRFRPPGCDE3F384WCJPK8PQJGZ8K9QKK7F59X contract_name' +
-        '      contract_function 1 0 "$PAYMENT" "(u100), (true), (\\"some-string\\"")\n' +
+        '      contract_function 1 0 "$PAYMENT" \'u100, true, "some-string", { a: u"str-utf8", b: 2 }\'\n' +
         '```\n' +
         '\n',
       group: 'Account Management',
