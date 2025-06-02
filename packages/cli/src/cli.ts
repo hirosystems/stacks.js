@@ -98,6 +98,7 @@ import {
 import { gaiaAuth, gaiaConnect, gaiaUploadProfileAll, getGaiaAddressFromProfile } from './data';
 
 import { defaultUrlFromNetwork, STACKS_TESTNET } from '@stacks/network';
+import { internal_parseCommaSeparated } from '@stacks/transactions';
 import {
   generateNewAccount,
   generateWallet,
@@ -793,23 +794,7 @@ async function contractDeploy(_network: CLINetworkAdapter, args: string[]): Prom
 
 /** @internal */
 export function parseDirectFunctionArgs(functionArgsStr: string): ClarityValue[] {
-  return functionArgsStr
-    .split('')
-    .reduce(
-      (acc, char) => {
-        if (char === '(' || char === '{') acc.p++;
-        if (char === ')' || char === '}') acc.p--;
-        if (char === ',' && !acc.p) {
-          acc.segs.push('');
-        } else {
-          acc.segs[acc.segs.length - 1] += char;
-        }
-        return acc;
-      },
-      { p: 0, segs: [''] }
-    )
-    .segs.filter(arg => arg.trim())
-    .map(arg => Cl.parse(arg.trim()));
+  return internal_parseCommaSeparated(functionArgsStr);
 }
 
 // Get function arguments via interactive prompts
