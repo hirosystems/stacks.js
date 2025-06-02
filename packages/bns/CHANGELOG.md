@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.1.0](https://github.com/blockstack/stacks.js/compare/v7.0.6...v7.1.0) (2025-06-02)
+
+**Note:** Version bump only for package @stacks/bns
+
+
+
+
+
 ## [7.0.6](https://github.com/blockstack/stacks.js/compare/v7.0.5...v7.0.6) (2025-04-18)
 
 **Note:** Version bump only for package @stacks/bns

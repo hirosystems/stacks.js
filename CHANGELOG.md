@@ -3,6 +3,21 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.1.0](https://github.com/hirosystems/stacks.js/compare/v7.0.6...v7.1.0) (2025-06-02)
+
+
+### Features
+
+* Allow CLI `call_contract_func` command to take Clarity arguments as command line arguments ([5d1ae3f](https://github.com/hirosystems/stacks.js/commit/5d1ae3f94b0e6c4acbe51594f91515c4cd188b8a))
+
+
+### Bug Fixes
+
+* Fix `Cl.parse` and `Cl.stringify` to match `JSON.parse` and `JSON.stringify` in escaping characters and string handling ([c3267a5](https://github.com/hirosystems/stacks.js/commit/c3267a5c48853b8f6074ad7fff68982362947dc0))
+* Fix a regression from the v7.x.x update where the localnet/mocknet flag stopped being respected in the CLI ([53c6aaa](https://github.com/hirosystems/stacks.js/commit/53c6aaa8a237fcbdee96c814b1e3a00a10b2a433))
+
+
+
 ## [7.0.6](https://github.com/hirosystems/stacks.js/compare/v7.0.5...v7.0.6) (2025-04-18)
 
 
