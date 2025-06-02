@@ -24,3 +24,6 @@ export * from './types';
 
 export * from './deserialize';
 export * from './serialize';
+
+/** @ignore Meant for internal use by other Stacks.js packages. Not stable. */
+export { internal_parseCommaSeparated } from './parser';

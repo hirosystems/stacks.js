@@ -327,3 +327,14 @@ export function parse(clarityValueString: string): ClarityValue {
   if (!result.success || !result.capture) throw 'Parse error'; // todo: we can add better error messages and add position tracking
   return result.capture as ClarityValue;
 }
+
+/** @ignore Meant for internal use by other Stacks.js packages. Not stable. */
+export function internal_parseCommaSeparated(clarityValueString: string): ClarityValue[] {
+  const combinator = entire(
+    greedy(1, clValue(), c => Cl.list(c as ClarityValue[]), regex(/\s*,\s*/))
+  );
+  const result = combinator(clarityValueString);
+  if (!result.success || !result.capture)
+    throw `Error trying to parse string: ${clarityValueString}`;
+  return (result.capture as ListCV<ClarityValue>).value;
+}
