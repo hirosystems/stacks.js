@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.1.1](https://github.com/hirosystems/stacks.js/compare/v7.1.0...v7.1.1) (2025-06-02)
+
+
+### Bug Fixes
+
+* Update CLI help menu entry ([2aaf20b](https://github.com/hirosystems/stacks.js/commit/2aaf20b97c59380f4da28a6a0a750803bb322705))
+
+
+
 ## [7.1.0](https://github.com/hirosystems/stacks.js/compare/v7.0.6...v7.1.0) (2025-06-02)
 
 
