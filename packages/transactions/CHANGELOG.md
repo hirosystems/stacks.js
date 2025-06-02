@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.1.0](https://github.com/hirosystems/stacks.js/compare/v7.0.6...v7.1.0) (2025-06-02)
+
+
+### Bug Fixes
+
+* Fix `Cl.parse` and `Cl.stringify` to match `JSON.parse` and `JSON.stringify` in escaping characters and string handling ([c3267a5](https://github.com/hirosystems/stacks.js/commit/c3267a5c48853b8f6074ad7fff68982362947dc0))
+
+
+
 ## [7.0.6](https://github.com/hirosystems/stacks.js/compare/v7.0.5...v7.0.6) (2025-04-18)
 
 
