@@ -1,4 +1,4 @@
-import { Cl, ClarityValue, TupleCV } from '..';
+import { Cl, ClarityValue, ListCV, TupleCV } from '..';
 
 // COMBINATOR TYPES
 type Combinator = (str: string) => ParseResult;
@@ -193,7 +193,17 @@ function clBuffer(): Combinator {
 
 /** @ignore helper for string values, removes escaping and unescapes special characters */
 function unescape(input: string): string {
-  return input.replace(/\\\\/g, '\\').replace(/\\(.)/g, '$1');
+  // To correctly unescape sequences like \n, \t, \", \\, \uXXXX, etc.,
+  // we can leverage JSON.parse by wrapping the input string in double quotes.
+  // This ensures that all standard JSON escape sequences are handled according
+  // to the JSON specification, aligning with the test cases provided.
+  try {
+    return JSON.parse(`"${input}"`);
+  } catch (error) {
+    throw new Error(
+      `Failed to unescape string: "${input}" ${error instanceof Error ? error.message : error}`
+    );
+  }
 }
 
 function clAscii(): Combinator {

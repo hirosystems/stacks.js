@@ -792,6 +792,8 @@ const TEST_CASES_PARSER = [
   { input: '"hello world"', expected: Cl.stringAscii('hello world') },
   { input: 'u"hello world"', expected: Cl.stringUtf8('hello world') },
   { input: '"hello \\"world\\""', expected: Cl.stringAscii('hello "world"') },
+  { input: '"hello \\\\"', expected: Cl.stringAscii('hello \\') },
+  { input: '"hello \\\\\\", \\"world\\""', expected: Cl.stringAscii('hello \\", "world"') },
   { input: '(list 1 2 3)', expected: Cl.list([Cl.int(1), Cl.int(2), Cl.int(3)]) },
   { input: '( list  1   2    3 )', expected: Cl.list([Cl.int(1), Cl.int(2), Cl.int(3)]) },
   { input: '( list )', expected: Cl.list([]) },
@@ -830,11 +832,58 @@ const TEST_CASES_PARSER = [
       ])
     ),
   },
+  { input: 'u""', expected: Cl.stringUtf8('') },
+  { input: 'u"\\\\"', expected: Cl.stringUtf8('\\') },
+  { input: `u"\\n"`, expected: Cl.stringUtf8('\n') },
 ] as const;
 
-test.each(TEST_CASES_PARSER)('clarity parser %p', ({ input, expected }) => {
-  const result = parse(input);
-  expect(result).toEqual(expected);
+const TEST_CASES_PARSER_INVERTIBLE = [
+  { input: '""', expected: Cl.stringAscii('') },
+  { input: '"hello"', expected: Cl.stringAscii('hello') },
+  { input: '"\\"hello\\""', expected: Cl.stringAscii('"hello"') },
+  { input: '"a\\\\b"', expected: Cl.stringAscii('a\\b') },
+  { input: 'u"a\\\\\\\\b"', expected: Cl.stringUtf8('a\\\\b') },
+  { input: 'u"a\\"b"', expected: Cl.stringUtf8('a"b') },
+  { input: 'u"こんにちは"', expected: Cl.stringUtf8('こんにちは') },
+
+  { input: '"\\\\path\\\\to\\\\file"', expected: Cl.stringAscii('\\path\\to\\file') },
+  { input: '"\\b\\f\\n\\r\\t\\"\\\\"', expected: Cl.stringAscii('\b\f\n\r\t"\\') },
+
+  {
+    input: '"Line1\\nLine2\\u0002 \\"Quote\\" \\\\ slash"',
+    expected: Cl.stringAscii('Line1\nLine2\u0002 "Quote" \\ slash'),
+  },
+
+  { input: 'u"résumé – ångström"', expected: Cl.stringUtf8('résumé – ångström') },
+] as const;
+
+test.each([...TEST_CASES_PARSER, ...TEST_CASES_PARSER_INVERTIBLE])(
+  'clarity parser %p',
+  ({ input, expected }) => {
+    const result = parse(input);
+    expect(result).toEqual(expected);
+  }
+);
+
+test.each(TEST_CASES_PARSER_INVERTIBLE)('clarity parser inverseable %p', ({ input, expected }) => {
+  const parsed = parse(input);
+  expect(parsed).toEqual(expected);
+
+  const stringified = Cl.stringify(parsed);
+  expect(stringified).toEqual(input);
 });
+
+test.each(TEST_CASES_PARSER_INVERTIBLE)(
+  'clarity parser string handling matches JSON JS implementation %p',
+  ({ input, expected }) => {
+    if (expected.type !== 'utf8' && expected.type !== 'ascii') return; // Only strings
+    if (expected.type === 'utf8') input = input.replace('u"', '"') as any; // Remove the u" prefix for UTF-8 strings
+
+    // String handling in Cl.parse/Cl.stringify should match the JSON.parse/JSON.stringify implementation
+    const parsed = JSON.parse(input);
+    const stringified = JSON.stringify(parsed);
+    expect(stringified).toEqual(input);
+  }
+);
 
 // const TEST_CASES_PARSER_THROW = []; // todo: e.g. `{}`

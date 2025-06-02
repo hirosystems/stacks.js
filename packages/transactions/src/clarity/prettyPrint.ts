@@ -8,6 +8,12 @@
 
 import { ClarityType, ClarityValue, ListCV, TupleCV } from '.';
 
+function escape(value: string): string {
+  // Use JSON.stringify to handle all necessary escape sequences (e.g., \n, \r, \t, \", \\, \uXXXX).
+  // JSON.stringify(value) produces a string like "\"hello\nworld\"", so we slice off the leading and trailing quotes.
+  return JSON.stringify(value).slice(1, -1);
+}
+
 function formatSpace(space: number, depth: number, end = false) {
   if (!space) return ' ';
   return `\n${' '.repeat(space * (depth - (end ? 1 : 0)))}`;
@@ -80,8 +86,8 @@ function prettyPrintWithDepth(cv: ClarityValue, space = 0, depth: number): strin
   if (cv.type === ClarityType.Int) return cv.value.toString();
   if (cv.type === ClarityType.UInt) return `u${cv.value.toString()}`;
 
-  if (cv.type === ClarityType.StringASCII) return `"${cv.value}"`;
-  if (cv.type === ClarityType.StringUTF8) return `u"${cv.value}"`;
+  if (cv.type === ClarityType.StringASCII) return `"${escape(cv.value)}"`;
+  if (cv.type === ClarityType.StringUTF8) return `u"${escape(cv.value)}"`;
 
   if (cv.type === ClarityType.PrincipalContract) return `'${cv.value}`;
   if (cv.type === ClarityType.PrincipalStandard) return `'${cv.value}`;
