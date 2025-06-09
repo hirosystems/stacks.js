@@ -1,17 +1,19 @@
 import {
-  ClientOpts,
   DEVNET_URL,
   FetchFn,
   HIRO_MAINNET_URL,
   HIRO_TESTNET_URL,
   createFetchFn,
+  createApiKeyMiddleware,
+  ClientOpts,
+  ApiKeyMiddlewareOpts,
 } from '@stacks/common';
 import { AddressVersion, ChainId, PeerNetworkId, TransactionVersion } from './constants';
 import { ClientParam } from '@stacks/common';
 
 export type StacksNetwork = {
   chainId: number;
-  transactionVersion: number; // todo: txVersion better?
+  transactionVersion: number;
   peerNetworkId: number;
   magicBytes: string;
   bootAddress: string;
@@ -129,4 +131,118 @@ export function clientFromNetwork(network: StacksNetwork): Required<ClientOpts> 
     ...network.client,
     fetch: createFetchFn(),
   };
+}
+
+/**
+ * Creates a customized Stacks network.
+ *
+ * This function allows you to create a network based on a predefined network
+ * (mainnet, testnet, devnet, mocknet) or a custom network object. You can also customize
+ * the network with an API key or other client options.
+ *
+ * @example
+ * ```ts
+ * // Create a basic network from a network name
+ * const network = createNetwork('mainnet');
+ * const network = createNetwork(STACKS_MAINNET);
+ * ```
+ *
+ * @example
+ * ```ts
+ * // Create a network with an API key
+ * const network = createNetwork('testnet', 'my-api-key');
+ * const network = createNetwork(STACKS_TESTNET, 'my-api-key');
+ * ```
+ *
+ * @example
+ * ```ts
+ * // Create a network with options object
+ * const network = createNetwork({
+ *   network: 'mainnet',
+ *   apiKey: 'my-api-key',
+ * });
+ * ```
+ *
+ * @example
+ * ```ts
+ * // Create a network with options object with custom API key options
+ * const network = createNetwork({
+ *   network: 'mainnet',
+ *   apiKey: 'my-api-key',
+ *   host: /\.example\.com$/, // default is /(.*)api(.*)(\.stacks\.co|\.hiro\.so)$/i
+ *   httpHeader: 'x-custom-api-key', // default is 'x-api-key'
+ * });
+ * ```
+ *
+ * @example
+ * ```ts
+ * // Create a network with custom client options
+ * const network = createNetwork({
+ *   network: STACKS_TESTNET,
+ *   client: {
+ *     baseUrl: 'https://custom-api.example.com',
+ *     fetch: customFetchFunction
+ *   }
+ * });
+ * ```
+ */
+export function createNetwork(network: StacksNetworkName | StacksNetwork): StacksNetwork;
+export function createNetwork(
+  network: StacksNetworkName | StacksNetwork,
+  apiKey: string
+): StacksNetwork;
+export function createNetwork(
+  options: {
+    network: StacksNetworkName | StacksNetwork;
+    client?: ClientOpts;
+  } & Partial<ApiKeyMiddlewareOpts>
+): StacksNetwork;
+export function createNetwork(
+  arg1:
+    | StacksNetworkName
+    | StacksNetwork
+    | ({
+        network: StacksNetworkName | StacksNetwork;
+        client?: ClientOpts;
+      } & Partial<ApiKeyMiddlewareOpts>),
+  arg2?: string
+): StacksNetwork {
+  const baseNetwork = networkFrom(
+    typeof arg1 === 'object' && 'network' in arg1 ? arg1.network : arg1
+  );
+
+  const newNetwork: StacksNetwork = {
+    ...baseNetwork,
+    addressVersion: { ...baseNetwork.addressVersion }, // deep copy
+    client: { ...baseNetwork.client }, // deep copy
+  };
+
+  // Options object argument
+  if (typeof arg1 === 'object' && 'network' in arg1) {
+    if (arg1.client) {
+      newNetwork.client.baseUrl = arg1.client.baseUrl ?? newNetwork.client.baseUrl;
+      newNetwork.client.fetch = arg1.client.fetch ?? newNetwork.client.fetch;
+    }
+
+    if (typeof arg1.apiKey === 'string') {
+      const middleware = createApiKeyMiddleware(arg1 as ApiKeyMiddlewareOpts);
+      newNetwork.client.fetch = newNetwork.client.fetch
+        ? createFetchFn(newNetwork.client.fetch, middleware)
+        : createFetchFn(middleware);
+    }
+
+    return newNetwork;
+  }
+
+  // Additional API key argument
+  if (typeof arg2 === 'string') {
+    const middleware = createApiKeyMiddleware({ apiKey: arg2 });
+    newNetwork.client.fetch = newNetwork.client.fetch
+      ? createFetchFn(newNetwork.client.fetch, middleware)
+      : createFetchFn(middleware);
+    return newNetwork;
+  }
+
+  // Only network argument
+  return newNetwork;
 }
