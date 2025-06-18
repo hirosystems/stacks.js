@@ -34,7 +34,8 @@ export const getProfileURLFromZoneFile = async (
   return;
 };
 
-interface HubInfo {
+/** @internal */
+export interface HubInfo {
   challenge_text?: string;
   read_url_prefix: string;
 }
