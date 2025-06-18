@@ -13,7 +13,12 @@ import {
 } from '@stacks/encryption';
 import { NetworkParam, StacksNetwork, StacksNetworkName } from '@stacks/network';
 import { getAddressFromPrivateKey } from '@stacks/transactions';
-import { connectToGaiaHubWithConfig, getHubInfo, makeGaiaAssociationToken } from '../utils';
+import {
+  HubInfo,
+  connectToGaiaHubWithConfig,
+  getHubInfo,
+  makeGaiaAssociationToken,
+} from '../utils';
 import { Account, HARDENED_OFFSET } from './common';
 import {
   DEFAULT_PROFILE,
@@ -21,6 +26,7 @@ import {
   fetchProfileFromUrl,
   signAndUploadProfile,
 } from './profile';
+import { PublicProfileBase } from '@stacks/profile';
 
 export function getStxAddress(
   account: Account,
@@ -76,6 +82,28 @@ export const getAppPrivateKey = ({
   return bytesToHex(appKeychain.privateKey);
 };
 
+/** @internal helper */
+async function optionalGaiaProfileData({
+  gaiaHubUrl,
+  fetchFn,
+  account,
+}: {
+  gaiaHubUrl: string;
+  fetchFn: FetchFn;
+  account: Account;
+}): Promise<{
+  hubInfo?: HubInfo;
+  profileUrl?: string;
+  profile?: PublicProfileBase | null;
+}> {
+  const hubInfo = await getHubInfo(gaiaHubUrl, fetchFn).catch(() => undefined);
+  if (!hubInfo) return {}; // keep data undefined if hub is not available
+
+  const profileUrl = await fetchAccountProfileUrl({ account, gaiaHubUrl: hubInfo.read_url_prefix });
+  const profile = (await fetchProfileFromUrl(profileUrl, fetchFn)) || DEFAULT_PROFILE;
+  return { hubInfo, profileUrl, profile };
+}
+
 export const makeAuthResponse = async ({
   account,
   appDomain,
@@ -96,10 +124,14 @@ export const makeAuthResponse = async ({
   fetchFn?: FetchFn;
 }) => {
   const appPrivateKey = getAppPrivateKey({ account, appDomain });
-  const hubInfo = await getHubInfo(gaiaHubUrl, fetchFn);
-  const profileUrl = await fetchAccountProfileUrl({ account, gaiaHubUrl: hubInfo.read_url_prefix });
-  const profile = (await fetchProfileFromUrl(profileUrl, fetchFn)) || DEFAULT_PROFILE;
-  if (scopes.includes('publish_data')) {
+
+  const { hubInfo, profileUrl, profile } = await optionalGaiaProfileData({
+    gaiaHubUrl,
+    fetchFn,
+    account,
+  });
+
+  if (scopes.includes('publish_data') && hubInfo && profile) {
     if (!profile.apps) {
       profile.apps = {};
     }
@@ -138,9 +170,7 @@ export const makeAuthResponse = async ({
       },
       ...additionalData,
     },
-    {
-      profileUrl,
-    },
+    profileUrl ? { profileUrl } : null,
     undefined,
     appPrivateKey,
     undefined,
