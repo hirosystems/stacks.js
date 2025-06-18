@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.1.2](https://github.com/hirosystems/stacks.js/compare/v7.1.1...v7.1.2) (2025-06-18)
+
+
+### Bug Fixes
+
+* Make Gaia hub profile fetching and uploading in `makeAuthResponse` optional ([5ca31e7](https://github.com/hirosystems/stacks.js/commit/5ca31e7ef971729962c3ba30b146d5d6069ad4d5))
+
+
+
 ## [7.1.1](https://github.com/hirosystems/stacks.js/compare/v7.1.0...v7.1.1) (2025-06-02)
 
 
