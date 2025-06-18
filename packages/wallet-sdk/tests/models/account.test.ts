@@ -152,6 +152,10 @@ describe(makeAuthResponse.name, () => {
           fetchMock.mockImplementationOnce(() => Promise.reject(new Error('Request timeout'))),
         opts: { scopes: ['read_write'] },
       },
+      {
+        mock: () => fetchMock.mockResponseOnce('Too Many Requests', { status: 429 }),
+        opts: {},
+      },
     ];
     test.each(TEST_CASES)(makeAuthResponse.name, async ({ mock, opts }) => {
       mock();

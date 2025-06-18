@@ -42,6 +42,8 @@ export interface HubInfo {
 
 export const getHubInfo = async (gaiaHubUrl: string, fetchFn: FetchFn = createFetchFn()) => {
   const response = await fetchFn(`${gaiaHubUrl}/hub_info`);
+  if (!response.ok) throw new Error('Failed to fetch hub info');
+
   const data: HubInfo = await response.json();
   return data;
 };
