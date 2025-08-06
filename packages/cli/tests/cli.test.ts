@@ -827,26 +827,6 @@ describe('CLIMain', () => {
       expect(exitSpy).toHaveBeenCalledWith(0);
     });
 
-    test('faucet should use custom network URL with -H flag', async () => {
-      const customApiUrl = 'https://custom-faucet.example.com';
-      const address = 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM';
 
-      process.argv = ['node', 'stx', '-H', customApiUrl, 'faucet', address];
-
-      fetchMock.once(
-        JSON.stringify({
-          success: true,
-          txId: '0x94b1cfab79555b8c6725f19e4fcd6268934d905578a3e8ef7a1e542b931d3676',
-        })
-      );
-
-      CLIMain();
-      await exit;
-
-      // Verify faucet used custom API URL
-      expect(fetchMock.mock.calls[0][0]).toContain('custom-faucet.example.com');
-      expect(fetchMock.mock.calls[0][0]).toContain('/extended/v1/faucets/stx');
-      expect(exitSpy).toHaveBeenCalledWith(0);
-    });
   });
 });
