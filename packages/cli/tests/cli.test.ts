@@ -576,6 +576,78 @@ describe('CLIMain', () => {
     expect(exitSpy).toHaveBeenCalledWith(0); // Expect successful exit
   });
 
+  test('Commands should use localnet API URL from -l flag for deploy_contract', async () => {
+    const localnetApiUrl = 'http://localhost:20443'; // From argparse.ts CONFIG_LOCALNET_DEFAULTS
+    const contractPath = '../transactions/tests/contracts/kv-store.clar';
+    const contractName = 'test';
+    const fee = 1;
+    const nonce = 2;
+    const privateKey = '539e35c740079b79f931036651ad01f76d8fe1496dbd840ba9e62c7e7b355db001';
+
+    process.argv = [
+      'node',
+      'stx',
+      '-l', // Use localnet flag
+      'deploy_contract',
+      contractPath,
+      contractName,
+      String(fee),
+      String(nonce),
+      privateKey,
+    ];
+
+    const mockTxid = `0x${bytesToHex(randomBytes(32))}`;
+
+    // Mock broadcast response
+    fetchMock.once(mockTxid);
+
+    CLIMain(); // Run the main CLI entrypoint
+    await exit;
+
+    // Verify fetch calls used the correct localnet URL
+    // The deploy_contract command should broadcast the transaction
+    expect(fetchMock.mock.calls).toHaveLength(1);
+    expect(fetchMock.mock.calls[0][0]).toEqual(`${localnetApiUrl}/v2/transactions`);
+
+    expect(exitSpy).toHaveBeenCalledWith(0); // Expect successful exit
+  });
+
+  test('Commands should use localnet API URL from -l flag for deploy_contract with estimate only', async () => {
+    const localnetApiUrl = 'http://localhost:20443'; // From argparse.ts CONFIG_LOCALNET_DEFAULTS
+    const contractPath = '../transactions/tests/contracts/kv-store.clar';
+    const contractName = 'test';
+    const fee = 1;
+    const nonce = 2;
+    const privateKey = '539e35c740079b79f931036651ad01f76d8fe1496dbd840ba9e62c7e7b355db001';
+
+    process.argv = [
+      'node',
+      'stx',
+      '-l', // Use localnet flag
+      '-e', // Use estimate only flag
+      'deploy_contract',
+      contractPath,
+      contractName,
+      String(fee),
+      String(nonce),
+      privateKey,
+    ];
+
+    // Mock fee estimate response
+    fetchMock.once(JSON.stringify(TEST_FEE_ESTIMATE));
+
+    CLIMain(); // Run the main CLI entrypoint
+    await exit;
+
+    // Verify fetch calls used the correct localnet URL
+    // The deploy_contract command with -e should call fee estimation
+    expect(fetchMock.mock.calls).toHaveLength(1);
+    expect(fetchMock.mock.calls[0][0]).toContain(localnetApiUrl);
+    expect(fetchMock.mock.calls[0][0]).toContain('/v2/fees/transaction');
+
+    expect(exitSpy).toHaveBeenCalledWith(0); // Expect successful exit
+  });
+
   test('Commands should use testnet API URL from -t flag', async () => {
     const testnetApiUrl = 'https://api.testnet.hiro.so'; // From argparse.ts CONFIG_TESTNET_DEFAULTS
     const contractAddress = 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM';
