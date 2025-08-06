@@ -729,5 +729,124 @@ describe('CLIMain', () => {
       expect(fetchMock.mock.calls[0][0]).toContain(testnetApiUrl);
       expect(exitSpy).toHaveBeenCalledWith(0);
     });
+
+    test('call_contract_func should use network configuration for fee estimation with -t flag', async () => {
+      const contractAddress = 'STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6';
+      const contractName = 'test-contract';
+      const functionName = 'test-func-string-ascii-argument';
+      const fee = '100';
+      const nonce = '0';
+      const privateKey = randomPrivateKey();
+
+      process.argv = [
+        'node',
+        'stx',
+        '-e', // Enable estimate only mode to test fee estimation
+        '-t', // Use testnet
+        'call_contract_func',
+        contractAddress,
+        contractName,
+        functionName,
+        fee,
+        nonce,
+        privateKey,
+      ];
+
+      const mockAbi = { ...TEST_ABI };
+      mockAbi.functions[0].args = []; // Remove args to avoid inquirer
+
+      fetchMock.once(JSON.stringify(mockAbi));
+      fetchMock.once(JSON.stringify(TEST_FEE_ESTIMATE));
+
+      CLIMain();
+      await exit;
+
+      // Verify fee estimation used testnet API URL
+      expect(fetchMock.mock.calls[1][0]).toContain('api.testnet.hiro.so');
+      expect(fetchMock.mock.calls[1][0]).toContain('/v2/fees/transaction');
+      expect(exitSpy).toHaveBeenCalledWith(0);
+    });
+
+    test('call_contract_func should use custom network URL for fee estimation with -H flag', async () => {
+      const customApiUrl = 'https://custom-api.example.com';
+      const contractAddress = 'STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6';
+      const contractName = 'test-contract';
+      const functionName = 'test-func-string-ascii-argument';
+      const fee = '100';
+      const nonce = '0';
+      const privateKey = randomPrivateKey();
+
+      process.argv = [
+        'node',
+        'stx',
+        '-e', // Enable estimate only mode to test fee estimation
+        '-H',
+        customApiUrl,
+        'call_contract_func',
+        contractAddress,
+        contractName,
+        functionName,
+        fee,
+        nonce,
+        privateKey,
+      ];
+
+      const mockAbi = { ...TEST_ABI };
+      mockAbi.functions[0].args = []; // Remove args to avoid inquirer
+
+      fetchMock.once(JSON.stringify(mockAbi));
+      fetchMock.once(JSON.stringify(TEST_FEE_ESTIMATE));
+
+      CLIMain();
+      await exit;
+
+      // Verify fee estimation used custom API URL
+      expect(fetchMock.mock.calls[1][0]).toContain('custom-api.example.com');
+      expect(fetchMock.mock.calls[1][0]).toContain('/v2/fees/transaction');
+      expect(exitSpy).toHaveBeenCalledWith(0);
+    });
+
+    test('faucet should default to testnet Hiro URL when no custom URL provided', async () => {
+      const address = 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM';
+
+      process.argv = ['node', 'stx', '-t', 'faucet', address];
+
+      fetchMock.once(
+        JSON.stringify({
+          success: true,
+          txId: '0x94b1cfab79555b8c6725f19e4fcd6268934d905578a3e8ef7a1e542b931d3676',
+        })
+      );
+
+      CLIMain();
+      await exit;
+
+      // Verify faucet used testnet Hiro URL
+      expect(fetchMock.mock.calls[0][0]).toContain('api.testnet.hiro.so');
+      expect(fetchMock.mock.calls[0][0]).toContain('/extended/v1/faucets/stx');
+      expect(exitSpy).toHaveBeenCalledWith(0);
+    });
+
+    test('faucet should use custom network URL with -H flag', async () => {
+      const customApiUrl = 'https://custom-faucet.example.com';
+      const address = 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM';
+
+      process.argv = ['node', 'stx', '-H', customApiUrl, 'faucet', address];
+
+      fetchMock.once(
+        JSON.stringify({
+          success: true,
+          txId: '0x94b1cfab79555b8c6725f19e4fcd6268934d905578a3e8ef7a1e542b931d3676',
+        })
+      );
+
+      CLIMain();
+      await exit;
+
+      // Verify faucet used custom API URL
+      expect(fetchMock.mock.calls[0][0]).toContain('custom-faucet.example.com');
+      expect(fetchMock.mock.calls[0][0]).toContain('/extended/v1/faucets/stx');
+      expect(exitSpy).toHaveBeenCalledWith(0);
+    });
   });
 });
