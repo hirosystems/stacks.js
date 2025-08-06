@@ -1866,22 +1866,27 @@ async function preorder(_network: CLINetworkAdapter, args: string[]): Promise<st
     });
 }
 
-function faucetCall(_: CLINetworkAdapter, args: string[]): Promise<string> {
+function faucetCall(network: CLINetworkAdapter, args: string[]): Promise<string> {
   const address = args[0];
   // console.log(address);
 
+  // Use network configuration if available, otherwise default to testnet
+  // Since faucets only exist on testnets, we default to testnet if no custom URL is provided
+  const basePath = network.nodeAPIUrl || HIRO_TESTNET_URL;
+
   const apiConfig = new Configuration({
-    basePath: 'https://api.testnet.hiro.so',
+    basePath,
   });
 
   const faucets = new FaucetsApi(apiConfig);
+  const stacksNetwork = getStacksNetwork(network);
 
   return faucets
     .runFaucetStx({ address })
     .then((faucetTx: any) => {
       return JSONStringify({
         txid: faucetTx.txId!,
-        transaction: generateExplorerTxPageUrl(faucetTx.txId!.replace(/^0x/, ''), STACKS_TESTNET),
+        transaction: generateExplorerTxPageUrl(faucetTx.txId!.replace(/^0x/, ''), stacksNetwork),
       });
     })
     .catch((error: any) => error.toString());
