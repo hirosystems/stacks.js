@@ -1,7 +1,7 @@
 import * as scureBip39 from '@scure/bip39';
 import { wordlist } from '@scure/bip39/wordlists/english';
 import { buildPreorderNameTx, buildRegisterNameTx } from '@stacks/bns';
-import { bytesToHex } from '@stacks/common';
+import { bytesToHex, HIRO_TESTNET_URL } from '@stacks/common';
 import {
   ACCOUNT_PATH,
   broadcastTransaction,
@@ -97,7 +97,6 @@ import {
 
 import { gaiaAuth, gaiaConnect, gaiaUploadProfileAll, getGaiaAddressFromProfile } from './data';
 
-import { defaultUrlFromNetwork, STACKS_TESTNET } from '@stacks/network';
 import { internal_parseCommaSeparated } from '@stacks/transactions';
 import {
   generateNewAccount,
@@ -363,7 +362,7 @@ async function migrateSubdomains(_network: CLINetworkAdapter, args: string[]): P
 
     console.log(`Finding subdomains for data-key address '${dataKeyAddress}'`);
     const namesResponse = await fetch(
-      `${defaultUrlFromNetwork(network)}/v1/addresses/stacks/${dataKeyAddress}`
+      `${network.client.baseUrl}/v1/addresses/stacks/${dataKeyAddress}`
     );
     const namesJson = await namesResponse.json();
 
@@ -381,7 +380,7 @@ async function migrateSubdomains(_network: CLINetworkAdapter, args: string[]): P
       // Alerts the user to any subdomains that can't be migrated to these wallet-key-derived addresses
       // Given collision with existing usernames owned by them
       const namesResponse = await fetch(
-        `${defaultUrlFromNetwork(network)}/v1/addresses/stacks/${walletKeyAddress}`
+        `${network.client.baseUrl}/v1/addresses/stacks/${walletKeyAddress}`
       );
       const existingNames = await namesResponse.json();
       if (existingNames.names?.includes(subdomain)) {
@@ -390,7 +389,7 @@ async function migrateSubdomains(_network: CLINetworkAdapter, args: string[]): P
       }
 
       // Validate user owns the subdomain
-      const nameInfo = await fetch(`${defaultUrlFromNetwork(network)}/v1/names/${subdomain}`);
+      const nameInfo = await fetch(`${network.client.baseUrl}/v1/names/${subdomain}`);
       const nameInfoJson = await nameInfo.json();
       console.log('Subdomain Info: ', nameInfoJson);
       if (nameInfoJson.address !== dataKeyAddress) {
