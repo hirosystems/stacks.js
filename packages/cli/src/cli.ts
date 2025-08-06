@@ -867,6 +867,7 @@ async function contractFunctionCall(_network: CLINetworkAdapter, args: string[])
     const costs = await fetchFeeEstimateTransaction({
       payload: serializePayload(tx.payload),
       estimatedLength: estimateTransactionByteLength(tx),
+      network,
     });
     return costs[1].fee.toString(10);
   }
