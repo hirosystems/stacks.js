@@ -770,6 +770,7 @@ async function contractDeploy(_network: CLINetworkAdapter, args: string[]): Prom
     return fetchFeeEstimateTransaction({
       payload: serializePayload(tx.payload),
       estimatedLength: estimateTransactionByteLength(tx),
+      network,
     }).then(costs => costs[1].fee.toString(10));
   }
 
@@ -777,7 +778,7 @@ async function contractDeploy(_network: CLINetworkAdapter, args: string[]): Prom
     return Promise.resolve(tx.serialize());
   }
 
-  return broadcastTransaction({ transaction: tx })
+  return broadcastTransaction({ transaction: tx, network })
     .then(response => {
       if (response.hasOwnProperty('error')) {
         return response;
