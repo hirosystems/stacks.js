@@ -97,6 +97,7 @@ import {
 
 import { gaiaAuth, gaiaConnect, gaiaUploadProfileAll, getGaiaAddressFromProfile } from './data';
 
+import { STACKS_TESTNET } from '@stacks/network';
 import { internal_parseCommaSeparated } from '@stacks/transactions';
 import {
   generateNewAccount,
@@ -1866,27 +1867,19 @@ async function preorder(_network: CLINetworkAdapter, args: string[]): Promise<st
     });
 }
 
-function faucetCall(network: CLINetworkAdapter, args: string[]): Promise<string> {
+function faucetCall(_network: CLINetworkAdapter, args: string[]): Promise<string> {
   const address = args[0];
-  // console.log(address);
 
-  // Use network configuration if available, otherwise default to testnet
-  // Since faucets only exist on testnets, we default to testnet if no custom URL is provided
-  const basePath = network.nodeAPIUrl || HIRO_TESTNET_URL;
-
-  const apiConfig = new Configuration({
-    basePath,
-  });
-
-  const faucets = new FaucetsApi(apiConfig);
-  const stacksNetwork = getStacksNetwork(network);
+  // Faucet only exists on testnet
+  const config = new Configuration({ basePath: HIRO_TESTNET_URL });
+  const faucets = new FaucetsApi(config);
 
   return faucets
     .runFaucetStx({ address })
     .then((faucetTx: any) => {
       return JSONStringify({
         txid: faucetTx.txId!,
-        transaction: generateExplorerTxPageUrl(faucetTx.txId!.replace(/^0x/, ''), stacksNetwork),
+        transaction: generateExplorerTxPageUrl(faucetTx.txId!.replace(/^0x/, ''), STACKS_TESTNET),
       });
     })
     .catch((error: any) => error.toString());
