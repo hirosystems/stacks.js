@@ -806,10 +806,11 @@ describe('CLIMain', () => {
       expect(exitSpy).toHaveBeenCalledWith(0);
     });
 
-    test('faucet should default to testnet Hiro URL when no custom URL provided', async () => {
+    test('faucet should auto-default to testnet when no network flags provided for backwards compatibility', async () => {
       const address = 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM';
 
-      process.argv = ['node', 'stx', '-t', 'faucet', address];
+      // No network flags provided, should default to testnet (faucet command only)
+      process.argv = ['node', 'stx', 'faucet', address];
 
       fetchMock.once(
         JSON.stringify({
@@ -821,12 +822,43 @@ describe('CLIMain', () => {
       CLIMain();
       await exit;
 
-      // Verify faucet used testnet Hiro URL
+      // Should automatically use testnet URL for backwards compatibility
       expect(fetchMock.mock.calls[0][0]).toContain('api.testnet.hiro.so');
       expect(fetchMock.mock.calls[0][0]).toContain('/extended/v1/faucets/stx');
       expect(exitSpy).toHaveBeenCalledWith(0);
     });
 
+    test('faucet should use localnet URL when -l flag provided', async () => {
+      const address = 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM';
+      const localnetApiUrl = 'http://localhost:20443';
 
+      process.argv = ['node', 'stx', '-l', 'faucet', address];
+
+      // Mock console.info to capture the warning message
+      const consoleSpy = jest.spyOn(console, 'info').mockImplementation();
+
+      fetchMock.once(
+        JSON.stringify({
+          success: true,
+          txId: '0x94b1cfab79555b8c6725f19e4fcd6268934d905578a3e8ef7a1e542b931d3676',
+        })
+      );
+
+      CLIMain();
+      await exit;
+
+      // Should use localnet URL
+      expect(fetchMock.mock.calls[0][0]).toContain(localnetApiUrl);
+      expect(fetchMock.mock.calls[0][0]).toContain('/extended/v1/faucets/stx');
+
+      // Should show warning about faucet availability
+      expect(consoleSpy).toHaveBeenCalledWith(
+        'The "faucet" feature may be unavailable for custom API setups.'
+      );
+
+      expect(exitSpy).toHaveBeenCalledWith(0);
+
+      consoleSpy.mockRestore();
+    });
   });
 });

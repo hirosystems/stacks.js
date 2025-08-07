@@ -1,7 +1,7 @@
 import * as scureBip39 from '@scure/bip39';
 import { wordlist } from '@scure/bip39/wordlists/english';
 import { buildPreorderNameTx, buildRegisterNameTx } from '@stacks/bns';
-import { bytesToHex, HIRO_TESTNET_URL } from '@stacks/common';
+import { bytesToHex } from '@stacks/common';
 import {
   ACCOUNT_PATH,
   broadcastTransaction,
@@ -1870,8 +1870,8 @@ async function preorder(_network: CLINetworkAdapter, args: string[]): Promise<st
 function faucetCall(_network: CLINetworkAdapter, args: string[]): Promise<string> {
   const address = args[0];
 
-  // Faucet only exists on testnet
-  const config = new Configuration({ basePath: HIRO_TESTNET_URL });
+  const network = getStacksNetwork(_network);
+  const config = new Configuration({ basePath: network.client.baseUrl });
   const faucets = new FaucetsApi(config);
 
   return faucets
@@ -2016,7 +2016,7 @@ export function CLIMain() {
     const debug = CLIOptAsBool(opts, 'd') || Boolean(process.env.DEBUG);
     const consensusHash = CLIOptAsString(opts, 'C');
     const integration_test = CLIOptAsBool(opts, 'i');
-    const testnet = CLIOptAsBool(opts, 't');
+    let testnet = CLIOptAsBool(opts, 't');
     const localnet = CLIOptAsBool(opts, 'l');
 
     const magicBytes = CLIOptAsString(opts, 'm');
@@ -2029,6 +2029,22 @@ export function CLIMain() {
 
     if (integration_test) {
       BLOCKSTACK_TEST = integration_test;
+    }
+
+    // Command specific checks and overrides
+    if (cmdArgs.command === 'help') {
+      console.log(makeCommandUsageString(cmdArgs.args[0]));
+      process.exit(0);
+    }
+
+    if (cmdArgs.command === 'faucet') {
+      if (!testnet && !localnet && !nodeAPIUrl && !apiUrl) {
+        // If not otherwise configured the `faucet` command will default to testnet for backwards compatibility
+        testnet = true;
+      }
+      if (localnet || nodeAPIUrl || apiUrl) {
+        console.info('The "faucet" feature may be unavailable for custom API setups.');
+      }
     }
 
     const configPath = CLIOptAsString(opts, 'c')
@@ -2094,11 +2110,6 @@ export function CLIMain() {
 
     // blockstack.config.network = blockstackNetwork;
     blockstack.config.logLevel = 'error';
-
-    if (cmdArgs.command === 'help') {
-      console.log(makeCommandUsageString(cmdArgs.args[0]));
-      process.exit(0);
-    }
 
     const method = COMMANDS[cmdArgs.command];
     let exitcode = 0;
