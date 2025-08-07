@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.2.0](https://github.com/hirosystems/stacks.js/compare/v7.1.2...v7.2.0) (2025-08-07)
+
+
+### Bug Fixes
+
+* Respect network changing flags for `contract_call` command ([04bb69c](https://github.com/hirosystems/stacks.js/commit/04bb69ce6c940d7a9588269e14e5067862f93649))
+* Respect network changing flags for `deploy_contract` CLI command ([aefdf26](https://github.com/hirosystems/stacks.js/commit/aefdf260502cd43225cddadc65653e971572bfa7))
+* Respect network changing flags for `faucet` command ([8142c1c](https://github.com/hirosystems/stacks.js/commit/8142c1caa0286c771d001b426dd699d0d99a0b57))
+* Respect network changing flags for `migrate_subdomains` command ([8624397](https://github.com/hirosystems/stacks.js/commit/86243973b0e576ea238e67d837b08b0668ba4103))
+
+
+
 ## [7.1.2](https://github.com/hirosystems/stacks.js/compare/v7.1.1...v7.1.2) (2025-06-18)
 
 **Note:** Version bump only for package @stacks/cli
